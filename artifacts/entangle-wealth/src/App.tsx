@@ -10,6 +10,7 @@ import Earn from "@/pages/Earn";
 import Options from "@/pages/Options";
 import About from "@/pages/About";
 import Terminal from "@/pages/Terminal";
+import Stocks from "@/pages/Stocks";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/earn" component={Earn} />
       <Route path="/options" component={Options} />
+      <Route path="/stocks" component={Stocks} />
       <Route path="/terminal" component={Terminal} />
       <Route path="/about" component={About} />
       <Route component={NotFound} />

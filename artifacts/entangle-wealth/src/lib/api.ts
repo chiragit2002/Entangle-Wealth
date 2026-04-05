@@ -1,0 +1,153 @@
+const API_BASE = "/api";
+
+export interface Stock {
+  symbol: string;
+  name: string;
+  sector: string;
+  capTier: "mega" | "large" | "mid" | "small" | "micro";
+  price: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  marketCap: number;
+  pe: number | null;
+  week52High: number;
+  week52Low: number;
+}
+
+export interface StocksResponse {
+  stocks: Stock[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface QuickAnalysis {
+  signal: "BUY" | "SELL" | "NEUTRAL";
+  confidence: number;
+  summary: string;
+  keyLevel: number;
+  risk: "LOW" | "MEDIUM" | "HIGH";
+  disclaimer: string;
+}
+
+export interface AgentAnalysis {
+  id: number;
+  name: string;
+  domain: string;
+  signal: "BULLISH" | "NEUTRAL" | "BEARISH";
+  confidence: number;
+  reasoning: string;
+  keyMetric: string;
+}
+
+export interface FullAnalysis {
+  symbol: string;
+  name: string;
+  overallSignal: "STRONG_BUY" | "BUY" | "NEUTRAL" | "SELL" | "STRONG_SELL";
+  confidenceScore: number;
+  consensusReached: boolean;
+  agents: AgentAnalysis[];
+  flashCouncilSummary: string;
+  riskFactors: string[];
+  catalysts: string[];
+  priceTargets: {
+    bear: number;
+    base: number;
+    bull: number;
+  };
+  timeHorizon: string;
+  disclaimer: string;
+}
+
+export interface SectorSummary {
+  sector: string;
+  count: number;
+  avgChange: number;
+}
+
+export interface Movers {
+  gainers: Stock[];
+  losers: Stock[];
+}
+
+export async function fetchStocks(params: {
+  q?: string;
+  sector?: string;
+  capTier?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortDir?: string;
+}): Promise<StocksResponse> {
+  const sp = new URLSearchParams();
+  if (params.q) sp.set("q", params.q);
+  if (params.sector) sp.set("sector", params.sector);
+  if (params.capTier) sp.set("capTier", params.capTier);
+  if (params.page) sp.set("page", String(params.page));
+  if (params.limit) sp.set("limit", String(params.limit));
+  if (params.sortBy) sp.set("sortBy", params.sortBy);
+  if (params.sortDir) sp.set("sortDir", params.sortDir);
+
+  const res = await fetch(`${API_BASE}/stocks?${sp.toString()}`);
+  if (!res.ok) throw new Error("Failed to fetch stocks");
+  return res.json();
+}
+
+export async function fetchStock(symbol: string): Promise<Stock> {
+  const res = await fetch(`${API_BASE}/stocks/${symbol}`);
+  if (!res.ok) throw new Error("Stock not found");
+  return res.json();
+}
+
+export async function fetchMovers(): Promise<Movers> {
+  const res = await fetch(`${API_BASE}/stocks/movers`);
+  if (!res.ok) throw new Error("Failed to fetch movers");
+  return res.json();
+}
+
+export async function fetchSectors(): Promise<{ sectors: SectorSummary[] }> {
+  const res = await fetch(`${API_BASE}/stocks/sectors`);
+  if (!res.ok) throw new Error("Failed to fetch sectors");
+  return res.json();
+}
+
+export async function analyzeStock(symbol: string): Promise<FullAnalysis> {
+  const res = await fetch(`${API_BASE}/stocks/${symbol}/analyze`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: "Analysis failed" }));
+    throw new Error(err.error || "Analysis failed");
+  }
+  return res.json();
+}
+
+export async function quickAnalyzeStock(symbol: string): Promise<QuickAnalysis> {
+  const res = await fetch(`${API_BASE}/stocks/${symbol}/quick-analyze`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: "Quick analysis failed" }));
+    throw new Error(err.error || "Quick analysis failed");
+  }
+  return res.json();
+}
+
+export function formatMarketCap(cap: number): string {
+  if (cap >= 1e12) return `$${(cap / 1e12).toFixed(2)}T`;
+  if (cap >= 1e9) return `$${(cap / 1e9).toFixed(2)}B`;
+  if (cap >= 1e6) return `$${(cap / 1e6).toFixed(1)}M`;
+  return `$${cap.toLocaleString()}`;
+}
+
+export function formatVolume(vol: number): string {
+  if (vol >= 1e6) return `${(vol / 1e6).toFixed(1)}M`;
+  if (vol >= 1e3) return `${(vol / 1e3).toFixed(1)}K`;
+  return vol.toLocaleString();
+}

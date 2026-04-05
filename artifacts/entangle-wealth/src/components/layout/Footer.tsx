@@ -19,6 +19,7 @@ export function Footer() {
           <div className="flex flex-col gap-3">
             <span className="font-semibold text-white">Platform</span>
             <Link href="/dashboard" className="text-muted-foreground hover:text-primary transition-colors">Dashboard</Link>
+            <Link href="/stocks" className="text-muted-foreground hover:text-primary transition-colors">Stock Explorer</Link>
             <Link href="/options" className="text-muted-foreground hover:text-primary transition-colors">Options Flow</Link>
             <Link href="/earn" className="text-muted-foreground hover:text-primary transition-colors">Earn</Link>
             <Link href="/terminal" className="text-muted-foreground hover:text-primary transition-colors">Terminal</Link>

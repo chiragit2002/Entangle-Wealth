@@ -23,6 +23,7 @@ export function Navbar() {
     { href: "/dashboard", label: "Dashboard" },
     { href: "/earn", label: "Earn" },
     { href: "/options", label: "Options Flow" },
+    { href: "/stocks", label: "Stocks" },
     { href: "/terminal", label: "Terminal" },
     { href: "/about", label: "About Us" },
   ];

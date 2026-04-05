@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { terminalOrderFlow, terminalNewsFeed, terminalSystemLog, marketTickerData } from "@/lib/mock-data";
+import { quickAnalyzeStock, fetchStocks } from "@/lib/api";
 
 export function MirofishTerminal() {
   const [commandInput, setCommandInput] = useState("");
@@ -22,37 +23,92 @@ export function MirofishTerminal() {
     return () => clearInterval(t);
   }, []);
 
-  const handleCommand = (e: React.FormEvent) => {
+  const addOutput = (input: string, output: string) => {
+    setCommandHistory(prev => [...prev, { input, output }]);
+    setCommandInput("");
+    setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
+  };
+
+  const handleCommand = async (e: React.FormEvent) => {
     e.preventDefault();
+    const rawInput = commandInput;
     const cmd = commandInput.trim().toUpperCase();
-    let output = "";
+    if (!cmd) return;
+
     if (cmd === "HELP") {
-      output = "Commands: QUOTE <SYMBOL> | RISK | STATUS | SIGNALS | PORTFOLIO | CLEAR";
-    } else if (cmd.startsWith("QUOTE")) {
+      addOutput(rawInput, "Commands: QUOTE <SYM> | ANALYZE <SYM> | SEARCH <QUERY> | RISK | STATUS | SIGNALS | PORTFOLIO | CLEAR\n\nAI-Powered:\n  ANALYZE <SYM> — Run quantum AI analysis on any of 5,000 NASDAQ stocks\n  SEARCH <QUERY> — Search stocks by symbol or name");
+      return;
+    }
+
+    if (cmd.startsWith("ANALYZE ") || cmd.startsWith("AI ")) {
+      const sym = cmd.split(" ")[1];
+      if (!sym) { addOutput(rawInput, "Usage: ANALYZE <SYMBOL>  (e.g. ANALYZE AAPL)"); return; }
+      addOutput(rawInput, `[QUANTUM] Dispatching 7 agents to analyze ${sym}... please wait.`);
+      try {
+        const result = await quickAnalyzeStock(sym);
+        const out = `[QUANTUM ANALYSIS] ${sym}\n  Signal: ${result.signal} | Confidence: ${result.confidence}% | Risk: ${result.risk}\n  Key Level: $${result.keyLevel}\n  ${result.summary}\n  ⚠ ${result.disclaimer}`;
+        setCommandHistory(prev => [...prev, { input: "", output: out }]);
+        setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
+      } catch {
+        setCommandHistory(prev => [...prev, { input: "", output: `[ERROR] Analysis failed for ${sym}. Check symbol and try again.` }]);
+        setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
+      }
+      return;
+    }
+
+    if (cmd.startsWith("SEARCH ")) {
+      const q = cmd.slice(7).trim();
+      if (!q) { addOutput(rawInput, "Usage: SEARCH <QUERY>  (e.g. SEARCH APPLE)"); return; }
+      try {
+        const data = await fetchStocks({ q, limit: 8 });
+        if (data.stocks.length === 0) {
+          addOutput(rawInput, `No stocks found for "${q}". Try a different query.`);
+        } else {
+          const lines = data.stocks.map(s =>
+            `  ${s.symbol.padEnd(6)} $${s.price.toFixed(2).padStart(8)} ${(s.changePercent >= 0 ? "+" : "") + s.changePercent.toFixed(2) + "%"} ${s.name.slice(0, 25)}`
+          );
+          addOutput(rawInput, `[SEARCH] Found ${data.pagination.total} results for "${q}" (showing ${data.stocks.length}):\n${lines.join("\n")}`);
+        }
+      } catch {
+        addOutput(rawInput, `[ERROR] Search failed. Try again.`);
+      }
+      return;
+    }
+
+    if (cmd.startsWith("QUOTE")) {
       const sym = cmd.split(" ")[1] || "SPY";
       const stock = marketTickerData.find(s => s.symbol === sym);
-      output = stock
-        ? `${stock.symbol} | $${stock.price.toFixed(2)} | ${stock.change} | Vol: ${(Math.random() * 50 + 10).toFixed(1)}M`
-        : `Symbol ${sym} not found. Try: SPY, QQQ, NVDA, AAPL, TSLA, META, AMD, MSFT`;
-    } else if (cmd === "RISK") {
-      output = "Portfolio Risk: 8.4% | Max Drawdown: -0.8% | Beta: 1.35 | Sharpe: 2.1 | Kelly: 14.2%";
+      if (stock) {
+        addOutput(rawInput, `${stock.symbol} | $${stock.price.toFixed(2)} | ${stock.change} | Vol: ${(Math.random() * 50 + 10).toFixed(1)}M`);
+      } else {
+        try {
+          const data = await fetchStocks({ q: sym, limit: 1 });
+          if (data.stocks.length > 0) {
+            const s = data.stocks[0];
+            addOutput(rawInput, `${s.symbol} | $${s.price.toFixed(2)} | ${s.changePercent >= 0 ? "+" : ""}${s.changePercent.toFixed(2)}% | Vol: ${(s.volume / 1e6).toFixed(1)}M | ${s.sector}`);
+          } else {
+            addOutput(rawInput, `Symbol ${sym} not found in 5,000 NASDAQ stocks.`);
+          }
+        } catch {
+          addOutput(rawInput, `Symbol ${sym} not found.`);
+        }
+      }
+      return;
+    }
+
+    if (cmd === "RISK") {
+      addOutput(rawInput, "Portfolio Risk: 8.4% | Max Drawdown: -0.8% | Beta: 1.35 | Sharpe: 2.1 | Kelly: 14.2%");
     } else if (cmd === "STATUS") {
-      output = "ENTANGLE-CORE: ONLINE | 6 Models Active | Consensus: 87% | Uptime: 99.97%";
+      addOutput(rawInput, "ENTANGLE-CORE: ONLINE | 7 AI Models Active | 5,000 NASDAQ Stocks | Consensus: 87% | Uptime: 99.97%");
     } else if (cmd === "SIGNALS") {
-      output = "Active: NVDA BUY 87% | AMD BUY 83% | PLTR BUY 79% | TSLA SELL 74% | AAPL HOLD 52%";
+      addOutput(rawInput, "Active: NVDA BUY 87% | AMD BUY 83% | PLTR BUY 79% | TSLA SELL 74% | AAPL HOLD 52%");
     } else if (cmd === "PORTFOLIO") {
-      output = "Value: $15,620 | Day P&L: +$1,420 (+10.0%) | Open Positions: 5 | Cash: $8,380";
+      addOutput(rawInput, "Value: $15,620 | Day P&L: +$1,420 (+10.0%) | Open Positions: 5 | Cash: $8,380");
     } else if (cmd === "CLEAR") {
       setCommandHistory([]);
       setCommandInput("");
-      return;
-    } else if (cmd) {
-      output = `Unknown command: ${cmd}. Type HELP for available commands.`;
-    }
-    if (cmd) {
-      setCommandHistory(prev => [...prev, { input: commandInput, output }]);
-      setCommandInput("");
-      setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
+    } else {
+      addOutput(rawInput, `Unknown command: ${cmd}. Type HELP for available commands.`);
     }
   };
 

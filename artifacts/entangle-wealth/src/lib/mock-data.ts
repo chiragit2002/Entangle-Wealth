@@ -37,11 +37,54 @@ export const unusualOptionsActivity = [
   { id: 7, symbol: "AMD", strike: 180, type: "CALL", exp: "2024-05-17", delta: 0.52, gamma: 0.09, theta: -0.18, ivRank: 78, strength: 94, time: "3:35 PM", strategy: "Pre-Earnings Straddle" },
 ];
 
-export const analysisMethods = [
-  { name: "Price Action", description: "Reads candlestick patterns, support/resistance, and market structure." },
-  { name: "Volume Analysis", description: "Tracks institutional buying and selling through volume profiles." },
-  { name: "Options Flow", description: "Monitors large premium sweeps and unusual open interest changes." },
-  { name: "Greeks Analysis", description: "Evaluates Delta, Gamma, Theta, and Vega for options positioning." },
-  { name: "Sentiment", description: "Gauges market mood from news, social data, and put/call ratios." },
-  { name: "Risk Management", description: "Sizes positions using Kelly Criterion. Caps risk at 2% per trade." },
+export const portfolioChartData = [
+  { time: "9AM", value: 14200 },
+  { time: "10AM", value: 14380 },
+  { time: "11AM", value: 14650 },
+  { time: "12PM", value: 14520 },
+  { time: "1PM", value: 14890 },
+  { time: "2PM", value: 15180 },
+  { time: "3PM", value: 15340 },
+  { time: "NOW", value: 15620 },
+];
+
+export const optionsIncomeData = [
+  { day: "Mon", income: 320 },
+  { day: "Tue", income: 410 },
+  { day: "Wed", income: 380 },
+  { day: "Thu", income: 520 },
+  { day: "Fri", income: 490 },
+  { day: "Sat", income: 0 },
+  { day: "Today", income: 680 },
+];
+
+export const councilMessages = [
+  "AAPL showing bullish divergence on 15-min — options flow confirms with $2.1M call sweep",
+  "NVDA institutional accumulation detected at $870 support — volume 3x average",
+  "SPY approaching key resistance at $515 — dealer gamma exposure flipping",
+  "TSLA bearish RSI divergence — premium selling activity increasing on calls",
+  "AMD pre-earnings IV elevated — calendar spread opportunity for theta capture",
+  "QQQ put flow likely hedging, not directional — context: large equity portfolio protection",
+];
+
+export const incomeOpportunities = [
+  { id: 1, title: "DoorDash - Peak Evening Hours", payout: "$28-$38/hr", location: "Local", time: "6-9 PM tonight", type: "Gig", note: "Highest demand hours in your area. Tips typically 20-30% of order." },
+  { id: 2, title: "Upwork - Data Entry & Analysis", payout: "$25-$45/hr", location: "Remote", time: "Flexible", type: "Freelance", note: "Consistent demand. Start with smaller projects to build rating." },
+  { id: 3, title: "Amazon Flex - Delivery Blocks", payout: "$22-$30/hr", location: "Local", time: "Morning blocks", type: "Gig", note: "Blocks release at 10PM for next day. Set alerts." },
+  { id: 4, title: "Covered Call Income - AAPL", payout: "$140-$220/week", location: "Your portfolio", time: "Weekly expiry", type: "Options", note: "If you hold 100 shares, sell weekly calls 5-10% OTM for income." },
+  { id: 5, title: "TaskRabbit - Furniture Assembly", payout: "$35-$55/hr", location: "Local", time: "Weekends", type: "Gig", note: "IKEA assembly is the highest demand category." },
+  { id: 6, title: "Cash Secured Puts - AMD", payout: "$80-$150/week", location: "Your portfolio", time: "Weekly expiry", type: "Options", note: "Sell puts at price you'd want to buy anyway. Collect premium while waiting." },
+];
+
+export const agentLogMessages = [
+  { time: "3:42 PM", message: "Price action analysis complete on NVDA — bull flag confirmed on 4H chart" },
+  { time: "3:41 PM", message: "Options flow scan: $4.2M call sweep on NVDA 950C detected across CBOE + ISE" },
+  { time: "3:40 PM", message: "Volume analysis: NVDA trading 2.8x average volume — institutional buying pattern" },
+  { time: "3:39 PM", message: "Risk check: NVDA position would be 1.6% of portfolio at current sizing — within limits" },
+  { time: "3:38 PM", message: "Sentiment scan: NVDA news sentiment 72% positive — no negative catalysts detected" },
+  { time: "3:37 PM", message: "Cross-check complete: 4 of 5 methods agree on NVDA bullish — signal fired at 87% confidence" },
+  { time: "3:35 PM", message: "Greeks analysis: AMD IV rank at 78th percentile — premium selling favorable" },
+  { time: "3:34 PM", message: "TSLA RSI divergence flagged — bearish signal at 74% confidence. 1 method dissenting." },
+  { time: "3:32 PM", message: "SPY approaching dealer gamma flip level at $515 — expect volatility expansion above this level" },
+  { time: "3:30 PM", message: "Portfolio risk scan: total exposure 8.4% — well within 15% max allocation guideline" },
 ];

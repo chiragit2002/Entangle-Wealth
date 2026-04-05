@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
+import { FlashCouncil } from "@/components/FlashCouncil";
 import { MarketTicker } from "@/components/MarketTicker";
 import { unusualOptionsActivity } from "@/lib/mock-data";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { Button } from "@/components/ui/button";
 export default function Options() {
   return (
     <Layout>
+      <FlashCouncil />
       <MarketTicker />
       
       <div className="container mx-auto px-4 py-6 max-w-7xl">

@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Activity, Target, Zap, TrendingUp, ShieldAlert, BarChart3, Eye } from "lucide-react";
+import { Activity, Target, Zap, TrendingUp, ShieldAlert, BarChart3, Eye, DollarSign } from "lucide-react";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -30,7 +30,7 @@ export default function Home() {
           </h1>
           
           <p className="max-w-2xl text-lg md:text-xl text-muted-foreground animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-150">
-            Multiple AI analysis models working together — cross-checking each other in real time. When they agree, you get a signal. When they don't, you get warned. No black boxes. No hype.
+            Multiple AI models working together — cross-checking each other in real time. Stock signals, options flow, income opportunities, and risk management. All in one place. No black boxes. No hype.
           </p>
 
           <form onSubmit={handleSubmit} className="w-full max-w-md flex flex-col sm:flex-row gap-3 mt-6 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300">
@@ -58,6 +58,7 @@ export default function Home() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground animate-in fade-in duration-1000 delay-500">
             <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-secondary" /> Real-time Analysis</div>
             <div className="flex items-center gap-2"><Target className="w-4 h-4 text-primary" /> High-Conviction Signals</div>
+            <div className="flex items-center gap-2"><DollarSign className="w-4 h-4 text-green-400" /> Income Opportunities</div>
             <div className="flex items-center gap-2"><ShieldAlert className="w-4 h-4 text-red-400" /> Built-in Risk Controls</div>
           </div>
         </div>
@@ -101,25 +102,37 @@ export default function Home() {
             <div className="glass-panel p-8 rounded-xl flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300">
               <BarChart3 className="w-8 h-8 text-primary" />
               <h3 className="text-xl font-bold">Stock Signals</h3>
-              <p className="text-muted-foreground">BUY, SELL, or HOLD — with a confidence percentage and the specific technical reasoning behind each call. You always know why.</p>
+              <p className="text-muted-foreground">BUY, SELL, or HOLD — with a confidence percentage and the specific technical reasoning behind each call.</p>
             </div>
             
             <div className="glass-panel p-8 rounded-xl flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300">
               <TrendingUp className="w-8 h-8 text-secondary" />
               <h3 className="text-xl font-bold">Options Flow Tracking</h3>
-              <p className="text-muted-foreground">See where big money is moving. Large premium sweeps, unusual volume, institutional block trades — before the market reacts.</p>
+              <p className="text-muted-foreground">See where big money is moving. Large premium sweeps, unusual volume, institutional block trades.</p>
+            </div>
+            
+            <div className="glass-panel p-8 rounded-xl flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300">
+              <DollarSign className="w-8 h-8 text-green-400" />
+              <h3 className="text-xl font-bold">Income Opportunities</h3>
+              <p className="text-muted-foreground">Local gig economy opportunities, freelance work, and options income strategies — all filtered for your situation.</p>
             </div>
             
             <div className="glass-panel p-8 rounded-xl flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300">
               <Eye className="w-8 h-8 text-green-400" />
               <h3 className="text-xl font-bold">Greeks Dashboard</h3>
-              <p className="text-muted-foreground">Delta, Gamma, Theta, IV Rank — all displayed clearly on every options contract. Know your exposure before you enter.</p>
+              <p className="text-muted-foreground">Delta, Gamma, Theta, IV Rank — all displayed clearly on every options contract. Know your exposure.</p>
             </div>
             
             <div className="glass-panel p-8 rounded-xl flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300">
               <Activity className="w-8 h-8 text-red-400" />
               <h3 className="text-xl font-bold">Risk Management</h3>
-              <p className="text-muted-foreground">Every signal comes with position sizing guidance. We cap risk at 2% per trade. Because protecting your capital is the first priority.</p>
+              <p className="text-muted-foreground">Every signal comes with position sizing. We cap risk at 2% per trade. Capital preservation first.</p>
+            </div>
+
+            <div className="glass-panel p-8 rounded-xl flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300">
+              <Zap className="w-8 h-8 text-purple-400" />
+              <h3 className="text-xl font-bold">Live Analysis Feed</h3>
+              <p className="text-muted-foreground">Watch the analysis happen in real time. Every cross-check, every disagreement, every consensus — visible to you.</p>
             </div>
           </div>
         </div>

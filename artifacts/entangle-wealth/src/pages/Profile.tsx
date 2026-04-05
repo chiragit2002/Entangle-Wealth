@@ -1,0 +1,356 @@
+import { useState, useEffect } from "react";
+import { useUser } from "@clerk/react";
+import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink } from "lucide-react";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+
+const API_BASE = "/api";
+
+interface ProfileData {
+  headline: string;
+  bio: string;
+  phone: string;
+  location: string;
+  isPublicProfile: boolean;
+  kycStatus: string;
+  subscriptionTier: string;
+}
+
+interface SavedJob {
+  id: number;
+  jobTitle: string;
+  company: string;
+  location: string;
+  salary: string;
+  savedAt: string;
+}
+
+interface ResumePreview {
+  id: number;
+  title: string;
+  summary: string;
+  skills: string[];
+  experiences: { company: string; title: string; isGigWork: string }[];
+}
+
+export default function Profile() {
+  const { user } = useUser();
+  const { toast } = useToast();
+  const [profile, setProfile] = useState<ProfileData>({
+    headline: "", bio: "", phone: "", location: "",
+    isPublicProfile: true, kycStatus: "not_started", subscriptionTier: "free",
+  });
+  const [savedJobs, setSavedJobs] = useState<SavedJob[]>([]);
+  const [resume, setResume] = useState<ResumePreview | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [kycForm, setKycForm] = useState({ fullLegalName: "", dateOfBirth: "", address: "", idType: "drivers_license", idNumber: "" });
+  const [showKyc, setShowKyc] = useState(false);
+  const [submittingKyc, setSubmittingKyc] = useState(false);
+
+  useEffect(() => {
+    loadProfile();
+    loadSavedJobs();
+    loadResume();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      if (user) {
+        await fetch(`${API_BASE}/users/sync`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: user.primaryEmailAddress?.emailAddress,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            photoUrl: user.imageUrl,
+          }),
+        });
+      }
+
+      const res = await fetch(`${API_BASE}/users/me`);
+      if (res.ok) {
+        const data = await res.json();
+        setProfile({
+          headline: data.headline || "",
+          bio: data.bio || "",
+          phone: data.phone || "",
+          location: data.location || "",
+          isPublicProfile: data.isPublicProfile ?? true,
+          kycStatus: data.kycStatus || "not_started",
+          subscriptionTier: data.subscriptionTier || "free",
+        });
+      }
+    } catch { /* ignore */ }
+    setLoading(false);
+  };
+
+  const loadSavedJobs = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/jobs/saved`);
+      if (res.ok) setSavedJobs(await res.json());
+    } catch { /* ignore */ }
+  };
+
+  const loadResume = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/resumes`);
+      if (res.ok) {
+        const resumes = await res.json();
+        if (resumes.length > 0) {
+          const detailRes = await fetch(`${API_BASE}/resumes/${resumes[0].id}`);
+          if (detailRes.ok) setResume(await detailRes.json());
+        }
+      }
+    } catch { /* ignore */ }
+  };
+
+  const saveProfile = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`${API_BASE}/users/me`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profile),
+      });
+      if (!res.ok) throw new Error("Save failed");
+      toast({ title: "Profile updated", description: "Your profile has been saved." });
+      setEditing(false);
+    } catch {
+      toast({ title: "Error", description: "Failed to save profile.", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const submitKyc = async () => {
+    if (!kycForm.fullLegalName || !kycForm.dateOfBirth || !kycForm.address || !kycForm.idNumber) {
+      toast({ title: "Missing fields", description: "All fields are required.", variant: "destructive" });
+      return;
+    }
+    setSubmittingKyc(true);
+    try {
+      const res = await fetch(`${API_BASE}/kyc/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(kycForm),
+      });
+      if (!res.ok) throw new Error("Submission failed");
+      const data = await res.json();
+      setProfile(prev => ({ ...prev, kycStatus: data.status }));
+      setShowKyc(false);
+      toast({ title: "KYC Submitted", description: data.message });
+    } catch {
+      toast({ title: "Error", description: "Failed to submit KYC.", variant: "destructive" });
+    } finally {
+      setSubmittingKyc(false);
+    }
+  };
+
+  const removeSavedJob = async (jobId: number) => {
+    try {
+      await fetch(`${API_BASE}/jobs/saved/${jobId}`, { method: "DELETE" });
+      setSavedJobs(prev => prev.filter(j => j.id !== jobId));
+    } catch { /* ignore */ }
+  };
+
+  const kycStatusIcon = () => {
+    switch (profile.kycStatus) {
+      case "verified": return <ShieldCheck className="w-5 h-5 text-green-400" />;
+      case "pending_review": return <Shield className="w-5 h-5 text-yellow-400" />;
+      case "rejected": return <ShieldAlert className="w-5 h-5 text-red-400" />;
+      default: return <Shield className="w-5 h-5 text-muted-foreground" />;
+    }
+  };
+
+  const kycStatusText = () => {
+    switch (profile.kycStatus) {
+      case "verified": return "Verified";
+      case "pending_review": return "Under Review";
+      case "rejected": return "Rejected";
+      default: return "Not Started";
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <Navbar />
+        <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <Navbar />
+      <main className="container mx-auto px-4 md:px-6 py-8 max-w-4xl">
+        <div className="glass-panel p-8 mb-6">
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex items-center gap-4">
+              {user?.imageUrl ? (
+                <img src={user.imageUrl} alt="" className="w-20 h-20 rounded-full border-2 border-primary/50" />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary/50">
+                  <User className="w-10 h-10 text-primary" />
+                </div>
+              )}
+              <div>
+                <h1 className="text-2xl font-bold">{user?.fullName || "Your Profile"}</h1>
+                {profile.headline && <p className="text-primary">{profile.headline}</p>}
+                <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                  {user?.primaryEmailAddress && <span className="flex items-center gap-1"><Mail className="w-3.5 h-3.5" />{user.primaryEmailAddress.emailAddress}</span>}
+                  {profile.location && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{profile.location}</span>}
+                </div>
+              </div>
+            </div>
+            <Button variant="outline" className="border-white/20 gap-2" onClick={() => editing ? saveProfile() : setEditing(true)} disabled={saving}>
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : editing ? <Save className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
+              {editing ? "Save" : "Edit"}
+            </Button>
+          </div>
+
+          {editing && (
+            <div className="space-y-3 border-t border-white/10 pt-4">
+              <Input placeholder="Headline (e.g., Full-Stack Developer)" value={profile.headline} onChange={(e) => setProfile(prev => ({ ...prev, headline: e.target.value }))} className="bg-white/5 border-white/10" />
+              <textarea
+                placeholder="Bio — tell employers about yourself..."
+                value={profile.bio}
+                onChange={(e) => setProfile(prev => ({ ...prev, bio: e.target.value }))}
+                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white placeholder:text-muted-foreground/50 min-h-[80px] resize-none focus:outline-none focus:border-primary/50"
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <Input placeholder="Phone" value={profile.phone} onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))} className="bg-white/5 border-white/10" />
+                <Input placeholder="Location" value={profile.location} onChange={(e) => setProfile(prev => ({ ...prev, location: e.target.value }))} className="bg-white/5 border-white/10" />
+              </div>
+              <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                <input type="checkbox" checked={profile.isPublicProfile} onChange={(e) => setProfile(prev => ({ ...prev, isPublicProfile: e.target.checked }))} className="accent-primary" />
+                Public profile (visible to employers)
+              </label>
+            </div>
+          )}
+
+          {!editing && profile.bio && (
+            <p className="text-muted-foreground text-sm border-t border-white/10 pt-4">{profile.bio}</p>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="glass-panel p-4 flex items-center gap-3">
+            {kycStatusIcon()}
+            <div>
+              <p className="text-xs text-muted-foreground">KYC Status</p>
+              <p className="font-medium">{kycStatusText()}</p>
+            </div>
+            {profile.kycStatus === "not_started" && (
+              <Button size="sm" variant="outline" className="ml-auto border-primary/30 text-primary" onClick={() => setShowKyc(true)}>
+                Verify
+              </Button>
+            )}
+          </div>
+          <div className="glass-panel p-4 flex items-center gap-3">
+            <Award className="w-5 h-5 text-gold" />
+            <div>
+              <p className="text-xs text-muted-foreground">Plan</p>
+              <p className="font-medium capitalize">{profile.subscriptionTier}</p>
+            </div>
+          </div>
+          <div className="glass-panel p-4 flex items-center gap-3">
+            <Briefcase className="w-5 h-5 text-primary" />
+            <div>
+              <p className="text-xs text-muted-foreground">Saved Jobs</p>
+              <p className="font-medium">{savedJobs.length}</p>
+            </div>
+          </div>
+        </div>
+
+        {showKyc && (
+          <div className="glass-panel p-6 mb-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2"><Shield className="w-5 h-5 text-primary" /> Identity Verification (KYC)</h3>
+            <p className="text-sm text-muted-foreground mb-4">Required before accessing payment features. Your information is handled securely.</p>
+            <div className="space-y-3">
+              <Input placeholder="Full Legal Name" value={kycForm.fullLegalName} onChange={(e) => setKycForm(prev => ({ ...prev, fullLegalName: e.target.value }))} className="bg-white/5 border-white/10" />
+              <Input type="date" placeholder="Date of Birth" value={kycForm.dateOfBirth} onChange={(e) => setKycForm(prev => ({ ...prev, dateOfBirth: e.target.value }))} className="bg-white/5 border-white/10" />
+              <Input placeholder="Full Address" value={kycForm.address} onChange={(e) => setKycForm(prev => ({ ...prev, address: e.target.value }))} className="bg-white/5 border-white/10" />
+              <select
+                value={kycForm.idType}
+                onChange={(e) => setKycForm(prev => ({ ...prev, idType: e.target.value }))}
+                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary/50"
+              >
+                <option value="drivers_license">Driver's License</option>
+                <option value="passport">Passport</option>
+                <option value="national_id">National ID</option>
+              </select>
+              <Input placeholder="ID Number" value={kycForm.idNumber} onChange={(e) => setKycForm(prev => ({ ...prev, idNumber: e.target.value }))} className="bg-white/5 border-white/10" />
+              <div className="flex gap-2">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={submitKyc} disabled={submittingKyc}>
+                  {submittingKyc ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                  Submit for Verification
+                </Button>
+                <Button variant="ghost" className="text-muted-foreground" onClick={() => setShowKyc(false)}>Cancel</Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {resume && (
+          <div className="glass-panel p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2"><FileText className="w-5 h-5 text-primary" /> My Résumé</h3>
+              <a href="/resume">
+                <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1">
+                  Edit <ExternalLink className="w-3.5 h-3.5" />
+                </Button>
+              </a>
+            </div>
+            <p className="text-sm font-medium mb-1">{resume.title}</p>
+            {resume.summary && <p className="text-sm text-muted-foreground mb-3">{resume.summary.slice(0, 200)}...</p>}
+            {resume.skills && resume.skills.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {(resume.skills as string[]).slice(0, 10).map((skill: string, i: number) => (
+                  <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/30">{skill}</span>
+                ))}
+              </div>
+            )}
+            {resume.experiences && resume.experiences.length > 0 && (
+              <div className="space-y-1">
+                {resume.experiences.slice(0, 3).map((exp: any, i: number) => (
+                  <div key={i} className="text-sm text-muted-foreground flex items-center gap-2">
+                    <Briefcase className="w-3.5 h-3.5" />
+                    <span>{exp.title} at {exp.company}</span>
+                    {exp.isGigWork === "true" && <span className="text-xs text-primary">Gig</span>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {savedJobs.length > 0 && (
+          <div className="glass-panel p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2"><Briefcase className="w-5 h-5 text-gold" /> Saved Jobs</h3>
+            <div className="space-y-3">
+              {savedJobs.map((job) => (
+                <div key={job.id} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                  <div>
+                    <p className="font-medium text-sm">{job.jobTitle}</p>
+                    <p className="text-xs text-muted-foreground">{job.company} • {job.location}</p>
+                  </div>
+                  <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => removeSavedJob(job.id)}>
+                    Remove
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+      <Footer />
+    </div>
+  );
+}

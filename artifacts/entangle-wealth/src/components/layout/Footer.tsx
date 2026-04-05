@@ -1,4 +1,5 @@
 import { Shield } from "lucide-react";
+import { Link } from "wouter";
 
 export function Footer() {
   return (
@@ -17,15 +18,15 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-sm">
           <div className="flex flex-col gap-3">
             <span className="font-semibold text-white">Platform</span>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Dashboard</a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Options Flow</a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Pricing</a>
+            <Link href="/dashboard" className="text-muted-foreground hover:text-primary transition-colors">Dashboard</Link>
+            <Link href="/options" className="text-muted-foreground hover:text-primary transition-colors">Options Flow</Link>
+            <Link href="/earn" className="text-muted-foreground hover:text-primary transition-colors">Earn</Link>
           </div>
           <div className="flex flex-col gap-3">
             <span className="font-semibold text-white">Company</span>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">About Us</a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Careers</a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Contact</a>
+            <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">About Us</Link>
+            <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">Our Mission</Link>
+            <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">Contact</Link>
           </div>
         </div>
       </div>

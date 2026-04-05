@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Quantum • Family Thrive</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiUXVhbnR1bSBGYW1pbHkgVGhyaXZlIiwi c2hvcnRfbmFtZSI6IlF1YW50dW0iLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9waWNhcnQuc3ZjIiwi c2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyIsInB1cnBvc2UiOiJhbnkifV0sInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoi c3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzAwMDAwMCIsImJhY2tncm91bmRfY29sb3IiOiIjMDAwMDAwIn0=">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
+    :root { --neon-cyan: #00f0ff; --neon-purple: #c300ff; }
+    body { font-family: 'Inter', sans-serif; }
+    .title { font-family: 'Space Grotesk', sans-serif; }
+    .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+    .quantum-glow { box-shadow: 0 0 30px -5px var(--neon-cyan); }
+    .live-dot { animation: pulse 2s infinite; }
+  </style>
+</head>
+<body class="bg-black text-white min-h-screen pb-20">
+  <!-- HEADER -->
+  <div class="fixed top-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-b border-white/10 z-50">
+    <div class="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-x-3">
+        <div class="w-9 h-9 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-2xl flex items-center justify-center text-2xl">⚛️</div>
+        <h1 class="title text-3xl tracking-[-2px]">Quantum</h1>
+        <span class="px-3 py-1 text-xs font-mono bg-white/10 rounded-3xl text-cyan-400">300 AGENTS LIVE</span>
+      </div>
+      <div class="flex items-center gap-x-4">
+        <div class="flex items-center text-xs font-medium">
+          <span class="text-emerald-400 live-dot w-2 h-2 rounded-full mr-1"></span>
+          SAN ANTONIO, TX • 11:15 PM
+        </div>
+        <button onclick="simulateVoice()" class="px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-3xl text-sm font-semibold flex items-center gap-x-2">
+          <span>🎤</span> ASK THE SWARM
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLASH COUNCIL LIVE TICKER -->
+  <div id="council" class="fixed top-16 left-0 right-0 bg-gradient-to-r from-purple-600/90 to-cyan-600/90 text-white text-xs font-mono py-2 overflow-hidden whitespace-nowrap z-40">
+    <div id="council-text" class="inline-block animate-marquee">FLASH COUNCIL 02s AGO • AGENT 252: BULLISH AAPL 1:4 R:R • AGENT 14: DoorDash peak in San Antonio 7-9PM • AGENT 05: 91% probability rent relief approved</div>
+  </div>
+
+  <div class="max-w-2xl mx-auto pt-28 px-4">
+    <!-- DASHBOARD TAB -->
+    <div class="tab-content" id="tab-dashboard">
+      <div class="glass rounded-3xl p-6 quantum-glow mb-6">
+        <h2 class="text-4xl title mb-1">Good evening, Mike 👋</h2>
+        <p class="text-cyan-400 text-lg">Your swarm is working. Projected family income this month: <span id="projected-income" class="font-semibold text-4xl">$4,872</span></p>
+      </div>
+
+      <!-- LIVE AGENT STATUS -->
+      <div class="grid grid-cols-3 gap-4 mb-8">
+        <div class="glass rounded-3xl p-4 text-center">
+          <div class="text-3xl mb-1">📈</div>
+          <p class="text-xs text-white/60">STOCKS</p>
+          <p id="stock-change" class="text-emerald-400 text-2xl font-semibold">+2.4%</p>
+        </div>
+        <div class="glass rounded-3xl p-4 text-center">
+          <div class="text-3xl mb-1">📦</div>
+          <p class="text-xs text-white/60">GIGS</p>
+          <p class="text-emerald-400 text-2xl font-semibold">3 LIVE</p>
+        </div>
+        <div class="glass rounded-3xl p-4 text-center">
+          <div class="text-3xl mb-1">❤️</div>
+          <p class="text-xs text-white/60">CHARITY</p>
+          <p class="text-purple-400 text-2xl font-semibold">$87 DONATED</p>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="glass rounded-3xl p-6 mb-8">
+        <h3 class="font-semibold mb-4 flex justify-between"><span>Portfolio Live</span><span class="text-cyan-400 text-sm font-mono">+1.8% today</span></h3>
+        <canvas id="portfolioChart" height="180"></canvas>
+      </div>
+
+      <div class="glass rounded-3xl p-6">
+        <h3 class="font-semibold mb-4">Options Income Today</h3>
+        <canvas id="optionsChart" height="180"></canvas>
+      </div>
+    </div>
+
+    <!-- INCOME OPPORTUNITIES TAB -->
+    <div class="tab-content hidden" id="tab-opportunities">
+      <h2 class="title text-3xl mb-6">Local Income Opportunities • San Antonio</h2>
+      <div id="opps-list" class="space-y-4"></div>
+    </div>
+
+    <!-- TRADING TAB -->
+    <div class="tab-content hidden" id="tab-trading">
+      <h2 class="title text-3xl mb-6">Live Trading Swarm</h2>
+      <div class="glass rounded-3xl p-6">
+        <div class="flex justify-between mb-4">
+          <div><span class="font-mono text-cyan-400">AAPL</span> <span id="aapl-price" class="text-4xl font-semibold">227.48</span></div>
+          <button onclick="executeTrade('AAPL','buy')" class="px-8 py-3 bg-emerald-500 rounded-3xl text-sm font-semibold">BUY • COVERED CALL</button>
+        </div>
+        <canvas id="priceChart" height="220"></canvas>
+      </div>
+      <p class="text-xs text-white/60 text-center mt-4">AGENT 252 + AGENT 233 just fired a 91% confidence signal</p>
+    </div>
+
+    <!-- AGENTS TAB -->
+    <div class="tab-content hidden" id="tab-agents">
+      <h2 class="title text-3xl mb-6">Live Agent Swarm</h2>
+      <div id="agent-log" class="max-h-96 overflow-y-auto font-mono text-xs space-y-3 text-cyan-300"></div>
+    </div>
+
+    <!-- PREDICTIONS TAB -->
+    <div class="tab-content hidden" id="tab-predictions">
+      <h2 class="title text-3xl mb-6">Swarm Predictions • 24h</h2>
+      <div id="predictions-list" class="space-y-6"></div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-2xl border-t border-white/10 max-w-2xl mx-auto">
+      <div class="flex justify-around py-3 text-xs">
+        <button onclick="switchTab(0)" class="flex flex-col items-center active-tab">🏠<span class="mt-1">Home</span></button>
+        <button onclick="switchTab(1)" class="flex flex-col items-center">💰<span class="mt-1">Earn</span></button>
+        <button onclick="switchTab(2)" class="flex flex-col items-center">📊<span class="mt-1">Trade</span></button>
+        <button onclick="switchTab(3)" class="flex flex-col items-center">⚛️<span class="mt-1">Swarm</span></button>
+        <button onclick="switchTab(4)" class="flex flex-col items-center">🔮<span class="mt-1">Predict</span></button>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    // Tailwind script already loaded
+    function initTailwind() {
+      tailwind.config = { content: ["*"], theme: { extend: {} } };
+    }
+
+    // Fake data
+    let portfolioData = [1420, 1380, 1450, 1520, 1490, 1580, 1620];
+    let optionsData = [320, 410, 380, 520, 490, 610, 680];
+    let aaplPrices = [224.1, 225.3, 226.8, 227.4, 228.9, 227.1, 229.3];
+
+    function createPortfolioChart() {
+      new Chart(document.getElementById('portfolioChart'), {
+        type: 'line',
+        data: { labels: ['9AM','10','11','12','1PM','2','NOW'], datasets: [{ label: 'Portfolio $', data: portfolioData, borderColor: '#00f0ff', tension: 0.4, borderWidth: 3 }] },
+        options: { plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.1)' } } } }
+      });
+    }
+
+    function createOptionsChart() {
+      new Chart(document.getElementById('optionsChart'), {
+        type: 'bar',
+        data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Today'], datasets: [{ label: 'Theta Income $', data: optionsData, backgroundColor: '#c300ff' }] },
+        options: { plugins: { legend: { display: false } } }
+      });
+    }
+
+    function createPriceChart() {
+      new Chart(document.getElementById('priceChart'), {
+        type: 'line',
+        data: { labels: ['10:00','10:15','10:30','10:45','11:00','NOW'], datasets: [{ label: 'AAPL', data: aaplPrices, borderColor: '#00f0ff', tension: 0.3 }] },
+        options: { plugins: { legend: { display: false } } }
+      });
+    }
+
+    // Live Flash Council
+    function runFlashCouncil() {
+      const messages = [
+        "AGENT 252: BULLISH AAPL 1:4 R:R • 93% confidence",
+        "AGENT 14: DoorDash peak San Antonio 7-9PM • $38/hr possible",
+        "AGENT 05: 91% probability rent relief approved for 78205",
+        "AGENT 237: Covered call on TSLA fired • +$142 projected",
+        "AGENT 300: Family impact score +47 today"
+      ];
+      let i = 0;
+      setInterval(() => {
+        const el = document.getElementById('council-text');
+        el.style.transition = 'all 0.4s';
+        el.style.opacity = '0';
+        setTimeout(() => {
+          el.textContent = messages[i % messages.length];
+          el.style.opacity = '1';
+          i++;
+        }, 400);
+      }, 2000);
+    }
+
+    // Opportunities (San Antonio specific)
+    function loadOpportunities() {
+      const opps = [
+        { title: "DoorDash • Peak hours 7-9PM", payout: "$32–$41/hr", location: "78205" },
+        { title: "Upwork AI Prompt Engineer", payout: "$75–$120/hr remote", location: "Worldwide" },
+        { title: "Local food delivery (Amazon Flex)", payout: "$28/hr + tips", location: "San Antonio" }
+      ];
+      const container = document.getElementById('opps-list');
+      container.innerHTML = opps.map(o => `
+        <div class="glass rounded-3xl p-6 flex justify-between items-center">
+          <div>
+            <p class="font-semibold">${o.title}</p>
+            <p class="text-xs text-white/60">${o.location}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-emerald-400 font-mono">${o.payout}</p>
+            <button onclick="claimGig(this)" class="text-xs mt-2 px-5 py-2 bg-emerald-500 rounded-3xl">CLAIM NOW</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function claimGig(btn) {
+      btn.textContent = '✅ CLAIMED • $ added to swarm';
+      btn.style.backgroundColor = '#10b981';
+      setTimeout(() => alert("🎉 Swarm just added $87 to your projected income!"), 800);
+    }
+
+    // Predictions
+    function loadPredictions() {
+      const preds = [
+        { text: "AAPL will hit $235 by EOD", conf: "94%", agent: "252" },
+        { text: "Best gig hour in SA tonight: 7–9PM", conf: "89%", agent: "14" },
+        { text: "Your family cashflow +$412 next 7 days", conf: "91%", agent: "05" }
+      ];
+      const container = document.getElementById('predictions-list');
+      container.innerHTML = preds.map(p => `
+        <div class="glass rounded-3xl p-6">
+          <div class="flex justify-between"><span class="font-semibold">${p.text}</span><span class="font-mono text-cyan-400">${p.conf}</span></div>
+          <p class="text-xs text-white/60 mt-2">— AGENT ${p.agent} • Quantum consensus</p>
+        </div>
+      `).join('');
+    }
+
+    // Agent log simulation
+    let agentLogIndex = 0;
+    const agentMessages = [
+      "AGENT 01 → AGENT 02: Layout audit complete. iOS glassmorphism applied.",
+      "AGENT 05 → ALL: Updated San Antonio cost-of-living gap to $1,240/month.",
+      "AGENT 252: Technical + options confluence on AAPL confirmed.",
+      "AGENT 300 (ETERNAL): Decision helps a real family today → EXECUTE."
+    ];
+    function simulateAgentLog() {
+      const log = document.getElementById('agent-log');
+      setInterval(() => {
+        const msg = document.createElement('div');
+        msg.className = 'flex gap-3';
+        msg.innerHTML = `<span class="text-purple-400 font-medium">[${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}]</span> ${agentMessages[agentLogIndex % agentMessages.length]}`;
+        log.appendChild(msg);
+        log.scrollTop = log.scrollHeight;
+        agentLogIndex++;
+      }, 2800);
+    }
+
+    // Trading execution (demo)
+    function executeTrade(symbol, side) {
+      alert(`🚀 SWARM EXECUTED: ${side.toUpperCase()} ${symbol} • AGENT 240 sized position at 1.8% risk. Theta income projected +$214 this week.`);
+      aaplPrices.push(aaplPrices[aaplPrices.length-1] + (side==='buy'?3:-2));
+      createPriceChart();
+    }
+
+    function simulateVoice() {
+      const q = prompt("Ask the Quantum Swarm anything (e.g. best side hustle in San Antonio):");
+      if (q) alert(`🔮 SWARM ANSWER: ${q.includes('San Antonio') ? 'DoorDash 7-9PM is highest probability tonight. $41/hr projected.' : 'AGENT 100 says: 87% chance this path adds $2,300/month to your family.'}`);
+    }
+
+    // Tab system
+    function switchTab(n) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(['tab-dashboard','tab-opportunities','tab-trading','tab-agents','tab-predictions'][n]).classList.remove('hidden');
+    }
+
+    // Main init
+    window.onload = function() {
+      initTailwind();
+      createPortfolioChart();
+      createOptionsChart();
+      createPriceChart();
+      runFlashCouncil();
+      loadOpportunities();
+      loadPredictions();
+      simulateAgentLog();
+
+      // Fake live price update
+      setInterval(() => {
+        document.getElementById('aapl-price').textContent = (parseFloat(document.getElementById('aapl-price').textContent) + (Math.random()*1.2 - 0.6)).toFixed(2);
+      }, 4500);
+
+      // Fake income growth
+      setInterval(() => {
+        let inc = parseInt(document.getElementById('projected-income').textContent.replace('$','').replace(',',''));
+        inc += Math.floor(Math.random()*38) + 12;
+        document.getElementById('projected-income').textContent = '$' + inc.toLocaleString();
+      }, 12000);
+
+      console.log('%c✅ QUANTUM ORCHESTRATOR FULLY LOADED • 300 AGENTS ENTANGLED • READY FOR iOS HOME SCREEN', 'color:#00f0ff; font-family:monospace;');
+    };
+  </script>
+</body>
+</html>

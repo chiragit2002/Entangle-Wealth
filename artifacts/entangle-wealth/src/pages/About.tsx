@@ -1,159 +1,87 @@
 import { Layout } from "@/components/layout/Layout";
-import { Shield, Target, TrendingUp, Users, Brain, Network, Heart, Zap, BookOpen, Home, DollarSign, GraduationCap, Briefcase } from "lucide-react";
-import { agentSwarmData } from "@/lib/mock-data";
+import { Shield, Target, Users, AlertTriangle, BarChart3, Activity } from "lucide-react";
 
 export default function About() {
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-20 max-w-5xl">
-        <div className="text-center mb-20">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-xs font-bold uppercase tracking-widest mb-6">
-            Primary Mission
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6" data-testid="text-headline">
-            Empowering everyday families through <span className="electric-text">smarter trading.</span>
+      <div className="container mx-auto px-4 py-20 max-w-4xl">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
+            What EntangleWealth <span className="electric-text">actually is.</span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Wall Street has had the edge for too long. We built EntangleWealth to democratize access to institutional-grade data, algorithmic analysis, and the power of 300 quantum-entangled AI agents — all in service of one mission: help real people earn more money to feed and sustain their families.
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            A financial analysis platform that runs multiple AI models simultaneously, cross-checks their outputs, and only surfaces signals when there's real agreement. Built for people who trade to support their families — not to gamble.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12 mb-24">
-          <div className="flex flex-col justify-center gap-6">
-            <h2 className="text-3xl font-bold">The Mission</h2>
-            <p className="text-muted-foreground leading-relaxed text-lg">
-              Trading isn't just about moving numbers on a screen; it's about freedom. It's about taking control of your financial destiny, paying off debt, and feeding your family in today's brutal economic reality.
-            </p>
-            <p className="text-muted-foreground leading-relaxed text-lg">
-              We built the Quantum Orchestrator — 300 specialized AI agents operating under quantum entanglement principles. When one agent discovers a signal, all entangled agents instantly reflect that change. Every 2 seconds, the entire swarm convenes a Flash Council, resolves conflicts, and delivers one unified, high-conviction signal.
-            </p>
-            <p className="text-muted-foreground leading-relaxed text-lg">
-              No debate. No hesitation. Pure signal. Pure execution.
-            </p>
+        <div className="flex flex-col gap-12 mb-16">
+          <div>
+            <h2 className="text-2xl font-bold mb-4">The idea is simple.</h2>
+            <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
+              <p>One analysis method can be wrong. Two can still be wrong. But when price action, volume analysis, options flow, sentiment, and risk modeling all point the same direction at the same time — the probability goes up.</p>
+              <p>That's what we do. We run multiple independent analysis methods on every ticker, every few seconds. When they disagree, we say nothing. When they agree, we tell you — with a confidence score and the specific reasoning.</p>
+              <p>We don't predict the future. Nobody can. But we can show you where the data is converging, and let you decide what to do with it.</p>
+            </div>
           </div>
-          <div className="relative rounded-2xl overflow-hidden glass-panel border-white/10 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-primary/10 to-secondary/5">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-50 mix-blend-overlay"></div>
-            <div className="relative z-10 text-center">
-              <Network className="w-24 h-24 text-primary mb-4 mx-auto opacity-80" />
-              <div className="text-5xl font-bold font-mono electric-text mb-2">300</div>
-              <div className="text-lg font-medium text-muted-foreground">Quantum-Entangled Agents</div>
-              <div className="mt-4 grid grid-cols-2 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold font-mono gold-text">30/min</div>
-                  <div className="text-xs text-muted-foreground">Flash Councils</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold font-mono electric-text">94.7%</div>
-                  <div className="text-xs text-muted-foreground">Consensus Rate</div>
-                </div>
-              </div>
+
+          <div>
+            <h2 className="text-2xl font-bold mb-4">What we don't do.</h2>
+            <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
+              <p>We don't guarantee returns. We don't promise you'll get rich. We don't show you cherry-picked screenshots of winning trades and pretend the losses don't exist.</p>
+              <p>Trading is hard. Most retail traders lose money. That's a fact, and we won't sugarcoat it. What we can do is give you better information, better analysis, and better risk management than trying to do it alone with a chart and gut feeling.</p>
             </div>
           </div>
         </div>
 
-        <div className="mb-24">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">The Quantum Entanglement Protocol</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">Every agent shares a quantum state with its paired agents. Contradictions create quantum interference — and must be resolved before any signal reaches you.</p>
-          </div>
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold mb-8">How the analysis works.</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
-              <Brain className="w-8 h-8 text-primary" />
-              <h3 className="text-lg font-bold">Instant Propagation</h3>
-              <p className="text-sm text-muted-foreground">When AGENT 201 (Price Action Surgeon) spots a structure break, AGENTS 202-230 instantly update their models. No latency. No lag.</p>
+              <BarChart3 className="w-7 h-7 text-primary" />
+              <h3 className="font-bold">Price Action</h3>
+              <p className="text-sm text-muted-foreground">Reads candlestick patterns, support and resistance levels, and market structure. Identifies breakouts, reversals, and continuation patterns.</p>
             </div>
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
-              <Zap className="w-8 h-8 text-secondary" />
-              <h3 className="text-lg font-bold">Conflict Resolution</h3>
-              <p className="text-sm text-muted-foreground">AGENT 06 (Devil's Advocate) challenges every prediction. AGENT 09 (Triage Commander) resolves contradictions. Only consensus signals survive.</p>
+              <Activity className="w-7 h-7 text-secondary" />
+              <h3 className="font-bold">Volume Analysis</h3>
+              <p className="text-sm text-muted-foreground">Tracks where institutional money is actually flowing. Volume profiles, VWAP levels, and accumulation/distribution patterns.</p>
             </div>
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
-              <Shield className="w-8 h-8 text-green-400" />
-              <h3 className="text-lg font-bold">Black Swan Protection</h3>
-              <p className="text-sm text-muted-foreground">AGENT 49 monitors for low-probability, high-impact events. Contingency plans activate before economic shocks can destroy portfolios.</p>
+              <Target className="w-7 h-7 text-primary" />
+              <h3 className="font-bold">Options Flow</h3>
+              <p className="text-sm text-muted-foreground">Monitors large premium sweeps, block trades, and unusual open interest changes across all major exchanges.</p>
+            </div>
+            <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
+              <Shield className="w-7 h-7 text-green-400" />
+              <h3 className="font-bold">Greeks Analysis</h3>
+              <p className="text-sm text-muted-foreground">Evaluates Delta, Gamma, Theta, and Vega on every options contract. Tracks dealer gamma exposure and IV rank.</p>
+            </div>
+            <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
+              <Users className="w-7 h-7 text-purple-400" />
+              <h3 className="font-bold">Sentiment</h3>
+              <p className="text-sm text-muted-foreground">Gauges market mood from news flow, social data, and put/call ratios. Helps identify crowd extremes.</p>
+            </div>
+            <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
+              <AlertTriangle className="w-7 h-7 text-red-400" />
+              <h3 className="font-bold">Risk Management</h3>
+              <p className="text-sm text-muted-foreground">Every signal includes position sizing guidance. Risk is capped at 2% per trade using Kelly Criterion. Capital preservation first.</p>
             </div>
           </div>
         </div>
 
-        <div className="mb-24">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-xs font-bold uppercase tracking-widest mb-4">
-              Economic Survival Agents 13-25
-            </div>
-            <h2 className="text-3xl font-bold mb-4">More Than Trading. Economic Empowerment.</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">13 agents dedicated entirely to helping families survive and thrive in today's economy. Because the mission is bigger than just markets.</p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="glass-panel p-5 rounded-xl flex items-start gap-3">
-              <DollarSign className="w-6 h-6 text-secondary shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-bold text-sm">AGENT 14 - Income Opportunity Hunter</h3>
-                <p className="text-xs text-muted-foreground mt-1">Scans every legitimate income stream: gig economy, remote work, freelance, passive income. Ranked by effort-to-income ratio.</p>
-              </div>
-            </div>
-            <div className="glass-panel p-5 rounded-xl flex items-start gap-3">
-              <BookOpen className="w-6 h-6 text-primary shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-bold text-sm">AGENT 15 - Financial Literacy Coach</h3>
-                <p className="text-xs text-muted-foreground mt-1">Teaches budgeting, debt reduction, credit building, savings strategies. Complex finance translated into actionable steps.</p>
-              </div>
-            </div>
-            <div className="glass-panel p-5 rounded-xl flex items-start gap-3">
-              <Briefcase className="w-6 h-6 text-green-400 shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-bold text-sm">AGENT 17 - Entrepreneurship Accelerator</h3>
-                <p className="text-xs text-muted-foreground mt-1">Low-capital business ideas with high survival rates. Businesses families can start with under $500.</p>
-              </div>
-            </div>
-            <div className="glass-panel p-5 rounded-xl flex items-start gap-3">
-              <GraduationCap className="w-6 h-6 text-purple-400 shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-bold text-sm">AGENT 21 - Free Education Curator</h3>
-                <p className="text-xs text-muted-foreground mt-1">Best free courses, certifications, and bootcamps. Credentials that lead directly to income.</p>
-              </div>
-            </div>
-            <div className="glass-panel p-5 rounded-xl flex items-start gap-3">
-              <Home className="w-6 h-6 text-orange-400 shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-bold text-sm">AGENT 23 - Food & Housing Security</h3>
-                <p className="text-xs text-muted-foreground mt-1">Food banks, rental assistance, utility programs. Local resources mapped by zip code for immediate family relief.</p>
-              </div>
-            </div>
-            <div className="glass-panel p-5 rounded-xl flex items-start gap-3">
-              <Heart className="w-6 h-6 text-red-400 shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-bold text-sm">AGENT 25 - Benefits Navigator</h3>
-                <p className="text-xs text-muted-foreground mt-1">Every federal, state, and local program: SNAP, WIC, Medicaid, EITC, childcare subsidies, housing vouchers.</p>
-              </div>
-            </div>
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold mb-4">Why we built this.</h2>
+          <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
+            <p>Because the tools that actually work — the ones hedge funds and institutions use — have always been too expensive or too complicated for regular people.</p>
+            <p>We wanted to build something that a working parent could open on their phone during lunch break and get real, useful information about whether now is a good time to enter or exit a position. No jargon overload. No subscription tiers with fake scarcity.</p>
+            <p>The goal is simple: help people make better financial decisions so they can take better care of their families.</p>
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-6 mb-24">
-          <div className="glass-panel p-8 rounded-xl flex flex-col gap-4">
-            <Users className="w-8 h-8 text-secondary" />
-            <h3 className="text-xl font-bold">Built for Retail</h3>
-            <p className="text-muted-foreground">
-              You don't need a Bloomberg terminal or a PhD in quantitative finance. 300 agents do the work. You get the signal. Our interface distills institutional-grade analysis into clear, actionable intelligence.
-            </p>
-          </div>
-          
-          <div className="glass-panel p-8 rounded-xl flex flex-col gap-4">
-            <Target className="w-8 h-8 text-primary" />
-            <h3 className="text-xl font-bold">Uncompromising Precision</h3>
-            <p className="text-muted-foreground">
-              AGENT 06 (Devil's Advocate) challenges every signal. AGENT 230 backtests every strategy across multiple market regimes. Only signals with proven statistical edge reach your dashboard.
-            </p>
-          </div>
-        </div>
-
-        <div className="text-center">
-          <div className="glass-panel rounded-xl p-8 max-w-2xl mx-auto">
-            <h2 className="text-2xl font-bold mb-4 gold-text">The Swarm Works for You</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              {agentSwarmData.totalAgents} agents. {agentSwarmData.categories.length} specialized divisions. One mission: predict the highest probability income opportunities and build the tools that make it happen. For your family.
-            </p>
-          </div>
+        <div className="glass-panel rounded-xl p-8 text-center">
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+            EntangleWealth is not a registered investment advisor. Nothing on this platform is financial advice. All analysis is algorithmic and informational. You are responsible for your own trading decisions. Past performance — ours or anyone else's — does not predict future results. Please only trade with capital you can afford to lose.
+          </p>
         </div>
       </div>
     </Layout>

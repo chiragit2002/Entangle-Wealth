@@ -12,41 +12,67 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **TypeScript version**: 5.9
 - **API framework**: Express 5
 - **Database**: PostgreSQL + Drizzle ORM
-- **Validation**: Zod (`zod/v4`), `drizzle-zod`
-- **API codegen**: Orval (from OpenAPI spec)
-- **Build**: esbuild (CJS bundle)
-- **Frontend**: React + Vite + Tailwind CSS + shadcn/ui
+- **Authentication**: Clerk (auto-provisioned via Replit)
+- **Payments**: Stripe (via Replit integration + stripe-replit-sync)
 - **AI**: OpenAI via Replit AI Integrations proxy (`@workspace/integrations-openai-ai-server`)
+- **Validation**: Zod (`zod/v4`), `drizzle-zod`
+- **Build**: esbuild (CJS bundle)
+- **Frontend**: React + Vite + Tailwind CSS + shadcn/ui + Clerk React
 
 ## Artifacts
 
 ### EntangleWealth (`artifacts/entangle-wealth`)
 - Financial analysis platform with dark theme (black bg, electric blue #00D4FF, gold #FFD700)
-- Pages: Landing (/), Dashboard (/dashboard), Earn (/earn), Options Signals (/options), Stock Explorer (/stocks), Terminal (/terminal), About (/about)
+- **Authentication**: Clerk (email + Google sign-in at /sign-in, /sign-up)
+- Pages: Landing (/), Dashboard (/dashboard), Earn (/earn), Options Signals (/options), Stock Explorer (/stocks), Job Search (/jobs), Terminal (/terminal), Résumé Builder (/resume, auth required), Profile (/profile, auth required), About (/about)
 - Tone: Honest, no-hype, no AI slop. Straightforward about what the platform does and doesn't do.
-- Core concept: Multiple AI analysis methods (price action, volume, options flow, Greeks, sentiment, risk) run simultaneously and cross-check each other via "quantum entanglement." Signals only fire on consensus.
+- Core concept: Multiple AI analysis methods run simultaneously and cross-check each other via "quantum entanglement." Signals only fire on consensus.
 - Mission: Help everyday families make better financial decisions.
 
 #### Stock Explorer (/stocks)
 - 5,000 NASDAQ-listed stocks with searchable/filterable table
 - Top Gainers, Top Losers, Sector Overview panels
 - Click any stock for detail view with 52-week range bar, market data
-- AI-powered "Quantum Entanglement Analysis" — 7 specialized agents analyze each stock via OpenAI (gpt-5-mini for full, gpt-5-nano for quick)
+- AI-powered "Quantum Entanglement Analysis" — 7 specialized agents analyze each stock via OpenAI
 - Rate limited: 10 AI requests per minute per IP
-- All data is simulated/demo — disclaimer shown on every AI output
+
+#### Job Search (/jobs)
+- Search jobs by keyword, location, type (full-time, part-time, gig, freelance, contract)
+- Remote-only filter, pagination
+- Save/bookmark jobs (requires sign-in)
+- Falls back to demo listings when no JSearch API key configured
+
+#### Résumé Builder (/resume, auth required)
+- Step-by-step guided builder with collapsible sections
+- Supports gig/freelance work (DoorDash, Uber, etc.) alongside traditional roles
+- Live preview pane (updates as you type)
+- 3 templates: Professional (blue accent), Modern (gold accent), Minimal (white accent)
+- Export to PDF via browser print
+- Save to database, auto-loads on return
+
+#### Profile (/profile, auth required)
+- User profile with headline, bio, contact info, photo
+- Public/private toggle for employer visibility
+- KYC verification form (name, DOB, address, ID)
+- Saved jobs list with remove
+- Résumé preview card
+- Subscription tier display (Free/Pro/Enterprise)
+
+#### KYC Verification
+- Multi-step form: personal info + government ID
+- Status tracking: Not Started → Pending Review → Verified / Rejected
+- Required before Stripe payment features
+
+#### Stripe Payments
+- Products: EntangleWealth Pro ($29/mo), Enterprise ($99/mo)
+- Checkout via Stripe Checkout Sessions
+- Customer portal for subscription management
+- KYC gate — must verify identity before payment
+- Webhook handler for payment events
 
 #### Terminal (/terminal)
 - MirofishTerminal with live order flow, news feed, system log panels
 - Commands: HELP, QUOTE, ANALYZE (AI), SEARCH (API), RISK, STATUS, SIGNALS, PORTFOLIO, CLEAR
-- Position calculator and P&L simulator below terminal
-
-#### Other Features
-- Email waitlist, live scrolling market ticker, Flash Council live ticker
-- Stock signals with confidence scores and reasoning notes
-- Options flow alerts with context, Greeks table with IV rank
-- Portfolio value area chart + options income bar chart (recharts)
-- Income opportunities page (gigs + freelance + options strategies)
-- Risk disclaimers on every data page
 
 #### Design System
 - Fonts: JetBrains Mono (data), Inter (UI)
@@ -56,24 +82,47 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 
 ### API Server (`artifacts/api-server`)
 - Express 5 on port defined by PORT env var
+- **Auth**: Clerk middleware (clerkMiddleware + requireAuth for protected routes)
+- **Stripe**: Webhook endpoint registered before body parsers, auto-init on startup
 - Routes:
   - `GET /api/health` — health check
-  - `GET /api/stocks` — search/filter/sort/paginate 5000 stocks (params: q, sector, capTier, page, limit, sortBy, sortDir)
-  - `GET /api/stocks/movers` — top gainers and losers
-  - `GET /api/stocks/sectors` — sector summary with counts and avg change
-  - `GET /api/stocks/:symbol` — single stock detail
-  - `POST /api/stocks/:symbol/analyze` — full 7-agent AI analysis (gpt-5-mini)
-  - `POST /api/stocks/:symbol/quick-analyze` — quick summary (gpt-5-nano)
-- Stock data: 5000 NASDAQ stocks generated deterministically (seed 42), ~320 real tickers prioritized, cached in memory at startup
-- Rate limiting on AI endpoints: 10 requests/minute per IP
-- CORS enabled, JSON limit 10mb
+  - **Stocks**: GET /api/stocks, /api/stocks/movers, /api/stocks/sectors, /api/stocks/:symbol
+  - **AI Analysis**: POST /api/stocks/:symbol/analyze, /api/stocks/:symbol/quick-analyze (rate-limited)
+  - **Users**: GET /api/users/me, POST /api/users/sync, PUT /api/users/me, GET /api/users/:userId/profile
+  - **Résumés**: GET/POST /api/resumes, GET/PUT/DELETE /api/resumes/:id, GET /api/resumes/public/:userId
+  - **Jobs**: GET /api/jobs/search, GET /api/jobs/saved, POST /api/jobs/save, DELETE /api/jobs/saved/:id
+  - **KYC**: GET /api/kyc/status, POST /api/kyc/submit, POST /api/kyc/approve/:userId
+  - **Stripe**: GET /api/stripe/config, GET /api/stripe/products, POST /api/stripe/create-checkout, GET /api/stripe/subscription, POST /api/stripe/create-portal
+
+## Database Schema
+
+### users
+- id, clerk_id, email, first_name, last_name, photo_url, headline, bio, phone, location
+- stripe_customer_id, stripe_subscription_id, subscription_tier
+- kyc_status (not_started | pending_review | verified | rejected), kyc_submitted_at, kyc_verified_at
+- is_public_profile, created_at, updated_at
+
+### resumes
+- id, user_id, title, template, summary, skills (jsonb), certifications (jsonb)
+
+### resume_experiences
+- id, resume_id, company, title, location, start_date, end_date, is_current, description, is_gig_work, sort_order
+
+### resume_education
+- id, resume_id, school, degree, field, start_date, end_date, sort_order
+
+### saved_jobs
+- id, user_id, job_title, company, location, salary, job_type, source_url, source, external_id, saved_at
+
+### stripe.* (auto-managed by stripe-replit-sync)
+- products, prices, customers, subscriptions, payment_intents, etc.
 
 ## Key Commands
 
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
+- `pnpm --filter @workspace/scripts exec tsx src/seed-products.ts` — seed Stripe products
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.

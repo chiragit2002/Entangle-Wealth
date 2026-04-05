@@ -63,7 +63,15 @@ router.post("/kyc/submit", requireAuth, async (req, res) => {
   }
 });
 
+const ADMIN_CLERK_IDS = (process.env.ADMIN_CLERK_IDS || "").split(",").filter(Boolean);
+
 router.post("/kyc/approve/:userId", requireAuth, async (req, res) => {
+  const callerClerkId = (req as any).userId;
+  if (!ADMIN_CLERK_IDS.includes(callerClerkId)) {
+    res.status(403).json({ error: "Admin access required" });
+    return;
+  }
+
   const targetUserId = req.params.userId;
 
   try {

@@ -1,13 +1,12 @@
-import { useState, useEffect } from "react";
-import { useUser } from "@clerk/react";
+import { useState, useEffect, useCallback } from "react";
+import { useUser, useAuth } from "@clerk/react";
 import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-
-const API_BASE = "/api";
+import { authFetch } from "@/lib/authFetch";
 
 interface ProfileData {
   headline: string;
@@ -37,7 +36,8 @@ interface ResumePreview {
 }
 
 export default function Profile() {
-  const { user } = useUser();
+  const { user, isLoaded: userLoaded } = useUser();
+  const { getToken } = useAuth();
   const { toast } = useToast();
   const [profile, setProfile] = useState<ProfileData>({
     headline: "", bio: "", phone: "", location: "",
@@ -52,16 +52,21 @@ export default function Profile() {
   const [showKyc, setShowKyc] = useState(false);
   const [submittingKyc, setSubmittingKyc] = useState(false);
 
+  const fetchAuth = useCallback((path: string, options: RequestInit = {}) => {
+    return authFetch(path, getToken, options);
+  }, [getToken]);
+
   useEffect(() => {
+    if (!userLoaded) return;
     loadProfile();
     loadSavedJobs();
     loadResume();
-  }, []);
+  }, [userLoaded]);
 
   const loadProfile = async () => {
     try {
       if (user) {
-        await fetch(`${API_BASE}/users/sync`, {
+        await fetchAuth("/users/sync", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -73,7 +78,7 @@ export default function Profile() {
         });
       }
 
-      const res = await fetch(`${API_BASE}/users/me`);
+      const res = await fetchAuth("/users/me");
       if (res.ok) {
         const data = await res.json();
         setProfile({
@@ -92,18 +97,18 @@ export default function Profile() {
 
   const loadSavedJobs = async () => {
     try {
-      const res = await fetch(`${API_BASE}/jobs/saved`);
+      const res = await fetchAuth("/jobs/saved");
       if (res.ok) setSavedJobs(await res.json());
     } catch { /* ignore */ }
   };
 
   const loadResume = async () => {
     try {
-      const res = await fetch(`${API_BASE}/resumes`);
+      const res = await fetchAuth("/resumes");
       if (res.ok) {
         const resumes = await res.json();
         if (resumes.length > 0) {
-          const detailRes = await fetch(`${API_BASE}/resumes/${resumes[0].id}`);
+          const detailRes = await fetchAuth(`/resumes/${resumes[0].id}`);
           if (detailRes.ok) setResume(await detailRes.json());
         }
       }
@@ -113,7 +118,7 @@ export default function Profile() {
   const saveProfile = async () => {
     setSaving(true);
     try {
-      const res = await fetch(`${API_BASE}/users/me`, {
+      const res = await fetchAuth("/users/me", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profile),
@@ -135,7 +140,7 @@ export default function Profile() {
     }
     setSubmittingKyc(true);
     try {
-      const res = await fetch(`${API_BASE}/kyc/submit`, {
+      const res = await fetchAuth("/kyc/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(kycForm),
@@ -154,7 +159,7 @@ export default function Profile() {
 
   const removeSavedJob = async (jobId: number) => {
     try {
-      await fetch(`${API_BASE}/jobs/saved/${jobId}`, { method: "DELETE" });
+      await fetchAuth(`/jobs/saved/${jobId}`, { method: "DELETE" });
       setSavedJobs(prev => prev.filter(j => j.id !== jobId));
     } catch { /* ignore */ }
   };

@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { Search, MapPin, Briefcase, Clock, ExternalLink, Bookmark, BookmarkCheck, Filter, Loader2 } from "lucide-react";
-import { useUser } from "@clerk/react";
+import { useUser, useAuth } from "@clerk/react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { authFetch } from "@/lib/authFetch";
 
 interface Job {
   id: string;
@@ -28,6 +29,7 @@ const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Freelance", "Gig"];
 
 export default function Jobs() {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [location, setLocation] = useState("");
@@ -83,7 +85,7 @@ export default function Jobs() {
       return;
     }
     try {
-      const res = await fetch(`${API_BASE}/jobs/save`, {
+      const res = await authFetch("/jobs/save", getToken, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

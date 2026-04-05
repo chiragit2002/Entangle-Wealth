@@ -1,13 +1,12 @@
-import { useState, useEffect } from "react";
-import { useUser } from "@clerk/react";
+import { useState, useEffect, useCallback } from "react";
+import { useUser, useAuth } from "@clerk/react";
 import { FileText, Plus, Trash2, GripVertical, Briefcase, GraduationCap, Award, Save, Download, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-
-const API_BASE = "/api";
+import { authFetch } from "@/lib/authFetch";
 
 interface Experience {
   company: string;
@@ -49,7 +48,8 @@ const emptyExperience: Experience = { company: "", title: "", location: "", star
 const emptyEducation: Education = { school: "", degree: "", field: "", startDate: "", endDate: "" };
 
 export default function Resume() {
-  const { user } = useUser();
+  const { user, isLoaded: userLoaded } = useUser();
+  const { getToken } = useAuth();
   const { toast } = useToast();
   const [resume, setResume] = useState<ResumeData>({
     title: "My Résumé",
@@ -68,17 +68,23 @@ export default function Resume() {
     contact: true, summary: true, experience: true, education: true, skills: true, certifications: false,
   });
 
+  const fetchAuth = useCallback((path: string, options: RequestInit = {}) => {
+    return authFetch(path, getToken, options);
+  }, [getToken]);
+
   useEffect(() => {
+    if (!userLoaded) return;
     loadResume();
-  }, []);
+    syncUser();
+  }, [userLoaded]);
 
   const loadResume = async () => {
     try {
-      const res = await fetch(`${API_BASE}/resumes`);
+      const res = await fetchAuth("/resumes");
       if (!res.ok) { setLoading(false); return; }
       const resumes = await res.json();
       if (resumes.length > 0) {
-        const detailRes = await fetch(`${API_BASE}/resumes/${resumes[0].id}`);
+        const detailRes = await fetchAuth(`/resumes/${resumes[0].id}`);
         if (detailRes.ok) {
           const data = await detailRes.json();
           setResume({
@@ -96,7 +102,6 @@ export default function Resume() {
         }
       }
     } catch {
-      // No saved resume yet
     } finally {
       setLoading(false);
     }
@@ -105,7 +110,7 @@ export default function Resume() {
   const syncUser = async () => {
     if (!user) return;
     try {
-      await fetch(`${API_BASE}/users/sync`, {
+      await fetchAuth("/users/sync", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -118,8 +123,6 @@ export default function Resume() {
     } catch { /* ignore */ }
   };
 
-  useEffect(() => { syncUser(); }, [user]);
-
   const saveResume = async () => {
     setSaving(true);
     try {
@@ -131,13 +134,13 @@ export default function Resume() {
 
       let res;
       if (resume.id) {
-        res = await fetch(`${API_BASE}/resumes/${resume.id}`, {
+        res = await fetchAuth(`/resumes/${resume.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
       } else {
-        res = await fetch(`${API_BASE}/resumes`, {
+        res = await fetchAuth("/resumes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),

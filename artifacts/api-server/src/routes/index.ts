@@ -6,6 +6,7 @@ import usersRouter from "./users";
 import resumesRouter from "./resumes";
 import jobsRouter from "./jobs";
 import kycRouter from "./kyc";
+import stripeRouter from "./stripe";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(usersRouter);
 router.use(resumesRouter);
 router.use(jobsRouter);
 router.use(kycRouter);
+router.use(stripeRouter);
 
 export default router;

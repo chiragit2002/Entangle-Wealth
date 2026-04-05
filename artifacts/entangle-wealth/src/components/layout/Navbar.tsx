@@ -23,6 +23,7 @@ export function Navbar() {
     { href: "/dashboard", label: "Dashboard" },
     { href: "/earn", label: "Earn" },
     { href: "/options", label: "Options Flow" },
+    { href: "/terminal", label: "Terminal" },
     { href: "/about", label: "About Us" },
   ];
 
@@ -81,6 +82,7 @@ export function Navbar() {
           <button
             className="md:hidden text-white"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
             {isMobileMenuOpen ? <X /> : <Menu />}
           </button>

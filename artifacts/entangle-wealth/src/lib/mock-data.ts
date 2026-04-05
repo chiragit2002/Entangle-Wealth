@@ -88,3 +88,99 @@ export const agentLogMessages = [
   { time: "3:32 PM", message: "SPY approaching dealer gamma flip level at $515 — expect volatility expansion above this level" },
   { time: "3:30 PM", message: "Portfolio risk scan: total exposure 8.4% — well within 15% max allocation guideline" },
 ];
+
+export const sectorData = [
+  { sector: "Technology", ticker: "XLK", change: 2.4, weight: 32, volume: "High" },
+  { sector: "Healthcare", ticker: "XLV", change: -0.8, weight: 14, volume: "Normal" },
+  { sector: "Financials", ticker: "XLF", change: 1.2, weight: 12, volume: "High" },
+  { sector: "Energy", ticker: "XLE", change: -1.5, weight: 8, volume: "Low" },
+  { sector: "Consumer Disc.", ticker: "XLY", change: 0.6, weight: 11, volume: "Normal" },
+  { sector: "Industrials", ticker: "XLI", change: 1.8, weight: 9, volume: "High" },
+  { sector: "Real Estate", ticker: "XLRE", change: -0.3, weight: 5, volume: "Low" },
+  { sector: "Utilities", ticker: "XLU", change: 0.2, weight: 4, volume: "Low" },
+  { sector: "Materials", ticker: "XLB", change: -0.5, weight: 3, volume: "Normal" },
+  { sector: "Telecom", ticker: "XLC", change: 0.9, weight: 2, volume: "Normal" },
+];
+
+export const fearGreedData = {
+  value: 72,
+  label: "Greed",
+  previousClose: 65,
+  weekAgo: 58,
+  monthAgo: 45,
+  components: [
+    { name: "Market Momentum", value: 78, signal: "Greed" },
+    { name: "Stock Strength", value: 65, signal: "Greed" },
+    { name: "Put/Call Ratio", value: 72, signal: "Greed" },
+    { name: "Market Volatility", value: 35, signal: "Fear" },
+    { name: "Safe Haven Demand", value: 80, signal: "Extreme Greed" },
+  ],
+};
+
+export const signalHistory = [
+  { id: 1, date: "Apr 4", symbol: "NVDA", type: "BUY", entry: 845.00, exit: 875.20, pnl: 3.55, result: "win" as const, confidence: 87, holdTime: "2d" },
+  { id: 2, date: "Apr 3", symbol: "TSLA", type: "SELL", entry: 205.00, exit: 198.45, pnl: 3.41, result: "win" as const, confidence: 74, holdTime: "1d" },
+  { id: 3, date: "Apr 3", symbol: "AAPL", type: "BUY", entry: 178.00, exit: 175.84, pnl: -1.21, result: "loss" as const, confidence: 52, holdTime: "3d" },
+  { id: 4, date: "Apr 2", symbol: "AMD", type: "BUY", entry: 155.00, exit: 162.75, pnl: 5.00, result: "win" as const, confidence: 83, holdTime: "3d" },
+  { id: 5, date: "Apr 2", symbol: "META", type: "BUY", entry: 178.00, exit: 185.20, pnl: 4.04, result: "win" as const, confidence: 79, holdTime: "2d" },
+  { id: 6, date: "Apr 1", symbol: "SPY", type: "SELL", entry: 515.00, exit: 512.45, pnl: 0.50, result: "win" as const, confidence: 68, holdTime: "4h" },
+  { id: 7, date: "Apr 1", symbol: "MSFT", type: "BUY", entry: 415.00, exit: 412.30, pnl: -0.65, result: "loss" as const, confidence: 55, holdTime: "1d" },
+  { id: 8, date: "Mar 31", symbol: "PLTR", type: "BUY", entry: 23.00, exit: 24.50, pnl: 6.52, result: "win" as const, confidence: 79, holdTime: "5d" },
+  { id: 9, date: "Mar 30", symbol: "NFLX", type: "BUY", entry: 600.00, exit: 615.30, pnl: 2.55, result: "win" as const, confidence: 81, holdTime: "6d" },
+  { id: 10, date: "Mar 29", symbol: "GOOGL", type: "BUY", entry: 480.00, exit: 485.90, pnl: 1.23, result: "win" as const, confidence: 72, holdTime: "7d" },
+];
+
+export const riskDimensions = [
+  { dimension: "Market", value: 72, max: 100 },
+  { dimension: "Sector", value: 55, max: 100 },
+  { dimension: "Position", value: 85, max: 100 },
+  { dimension: "Volatility", value: 60, max: 100 },
+  { dimension: "Liquidity", value: 90, max: 100 },
+  { dimension: "Correlation", value: 45, max: 100 },
+];
+
+export const terminalOrderFlow = [
+  { time: "15:42:01", action: "BUY", symbol: "NVDA", size: "2,500", price: "875.20", exchange: "NASDAQ", type: "SWEEP" },
+  { time: "15:41:58", action: "SELL", symbol: "SPY", size: "15,000", price: "512.45", exchange: "ARCA", type: "BLOCK" },
+  { time: "15:41:55", action: "BUY", symbol: "AMD", size: "8,200", price: "162.75", exchange: "NYSE", type: "SWEEP" },
+  { time: "15:41:52", action: "BUY", symbol: "AAPL", size: "3,100", price: "175.84", exchange: "BATS", type: "SPLIT" },
+  { time: "15:41:48", action: "SELL", symbol: "TSLA", size: "5,800", price: "198.45", exchange: "NASDAQ", type: "BLOCK" },
+  { time: "15:41:45", action: "BUY", symbol: "META", size: "4,500", price: "185.20", exchange: "NYSE", type: "SWEEP" },
+  { time: "15:41:40", action: "BUY", symbol: "MSFT", size: "2,200", price: "412.30", exchange: "ARCA", type: "SPLIT" },
+  { time: "15:41:35", action: "SELL", symbol: "QQQ", size: "12,000", price: "438.12", exchange: "BATS", type: "BLOCK" },
+  { time: "15:41:30", action: "BUY", symbol: "AMZN", size: "1,800", price: "495.10", exchange: "NASDAQ", type: "SWEEP" },
+  { time: "15:41:25", action: "BUY", symbol: "GOOGL", size: "3,400", price: "485.90", exchange: "NYSE", type: "SPLIT" },
+];
+
+export const terminalNewsFeed = [
+  { time: "15:40", source: "Reuters", headline: "Fed minutes signal potential rate hold through Q3 2024", sentiment: "neutral" as const },
+  { time: "15:38", source: "Bloomberg", headline: "NVDA datacenter revenue exceeds estimates by 22%", sentiment: "positive" as const },
+  { time: "15:35", source: "CNBC", headline: "Treasury yields fall as inflation data comes in softer", sentiment: "positive" as const },
+  { time: "15:32", source: "WSJ", headline: "China tech stocks rally on regulatory easing signals", sentiment: "positive" as const },
+  { time: "15:28", source: "Reuters", headline: "Oil prices drop 2% on surprise inventory build", sentiment: "negative" as const },
+  { time: "15:25", source: "Bloomberg", headline: "AMD announces next-gen AI chip to compete with NVDA", sentiment: "positive" as const },
+  { time: "15:22", source: "FT", headline: "European banks face new capital requirements in 2025", sentiment: "negative" as const },
+  { time: "15:18", source: "CNBC", headline: "Apple Vision Pro sales slower than expected in Q2", sentiment: "negative" as const },
+];
+
+export const terminalSystemLog = [
+  { time: "15:42:03", level: "INFO", module: "ENTANGLE-CORE", message: "Quantum consensus reached: NVDA BUY @ 87% confidence — 5/6 models agree" },
+  { time: "15:42:01", level: "DATA", module: "FLOW-SCANNER", message: "Detected $4.2M sweep on NVDA 950C 05/17 across 3 exchanges" },
+  { time: "15:41:58", level: "WARN", module: "RISK-ENGINE", message: "Portfolio beta exposure elevated: 1.35 vs target 1.0" },
+  { time: "15:41:55", level: "INFO", module: "PRICE-ACTION", message: "Bull flag breakout confirmed on NVDA 4H — volume 2.8x avg" },
+  { time: "15:41:52", level: "INFO", module: "SENTIMENT", message: "Market sentiment index: 72/100 (Greed) — up from 65 yesterday" },
+  { time: "15:41:48", level: "DATA", module: "GREEKS-ENGINE", message: "AMD IV rank: 78th percentile — theta premium elevated" },
+  { time: "15:41:45", level: "WARN", module: "ENTANGLE-CORE", message: "TSLA signal conflict: 3 bearish, 2 bullish, 1 neutral — no consensus" },
+  { time: "15:41:40", level: "INFO", module: "VOLUME-ANALYSIS", message: "SPY dark pool activity: 42% of volume — above average institutional flow" },
+  { time: "15:41:35", level: "INFO", module: "RISK-ENGINE", message: "Max drawdown today: -0.8% — within tolerance (max -3%)" },
+  { time: "15:41:30", level: "DATA", module: "FLOW-SCANNER", message: "QQQ put sweep $1.8M — flagged as hedge (correlated with equity position)" },
+];
+
+export const quantumNodes = [
+  { id: "price", label: "Price Action", status: "active" as const, confidence: 92 },
+  { id: "volume", label: "Volume", status: "active" as const, confidence: 88 },
+  { id: "flow", label: "Options Flow", status: "active" as const, confidence: 95 },
+  { id: "greeks", label: "Greeks", status: "active" as const, confidence: 78 },
+  { id: "sentiment", label: "Sentiment", status: "warning" as const, confidence: 65 },
+  { id: "risk", label: "Risk Mgmt", status: "active" as const, confidence: 90 },
+];

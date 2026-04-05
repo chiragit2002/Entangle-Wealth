@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "EntangleWealth"
+version = "1.0.0"
+id = "artifacts/entangle-wealth"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25343
+
+[services.development]
+run = "pnpm --filter @workspace/entangle-wealth run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/entangle-wealth", "run", "build" ]
+publicDir = "artifacts/entangle-wealth/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25343"
+BASE_PATH = "/"

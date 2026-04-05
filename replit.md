@@ -15,6 +15,18 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **Validation**: Zod (`zod/v4`), `drizzle-zod`
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
+- **Frontend**: React + Vite + Tailwind CSS + shadcn/ui
+
+## Artifacts
+
+### EntangleWealth (`artifacts/entangle-wealth`)
+- Professional dark-themed stock and options alert web application
+- Black background with electric blue (#00D4FF) and gold (#FFD700) accents
+- Pages: Landing (/), Dashboard (/dashboard), Options Signals (/options), About (/about)
+- Features: Email waitlist capture, live scrolling market ticker, stock alert cards, options flow alerts, Greeks display, signal strength indicators
+- Frontend-only with mock data (no backend API calls)
+- Mobile responsive with hamburger navigation
+- Fonts: JetBrains Mono (data), Inter (UI)
 
 ## Key Commands
 

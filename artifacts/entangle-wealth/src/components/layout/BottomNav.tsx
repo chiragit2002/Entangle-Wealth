@@ -1,12 +1,12 @@
 import { useLocation, Link } from "wouter";
-import { Home, TrendingUp, Wrench, FileText, User } from "lucide-react";
+import { Home, TrendingUp, BarChart3, Wrench, FileText } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
   { href: "/dashboard", label: "Signals", icon: TrendingUp },
+  { href: "/technical", label: "Analysis", icon: BarChart3 },
   { href: "/gigs", label: "Gigs", icon: Wrench },
   { href: "/tax", label: "TaxFlow", icon: FileText },
-  { href: "/profile", label: "Profile", icon: User },
 ];
 
 export function BottomNav() {

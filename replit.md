@@ -24,7 +24,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 ### EntangleWealth (`artifacts/entangle-wealth`)
 - Financial analysis platform with dark theme (black bg, electric blue #00D4FF, gold #FFD700)
 - **Authentication**: Clerk (email + Google sign-in at /sign-in, /sign-up)
-- Pages: Landing (/), Dashboard (/dashboard), Earn (/earn), Options Signals (/options), Stock Explorer (/stocks), Job Search (/jobs), Gig Marketplace (/gigs), Community (/community), Tax Dashboard (/tax), Receipt Scanner (/receipts), Business Travel Planner (/travel), TaxGPT (/taxgpt), Terminal (/terminal), Résumé Builder (/resume, auth required), Profile (/profile, auth required), About (/about)
+- Pages: Landing (/), Dashboard (/dashboard), Earn (/earn), Options Signals (/options), Stock Explorer (/stocks), Job Search (/jobs), Gig Marketplace (/gigs), Community (/community), Tax Dashboard (/tax), Receipt Scanner (/receipts), Business Travel Planner (/travel), TaxGPT (/taxgpt), Technical Analysis (/technical), Terminal (/terminal), Résumé Builder (/resume, auth required), Profile (/profile, auth required), About (/about)
 - Tone: Honest, no-hype, no AI slop. Straightforward about what the platform does and doesn't do.
 - Core concept: Multiple AI analysis methods run simultaneously and cross-check each other via "quantum entanglement." Signals only fire on consensus.
 - Mission: Help everyday families make better financial decisions.
@@ -94,6 +94,26 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **TaxGPT (/taxgpt)**: AI chat powered by OpenAI (gpt-4o-mini via proxy), common questions quick buttons, audit risk factors section with progress bars, client-side fallback with keyword-matched IRS answers (10 topics) when API unavailable, client-side rate limiting (10 req/min sliding window), 1000-char input limit
 - **Security**: CSV exports use formula-injection-safe `escapeCSV()` (prefixes `=+\-@\t\r` with `'`), all inputs have `maxLength`, server-side rate limiting on TaxGPT API (10 req/min per IP), all buttons 44px min-height for mobile touch targets, dark select option styling
 
+#### Technical Analysis (/technical)
+- 55+ technical indicators across 5 categories: Trend (SMA, EMA, WMA, DEMA, TEMA, HMA, KAMA, VWAP, Ichimoku, Parabolic SAR, Supertrend, ADX, Aroon, TRIX, DPO, Mass Index, Vortex), Momentum (RSI, MACD, Stochastic, Williams %R, CCI, ROC, MFI, CMO, UO, TSI, PPO, AO, Coppock, KST, Stoch RSI), Volatility (Bollinger, ATR, Keltner, Donchian, StdDev, HV, Chaikin Vol, Ulcer), Volume (OBV, A/D Line, CMF, Force Index, EMV, Vol RSI, Pivot Points, Fibonacci)
+- Indicator library: `src/lib/indicators.ts` with `runAllIndicators(data)`, `getOverallSignal(results)`, `generateMockOHLCV(basePrice)`
+- 6 AI agent reviews: Trend Analyst, Momentum Surgeon, Risk Manager, Volume Profiler, Devil's Advocate, Consensus Engine
+- Each agent provides verdict, signal, reasoning, and key metrics
+- Category filter tabs (All/Trend/Momentum/Volatility/Volume)
+- Overall signal summary with buy/sell/neutral counts and confidence percentage
+- Export all indicators to CSV
+- Stock search with autocomplete for 20 popular NASDAQ tickers
+
+#### Notification Center
+- Bell icon in navbar (desktop and mobile) with unread count badge
+- Dropdown with two tabs: Alerts (notification list) and Configure (alert setup)
+- Mock notifications: buy/sell signals, price alerts, volume spikes, system messages
+- Alert configuration: add alerts by symbol + type (price above/below, RSI oversold/overbought, MACD crossover, volume spike) + value
+- Alerts persisted to localStorage (`entangle-alerts`)
+- Toggle/delete configured alerts
+- Mark all read, clear all actions
+- Keyboard accessible: Escape to close, focus management, dialog role
+
 #### Terminal (/terminal)
 - MirofishTerminal with live order flow, news feed, system log panels
 - Commands: HELP, QUOTE, ANALYZE (AI), SEARCH (API), RISK, STATUS, SIGNALS, PORTFOLIO, CLEAR
@@ -108,7 +128,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - Fonts: JetBrains Mono (data), Inter (UI)
 - CSS utilities: `.electric-text` (blue gradient), `.gold-text` (gold gradient), `.glass-panel`
 - Routing: wouter for client-side routing
-- Mobile responsive with hamburger navigation + bottom navigation bar (Home, Signals, Gigs, TaxFlow, Profile) on screens < 1024px
+- Mobile responsive with hamburger navigation + bottom navigation bar (Home, Signals, Analysis, Gigs, TaxFlow) on screens < 1024px
 - Dashboard includes enhanced Options Flow with Greeks display (delta, gamma, theta, IV rank) and unusual activity flags
 
 ### API Server (`artifacts/api-server`)

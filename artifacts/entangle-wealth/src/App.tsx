@@ -22,6 +22,7 @@ import Travel from "@/pages/Travel";
 import TaxGPT from "@/pages/TaxGPT";
 import Resume from "@/pages/Resume";
 import Profile from "@/pages/Profile";
+import TechnicalAnalysis from "@/pages/TechnicalAnalysis";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -113,6 +114,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/receipts" component={Receipts} />
             <Route path="/travel" component={Travel} />
             <Route path="/taxgpt" component={TaxGPT} />
+            <Route path="/technical" component={TechnicalAnalysis} />
             <Route path="/terminal" component={Terminal} />
             <Route path="/about" component={About} />
             <Route path="/sign-in/*?" component={SignInPage} />

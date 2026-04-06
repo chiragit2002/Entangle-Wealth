@@ -3,6 +3,7 @@ import { Menu, X, Activity, LogOut, User } from "lucide-react";
 import { useState } from "react";
 import { useUser, useClerk, Show } from "@clerk/react";
 import { Button } from "@/components/ui/button";
+import NotificationCenter from "@/components/NotificationCenter";
 
 export function Navbar() {
   const [location, setLocation] = useLocation();
@@ -20,6 +21,7 @@ export function Navbar() {
     { href: "/gigs", label: "Gigs" },
     { href: "/community", label: "Community" },
     { href: "/tax", label: "TaxFlow" },
+    { href: "/technical", label: "Technical" },
     { href: "/terminal", label: "Terminal" },
     { href: "/about", label: "About Us" },
   ];
@@ -48,6 +50,8 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+
+          <NotificationCenter />
 
           <Show when="signed-in">
             <div className="flex items-center gap-3 ml-2">
@@ -85,13 +89,16 @@ export function Navbar() {
           </Show>
         </div>
 
-        <button
-          className="lg:hidden text-white"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-        >
-          {isMobileMenuOpen ? <X /> : <Menu />}
-        </button>
+        <div className="lg:hidden flex items-center gap-1">
+          <NotificationCenter />
+          <button
+            className="text-white"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {isMobileMenuOpen ? <X /> : <Menu />}
+          </button>
+        </div>
       </div>
 
       {isMobileMenuOpen && (

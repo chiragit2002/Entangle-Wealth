@@ -1,6 +1,8 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
+import { createHash } from "crypto";
 import { logger } from "../lib/logger";
 import Parser from "rss-parser";
+import { getAllSymbols } from "../data/nasdaq-stocks";
 
 const router = Router();
 const rssParser = new Parser({
@@ -63,17 +65,22 @@ const NEGATIVE_WORDS = [
   "default", "layoff", "bankruptcy", "negative", "slump", "shutdown", "crisis",
 ];
 
-const COMMON_TICKERS = new Set([
-  "AAPL", "MSFT", "GOOGL", "GOOG", "AMZN", "NVDA", "META", "TSLA", "AVGO",
-  "NFLX", "AMD", "INTC", "QCOM", "TXN", "AMAT", "LRCX", "MU", "MRVL",
-  "ASML", "TSM", "SMCI", "ARM", "PLTR", "COIN", "SOFI", "RKLB", "CRWD",
-  "PANW", "CRM", "UBER", "SHOP", "SNOW", "NET", "DDOG", "SQ", "PYPL",
-  "BABA", "JD", "PDD", "NIO", "LI", "RIVN", "LCID",
-  "SPY", "QQQ", "DIA", "IWM", "VTI",
-  "JPM", "GS", "V", "MA", "BAC", "WFC",
-  "XOM", "CVX", "BA", "LMT", "RTX",
-  "UNH", "LLY", "PFE", "JNJ", "MRNA",
-]);
+let VALID_TICKERS: Set<string> | null = null;
+function getValidTickers(): Set<string> {
+  if (!VALID_TICKERS) {
+    VALID_TICKERS = getAllSymbols();
+  }
+  return VALID_TICKERS;
+}
+
+const COMMON_NAMES_TO_TICKERS: Record<string, string> = {
+  apple: "AAPL", microsoft: "MSFT", google: "GOOGL", alphabet: "GOOGL",
+  amazon: "AMZN", nvidia: "NVDA", meta: "META", tesla: "TSLA",
+  broadcom: "AVGO", netflix: "NFLX", amd: "AMD", intel: "INTC",
+  qualcomm: "QCOM", tsmc: "TSM", arm: "ARM", palantir: "PLTR",
+  coinbase: "COIN", crowdstrike: "CRWD", salesforce: "CRM", uber: "UBER",
+  shopify: "SHOP", snowflake: "SNOW", paypal: "PYPL", boeing: "BA",
+};
 
 function scoreItem(title: string, summary: string): number {
   const text = `${title} ${summary}`.toLowerCase();
@@ -98,15 +105,87 @@ function deriveSentiment(title: string, summary: string): "positive" | "negative
   return "neutral";
 }
 
+const TICKER_EXCLUSIONS = new Set([
+  "A", "AN", "AM", "ARE", "AS", "AT", "BE", "BY", "DO", "FOR", "GO", "HAS",
+  "HE", "IF", "IN", "IS", "IT", "KEY", "LOW", "MAN", "MAR", "MAT", "MAY",
+  "MET", "NEW", "NOW", "OF", "OLD", "ON", "ONE", "OR", "OUT", "OWN",
+  "RUN", "SAY", "SEE", "SET", "SO", "THE", "TO", "TWO", "UP", "US", "WAS",
+  "WAY", "WE", "ALL", "BIG", "CAN", "CAR", "DAY", "DID", "END", "ERA",
+  "FAR", "FIT", "GET", "GOT", "HAD", "HER", "HIM", "HIS", "HOW", "ITS",
+  "JOB", "LET", "LOT", "NOT", "OUR", "PUT", "RAN", "SAT", "SHE", "SIT",
+  "SIX", "TEN", "TOP", "TRY", "USE", "VIA", "WON", "YES", "YET",
+  "ELSE", "EVER", "JUST", "LIKE", "MAKE", "MUCH", "NEXT", "OPEN",
+  "PLUG", "PLUS", "VERY", "WELL", "WHEN", "WING",
+  "FIVE", "FOUR", "FAST", "FACT", "GOOD", "GOLD", "GRAB", "FLEX",
+  "FORM", "FREE", "FULL", "FUND", "GAIN", "GAME", "PEAK", "REAL",
+  "RISK", "ROCK", "ROLL", "SAFE", "SAVE", "SHIP", "SHOP", "SHOW",
+  "SIGN", "STAY", "STEP", "TAKE", "TALK", "TELL", "THAT", "THEM",
+  "THEY", "THIS", "THAN", "THEN", "TRIP", "TRUE", "TURN", "UNIT",
+  "WORK", "BILL", "BORN", "CALL", "CAME", "CASH", "CHIP", "CITE",
+  "COAT", "COLD", "COME", "COOL", "CORE", "COST", "DEAL", "DEEP",
+  "DROP", "EACH", "EAST", "EDGE", "EVEN", "FACE", "FAIL", "FALL",
+  "FEEL", "FILE", "FILL", "FIRE", "FIRM", "FLAT", "FLOW", "FOLD",
+  "FOOT", "GAVE", "GOES", "GONE", "GROW", "HALF", "HAND", "HANG",
+  "HARD", "HATE", "HEAD", "HEAR", "HEAT", "HELP", "HERE", "HIGH",
+  "HOLD", "HOME", "HOPE", "HUGE", "IDEA", "IRON", "JACK", "JOHN",
+  "JOIN", "JUMP", "KEEP", "KEPT", "KIND", "KING", "KNEW", "KNOW",
+  "LACK", "LAND", "LAST", "LATE", "LEAD", "LEFT", "LESS", "LIFT",
+  "LINE", "LINK", "LIST", "LIVE", "LOAD", "LOCK", "LONG", "LOOK",
+  "LORD", "LOSE", "LOST", "LOVE", "LUCK", "MADE", "MAIL", "MAIN",
+  "MARK", "MASS", "MEAN", "MEET", "MIKE", "MILD", "MIND", "MINE",
+  "MISS", "MODE", "MORE", "MOST", "MOVE", "MUST", "NAME", "NEAR",
+  "NEED", "NEWS", "NOTE", "ONLY", "OVER", "PACE", "PACK", "PAGE",
+  "PAID", "PAIR", "PALM", "PART", "PASS", "PAST", "PATH", "PICK",
+  "PLAN", "PLAY", "POLL", "POOL", "POOR", "PORT", "POST", "POUR",
+  "PRAY", "PULL", "PURE", "PUSH", "RACE", "RAIN", "RANK", "RARE",
+  "RATE", "READ", "RELY", "REST", "RICH", "RIDE", "RING", "RISE",
+  "ROAD", "ROLE", "ROOF", "ROOT", "ROPE", "ROSE", "RULE", "RUSH",
+  "SAID", "SALE", "SALT", "SAME", "SAND", "SANG", "SEAT", "SEED",
+  "SEEK", "SEEM", "SEEN", "SELF", "SELL", "SEND", "SENT", "SHOT",
+  "SHUT", "SIDE", "SITE", "SIZE", "SLIP", "SLOW", "SNOW", "SOFT",
+  "SOIL", "SOLD", "SOLE", "SOME", "SONG", "SOON", "SORT", "SPIN",
+  "SPOT", "STAR", "STEM", "STOP", "SUCH", "SURE", "SWAP", "TALL",
+  "TANK", "TAPE", "TASK", "TEAM", "TEAR", "TECH", "TEND", "TERM",
+  "TEST", "TEXT", "THIN", "TIED", "TILL", "TIME", "TINY", "TIRE",
+  "TOLD", "TONE", "TOOK", "TOOL", "TORN", "TOWN", "TREE", "TUBE",
+  "TYPE", "UPON", "VAST", "VOTE", "WAGE", "WAIT", "WAKE", "WALK",
+  "WALL", "WANT", "WARM", "WARN", "WASH", "WAVE", "WEAK", "WEAR",
+  "WEEK", "WENT", "WEST", "WHAT", "WIDE", "WIFE", "WILD", "WILL",
+  "WIND", "WINE", "WIRE", "WISE", "WISH", "WITH", "WOOD", "WORD",
+  "WORE", "WRAP", "YARD", "YEAR", "YOUR", "ZERO", "ZONE",
+  "ICE", "AIR", "AGE", "AID", "AIM", "ARM", "ART", "ASK", "ATE",
+  "BAD", "BAR", "BAT", "BED", "BIT", "BOX", "BOY", "BUS", "BUT",
+  "BUY", "COP", "CUT", "DIE", "DOG", "DRY", "DUE", "EAR", "EAT",
+  "EGG", "EYE", "FAN", "FAT", "FED", "FEW", "FLY", "FOX", "FUN",
+  "GAS", "GAP", "GUN", "GUY", "HIT", "HOT", "HUB", "HUT",
+  "ILL", "JAM", "JET", "LAW", "LAY", "LED", "LEG", "LIE", "LIP",
+  "LOG", "MAP", "MIX", "MOB", "MOM", "MUD", "NAP", "NET", "NOR",
+  "NUT", "ODD", "OIL", "OWE", "PAD", "PAN", "PAY", "PEN", "PER",
+  "PET", "PIE", "PIN", "PIT", "POP", "POT", "RAW", "RED", "RIB",
+  "RID", "ROB", "ROD", "ROW", "RUB", "RUG", "SAD", "SAN", "TAP",
+  "TAX", "TIE", "TIP", "TOE", "TON", "TOO", "WAR", "WEB", "WET",
+  "WHO", "WHY", "WIN", "WIT", "WOK",
+]);
+
 function extractTickers(text: string): string[] {
-  const words = text.split(/[\s,.()\[\]{}<>:;!?"'\/]+/);
+  const tickers = getValidTickers();
   const found = new Set<string>();
+
+  const words = text.split(/[\s,.()\[\]{}<>:;!?"'\/]+/);
   for (const w of words) {
     const upper = w.toUpperCase();
-    if (COMMON_TICKERS.has(upper) && upper.length >= 2) {
+    if (upper.length >= 2 && upper.length <= 5 && tickers.has(upper) && !TICKER_EXCLUSIONS.has(upper)) {
       found.add(upper);
     }
   }
+
+  const lower = text.toLowerCase();
+  for (const [name, ticker] of Object.entries(COMMON_NAMES_TO_TICKERS)) {
+    if (lower.includes(name)) {
+      found.add(ticker);
+    }
+  }
+
   return Array.from(found);
 }
 
@@ -117,6 +196,33 @@ function cleanText(raw: string): string {
   text = text.replace(/\s+/g, " ").trim();
   if (text.length > 500) text = text.slice(0, 500) + "...";
   return text;
+}
+
+async function fetchArticleBody(url: string): Promise<string> {
+  if (!url) return "";
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { "User-Agent": "EntangleWealth/1.0 NewsBot" },
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return "";
+    const html = await res.text();
+    const bodyMatch = html.match(/<article[^>]*>([\s\S]*?)<\/article>/i) ||
+                      html.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
+    const bodyHtml = bodyMatch ? bodyMatch[1] : "";
+    let text = bodyHtml.replace(/<script[\s\S]*?<\/script>/gi, "");
+    text = text.replace(/<style[\s\S]*?<\/style>/gi, "");
+    text = text.replace(/<[^>]*>/g, " ");
+    text = text.replace(/&[a-zA-Z]+;/g, " ");
+    text = text.replace(/\s+/g, " ").trim();
+    if (text.length > 1000) text = text.slice(0, 1000) + "...";
+    return text;
+  } catch {
+    return "";
+  }
 }
 
 let cachedItems: NewsItem[] = [];
@@ -135,15 +241,15 @@ async function parseFeed(topic: string, url: string): Promise<NewsItem[]> {
       const title = cleanText(entry.title || "Untitled");
       const link = entry.link || "";
       const pubDate = entry.pubDate || entry.isoDate || "";
-      const summary = cleanText(entry.contentSnippet || entry.content || entry.summary || "");
+      const rssSummary = cleanText(entry.contentSnippet || entry.content || entry.summary || "");
+      const summary = rssSummary;
       const combinedText = `${title} ${summary}`;
-      const score = scoreItem(title, summary);
+      const score = scoreItem(title, combinedText);
       const sentiment = deriveSentiment(title, summary);
       const tickers = extractTickers(combinedText);
 
       const publishedAt = pubDate ? new Date(pubDate).getTime() : Date.now();
-      const raw = `${url}::${idx}::${link}::${title}`;
-      const id = Buffer.from(raw).toString("base64url").slice(0, 40);
+      const id = createHash("sha256").update(`${url}::${idx}::${link}::${title}`).digest("hex").slice(0, 16);
 
       items.push({
         id,
@@ -191,6 +297,30 @@ async function scrapeAllFeeds(): Promise<NewsItem[]> {
     if (!seen.has(key)) {
       seen.add(key);
       deduped.push(item);
+    }
+  }
+
+  deduped.sort((a, b) => b.score - a.score || b.publishedAt - a.publishedAt);
+
+  const topItems = deduped.slice(0, 15);
+  const bodyResults = await Promise.allSettled(
+    topItems.map((item) => fetchArticleBody(item.link))
+  );
+  for (let i = 0; i < topItems.length; i++) {
+    const r = bodyResults[i];
+    if (r.status === "fulfilled" && r.value) {
+      const bodyText = r.value;
+      const bodyTickers = extractTickers(bodyText);
+      for (const t of bodyTickers) {
+        if (!topItems[i].tickers.includes(t)) {
+          topItems[i].tickers.push(t);
+        }
+      }
+      const bodyScore = scoreItem("", bodyText);
+      topItems[i].score += Math.min(bodyScore, 10);
+      if (!topItems[i].summary || topItems[i].summary.length < 50) {
+        topItems[i].summary = bodyText.slice(0, 500);
+      }
     }
   }
 

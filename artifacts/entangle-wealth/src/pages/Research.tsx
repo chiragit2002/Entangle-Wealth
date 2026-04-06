@@ -59,7 +59,7 @@ function SentimentDot({ sentiment }: { sentiment: string }) {
 function TickerLink({ ticker }: { ticker: string }) {
   return (
     <Link
-      href={`/stocks`}
+      href={`/stocks?q=${ticker}`}
       className="inline-flex items-center px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-mono font-bold hover:bg-primary/20 transition-colors"
     >
       ${ticker}

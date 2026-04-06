@@ -42,12 +42,15 @@ const CAP_TIERS = [
 ];
 
 export default function Stocks() {
+  const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const initialQuery = urlParams?.get("q") || "";
+
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
   const [sectorFilter, setSectorFilter] = useState("");
   const [capFilter, setCapFilter] = useState("");
   const [sortBy, setSortBy] = useState("symbol");

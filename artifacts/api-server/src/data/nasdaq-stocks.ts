@@ -652,6 +652,10 @@ export function getTopMovers(count = 20): { gainers: NasdaqStock[]; losers: Nasd
   };
 }
 
+export function getAllSymbols(): Set<string> {
+  return new Set(KNOWN_STOCKS.map(([symbol]) => symbol));
+}
+
 export function getSectorSummary(): { sector: string; count: number; avgChange: number }[] {
   const all = getAllStocks();
   const map: Record<string, { count: number; totalChange: number }> = {};

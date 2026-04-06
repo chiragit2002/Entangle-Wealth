@@ -8,6 +8,7 @@ import jobsRouter from "./jobs";
 import kycRouter from "./kyc";
 import stripeRouter from "./stripe";
 import gigsRouter from "./gigs";
+import taxgptRouter from "./taxgpt";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(jobsRouter);
 router.use(kycRouter);
 router.use(stripeRouter);
 router.use(gigsRouter);
+router.use(taxgptRouter);
 
 export default router;

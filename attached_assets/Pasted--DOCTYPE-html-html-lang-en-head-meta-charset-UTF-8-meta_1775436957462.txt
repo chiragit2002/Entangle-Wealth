@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EntangleWealth — Community</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--black:#080810;--blue:#00d4ff;--gold:#ffd700;--green:#00ff88;--red:#ff3366;--card:#0d0d1a;--border:rgba(0,212,255,0.15)}
+body{background:var(--black);color:#fff;font-family:'Segoe UI',sans-serif;padding-bottom:80px}
+nav{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(8,8,16,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:18px;font-weight:900;background:linear-gradient(135deg,var(--blue),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,16,0.98);border-top:1px solid var(--border);display:flex;z-index:999}
+.bnav{flex:1;padding:10px 4px 14px;background:none;border:none;color:#444;font-size:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bnav .ic{font-size:20px}
+.bnav.active{color:var(--blue)}
+.page{display:none;padding-top:65px;min-height:100vh}
+.page.active{display:block}
+.pi{padding:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.sec-title{font-size:16px;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.btn{border:none;border-radius:10px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:8px}
+.btn-blue{background:linear-gradient(135deg,var(--blue),#0099cc);color:#000}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#cc9900);color:#000}
+.btn-outline{background:none;border:1px solid var(--border);color:#aaa}
+.btn-green{background:linear-gradient(135deg,var(--green),#00cc66);color:#000}
+input,textarea,select{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;width:100%;margin-bottom:10px;font-family:inherit}
+input:focus,textarea:focus,select:focus{border-color:var(--blue)}
+input::placeholder,textarea::placeholder{color:#444}
+.badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-blue{background:rgba(0,212,255,0.15);color:var(--blue)}
+.badge-gold{background:rgba(255,215,0,0.15);color:var(--gold)}
+.badge-green{background:rgba(0,255,136,0.15);color:var(--green)}
+.badge-red{background:rgba(255,51,102,0.15);color:var(--red)}
+.badge-free{background:rgba(0,255,136,0.2);color:var(--green);font-size:13px;padding:6px 16px}
+.toast{display:none;position:fixed;top:75px;left:16px;right:16px;background:rgba(0,255,136,0.12);border:1px solid var(--green);border-radius:12px;padding:14px;color:var(--green);font-size:14px;text-align:center;z-index:9999;font-weight:600}
+.community-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.community-header{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.community-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.community-name{font-size:16px;font-weight:800}
+.community-meta{font-size:12px;color:#555;margin-top:3px}
+.community-stats{display:flex;gap:16px;padding-top:12px;border-top:1px solid var(--border)}
+.comm-stat{font-size:12px;color:#555}
+.comm-stat span{display:block;font-size:15px;font-weight:700;color:#fff;margin-top:2px}
+.post-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.post-header{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.post-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#000;flex-shrink:0}
+.post-name{font-size:14px;font-weight:700}
+.post-time{font-size:11px;color:#555}
+.post-body{font-size:14px;color:#ccc;line-height:1.6;margin-bottom:12px}
+.post-actions{display:flex;gap:16px;padding-top:10px;border-top:1px solid var(--border)}
+.post-action{background:none;border:none;color:#555;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;padding:0}
+.post-action:hover{color:var(--blue)}
+.event-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
+.event-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue)}
+.event-date{font-size:11px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.event-title{font-size:16px;font-weight:800;margin-bottom:6px}
+.event-meta{font-size:12px;color:#555;margin-bottom:12px}
+.job-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.job-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.job-company{font-size:13px;color:var(--blue);margin-bottom:6px}
+.job-meta{font-size:11px;color:#555;margin-bottom:8px}
+.job-salary{font-size:14px;font-weight:700;color:var(--green)}
+.pricing-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;text-align:center}
+.pricing-card.featured{border-color:var(--gold);background:linear-gradient(135deg,rgba(255,215,0,0.05),rgba(0,212,255,0.05))}
+.pricing-name{font-size:14px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.pricing-price{font-size:42px;font-weight:900;margin-bottom:4px}
+.pricing-period{font-size:13px;color:#555;margin-bottom:20px}
+.pricing-feature{font-size:13px;color:#aaa;padding:8px 0;border-bottom:1px solid var(--border);text-align:left;display:flex;align-items:center;gap:8px}
+.pricing-feature:last-of-type{border:none}
+.tab-row{display:flex;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.tab{flex:1;padding:10px 4px;background:none;border:none;color:#555;font-size:12px;cursor:pointer;font-weight:600}
+.tab.active{background:rgba(0,212,255,0.1);color:var(--blue)}
+.filter-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px}
+.filter-btn{background:var(--card);border:1px solid var(--border);color:#777;padding:7px 14px;border-radius:20px;font-size:12px;cursor:pointer;white-space:nowrap}
+.filter-btn.active{background:rgba(0,212,255,0.1);border-color:var(--blue);color:var(--blue)}
+.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:9998;padding:20px;padding-top:80px;overflow-y:auto}
+.modal.active{display:block}
+.modal-content{background:#0d0d1a;border:1px solid var(--border);border-radius:16px;padding:20px}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:16px;color:var(--blue)}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<nav>
+  <div class="logo">⚛ EntangleWealth</div>
+  <div style="font-size:11px;color:var(--gold)">COMMUNITY</div>
+</nav>
+
+<!-- COMMUNITIES -->
+<div id="pg-community" class="page active">
+  <div class="pi">
+    <div class="sec-title">Communities <span style="font-size:12px;color:var(--blue);cursor:pointer" onclick="showModal('create-community')">+ Create</span></div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="filterComm('all',this)">All</button>
+      <button class="filter-btn" onclick="filterComm('trading',this)">📈 Trading</button>
+      <button class="filter-btn" onclick="filterComm('realestate',this)">🏠 Real Estate</button>
+      <button class="filter-btn" onclick="filterComm('tax',this)">📊 Tax & Accounting</button>
+      <button class="filter-btn" onclick="filterComm('tech',this)">💻 Tech</button>
+      <button class="filter-btn" onclick="filterComm('gig',this)">🛠️ Gig Workers</button>
+    </div>
+    <div id="community-list"></div>
+  </div>
+</div>
+
+<!-- FEED -->
+<div id="pg-feed" class="page">
+  <div class="pi">
+    <div class="sec-title">Community Feed</div>
+    <div class="card">
+      <textarea id="post-text" placeholder="Share something with your community..." rows="3" style="margin-bottom:10px"></textarea>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-blue" style="margin-top:0" onclick="createPost()">Post</button>
+        <button class="btn btn-outline" style="margin-top:0" onclick="toast('📷 Photo upload coming soon')">📷 Photo</button>
+      </div>
+    </div>
+    <div id="feed-list"></div>
+  </div>
+</div>
+
+<!-- EVENTS -->
+<div id="pg-events" class="page">
+  <div class="pi">
+    <div class="sec-title">Events & Trade Shows <span style="font-size:12px;color:var(--blue);cursor:pointer" onclick="showModal('create-event')">+ Create</span></div>
+    <div class="tab-row">
+      <button class="tab active" onclick="eventTab('upcoming',this)">Upcoming</button>
+      <button class="tab" onclick="eventTab('virtual',this)">Virtual</button>
+      <button class="tab" onclick="eventTab('inperson',this)">In Person</button>
+      <button class="tab" onclick="eventTab('myevents',this)">My Events</button>
+    </div>
+    <div id="event-list"></div>
+  </div>
+</div>
+
+<!-- JOBS -->
+<div id="pg-jobs" class="page">
+  <div class="pi">
+    <div class="sec-title">Job Board <span style="font-size:12px;color:var(--blue);cursor:pointer" onclick="showModal('post-job')">+ Post Job</span></div>
+    <input placeholder="🔍 Search jobs..." id="job-search" oninput="filterJobs()">
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="filterJobCat('all',this)">All</button>
+      <button class="filter-btn" onclick="filterJobCat('remote',this)">🌐 Remote</button>
+      <button class="filter-btn" onclick="filterJobCat('fulltime',this)">💼 Full-time</button>
+      <button class="filter-btn" onclick="filterJobCat('parttime',this)">⏰ Part-time</button>
+      <button class="filter-btn" onclick="filterJobCat('gig',this)">🛠️ Gig</button>
+      <button class="filter-btn" onclick="filterJobCat('freelance',this)">💻 Freelance</button>
+    </div>
+    <div id="job-list"></div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div id="pg-pricing" class="page">
+  <div class="pi">
+    <div style="text-align:center;padding:20px 0 24px">
+      <div style="font-size:28px;font-weight:900;margin-bottom:8px;background:linear-gradient(135deg,#fff,var(--blue),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Simple Pricing</div>
+      <div style="font-size:14px;color:#666">Try everything free for 30 days. No card required.</div>
+      <div style="margin-top:12px"><span class="badge badge-free">✅ 30 DAY FREE TRIAL — NO CARD NEEDED</span></div>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-name">Starter</div>
+      <div class="pricing-price" style="color:var(--green)">Free</div>
+      <div class="pricing-period">Forever free tier</div>
+      <div class="pricing-feature">✅ 3 stock signals per day</div>
+      <div class="pricing-feature">✅ Basic options flow</div>
+      <div class="pricing-feature">✅ Community access</div>
+      <div class="pricing-feature">✅ 5 receipt scans per month</div>
+      <div class="pricing-feature">❌ TaxGPT</div>
+      <div class="pricing-feature">❌ Travel itinerary builder</div>
+      <div class="pricing-feature">❌ Resume builder</div>
+      <button class="btn btn-outline" onclick="toast('✅ You are on the free plan')">Current Plan</button>
+    </div>
+
+    <div class="pricing-card featured">
+      <div style="position:absolute;top:-1px;left:50%;transform:translateX(-50%)">
+        <span class="badge badge-gold" style="font-size:12px;padding:6px 16px">MOST POPULAR</span>
+      </div>
+      <div style="margin-top:12px"></div>
+      <div class="pricing-name" style="color:var(--gold)">Pro</div>
+      <div class="pricing-price" style="color:var(--gold)">$29<span style="font-size:18px">/mo</span></div>
+      <div class="pricing-period">After 30-day free trial</div>
+      <div class="pricing-feature">✅ Unlimited stock signals</div>
+      <div class="pricing-feature">✅ Full options flow with Greeks</div>
+      <div class="pricing-feature">✅ TaxGPT unlimited</div>
+      <div class="pricing-feature">✅ Unlimited receipt scanning</div>
+      <div class="pricing-feature">✅ Travel itinerary builder</div>
+      <div class="pricing-feature">✅ Resume builder & job finder</div>
+      <div class="pricing-feature">✅ Community + events access</div>
+      <div class="pricing-feature">✅ Compliance score dashboard</div>
+      <div class="pricing-feature">✅ CPA-ready expense exports</div>
+      <button class="btn btn-gold" onclick="startTrial()">Start Free 30-Day Trial →</button>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-name">Business</div>
+      <div class="pricing-price" style="color:var(--blue)">$79<span style="font-size:18px">/mo</span></div>
+      <div class="pricing-period">For teams and power users</div>
+      <div class="pricing-feature">✅ Everything in Pro</div>
+      <div class="pricing-feature">✅ Up to 5 team members</div>
+      <div class="pricing-feature">✅ Priority signal alerts</div>
+      <div class="pricing-feature">✅ White-label reports for CPA</div>
+      <div class="pricing-feature">✅ Trade show event creation</div>
+      <div class="pricing-feature">✅ Job board posting (5/mo)</div>
+      <div class="pricing-feature">✅ Dedicated support</div>
+      <button class="btn btn-blue" onclick="startTrial()">Start Free 30-Day Trial →</button>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--blue)">Why EntangleWealth Pays For Itself</div>
+      <div style="font-size:13px;color:#666;line-height:1.7">
+        Average user finds <strong style="color:var(--green)">$4,280</strong> in missed deductions.<br>
+        Average signal win rate: <strong style="color:var(--blue)">87% confidence</strong>.<br>
+        One good trade or one found deduction covers a full year.<br><br>
+        <strong style="color:var(--gold)">$29/month = $348/year.<br>Find one missed deduction and you're ahead.</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px;color:var(--gold)">💰 Revenue Share Program</div>
+      <div style="font-size:13px;color:#777;line-height:1.6;margin-bottom:12px">Refer friends and earn 20% of their subscription every month for life. Build your own income stream by sharing what already helps you.</div>
+      <button class="btn btn-gold" onclick="toast('🔗 Your referral link copied!')">Get Your Referral Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="modal-create-community" class="modal">
+  <div class="modal-content">
+    <div class="modal-title">Create Community</div>
+    <input id="comm-name" placeholder="Community name">
+    <select id="comm-cat">
+      <option value="trading">📈 Trading & Investing</option>
+      <option value="realestate">🏠 Real Estate</option>
+      <option value="tax">📊 Tax & Accounting</option>
+      <option value="tech">💻 Technology</option>
+      <option value="gig">🛠️ Gig Workers</option>
+      <option value="other">🌐 Other</option>
+    </select>
+    <textarea id="comm-desc" placeholder="What is this community about?" rows="3"></textarea>
+    <select id="comm-privacy">
+      <option>Public — Anyone can join</option>
+      <option>Private — Request to join</option>
+    </select>
+    <button class="btn btn-blue" onclick="createCommunity()">Create Community</button>

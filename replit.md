@@ -24,7 +24,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 ### EntangleWealth (`artifacts/entangle-wealth`)
 - Financial analysis platform with dark theme (black bg, electric blue #00D4FF, gold #FFD700)
 - **Authentication**: Clerk (email + Google sign-in at /sign-in, /sign-up)
-- Pages: Landing (/), Dashboard (/dashboard), Earn (/earn), Options Signals (/options), Stock Explorer (/stocks), Job Search (/jobs), Gig Marketplace (/gigs), Terminal (/terminal), Résumé Builder (/resume, auth required), Profile (/profile, auth required), About (/about)
+- Pages: Landing (/), Dashboard (/dashboard), Earn (/earn), Options Signals (/options), Stock Explorer (/stocks), Job Search (/jobs), Gig Marketplace (/gigs), Tax Dashboard (/tax), Receipt Scanner (/receipts), Business Travel Planner (/travel), TaxGPT (/taxgpt), Terminal (/terminal), Résumé Builder (/resume, auth required), Profile (/profile, auth required), About (/about)
 - Tone: Honest, no-hype, no AI slop. Straightforward about what the platform does and doesn't do.
 - Core concept: Multiple AI analysis methods run simultaneously and cross-check each other via "quantum entanglement." Signals only fire on consensus.
 - Mission: Help everyday families make better financial decisions.
@@ -78,6 +78,12 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - KYC gate — must verify identity before payment
 - Webhook handler for payment events
 
+#### TaxFlow Suite
+- **Tax Dashboard (/tax)**: Compliance score ring (SVG), 4-stat grid (deductions found, missing, receipts logged, audit risk), missing deductions cards with IRS publication references and estimated values, "Add to Checklist" buttons, quick links to Receipts/Travel/TaxGPT
+- **Receipt Scanner (/receipts)**: Upload zone + manual entry form (vendor, amount, IRS category, purpose, date), logged receipts list with deductibility badges and running totals, Export for CPA (CSV download), all client-side via localStorage (`entangle-receipts`)
+- **Business Travel Planner (/travel)**: Trip details form (name, dates, purpose, type), generates tax-optimized itinerary with day-by-day activities and deductibility badges, trip deduction summary
+- **TaxGPT (/taxgpt)**: AI chat powered by OpenAI (gpt-4o-mini via proxy), common questions quick buttons, audit risk factors section with progress bars, client-side fallback with keyword-matched IRS answers when API unavailable
+
 #### Terminal (/terminal)
 - MirofishTerminal with live order flow, news feed, system log panels
 - Commands: HELP, QUOTE, ANALYZE (AI), SEARCH (API), RISK, STATUS, SIGNALS, PORTFOLIO, CLEAR
@@ -86,7 +92,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - Fonts: JetBrains Mono (data), Inter (UI)
 - CSS utilities: `.electric-text` (blue gradient), `.gold-text` (gold gradient), `.glass-panel`
 - Routing: wouter for client-side routing
-- Mobile responsive with hamburger navigation + bottom navigation bar (Home, Signals, Gigs, Jobs, Profile) on screens < 1024px
+- Mobile responsive with hamburger navigation + bottom navigation bar (Home, Signals, Gigs, TaxFlow, Profile) on screens < 1024px
 - Dashboard includes enhanced Options Flow with Greeks display (delta, gamma, theta, IV rank) and unusual activity flags
 
 ### API Server (`artifacts/api-server`)
@@ -102,6 +108,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
   - **Jobs**: GET /api/jobs/search, GET /api/jobs/saved, POST /api/jobs/save, DELETE /api/jobs/saved/:id
   - **KYC**: GET /api/kyc/status, POST /api/kyc/submit, POST /api/kyc/approve/:userId
   - **Stripe**: GET /api/stripe/config, GET /api/stripe/products, POST /api/stripe/create-checkout, GET /api/stripe/subscription, POST /api/stripe/create-portal
+  - **TaxGPT**: POST /api/taxgpt (OpenAI-powered tax Q&A, gpt-4o-mini, temp 0.3)
 
 ## Database Schema
 

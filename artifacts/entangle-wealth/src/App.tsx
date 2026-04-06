@@ -15,6 +15,10 @@ import Terminal from "@/pages/Terminal";
 import Stocks from "@/pages/Stocks";
 import Jobs from "@/pages/Jobs";
 import Gigs from "@/pages/Gigs";
+import Tax from "@/pages/Tax";
+import Receipts from "@/pages/Receipts";
+import Travel from "@/pages/Travel";
+import TaxGPT from "@/pages/TaxGPT";
 import Resume from "@/pages/Resume";
 import Profile from "@/pages/Profile";
 
@@ -103,6 +107,10 @@ function ClerkProviderWithRoutes() {
             <Route path="/stocks" component={Stocks} />
             <Route path="/jobs" component={Jobs} />
             <Route path="/gigs" component={Gigs} />
+            <Route path="/tax" component={Tax} />
+            <Route path="/receipts" component={Receipts} />
+            <Route path="/travel" component={Travel} />
+            <Route path="/taxgpt" component={TaxGPT} />
             <Route path="/terminal" component={Terminal} />
             <Route path="/about" component={About} />
             <Route path="/sign-in/*?" component={SignInPage} />

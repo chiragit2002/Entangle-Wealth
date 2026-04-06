@@ -1,11 +1,11 @@
 import { useLocation, Link } from "wouter";
-import { Home, TrendingUp, Wrench, Briefcase, User } from "lucide-react";
+import { Home, TrendingUp, Wrench, FileText, User } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
   { href: "/dashboard", label: "Signals", icon: TrendingUp },
   { href: "/gigs", label: "Gigs", icon: Wrench },
-  { href: "/jobs", label: "Jobs", icon: Briefcase },
+  { href: "/tax", label: "TaxFlow", icon: FileText },
   { href: "/profile", label: "Profile", icon: User },
 ];
 

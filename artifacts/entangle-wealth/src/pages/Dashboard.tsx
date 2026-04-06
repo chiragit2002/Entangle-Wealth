@@ -8,7 +8,7 @@ import { SectorHeatmap } from "@/components/SectorHeatmap";
 import { WatchlistPanel } from "@/components/WatchlistPanel";
 import { SignalHistory } from "@/components/SignalHistory";
 import { RiskRadar } from "@/components/RiskRadar";
-import { stockAlerts, optionsAlerts, portfolioChartData, optionsIncomeData, agentLogMessages } from "@/lib/mock-data";
+import { stockAlerts, optionsAlerts, unusualOptionsActivity, portfolioChartData, optionsIncomeData, agentLogMessages } from "@/lib/mock-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, ArrowDownRight, Activity, AlertTriangle, Zap, Minus, TrendingUp, Shield, Eye, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, RefreshCw, Search } from "lucide-react";
@@ -380,6 +380,60 @@ export default function Dashboard() {
                 ))}
               </div>
             )}
+
+            <div className="flex items-center gap-2 pb-2 border-b border-white/10 mt-6">
+              <AlertTriangle className="w-5 h-5 text-secondary" />
+              <h2 className="text-lg font-semibold">Unusual Activity + Greeks</h2>
+              <span className="text-xs text-muted-foreground ml-auto">{unusualOptionsActivity.length} entries</span>
+            </div>
+            <div className="grid gap-3">
+              {unusualOptionsActivity.map((entry) => (
+                <div key={`uoa-${entry.id}`} className="glass-panel rounded-xl p-4">
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg font-bold">{entry.symbol}</span>
+                      <Badge variant="outline" className={`px-2 py-0.5 text-xs ${getSignalColor(entry.type)}`}>
+                        {entry.type} ${entry.strike}
+                      </Badge>
+                      <span className="text-[10px] text-muted-foreground">{entry.time}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {entry.strength >= 85 && (
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#00ff88]/10 text-[#00ff88] border border-[#00ff88]/20">UNUSUAL</span>
+                      )}
+                      <span className="text-[10px] text-primary font-mono">{entry.strategy}</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-white/[0.02] rounded-lg p-2.5 mb-2">
+                    <div className="text-center">
+                      <p className="text-[9px] text-muted-foreground uppercase">Delta</p>
+                      <p className={`font-mono text-sm font-bold ${entry.delta > 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>{entry.delta > 0 ? '+' : ''}{entry.delta}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[9px] text-muted-foreground uppercase">Gamma</p>
+                      <p className="font-mono text-sm font-bold text-primary">{entry.gamma}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[9px] text-muted-foreground uppercase">Theta</p>
+                      <p className="font-mono text-sm font-bold text-[#ff3366]">{entry.theta}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[9px] text-muted-foreground uppercase">IV Rank</p>
+                      <p className={`font-mono text-sm font-bold ${entry.ivRank >= 70 ? 'text-secondary' : 'text-muted-foreground'}`}>{entry.ivRank}%</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 bg-white/5 rounded-full h-1.5 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${entry.strength >= 85 ? 'bg-[#00ff88]' : entry.strength >= 60 ? 'bg-primary' : 'bg-muted-foreground'}`}
+                        style={{ width: `${entry.strength}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-mono text-muted-foreground">{entry.strength}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="flex flex-col gap-6">

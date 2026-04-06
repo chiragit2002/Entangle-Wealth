@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useUser, useAuth } from "@clerk/react";
-import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink } from "lucide-react";
+import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { BottomNav } from "@/components/layout/BottomNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -192,7 +193,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white pb-20 lg:pb-0">
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-8 max-w-4xl">
         <div className="glass-panel p-8 mb-6">
@@ -336,6 +337,76 @@ export default function Profile() {
           </div>
         )}
 
+        <div className="glass-panel p-6 mb-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-primary" /> Investment Progress</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+              <DollarSign className="w-5 h-5 text-[#00ff88] mx-auto mb-1" />
+              <p className="text-[10px] text-muted-foreground uppercase">This Month</p>
+              <p className="text-xl font-bold font-mono text-[#00ff88]">$1,247</p>
+            </div>
+            <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+              <Zap className="w-5 h-5 text-primary mx-auto mb-1" />
+              <p className="text-[10px] text-muted-foreground uppercase">Signals Used</p>
+              <p className="text-xl font-bold font-mono text-primary">18</p>
+            </div>
+            <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+              <Briefcase className="w-5 h-5 text-secondary mx-auto mb-1" />
+              <p className="text-[10px] text-muted-foreground uppercase">Gig Earned</p>
+              <p className="text-xl font-bold font-mono text-secondary">$320</p>
+            </div>
+            <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+              <AlertTriangle className="w-5 h-5 text-[#ff3366] mx-auto mb-1" />
+              <p className="text-[10px] text-muted-foreground uppercase">Max Risk</p>
+              <p className="text-xl font-bold font-mono text-[#ff3366]">8.4%</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="glass-panel p-6 mb-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2"><Shield className="w-5 h-5 text-primary" /> Privacy Settings</h3>
+          <div className="space-y-4">
+            {[
+              { key: "isPublicProfile" as const, label: "Public Profile", desc: "Make your profile visible to other users", icon: User },
+            ].map((toggle) => (
+              <div key={toggle.key} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                <div className="flex items-center gap-3">
+                  <toggle.icon className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">{toggle.label}</p>
+                    <p className="text-xs text-muted-foreground">{toggle.desc}</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={profile[toggle.key] as boolean}
+                    className="sr-only peer"
+                    onChange={async (e) => {
+                      const newVal = e.target.checked;
+                      setProfile(prev => ({ ...prev, [toggle.key]: newVal }));
+                      try {
+                        const res = await fetchAuth("/users/me", {
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ ...profile, [toggle.key]: newVal }),
+                        });
+                        if (!res.ok) throw new Error("Save failed");
+                        toast({ title: "Settings saved", description: `${toggle.label} updated.` });
+                      } catch {
+                        setProfile(prev => ({ ...prev, [toggle.key]: !newVal }));
+                        toast({ title: "Error", description: "Failed to save setting.", variant: "destructive" });
+                      }
+                    }}
+                  />
+                  <div className="w-10 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary/60"></div>
+                </label>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-3">Additional privacy controls (portfolio visibility, gig profile, notifications) coming soon.</p>
+        </div>
+
         {savedJobs.length > 0 && (
           <div className="glass-panel p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2"><Briefcase className="w-5 h-5 text-gold" /> Saved Jobs</h3>
@@ -356,6 +427,7 @@ export default function Profile() {
         )}
       </main>
       <Footer />
+      <BottomNav />
     </div>
   );
 }

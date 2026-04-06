@@ -24,7 +24,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 ### EntangleWealth (`artifacts/entangle-wealth`)
 - Financial analysis platform with dark theme (black bg, electric blue #00D4FF, gold #FFD700)
 - **Authentication**: Clerk (email + Google sign-in at /sign-in, /sign-up)
-- Pages: Landing (/), Dashboard (/dashboard), Earn (/earn), Options Signals (/options), Stock Explorer (/stocks), Job Search (/jobs), Terminal (/terminal), Résumé Builder (/resume, auth required), Profile (/profile, auth required), About (/about)
+- Pages: Landing (/), Dashboard (/dashboard), Earn (/earn), Options Signals (/options), Stock Explorer (/stocks), Job Search (/jobs), Gig Marketplace (/gigs), Terminal (/terminal), Résumé Builder (/resume, auth required), Profile (/profile, auth required), About (/about)
 - Tone: Honest, no-hype, no AI slop. Straightforward about what the platform does and doesn't do.
 - Core concept: Multiple AI analysis methods run simultaneously and cross-check each other via "quantum entanglement." Signals only fire on consensus.
 - Mission: Help everyday families make better financial decisions.
@@ -50,9 +50,17 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - Export to PDF via browser print
 - Save to database, auto-loads on return
 
+#### Gig Marketplace (/gigs)
+- Browse local service gigs with category filters (cleaning, outdoor, auto, moving)
+- Search gigs by keyword
+- Post gigs (requires sign-in) with title, price, category, description
+- Mock gig data fallback when DB has few entries
+- API: GET /api/gigs (list+filter), POST /api/gigs (create), DELETE /api/gigs/:id
+
 #### Profile (/profile, auth required)
 - User profile with headline, bio, contact info, photo
-- Public/private toggle for employer visibility
+- Investment Progress stats: This Month earnings, Signals Used, Gig Earned, Max Risk
+- Privacy Settings: Public Profile toggle (persisted to DB)
 - KYC verification form (name, DOB, address, ID)
 - Saved jobs list with remove
 - Résumé preview card
@@ -78,7 +86,8 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - Fonts: JetBrains Mono (data), Inter (UI)
 - CSS utilities: `.electric-text` (blue gradient), `.gold-text` (gold gradient), `.glass-panel`
 - Routing: wouter for client-side routing
-- Mobile responsive with hamburger navigation
+- Mobile responsive with hamburger navigation + bottom navigation bar (Home, Signals, Gigs, Jobs, Profile) on screens < 1024px
+- Dashboard includes enhanced Options Flow with Greeks display (delta, gamma, theta, IV rank) and unusual activity flags
 
 ### API Server (`artifacts/api-server`)
 - Express 5 on port defined by PORT env var
@@ -113,6 +122,9 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 
 ### saved_jobs
 - id, user_id, job_title, company, location, salary, job_type, source_url, source, external_id, saved_at
+
+### gigs
+- id, user_id, title, description, price, category, contact_name, rating, completed_jobs, is_active, created_at
 
 ### stripe.* (auto-managed by stripe-replit-sync)
 - products, prices, customers, subscriptions, payment_intents, etc.

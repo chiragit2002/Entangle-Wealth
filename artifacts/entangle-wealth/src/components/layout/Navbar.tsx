@@ -17,6 +17,7 @@ export function Navbar() {
     { href: "/options", label: "Options Flow" },
     { href: "/stocks", label: "Stocks" },
     { href: "/jobs", label: "Jobs" },
+    { href: "/gigs", label: "Gigs" },
     { href: "/terminal", label: "Terminal" },
     { href: "/about", label: "About Us" },
   ];

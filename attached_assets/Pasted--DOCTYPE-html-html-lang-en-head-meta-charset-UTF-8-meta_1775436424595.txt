@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaxFlow — Business Compliance Engine</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--black:#080810;--blue:#00d4ff;--gold:#ffd700;--green:#00ff88;--red:#ff3366;--card:#0d0d1a;--border:rgba(0,212,255,0.15)}
+body{background:var(--black);color:#fff;font-family:'Segoe UI',sans-serif;padding-bottom:80px}
+nav{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(8,8,16,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:18px;font-weight:900;background:linear-gradient(135deg,var(--blue),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,16,0.98);border-top:1px solid var(--border);display:flex;z-index:999}
+.bnav{flex:1;padding:10px 4px 14px;background:none;border:none;color:#444;font-size:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bnav .ic{font-size:20px}
+.bnav.active{color:var(--blue)}
+.page{display:none;padding-top:65px;min-height:100vh}
+.page.active{display:block}
+.pi{padding:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.sec-title{font-size:16px;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.btn{border:none;border-radius:10px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:8px}
+.btn-blue{background:linear-gradient(135deg,var(--blue),#0099cc);color:#000}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#cc9900);color:#000}
+.btn-outline{background:none;border:1px solid var(--border);color:#aaa;margin-top:8px}
+.btn-red{background:linear-gradient(135deg,var(--red),#cc0033);color:#fff}
+input,textarea,select{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;width:100%;margin-bottom:10px;font-family:inherit}
+input:focus,textarea:focus,select:focus{border-color:var(--blue)}
+input::placeholder,textarea::placeholder{color:#444}
+.badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-green{background:rgba(0,255,136,0.15);color:var(--green)}
+.badge-gold{background:rgba(255,215,0,0.15);color:var(--gold)}
+.badge-red{background:rgba(255,51,102,0.15);color:var(--red)}
+.badge-blue{background:rgba(0,212,255,0.15);color:var(--blue)}
+.score-ring{width:140px;height:140px;margin:0 auto 16px;position:relative}
+.score-ring svg{transform:rotate(-90deg)}
+.score-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.score-num{font-size:32px;font-weight:900}
+.score-label{font-size:11px;color:#555}
+.progress-bar{height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;border-radius:4px;transition:width 1s ease}
+.receipt-zone{border:2px dashed var(--border);border-radius:14px;padding:32px;text-align:center;margin-bottom:12px;cursor:pointer;transition:border-color 0.2s}
+.receipt-zone:hover{border-color:var(--blue)}
+.receipt-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.deduction-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.deduction-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.deduction-title{font-size:15px;font-weight:700}
+.deduction-pct{font-size:18px;font-weight:900;color:var(--green)}
+.audit-card{background:var(--card);border-left:3px solid var(--gold);border-radius:14px;padding:14px;margin-bottom:10px}
+.audit-risk{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.itinerary-day{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.day-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.day-num{font-size:20px;font-weight:900;color:var(--blue)}
+.activity-item{background:rgba(255,255,255,0.03);border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.toast{display:none;position:fixed;top:75px;left:16px;right:16px;background:rgba(0,255,136,0.12);border:1px solid var(--green);border-radius:12px;padding:14px;color:var(--green);font-size:14px;text-align:center;z-index:9999;font-weight:600}
+.disclaimer{background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.2);border-radius:12px;padding:14px;font-size:11px;color:#666;line-height:1.6;margin-bottom:16px}
+.chat-msg{padding:12px 14px;border-radius:12px;margin-bottom:10px;font-size:14px;line-height:1.6;max-width:90%}
+.chat-user{background:rgba(0,212,255,0.1);border:1px solid var(--border);margin-left:auto;text-align:right}
+.chat-ai{background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15)}
+.chat-input-row{display:flex;gap:8px;margin-top:12px}
+.chat-input-row input{margin-bottom:0}
+.chat-send{background:linear-gradient(135deg,var(--blue),#0099cc);border:none;border-radius:10px;padding:12px 16px;color:#000;font-weight:700;cursor:pointer;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<nav>
+  <div class="logo">📊 TaxFlow</div>
+  <div style="font-size:11px;color:var(--gold)">IRS COMPLIANCE ENGINE</div>
+</nav>
+
+<!-- DASHBOARD -->
+<div id="pg-dash" class="page active">
+  <div class="pi">
+    <div class="disclaimer">⚖️ TaxFlow provides educational information based on IRS publications and is not a substitute for professional tax advice. Always consult a licensed CPA or tax attorney for your specific situation.</div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:13px;color:#555;margin-bottom:16px">YOUR COMPLIANCE SCORE</div>
+      <div class="score-ring">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
+          <circle cx="70" cy="70" r="60" fill="none" stroke="url(#grad)" stroke-width="12" stroke-dasharray="377" stroke-dashoffset="94" stroke-linecap="round"/>
+          <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#00d4ff"/><stop offset="100%" style="stop-color:#00ff88"/></linearGradient></defs>
+        </svg>
+        <div class="score-center">
+          <div class="score-num" style="color:var(--blue)">75</div>
+          <div class="score-label">GOOD</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#666;margin-bottom:20px">Based on your submitted receipts and business profile</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+        <div style="background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:12px;text-align:center">
+          <div style="font-size:18px;font-weight:800;color:var(--green)">$4,280</div>
+          <div style="font-size:11px;color:#555;margin-top:4px">Deductions Found</div>
+        </div>
+        <div style="background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.2);border-radius:12px;padding:12px;text-align:center">
+          <div style="font-size:18px;font-weight:800;color:var(--gold)">3</div>
+          <div style="font-size:11px;color:#555;margin-top:4px">Missing Deductions</div>
+        </div>
+        <div style="background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:12px;text-align:center">
+          <div style="font-size:18px;font-weight:800;color:var(--blue)">12</div>
+          <div style="font-size:11px;color:#555;margin-top:4px">Receipts Logged</div>
+        </div>
+        <div style="background:rgba(255,51,102,0.05);border:1px solid rgba(255,51,102,0.2);border-radius:12px;padding:12px;text-align:center">
+          <div style="font-size:18px;font-weight:800;color:var(--red)">Low</div>
+          <div style="font-size:11px;color:#555;margin-top:4px">Audit Risk</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-title">Missing Deductions</div>
+    <div class="deduction-card">
+      <div class="deduction-top">
+        <div>
+          <div class="deduction-title">Home Office Deduction</div>
+          <div style="font-size:12px;color:#555;margin-top:4px">IRS Publication 587 · Section 280A</div>
+        </div>
+        <span class="badge badge-gold">MISSING</span>
+      </div>
+      <div style="font-size:13px;color:#777;margin-bottom:10px">If you use part of your home regularly and exclusively for business, you may deduct $5 per sq ft up to 300 sq ft ($1,500 max) using simplified method.</div>
+      <div style="font-size:12px;color:var(--green);font-weight:600">Estimated value: $1,500/yr</div>
+      <button class="btn btn-blue" onclick="toast('📋 Home Office worksheet added to your checklist')">Add to Checklist</button>
+    </div>
+
+    <div class="deduction-card">
+      <div class="deduction-top">
+        <div>
+          <div class="deduction-title">Vehicle Business Use</div>
+          <div style="font-size:12px;color:#555;margin-top:4px">IRS Publication 463 · IRC Section 179</div>
+        </div>
+        <span class="badge badge-gold">MISSING</span>
+      </div>
+      <div style="font-size:13px;color:#777;margin-bottom:10px">Standard mileage rate is 67 cents per mile for 2024. You must keep a contemporaneous mileage log with date, destination, business purpose, and miles.</div>
+      <div style="font-size:12px;color:var(--green);font-weight:600">Estimated value: $2,010/yr (3,000 mi)</div>
+      <button class="btn btn-blue" onclick="toast('🚗 Mileage tracker added')">Start Tracking Miles</button>
+    </div>
+
+    <div class="deduction-card">
+      <div class="deduction-top">
+        <div>
+          <div class="deduction-title">Professional Development</div>
+          <div style="font-size:12px;color:#555;margin-top:4px">IRS Publication 970 · IRC Section 162</div>
+        </div>
+        <span class="badge badge-gold">MISSING</span>
+      </div>
+      <div style="font-size:13px;color:#777;margin-bottom:10px">Books, courses, subscriptions, and training directly related to your current business are 100% deductible as ordinary and necessary business expenses.</div>
+      <div style="font-size:12px;color:var(--green);font-weight:600">Estimated value: $800/yr</div>
+      <button class="btn btn-blue" onclick="toast('📚 Education expense tracker added')">Track Education Expenses</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECEIPTS -->
+<div id="pg-receipts" class="page">
+  <div class="pi">
+    <div class="sec-title">Receipt Scanner</div>
+    <div class="disclaimer">📸 Upload or photograph receipts. TaxFlow categorizes them based on IRS expense categories. Keep all original receipts for 7 years per IRS guidelines.</div>
+    <div class="receipt-zone" onclick="document.getElementById('receipt-input').click()">
+      <div style="font-size:40px;margin-bottom:12px">📷</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px">Scan Receipt</div>
+      <div style="font-size:13px;color:#555">Tap to photograph or upload</div>
+      <input type="file" id="receipt-input" accept="image/*" style="display:none" onchange="scanReceipt(this)">
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px;color:var(--blue)">Or Enter Manually</div>
+      <input id="r-vendor" placeholder="Vendor / Business Name">
+      <input id="r-amount" placeholder="Amount ($)" type="number">
+      <select id="r-category">
+        <option value="">Select IRS Category</option>
+        <option value="meals">Meals & Entertainment (50% deductible)</option>
+        <option value="travel">Business Travel (100% deductible)</option>
+        <option value="office">Office Supplies (100% deductible)</option>
+        <option value="software">Software & Subscriptions (100% deductible)</option>
+        <option value="vehicle">Vehicle & Transportation</option>
+        <option value="marketing">Advertising & Marketing (100% deductible)</option>
+        <option value="professional">Professional Services (100% deductible)</option>
+        <option value="education">Education & Training (100% deductible)</option>
+        <option value="phone">Phone & Internet (business %)</option>
+        <option value="other">Other Business Expense</option>
+      </select>
+      <input id="r-purpose" placeholder="Business purpose (required by IRS)">
+      <input id="r-date" type="date">
+      <button class="btn btn-gold" onclick="addReceipt()">⚡ Log Receipt</button>
+    </div>
+
+    <div class="sec-title">Logged Receipts <span style="font-size:13px;color:var(--blue)" id="receipt-total">$0 total</span></div>
+    <div id="receipt-list">
+      <div class="receipt-item">
+        <div>
+          <div style="font-size:14px;font-weight:700">Delta Airlines</div>
+          <div style="font-size:12px;color:#555">Business Travel · Jan 15</div>
+          <div style="font-size:11px;color:var(--green)">100% deductible · IRS Pub 463</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:16px;font-weight:800;color:var(--green)">$480</div>
+          <span class="badge badge-green">VERIFIED</span>
+        </div>
+      </div>
+      <div class="receipt-item">
+        <div>
+          <div style="font-size:14px;font-weight:700">Client Dinner - Mastros</div>
+          <div style="font-size:12px;color:#555">Meals & Entertainment · Jan 18</div>
+          <div style="font-size:11px;color:var(--gold)">50% deductible · IRS Pub 463</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:16px;font-weight:800;color:var(--gold)">$210</div>
+          <span class="badge badge-gold">50%</span>
+        </div>
+      </div>
+      <div class="receipt-item">
+        <div>
+          <div style="font-size:14px;font-weight:700">Adobe Creative Cloud</div>
+          <div style="font-size:12px;color:#555">Software · Jan 20</div>
+          <div style="font-size:11px;color:var(--green)">100% deductible · IRC 162</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:16px;font-weight:800;color:var(--green)">$54</div>
+          <span class="badge badge-green">VERIFIED</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-blue" onclick="exportReceipts()">📤 Export for CPA</button>
+  </div>
+</div>
+
+<!-- TRAVEL ITINERARY -->
+<div id="pg-travel" class="page">
+  <div class="pi">
+    <div class="sec-title">Business Travel Planner</div>
+    <div class="disclaimer">✈️ Per IRS Publication 463, travel is deductible when the primary purpose is business. The trip must be ordinary and necessary. Keep records of business activities each day.</div>
+
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px;color:var(--blue)">Trip Details</div>
+      <input id="trip-name" placeholder="Trip name / destination">
+      <input id="trip-start" type="date" placeholder="Departure date">
+      <input id="trip-end" type="date" placeholder="Return date">
+      <input id="trip-purpose" placeholder="Primary business purpose">
+      <select id="trip-type">
+        <option>Conference / Trade Show</option>
+        <option>Client Meeting</option>
+        <option>Business Training</option>
+        <option>Site Inspection</option>
+        <option>Industry Event</option>
+      </select>
+      <button class="btn btn-gold" onclick="createItinerary()">⚡ Build Deductible Itinerary</button>
+    </div>
+
+    <div id="itinerary-output" style="display:none">
+      <div class="sec-title">Your Itinerary <span class="badge badge-green">TAX OPTIMIZED</span></div>
+
+      <div class="itinerary-day">
+        <div class="day-header">
+          <div class="day-num">Day 1</div>
+          <span class="badge badge-green">100% Business</span>
+        </div>
+        <div class="activity-item">
+          <div>
+            <div style="font-size:13px;font-weight:700">9:00 AM — Conference Registration</div>
+            <div style="font-size:11px;color:#555">Qualifies: IRC 162 ordinary business expense</div>
+          </div>
+          <span class="badge badge-green">✓</span>
+        </div>
+        <div class="activity-item">
+          <div>
+            <div style="font-size:13px;font-weight:700">12:00 PM — Networking Lunch</div>
+            <div style="font-size:11px;color:var(--gold)">50% deductible — document attendees & purpose</div>
+          </div>
+          <span class="badge badge-gold">50%</span>
+        </div>
+        <div class="activity-item">
+          <div>
+            <div style="font-size:13px;font-weight:700">2:00 PM — Industry Sessions</div>
+            <div style="font-size:11px;color:#555">Qualifies: education maintaining business skills</div>
+          </div>
+          <span class="badge badge-green">✓</span>
+        </div>
+        <div class="activity-item">
+          <div>
+            <div style="font-size:13px;font-weight:700">7:00 PM — Client Dinner</div>
+            <div style="font-size:11px;color:var(--gold)">50% deductible — document business discussed</div>
+          </div>
+          <span class="badge badge-gold">50%</span>
+        </div>
+      </div>
+
+      <div class="itinerary-day">
+        <div class="day-header">
+          <div class="day-num">Day 2</div>
+          <span class="badge badge-green">100% Business</span>
+        </div>
+        <div class="activity-item">
+          <div>
+            <div style="font-size:13px;font-weight:700">8:00 AM — Keynote Session</div>
+            <div style="font-size:11px;color:#555">Qualifies: industry knowledge for business</div>
+          </div>
+          <span class="badge badge-green">✓</span>
+        </div>
+        <div class="activity-item">
+          <div>
+            <div style="font-size:13px;font-weight:700">10:00 AM — Vendor Meetings</div>
+            <div style="font-size:11px;color:#555">Qualifies: ordinary and necessary business activity</div>
+          </div>
+          <span class="badge badge-green">✓</span>
+        </div>
+        <div class="activity-item">
+          <div>
+            <div style="font-size:13px;font-weight:700">3:00 PM — Personal Time</div>
+            <div style="font-size:11px;color:var(--red)">NOT deductible — personal activities excluded</div>
+          </div>
+          <span class="badge badge-red">✗</span>
+        </div>
+      </div>
+
+      <div class="card" style="background:rgba(0,255,136,0.05);border-color:rgba(0,255,136,0.2)">
+        <div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:12px">Trip Deduction Summary</div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:13px;color:#777">Transportation</span>
+          <span style="font-size:13px;font-weight:700;color:var(--green)">100% deductible</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:13px;color:#777">Lodging</span>
+          <span style="font-size:13px;font-weight:700;color:var(--green)">100% deductible</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:13px;color:#777">Meals</span>
+          <span style="font-size:13px;font-weight:700;color:var(--gold)">50% deductible</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0">
+          <span style="font-size:13px;color:#777">Conference Fees</span>
+          <span style="font-size:13px;font-weight:700;color:var(--green)">100% deductible</span>
+        </div>
+      </div>
+      <button class="btn btn-blue" onclick="toast('📤 Itinerary exported for CPA review')">Export Itinerary for CPA</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAX GPT -->
+<div id="pg-taxgpt" class="page">
+  <div class="pi">
+    <div class="sec-title">TaxGPT — IRS Knowledge Engine</div>
+    <div class="disclaimer">🤖 TaxGPT answers based on IRS publications and tax code. This is educational information only — not professional tax advice. Consult a licensed CPA for your specific situation.</div>
+
+    <div class="card">
+      <div style="font-size:13px;color:#555;margin-bottom:12px">Ask about deductions, compliance, audit risks, or IRS rules</div>
+      <div id="chat-messages">
+        <div class="chat-msg chat-ai">
+          👋 Hello! I'm TaxGPT, trained on IRS publications including Pub 463, 535, 587, 946, and thousands of tax court cases. Ask me about business deductions, travel rules, meal deductions, home office, vehicle use, or audit risk factors. What can I help you with?
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input id="chat-in" placeholder="Ask about any deduction..." onkeypress="if(event.key==='Enter')sendChat()">
+        <button class="chat-send" onclick="sendChat()">→</button>
+      </div>
+    </div>
+
+    <div class="sec-title" style="margin-top:8px">Common Questions</div>
+    <div class="card" style="padding:12px">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-outline" style="text-align:left;font-size:13px" onclick="askQuestion('Can I deduct my meals when traveling for business?')">🍽️ Can I deduct meals when traveling?</button>
+        <button class="btn btn-outline" style="text-align:left;font-size:13px" onclick="askQuestion('What are the rules for deducting a home office?')">🏠 Home office deduction rules?</button>
+        <button class="btn btn-outline" style="text-align:left;font-size:13px" onclick="askQuestion('How do I document vehicle mileage for a tax deduction?')">🚗 How to document vehicle mileage?</button>
+        <button class="btn btn-outline" style="text-align:left;font-size:13px" onclick="askQuestion('What triggers an IRS audit for small businesses?')">⚠️ What triggers an IRS audit?</button>
+        <button class="btn btn-outline" style="text-align:left;font-size:13px" onclick="askQuestion('Can I deduct a conference trip that includes personal days?')">✈️ Deducting mixed business and personal travel?</button>
+      </div>
+    </div>
+
+    <div class="sec-title" style="margin-top:8px">Audit Risk Factors</div>
+    <div class="audit-card">
+      <div class="audit-risk">
+        <div style="font-size:14px;font-weight:700">Excessive Meal Deductions</div>
+        <span class="badge badge-red">HIGH RISK</span>
+      </div>
+      <div style="font-size:13px;color:#777;margin-bottom:8px">Meals over 50% of gross income are a major audit trigger. Always document who attended and the business purpose discussed.</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:85%;background:var(--red)"></div></div>
+    </div>
+    <div class="audit-card">
+      <div class="audit-risk">
+        <div style="font-size:14px;font-weight:700">100% Vehicle Business Use</div>
+        <span class="badge badge-red">HIGH RISK</span>
+      </div>
+      <div style="font-size:13px;color:#777;margin-bottom:8px">Claiming a vehicle is used 100% for business is heavily scrutinized. IRS expects some personal use. Keep a detailed contemporaneous log.</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:80%;background:var(--red)"></div></div>
+    </div>
+    <div class="audit-card">
+      <div class="audit-risk">
+        <div style="font-size:14px;font-weight:700">Large Cash Transactions</div>
+        <span class="badge badge-gold">MEDIUM RISK</span>
+      </div>
+      <div style="font-size:13px;color:#777;margin-bottom:8px">Cash transactions over $10,000 require Form 8300. Pattern of just-under-$10K transactions is called structuring and is illegal.</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:55%;background:var(--gold)"></div></div>
+    </div>
+    <div class="audit-card">
+      <div class="audit-risk">
+        <div style="font-size:14px;font-weight:700">Home Office Deduction</div>
+        <span class="badge badge-gold">MEDIUM RISK</span>
+      </div>
+      <div style="font-size:13px;color:#777;margin-bottom:8px">Must be used regularly and exclusively for business. A desk in your bedroom does not qualify. The space must be your principal place of business.</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--gold)"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <button class="bnav active" id="bn-dash" onclick="showPage('dash')"><span class="ic">📊</span>Score</button>
+  <button class="bnav" id="bn-receipts" onclick="showPage('receipts')"><span class="ic">📷</span>Receipts</button>
+  <button class="bnav" id="bn-travel" onclick="showPage('travel')"><span class="ic">✈️</span>Travel</button>
+  <button class="bnav" id="bn-taxgpt" onclick="showPage('taxgpt')"><span class="ic">🤖</span>TaxGPT</button>
+</div>
+
+<script>
+const taxResponses={
+  'meal':`Per IRS Publication 463, business meals are 50% deductible. Requirements: (1) You or an employee must be present, (2) The meal must not be lavish or extravagant, (3) There must be a business purpose. Document: who attended, business relationship, business discussed, date, location, and amount. Client entertainment is no longer deductible since the Tax Cuts and Jobs Act of 2017.`,
+  'home office':`IRS Publication 587 covers home office deductions. The space must be used regularly and exclusively for business as your principal place of business. Two methods: (1) Simplified: $5 per sq ft, max 300 sq ft = $1,500 max. (2) Regular method: calculate actual expenses proportionally. The exclusive use test is strictly enforced — a dual-use room does not qualify.`,
+  'mileage':`For 2024, the standard mileage rate is 67 cents per mile (IRS Rev. Proc. 2023-34). You must keep a contemporaneous mileage log recording: date, destination, business purpose, and miles driven. Apps like MileIQ work. Commuting from home to your regular office is never deductible. Business travel between job sites is deductible.`,
+  'audit':`Common small business audit triggers per IRS data: (1) High meal and entertainment deductions relative to income, (2) Consistent business losses (hobby loss rules — IRC 183), (3) 100% vehicle business use claims, (4) Large cash transactions, (5) Home office deductions, (6) Significantly higher deductions than similar businesses in your industry. The IRS uses DIF scores to flag statistically unusual returns.`,
+  'travel':`Per IRS Publication 463, business travel is deductible when travel is primarily for business. For domestic travel, if primarily business, transportation is 100% deductible. Lodging on business days is 100% deductible. Meals are 50% deductible. Personal days are not deductible. Document: business purpose for each day, receipts for all expenses over $75, and keep records for 3-7 years.`,
+  'conference':`Conference and trade show attendance is deductible under IRC Section 162 as an ordinary and necessary business expense. Registration fees: 100% deductible. Travel to and from: 100% deductible if primarily business. Hotel during conference days: 100% deductible. Meals: 50% deductible. Side trips and personal activities: not deductible. Keep the conference program as documentation.`,
+  'vehicle':`IRS Publication 463 covers vehicle deductions. Two methods: (1) Standard mileage rate: 67 cents/mile for 2024. Cannot use if you previously claimed MACRS depreciation. (2) Actual expense method: deduct the business percentage of all vehicle costs. For both methods you need a mileage log. Luxury vehicle limits apply under IRC Section 179. SUVs over 6,000 lbs have special rules.`,
+};
+
+function getTaxResponse(q){
+  q=q.toLowerCase();
+  if(q.includes('meal')||q.includes('food')||q.includes('dinner')||q.includes('lunch')) return taxResponses['meal'];
+  if(q.includes('home office')||q.includes('home-office')||q.includes('work from home')) return taxResponses['home office'];
+  if(q.includes('mileage')||q.includes('vehicle')||q.includes('car')||q.includes('miles')) return taxResponses['mileage'];
+  if(q.includes('audit')) return taxResponses['audit'];
+  if(q.includes('travel')||q.includes('trip')||q.includes('personal days')) return taxResponses['travel'];
+  if(q.includes('conference')||q.includes('trade show')||q.includes('seminar')) return taxResponses['conference'];
+  if(q.includes('vehicle')||q.includes('car')||q.includes('truck')) return taxResponses['vehicle'];
+  return`Based on IRS guidelines, this depends on whether the expense is "ordinary and necessary" under IRC Section 162. An ordinary expense is common and accepted in your industry. A necessary expense is helpful and appropriate for your business. I'd recommend documenting: the business purpose, who was involved, the date, and keeping receipts for all expenses. For your specific situation, please consult a licensed CPA. Would you like me to look up a more specific IRS publication?`;
+}
+
+function sendChat(){
+  const input=document.getElementById('chat-in');
+  const q=input.value.trim();
+  if(!q) return;
+  const msgs=document.getElementById('chat-messages');
+  msgs.innerHTML+=`<div class="chat-msg chat-user">${q}</div>`;
+  setTimeout(()=>{
+    msgs.innerHTML+=`<div class="chat-msg chat-ai">📚 <strong>IRS Reference:</strong><br><br>${getTaxResponse(q)}</div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+  },800);
+  input.value='';
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function askQuestion(q){
+  document.getElementById('chat-in').value=q;
+  showPage('taxgpt');
+  setTimeout(sendChat,200);
+}
+
+let receipts=[];
+let receiptTotal=0;
+
+function addReceipt(){
+  const vendor=document.getElementById('r-vendor').value;
+  const amount=parseFloat(document.getElementById('r-amount').value);
+  const cat=document.getElementById('r-category').value;
+  const purpose=document.getElementById('r-purpose').value;
+  if(!vendor||!amount||!cat){toast('⚠️ Please fill in vendor, amount, and category');return;}
+  const catLabels={'meals':'Meals (50%)','travel':'Business Travel','office':'Office Supplies','software':'Software','vehicle':'Vehicle','marketing':'Marketing','professional':'Professional Services','education':'Education','phone':'Phone/Internet','other':'Other'};
+  const deductPct={'meals':'50%','travel':'100%','office':'100%','software':'100%','vehicle':'varies','marketing':'100%','professional':'100%','education':'100%','phone':'varies','other':'100%'};
+  receiptTotal+=amount;
+  document.getElementById('receipt-total').textContent=`$${receiptTotal.toFixed(2)} total`;
+  const list=document.getElementById('receipt-list');
+  const item=document.createElement('div');
+  item.className='receipt-item';
+  item.innerHTML=`
+    <div>
+      <div style="font-size:14px;font-weight:700">${vendor}</div>
+      <div style="font-size:12px;color:#555">${catLabels[cat]||cat} · ${new Date().toLocaleDateString()}</div>
+      <div style="font-size:11px;color:var(--green)">${deductPct[cat]||'100%'} deductible</div>
+      ${purpose?`<div style="font-size:11px;color:#555;margin-top:2px">Purpose: ${purpose}</div>`:''}
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:16px;font-weight:800;color:var(--green)">$${amount.toFixed(2)}</div>
+      <span class="badge badge-green">LOGGED</span>
+    </div>`;
+  list.prepend(item);
+  document.getElementById('r-vendor').value='';
+  document.getElementById('r-amount').value='';
+  document.getElementById('r-purpose').value='';
+  document.getElementById('r-category').value='';
+  toast('✅ Receipt logged and categorized');
+}
+
+function scanReceipt(input){
+  if(input.files&&input.files[0]){
+    toast('🔍 Analyzing receipt... Categorizing expense...');
+    setTimeout(()=>{
+      receiptTotal+=127;
+      document.getElementById('receipt-total').textContent=`$${receiptTotal.toFixed(2)} total`;
+      const list=document.getElementById('receipt-list');
+      const item=document.createElement('div');
+      item.className='receipt-item';
+      item.innerHTML=`
+        <div>
+          <div style="font-size:14px;font-weight:700">Scanned Receipt</div>
+          <div style="font-size:12px;color:#555">Auto-categorized · ${new Date().toLocaleDateString()}</div>
+          <div style="font-size:11px;color:var(--green)">100% deductible · Business Expense</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:16px;font-weight:800;color:var(--green)">$127.00</div>
+          <span class="badge badge-blue">SCANNED</span>
+        </div>`;
+      list.prepend(item);
+      toast('✅ Receipt scanned and categorized successfully');
+    },2000);
+  }
+}
+
+function exportReceipts(){
+  toast('📤 Generating CPA-ready expense report...');
+  setTimeout(()=>toast('✅ Report ready. Check your email.'),2000);
+}
+
+function createItinerary(){
+  const name=document.getElementById('trip-name').value;
+  if(!name){toast('⚠️ Please enter a trip destination');return;}
+  document.getElementById('itinerary-output').style.display='block';
+  document.getElementById('itinerary-output').scrollIntoView({behavior:'smooth'});
+  toast('✅ Tax-optimized itinerary created');
+}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bnav').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  document.getElementById('bn-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>

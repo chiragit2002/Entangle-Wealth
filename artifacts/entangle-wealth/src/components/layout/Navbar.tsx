@@ -47,6 +47,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/resume", label: "Résumé Builder", desc: "Quantum résumé engine" },
       { href: "/about", label: "About", desc: "Our mission" },
       { href: "/competitive-intel", label: "Intel Report", desc: "Competitive analysis" },
+      { href: "/open-source-intel", label: "Open Source Intel", desc: "GitHub solutions" },
     ],
   },
 ];
@@ -88,6 +89,7 @@ const MOBILE_SECTIONS = [
       { href: "/resume", label: "Résumé Builder" },
       { href: "/about", label: "About" },
       { href: "/competitive-intel", label: "Intel Report" },
+      { href: "/open-source-intel", label: "Open Source Intel" },
     ],
   },
 ];

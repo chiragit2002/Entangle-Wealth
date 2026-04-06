@@ -25,6 +25,7 @@ The project is a pnpm workspace monorepo with each package managing its own depe
 - **Layout Background**: Three animated gradient orbs (cyan, gold, purple) with slow drift animations, plus a subtle dot grid overlay at 40px spacing.
 - **Competitive Intelligence**: `/competitive-intel` — Full quantum competitive analysis report with 7 competitors (Bloomberg, TradingView, Koyfin, Trade Ideas, TrendSpider, Danelfin, Robinhood), April Dunford positioning, feature matrix, 2x2 positioning map, Kano analysis, strategic action plan, and PDF export via jsPDF.
 - **Résumé Builder**: `/resume` (protected) — Quantum Résumé Entanglement Engine with three tabs: Resume Builder (5 templates, live preview, contact/summary/experience/education/skills/certifications sections), LinkedIn Import (URL-based profile import with AI enhancement), and Accounting Software Integration (QuickBooks, Xero, H&R Block connection cards for financial data entanglement). Includes Quantum Coherence Score (completion %) and gig/freelance work tagging.
+- **Open Source Intel**: `/open-source-intel` — GitHub Solution Entanglement Map showing 14 battle-tested open-source libraries (TradingView Lightweight Charts, Alpaca TypeScript SDK, TanStack Table, @react-pdf/renderer, Sonner, tsParticles, zustand, etc.) with priority filtering (Critical/High/Medium/Explore), category filtering, expandable details, install commands, license compliance matrix, and 3-phase integration strategy.
 
 ## Technical Implementations
 - **Authentication**: Clerk for user authentication (email and Google sign-in).

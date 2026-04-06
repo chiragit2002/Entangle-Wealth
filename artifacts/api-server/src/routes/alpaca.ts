@@ -29,10 +29,24 @@ function alpacaRateLimit(req: Request, res: Response, next: NextFunction) {
 
 router.use("/alpaca", alpacaRateLimit);
 
+let _swapped = false;
 function alpacaHeaders() {
+  let keyId = process.env.ALPACA_API_KEY || "";
+  let secretKey = process.env.ALPACA_API_SECRET || "";
+  if (!keyId.startsWith("PK") && secretKey.startsWith("PK")) {
+    [keyId, secretKey] = [secretKey, keyId];
+    if (!_swapped) {
+      logger.warn("Auto-swapped ALPACA_API_KEY and ALPACA_API_SECRET (key should start with PK)");
+      _swapped = true;
+    }
+  }
+  if (!_swapped) {
+    logger.info({ keyLen: keyId.length, secretLen: secretKey.length, keyPrefix: keyId.slice(0, 3) }, "Alpaca credentials loaded");
+    _swapped = true;
+  }
   return {
-    "APCA-API-KEY-ID": process.env.ALPACA_API_KEY || "",
-    "APCA-API-SECRET-KEY": process.env.ALPACA_API_SECRET || "",
+    "APCA-API-KEY-ID": keyId,
+    "APCA-API-SECRET-KEY": secretKey,
     "Accept": "application/json",
   };
 }

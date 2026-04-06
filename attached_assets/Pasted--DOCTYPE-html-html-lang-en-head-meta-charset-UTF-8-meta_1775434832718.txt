@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EntangleWealth</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--black:#080810;--blue:#00d4ff;--gold:#ffd700;--green:#00ff88;--red:#ff3366;--card:#0d0d1a;--border:rgba(0,212,255,0.15)}
+body{background:var(--black);color:#fff;font-family:'Segoe UI',sans-serif;overflow-x:hidden;padding-bottom:80px}
+nav{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(8,8,16,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:18px;font-weight:900;background:linear-gradient(135deg,var(--blue),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,16,0.98);border-top:1px solid var(--border);display:flex;z-index:999}
+.bnav{flex:1;padding:10px 4px 14px;background:none;border:none;color:#444;font-size:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color 0.2s}
+.bnav .ic{font-size:20px}
+.bnav.active{color:var(--blue)}
+.page{display:none;padding-top:60px;min-height:100vh}
+.page.active{display:block}
+.pi{padding:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.sec-title{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.live{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--green)}
+.live::before{content:'';width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.btn{border:none;border-radius:10px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:8px}
+.btn-blue{background:linear-gradient(135deg,var(--blue),#0099cc);color:#000}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#cc9900);color:#000}
+.btn-outline{background:none;border:1px solid var(--border);color:#aaa}
+input,textarea,select{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;width:100%;margin-bottom:10px;font-family:inherit}
+input::placeholder,textarea::placeholder{color:#444}
+input:focus,textarea:focus{border-color:var(--blue)}
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-buy{background:rgba(0,255,136,0.15);color:var(--green)}
+.badge-sell{background:rgba(255,51,102,0.15);color:var(--red)}
+.badge-watch{background:rgba(255,215,0,0.15);color:var(--gold)}
+.badge-call{background:rgba(0,255,136,0.15);color:var(--green)}
+.badge-put{background:rgba(255,51,102,0.15);color:var(--red)}
+.badge-gig{background:rgba(0,212,255,0.15);color:var(--blue)}
+.ticker-wrap{background:rgba(0,212,255,0.04);border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;padding:9px 0;margin-bottom:16px}
+.ticker{display:flex;gap:28px;animation:scroll 30s linear infinite;white-space:nowrap}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.tick{display:inline-flex;gap:7px;font-size:12px;font-weight:600}
+.up{color:var(--green)}.down{color:var(--red)}.muted{color:#666}
+.hero{padding:40px 20px 20px;text-align:center}
+.hero h1{font-size:32px;font-weight:900;line-height:1.1;margin-bottom:12px;background:linear-gradient(135deg,#fff 0%,var(--blue) 50%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:14px;color:#777;margin-bottom:24px;line-height:1.6}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center}
+.stat-n{font-size:20px;font-weight:800;color:var(--blue)}
+.stat-l{font-size:10px;color:#555;margin-top:3px}
+.sig-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden}
+.sig-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.sig-card.buy::before{background:var(--green)}
+.sig-card.sell::before{background:var(--red)}
+.sig-card.watch::before{background:var(--gold)}
+.sig-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sig-sym{font-size:20px;font-weight:800}
+.sig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.sig-stat{font-size:11px;color:#555}
+.sig-stat span{display:block;font-size:13px;font-weight:600;color:#fff;margin-top:2px}
+.conf-bar{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.conf-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:2px}
+.opt-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.opt-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.opt-sym{font-size:18px;font-weight:800}
+.opt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+.opt-stat{font-size:11px;color:#555}
+.opt-stat span{display:block;font-size:13px;font-weight:600;color:#fff;margin-top:2px}
+.greeks{display:flex;gap:14px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:#444}
+.greeks span{color:var(--blue);font-weight:600}
+.gig-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.gig-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.gig-title{font-size:16px;font-weight:700}
+.gig-price{font-size:18px;font-weight:800;color:var(--green)}
+.gig-meta{font-size:12px;color:#555;margin-bottom:12px}
+.gig-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--gold));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#000;flex-shrink:0}
+.profile-header{background:linear-gradient(135deg,rgba(0,212,255,0.1),rgba(255,215,0,0.05));border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;text-align:center}
+.profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--gold));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px}
+.profile-name{font-size:20px;font-weight:800;margin-bottom:4px}
+.profile-bio{font-size:13px;color:#666;margin-bottom:12px}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.toggle{width:44px;height:24px;background:var(--border);border-radius:12px;position:relative;cursor:pointer;transition:background 0.2s}
+.toggle.on{background:var(--blue)}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left 0.2s}
+.toggle.on::after{left:23px}
+.filter-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px}
+.filter-btn{background:var(--card);border:1px solid var(--border);color:#777;padding:7px 14px;border-radius:20px;font-size:12px;cursor:pointer;white-space:nowrap}
+.filter-btn.active{background:rgba(0,212,255,0.1);border-color:var(--blue);color:var(--blue)}
+.resume-section{margin-bottom:16px}
+.resume-section h3{font-size:14px;font-weight:700;color:var(--blue);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.job-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.job-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.job-company{font-size:13px;color:var(--blue);margin-bottom:6px}
+.job-meta{font-size:11px;color:#555;margin-bottom:8px}
+.job-salary{font-size:14px;font-weight:700;color:var(--green)}
+.progress-ring{width:80px;height:80px;margin:0 auto 8px}
+.tab-row{display:flex;gap:0;margin-bottom:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tab{flex:1;padding:10px 4px;background:none;border:none;color:#555;font-size:12px;cursor:pointer;font-weight:600}
+.tab.active{background:rgba(0,212,255,0.1);color:var(--blue)}
+.success-toast{display:none;position:fixed;top:80px;left:16px;right:16px;background:rgba(0,255,136,0.15);border:1px solid var(--green);border-radius:12px;padding:14px;color:var(--green);font-size:14px;text-align:center;z-index:9999;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="success-toast" id="toast"></div>
+
+<nav>
+  <div class="logo">⚛ EntangleWealth</div>
+  <div style="font-size:11px;color:#444">BETA</div>
+</nav>
+
+<!-- HOME -->
+<div id="pg-home" class="page active">
+  <div class="hero">
+    <h1>Trade Smarter.<br>Earn More.<br>Feed Your Family.</h1>
+    <p>Stock signals, options flow, gig work, and resume tools — all in one place.</p>
+    <div class="stats-grid">
+      <div class="stat"><div class="stat-n">87%</div><div class="stat-l">Accuracy</div></div>
+      <div class="stat"><div class="stat-n" id="sc">1,247</div><div class="stat-l">Signals</div></div>
+      <div class="stat"><div class="stat-n">4,891</div><div class="stat-l">Members</div></div>
+    </div>
+  </div>
+  <div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
+  <div class="pi">
+    <div class="card">
+      <h2 style="font-size:18px;margin-bottom:6px;color:var(--gold)">🔥 Join the Waitlist</h2>
+      <p style="font-size:13px;color:#555;margin-bottom:14px">Get early access to live signals and gig opportunities.</p>
+      <input type="email" id="emailIn" placeholder="your@email.com">
+      <button class="btn btn-blue" onclick="joinWait()">Get Free Access →</button>
+      <div id="waitMsg" style="display:none;margin-top:10px;color:var(--green);font-size:13px;text-align:center">✅ You're in! Welcome to EntangleWealth.</div>
+    </div>
+    <div class="sec-title">Top Signals <span class="live">LIVE</span></div>
+    <div id="home-sigs"></div>
+    <div class="sec-title" style="margin-top:8px">Featured Gigs <span style="font-size:12px;color:var(--blue);cursor:pointer" onclick="showPage('gigs')">See all →</span></div>
+    <div id="home-gigs"></div>
+  </div>
+</div>
+
+<!-- SIGNALS -->
+<div id="pg-signals" class="page">
+  <div class="pi">
+    <div class="sec-title">Stock Signals <span class="live">LIVE</span></div>
+    <div class="tab-row">
+      <button class="tab active" onclick="sigTab('all',this)">All</button>
+      <button class="tab" onclick="sigTab('buy',this)">Buy</button>
+      <button class="tab" onclick="sigTab('sell',this)">Sell</button>
+      <button class="tab" onclick="sigTab('watch',this)">Watch</button>
+    </div>
+    <div id="all-sigs"></div>
+    <div class="sec-title" style="margin-top:8px">Options Flow <span class="live">LIVE</span></div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="optFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="optFilter('call',this)">Calls 📈</button>
+      <button class="filter-btn" onclick="optFilter('put',this)">Puts 📉</button>
+      <button class="filter-btn" onclick="optFilter('unusual',this)">Unusual 🔥</button>
+    </div>
+    <div id="all-opts"></div>
+  </div>
+</div>
+
+<!-- GIGS -->
+<div id="pg-gigs" class="page">
+  <div class="pi">
+    <div class="sec-title">Gig Marketplace <span style="font-size:12px;color:var(--blue);cursor:pointer" onclick="showGigForm()">+ Post Gig</span></div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="gigFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="gigFilter('cleaning',this)">🧹 Cleaning</button>
+      <button class="filter-btn" onclick="gigFilter('outdoor',this)">🌿 Outdoor</button>
+      <button class="filter-btn" onclick="gigFilter('auto',this)">🚗 Auto</button>
+      <button class="filter-btn" onclick="gigFilter('moving',this)">📦 Moving</button>
+    </div>
+    <div id="gig-list"></div>
+    <div id="gig-form" style="display:none">
+      <div class="card">
+        <h3 style="margin-bottom:14px;color:var(--blue)">Post Your Gig</h3>
+        <input id="gig-title-in" placeholder="Service title (e.g. Pressure Wash Driveway)">
+        <input id="gig-price-in" placeholder="Your price (e.g. $75)">
+        <select id="gig-cat-in">
+          <option value="cleaning">🧹 Cleaning</option>
+          <option value="outdoor">🌿 Outdoor</option>
+          <option value="auto">🚗 Auto</option>
+          <option value="moving">📦 Moving</option>
+        </select>
+        <textarea id="gig-desc-in" placeholder="Describe your service..." rows="3"></textarea>
+        <button class="btn btn-blue" onclick="postGig()">Post Gig</button>
+        <button class="btn btn-outline" onclick="document.getElementById('gig-form').style.display='none'">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESUME & JOBS -->
+<div id="pg-resume" class="page">
+  <div class="pi">
+    <div class="tab-row">
+      <button class="tab active" onclick="resumeTab('builder',this)">Resume Builder</button>
+      <button class="tab" onclick="resumeTab('jobs',this)">Job Finder</button>
+    </div>
+    <div id="resume-builder">
+      <div class="card">
+        <h3 style="margin-bottom:14px;color:var(--blue)">📄 Build Your Resume</h3>
+        <div class="resume-section">
+          <h3>Personal Info</h3>
+          <input id="r-name" placeholder="Full Name">
+          <input id="r-email" placeholder="Email">
+          <input id="r-phone" placeholder="Phone">
+          <input id="r-location" placeholder="City, State">
+        </div>
+        <div class="resume-section">
+          <h3>Professional Summary</h3>
+          <textarea id="r-summary" placeholder="Write a 2-3 sentence summary of your experience and goals..." rows="3"></textarea>
+        </div>
+        <div class="resume-section">
+          <h3>Work Experience</h3>
+          <input id="r-job1" placeholder="Most recent job title & company">
+          <input id="r-job2" placeholder="Previous job title & company">
+        </div>
+        <div class="resume-section">
+          <h3>Skills</h3>
+          <input id="r-skills" placeholder="e.g. Trading, Excel, Customer Service, Driving">
+        </div>
+        <button class="btn btn-gold" onclick="buildResume()">⚡ Generate Resume</button>
+      </div>
+      <div id="resume-output" style="display:none">
+        <div class="card" id="resume-content"></div>
+        <button class="btn btn-blue" onclick="copyResume()">📋 Copy Resume</button>
+      </div>
+    </div>
+    <div id="job-finder" style="display:none">
+      <div class="card">
+        <h3 style="margin-bottom:12px;color:var(--blue)">🔍 AI Job Finder</h3>
+        <input id="job-search" placeholder="Job title or keywords...">
+        <input id="job-location" placeholder="City or Remote">
+        <select id="job-type">
+          <option>Full-time</option>
+          <option>Part-time</option>
+          <option>Remote</option>
+          <option>Freelance</option>
+          <option>Gig</option>
+        </select>
+        <button class="btn btn-blue" onclick="findJobs()">Find Jobs →</button>
+      </div>
+      <div id="job-results"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div id="pg-profile" class="page">
+  <div class="pi">
+    <div class="profile-header">
+      <div class="profile-avatar">👤</div>
+      <div class="profile-name" id="profile-name-display">Your Name</div>
+      <div class="profile-bio" id="profile-bio-display">EntangleWealth Member</div>
+      <div style="display:flex;gap:16px;justify-content:center;margin-top:12px">
+        <div style="text-align:center"><div style="font-size:18px;font-weight:800;color:var(--green)">+12.4%</div><div style="font-size:10px;color:#555">Portfolio</div></div>
+        <div style="text-align:center"><div style="font-size:18px;font-weight:800;color:var(--blue)">87%</div><div style="font-size:10px;color:#555">Win Rate</div></div>
+        <div style="text-align:center"><div style="font-size:18px;font-weight:800;color:var(--gold)">$2,840</div><div style="font-size:10px;color:#555">Earned</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:14px;color:var(--blue)">Edit Profile</h3>
+      <input id="p-name" placeholder="Your name">
+      <input id="p-bio" placeholder="Bio (trader, gig worker, etc.)">
+      <button class="btn btn-blue" onclick="saveProfile()">Save Profile</button>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:14px;color:var(--blue)">Privacy Settings</h3>
+      <div class="toggle-row">
+        <div>
+          <div style="font-size:14px;font-weight:600">Show Portfolio Gains</div>
+          <div style="font-size:12px;color:#555">Display your investment progress publicly</div>
+        </div>
+        <div class="toggle on" id="t1" onclick="toggleSwitch('t1')"></div>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div style="font-size:14px;font-weight:600">Show Gig Profile</div>
+          <div style="font-size:12px;color:#555">Let others find your gig services</div>
+        </div>
+        <div class="toggle on" id="t2" onclick="toggleSwitch('t2')"></div>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div style="font-size:14px;font-weight:600">Signal Notifications</div>
+          <div style="font-size:12px;color:#555">Get alerted on new trade signals</div>
+        </div>
+        <div class="toggle on" id="t3" onclick="toggleSwitch('t3')"></div>
+      </div>
+      <div class="toggle-row" style="border:none">
+        <div>
+          <div style="font-size:14px;font-weight:600">Public Profile</div>
+          <div style="font-size:12px;color:#555">Anyone can view your profile page</div>
+        </div>
+        <div class="toggle" id="t4" onclick="toggleSwitch('t4')"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:14px;color:var(--blue)">Investment Progress</h3>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+        <div style="background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--green)">+$1,240</div>
+          <div style="font-size:11px;color:#555;margin-top:4px">This Month</div>
+        </div>
+        <div style="background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--blue)">23</div>
+          <div style="font-size:11px;color:#555;margin-top:4px">Signals Used</div>
+        </div>
+        <div style="background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.2);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--gold)">$680</div>
+          <div style="font-size:11px;color:#555;margin-top:4px">Gig Earned</div>
+        </div>
+        <div style="background:rgba(255,51,102,0.05);border:1px solid rgba(255,51,102,0.2);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--red)">2%</div>
+          <div style="font-size:11px;color:#555;margin-top:4px">Max Risk</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <button class="bnav active" id="bn-home" onclick="showPage('home')"><span class="ic">🏠</span>Home</button>
+  <button class="bnav" id="bn-signals" onclick="showPage('signals')"><span class="ic">📈</span>Signals</button>
+  <button class="bnav" id="bn-gigs" onclick="showPage('gigs')"><span class="ic">🛠️</span>Gigs</button>
+  <button class="bnav" id="bn-resume" onclick="showPage('resume')"><span class="ic">📄</span>Jobs</button>
+  <button class="bnav" id="bn-profile" onclick="showPage('profile')"><span class="ic">👤</span>Profile</button>
+</div>
+
+<script>
+const stocks=[
+  {sym:'NVDA',price:'875.40',chg:'+3.2%',sig:'buy',conf:92,vol:'48.2M',tgt:'$920',stop:'$850',time:'2m ago',reason:'Bull flag breakout. Volume 2.8x avg.'},
+  {sym:'TSLA',price:'198.45',chg:'-1.8%',sig:'sell',conf:85,vol:'32.1M',tgt:'$180',stop:'$210',time:'5m ago',reason:'RSI bearish divergence on 4H.'},
+  {sym:'AAPL',price:'175.84',chg:'+0.9%',sig:'watch',conf:65,vol:'22.4M',tgt:'$185',stop:'$170',time:'8m ago',reason:'Range compression. Wait for breakout.'},
+  {sym:'AMD',price:'162.75',chg:'+2.1%',sig:'buy',conf:88,vol:'28.9M',tgt:'$178',stop:'$155',time:'11m ago',reason:'Wyckoff spring. Institutional accumulation.'},
+  {sym:'META',price:'512.30',chg:'+1.4%',sig:'buy',conf:81,vol:'18.3M',tgt:'$535',stop:'$500',time:'14m ago',reason:'VWAP reclaim with strong momentum.'},
+  {sym:'SPY',price:'542.10',chg:'+0.4%',sig:'watch',conf:60,vol:'88.7M',tgt:'$550',stop:'$535',time:'18m ago',reason:'Approaching key resistance. Caution.'},
+];
+
+const opts=[
+  {sym:'NVDA',type:'call',strike:'$900',exp:'May 17',prem:'$8.40',vol:'48,200',oi:'12,400',iv:'68%',delta:'0.42',gamma:'0.018',theta:'-0.85',unusual:true,note:'$4.2M sweep across 3 exchanges'},
+  {sym:'TSLA',type:'put',strike:'$180',exp:'May 16',prem:'$5.20',vol:'62,100',oi:'28,700',iv:'82%',delta:'-0.38',gamma:'0.022',theta:'-1.12',unusual:true,note:'$3.1M block. Likely hedge.'},
+  {sym:'SPY',type:'call',strike:'$550',exp:'Apr 26',prem:'$3.80',vol:'124,400',oi:'88,200',iv:'18%',delta:'0.35',gamma:'0.012',theta:'-0.45',unusual:false,note:'Institutional sweep. Multiple exchanges.'},
+  {sym:'AMD',type:'call',strike:'$175',exp:'May 23',prem:'$6.70',vol:'38,400',oi:'9,800',iv:'74%',delta:'0.45',gamma:'0.024',theta:'-1.08',unusual:true,note:'Pre-earnings positioning.'},
+  {sym:'QQQ',type:'put',strike:'$430',exp:'May 16',prem:'$4.20',vol:'44,100',oi:'21,300',iv:'28%',delta:'-0.32',gamma:'0.014',theta:'-0.72',unusual:false,note:'Likely portfolio hedge.'},
+];
+
+let gigs=[
+  {id:1,title:'Pressure Wash Driveway & Walkway',price:'$120',cat:'outdoor',desc:'Professional pressure washing. Before/after photos provided.',name:'Marcus J.',rating:'4.9',jobs:47,emoji:'🚿'},
+  {id:2,title:'Full Car Detail Interior & Exterior',price:'$85',cat:'auto',desc:'Complete detail including vacuum, wipe down, exterior wash and wax.',name:'DeShawn T.',rating:'5.0',jobs:83,emoji:'🚗'},
+  {id:3,title:'Lawn Mowing & Edging',price:'$45',cat:'outdoor',desc:'Mow, edge, and blow. Yards up to 1/4 acre. Same day available.',name:'Carlos R.',rating:'4.8',jobs:124,emoji:'🌿'},
+  {id:4,title:'House Deep Clean Top to Bottom',price:'$150',cat:'cleaning',desc:'Full home deep clean. Bathrooms, kitchen, floors, baseboards.',name:'Tanya M.',rating:'4.9',jobs:61,emoji:'🧹'},
+  {id:5,title:'Help Moving Furniture & Boxes',price:'$35/hr',cat:'moving',desc:'Strong and reliable. Truck available for extra fee. No job too big.',name:'Jerome B.',rating:'4.7',jobs:38,emoji:'📦'},
+  {id:6,title:'Shed & Garage Cleanout',price:'$95',cat:'cleaning',desc:'Full cleanout, haul away, sweep. Same week availability.',name:'Lisa K.',rating:'4.8',jobs:29,emoji:'🏚️'},
+];
+
+const ticks=[
+  {sym:'NVDA',price:'875.40',chg:'+3.2%',up:true},
+  {sym:'TSLA',price:'198.45',chg:'-1.8%',up:false},
+  {sym:'AAPL',price:'175.84',chg:'+0.9%',up:true},
+  {sym:'SPY',price:'542.10',chg:'+0.4%',up:true},
+  {sym:'AMD',price:'162.75',chg:'+2.1%',up:true},
+  {sym:'META',price:'512.30',chg:'+1.4%',up:true},
+  {sym:'MSFT',price:'415.70',chg:'-0.6%',up:false},
+  {sym:'QQQ',price:'448.20',chg:'+0.7%',up:true},
+  {sym:'AMZN',price:'198.40',chg:'-0.3%',up:false},
+  {sym:'GOOGL',price:'174.80',chg:'+1.1%',up:true},
+];
+
+const jobsDB=[
+  {title:'Delivery Driver',company:'Amazon Flex',location:'Your City',type:'Gig',salary:'$18-$25/hr',desc:'Flexible hours. Use your own vehicle. Weekly pay.'},
+  {title:'Remote Customer Service Rep',company:'Teleperformance',location:'Remote',type:'Full-time',salary:'$16-$20/hr',desc:'Work from home. Equipment provided. Benefits after 90 days.'},
+  {title:'Warehouse Associate',company:'UPS',location:'Local Hub',type:'Part-time',salary:'$21/hr',desc:'Early morning shifts available. Benefits from day one.'},
+  {title:'Freelance Graphic Designer',company:'Upwork',location:'Remote',type:'Freelance',salary:'$25-$75/hr',desc:'Build your own client base. Flexible schedule.'},
+  {title:'Home Health Aide',company:'BrightSpring',location:'Your City',type:'Full-time',salary:'$15-$18/hr',desc:'Paid training. Flexible scheduling. Meaningful work.'},
+  {title:'Rideshare Driver',company:'Uber/Lyft',location:'Your City',type:'Gig',salary:'$15-$30/hr',desc:'Set your own hours. Instant pay available.'},
+  {title:'Social Media Manager',company:'Various Clients',location:'Remote',type:'Freelance',salary:'$20-$45/hr',desc:'Manage accounts for small businesses. Grow your portfolio.'},
+  {title:'HVAC Technician',company:'Local Contractors',location:'Your City',type:'Full-time',salary:'$28-$45/hr',desc:'High demand trade. Certification preferred but will train.'},
+];
+
+function buildTicker(){
+  const t=document.getElementById('ticker');
+  const d=[...ticks,...ticks];
+  t.innerHTML=d.map(i=>`<span class="tick"><span class="muted">${i.sym}</span><span>${i.price}</span><span class="${i.up?'up':'down'}">${i.chg}</span></span>`).join('');
+}
+
+function sigCard(s){
+  const bc=s.sig==='buy'?'badge-buy':s.sig==='sell'?'badge-sell':'badge-watch';
+  return`<div class="sig-card ${s.sig}" data-sig="${s.sig}">
+    <div class="sig-top"><div class="sig-sym">${s.sym}<span style="font-size:12px;color:#555;font-weight:400;margin-left:6px">${s.price}</span></div><span class="badge ${bc}">${s.sig.toUpperCase()}</span></div>
+    <div class="sig-grid">
+      <div class="sig-stat">Target<span style="color:var(--green)">${s.tgt}</span></div>
+      <div class="sig-stat">Stop<span style="color:var(--red)">${s.stop}</span></div>
+      <div class="sig-stat">Conf<span style="color:var(--blue)">${s.conf}%</span></div>
+      <div class="sig-stat">Volume<span>${s.vol}</span></div>
+      <div class="sig-stat">Change<span>${s.chg}</span></div>
+      <div class="sig-stat">Time<span>${s.time}</span></div>
+    </div>
+    <div class="conf-bar"><div class="conf-fill" style="width:${s.conf}%"></div></div>
+    <div style="font-size:11px;color:#555;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${s.reason}</div>
+  </div>`;
+}
+
+function optCard(o){
+  return`<div class="opt-card" data-type="${o.type}" data-unusual="${o.unusual}">
+    <div class="opt-top">
+      <div><div class="opt-sym">${o.sym}${o.unusual?' 🔥':''}</div><div style="font-size:11px;color:#555;margin-top:2px">${o.strike} strike • ${o.exp}</div></div>
+      <span class="badge badge-${o.type}">${o.type.toUpperCase()}</span>
+    </div>
+    <div class="opt-grid">
+      <div class="opt-stat">Premium<span>${o.prem}</span></div>
+      <div class="opt-stat">Volume<span style="color:var(--blue)">${o.vol}</span></div>
+      <div class="opt-stat">Open Int<span>${o.oi}</span></div>
+      <div class="opt-stat">IV<span style="color:var(--gold)">${o.iv}</span></div>
+    </div>
+    <div class="greeks">Δ<span>${o.delta}</span> Γ<span>${o.gamma}</span> Θ<span>${o.theta}</span></div>
+    <div style="font-size:11px;color:#555;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${o.note}</div>
+  </div>`;
+}
+
+function gigCard(g){
+  return`<div class="gig-card" data-cat="${g.cat}">
+    <div class="gig-top">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div class="gig-avatar">${g.emoji}</div>
+        <div>
+          <div class="gig-title">${g.title}</div>
+          <div class="gig-meta">⭐ ${g.rating} · ${g.jobs} jobs completed</div>
+          <span class="badge badge-gig">${g.cat}</span>
+        </div>
+      </div>
+      <div class="gig-price">${g.price}</div>
+    </div>
+    <div style="font-size:13px;color:#666;margin-bottom:12px">${g.desc}</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-blue" style="margin-top:0" onclick="toast('📞 Contacting ${g.name}...')">Contact</button>
+      <button class="btn btn-outline" style="margin-top:0" onclick="toast('🔖 Saved!')">Save</button>
+    </div>
+  </div>`;
+}
+
+function render(){
+  buildTicker();
+  document.getElementById('home-sigs').innerHTML=stocks.slice(0,2).map(sigCard).join('');
+  document.getElementById('home-gigs').innerHTML=gigs.slice(0,2).map(gigCard).join('');
+  document.getElementById('all-sigs').innerHTML=stocks.map(sigCard).join('');
+  document.getElementById('all-opts').innerHTML=opts.map(optCard).join('');
+  document.getElementById('gig-list').innerHTML=gigs.map(gigCard).join('');
+}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bnav').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  document.getElementById('bn-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function sigTab(type,btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.sig-card').forEach(c=>{
+    c.style.display=(type==='all'||c.dataset.sig===type)?'block':'none';
+  });
+}
+
+function optFilter(type,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.opt-card').forEach(c=>{
+    if(type==='all') c.style.display='block';
+    else if(type==='unusual') c.style.display=c.dataset.unusual==='true'?'block':'none';
+    else c.style.display=c.dataset.type===type?'block':'none';
+  });
+}
+
+function gigFilter(type,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.gig-card').forEach(c=>{
+    c.style.display=(type==='all'||c.dataset.cat===type)?'block':'none';
+  });
+}
+
+function showGigForm(){
+  const f=document.getElementById('gig-form');
+  f.style.display=f.style.display==='none'?'block':'none';
+}
+
+function postGig(){
+  const title=document.getElementById('gig-title-in').value;
+  const price=document.getElementById('gig-price-in').value;
+  const cat=document.getElementById('gig-cat-in').value;
+  const desc=document.getElementById('gig-desc-in').value;
+  if(!title||!price){toast('⚠️ Please fill in title and price');return;}
+  const emojis={cleaning:'🧹',outdoor:'🌿',auto:'🚗',moving:'📦'};
+  gigs.unshift({id:Date.now(),title,price,cat,desc:desc||'Quality service guaranteed.',name:'You',rating:'New',jobs:0,emoji:emojis[cat]||'🛠️'});
+  document.getElementById('gig-list').innerHTML=gigs.map(gigCard).join('');
+  document.getElementById('gig-form').style.display='none';
+  document.getElementById('gig-title-in').value='';
+  document.getElementById('gig-price-in').value='';
+  document.getElementById('gig-desc-in').value='';
+  toast('✅ Your gig is live!');
+}
+
+function resumeTab(tab,btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('resume-builder').style.display=tab==='builder'?'block':'none';
+  document.getElementById('job-finder').style.display=tab==='jobs'?'block':'none';
+}
+
+function buildResume(){
+  const name=document.getElementById('r-name').value||'Your Name';
+  const email=document.getElementById('r-email').value||'email@example.com';
+  const phone=document.getElementById('r-phone').value||'(555) 000-0000';
+  const location=document.getElementById('r-location').value||'City, State';
+  const summary=document.getElementById('r-summary').value||'Experienced professional seeking new opportunities.';
+  const job1=document.getElementById('r-job1').value||'Most Recent Position';
+  const job2=document.getElementById('r-job2').value||'Previous Position';
+  const skills=document.getElementById('r-skills').value||'Communication, Problem Solving, Teamwork';
+  document.getElementById('resume-content').innerHTML=`
+    <div style="text-align:center;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:20px;font-weight:800;color:var(--blue)">${name}</div>
+      <div style="font-size:12px;color:#666;margin-top:4px">${email} · ${phone} · ${location}</div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Summary</div>
+      <div style="font-size:13px;color:#aaa;line-height:1.6">${summary}</div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Experience</div>
+      <div style="font-size:13px;color:#fff;font-weight:600">${job1}</div>
+      <div style="font-size:13px;color:#fff;font-weight:600;margin-top:6px">${job2}</div>
+    </div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Skills</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${skills.split(',').map(s=>`<span style="background:rgba(0,212,255,0.1);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:12px;color:var(--blue)">${s.trim()}</span>`).join('')}</div>
+    </div>`;
+  document.getElementById('resume-output').style.display='block';
+  toast('✅ Resume generated!');
+}
+
+function copyResume(){
+  const content=document.getElementById('resume-content').innerText;
+  navigator.clipboard.writeText(content).then(()=>toast('📋 Copied to clipboard!'));
+}
+
+function findJobs(){
+  const search=document.getElementById('job-search').value.toLowerCase();
+  const type=document.getElementById('job-type').value;
+  let results=jobsDB.filter(j=>
+    (search===''||j.title.toLowerCase().includes(search)||j.desc.toLowerCase().includes(search))&&
+    (type==='Full-time'||j.type===type||search!=='')
+  );
+  if(results.length===0) results=jobsDB;
+  document.getElementById('job-results').innerHTML=results.map(j=>`
+    <div class="job-card">
+      <div class="job-title">${j.title}</div>
+      <div class="job-company">${j.company}</div>
+      <div class="job-meta">📍 ${j.location} · 💼 ${j.type}</div>
+      <div class="job-salary">${j.salary}</div>
+      <div style="font-size:12px;color:#666;margin-top:8px;margin-bottom:12px">${j.desc}</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-blue" style="margin-top:0;font-size:13px" onclick="toast('📨 Applying to ${j.title}...')">Quick Apply</button>
+        <button class="btn btn-outline" style="margin-top:0;font-size:13px" onclick="toast('🔖 Job saved!')">Save</button>
+      </div>
+    </div>`).join('');
+  toast(`Found ${results.length} opportunities`);
+}
+
+function saveProfile(){
+  const name=document.getElementById('p-name').value;
+  const bio=document.getElementById('p-bio').value;
+  if(name) document.getElementById('profile-name-display').textContent=name;
+  if(bio) document.getElementById('profile-bio-display').textContent=bio;
+  toast('✅ Profile saved!');
+}
+
+function toggleSwitch(id){
+  document.getElementById(id).classList.toggle('on');
+}
+
+function joinWait(){
+  const e=document.getElementById('emailIn');
+  if(!e.value||!e.value.includes('@')){e.style.borderColor='var(--red)';return;}
+  document.getElementById('waitMsg').style.display='block';
+  e.style.display='none';
+  e.nextElementSibling.style.display='none';
+  document.getElementById('sc').textContent='1,248';
+  toast('🎉 Welcome to EntangleWealth!');
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+
+setInterval(()=>{
+  const s=document.getElementById('sc');
+  if(s&&Math.random()>0.7) s.textContent=(parseInt(s.textContent.replace(',',''))+1).toLocaleString();
+},15000);
+
+render();
+</script>
+</body>
+</html>

@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Area, AreaChart, Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from "recharts";
+import { EconomicCalendar } from "@/components/EconomicCalendar";
 
 const DASHBOARD_STOCKS: { symbol: string; name: string }[] = [
   { symbol: "AAPL", name: "Apple Inc." }, { symbol: "MSFT", name: "Microsoft Corporation" },
@@ -598,8 +599,9 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <SignalHistory />
+          <EconomicCalendar />
         </div>
 
         <div className="p-4 rounded-lg border border-white/5 bg-white/[0.01]">

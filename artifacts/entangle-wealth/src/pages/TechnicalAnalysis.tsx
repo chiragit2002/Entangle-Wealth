@@ -13,6 +13,7 @@ import {
   type IndicatorResult, type StockData,
   generateMockOHLCV, runAllIndicators, getOverallSignal,
 } from "@/lib/indicators";
+import { CandlestickChart } from "@/components/CandlestickChart";
 
 type Category = "all" | "trend" | "momentum" | "volatility" | "volume";
 
@@ -581,6 +582,12 @@ export default function TechnicalAnalysis() {
                     })}
                   </div>
                 </div>
+
+                {stockData && (
+                  <div className="mb-4">
+                    <CandlestickChart data={stockData} symbol={activeSymbol} />
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">

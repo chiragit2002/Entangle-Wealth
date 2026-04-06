@@ -24,7 +24,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 ### EntangleWealth (`artifacts/entangle-wealth`)
 - Financial analysis platform with dark theme (black bg, electric blue #00D4FF, gold #FFD700)
 - **Authentication**: Clerk (email + Google sign-in at /sign-in, /sign-up)
-- Pages: Landing (/), Dashboard (/dashboard), Earn (/earn), Options Signals (/options), Stock Explorer (/stocks), Job Search (/jobs), Gig Marketplace (/gigs), Community (/community), Tax Dashboard (/tax), Receipt Scanner (/receipts), Business Travel Planner (/travel), TaxGPT (/taxgpt), Technical Analysis (/technical), Terminal (/terminal), Résumé Builder (/resume, auth required), Profile (/profile, auth required), About (/about)
+- Pages: Landing (/), Dashboard (/dashboard), Market Overview (/market-overview), Earn (/earn), Options (/options), Stock Explorer (/stocks), Screener (/screener), Job Search (/jobs), Gig Marketplace (/gigs), Community (/community), Tax Dashboard (/tax), Receipt Scanner (/receipts), Business Travel Planner (/travel), TaxGPT (/taxgpt), Technical Analysis (/technical), Terminal (/terminal), Résumé Builder (/resume, auth required), Profile (/profile, auth required), About (/about)
 - Tone: Honest, no-hype, no AI slop. Straightforward about what the platform does and doesn't do.
 - Core concept: Multiple AI analysis methods run simultaneously and cross-check each other via "quantum entanglement." Signals only fire on consensus.
 - Mission: Help everyday families make better financial decisions.
@@ -103,9 +103,28 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **Toggle views**: AI Agents view (6 agent cards) or Indicators view (sortable table with signal badges)
 - 6 AI agent reviews: Trend Analyst, Momentum Surgeon, Risk Manager, Volume Profiler, Devil's Advocate, Consensus Engine
 - Category filter tabs (All/Trend/Momentum/Volatility/Volume) with buy/sell counts
+- **Candlestick chart**: OHLCV chart rendered via SVG with green/red candles, volume bars, SMA20 (gold) and SMA50 (purple) overlays, price grid, and % change
 - Overall signal summary with confidence percentage
 - Export all indicators to CSV (formula-injection safe)
 - Race condition protection: `useRef` guards prevent stale analysis results from rapid searches
+
+#### Market Overview (/market-overview) — Bloomberg MMAP
+- 6 major indices dashboard (S&P 500, NASDAQ, DOW, Russell 2000, VIX, 10Y Treasury) with live prices/change
+- 6 economic indicators strip (GDP, CPI, Unemployment, Fed Rate, PCE Core, 10Y Yield) with prev/status
+- 11-sector heat map with individual stock tiles showing % change (green/red gradient)
+- Top Gainers and Top Losers sections (8 stocks each)
+- Global Markets grid: Forex (EUR/USD, GBP/USD, USD/JPY), Crypto (BTC, ETH), Commodities (Gold, Oil, NatGas, Silver), Futures, Asia/Europe indices
+- Market breadth (advance/decline ratio) in header
+- Live clock, market status badge
+
+#### Stock Screener (/screener) — Bloomberg EQS
+- 36+ stocks with sortable columns: Symbol, Price, Change, Volume, Market Cap, P/E, AI Signal, Confidence
+- Filter by sector, signal type, gainers/losers
+- Per-stock AI analysis (55+ indicators) via "Analyze" button
+- "Scan All" bulk analysis
+- 52-week range position bar per stock
+- Bookmark to watchlist
+- Search filter for ticker/name
 
 #### Dashboard (/dashboard) — Command Center
 - **Full stock search**: 60+ stocks searchable by ticker or company name with dropdown autocomplete
@@ -113,6 +132,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - Stock Signals, Options Flow, Unusual Activity + Greeks sections
 - Portfolio chart (1D/1W/1M/3M), Options Income chart, Fear/Greed, Sector Heatmap, Risk Radar
 - WatchlistPanel + Live Analysis Feed + Signal History
+- Economic Calendar widget (FOMC, CPI, NFP, earnings, etc.) with impact ratings and category filters
 - Race condition protection on quick analysis
 
 #### Notification Center
@@ -124,6 +144,15 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - Toggle/delete configured alerts
 - Mark all read, clear all actions
 - Keyboard accessible: Escape to close, focus management, dialog role
+
+#### Options (/options) — Bloomberg OMON
+- **Full Options Chain**: Bloomberg-style table with Calls (left), Strike (center), Puts (right)
+- 10 underlying symbols (AAPL, NVDA, TSLA, MSFT, AMD, AMZN, META, RKLB, GOOGL, SPY) with 9 expiration dates
+- Per-contract Greeks: Delta, Gamma, Theta, Vega, IV%
+- ITM highlighting (calls tinted cyan, puts tinted red), ATM strike highlighted gold
+- P/C ratio, total call/put volume stats
+- Toggle Greeks visibility
+- **Unusual Options Activity** table below chain with filters, column toggle, expandable rows with contract details + Greeks cards + signal analysis
 
 #### Terminal (/terminal)
 - MirofishTerminal with live order flow, news feed, system log panels

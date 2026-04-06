@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { FlashCouncil } from "@/components/FlashCouncil";
 import { MarketTicker } from "@/components/MarketTicker";
+import { OptionsChain } from "@/components/OptionsChain";
 import { unusualOptionsActivity } from "@/lib/mock-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -102,9 +103,11 @@ export default function Options() {
       <MarketTicker />
       
       <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <OptionsChain />
+
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Options Signals</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Unusual Options Activity</h1>
             <p className="text-muted-foreground mt-1">
               Unusual options activity with full Greeks breakdown.
               <span className="text-white/40"> • </span>

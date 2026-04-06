@@ -14,16 +14,16 @@ export function Navbar() {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/dashboard", label: "Dashboard" },
-    { href: "/earn", label: "Earn" },
-    { href: "/options", label: "Options Flow" },
+    { href: "/market-overview", label: "Markets" },
+    { href: "/technical", label: "Analysis" },
+    { href: "/screener", label: "Screener" },
+    { href: "/options", label: "Options" },
+    { href: "/terminal", label: "Terminal" },
     { href: "/stocks", label: "Stocks" },
-    { href: "/jobs", label: "Jobs" },
-    { href: "/gigs", label: "Gigs" },
+    { href: "/earn", label: "Earn" },
     { href: "/community", label: "Community" },
     { href: "/tax", label: "TaxFlow" },
-    { href: "/technical", label: "Technical" },
-    { href: "/terminal", label: "Terminal" },
-    { href: "/about", label: "About Us" },
+    { href: "/about", label: "About" },
   ];
 
   return (

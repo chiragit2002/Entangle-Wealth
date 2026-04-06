@@ -45,6 +45,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/tax", label: "TaxFlow", desc: "Tax suite" },
       { href: "/pricing", label: "Pricing", desc: "Plans" },
       { href: "/about", label: "About", desc: "Our mission" },
+      { href: "/competitive-intel", label: "Intel Report", desc: "Competitive analysis" },
     ],
   },
 ];
@@ -84,6 +85,7 @@ const MOBILE_SECTIONS = [
       { href: "/tax", label: "TaxFlow" },
       { href: "/pricing", label: "Pricing" },
       { href: "/about", label: "About" },
+      { href: "/competitive-intel", label: "Intel Report" },
     ],
   },
 ];

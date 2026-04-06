@@ -23,6 +23,7 @@ The project is a pnpm workspace monorepo with each package managing its own depe
 - **Responsiveness**: Mobile-responsive design with grouped hamburger menu (section headers: Trading, Tools, Research, More in 2-column grid) and bottom navigation bar on screens smaller than 1024px.
 - **Components**: Utilizes shadcn/ui components.
 - **Layout Background**: Three animated gradient orbs (cyan, gold, purple) with slow drift animations, plus a subtle dot grid overlay at 40px spacing.
+- **Competitive Intelligence**: `/competitive-intel` — Full quantum competitive analysis report with 7 competitors (Bloomberg, TradingView, Koyfin, Trade Ideas, TrendSpider, Danelfin, Robinhood), April Dunford positioning, feature matrix, 2x2 positioning map, Kano analysis, strategic action plan, and PDF export via jsPDF.
 
 ## Technical Implementations
 - **Authentication**: Clerk for user authentication (email and Google sign-in).

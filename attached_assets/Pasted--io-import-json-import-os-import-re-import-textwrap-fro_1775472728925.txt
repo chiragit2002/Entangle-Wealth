@@ -1,0 +1,734 @@
+ io
+import json
+import os
+import re
+import textwrap
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Dict, List, Optional
+
+import feedparser
+import requests
+from bs4 import BeautifulSoup
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+
+# Load environment variables from .env file if it exists
+try:
+	from dotenv import load_dotenv
+	load_dotenv()
+except ImportError:
+	pass  # dotenv not available, continue without it
+
+
+MICROELECTRONICS_FEEDS = [
+	"https://www.eetimes.com/feed/",
+	"https://semiengineering.com/feed/",
+	"https://www.allaboutcircuits.com/rss/",
+]
+
+GEOPOLITICAL_FEEDS = [
+	"https://feeds.bbci.co.uk/news/world/rss.xml",
+	"https://www.aljazeera.com/xml/rss/all.xml",
+	"https://rss.cnn.com/rss/edition.rss",
+]
+
+# Additional feeds for specific topics of interest - test these gradually
+SUPPLY_CHAIN_FEEDS = [
+	# "https://www.supplychaindive.com/feeds/news/",  # Test later
+]
+
+TECH_POLICY_FEEDS = [
+	"https://www.theverge.com/rss/index.xml",
+]
+
+
+@dataclass
+class NewsItem:
+	topic: str
+	title: str
+	link: str
+	source: str
+	published: str
+	summary: str
+
+
+@dataclass
+class MiroFishConfig:
+	base_url: str
+	project_name: str
+	simulation_requirement: str
+	request_timeout_sec: int
+	poll_interval_sec: int
+	poll_timeout_sec: int
+	api_token: Optional[str] = None
+
+
+class MiroFishClient:
+	def __init__(self, cfg: MiroFishConfig):
+		self.cfg = cfg
+		self.session = requests.Session()
+		self.session.headers.update({"Accept": "application/json"})
+		if cfg.api_token:
+			self.session.headers.update({"Authorization": f"Bearer {cfg.api_token}"})
+
+	def _url(self, path: str) -> str:
+		return f"{self.cfg.base_url.rstrip('/')}{path}"
+
+	def _check_ok(self, payload: Dict, action: str) -> None:
+		if payload.get("success") is False:
+			raise RuntimeError(f"MiroFish error on {action}: {payload.get('error', 'unknown error')}")
+
+	def _debug_request(self, method: str, url: str, response: requests.Response) -> None:
+		"""Debug helper to log request/response details"""
+		print(f"[DEBUG] {method} {url}")
+		print(f"[DEBUG] Response Status: {response.status_code}")
+		print(f"[DEBUG] Response Headers: {dict(response.headers)}")
+		try:
+			response_text = response.text
+			if len(response_text) > 500:
+				response_text = response_text[:500] + "..."
+			print(f"[DEBUG] Response Body: {response_text}")
+		except:
+			print("[DEBUG] Could not decode response body")
+
+	def upload_pdf_and_generate_ontology(self, pdf_bytes: bytes, filename: str) -> str:
+		"""Upload PDF and generate ontology - now with working format and token limit handling"""
+		print(f"[API] Uploading {filename} ({len(pdf_bytes)} bytes) to MiroFish...")
+
+		files = {"files": (filename, pdf_bytes, "application/pdf")}
+		data = {
+			"simulation_requirement": self.cfg.simulation_requirement,
+			"project_name": self.cfg.project_name,
+		}
+
+		try:
+			resp = self.session.post(
+				self._url("/api/graph/ontology/generate"),
+				files=files,
+				data=data,
+				timeout=self.cfg.request_timeout_sec,
+			)
+
+			print(f"[API] Upload response: {resp.status_code}")
+
+			if resp.status_code == 200:
+				payload = resp.json()
+				self._check_ok(payload, "ontology generation")
+				project_id = payload["data"]["project_id"]
+				print(f"[API] Successfully created project: {project_id}")
+				return project_id
+			else:
+				# Try to get error details
+				try:
+					error_data = resp.json()
+					error_msg = error_data.get("error", f"HTTP {resp.status_code}")
+				except:
+					error_msg = f"HTTP {resp.status_code}: {resp.text[:200]}"
+
+				# Check if this is a token limit error
+				if "tokens_limit_reached" in str(error_data) or "too large" in str(error_data):
+					raise RuntimeError(f"Token limit exceeded: {error_msg}. The PDF content is too large for the current model.")
+				else:
+					raise RuntimeError(f"MiroFish API error: {error_msg}")
+
+		except requests.exceptions.Timeout:
+			raise RuntimeError(f"MiroFish API timeout after {self.cfg.request_timeout_sec}s. The file might still be processing.")
+		except requests.exceptions.ConnectionError:
+			raise RuntimeError("Cannot connect to MiroFish. Ensure MiroFish is running on localhost:5001")
+		except Exception as e:
+			if "project_id" in str(e):
+				raise  # Re-raise if it's our custom error
+			else:
+				raise RuntimeError(f"Unexpected error uploading to MiroFish: {e}")
+
+	def build_graph(self, project_id: str) -> str:
+		resp = self.session.post(
+			self._url("/api/graph/build"),
+			json={"project_id": project_id},
+			timeout=self.cfg.request_timeout_sec,
+		)
+		resp.raise_for_status()
+		payload = resp.json()
+		self._check_ok(payload, "graph build start")
+		task_id = payload["data"]["task_id"]
+		return task_id
+
+	def wait_for_graph(self, task_id: str) -> Dict:
+		started = datetime.now(timezone.utc)
+		while True:
+			resp = self.session.get(
+				self._url(f"/api/graph/task/{task_id}"),
+				timeout=self.cfg.request_timeout_sec,
+			)
+			resp.raise_for_status()
+			payload = resp.json()
+			self._check_ok(payload, "graph task status")
+			data = payload.get("data", {})
+			status = (data.get("status") or "").lower()
+
+			if status == "completed":
+				return data.get("result", {})
+			if status in {"failed", "error"}:
+				raise RuntimeError(f"Graph build failed: {data.get('error', 'unknown error')}")
+
+			elapsed = (datetime.now(timezone.utc) - started).total_seconds()
+			if elapsed > self.cfg.poll_timeout_sec:
+				raise TimeoutError(
+					f"Graph build timed out after {self.cfg.poll_timeout_sec}s (task {task_id})."
+				)
+
+			print(f"[MiroFish] task={task_id} status={status} progress={data.get('progress', '?')}%")
+			_sleep(self.cfg.poll_interval_sec)
+
+
+def _sleep(seconds: int) -> None:
+	import time
+
+	time.sleep(seconds)
+
+
+def clean_text(raw: str) -> str:
+	text = re.sub(r"\s+", " ", (raw or "").strip())
+	return text
+
+
+def extract_article_text(url: str, timeout_sec: int = 12) -> str:
+	try:
+		resp = requests.get(url, timeout=timeout_sec)
+		resp.raise_for_status()
+	except Exception:
+		return ""
+
+	soup = BeautifulSoup(resp.text, "html.parser")
+	for tag in soup(["script", "style", "noscript"]):
+		tag.decompose()
+
+	paragraphs = [p.get_text(" ", strip=True) for p in soup.find_all("p")]
+	text = clean_text(" ".join(paragraphs))
+	if len(text) > 2200:
+		return text[:2200] + "..."
+	return text
+
+
+def parse_feed(topic: str, url: str, per_feed_limit: int = 8) -> List[NewsItem]:
+	try:
+		parsed = feedparser.parse(url)
+		source_title = parsed.feed.get("title") or url
+		items: List[NewsItem] = []
+
+		for entry in parsed.entries[:per_feed_limit]:
+			title = clean_text(entry.get("title", "Untitled"))
+			link = entry.get("link", "")
+			published = clean_text(entry.get("published", ""))
+			summary = clean_text(entry.get("summary", ""))
+
+			if not summary and link:
+				try:
+					summary = extract_article_text(link)
+				except Exception:
+					summary = ""
+
+			if summary:
+				summary = summary[:500]
+
+			items.append(
+				NewsItem(
+					topic=topic,
+					title=title,
+					link=link,
+					source=source_title,
+					published=published,
+					summary=summary,
+				)
+			)
+
+		return items
+	except Exception as e:
+		print(f"Warning: Failed to parse feed {url}: {e}")
+		return []
+
+
+def scrape_news(max_items_per_topic: int = 18) -> List[NewsItem]:
+	collected: List[NewsItem] = []
+
+	# Scrape microelectronics feeds
+	print("Scraping microelectronics feeds...")
+	for feed in MICROELECTRONICS_FEEDS:
+		collected.extend(parse_feed("Microelectronics", feed))
+
+	# Scrape geopolitics feeds
+	print("Scraping geopolitics feeds...")
+	for feed in GEOPOLITICAL_FEEDS:
+		collected.extend(parse_feed("Geopolitics", feed))
+
+	# Scrape supply chain feeds (relevant to both topics)
+	print("Scraping supply chain feeds...")
+	try:
+		for feed in SUPPLY_CHAIN_FEEDS:
+			collected.extend(parse_feed("Supply Chain", feed))
+	except Exception as e:
+		print(f"Warning: Supply chain feeds failed: {e}")
+
+	# Scrape tech policy feeds (relevant to both topics)
+	print("Scraping tech policy feeds...")
+	try:
+		for feed in TECH_POLICY_FEEDS:
+			collected.extend(parse_feed("Tech Policy", feed))
+	except Exception as e:
+		print(f"Warning: Tech policy feeds failed: {e}")
+
+	# Separate items by topic and limit counts
+	micro = [n for n in collected if n.topic == "Microelectronics"][:max_items_per_topic]
+	geo = [n for n in collected if n.topic == "Geopolitics"][:max_items_per_topic]
+	supply = [n for n in collected if n.topic == "Supply Chain"][:max_items_per_topic//2]
+	tech = [n for n in collected if n.topic == "Tech Policy"][:max_items_per_topic//2]
+
+	print(f"Collected: {len(micro)} microelectronics, {len(geo)} geopolitics, {len(supply)} supply chain, {len(tech)} tech policy items")
+	return micro + geo + supply + tech
+
+
+def score_item(item: NewsItem) -> int:
+	text = f"{item.title} {item.summary}".lower()
+	weights = {
+		# High-priority semiconductor terms
+		"chip": 3,
+		"semiconductor": 3,
+		"tsmc": 4,
+		"nvidia": 3,
+		"amd": 3,
+		"intel": 3,
+		"globalfoundries": 3,
+		"fab": 2,
+		"foundry": 2,
+		"wafer": 2,
+
+		# AI and technology
+		"ai": 2,
+		"artificial intelligence": 3,
+		"machine learning": 2,
+		"gpu": 2,
+		"cpu": 2,
+
+		# Supply chain and trade
+		"supply chain": 3,
+		"shortage": 3,
+		"export": 3,
+		"import": 2,
+		"sanction": 4,
+		"export control": 4,
+		"trade war": 4,
+		"tariff": 3,
+		"embargo": 4,
+
+		# Geopolitical hotspots
+		"taiwan": 4,
+		"china": 3,
+		"usa": 2,
+		"europe": 2,
+		"japan": 2,
+		"south korea": 2,
+		"nato": 2,
+		"conflict": 3,
+		"war": 2,
+		"tension": 2,
+
+		# Economic and policy
+		"investment": 2,
+		"funding": 2,
+		"regulation": 2,
+		"policy": 2,
+		"act": 2,
+		"bill": 2,
+		"legislation": 2,
+	}
+
+	score = 0
+	for token, value in weights.items():
+		if token in text:
+			score += value
+
+	# Bonus for having summary content
+	if item.summary and len(item.summary) > 50:
+		score += 2
+	elif item.summary:
+		score += 1
+
+	# Bonus for recent publication (prefer items with today's date)
+	if "2026" in item.published and "25 mar" in item.published.lower():
+		score += 2
+	elif "2026" in item.published:
+		score += 1
+
+	return score
+
+
+def build_summary(items: List[NewsItem], top_n_per_topic: int = 10) -> Dict[str, List[NewsItem]]:
+	micro = [i for i in items if i.topic == "Microelectronics"]
+	geo = [i for i in items if i.topic == "Geopolitics"]
+	supply = [i for i in items if i.topic == "Supply Chain"]
+	tech = [i for i in items if i.topic == "Tech Policy"]
+
+	micro.sort(key=score_item, reverse=True)
+	geo.sort(key=score_item, reverse=True)
+	supply.sort(key=score_item, reverse=True)
+	tech.sort(key=score_item, reverse=True)
+
+	return {
+		"Microelectronics": micro[:top_n_per_topic],
+		"Geopolitics": geo[:top_n_per_topic],
+		"Supply Chain": supply[:top_n_per_topic//2],
+		"Tech Policy": tech[:top_n_per_topic//2],
+	}
+
+
+def build_compact_summary(items: List[NewsItem], max_total_items: int = 15) -> Dict[str, List[NewsItem]]:
+	"""Create a more compact summary suitable for token-limited models"""
+	micro = [i for i in items if i.topic == "Microelectronics"]
+	geo = [i for i in items if i.topic == "Geopolitics"]
+	supply = [i for i in items if i.topic == "Supply Chain"]
+	tech = [i for i in items if i.topic == "Tech Policy"]
+
+	# Sort by relevance
+	micro.sort(key=score_item, reverse=True)
+	geo.sort(key=score_item, reverse=True)
+	supply.sort(key=score_item, reverse=True)
+	tech.sort(key=score_item, reverse=True)
+
+	# Take fewer items per category for compact version
+	items_per_main_topic = max_total_items // 3  # Split between main topics
+	items_per_sub_topic = max(1, max_total_items // 6)  # Fewer for sub topics
+
+	return {
+		"Microelectronics": micro[:items_per_main_topic],
+		"Geopolitics": geo[:items_per_main_topic],
+		"Supply Chain": supply[:items_per_sub_topic],
+		"Tech Policy": tech[:items_per_sub_topic],
+	}
+
+
+def _register_font() -> str:
+	# Try common fonts with broad Unicode support, fallback to Helvetica.
+	candidates = [
+		("DejaVuSans", r"C:\Windows\Fonts\DejaVuSans.ttf"),
+		("ArialUnicode", r"C:\Windows\Fonts\ARIALUNI.TTF"),
+		("SegoeUI", r"C:\Windows\Fonts\segoeui.ttf"),
+	]
+	for font_name, font_path in candidates:
+		if os.path.exists(font_path):
+			pdfmetrics.registerFont(TTFont(font_name, font_path))
+			return font_name
+	return "Helvetica"
+
+
+def render_pdf(summary: Dict[str, List[NewsItem]], output_path: str, compact_mode: bool = False) -> bytes:
+	font_name = _register_font()
+	page_width, page_height = A4
+	margin = 40
+	line_height = 14
+
+	buf = io.BytesIO()
+	c = canvas.Canvas(buf, pagesize=A4)
+	y = page_height - margin
+
+	def new_page():
+		nonlocal y
+		c.showPage()
+		c.setFont(font_name, 10)
+		y = page_height - margin
+
+	def write_line(text: str, size: int = 10):
+		nonlocal y
+		if y < margin:
+			new_page()
+		c.setFont(font_name, size)
+		c.drawString(margin, y, text)
+		y -= line_height
+
+	ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+	write_line("MiroFish Seed Report", size=16)
+	write_line(f"Generated at: {ts}")
+	scope_text = "Microelectronics, Geopolitical news, Supply Chain & Tech Policy"
+	if compact_mode:
+		scope_text += " (Compact)"
+	write_line(f"Scope: {scope_text}")
+	write_line("")
+
+	for topic in ("Microelectronics", "Geopolitics", "Supply Chain", "Tech Policy"):
+		if not summary.get(topic):
+			continue
+		write_line(topic, size=13)
+		write_line("-" * 80)
+		for idx, item in enumerate(summary.get(topic, []), start=1):
+			write_line(f"{idx}. {item.title}", size=11)
+			write_line(f"   Source: {item.source}")
+			if item.published and not compact_mode:
+				write_line(f"   Published: {item.published}")
+			if item.link and not compact_mode:
+				wrapped_link = textwrap.wrap(f"   Link: {item.link}", width=95)
+				for ln in wrapped_link:
+					write_line(ln)
+
+			# Truncate summary for compact mode
+			body = item.summary or "No abstract available from source."
+			if compact_mode:
+				body = body[:200] + "..." if len(body) > 200 else body
+
+			wrapped_summary = textwrap.wrap(f"   Summary: {body}", width=95)
+			for ln in wrapped_summary:
+				write_line(ln)
+			write_line("")
+		write_line("")
+
+	c.save()
+	pdf_bytes = buf.getvalue()
+	with open(output_path, "wb") as f:
+		f.write(pdf_bytes)
+	return pdf_bytes
+
+
+def to_markdown(summary: Dict[str, List[NewsItem]]) -> str:
+	lines = [
+		"# MiroFish Seed Report",
+		"",
+		"## Scope",
+		"Microelectronics, Geopolitical news, Supply Chain developments, and Tech Policy updates",
+		""
+	]
+	for topic in ("Microelectronics", "Geopolitics", "Supply Chain", "Tech Policy"):
+		if not summary.get(topic):
+			continue
+		lines.append(f"## {topic}")
+		lines.append("")
+		for item in summary.get(topic, []):
+			lines.append(f"- **{item.title}**")
+			lines.append(f"  - Source: {item.source}")
+			if item.published:
+				lines.append(f"  - Published: {item.published}")
+			if item.link:
+				lines.append(f"  - Link: {item.link}")
+			lines.append(f"  - Summary: {item.summary or 'No abstract available.'}")
+			lines.append("")
+	return "\n".join(lines)
+
+
+def build_mirofish_config() -> MiroFishConfig:
+	return MiroFishConfig(
+		base_url=os.getenv("MIROFISH_BASE_URL", "http://localhost:5001"),
+		project_name=os.getenv("MIROFISH_PROJECT_NAME", "Microelectronics and Geopolitics Auto Brief"),
+		simulation_requirement=os.getenv(
+			"MIROFISH_SIMULATION_REQUIREMENT",
+			(
+				"Use this PDF as seed material. Build a high-fidelity scenario analysis focused on "
+				"microelectronics supply chains, export controls, geopolitics, and second-order effects."
+			),
+		),
+		request_timeout_sec=int(os.getenv("MIROFISH_REQUEST_TIMEOUT", "90")),
+		poll_interval_sec=int(os.getenv("MIROFISH_POLL_INTERVAL", "5")),
+		poll_timeout_sec=int(os.getenv("MIROFISH_POLL_TIMEOUT", "1800")),
+		api_token=os.getenv("MIROFISH_API_TOKEN"),
+	)
+
+
+def write_mirofish_config_template(path: str = "mirofish.env.example") -> None:
+	content = """# Copy to .env and customize values
+
+# MiroFish Core Configuration
+MIROFISH_BASE_URL=http://localhost:5001
+MIROFISH_PROJECT_NAME=Microelectronics and Geopolitics Auto Brief
+MIROFISH_SIMULATION_REQUIREMENT=Use this PDF as seed material. Build a high-fidelity scenario analysis focused on microelectronics supply chains, export controls, geopolitics, and second-order effects.
+MIROFISH_REQUEST_TIMEOUT=90
+MIROFISH_POLL_INTERVAL=5
+MIROFISH_POLL_TIMEOUT=1800
+# Optional
+# MIROFISH_API_TOKEN=
+
+# MiroFish LLM Integration (Required for MiroFish operation)
+# Supports any OpenAI SDK-compatible API
+LLM_API_KEY=your_llm_api_key_here
+LLM_BASE_URL=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+LLM_MODEL_NAME=qwen-plus
+
+# MiroFish Memory Service (Required for agent memory management)
+ZEP_API_KEY=z_1dWlkIjoiYjYyNTI0MDktMDBiNC00NGNhLWI0ZjQtODUxMzZiZjgwMTYzIn0.K0px3wl6O_Hf1iHCtn_x2LmsXsFRglctctcHwU7Tm6abCOoQyGV-X9MIZa5KP4CZfJp9VTH87_fRFCq_08Ob7A
+
+# News Scraper Configuration (Optional overrides)
+# MAX_ITEMS_PER_TOPIC=18
+# TOP_N_PER_TOPIC=10
+# ARTICLE_EXTRACTION_TIMEOUT=12
+"""
+	with open(path, "w", encoding="utf-8") as f:
+		f.write(content)
+
+
+def run_pipeline(output_pdf: str, output_markdown: str, skip_mirofish: bool, compact_mode: bool = False) -> None:
+	print("[1/5] Scraping news feeds...")
+	items = scrape_news()
+	if not items:
+		raise RuntimeError("No items scraped. Check internet connectivity or feed availability.")
+
+	print(f"[2/5] Building summary from {len(items)} items...")
+	if compact_mode:
+		print("[INFO] Using compact mode for token-limited models")
+		summary = build_compact_summary(items, max_total_items=12)
+	else:
+		summary = build_summary(items)
+
+	print(f"[3/5] Rendering PDF: {output_pdf}")
+	pdf_bytes = render_pdf(summary, output_pdf, compact_mode=compact_mode)
+
+	print(f"[4/5] Saving Markdown companion: {output_markdown}")
+	with open(output_markdown, "w", encoding="utf-8") as f:
+		f.write(to_markdown(summary))
+
+	if skip_mirofish:
+		print("[5/5] Skipped MiroFish upload (--skip-mirofish enabled).")
+		return
+
+	print("[5/5] Uploading PDF to MiroFish and building graph...")
+	cfg = build_mirofish_config()
+	client = MiroFishClient(cfg)
+
+	try:
+		project_id = client.upload_pdf_and_generate_ontology(pdf_bytes, os.path.basename(output_pdf))
+		print(f"[MiroFish] project_id={project_id}")
+
+		task_id = client.build_graph(project_id)
+		print(f"[MiroFish] graph task_id={task_id}")
+
+		result = client.wait_for_graph(task_id)
+		print("[MiroFish] graph build completed")
+		print(json.dumps(result, indent=2, ensure_ascii=False))
+
+	except Exception as e:
+		error_message = str(e)
+
+		# Check if this is a token limit error and we're not already in compact mode
+		if not compact_mode and ("token limit" in error_message.lower() or "too large" in error_message.lower()):
+			print(f"[WARNING] Content too large for current model, creating compact version...")
+
+			try:
+				# Create compact version
+				compact_summary = build_compact_summary(items, max_total_items=12)
+				compact_pdf_path = output_pdf.replace('.pdf', '_compact.pdf')
+				compact_pdf_bytes = render_pdf(compact_summary, compact_pdf_path, compact_mode=True)
+
+				print(f"[RETRY] Uploading compact version: {compact_pdf_path} ({len(compact_pdf_bytes)} bytes)")
+				project_id = client.upload_pdf_and_generate_ontology(compact_pdf_bytes, os.path.basename(compact_pdf_path))
+				print(f"[MiroFish] project_id={project_id}")
+
+				task_id = client.build_graph(project_id)
+				print(f"[MiroFish] graph task_id={task_id}")
+
+				result = client.wait_for_graph(task_id)
+				print("[MiroFish] graph build completed with compact version")
+				print(json.dumps(result, indent=2, ensure_ascii=False))
+
+				print(f"\n[SUCCESS] Used compact version for MiroFish integration")
+				print(f"Full version available: {output_pdf}")
+				print(f"Compact version used: {compact_pdf_path}")
+				return
+
+			except Exception as compact_error:
+				print(f"[ERROR] Compact version also failed: {compact_error}")
+
+		print(f"[ERROR] MiroFish integration failed: {e}")
+		print("\n=== Alternative Options ===")
+		print(f"1. Manual Upload:")
+		print(f"   - Open http://localhost:3000 in your browser")
+		print(f"   - Upload the generated PDF: {output_pdf}")
+		print(f"   - Use simulation requirement: {cfg.simulation_requirement}")
+
+		print(f"\n2. Switch to Higher Capacity Model:")
+		print(f"   - Edit .env file and change LLM_MODEL_NAME")
+		print(f"   - Try: gpt-4-turbo, claude-3-5-sonnet, qwen-max")
+		print(f"   - Current model (deepseek-r1) has 4000 token limit")
+
+		print(f"\n3. Use Compact Mode:")
+		print(f"   - Run: python Trading.py --compact")
+		print(f"   - Generates smaller PDFs suitable for limited models")
+
+		print(f"\n4. Files Generated Successfully:")
+		print(f"   - PDF: {output_pdf}")
+		print(f"   - Markdown: {output_markdown}")
+
+		# Don't raise the exception - let the user know files were created successfully
+		print(f"\nThe news scraping and file generation completed successfully.")
+		print(f"Only the MiroFish API integration encountered issues.")
+
+
+def build_parser() -> argparse.ArgumentParser:
+	parser = argparse.ArgumentParser(
+		description=(
+			"Scrape microelectronics/geopolitical news, generate PDF summary, and optionally ingest to MiroFish"
+		)
+	)
+	parser.add_argument("--output-pdf", default="mirofish_news_summary.pdf", help="Path for the generated PDF")
+	parser.add_argument(
+		"--output-markdown",
+		default="mirofish_news_summary.md",
+		help="Path for the generated Markdown companion",
+	)
+	parser.add_argument(
+		"--skip-mirofish",
+		action="store_true",
+		help="Generate files only, without sending to MiroFish",
+	)
+	parser.add_argument(
+		"--compact",
+		action="store_true",
+		help="Generate compact version suitable for token-limited models",
+	)
+	parser.add_argument(
+		"--write-config-template",
+		action="store_true",
+		help="Write mirofish.env.example template and exit",
+	)
+	parser.add_argument(
+		"--test-api",
+		action="store_true",
+		help="Test MiroFish API compatibility and exit",
+	)
+	return parser
+
+
+def main() -> None:
+	parser = build_parser()
+	args = parser.parse_args()
+
+	if args.write_config_template:
+		write_mirofish_config_template()
+		print("Wrote configuration template: mirofish.env.example")
+		return
+
+	if args.test_api:
+		# Import and run the API test
+		try:
+			import subprocess
+			import sys
+			subprocess.run([sys.executable, "test_api_formats.py"], check=True)
+		except FileNotFoundError:
+			print("API test script not found. Creating a quick test...")
+			cfg = build_mirofish_config()
+			client = MiroFishClient(cfg)
+			try:
+				# Try to test with a minimal PDF
+				test_pdf = b"%PDF-1.4\n%%EOF"
+				result = client.upload_pdf_and_generate_ontology(test_pdf, "test.pdf")
+				print(f"API test successful! Project ID: {result}")
+			except Exception as e:
+				print(f"API test failed: {e}")
+		return
+
+	run_pipeline(
+		output_pdf=args.output_pdf,
+		output_markdown=args.output_markdown,
+		skip_mirofish=args.skip_mirofish,
+		compact_mode=args.compact,
+	)
+
+
+if __name__ == "__main__":
+	main()

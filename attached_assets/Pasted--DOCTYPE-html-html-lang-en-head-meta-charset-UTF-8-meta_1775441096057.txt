@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EntangleWealth — Community</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--black:#080810;--blue:#00d4ff;--gold:#ffd700;--green:#00ff88;--red:#ff3366;--card:#0d0d1a;--border:rgba(0,212,255,0.15)}
+body{background:var(--black);color:#fff;font-family:'Segoe UI',sans-serif;padding-bottom:80px}
+nav{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(8,8,16,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:18px;font-weight:900;background:linear-gradient(135deg,var(--blue),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,16,0.98);border-top:1px solid var(--border);display:flex;z-index:999}
+.bnav{flex:1;padding:10px 4px 14px;background:none;border:none;color:#444;font-size:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bnav .ic{font-size:20px}
+.bnav.active{color:var(--blue)}
+.page{display:none;padding-top:65px;min-height:100vh}
+.page.active{display:block}
+.pi{padding:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.sec-title{font-size:16px;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.btn{border:none;border-radius:10px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:8px}
+.btn-blue{background:linear-gradient(135deg,var(--blue),#0099cc);color:#000}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#cc9900);color:#000}
+.btn-outline{background:none;border:1px solid var(--border);color:#aaa}
+.btn-green{background:linear-gradient(135deg,var(--green),#00cc66);color:#000}
+input,textarea,select{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;width:100%;margin-bottom:10px;font-family:inherit}
+input:focus,textarea:focus,select:focus{border-color:var(--blue)}
+input::placeholder,textarea::placeholder{color:#444}
+.badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-blue{background:rgba(0,212,255,0.15);color:var(--blue)}
+.badge-gold{background:rgba(255,215,0,0.15);color:var(--gold)}
+.badge-green{background:rgba(0,255,136,0.15);color:var(--green)}
+.badge-red{background:rgba(255,51,102,0.15);color:var(--red)}
+.badge-free{background:rgba(0,255,136,0.2);color:var(--green);font-size:13px;padding:6px 16px}
+.toast{display:none;position:fixed;top:75px;left:16px;right:16px;background:rgba(0,255,136,0.12);border:1px solid var(--green);border-radius:12px;padding:14px;color:var(--green);font-size:14px;text-align:center;z-index:9999;font-weight:600}
+.community-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.community-header{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.community-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.community-name{font-size:16px;font-weight:800}
+.community-meta{font-size:12px;color:#555;margin-top:3px}
+.community-stats{display:flex;gap:16px;padding-top:12px;border-top:1px solid var(--border)}
+.comm-stat{font-size:12px;color:#555}
+.comm-stat span{display:block;font-size:15px;font-weight:700;color:#fff;margin-top:2px}
+.post-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.post-header{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.post-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#000;flex-shrink:0}
+.post-name{font-size:14px;font-weight:700}
+.post-time{font-size:11px;color:#555}
+.post-body{font-size:14px;color:#ccc;line-height:1.6;margin-bottom:12px}
+.post-actions{display:flex;gap:16px;padding-top:10px;border-top:1px solid var(--border)}
+.post-action{background:none;border:none;color:#555;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;padding:0}
+.post-action:hover{color:var(--blue)}
+.event-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
+.event-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue)}
+.event-date{font-size:11px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.event-title{font-size:16px;font-weight:800;margin-bottom:6px}
+.event-meta{font-size:12px;color:#555;margin-bottom:12px}
+.job-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.job-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.job-company{font-size:13px;color:var(--blue);margin-bottom:6px}
+.job-meta{font-size:11px;color:#555;margin-bottom:8px}
+.job-salary{font-size:14px;font-weight:700;color:var(--green)}
+.pricing-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;text-align:center}
+.pricing-card.featured{border-color:var(--gold);background:linear-gradient(135deg,rgba(255,215,0,0.05),rgba(0,212,255,0.05))}
+.pricing-name{font-size:14px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.pricing-price{font-size:42px;font-weight:900;margin-bottom:4px}
+.pricing-period{font-size:13px;color:#555;margin-bottom:20px}
+.pricing-feature{font-size:13px;color:#aaa;padding:8px 0;border-bottom:1px solid var(--border);text-align:left;display:flex;align-items:center;gap:8px}
+.pricing-feature:last-of-type{border:none}
+.tab-row{display:flex;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.tab{flex:1;padding:10px 4px;background:none;border:none;color:#555;font-size:12px;cursor:pointer;font-weight:600}
+.tab.active{background:rgba(0,212,255,0.1);color:var(--blue)}
+.filter-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px}
+.filter-btn{background:var(--card);border:1px solid var(--border);color:#777;padding:7px 14px;border-radius:20px;font-size:12px;cursor:pointer;white-space:nowrap}
+.filter-btn.active{background:rgba(0,212,255,0.1);border-color:var(--blue);color:var(--blue)}
+.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:9998;padding:20px;padding-top:80px;overflow-y:auto}
+.modal.active{display:block}
+.modal-content{background:#0d0d1a;border:1px solid var(--border);border-radius:16px;padding:20px}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:16px;color:var(--blue)}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<nav>
+  <div class="logo">⚛ EntangleWealth</div>
+  <div style="font-size:11px;color:var(--gold)">COMMUNITY</div>
+</nav>
+
+<!-- COMMUNITIES -->
+<div id="pg-community" class="page active">
+  <div class="pi">
+    <div class="sec-title">Communities <span style="font-size:12px;color:var(--blue);cursor:pointer" onclick="showModal('create-community')">+ Create</span></div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="filterComm('all',this)">All</button>
+      <button class="filter-btn" onclick="filterComm('trading',this)">📈 Trading</button>
+      <button class="filter-btn" onclick="filterComm('realestate',this)">🏠 Real Estate</button>
+      <button class="filter-btn" onclick="filterComm('tax',this)">📊 Tax & Accounting</button>
+      <button class="filter-btn" onclick="filterComm('tech',this)">💻 Tech</button>
+      <button class="filter-btn" onclick="filterComm('gig',this)">🛠️ Gig Workers</button>
+    </div>
+    <div id="community-list"></div>
+  </div>
+</div>
+
+<!-- FEED -->
+<div id="pg-feed" class="page">
+  <div class="pi">
+    <div class="sec-title">Community Feed</div>
+    <div class="card">
+      <textarea id="post-text" placeholder="Share something with your community..." rows="3" style="margin-bottom:10px"></textarea>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-blue" style="margin-top:0" onclick="createPost()">Post</button>
+        <button class="btn btn-outline" style="margin-top:0" onclick="toast('📷 Photo upload coming soon')">📷 Photo</button>
+      </div>
+    </div>
+    <div id="feed-list"></div>
+  </div>
+</div>
+
+<!-- EVENTS -->
+<div id="pg-events" class="page">
+  <div class="pi">
+    <div class="sec-title">Events & Trade Shows <span style="font-size:12px;color:var(--blue);cursor:pointer" onclick="showModal('create-event')">+ Create</span></div>
+    <div class="tab-row">
+      <button class="tab active" onclick="eventTab('upcoming',this)">Upcoming</button>
+      <button class="tab" onclick="eventTab('virtual',this)">Virtual</button>
+      <button class="tab" onclick="eventTab('inperson',this)">In Person</button>
+      <button class="tab" onclick="eventTab('myevents',this)">My Events</button>
+    </div>
+    <div id="event-list"></div>
+  </div>
+</div>
+
+<!-- JOBS -->
+<div id="pg-jobs" class="page">
+  <div class="pi">
+    <div class="sec-title">Job Board <span style="font-size:12px;color:var(--blue);cursor:pointer" onclick="showModal('post-job')">+ Post Job</span></div>
+    <input placeholder="🔍 Search jobs..." id="job-search" oninput="filterJobs()">
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="filterJobCat('all',this)">All</button>
+      <button class="filter-btn" onclick="filterJobCat('remote',this)">🌐 Remote</button>
+      <button class="filter-btn" onclick="filterJobCat('fulltime',this)">💼 Full-time</button>
+      <button class="filter-btn" onclick="filterJobCat('parttime',this)">⏰ Part-time</button>
+      <button class="filter-btn" onclick="filterJobCat('gig',this)">🛠️ Gig</button>
+      <button class="filter-btn" onclick="filterJobCat('freelance',this)">💻 Freelance</button>
+    </div>
+    <div id="job-list"></div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div id="pg-pricing" class="page">
+  <div class="pi">
+    <div style="text-align:center;padding:20px 0 24px">
+      <div style="font-size:28px;font-weight:900;margin-bottom:8px;background:linear-gradient(135deg,#fff,var(--blue),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Simple Pricing</div>
+      <div style="font-size:14px;color:#666">Try everything free for 30 days. No card required.</div>
+      <div style="margin-top:12px"><span class="badge badge-free">✅ 30 DAY FREE TRIAL — NO CARD NEEDED</span></div>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-name">Starter</div>
+      <div class="pricing-price" style="color:var(--green)">Free</div>
+      <div class="pricing-period">Forever free tier</div>
+      <div class="pricing-feature">✅ 3 stock signals per day</div>
+      <div class="pricing-feature">✅ Basic options flow</div>
+      <div class="pricing-feature">✅ Community access</div>
+      <div class="pricing-feature">✅ 5 receipt scans per month</div>
+      <div class="pricing-feature">❌ TaxGPT</div>
+      <div class="pricing-feature">❌ Travel itinerary builder</div>
+      <div class="pricing-feature">❌ Resume builder</div>
+      <button class="btn btn-outline" onclick="toast('✅ You are on the free plan')">Current Plan</button>
+    </div>
+
+    <div class="pricing-card featured">
+      <div style="position:absolute;top:-1px;left:50%;transform:translateX(-50%)">
+        <span class="badge badge-gold" style="font-size:12px;padding:6px 16px">MOST POPULAR</span>
+      </div>
+      <div style="margin-top:12px"></div>
+      <div class="pricing-name" style="color:var(--gold)">Pro</div>
+      <div class="pricing-price" style="color:var(--gold)">$29<span style="font-size:18px">/mo</span></div>
+      <div class="pricing-period">After 30-day free trial</div>
+      <div class="pricing-feature">✅ Unlimited stock signals</div>
+      <div class="pricing-feature">✅ Full options flow with Greeks</div>
+      <div class="pricing-feature">✅ TaxGPT unlimited</div>
+      <div class="pricing-feature">✅ Unlimited receipt scanning</div>
+      <div class="pricing-feature">✅ Travel itinerary builder</div>
+      <div class="pricing-feature">✅ Resume builder & job finder</div>
+      <div class="pricing-feature">✅ Community + events access</div>
+      <div class="pricing-feature">✅ Compliance score dashboard</div>
+      <div class="pricing-feature">✅ CPA-ready expense exports</div>
+      <button class="btn btn-gold" onclick="startTrial()">Start Free 30-Day Trial →</button>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-name">Business</div>
+      <div class="pricing-price" style="color:var(--blue)">$79<span style="font-size:18px">/mo</span></div>
+      <div class="pricing-period">For teams and power users</div>
+      <div class="pricing-feature">✅ Everything in Pro</div>
+      <div class="pricing-feature">✅ Up to 5 team members</div>
+      <div class="pricing-feature">✅ Priority signal alerts</div>
+      <div class="pricing-feature">✅ White-label reports for CPA</div>
+      <div class="pricing-feature">✅ Trade show event creation</div>
+      <div class="pricing-feature">✅ Job board posting (5/mo)</div>
+      <div class="pricing-feature">✅ Dedicated support</div>
+      <button class="btn btn-blue" onclick="startTrial()">Start Free 30-Day Trial →</button>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--blue)">Why EntangleWealth Pays For Itself</div>
+      <div style="font-size:13px;color:#666;line-height:1.7">
+        Average user finds <strong style="color:var(--green)">$4,280</strong> in missed deductions.<br>
+        Average signal win rate: <strong style="color:var(--blue)">87% confidence</strong>.<br>
+        One good trade or one found deduction covers a full year.<br><br>
+        <strong style="color:var(--gold)">$29/month = $348/year.<br>Find one missed deduction and you're ahead.</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px;color:var(--gold)">💰 Revenue Share Program</div>
+      <div style="font-size:13px;color:#777;line-height:1.6;margin-bottom:12px">Refer friends and earn 20% of their subscription every month for life. Build your own income stream by sharing what already helps you.</div>
+      <button class="btn btn-gold" onclick="toast('🔗 Your referral link copied!')">Get Your Referral Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="modal-create-community" class="modal">
+  <div class="modal-content">
+    <div class="modal-title">Create Community</div>
+    <input id="comm-name" placeholder="Community name">
+    <select id="comm-cat">
+      <option value="trading">📈 Trading & Investing</option>
+      <option value="realestate">🏠 Real Estate</option>
+      <option value="tax">📊 Tax & Accounting</option>
+      <option value="tech">💻 Technology</option>
+      <option value="gig">🛠️ Gig Workers</option>
+      <option value="other">🌐 Other</option>
+    </select>
+    <textarea id="comm-desc" placeholder="What is this community about?" rows="3"></textarea>
+    <select id="comm-privacy">
+      <option>Public — Anyone can join</option>
+      <option>Private — Request to join</option>
+    </select>
+    <button class="btn btn-blue" onclick="createCommunity()">Create Community</button>
+    <button class="btn btn-outline" onclick="closeModal('create-community')">Cancel</button>
+  </div>
+</div>
+
+<div id="modal-create-event" class="modal">
+  <div class="modal-content">
+    <div class="modal-title">Create Event</div>
+    <input id="ev-title" placeholder="Event title">
+    <input id="ev-date" type="date">
+    <input id="ev-location" placeholder="Location or Virtual Link">
+    <select id="ev-type">
+      <option>Trade Show</option>
+      <option>Training Event</option>
+      <option>Webinar</option>
+      <option>Networking Event</option>
+      <option>Workshop</option>
+      <option>Conference</option>
+    </select>
+    <textarea id="ev-desc" placeholder="Event description..." rows="3"></textarea>
+    <input id="ev-price" placeholder="Ticket price (0 for free)">
+    <button class="btn btn-blue" onclick="createEvent()">Create Event</button>
+    <button class="btn btn-outline" onclick="closeModal('create-event')">Cancel</button>
+  </div>
+</div>
+
+<div id="modal-post-job" class="modal">
+  <div class="modal-content">
+    <div class="modal-title">Post a Job</div>
+    <input id="j-title" placeholder="Job title">
+    <input id="j-company" placeholder="Company name">
+    <input id="j-salary" placeholder="Salary range (e.g. $50K-$80K)">
+    <select id="j-type">
+      <option value="fulltime">Full-time</option>
+      <option value="parttime">Part-time</option>
+      <option value="remote">Remote</option>
+      <option value="freelance">Freelance</option>
+      <option value="gig">Gig</option>
+    </select>
+    <input id="j-location" placeholder="Location or Remote">
+    <textarea id="j-desc" placeholder="Job description..." rows="3"></textarea>
+    <button class="btn btn-blue" onclick="postJob()">Post Job</button>
+    <button class="btn btn-outline" onclick="closeModal('post-job')">Cancel</button>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <button class="bnav active" id="bn-community" onclick="showPage('community')"><span class="ic">👥</span>Communities</button>
+  <button class="bnav" id="bn-feed" onclick="showPage('feed')"><span class="ic">📢</span>Feed</button>
+  <button class="bnav" id="bn-events" onclick="showPage('events')"><span class="ic">🎪</span>Events</button>
+  <button class="bnav" id="bn-jobs" onclick="showPage('jobs')"><span class="ic">💼</span>Jobs</button>
+  <button class="bnav" id="bn-pricing" onclick="showPage('pricing')"><span class="ic">💎</span>Pricing</button>
+</div>
+
+<script>
+let communities=[
+  {id:1,name:'Options Flow Traders',cat:'trading',icon:'📈',color:'#00d4ff',desc:'Advanced options flow analysis, unusual activity, and Greeks discussion.',members:2847,posts:14203,joined:true},
+  {id:2,name:'Real Estate Investors',cat:'realestate',icon:'🏠',color:'#ffd700',desc:'Rental properties, house hacking, REITs, and market analysis.',members:1923,posts:8941,joined:false},
+  {id:3,name:'Small Business Tax Pros',cat:'tax',icon:'📊',color:'#00ff88',desc:'IRS compliance, deductions, audit defense, and CPA connections.',members:3102,posts:19847,joined:true},
+  {id:4,name:'Gig Economy Warriors',cat:'gig',icon:'🛠️',color:'#ff9900',desc:'Maximize your gig income, find opportunities, share strategies.',members:5621,posts:31204,joined:false},
+  {id:5,name:'Tech Freelancers',cat:'tech',icon:'💻',color:'#cc00ff',desc:'Software development, design, remote work, and client acquisition.',members:4103,posts:22891,joined:false},
+  {id:6,name:'Day Traders Hub',cat:'trading',icon:'⚡',color:'#ff3366',desc:'Intraday setups, scalping strategies, and market open plays.',members:6204,posts:44102,joined:true},
+];
+
+let posts=[
+  {id:1,name:'Marcus J.',avatar:'MJ',color:'#00d4ff',community:'Options Flow Traders',time:'2 min ago',body:'Just caught a $4.2M sweep on NVDA 900C May 17. Three exchanges simultaneously. This is institutional positioning ahead of earnings. Watch this one closely.',likes:47,comments:23,liked:false},
+  {id:2,name:'Sarah K.',avatar:'SK',color:'#00ff88',community:'Small Business Tax Pros',time:'15 min ago',body:'Reminder: if you have a home office that qualifies under IRC 280A, the simplified method gives you $1,500 per year with zero documentation headache. Most small business owners miss this.',likes:89,comments:41,liked:false},
+  {id:3,name:'DeShawn T.',avatar:'DT',color:'#ffd700',community:'Gig Economy Warriors',time:'1 hr ago',body:'Peak DoorDash hours in my market: 6-9PM weekdays, 11AM-2PM weekends. Stacking with Uber Eats during downtime. Averaged $34/hr last week. Location matters more than the platform.',likes:134,comments:67,liked:false},
+  {id:4,name:'Carlos R.',avatar:'CR',color:'#ff9900',community:'Day Traders Hub',time:'2 hr ago',body:'TSLA showing bearish RSI divergence on the 4H. Lower highs on RSI while price tested resistance. Combined with the $3.1M put sweep we saw earlier — this setup has conviction. Not financial advice.',likes:203,comments:98,liked:false},
+];
+
+let events=[
+  {id:1,title:'Options Flow Masterclass',date:'Apr 15, 2026',location:'Virtual — Zoom',type:'Training Event',desc:'3-hour deep dive into reading institutional options flow. Greeks, sweeps, unusual activity.',price:'Free for Pro members',attendees:847,virtual:true},
+  {id:2,title:'EntangleWealth Annual Trade Show',date:'May 22, 2026',location:'Las Vegas Convention Center',type:'Trade Show',desc:'Network with 5,000+ traders, investors, and financial professionals. Keynotes, workshops, exhibitors.',price:'$97 General / Free for Business',attendees:3204,virtual:false},
+  {id:3,title:'Small Business Tax Strategy Summit',date:'Apr 28, 2026',location:'Virtual — Zoom',type:'Webinar',desc:'CPA panel covering 2026 tax law changes, audit defense strategies, and maximum deduction planning.',price:'Free',attendees:1203,virtual:true},
+  {id:4,title:'Gig Worker Income Accelerator',date:'May 5, 2026',location:'Virtual — Zoom',type:'Workshop',desc:'Platform strategies, peak timing, multi-app stacking, and income tracking for gig workers.',price:'Free for all members',attendees:2891,virtual:true},
+  {id:5,title:'Real Estate Investor Networking Mixer',date:'Jun 10, 2026',location:'Miami, FL',type:'Networking Event',desc:'Connect with local real estate investors, lenders, and property managers. Cocktail reception included.',price:'$47',attendees:312,virtual:false},
+];
+
+let jobs=[
+  {id:1,title:'Senior Options Trader',company:'Quantum Capital',location:'Remote',type:'fulltime',salary:'$120K-$180K',desc:'5+ years options trading experience. Proficiency in Greeks and flow analysis required.',posted:'Today'},
+  {id:2,title:'Tax Associate — Small Business',company:'ClearPath CPA',location:'Remote',type:'remote',salary:'$55K-$75K',desc:'CPA license preferred. Experience with small business returns and IRS compliance.',posted:'Yesterday'},
+  {id:3,title:'Freelance Financial Content Writer',company:'EntangleWealth',location:'Remote',type:'freelance',salary:'$45-$75/hr',desc:'Write educational content about trading, tax strategy, and personal finance. Finance background required.',posted:'2 days ago'},
+  {id:4,title:'Gig Platform Community Manager',company:'FlexWork Inc.',location:'Remote',type:'parttime',salary:'$22-$28/hr',desc:'Manage gig worker communities, moderate content, and drive engagement.',posted:'3 days ago'},
+  {id:5,title:'Real Estate Investment Analyst',company:'PropFlow',location:'Austin, TX',type:'fulltime',salary:'$80K-$110K',desc:'Analyze deal flow, underwrite properties, and support acquisition decisions.',posted:'4 days ago'},
+  {id:6,title:'App Delivery Driver — Peak Hours',company:'Flex Delivery Co',location:'Your City',type:'gig',salary:'$20-$35/hr',desc:'Flexible hours. Weekly pay. Use your own vehicle. High earning potential during peak hours.',posted:'Today'},
+];
+
+const catEmojis={trading:'📈',realestate:'🏠',tax:'📊',tech:'💻',gig:'🛠️',other:'🌐'};
+const catColors={trading:'#00d4ff',realestate:'#ffd700',tax:'#00ff88',tech:'#cc00ff',gig:'#ff9900',other:'#aaa'};
+
+function renderCommunities(filter='all'){
+  const list=document.getElementById('community-list');
+  const filtered=filter==='all'?communities:communities.filter(c=>c.cat===filter);
+  list.innerHTML=filtered.map(c=>`
+    <div class="community-card" data-cat="${c.cat}">
+      <div class="community-header">
+        <div class="community-icon" style="background:${c.color}22;border:1px solid ${c.color}44">${c.icon}</div>
+        <div style="flex:1">
+          <div class="community-name">${c.name}</div>
+          <div class="community-meta">${c.members.toLocaleString()} members · ${c.posts.toLocaleString()} posts</div>
+        </div>
+        <button class="btn ${c.joined?'btn-outline':'btn-blue'}" style="width:auto;margin:0;padding:8px 14px;font-size:12px" onclick="toggleJoin(${c.id})">${c.joined?'Joined ✓':'Join'}</button>
+      </div>
+      <div style="font-size:13px;color:#666;margin-bottom:12px">${c.desc}</div>
+      <div class="community-stats">
+        <div class="comm-stat">Members<span>${c.members.toLocaleString()}</span></div>
+        <div class="comm-stat">Posts<span>${c.posts.toLocaleString()}</span></div>
+        <div class="comm-stat">Status<span style="color:${c.joined?'var(--green)':'#555'}">${c.joined?'✓ Joined':'Not joined'}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderFeed(){
+  const list=document.getElementById('feed-list');
+  list.innerHTML=posts.map(p=>`
+    <div class="post-card">
+      <div class="post-header">
+        <div class="post-avatar" style="background:${p.color}">${p.avatar}</div>
+        <div>
+          <div class="post-name">${p.name}</div>
+          <div class="post-time">${p.community} · ${p.time}</div>
+        </div>
+      </div>
+      <div class="post-body">${p.body}</div>
+      <div class="post-actions">
+        <button class="post-action" onclick="likePost(${p.id})">❤️ ${p.likes}</button>
+        <button class="post-action" onclick="toast('💬 Comments coming soon')">💬 ${p.comments}</button>
+        <button class="post-action" onclick="toast('🔗 Link copied!')">🔗 Share</button>
+        <button class="post-action" onclick="toast('🔖 Post saved!')">🔖 Save</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderEvents(filter='upcoming'){
+  const list=document.getElementById('event-list');
+  let filtered=events;
+  if(filter==='virtual') filtered=events.filter(e=>e.virtual);
+  if(filter==='inperson') filtered=events.filter(e=>!e.virtual);
+  list.innerHTML=filtered.map(e=>`
+    <div class="event-card">
+      <div class="event-date">📅 ${e.date}</div>
+      <div class="event-title">${e.title}</div>
+      <div class="event-meta">📍 ${e.location} · 🎯 ${e.type} · 👥 ${e.attendees.toLocaleString()} attending</div>
+      <div style="font-size:13px;color:#666;margin-bottom:12px">${e.desc}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:13px;font-weight:700;color:var(--green)">${e.price}</span>
+        <span class="badge ${e.virtual?'badge-blue':'badge-gold'}">${e.virtual?'Virtual':'In Person'}</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-blue" style="margin-top:0" onclick="toast('✅ Registered for ${e.title}!')">Register</button>
+        <button class="btn btn-outline" style="margin-top:0" onclick="toast('🔖 Event saved!')">Save</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderJobs(filter='all',search=''){
+  const list=document.getElementById('job-list');
+  let filtered=jobs;
+  if(filter!=='all') filtered=filtered.filter(j=>j.type===filter);
+  if(search) filtered=filtered.filter(j=>j.title.toLowerCase().includes(search)||j.desc.toLowerCase().includes(search));
+  list.innerHTML=filtered.map(j=>`
+    <div class="job-card" data-type="${j.type}">
+      <div class="job-title">${j.title}</div>
+      <div class="job-company">${j.company}</div>
+      <div class="job-meta">📍 ${j.location} · 💼 ${j.type} · 🕐 ${j.posted}</div>
+      <div class="job-salary">${j.salary}</div>
+      <div style="font-size:12px;color:#555;margin:8px 0 12px">${j.desc}</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-blue" style="margin-top:0;font-size:13px" onclick="toast('📨 Applied to ${j.title}!')">Quick Apply</button>
+        <button class="btn btn-outline" style="margin-top:0;font-size:13px" onclick="toast('🔖 Job saved!')">Save</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterComm(cat,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCommunities(cat);
+}
+
+function filterJobCat(cat,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderJobs(cat,document.getElementById('job-search').value);
+}
+
+function filterJobs(){
+  renderJobs('all',document.getElementById('job-search').value);
+}
+
+function eventTab(type,btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderEvents(type);
+}
+
+function toggleJoin(id){
+  const c=communities.find(c=>c.id===id);
+  if(c){
+    c.joined=!c.joined;
+    c.members+=c.joined?1:-1;
+    renderCommunities();
+    toast(c.joined?`✅ Joined ${c.name}!`:`Left ${c.name}`);
+  }
+}
+
+function likePost(id){
+  const p=posts.find(p=>p.id===id);
+  if(p){p.liked=!p.liked;p.likes+=p.liked?1:-1;renderFeed();}
+}
+
+function createPost(){
+  const text=document.getElementById('post-text').value.trim();
+  if(!text){toast('⚠️ Please write something first');return;}
+  posts.unshift({id:Date.now(),name:'You',avatar:'YO',color:'var(--gold)',community:'Options Flow Traders',time:'Just now',body:text,likes:0,comments:0,liked:false});
+  document.getElementById('post-text').value='';
+  renderFeed();
+  toast('✅ Posted to your community!');
+}
+
+function createCommunity(){
+  const name=document.getElementById('comm-name').value;
+  const cat=document.getElementById('comm-cat').value;
+  const desc=document.getElementById('comm-desc').value;
+  if(!name){toast('⚠️ Please enter a community name');return;}
+  communities.unshift({id:Date.now(),name,cat,icon:catEmojis[cat]||'🌐',color:catColors[cat]||'#aaa',desc:desc||'A new community on EntangleWealth.',members:1,posts:0,joined:true});
+  closeModal('create-community');
+  renderCommunities();
+  toast(`✅ ${name} community created!`);
+}
+
+function createEvent(){
+  const title=document.getElementById('ev-title').value;
+  const date=document.getElementById('ev-date').value;
+  const location=document.getElementById('ev-location').value;
+  const type=document.getElementById('ev-type').value;
+  const desc=document.getElementById('ev-desc').value;
+  const price=document.getElementById('ev-price').value;
+  if(!title||!date){toast('⚠️ Please fill in title and date');return;}
+  events.unshift({id:Date.now(),title,date:new Date(date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),location:location||'TBD',type,desc:desc||'Join us for this exciting event.',price:price==='0'||price===''?'Free':price,attendees:1,virtual:location.toLowerCase().includes('virtual')||location.toLowerCase().includes('zoom')});
+  closeModal('create-event');
+  renderEvents();
+  toast(`✅ ${title} created!`);
+}
+
+function postJob(){
+  const title=document.getElementById('j-title').value;
+  const company=document.getElementById('j-company').value;
+  const salary=document.getElementById('j-salary').value;
+  const type=document.getElementById('j-type').value;
+  const location=document.getElementById('j-location').value;
+  const desc=document.getElementById('j-desc').value;
+  if(!title||!company){toast('⚠️ Please fill in title and company');return;}
+  jobs.unshift({id:Date.now(),title,company,location:location||'Remote',type,salary:salary||'Competitive',desc:desc||'Great opportunity to join our team.',posted:'Just now'});
+  closeModal('post-job');
+  renderJobs();
+  toast(`✅ ${title} job posted!`);
+}
+
+function startTrial(){
+  toast('🎉 30-day free trial started! No card needed. Enjoy full access.');
+}
+
+function showModal(id){
+  document.getElementById('modal-'+id).classList.add('active');
+}
+
+function closeModal(id){
+  document.getElementById('modal-'+id).classList.remove('active');
+}
+
+document.querySelectorAll('.modal').forEach(m=>{
+  m.addEventListener('click',function(e){
+    if(e.target===this) this.classList.remove('active');
+  });
+});
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bnav').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  document.getElementById('bn-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+
+renderCommunities();
+renderFeed();
+renderEvents();
+renderJobs();
+</script>
+</body>
+</html>

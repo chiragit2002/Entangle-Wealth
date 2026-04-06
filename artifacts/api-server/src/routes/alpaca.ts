@@ -29,20 +29,23 @@ function alpacaRateLimit(req: Request, res: Response, next: NextFunction) {
 
 router.use("/alpaca", alpacaRateLimit);
 
-let _swapped = false;
+function resolveAlpacaCreds() {
+  const candidates = [
+    process.env.ALPACA_KEY_ID || "",
+    process.env.ALPACA_API_KEY || "",
+    process.env.ALPACA_API_SECRET || "",
+  ].filter(Boolean);
+  const pk = candidates.find(v => v.startsWith("PK")) || candidates[0] || "";
+  const secret = candidates.find(v => !v.startsWith("PK") && v.length > 30) || candidates[1] || "";
+  return { keyId: pk, secretKey: secret };
+}
+
+let _logged = false;
 function alpacaHeaders() {
-  let keyId = process.env.ALPACA_API_KEY || "";
-  let secretKey = process.env.ALPACA_API_SECRET || "";
-  if (!keyId.startsWith("PK") && secretKey.startsWith("PK")) {
-    [keyId, secretKey] = [secretKey, keyId];
-    if (!_swapped) {
-      logger.warn("Auto-swapped ALPACA_API_KEY and ALPACA_API_SECRET (key should start with PK)");
-      _swapped = true;
-    }
-  }
-  if (!_swapped) {
-    logger.info({ keyLen: keyId.length, secretLen: secretKey.length, keyPrefix: keyId.slice(0, 3) }, "Alpaca credentials loaded");
-    _swapped = true;
+  const { keyId, secretKey } = resolveAlpacaCreds();
+  if (!_logged) {
+    logger.info({ keyLen: keyId.length, secretLen: secretKey.length, keyPrefix: keyId.slice(0, 3) }, "Alpaca credentials resolved");
+    _logged = true;
   }
   return {
     "APCA-API-KEY-ID": keyId,

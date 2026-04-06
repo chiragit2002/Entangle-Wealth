@@ -28,3 +28,8 @@ timeoutMs = 20000
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+ALPACA_KEY_ID = "PKK4VHJT6MINSFW3S4ZD4YB6VO"

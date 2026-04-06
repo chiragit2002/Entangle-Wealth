@@ -19,6 +19,7 @@ export function Navbar() {
     { href: "/screener", label: "Screener" },
     { href: "/options", label: "Options" },
     { href: "/terminal", label: "Terminal" },
+    { href: "/research", label: "Research" },
     { href: "/stocks", label: "Stocks" },
     { href: "/earn", label: "Earn" },
     { href: "/community", label: "Community" },

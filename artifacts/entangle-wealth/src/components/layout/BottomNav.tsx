@@ -1,12 +1,12 @@
 import { useLocation, Link } from "wouter";
-import { Home, TrendingUp, BarChart3, Wrench, FileText, DollarSign } from "lucide-react";
+import { Home, TrendingUp, BarChart3, FileText, Newspaper } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
   { href: "/dashboard", label: "Signals", icon: TrendingUp },
   { href: "/technical", label: "Analysis", icon: BarChart3 },
+  { href: "/research", label: "Research", icon: Newspaper },
   { href: "/tax", label: "TaxFlow", icon: FileText },
-  { href: "/pricing", label: "Pricing", icon: DollarSign },
 ];
 
 export function BottomNav() {

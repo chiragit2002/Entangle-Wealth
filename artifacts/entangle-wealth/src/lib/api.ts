@@ -151,3 +151,41 @@ export function formatVolume(vol: number): string {
   if (vol >= 1e3) return `${(vol / 1e3).toFixed(1)}K`;
   return vol.toLocaleString();
 }
+
+export interface NewsItem {
+  id: string;
+  topic: string;
+  title: string;
+  link: string;
+  source: string;
+  published: string;
+  publishedAt: number;
+  summary: string;
+  score: number;
+  sentiment: "positive" | "negative" | "neutral";
+  tickers: string[];
+}
+
+export interface NewsResponse {
+  items: NewsItem[];
+  total: number;
+  topics: Record<string, number>;
+  cachedAt: number;
+  feedCount: number;
+}
+
+export async function fetchNews(params?: {
+  topic?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<NewsResponse> {
+  const sp = new URLSearchParams();
+  if (params?.topic) sp.set("topic", params.topic);
+  if (params?.search) sp.set("search", params.search);
+  if (params?.limit) sp.set("limit", String(params.limit));
+  if (params?.offset) sp.set("offset", String(params.offset));
+  const res = await fetch(`${API_BASE}/news?${sp.toString()}`);
+  if (!res.ok) throw new Error("Failed to fetch news");
+  return res.json();
+}

@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-import { terminalOrderFlow, terminalNewsFeed, terminalSystemLog, marketTickerData } from "@/lib/mock-data";
-import { quickAnalyzeStock, fetchStocks } from "@/lib/api";
+import { terminalOrderFlow, terminalSystemLog, marketTickerData } from "@/lib/mock-data";
+import { quickAnalyzeStock, fetchStocks, fetchNews, type NewsItem } from "@/lib/api";
+
+interface TerminalNewsItem {
+  time: string;
+  source: string;
+  headline: string;
+  sentiment: "positive" | "negative" | "neutral";
+}
 
 export function MirofishTerminal() {
   const [commandInput, setCommandInput] = useState("");
@@ -8,6 +15,7 @@ export function MirofishTerminal() {
   const [visibleOrders, setVisibleOrders] = useState(6);
   const [visibleLogs, setVisibleLogs] = useState(6);
   const [clock, setClock] = useState(new Date().toLocaleTimeString());
+  const [liveNews, setLiveNews] = useState<TerminalNewsItem[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,6 +31,34 @@ export function MirofishTerminal() {
     return () => clearInterval(t);
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    async function loadNews() {
+      try {
+        const data = await fetchNews({ limit: 12 });
+        if (cancelled) return;
+        const mapped: TerminalNewsItem[] = data.items.slice(0, 8).map((item: NewsItem) => {
+          const d = new Date(item.published || Date.now());
+          const time = `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+          return {
+            time,
+            source: item.source.split(" ").slice(0, 2).join(" ").slice(0, 15),
+            headline: item.title.slice(0, 100),
+            sentiment: item.sentiment,
+          };
+        });
+        setLiveNews(mapped);
+      } catch {
+        setLiveNews([
+          { time: "--:--", source: "System", headline: "News feeds loading...", sentiment: "neutral" },
+        ]);
+      }
+    }
+    loadNews();
+    const interval = setInterval(loadNews, 5 * 60 * 1000);
+    return () => { cancelled = true; clearInterval(interval); };
+  }, []);
+
   const addOutput = (input: string, output: string) => {
     setCommandHistory(prev => [...prev, { input, output }]);
     setCommandInput("");
@@ -36,7 +72,37 @@ export function MirofishTerminal() {
     if (!cmd) return;
 
     if (cmd === "HELP") {
-      addOutput(rawInput, "Commands: QUOTE <SYM> | ANALYZE <SYM> | SEARCH <QUERY> | RISK | STATUS | SIGNALS | PORTFOLIO | CLEAR\n\nAI-Powered:\n  ANALYZE <SYM> — Run quantum AI analysis on any of 5,000 NASDAQ stocks\n  SEARCH <QUERY> — Search stocks by symbol or name");
+      addOutput(rawInput, "Commands: QUOTE <SYM> | ANALYZE <SYM> | SEARCH <QUERY> | NEWS [TOPIC] | RISK | STATUS | SIGNALS | PORTFOLIO | CLEAR\n\nAI-Powered:\n  ANALYZE <SYM> — Run quantum AI analysis on any of 5,000 NASDAQ stocks\n  SEARCH <QUERY> — Search stocks by symbol or name\n  NEWS [TOPIC] — Fetch live intelligence (Microelectronics, Geopolitics, Supply Chain, Tech Policy)");
+      return;
+    }
+
+    if (cmd === "NEWS" || cmd.startsWith("NEWS ")) {
+      const rawTopicArg = rawInput.trim().slice(4).trim();
+      const topicMap: Record<string, string> = {
+        MICROELECTRONICS: "Microelectronics",
+        GEOPOLITICS: "Geopolitics",
+        "SUPPLY CHAIN": "Supply Chain",
+        "TECH POLICY": "Tech Policy",
+      };
+      const topicArg = topicMap[rawTopicArg.toUpperCase()] || rawTopicArg;
+      addOutput(rawInput, `[NEWS] Fetching live intelligence${topicArg ? ` for ${topicArg}` : ""}...`);
+      try {
+        const data = await fetchNews({ topic: topicArg || undefined, limit: 8 });
+        if (data.items.length === 0) {
+          setCommandHistory(prev => [...prev, { input: "", output: "[NEWS] No articles found. Try: NEWS Microelectronics" }]);
+        } else {
+          const lines = data.items.map((item: NewsItem, i: number) => {
+            const sent = item.sentiment === "positive" ? "+" : item.sentiment === "negative" ? "-" : "~";
+            const tickers = item.tickers.length > 0 ? ` [${item.tickers.join(",")}]` : "";
+            return `  ${i + 1}. [${sent}] ${item.title.slice(0, 70)}${tickers}\n     Score: ${item.score} | ${item.source} | ${item.topic}`;
+          });
+          setCommandHistory(prev => [...prev, { input: "", output: `[NEWS INTELLIGENCE] ${data.total} articles from ${data.feedCount} feeds:\n${lines.join("\n")}` }]);
+        }
+        setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
+      } catch {
+        setCommandHistory(prev => [...prev, { input: "", output: "[ERROR] Failed to fetch news. Try again." }]);
+        setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
+      }
       return;
     }
 
@@ -128,6 +194,10 @@ export function MirofishTerminal() {
     }
   };
 
+  const newsItems = liveNews.length > 0 ? liveNews : [
+    { time: "--:--", source: "Loading", headline: "Fetching live news feeds...", sentiment: "neutral" as const },
+  ];
+
   return (
     <div className="rounded-2xl overflow-hidden border border-primary/20 bg-[#000810]">
       <div className="flex items-center justify-between px-4 py-2 border-b border-primary/10 bg-primary/[0.03]">
@@ -168,10 +238,10 @@ export function MirofishTerminal() {
         <div className="border-r border-primary/10 p-3">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-            <span className="text-[9px] font-mono text-blue-400/70 uppercase tracking-wider">News Feed</span>
+            <span className="text-[9px] font-mono text-blue-400/70 uppercase tracking-wider">News Feed — Live</span>
           </div>
           <div className="space-y-1 max-h-64 overflow-y-auto">
-            {terminalNewsFeed.map((item, i) => (
+            {newsItems.map((item, i) => (
               <div key={i} className="py-1.5 border-b border-white/[0.03]">
                 <div className="flex items-center gap-2 mb-0.5">
                   <span className="text-[9px] font-mono text-white/30">{item.time}</span>
@@ -218,7 +288,7 @@ export function MirofishTerminal() {
               <div className="text-primary">
                 <span className="text-primary/40">entangle@core:~$ </span>{cmd.input}
               </div>
-              <div className="text-white/60 pl-4">{cmd.output}</div>
+              <div className="text-white/60 pl-4 whitespace-pre-wrap">{cmd.output}</div>
             </div>
           ))}
         </div>

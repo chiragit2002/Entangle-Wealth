@@ -53,7 +53,8 @@ The project is a pnpm workspace monorepo with each package managing its own depe
 - **Dashboard**: Central command center with stock search, quick analysis, portfolio charts, and economic calendar.
 - **Notification Center**: In-app alerts for signals, price alerts, and system messages, with configurable alert settings.
 - **Options**: Detailed options chain with Greeks, expiration dates, and unusual options activity tables.
-- **Terminal**: Interactive terminal with commands like QUOTE, ANALYZE (AI), SEARCH, RISK, etc.
+- **Terminal**: Interactive terminal with commands like QUOTE, ANALYZE (AI), SEARCH, NEWS, RISK, etc. News feed panel shows live scraped articles with sentiment indicators.
+- **Research / News Intelligence** (`/research`): MiroFish-powered live news intelligence page. Scrapes 10+ RSS feeds (EE Times, Semiconductor Engineering, BBC, Al Jazeera, CNN, The Verge, Ars Technica, Supply Chain Dive, Tom's Hardware) across 4 categories (Microelectronics, Geopolitics, Supply Chain, Tech Policy). Features 35+ keyword relevance scoring, sentiment analysis, stock ticker detection with cross-links, category filtering tabs, search, expandable article summaries, and 5-minute server-side cache.
 
 - **Pricing** (`/pricing`): 3-tier pricing page (Starter $0, Pro $29/mo, Business $79/mo) with feature comparison, free trial CTA, and referral program section.
 - **Terms of Use** (`/terms`): Full legal terms covering acceptance, service description, financial advice disclaimer, market data & third-party services (Alpaca), user accounts, subscriptions, AI analysis disclosure, prohibited uses, IP, liability, risk disclosure, indemnification, and governing law.
@@ -64,7 +65,8 @@ The project is a pnpm workspace monorepo with each package managing its own depe
 - Express 5 server with Clerk middleware for authentication.
 - Stripe webhook endpoint for payment events.
 - **Alpaca Market Data**: Proxy routes to Alpaca Markets API for real-time stock snapshots, historical OHLCV bars, quotes, trades, and market movers. Endpoints: `/api/alpaca/snapshot/:symbol`, `/api/alpaca/snapshots`, `/api/alpaca/bars/:symbol`, `/api/alpaca/quote/:symbol`, `/api/alpaca/trades/:symbol`, `/api/alpaca/multibars`, `/api/alpaca/movers`, `/api/alpaca/account`. Uses IEX feed. Falls back to mock data on auth errors.
-- **Routes**: Health check, stocks data, AI analysis (rate-limited), user management, résumé operations, job search/save, KYC submission, Stripe configuration/checkout, TaxGPT queries, and Alpaca market data proxy.
+- **News Intelligence**: `/api/news` endpoint with RSS feed scraping via `rss-parser`, relevance scoring (35+ keywords), sentiment analysis, ticker extraction, category filtering, search, pagination, and 5-min cache. `/api/news/refresh` for manual cache invalidation. Rate-limited to 30 requests/min per IP.
+- **Routes**: Health check, stocks data, AI analysis (rate-limited), user management, résumé operations, job search/save, KYC submission, Stripe configuration/checkout, TaxGPT queries, Alpaca market data proxy, and news intelligence.
 
 # External Dependencies
 

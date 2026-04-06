@@ -174,6 +174,37 @@ export interface NewsResponse {
   feedCount: number;
 }
 
+export interface AlpacaBar {
+  t: string;
+  o: number;
+  h: number;
+  l: number;
+  c: number;
+  v: number;
+}
+
+export async function fetchAlpacaBars(symbol: string, params?: {
+  timeframe?: string;
+  limit?: number;
+  start?: string;
+  end?: string;
+}): Promise<{ bars: AlpacaBar[] }> {
+  const sp = new URLSearchParams();
+  if (params?.timeframe) sp.set("timeframe", params.timeframe);
+  if (params?.limit) sp.set("limit", String(params.limit));
+  if (params?.start) sp.set("start", params.start);
+  if (params?.end) sp.set("end", params.end);
+  const res = await fetch(`${API_BASE}/alpaca/bars/${symbol}?${sp.toString()}`);
+  if (!res.ok) throw new Error("Failed to fetch bars");
+  return res.json();
+}
+
+export async function fetchAlpacaSnapshots(symbols: string[]): Promise<Record<string, any>> {
+  const res = await fetch(`${API_BASE}/alpaca/snapshots?symbols=${symbols.join(",")}`);
+  if (!res.ok) throw new Error("Failed to fetch snapshots");
+  return res.json();
+}
+
 export async function fetchNews(params?: {
   topic?: string;
   search?: string;

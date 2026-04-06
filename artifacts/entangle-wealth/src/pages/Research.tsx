@@ -9,18 +9,20 @@ import {
   Cpu, Globe, Truck, Scale, Newspaper,
 } from "lucide-react";
 
-const TOPICS = ["All", "Microelectronics", "Geopolitics", "Supply Chain", "Tech Policy"];
+const TOPICS = ["All", "Microelectronics", "Geopolitics", "Supply Chain", "Tech Policy", "Markets"];
 const TOPIC_ICONS: Record<string, typeof Cpu> = {
   Microelectronics: Cpu,
   Geopolitics: Globe,
   "Supply Chain": Truck,
   "Tech Policy": Scale,
+  Markets: Newspaper,
 };
 const TOPIC_COLORS: Record<string, string> = {
   Microelectronics: "text-[#00c8f8] bg-[rgba(0,200,248,0.1)] border-[rgba(0,200,248,0.2)]",
   Geopolitics: "text-[#ff4466] bg-[rgba(255,68,102,0.1)] border-[rgba(255,68,102,0.2)]",
   "Supply Chain": "text-[#f5c842] bg-[rgba(245,200,66,0.1)] border-[rgba(245,200,66,0.2)]",
   "Tech Policy": "text-[#00e676] bg-[rgba(0,230,118,0.1)] border-[rgba(0,230,118,0.2)]",
+  Markets: "text-[#FFD700] bg-[rgba(255,215,0,0.1)] border-[rgba(255,215,0,0.2)]",
 };
 
 function timeAgo(dateStr: string): string {

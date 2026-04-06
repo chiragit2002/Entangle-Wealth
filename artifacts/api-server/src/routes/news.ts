@@ -21,6 +21,11 @@ const FEEDS: { topic: string; url: string }[] = [
   { topic: "Supply Chain", url: "https://www.supplychaindive.com/feeds/news/" },
   { topic: "Microelectronics", url: "https://www.tomshardware.com/feeds/all" },
   { topic: "Tech Policy", url: "https://arstechnica.com/feed/" },
+  { topic: "Markets", url: "https://feeds.finance.yahoo.com/rss/2.0/headline?s=^IXIC&region=US&lang=en-US" },
+  { topic: "Markets", url: "https://www.cnbc.com/id/100003114/device/rss/rss.html" },
+  { topic: "Tech Policy", url: "https://techcrunch.com/feed/" },
+  { topic: "Geopolitics", url: "https://feeds.npr.org/1004/rss.xml" },
+  { topic: "Supply Chain", url: "https://www.freightwaves.com/news/rss.xml" },
 ];
 
 export interface NewsItem {
@@ -205,7 +210,14 @@ async function fetchArticleBody(url: string): Promise<string> {
   try {
     const parsed = new URL(url);
     if (!ALLOWED_PROTOCOLS.has(parsed.protocol)) return "";
-    if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1" || parsed.hostname.startsWith("10.") || parsed.hostname.startsWith("192.168.")) return "";
+    const h = parsed.hostname;
+    if (h === "localhost" || h === "127.0.0.1" || h === "::1" || h === "0.0.0.0"
+      || h.startsWith("10.") || h.startsWith("192.168.")
+      || h.startsWith("172.16.") || h.startsWith("172.17.") || h.startsWith("172.18.")
+      || h.startsWith("172.19.") || h.startsWith("172.2") || h.startsWith("172.30.")
+      || h.startsWith("172.31.") || h.startsWith("169.254.")
+      || h.startsWith("fc") || h.startsWith("fd") || h.startsWith("fe80")
+      || h.endsWith(".local") || h.endsWith(".internal")) return "";
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
     const res = await fetch(url, {

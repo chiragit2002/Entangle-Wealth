@@ -24,7 +24,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 ### EntangleWealth (`artifacts/entangle-wealth`)
 - Financial analysis platform with dark theme (black bg, electric blue #00D4FF, gold #FFD700)
 - **Authentication**: Clerk (email + Google sign-in at /sign-in, /sign-up)
-- Pages: Landing (/), Dashboard (/dashboard), Earn (/earn), Options Signals (/options), Stock Explorer (/stocks), Job Search (/jobs), Gig Marketplace (/gigs), Tax Dashboard (/tax), Receipt Scanner (/receipts), Business Travel Planner (/travel), TaxGPT (/taxgpt), Terminal (/terminal), Résumé Builder (/resume, auth required), Profile (/profile, auth required), About (/about)
+- Pages: Landing (/), Dashboard (/dashboard), Earn (/earn), Options Signals (/options), Stock Explorer (/stocks), Job Search (/jobs), Gig Marketplace (/gigs), Community (/community), Tax Dashboard (/tax), Receipt Scanner (/receipts), Business Travel Planner (/travel), TaxGPT (/taxgpt), Terminal (/terminal), Résumé Builder (/resume, auth required), Profile (/profile, auth required), About (/about)
 - Tone: Honest, no-hype, no AI slop. Straightforward about what the platform does and doesn't do.
 - Core concept: Multiple AI analysis methods run simultaneously and cross-check each other via "quantum entanglement." Signals only fire on consensus.
 - Mission: Help everyday families make better financial decisions.
@@ -78,11 +78,21 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - KYC gate — must verify identity before payment
 - Webhook handler for payment events
 
+#### Community (/community)
+- 5-tab interface: Groups, Feed, Events, Jobs, Pricing
+- Communities: 6 default groups (Options Flow Traders, Real Estate Investors, Tax Strategy Hub, Tech Builders, Gig Economy Workers, Crypto & DeFi) with category filters, join/leave, create modal
+- Feed: post creation (1000 char limit), like/unlike, share, comment counts
+- Events: event cards with RSVP, create event modal, filter by upcoming/virtual/in-person
+- Jobs: job board with search + category filter, post job modal (adds to state list)
+- Pricing: 3-tier cards (Starter Free, Pro $29/mo, Business $79/mo) with referral program
+- All state is client-side (no backend for MVP)
+
 #### TaxFlow Suite
 - **Tax Dashboard (/tax)**: Compliance score ring (SVG), 4-stat grid (deductions found, missing, receipts logged, audit risk), missing deductions cards with IRS publication references and estimated values, "Add to Checklist" buttons, quick links to Receipts/Travel/TaxGPT
-- **Receipt Scanner (/receipts)**: Upload zone + manual entry form (vendor, amount, IRS category, purpose, date), logged receipts list with deductibility badges and running totals, Export for CPA (CSV download), all client-side via localStorage (`entangle-receipts`)
+- **Receipt Scanner (/receipts)**: Upload zone + manual entry form (vendor, amount, IRS category, purpose, date), logged receipts list with deductibility badges and running totals, Export for CPA (CSV download with formula-injection-safe escaping), all client-side via localStorage (`entangle-receipts`), amount validation (0.01–999,999.99), maxLength on all inputs
 - **Business Travel Planner (/travel)**: Trip details form (name, dates, purpose, type), generates tax-optimized itinerary with day-by-day activities and deductibility badges, trip deduction summary
-- **TaxGPT (/taxgpt)**: AI chat powered by OpenAI (gpt-4o-mini via proxy), common questions quick buttons, audit risk factors section with progress bars, client-side fallback with keyword-matched IRS answers when API unavailable
+- **TaxGPT (/taxgpt)**: AI chat powered by OpenAI (gpt-4o-mini via proxy), common questions quick buttons, audit risk factors section with progress bars, client-side fallback with keyword-matched IRS answers (10 topics) when API unavailable, client-side rate limiting (10 req/min sliding window), 1000-char input limit
+- **Security**: CSV exports use formula-injection-safe `escapeCSV()` (prefixes `=+\-@\t\r` with `'`), all inputs have `maxLength`, server-side rate limiting on TaxGPT API (10 req/min per IP), all buttons 44px min-height for mobile touch targets, dark select option styling
 
 #### Terminal (/terminal)
 - MirofishTerminal with live order flow, news feed, system log panels
@@ -108,7 +118,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
   - **Jobs**: GET /api/jobs/search, GET /api/jobs/saved, POST /api/jobs/save, DELETE /api/jobs/saved/:id
   - **KYC**: GET /api/kyc/status, POST /api/kyc/submit, POST /api/kyc/approve/:userId
   - **Stripe**: GET /api/stripe/config, GET /api/stripe/products, POST /api/stripe/create-checkout, GET /api/stripe/subscription, POST /api/stripe/create-portal
-  - **TaxGPT**: POST /api/taxgpt (OpenAI-powered tax Q&A, gpt-4o-mini, temp 0.3)
+  - **TaxGPT**: POST /api/taxgpt (OpenAI-powered tax Q&A, gpt-4o-mini, temp 0.3, server-side rate limit 10/min per IP)
 
 ## Database Schema
 

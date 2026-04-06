@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { MessageCircle, Send, Loader2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,10 +33,15 @@ const COMMON_QUESTIONS = [
 
 const MOCK_ANSWERS: Record<string, string> = {
   "meals": "Per IRS Publication 463, business meals are 50% deductible if:\n\n1. The meal is not lavish or extravagant\n2. You or your employee is present\n3. The meal has a clear business purpose\n\nYou MUST document: date, place, amount, business purpose, and who attended. Without this documentation, the deduction is disallowed entirely.\n\nTip: Use a receipt-tracking app (like our Receipt Scanner) to log meals as you go.",
-  "home office": "Per IRS Publication 587, you can deduct home office expenses if the space is used:\n\n1. Regularly (not occasionally)\n2. Exclusively for business (no personal use)\n\nTwo methods:\n• Simplified: $5 per sq ft, max 300 sq ft = $1,500\n• Regular: Actual expenses × business use percentage\n\nThe simplified method is easier to defend during an audit and requires less recordkeeping.",
-  "vehicle": "Per IRS Publication 463, you can deduct vehicle expenses using:\n\n1. Standard mileage rate: 67 cents/mile (2024)\n2. Actual expenses: gas, insurance, repairs, depreciation × business use %\n\nYou MUST keep a contemporaneous mileage log with:\n• Date of each trip\n• Destination and business purpose\n• Miles driven\n\nClaiming 100% business use is a major audit red flag.",
+  "home office": "Per IRS Publication 587, you can deduct home office expenses if the space is used:\n\n1. Regularly (not occasionally)\n2. Exclusively for business (no personal use)\n\nTwo methods:\n• Simplified: $5 per sq ft, max 300 sq ft = $1,500\n• Regular: Actual expenses x business use percentage\n\nThe simplified method is easier to defend during an audit and requires less recordkeeping.",
+  "vehicle": "Per IRS Publication 463, you can deduct vehicle expenses using:\n\n1. Standard mileage rate: 67 cents/mile (2024)\n2. Actual expenses: gas, insurance, repairs, depreciation x business use %\n\nYou MUST keep a contemporaneous mileage log with:\n• Date of each trip\n• Destination and business purpose\n• Miles driven\n\nClaiming 100% business use is a major audit red flag.",
   "audit": "Common IRS audit triggers for small businesses:\n\n1. High deductions relative to income\n2. Large cash transactions or unreported income\n3. Claiming 100% business use of a vehicle\n4. Excessive meal/entertainment deductions\n5. Home office deduction with no dedicated space\n6. Round numbers on tax returns\n7. Consistent losses year after year (hobby loss rules)\n\nBest defense: meticulous documentation and reasonable claims.",
   "travel": "Per IRS Publication 463, for a trip to be deductible:\n\n1. The PRIMARY purpose must be business\n2. You must be away from your 'tax home' overnight\n3. Each day should have documented business activities\n\nFor mixed trips: transportation is 100% deductible if business is the primary purpose. Lodging is deductible only for business days. Meals are 50% deductible on business days.\n\nPersonal days in the middle of a business trip are NOT deductible.",
+  "depreciation": "Per IRS Publication 946, depreciation allows you to deduct the cost of business assets over their useful life.\n\nKey methods:\n1. Section 179: Deduct the full cost in year 1 (up to $1,160,000 for 2023)\n2. Bonus depreciation: 80% first-year deduction (2023), declining annually\n3. MACRS: Standard depreciation schedule over 3-39 years\n\nCommon asset classes:\n• Computers/electronics: 5 years\n• Office furniture: 7 years\n• Vehicles: 5 years (with limits)\n• Buildings: 27.5-39 years",
+  "self-employment": "Self-employment tax is 15.3% of net earnings:\n• 12.4% Social Security (on first $160,200 for 2023)\n• 2.9% Medicare (no cap)\n• Additional 0.9% Medicare over $200K single / $250K married\n\nYou can deduct 50% of SE tax on Form 1040.\n\nEstimated taxes are due quarterly:\n• April 15, June 15, Sept 15, Jan 15\n\nPenalty for underpayment if you owe >$1,000.",
+  "retirement": "Per IRS guidelines, self-employed individuals have several retirement plan options:\n\n1. SEP-IRA: Up to 25% of net SE income (max $66,000 for 2023)\n2. Solo 401(k): Up to $22,500 employee + 25% employer (max $66,000)\n3. SIMPLE IRA: Up to $15,500 employee + 3% employer match\n4. Traditional/Roth IRA: $6,500 ($7,500 if 50+)\n\nAll contributions reduce taxable income (except Roth). SEP-IRA is simplest to set up.",
+  "health": "Self-employed health insurance deduction (IRS Publication 535):\n\n1. Deduct 100% of premiums for yourself, spouse, and dependents\n2. Must have net profit from self-employment\n3. Cannot exceed your net SE income\n4. Cannot be eligible for employer-sponsored plan\n\nThis is an above-the-line deduction (reduces AGI).\n\nHSA contributions are also deductible: $3,850 individual / $7,750 family (2023).",
+  "quarterly": "Estimated tax payments for self-employed individuals:\n\nDue dates:\n• Q1: April 15\n• Q2: June 15\n• Q3: September 15\n• Q4: January 15 (next year)\n\nUse Form 1040-ES to calculate and pay.\n\nSafe harbor: Pay 100% of last year's tax (110% if AGI > $150K) to avoid penalties.\n\nPenalty for underpayment if you owe more than $1,000 at filing.",
 };
 
 function getAIResponse(question: string): string {
@@ -46,8 +51,16 @@ function getAIResponse(question: string): string {
   if (q.includes("vehicle") || q.includes("mileage") || q.includes("car") || q.includes("drive")) return MOCK_ANSWERS["vehicle"];
   if (q.includes("audit") || q.includes("trigger") || q.includes("risk")) return MOCK_ANSWERS["audit"];
   if (q.includes("travel") || q.includes("trip") || q.includes("flight") || q.includes("conference")) return MOCK_ANSWERS["travel"];
-  return "That's a great question! Based on IRS publications, this topic involves several factors specific to your situation. I'd recommend:\n\n1. Reviewing the relevant IRS publication for your specific case\n2. Keeping detailed documentation of all related expenses\n3. Consulting with a licensed CPA for personalized advice\n\nWould you like to ask about a specific deduction type? I can help with meals, home office, vehicle use, travel, or audit risk factors.";
+  if (q.includes("depreci") || q.includes("section 179") || q.includes("asset")) return MOCK_ANSWERS["depreciation"];
+  if (q.includes("self-employ") || q.includes("self employ") || q.includes("1099") || q.includes("freelanc")) return MOCK_ANSWERS["self-employment"];
+  if (q.includes("retire") || q.includes("401k") || q.includes("ira") || q.includes("sep")) return MOCK_ANSWERS["retirement"];
+  if (q.includes("health") || q.includes("insurance") || q.includes("medical") || q.includes("hsa")) return MOCK_ANSWERS["health"];
+  if (q.includes("quarter") || q.includes("estimated") || q.includes("1040-es")) return MOCK_ANSWERS["quarterly"];
+  return "That's a great question! Based on IRS publications, this topic involves several factors specific to your situation. I'd recommend:\n\n1. Reviewing the relevant IRS publication for your specific case\n2. Keeping detailed documentation of all related expenses\n3. Consulting with a licensed CPA for personalized advice\n\nWould you like to ask about a specific deduction type? I can help with meals, home office, vehicle use, travel, depreciation, self-employment tax, retirement plans, health insurance, or estimated quarterly payments.";
 }
+
+const RATE_LIMIT_MAX = 10;
+const RATE_LIMIT_WINDOW = 60_000;
 
 export default function TaxGPT() {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -56,22 +69,38 @@ export default function TaxGPT() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const rateLimitRef = useRef<number[]>([]);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, loading]);
+
+  const isRateLimited = useCallback((): boolean => {
+    const now = Date.now();
+    rateLimitRef.current = rateLimitRef.current.filter(t => now - t < RATE_LIMIT_WINDOW);
+    if (rateLimitRef.current.length >= RATE_LIMIT_MAX) return true;
+    rateLimitRef.current.push(now);
+    return false;
+  }, []);
 
   const sendMessage = async (text?: string) => {
-    const question = text || input.trim();
+    const question = (text || input).trim().slice(0, 1000);
     if (!question || loading) return;
+
+    if (isRateLimited()) {
+      setMessages(prev => [...prev, { role: "ai", text: "You're sending questions too quickly. Please wait a moment before asking another question." }]);
+      return;
+    }
+
     setInput("");
     setMessages(prev => [...prev, { role: "user", text: question }]);
     setLoading(true);
 
     try {
-      const res = await fetch("/api/taxgpt", {
+      const baseUrl = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+      const res = await fetch(`${baseUrl}/api/taxgpt`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question }),
@@ -114,7 +143,7 @@ export default function TaxGPT() {
 
         <div className="glass-panel rounded-xl p-5 mb-6">
           <p className="text-[13px] text-muted-foreground mb-3">Ask about deductions, compliance, audit risks, or IRS rules</p>
-          <div ref={scrollRef} className="max-h-[400px] overflow-y-auto space-y-3 mb-4">
+          <div ref={scrollRef} className="max-h-[400px] overflow-y-auto space-y-3 mb-4 scroll-smooth">
             {messages.map((msg, i) => (
               <div key={i} className={`rounded-xl p-3 text-[14px] leading-relaxed max-w-[90%] whitespace-pre-line ${
                 msg.role === "user"
@@ -135,14 +164,17 @@ export default function TaxGPT() {
             <Input
               placeholder="Ask about any deduction..."
               value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => { if (e.key === "Enter") sendMessage(); }}
+              onChange={e => setInput(e.target.value.slice(0, 1000))}
+              onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+              maxLength={1000}
               className="bg-white/5 border-white/10 flex-1"
+              aria-label="Type your tax question"
             />
             <Button
-              className="bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold px-4"
+              className="bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold px-4 min-h-[44px] min-w-[44px]"
               onClick={() => sendMessage()}
               disabled={loading}
+              aria-label="Send message"
             >
               <Send className="w-4 h-4" />
             </Button>
@@ -158,7 +190,8 @@ export default function TaxGPT() {
             {COMMON_QUESTIONS.map((q, i) => (
               <button key={i}
                 onClick={() => sendMessage(q.text)}
-                className="text-left text-[13px] p-3 rounded-lg border border-white/10 bg-transparent hover:bg-white/5 text-muted-foreground transition-colors"
+                className="text-left text-[13px] p-3 rounded-lg border border-white/10 bg-transparent hover:bg-white/5 text-muted-foreground transition-colors min-h-[44px]"
+                disabled={loading}
               >
                 {q.emoji} {q.text}
               </button>
@@ -175,7 +208,7 @@ export default function TaxGPT() {
             <div key={i} className="glass-panel rounded-xl p-4 border-l-[3px]" style={{ borderLeftColor: getRiskColor(risk.level) }}>
               <div className="flex justify-between items-center mb-2">
                 <p className="font-bold text-[14px]">{risk.title}</p>
-                <span className="px-3 py-1 rounded-full text-[11px] font-bold" style={{
+                <span className="px-3 py-1 rounded-full text-[11px] font-bold flex-shrink-0" style={{
                   background: `${getRiskColor(risk.level)}20`,
                   color: getRiskColor(risk.level),
                 }}>
@@ -184,7 +217,7 @@ export default function TaxGPT() {
               </div>
               <p className="text-[13px] text-muted-foreground mb-2">{risk.description}</p>
               <div className="h-2 bg-white/[0.06] rounded-full overflow-hidden">
-                <div className="h-full rounded-full transition-all duration-1000" style={{
+                <div className="h-full rounded-full" style={{
                   width: `${risk.pct}%`,
                   backgroundColor: getRiskColor(risk.level),
                 }} />

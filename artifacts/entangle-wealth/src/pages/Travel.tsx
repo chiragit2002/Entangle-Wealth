@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
-import { Plane, CheckCircle, XCircle } from "lucide-react";
+import { Plane, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -46,13 +46,21 @@ const SUMMARY_ITEMS = [
   { label: "Conference Fees", pct: "100% deductible", color: "#00ff88" },
 ];
 
+function escapeCSV(str: string): string {
+  let s = str;
+  if (/^[=+\-@\t\r]/.test(s)) {
+    s = "'" + s;
+  }
+  return `"${s.replace(/"/g, '""')}"`;
+}
+
 export default function Travel() {
   const { toast } = useToast();
   const [form, setForm] = useState({ name: "", startDate: "", endDate: "", purpose: "", type: "Conference / Trade Show" });
   const [showItinerary, setShowItinerary] = useState(false);
 
   const createItinerary = () => {
-    if (!form.name || !form.startDate || !form.purpose) {
+    if (!form.name.trim() || !form.startDate || !form.purpose.trim()) {
       toast({ title: "Missing fields", description: "Please fill trip name, start date, and purpose.", variant: "destructive" });
       return;
     }
@@ -61,7 +69,33 @@ export default function Travel() {
   };
 
   const exportItinerary = () => {
-    toast({ title: "Exported", description: "Itinerary exported for CPA review." });
+    const lines = [
+      "Day,Time,Activity,Deductible,Percentage,IRS Note",
+      ...GENERATED_ITINERARY.flatMap(day =>
+        day.activities.map(a =>
+          `${day.day},${escapeCSV(a.time)},${escapeCSV(a.title)},${a.deductible === "full" ? "Yes" : a.deductible === "partial" ? "Partial" : "No"},${a.pct},${escapeCSV(a.note)}`
+        )
+      ),
+      "",
+      `Trip Name,${escapeCSV(form.name)}`,
+      `Purpose,${escapeCSV(form.purpose)}`,
+      `Dates,${form.startDate} to ${form.endDate || form.startDate}`,
+      `Type,${escapeCSV(form.type)}`,
+      "",
+      "Category,Deductibility",
+      ...SUMMARY_ITEMS.map(s => `${escapeCSV(s.label)},${escapeCSV(s.pct)}`),
+    ];
+
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `travel-itinerary-${form.name.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase()}-${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast({ title: "Exported", description: "Travel itinerary CSV downloaded for CPA review." });
   };
 
   const getBadgeStyle = (type: "full" | "partial" | "none") => {
@@ -88,21 +122,25 @@ export default function Travel() {
         <div className="glass-panel rounded-xl p-5 mb-6">
           <h3 className="text-sm font-bold text-primary mb-3">Trip Details</h3>
           <div className="space-y-2.5">
-            <Input placeholder="Trip name / destination" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className="bg-white/5 border-white/10" />
+            <Input placeholder="Trip name / destination" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value.slice(0, 200) }))} maxLength={200} className="bg-white/5 border-white/10" />
             <div className="grid grid-cols-2 gap-3">
-              <Input type="date" value={form.startDate} onChange={e => setForm(p => ({ ...p, startDate: e.target.value }))} className="bg-white/5 border-white/10" />
-              <Input type="date" value={form.endDate} onChange={e => setForm(p => ({ ...p, endDate: e.target.value }))} className="bg-white/5 border-white/10" />
+              <Input type="date" value={form.startDate} onChange={e => setForm(p => ({ ...p, startDate: e.target.value }))} className="bg-white/5 border-white/10" aria-label="Start date" />
+              <Input type="date" value={form.endDate} onChange={e => setForm(p => ({ ...p, endDate: e.target.value }))} className="bg-white/5 border-white/10" aria-label="End date" />
             </div>
-            <Input placeholder="Primary business purpose" value={form.purpose} onChange={e => setForm(p => ({ ...p, purpose: e.target.value }))} className="bg-white/5 border-white/10" />
-            <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}
-              className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary/50">
+            <Input placeholder="Primary business purpose" value={form.purpose} onChange={e => setForm(p => ({ ...p, purpose: e.target.value.slice(0, 500) }))} maxLength={500} className="bg-white/5 border-white/10" />
+            <select
+              value={form.type}
+              onChange={e => setForm(p => ({ ...p, type: e.target.value }))}
+              className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-primary/50 min-h-[44px] [&>option]:bg-[#0d0d1a] [&>option]:text-white"
+              aria-label="Trip type"
+            >
               <option>Conference / Trade Show</option>
               <option>Client Meeting</option>
               <option>Business Training</option>
               <option>Site Inspection</option>
               <option>Industry Event</option>
             </select>
-            <Button className="w-full bg-gradient-to-r from-secondary to-[#cc9900] text-black font-bold" onClick={createItinerary}>
+            <Button className="w-full bg-gradient-to-r from-secondary to-[#cc9900] text-black font-bold min-h-[44px]" onClick={createItinerary}>
               Build Deductible Itinerary
             </Button>
           </div>
@@ -124,16 +162,16 @@ export default function Travel() {
                   </div>
                   <div className="space-y-2">
                     {day.activities.map((a, i) => (
-                      <div key={i} className="bg-white/[0.03] rounded-lg p-3 flex justify-between items-center">
+                      <div key={i} className="bg-white/[0.03] rounded-lg p-3 flex justify-between items-center gap-2">
                         <div className="min-w-0 flex-1">
                           <p className="text-[13px] font-bold">{a.time} — {a.title}</p>
                           <p className="text-[11px]" style={{
-                            color: a.deductible === "full" ? "#666" : a.deductible === "partial" ? "#ffd700" : "#ff3366"
+                            color: a.deductible === "full" ? "#888" : a.deductible === "partial" ? "#ffd700" : "#ff3366"
                           }}>
                             {a.note}
                           </p>
                         </div>
-                        <span className={`ml-3 px-2.5 py-0.5 rounded-full text-[11px] font-bold flex-shrink-0 ${getBadgeStyle(a.deductible)}`}>
+                        <span className={`ml-2 px-2.5 py-0.5 rounded-full text-[11px] font-bold flex-shrink-0 ${getBadgeStyle(a.deductible)}`}>
                           {a.deductible === "full" ? "✓" : a.deductible === "partial" ? "50%" : "✗"}
                         </span>
                       </div>
@@ -143,7 +181,7 @@ export default function Travel() {
               ))}
             </div>
 
-            <div className="glass-panel rounded-xl p-5 mb-6 border-[rgba(0,255,136,0.2)] bg-[rgba(0,255,136,0.03)]">
+            <div className="glass-panel rounded-xl p-5 mb-6 border border-[rgba(0,255,136,0.2)] bg-[rgba(0,255,136,0.03)]">
               <h3 className="text-sm font-bold text-[#00ff88] mb-3">Trip Deduction Summary</h3>
               <div className="space-y-0">
                 {SUMMARY_ITEMS.map((item, i) => (
@@ -155,8 +193,8 @@ export default function Travel() {
               </div>
             </div>
 
-            <Button className="w-full bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold" onClick={exportItinerary}>
-              Export Itinerary for CPA
+            <Button className="w-full bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold min-h-[44px] gap-2" onClick={exportItinerary}>
+              <Download className="w-4 h-4" /> Export Itinerary for CPA
             </Button>
           </>
         )}

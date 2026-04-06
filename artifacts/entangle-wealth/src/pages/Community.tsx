@@ -133,7 +133,9 @@ export default function Community() {
 
   const filteredCommunities = commFilter === "all" ? communities : communities.filter(c => c.category === commFilter);
 
-  const filteredJobs = INITIAL_JOBS.filter(j => {
+  const [jobs, setJobs] = useState<Job[]>(INITIAL_JOBS);
+
+  const filteredJobs = jobs.filter(j => {
     const matchCat = jobFilter === "all" || j.category === jobFilter;
     const matchSearch = !jobSearch || j.title.toLowerCase().includes(jobSearch.toLowerCase()) || j.company.toLowerCase().includes(jobSearch.toLowerCase());
     return matchCat && matchSearch;
@@ -222,9 +224,18 @@ export default function Community() {
       toast({ title: "Missing fields", description: "Title and company are required.", variant: "destructive" });
       return;
     }
-    toast({ title: "Job posted", description: `${newJob.title.trim()} listing is now live.` });
+    const job: Job = {
+      id: crypto.randomUUID(),
+      title: newJob.title.trim().slice(0, 200),
+      company: newJob.company.trim().slice(0, 200),
+      salary: newJob.salary.trim().slice(0, 50) || "Competitive",
+      category: newJob.category,
+      meta: (newJob.meta.trim() || "Just posted").slice(0, 200),
+    };
+    setJobs(prev => [job, ...prev]);
     setNewJob({ title: "", company: "", salary: "", category: "remote", meta: "" });
     setShowPostJob(false);
+    toast({ title: "Job posted", description: `${job.title} listing is now live.` });
   };
 
   const tabs: { key: Tab; label: string; icon: typeof Users }[] = [

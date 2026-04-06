@@ -38,8 +38,11 @@ const INITIAL_RECEIPTS: ReceiptEntry[] = [
 const STORAGE_KEY = "entangle-receipts";
 
 function escapeCSV(str: string): string {
-  const escaped = str.replace(/"/g, '""');
-  return `"${escaped}"`;
+  let s = str;
+  if (/^[=+\-@\t\r]/.test(s)) {
+    s = "'" + s;
+  }
+  return `"${s.replace(/"/g, '""')}"`;
 }
 
 export default function Receipts() {

@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type Request } from "express";
 
 let openai: any = null;
 try {
@@ -9,6 +9,28 @@ try {
 }
 
 const router = Router();
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW = 60_000;
+const RATE_LIMIT_MAX = 10;
+
+function checkRateLimit(req: Request): boolean {
+  const ip = req.ip || req.socket.remoteAddress || "unknown";
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+
+  entry.count++;
+  return true;
+}
 
 const TAX_SYSTEM_PROMPT = `You are TaxGPT, an IRS tax knowledge assistant built into EntangleWealth. You answer questions about US business tax deductions, compliance, audit risk factors, and IRS rules.
 
@@ -22,9 +44,20 @@ Rules:
 7. Never make up IRS rules or publication numbers.`;
 
 router.post("/taxgpt", async (req, res) => {
+  if (!checkRateLimit(req)) {
+    res.status(429).json({ error: "Rate limit exceeded. Please wait before sending another question." });
+    return;
+  }
+
   const { question } = req.body;
-  if (!question || typeof question !== "string" || question.length > 1000) {
-    res.status(400).json({ error: "Question is required (max 1000 chars)" });
+  if (!question || typeof question !== "string") {
+    res.status(400).json({ error: "Question is required" });
+    return;
+  }
+
+  const sanitized = question.trim().slice(0, 1000);
+  if (sanitized.length === 0) {
+    res.status(400).json({ error: "Question cannot be empty" });
     return;
   }
 
@@ -38,7 +71,7 @@ router.post("/taxgpt", async (req, res) => {
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: TAX_SYSTEM_PROMPT },
-        { role: "user", content: question },
+        { role: "user", content: sanitized },
       ],
       max_tokens: 800,
       temperature: 0.3,

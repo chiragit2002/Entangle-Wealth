@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EntangleWealth — Institutional Intelligence for Everyone</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#05050f;
+  --card:#0a0a1a;
+  --card2:#0f0f22;
+  --blue:#00c8f8;
+  --blue2:#0099cc;
+  --gold:#f5c842;
+  --green:#00e676;
+  --red:#ff4466;
+  --purple:#9c27b0;
+  --border:rgba(0,200,248,0.12);
+  --border2:rgba(255,255,255,0.06);
+  --text:#e8e8f0;
+  --muted:#5a5a7a;
+}
+body{background:var(--black);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden;padding-bottom:72px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--black)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(5,5,15,0.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:17px;font-weight:800;background:linear-gradient(135deg,var(--blue),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.3px}
+.nav-badge{background:rgba(0,200,248,0.1);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--blue);letter-spacing:0.5px}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(5,5,15,0.96);backdrop-filter:blur(24px);border-top:1px solid var(--border);display:flex;z-index:999;height:72px}
+.bnav{flex:1;background:none;border:none;color:var(--muted);font-size:9px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:color 0.2s;letter-spacing:0.3px;font-family:'Inter',sans-serif}
+.bnav .ic{font-size:22px;line-height:1}
+.bnav.active{color:var(--blue)}
+
+/* PAGES */
+.page{display:none;padding-top:56px;min-height:100vh}
+.page.active{display:block}
+.pi{padding:16px}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:16px;margin-bottom:12px}
+.card-glow{background:linear-gradient(135deg,rgba(0,200,248,0.06),rgba(245,200,66,0.03));border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px}
+
+/* TYPOGRAPHY */
+.sec-title{font-size:15px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;letter-spacing:-0.2px}
+.sec-action{font-size:12px;color:var(--blue);cursor:pointer;font-weight:600}
+
+/* BUTTONS */
+.btn{border:none;border-radius:12px;padding:13px 16px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:8px;font-family:'Inter',sans-serif;letter-spacing:-0.2px;transition:opacity 0.2s,transform 0.1s}
+.btn:active{transform:scale(0.98)}
+.btn-blue{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#000}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#cc9900);color:#000}
+.btn-green{background:linear-gradient(135deg,var(--green),#00aa55);color:#000}
+.btn-outline{background:rgba(255,255,255,0.04);border:1px solid var(--border2);color:var(--muted)}
+.btn-sm{padding:8px 14px;font-size:12px;border-radius:10px;width:auto;margin-top:0}
+
+/* INPUTS */
+input,textarea,select{background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:12px;padding:13px 14px;color:var(--text);font-size:14px;outline:none;width:100%;margin-bottom:10px;font-family:'Inter',sans-serif;transition:border-color 0.2s}
+input:focus,textarea:focus,select:focus{border-color:var(--blue);background:rgba(0,200,248,0.04)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+select option{background:var(--card)}
+
+/* BADGES */
+.badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:0.3px}
+.badge-blue{background:rgba(0,200,248,0.12);color:var(--blue)}
+.badge-gold{background:rgba(245,200,66,0.12);color:var(--gold)}
+.badge-green{background:rgba(0,230,118,0.12);color:var(--green)}
+.badge-red{background:rgba(255,68,102,0.12);color:var(--red)}
+.badge-purple{background:rgba(156,39,176,0.12);color:#ce93d8}
+
+/* TICKER */
+.ticker-wrap{background:rgba(0,200,248,0.03);border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);overflow:hidden;padding:10px 0;margin-bottom:16px}
+.ticker{display:flex;gap:32px;animation:scroll 35s linear infinite;white-space:nowrap}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.tick{display:inline-flex;gap:8px;font-size:12px;font-weight:600;align-items:center}
+.tick-sym{color:var(--muted);font-size:11px}
+.up{color:var(--green)}
+.down{color:var(--red)}
+
+/* HERO */
+.hero{padding:32px 20px 20px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(0,200,248,0.06) 0%,transparent 70%);pointer-events:none}
+.hero h1{font-size:30px;font-weight:900;line-height:1.1;margin-bottom:10px;letter-spacing:-1px}
+.hero h1 span{background:linear-gradient(135deg,var(--blue),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat{background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:14px 8px;text-align:center}
+.stat-n{font-size:20px;font-weight:800;letter-spacing:-0.5px}
+.stat-l{font-size:10px;color:var(--muted);margin-top:3px;font-weight:500;letter-spacing:0.3px;text-transform:uppercase}
+
+/* SIGNAL CARDS */
+.sig-card{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden;transition:border-color 0.2s,transform 0.2s}
+.sig-card:active{transform:scale(0.99)}
+.sig-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
+.sig-card.buy::before{background:var(--green)}
+.sig-card.sell::before{background:var(--red)}
+.sig-card.watch::before{background:var(--gold)}
+.sig-card.buy{border-color:rgba(0,230,118,0.12)}
+.sig-card.sell{border-color:rgba(255,68,102,0.12)}
+.sig-card.watch{border-color:rgba(245,200,66,0.12)}
+.sig-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.sig-sym{font-size:22px;font-weight:900;letter-spacing:-0.5px}
+.sig-price{font-size:13px;color:var(--muted);margin-top:2px;font-weight:500}
+.sig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.sig-stat{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px;font-weight:600}
+.sig-stat span{display:block;font-size:14px;font-weight:700;color:var(--text);margin-top:3px;letter-spacing:-0.3px}
+.conf-bar{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;margin-bottom:10px}
+.conf-fill{height:100%;border-radius:2px}
+.sig-reason{font-size:12px;color:var(--muted);line-height:1.5;padding-top:10px;border-top:1px solid var(--border2)}
+
+/* INDICATOR PANEL */
+.indicator-panel{background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:12px;margin-top:10px}
+.ind-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2)}
+.ind-row:last-child{border:none;padding-bottom:0}
+.ind-name{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+.ind-val{font-size:13px;font-weight:700}
+.ind-signal{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.bull{background:rgba(0,230,118,0.12);color:var(--green)}
+.bear{background:rgba(255,68,102,0.12);color:var(--red)}
+.neut{background:rgba(245,200,66,0.12);color:var(--gold)}
+
+/* OPTIONS */
+.opt-card{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:16px;margin-bottom:10px;transition:border-color 0.2s}
+.opt-card.call{border-color:rgba(0,230,118,0.12)}
+.opt-card.put{border-color:rgba(255,68,102,0.12)}
+.opt-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.opt-sym{font-size:20px;font-weight:900;letter-spacing:-0.5px}
+.opt-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.opt-premium{font-size:18px;font-weight:800;letter-spacing:-0.5px}
+.opt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.opt-stat{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px;font-weight:600}
+.opt-stat span{display:block;font-size:14px;font-weight:700;color:var(--text);margin-top:3px}
+.greeks-row{display:flex;gap:16px;padding-top:10px;border-top:1px solid var(--border2)}
+.greek{font-size:11px;color:var(--muted);font-weight:600}
+.greek span{color:var(--blue);font-weight:700}
+.opt-note{font-size:12px;color:var(--muted);margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);line-height:1.5}
+
+/* LIVE DOT */
+.live{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-weight:600}
+.live::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.4)}}
+
+/* QUANTUM MATRIX */
+.quantum-matrix{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;text-align:center}
+.q-title{font-size:11px;color:var(--blue);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+.q-nodes{position:relative;width:200px;height:200px;margin:0 auto 16px}
+.q-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:50%;background:rgba(0,200,248,0.1);border:2px solid var(--blue);display:flex;align-items:center;justify-content:center;flex-direction:column}
+.q-score{font-size:20px;font-weight:900;color:var(--blue)}
+.q-label{font-size:8px;color:var(--muted);font-weight:700;letter-spacing:0.5px}
+.q-node{position:absolute;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;text-align:center;border:1px solid}
+.q-line{position:absolute;top:50%;left:50%;transform-origin:0 50%;height:1px;opacity:0.3}
+.model-list{text-align:left}
+.model-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border2)}
+.model-row:last-child{border:none}
+.model-name{font-size:13px;font-weight:600}
+.model-bar-wrap{width:80px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.model-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--green))}
+.model-pct{font-size:12px;font-weight:700;color:var(--blue);min-width:36px;text-align:right}
+
+/* FILTER ROW */
+.filter-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:16px;-ms-overflow-style:none;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-btn{background:var(--card);border:1px solid var(--border2);color:var(--muted);padding:7px 14px;border-radius:20px;font-size:12px;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;font-weight:600;transition:all 0.2s}
+.filter-btn.active{background:rgba(0,200,248,0.1);border-color:var(--blue);color:var(--blue)}
+
+/* TAB ROW */
+.tab-row{display:flex;background:var(--card);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.tab{flex:1;padding:10px 4px;background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-weight:600;font-family:'Inter',sans-serif;transition:all 0.2s}
+.tab.active{background:rgba(0,200,248,0.1);color:var(--blue)}
+
+/* TOAST */
+.toast{display:none;position:fixed;top:66px;left:16px;right:16px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);border-radius:12px;padding:13px 16px;color:var(--green);font-size:13px;text-align:center;z-index:9999;font-weight:600;backdrop-filter:blur(20px)}
+
+/* WAITLIST */
+.waitlist{background:linear-gradient(135deg,rgba(0,200,248,0.06),rgba(245,200,66,0.04));border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px}
+.waitlist h2{font-size:18px;font-weight:800;margin-bottom:6px;letter-spacing:-0.3px}
+.waitlist p{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5}
+
+/* DISCLAIMER */
+.disclaimer{background:rgba(245,200,66,0.04);border:1px solid rgba(245,200,66,0.15);border-radius:12px;padding:12px 14px;font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+
+/* PRICING */
+.pricing-card{background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden}
+.pricing-card.featured{background:linear-gradient(135deg,rgba(245,200,66,0.06),rgba(0,200,248,0.04));border-color:rgba(245,200,66,0.3)}
+.pricing-name{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.pricing-price{font-size:44px;font-weight:900;letter-spacing:-2px;margin-bottom:4px;line-height:1}
+.pricing-period{font-size:13px;color:var(--muted);margin-bottom:20px}
+.pricing-feature{font-size:13px;color:var(--muted);padding:9px 0;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px;font-weight:500}
+.pricing-feature:last-of-type{border:none}
+.pricing-feature.on{color:var(--text)}
+.feat-icon{width:18px;text-align:center;flex-shrink:0}
+
+/* COMMUNITY */
+.community-card{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:16px;margin-bottom:12px}
+.comm-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.comm-name{font-size:15px;font-weight:800;letter-spacing:-0.3px}
+.comm-meta{font-size:11px;color:var(--muted);margin-top:2px;font-weight:500}
+
+/* POST */
+.post-card{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:16px;margin-bottom:12px}
+.post-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#000;flex-shrink:0}
+.post-name{font-size:14px;font-weight:700;letter-spacing:-0.2px}
+.post-time{font-size:11px;color:var(--muted)}
+.post-body{font-size:14px;color:var(--text);line-height:1.6;margin-bottom:14px}
+.post-action{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;padding:0;font-family:'Inter',sans-serif;font-weight:600;transition:color 0.2s}
+.post-action:hover{color:var(--blue)}
+
+/* EVENT */
+.event-card{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:16px;margin-bottom:12px;border-left:3px solid var(--blue)}
+.event-date{font-size:11px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.event-title{font-size:16px;font-weight:800;margin-bottom:6px;letter-spacing:-0.3px}
+.event-meta{font-size:12px;color:var(--muted);margin-bottom:12px;font-weight:500}
+
+/* JOB */
+.job-card{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:14px;margin-bottom:10px}
+.job-title{font-size:15px;font-weight:700;margin-bottom:3px;letter-spacing:-0.2px}
+.job-company{font-size:13px;color:var(--blue);margin-bottom:6px;font-weight:600}
+.job-meta{font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.job-salary{font-size:14px;font-weight:800;color:var(--green);letter-spacing:-0.3px}
+
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9998;padding:20px;padding-top:76px;overflow-y:auto;backdrop-filter:blur(8px)}
+.modal.active{display:block}
+.modal-content{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:16px;color:var(--blue);letter-spacing:-0.3px}
+
+/* RECEIPT */
+.receipt-zone{border:2px dashed var(--border);border-radius:14px;padding:28px;text-align:center;margin-bottom:12px;cursor:pointer;transition:all 0.2s;background:rgba(0,200,248,0.02)}
+.receipt-zone:hover{border-color:var(--blue);background:rgba(0,200,248,0.05)}
+.receipt-item{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+
+/* SCORE RING */
+.score-wrap{text-align:center;padding:20px 0}
+.score-ring{width:130px;height:130px;margin:0 auto 12px;position:relative}
+.score-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.score-num{font-size:30px;font-weight:900;letter-spacing:-1px}
+.score-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+
+/* CHAT */
+.chat-msg{padding:12px 14px;border-radius:14px;margin-bottom:10px;font-size:13px;line-height:1.6;max-width:92%}
+.chat-user{background:rgba(0,200,248,0.08);border:1px solid var(--border);margin-left:auto;text-align:right;border-radius:14px 14px 4px 14px}
+.chat-ai{background:rgba(245,200,66,0.05);border:1px solid rgba(245,200,66,0.12);border-radius:14px 14px 14px 4px}
+.chat-input-row{display:flex;gap:8px;margin-top:12px}
+.chat-input-row input{margin-bottom:0}
+.chat-send{background:linear-gradient(135deg,var(--blue),var(--blue2));border:none;border-radius:12px;padding:0 18px;color:#000;font-weight:800;cursor:pointer;font-size:16px;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<nav>
+  <div class="logo">⚛ EntangleWealth</div>
+  <div class="nav-badge">BETA</div>
+</nav>
+
+<!-- HOME -->
+<div id="pg-home" class="page active">
+  <div class="hero">
+    <h1>Institutional Intelligence<br><span>For Everyone.</span></h1>
+    <p>Real-time signals powered by 6 cross-verifying models. Stock alerts, options flow, tax tools, and gig income — all in one place.</p>
+    <div class="stats-grid">
+      <div class="stat"><div class="stat-n" style="color:var(--blue)">87%</div><div class="stat-l">Accuracy</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--green)" id="sc">1,247</div><div class="stat-l">Signals</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--gold)">4,891</div><div class="stat-l">Members</div></div>
+    </div>
+  </div>
+
+  <div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
+
+  <div class="pi">
+    <div class="waitlist">
+      <h2>🔥 30 Days Free</h2>
+      <p>No credit card. Full access. Cancel anytime. Join thousands building wealth smarter.</p>
+      <input type="email" id="emailIn" placeholder="Enter your email address">
+      <button class="btn btn-gold" onclick="joinWait()">Start Free Trial — No Card Needed →</button>
+      <div id="waitMsg" style="display:none;margin-top:10px;color:var(--green);font-size:13px;text-align:center;font-weight:600">✅ Welcome! Check your email for next steps.</div>
+    </div>
+
+    <div class="quantum-matrix">
+      <div class="q-title">⚛ Quantum Entanglement Matrix</div>
+      <canvas id="qCanvas" width="200" height="200" style="margin:0 auto 16px;display:block"></canvas>
+      <div class="model-list">
+        <div class="model-row"><span class="model-name">Price Action</span><div class="model-bar-wrap"><div class="model-bar" style="width:92%"></div></div><span class="model-pct">92%</span></div>
+        <div class="model-row"><span class="model-name">Volume Analysis</span><div class="model-bar-wrap"><div class="model-bar" style="width:88%"></div></div><span class="model-pct">88%</span></div>
+        <div class="model-row"><span class="model-name">Options Flow</span><div class="model-bar-wrap"><div class="model-bar" style="width:95%"></div></div><span class="model-pct">95%</span></div>
+        <div class="model-row"><span class="model-name">RSI + MACD</span><div class="model-bar-wrap"><div class="model-bar" style="width:84%"></div></div><span class="model-pct">84%</span></div>
+        <div class="model-row"><span class="model-name">Sentiment</span><div class="model-bar-wrap"><div class="model-bar" style="width:71%"></div></div><span class="model-pct">71%</span></div>
+        <div class="model-row"><span class="model-name">Risk Mgmt</span><div class="model-bar-wrap"><div class="model-bar" style="width:90%"></div></div><span class="model-pct">90%</span></div>
+      </div>
+    </div>
+
+    <div class="sec-title">Live Signals <span class="live">LIVE</span></div>
+    <div id="home-sigs"></div>
+  </div>
+</div>
+
+<!-- SIGNALS -->
+<div id="pg-signals" class="page">
+  <div class="pi">
+    <div class="sec-title">Stock Signals <span class="live">LIVE</span></div>
+    <div class="tab-row">
+      <button class="tab active" onclick="sigTab('all',this)">All</button>
+      <button class="tab" onclick="sigTab('buy',this)">Buy</button>
+      <button class="tab" onclick="sigTab('sell',this)">Sell</button>
+      <button class="tab" onclick="sigTab('watch',this)">Watch</button>
+    </div>
+    <div id="all-sigs"></div>
+    <div class="sec-title" style="margin-top:8px">Options Flow <span class="live">LIVE</span></div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="optFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="optFilter('call',this)">Calls 📈</button>
+      <button class="filter-btn" onclick="optFilter('put',this)">Puts 📉</button>
+      <button class="filter-btn" onclick="optFilter('unusual',this)">Unusual 🔥</button>
+    </div>
+    <div id="all-opts"></div>
+  </div>
+</div>
+
+<!-- TAX -->
+<div id="pg-tax" class="page">
+  <div class="pi">
+    <div class="disclaimer">⚖️ Educational information based on IRS publications. Not professional tax advice. Consult a licensed CPA.</div>
+    <div class="score-wrap">
+      <div class="score-ring">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle cx="65" cy="65" r="55" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+          <circle cx="65" cy="65" r="55" fill="none" stroke="url(#sg)" stroke-width="10" stroke-dasharray="346" stroke-dashoffset="86" stroke-linecap="round" transform="rotate(-90 65 65)"/>
+          <defs><linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#00c8f8"/><stop offset="100%" style="stop-color:#00e676"/></linearGradient></defs>
+        </svg>
+        <div class="score-center"><div class="score-num" style="color:var(--blue)">75</div><div class="score-lbl">Compliance</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:300px;margin:0 auto">
+        <div class="stat" style="background:rgba(0,230,118,0.05);border-color:rgba(0,230,118,0.2)"><div class="stat-n" style="color:var(--green)">$4,280</div><div class="stat-l">Found</div></div>
+        <div class="stat" style="background:rgba(245,200,66,0.05);border-color:rgba(245,200,66,0.2)"><div class="stat-n" style="color:var(--gold)">3</div><div class="stat-l">Missing</div></div>
+      </div>
+    </div>
+
+    <div class="tab-row">
+      <button class="tab active" onclick="taxTab('receipts',this)">Receipts</button>
+      <button class="tab" onclick="taxTab('travel',this)">Travel</button>
+      <button class="tab" onclick="taxTab('taxgpt',this)">TaxGPT</button>
+    </div>
+
+    <div id="tax-receipts">
+      <div class="receipt-zone" onclick="document.getElementById('ri').click()">
+        <div style="font-size:36px;margin-bottom:10px">📷</div>
+        <div style="font-size:15px;font-weight:700;margin-bottom:4px">Scan Receipt</div>
+        <div style="font-size:12px;color:var(--muted)">Tap to photograph or upload</div>
+        <input type="file" id="ri" accept="image/*" style="display:none" onchange="scanR(this)">
+      </div>
+      <select id="r-cat"><option value="">Select IRS Category</option><option value="meals">Meals (50% deductible)</option><option value="travel">Business Travel (100%)</option><option value="office">Office Supplies (100%)</option><option value="software">Software & Subscriptions (100%)</option><option value="vehicle">Vehicle & Mileage</option><option value="marketing">Marketing (100%)</option><option value="education">Education & Training (100%)</option></select>
+      <input id="r-vendor" placeholder="Vendor name">
+      <input id="r-amount" type="number" placeholder="Amount ($)">
+      <input id="r-purpose" placeholder="Business purpose (required by IRS)">
+      <button class="btn btn-blue" onclick="addReceipt()">Log Receipt</button>
+      <div id="receipt-list" style="margin-top:16px"></div>
+    </div>
+
+    <div id="tax-travel" style="display:none">
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;color:var(--blue);margin-bottom:12px">✈️ Business Travel Planner</div>
+        <input id="trip-dest" placeholder="Destination">
+        <input id="trip-purpose" placeholder="Primary business purpose">
+        <select id="trip-type"><option>Conference / Trade Show</option><option>Client Meeting</option><option>Training Event</option><option>Site Inspection</option></select>
+        <button class="btn btn-gold" onclick="buildTrip()">Build Deductible Itinerary</button>
+      </div>
+      <div id="trip-output" style="display:none">
+        <div class="card" style="background:rgba(0,230,118,0.04);border-color:rgba(0,230,118,0.2)">
+          <div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:12px">✅ Tax-Optimized Itinerary</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.8">
+            <div style="padding:8px 0;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between"><span>✈️ Transportation</span><span style="color:var(--green);font-weight:700">100% deductible</span></div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between"><span>🏨 Lodging (business days)</span><span style="color:var(--green);font-weight:700">100% deductible</span></div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between"><span>🍽️ Meals</span><span style="color:var(--gold);font-weight:700">50% deductible</span></div>
+            <div style="padding:8px 0;display:flex;justify-content:space-between"><span>🎪 Conference Fees</span><span style="color:var(--green);font-weight:700">100% deductible</span></div>
+          </div>
+          <button class="btn btn-blue" style="margin-top:12px" onclick="toast('📤 Exported for CPA review')">Export for CPA</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tax-taxgpt" style="display:none">
+      <div class="card">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Ask about any deduction, IRS rule, or audit risk</div>
+        <div id="chat-msgs" style="max-height:300px;overflow-y:auto">
+          <div class="chat-msg chat-ai">👋 I'm TaxGPT, trained on IRS Publications 463, 535, 587, 946 and thousands of audit cases. Ask me anything about business deductions, travel rules, or compliance.</div>
+        </div>
+        <div class="chat-input-row">
+          <input id="chat-in" placeholder="Ask about any deduction..." onkeypress="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" onclick="sendChat()">→</button>
+        </div>
+      </div>
+      <div class="card" style="padding:12px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-weight:600">COMMON QUESTIONS</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button class="btn btn-outline" style="text-align:left;font-size:12px;margin-top:0" onclick="askQ('Can I deduct meals when traveling for business?')">🍽️ Meal deduction rules?</button>
+          <button class="btn btn-outline" style="text-align:left;font-size:12px;margin-top:0" onclick="askQ('What are the home office deduction rules?')">🏠 Home office rules?</button>
+          <button class="btn btn-outline" style="text-align:left;font-size:12px;margin-top:0" onclick="askQ('What triggers an IRS audit for small businesses?')">⚠️ Audit triggers?</button>
+          <button class="btn btn-outline" style="text-align:left;font-size:12px;margin-top:0" onclick="askQ('How do I deduct a business conference trip?')">✈️ Conference deductions?</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMMUNITY -->
+<div id="pg-community" class="page">
+  <div class="pi">
+    <div class="tab-row">
+      <button class="tab active" onclick="commTab('communities',this)">Communities</button>
+      <button class="tab" onclick="commTab('feed',this)">Feed</button>
+      <button class="tab" onclick="commTab('events',this)">Events</button>
+      <button class="tab" onclick="commTab('jobs',this)">Jobs</button>
+    </div>
+    <div id="comm-communities"><div id="community-list"></div></div>
+    <div id="comm-feed" style="display:none">
+      <div class="card">
+        <textarea id="post-text" placeholder="Share with your community..." rows="3" style="margin-bottom:10px"></textarea>
+        <button class="btn btn-blue" onclick="createPost()">Post</button>
+      </div>
+      <div id="feed-list"></div>
+    </div>
+    <div id="comm-events" style="display:none"><div id="event-list"></div></div>
+    <div id="comm-jobs" style="display:none">
+      <input placeholder="🔍 Search jobs..." id="job-search" oninput="renderJobs()">
+      <div id="job-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div id="pg-pricing" class="page">
+  <div class="pi">
+    <div style="text-align:center;padding:24px 0 20px">
+      <div style="font-size:26px;font-weight:900;letter-spacing:-1px;margin-bottom:8px">Simple Pricing</div>
+      <div style="font-size:14px;color:var(--muted)">30 days free. No card. Cancel anytime.</div>
+      <div style="margin-top:12px;display:inline-block;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);border-radius:20px;padding:6px 16px;font-size:12px;font-weight:700;color:var(--green)">✅ FREE TRIAL — NO CREDIT CARD NEEDED</div>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-name">Starter</div>
+      <div class="pricing-price" style="color:var(--green)">$0</div>
+      <div class="pricing-period">Free forever</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>3 signals per day</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>Basic options flow</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>Community access</div>
+      <div class="pricing-feature"><span class="feat-icon">❌</span>TaxGPT</div>
+      <div class="pricing-feature"><span class="feat-icon">❌</span>Receipt scanner</div>
+      <div class="pricing-feature"><span class="feat-icon">❌</span>Full indicators</div>
+      <button class="btn btn-outline" onclick="toast('You are on the free plan')">Current Plan</button>
+    </div>
+
+    <div class="pricing-card featured">
+      <div style="position:absolute;top:16px;right:16px"><span class="badge badge-gold">POPULAR</span></div>
+      <div class="pricing-name" style="color:var(--gold)">Pro</div>
+      <div class="pricing-price" style="color:var(--gold)">$29<span style="font-size:20px;font-weight:600">/mo</span></div>
+      <div class="pricing-period">After 30-day free trial</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>Unlimited signals + full indicators</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>RSI, MACD, Bollinger, Aroon</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>Full options flow + Greeks</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>TaxGPT unlimited</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>Unlimited receipt scanning</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>Travel itinerary builder</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>Resume builder + job finder</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>Community + events</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>Compliance score dashboard</div>
+      <button class="btn btn-gold" onclick="startTrial()">Start Free 30-Day Trial →</button>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-name">Business</div>
+      <div class="pricing-price" style="color:var(--blue)">$79<span style="font-size:20px;font-weight:600">/mo</span></div>
+      <div class="pricing-period">For teams · After free trial</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>Everything in Pro</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>5 team members</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>White-label CPA reports</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>Event creation tools</div>
+      <div class="pricing-feature on"><span class="feat-icon">✅</span>Priority support</div>
+      <button class="btn btn-blue" onclick="startTrial()">Start Free 30-Day Trial →</button>
+    </div>
+
+    <div class="card" style="text-align:center;background:linear-gradient(135deg,rgba(0,200,248,0.04),rgba(245,200,66,0.03))">
+      <div style="font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px">💰 Referral Program</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px">Earn <strong style="color:var(--gold)">20% monthly</strong> for every person you refer. For life. Build your own income stream.</div>
+      <button class="btn btn-gold" onclick="toast('🔗 Referral link copied!')">Get Your Referral Link</button>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <button class="bnav active" id="bn-home" onclick="showPage('home')"><span class="ic">🏠</span>Home</button>
+  <button class="bnav" id="bn-signals" onclick="showPage('signals')"><span class="ic">📈</span>Signals</button>
+  <button class="bnav" id="bn-tax" onclick="showPage('tax')"><span class="ic">📊</span>Tax</button>
+  <button class="bnav" id="bn-community" onclick="showPage('community')"><span class="ic">👥</span>Community</button>
+  <button class="bnav" id="bn-pricing" onclick="showPage('pricing')"><span class="ic">💎</span>Pricing</button>
+</div>
+
+<script>
+// DATA
+const stocks=[
+  {sym:'NVDA',price:'875.40',chg:'+3.2%',sig:'buy',conf:92,vol:'48.2M',tgt:'$920',stop:'$850',time:'2m ago',reason:'Bull flag breakout confirmed. Volume 2.8x average. Institutional accumulation detected.',rsi:62,macd:'Bullish crossover',bb:'Above midline',aroon:'Up 88 / Down 12'},
+  {sym:'TSLA',price:'198.45',chg:'-1.8%',sig:'sell',conf:85,vol:'32.1M',tgt:'$180',stop:'$210',time:'5m ago',reason:'RSI bearish divergence on 4H. Lower highs while price tests resistance. $3.1M put sweep.',rsi:71,macd:'Bearish divergence',bb:'Upper band rejection',aroon:'Up 24 / Down 76'},
+  {sym:'AAPL',price:'175.84',chg:'+0.9%',sig:'watch',conf:65,vol:'22.4M',tgt:'$185',stop:'$170',time:'8m ago',reason:'Range compression near VWAP. Bollinger squeeze forming. Wait for breakout confirmation.',rsi:52,macd:'Neutral',bb:'Squeeze forming',aroon:'Up 48 / Down 52'},
+  {sym:'AMD',price:'162.75',chg:'+2.1%',sig:'buy',conf:88,vol:'28.9M',tgt:'$178',stop:'$155',time:'11m ago',reason:'Wyckoff spring at support. Institutional accumulation. RSI recovering from oversold.',rsi:44,macd:'Bullish crossover',bb:'Near lower band',aroon:'Up 80 / Down 20'},
+  {sym:'META',price:'512.30',chg:'+1.4%',sig:'buy',conf:81,vol:'18.3M',tgt:'$535',stop:'$500',time:'14m ago',reason:'VWAP reclaim with strong momentum. Options flow bullish. Above all major EMAs.',rsi:58,macd:'Bullish',bb:'Above midline',aroon:'Up 72 / Down 28'},
+  {sym:'SPY',price:'542.10',chg:'+0.4%',sig:'watch',conf:60,vol:'88.7M',tgt:'$550',stop:'$535',time:'18m ago',reason:'Approaching key resistance zone. Mixed breadth signals. Caution warranted here.',rsi:55,macd:'Neutral',bb:'Near upper band',aroon:'Up 56 / Down 44'},
+];
+
+const opts=[
+  {sym:'NVDA',type:'call',strike:'$900',exp:'May 17',prem:'$8.40',vol:'48,200',oi:'12,400',iv:'68%',delta:'0.42',gamma:'0.018',theta:'-0.85',vega:'0.92',unusual:true,note:'$4.2M sweep across 3 exchanges simultaneously. Institutional positioning ahead of earnings.'},
+  {sym:'TSLA',type:'put',strike:'$180',exp:'May 16',prem:'$5.20',vol:'62,100',oi:'28,700',iv:'82%',delta:'-0.38',gamma:'0.022',theta:'-1.12',vega:'1.14',unusual:true,note:'$3.1M block trade. Part of larger spread structure. Context suggests portfolio hedge.'},
+  {sym:'SPY',type:'call',strike:'$550',exp:'Apr 26',prem:'$3.80',vol:'124,400',oi:'88,200',iv:'18%',delta:'0.35',gamma:'0.012',theta:'-0.45',vega:'0.68',unusual:false,note:'Large institutional sweep across multiple exchanges. Broad market bullish positioning.'},
+  {sym:'AMD',type:'call',strike:'$175',exp:'May 23',prem:'$6.70',vol:'38,400',oi:'9,800',iv:'74%',delta:'0.45',gamma:'0.024',theta:'-1.08',vega:'1.02',unusual:true,note:'Pre-earnings positioning. Elevated IV. Steady delta accumulation detected.'},
+];
+
+const ticks=[
+  {sym:'NVDA',price:'875.40',chg:'+3.2%',up:true},{sym:'TSLA',price:'198.45',chg:'-1.8%',up:false},
+  {sym:'AAPL',price:'175.84',chg:'+0.9%',up:true},{sym:'SPY',price:'542.10',chg:'+0.4%',up:true},
+  {sym:'AMD',price:'162.75',chg:'+2.1%',up:true},{sym:'META',price:'512.30',chg:'+1.4%',up:true},
+  {sym:'MSFT',price:'415.70',chg:'-0.6%',up:false},{sym:'QQQ',price:'448.20',chg:'+0.7%',up:true},
+  {sym:'AMZN',price:'198.40',chg:'-0.3%',up:false},{sym:'GOOGL',price:'174.80',chg:'+1.1%',up:true},
+];
+
+let communities=[
+  {id:1,name:'Options Flow Traders',cat:'trading',icon:'📈',color:'#00c8f8',desc:'Institutional options flow, unusual activity, Greeks analysis.',members:2847,posts:14203,joined:true},
+  {id:2,name:'Small Business Tax Pros',cat:'tax',icon:'📊',color:'#00e676',desc:'IRS compliance, deductions, audit defense, CPA connections.',members:3102,posts:19847,joined:true},
+  {id:3,name:'Gig Economy Warriors',cat:'gig',icon:'🛠️',color:'#ff9900',desc:'Maximize gig income, find opportunities, share strategies.',members:5621,posts:31204,joined:false},
+  {id:4,name:'Day Traders Hub',cat:'trading',icon:'⚡',color:'#ff4466',desc:'Intraday setups, scalping, market open plays.',members:6204,posts:44102,joined:false},
+];
+
+let posts=[
+  {id:1,name:'Marcus J.',avatar:'MJ',color:'#00c8f8',comm:'Options Flow Traders',time:'2m ago',body:'Just caught a $4.2M sweep on NVDA 900C May 17 across 3 exchanges simultaneously. RSI at 62 with MACD bullish crossover. 5/6 models in consensus. This is institutional positioning.',likes:47,comments:23,liked:false},
+  {id:2,name:'Sarah K.',avatar:'SK',color:'#00e676',comm:'Small Business Tax Pros',time:'15m ago',body:'PSA: simplified home office deduction is $1,500/yr with zero documentation headache. IRC 280A. Most small business owners completely miss this. Free money on the table.',likes:89,comments:41,liked:false},
+];
+
+let events=[
+  {id:1,title:'Options Flow Masterclass',date:'Apr 15, 2026',loc:'Virtual — Zoom',type:'Training',price:'Free for Pro',attendees:847,virtual:true},
+  {id:2,title:'EntangleWealth Annual Trade Show',date:'May 22, 2026',loc:'Las Vegas Convention Center',type:'Trade Show',price:'$97 / Free Business',attendees:3204,virtual:false},
+  {id:3,title:'Small Business Tax Summit',date:'Apr 28, 2026',loc:'Virtual — Zoom',type:'Webinar',price:'Free',attendees:1203,virtual:true},
+];
+
+let jobs=[
+  {id:1,title:'Senior Options Trader',company:'Quantum Capital',loc:'Remote',type:'fulltime',salary:'$120K-$180K',posted:'Today'},
+  {id:2,title:'Tax Associate',company:'ClearPath CPA',loc:'Remote',type:'remote',salary:'$55K-$75K',posted:'Yesterday'},
+  {id:3,title:'Financial Content Writer',company:'EntangleWealth',loc:'Remote',type:'freelance',salary:'$45-$75/hr',posted:'2 days ago'},
+  {id:4,title:'Delivery Driver — Peak Hours',company:'Flex Delivery',loc:'Your City',type:'gig',salary:'$20-$35/hr',posted:'Today'},
+];
+
+let receipts=[];
+let receiptTotal=0;
+
+const taxAnswers={
+  meal:`Per IRS Publication 463, business meals are 50% deductible. Requirements: you or an employee must be present, meal must not be lavish, there must be a genuine business purpose. Document: who attended, business relationship, what was discussed, date, location, and amount. Client entertainment has not been deductible since the Tax Cuts and Jobs Act of 2017.`,
+  home:`IRS Publication 587: home office must be used regularly and exclusively for business as your principal place of business. Simplified method: $5 per sq ft, max 300 sq ft = $1,500 maximum. Regular method: calculate actual expenses proportionally. The exclusive use test is strictly enforced.`,
+  audit:`Common audit triggers per IRS data: excessive meals relative to income, consistent business losses (hobby loss rules IRC 183), 100% vehicle business use claims, large cash transactions, home office deductions, deductions significantly higher than industry peers. The IRS uses DIF scores to flag statistically unusual returns.`,
+  conference:`Conference attendance is deductible under IRC Section 162 as ordinary and necessary business expense. Registration: 100% deductible. Travel: 100% if primarily business. Hotel on business days: 100%. Meals: 50%. Personal activities: not deductible. Keep the conference program as documentation.`,
+};
+
+function getTaxResponse(q){
+  q=q.toLowerCase();
+  if(q.includes('meal')||q.includes('food')||q.includes('dinner')||q.includes('lunch')) return taxAnswers.meal;
+  if(q.includes('home')||q.includes('office')) return taxAnswers.home;
+  if(q.includes('audit')) return taxAnswers.audit;
+  if(q.includes('conference')||q.includes('travel')||q.includes('trip')) return taxAnswers.conference;
+  return`Based on IRS guidelines, this expense may qualify as "ordinary and necessary" under IRC Section 162. Key factors: is it common in your industry, is it helpful for your business, and do you have documentation? Keep records showing business purpose, amount, date, and who was involved. For your specific situation, please consult a licensed CPA or enrolled agent.`;
+}
+
+// QUANTUM CANVAS
+function drawQuantum(){
+  const c=document.getElementById('qCanvas');
+  if(!c) return;
+  const ctx=c.getContext('2d');
+  const cx=100,cy=100,r=70;
+  ctx.clearRect(0,0,200,200);
+  const nodes=[
+    {label:'RSI',angle:-90,pct:84,color:'#00c8f8'},
+    {label:'MACD',angle:-30,pct:88,color:'#00e676'},
+    {label:'Flow',angle:30,pct:95,color:'#f5c842'},
+    {label:'Price',angle:90,pct:92,color:'#00c8f8'},
+    {label:'Vol',angle:150,pct:88,color:'#00e676'},
+    {label:'Risk',angle:210,pct:90,color:'#f5c842'},
+  ];
+  const positions=nodes.map(n=>({
+    x:cx+r*Math.cos(n.angle*Math.PI/180),
+    y:cy+r*Math.sin(n.angle*Math.PI/180),
+    ...n
+  }));
+  // draw lines
+  positions.forEach(a=>{
+    positions.forEach(b=>{
+      if(a!==b){
+        ctx.beginPath();
+        ctx.moveTo(a.x,a.y);
+        ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle='rgba(0,200,248,0.08)';
+        ctx.lineWidth=1;
+        ctx.stroke();
+      }
+    });
+  });
+  // draw nodes
+  positions.forEach(n=>{
+    ctx.beginPath();
+    ctx.arc(n.x,n.y,16,0,Math.PI*2);
+    ctx.fillStyle=n.color+'22';
+    ctx.fill();
+    ctx.strokeStyle=n.color+'88';
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+    ctx.fillStyle=n.color;
+    ctx.font='bold 9px Inter,sans-serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(n.label,n.x,n.y);
+  });
+  // center
+  ctx.beginPath();
+  ctx.arc(cx,cy,28,0,Math.PI*2);
+  ctx.fillStyle='rgba(0,200,248,0.08)';
+  ctx.fill();
+  ctx.strokeStyle='rgba(0,200,248,0.6)';
+  ctx.lineWidth=2;
+  ctx.stroke();
+  ctx.fillStyle='#00c8f8';
+  ctx.font='bold 14px Inter,sans-serif';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText('87%',cx,cy-6);
+  ctx.font='bold 8px Inter,sans-serif';
+  ctx.fillStyle='rgba(0,200,248,0.6)';
+  ctx.fillText('CONSENSUS',cx,cy+8);
+}
+
+function buildTicker(){
+  const t=document.getElementById('ticker');
+  if(!t) return;
+  const d=[...ticks,...ticks];
+  t.innerHTML=d.map(i=>`<span class="tick"><span class="tick-sym">${i.sym}</span><span>${i.price}</span><span class="${i.up?'up':'down'}">${i.chg}</span></span>`).join('');
+}
+
+function sigCard(s,showIndicators=false){
+  const bc=s.sig==='buy'?'badge-green':s.sig==='sell'?'badge-red':'badge-gold';
+  const rsiColor=s.rsi<30?'var(--green)':s.rsi>70?'var(--red)':'var(--gold)';
+  const rsiLabel=s.rsi<30?'Oversold':s.rsi>70?'Overbought':'Neutral';
+  return`<div class="sig-card ${s.sig}" data-sig="${s.sig}">
+    <div class="sig-top">
+      <div><div class="sig-sym">${s.sym}</div><div class="sig-price">${s.price} · ${s.chg}</div></div>
+      <span class="badge ${bc}">${s.sig.toUpperCase()}</span>
+    </div>
+    <div class="sig-grid">
+      <div class="sig-stat">Target<span style="color:var(--green)">${s.tgt}</span></div>
+      <div class="sig-stat">Stop Loss<span style="color:var(--red)">${s.stop}</span></div>
+      <div class="sig-stat">Confidence<span style="color:var(--blue)">${s.conf}%</span></div>
+      <div class="sig-stat">Volume<span>${s.vol}</span></div>
+      <div class="sig-stat">Change<span>${s.chg}</span></div>
+      <div class="sig-stat">Updated<span>${s.time}</span></div>
+    </div>
+    <div class="conf-bar"><div class="conf-fill" style="width:${s.conf}%;background:linear-gradient(90deg,${s.sig==='buy'?'var(--blue),var(--green)':s.sig==='sell'?'var(--red),#ff8888':'var(--gold),#ffaa00'})"></div></div>
+    <div class="sig-reason">${s.reason}</div>
+    <div class="indicator-panel" style="margin-top:10px">
+      <div class="ind-row"><span class="ind-name">RSI (14)</span><span class="ind-val" style="color:${rsiColor}">${s.rsi}</span><span class="ind-signal ${s.rsi<30?'bull':s.rsi>70?'bear':'neut'}">${rsiLabel}</span></div>
+      <div class="ind-row"><span class="ind-name">MACD</span><span class="ind-val">${s.macd}</span><span class="ind-signal ${s.macd.includes('Bull')?'bull':s.macd.includes('Bear')?'bear':'neut'}">${s.macd.includes('Bull')?'BULL':s.macd.includes('Bear')?'BEAR':'NEUT'}</span></div>
+      <div class="ind-row"><span class="ind-name">Bollinger</span><span class="ind-val">${s.bb}</span><span class="ind-signal neut">INFO</span></div>
+      <div class="ind-row"><span class="ind-name">Aroon</span><span class="ind-val">${s.aroon}</span><span class="ind-signal ${s.sig==='buy'?'bull':s.sig==='sell'?'bear':'neut'}">${s.sig==='buy'?'BULL':s.sig==='sell'?'BEAR':'NEUT'}</span></div>
+    </div>
+  </div>`;
+}
+
+function optCard(o){
+  return`<div class="opt-card ${o.type}" data-type="${o.type}" data-unusual="${o.unusual}">
+    <div class="opt-top">
+      <div><div class="opt-sym">${o.sym}${o.unusual?' 🔥':''}</div><div class="opt-sub">${o.strike} strike · ${o.exp}</div></div>
+      <div style="text-align:right"><div class="opt-premium" style="color:${o.type==='call'?'var(--green)':'var(--red)'}">${o.prem}</div><span class="badge ${o.type==='call'?'badge-green':'badge-red'}">${o.type.toUpperCase()}</span></div>
+    </div>
+    <div class="opt-grid">
+      <div class="opt-stat">Volume<span style="color:var(--blue)">${o.vol}</span></div>
+      <div class="opt-stat">Open Interest<span>${o.oi}</span></div>
+      <div class="opt-stat">IV Rank<span style="color:var(--gold)">${o.iv}</span></div>
+      <div class="opt-stat">Premium<span>${o.prem}</span></div>
+    </div>
+    <div class="greeks-row">
+      <div class="greek">Δ Delta<span>${o.delta}</span></div>
+      <div class="greek">Γ Gamma<span>${o.gamma}</span></div>
+      <div class="greek">Θ Theta<span>${o.theta}</span></div>
+      <div class="greek">V Vega<span>${o.vega}</span></div>
+    </div>
+    <div class="opt-note">${o.note}</div>
+  </div>`;
+}
+
+function renderAll(){
+  buildTicker();
+  drawQuantum();
+  document.getElementById('home-sigs').innerHTML=stocks.slice(0,3).map(s=>sigCard(s)).join('');
+  document.getElementById('all-sigs').innerHTML=stocks.map(s=>sigCard(s,true)).join('');
+  document.getElementById('all-opts').innerHTML=opts.map(optCard).join('');
+  document.getElementById('community-list').innerHTML=communities.map(c=>`
+    <div class="community-card">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">
+        <div class="comm-icon" style="background:${c.color}18;border:1px solid ${c.color}33">${c.icon}</div>
+        <div style="flex:1"><div class="comm-name">${c.name}</div><div class="comm-meta">${c.members.toLocaleString()} members · ${c.posts.toLocaleString()} posts</div></div>
+        <button class="btn ${c.joined?'btn-outline':'btn-blue'} btn-sm" onclick="toggleJoin(${c.id})">${c.joined?'✓ Joined':'Join'}</button>
+      </div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.5">${c.desc}</div>
+    </div>`).join('');
+  document.getElementById('feed-list').innerHTML=posts.map(p=>`
+    <div class="post-card">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
+        <div class="post-avatar" style="background:${p.color}">${p.avatar}</div>
+        <div><div class="post-name">${p.name}</div><div class="post-time">${p.comm} · ${p.time}</div></div>
+      </div>
+      <div class="post-body">${p.body}</div>
+      <div style="display:flex;gap:20px;padding-top:10px;border-top:1px solid var(--border2)">
+        <button class="post-action" onclick="likePost(${p.id})">❤️ ${p.likes}</button>
+        <button class="post-action" onclick="toast('💬 Comments coming soon')">💬 ${p.comments}</button>
+        <button class="post-action" onclick="toast('🔗 Link copied!')">🔗 Share</button>
+      </div>
+    </div>`).join('');
+  document.getElementById('event-list').innerHTML=events.map(e=>`
+    <div class="event-card">
+      <div class="event-date">📅 ${e.date}</div>
+      <div class="event-title">${e.title}</div>
+      <div class="event-meta">📍 ${e.loc} · 🎯 ${e.type} · 👥 ${e.attendees.toLocaleString()} attending</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:13px;font-weight:700;color:var(--green)">${e.price}</span>
+        <span class="badge ${e.virtual?'badge-blue':'badge-gold'}">${e.virtual?'Virtual':'In Person'}</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-blue btn-sm" onclick="toast('✅ Registered!')">Register</button>
+        <button class="btn btn-outline btn-sm" onclick="toast('🔖 Saved!')">Save</button>
+      </div>
+    </div>`).join('');
+  renderJobs();
+}
+
+function renderJobs(){
+  const search=(document.getElementById('job-search')?.value||'').toLowerCase();
+  const filtered=search?jobs.filter(j=>j.title.toLowerCase().includes(search)||j.company.toLowerCase().includes(search)):jobs;
+  document.getElementById('job-list').innerHTML=filtered.map(j=>`
+    <div class="job-card">
+      <div class="job-title">${j.title}</div>
+      <div class="job-company">${j.company}</div>
+      <div class="job-meta">📍 ${j.loc} · 💼 ${j.type} · 🕐 ${j.posted}</div>
+      <div class="job-salary">${j.salary}</div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-blue btn-sm" onclick="toast('📨 Applied to ${j.title}!')">Quick Apply</button>
+        <button class="btn btn-outline btn-sm" onclick="toast('🔖 Saved!')">Save</button>
+      </div>
+    </div>`).join('');
+}
+
+function sigTab(type,btn){
+  document.querySelectorAll('.tab-row .tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.sig-card').forEach(c=>{
+    c.style.display=(type==='all'||c.dataset.sig===type)?'block':'none';
+  });
+}
+
+function optFilter(type,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.opt-card').forEach(c=>{
+    if(type==='all') c.style.display='block';
+    else if(type==='unusual') c.style.display=c.dataset.unusual==='true'?'block':'none';
+    else c.style.display=c.dataset.type===type?'block':'none';
+  });
+}
+
+function taxTab(tab,btn){
+  document.querySelectorAll('.tab-row .tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['receipts','travel','taxgpt'].forEach(t=>{
+    document.getElementById('tax-'+t).style.display=t===tab?'block':'none';
+  });
+}
+
+function commTab(tab,btn){
+  document.querySelectorAll('.tab-row .tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['communities','feed','events','jobs'].forEach(t=>{
+    document.getElementById('comm-'+t).style.display=t===tab?'block':'none';
+  });
+}
+
+function toggleJoin(id){
+  const c=communities.find(c=>c.id===id);
+  if(c){c.joined=!c.joined;c.members+=c.joined?1:-1;renderAll();toast(c.joined?`✅ Joined ${c.name}!`:`Left ${c.name}`);}
+}
+
+function likePost(id){
+  const p=posts.find(p=>p.id===id);
+  if(p){p.liked=!p.liked;p.likes+=p.liked?1:-1;renderAll();}
+}
+
+function createPost(){
+  const text=document.getElementById('post-text').value.trim();
+  if(!text){toast('⚠️ Write something first');return;}
+  posts.unshift({id:Date.now(),name:'You',avatar:'ME',color:'var(--gold)',comm:'Options Flow Traders',time:'Just now',body:text,likes:0,comments:0,liked:false});
+  document.getElementById('post-text').value='';
+  renderAll();
+  toast('✅ Posted!');
+}
+
+function addReceipt(){
+  const vendor=document.getElementById('r-vendor').value;
+  const amount=parseFloat(document.getElementById('r-amount').value);
+  const cat=document.getElementById('r-cat').value;
+  const purpose=document.getElementById('r-purpose').value;
+  if(!vendor||!amount||!cat){toast('⚠️ Fill in all fields');return;}
+  receiptTotal+=amount;
+  const pct={'meals':'50%','travel':'100%','office':'100%','software':'100%','vehicle':'varies','marketing':'100%','education':'100%'}[cat]||'100%';
+  const list=document.getElementById('receipt-list');
+  const item=document.createElement('div');
+  item.className='receipt-item';
+  item.innerHTML=`<div><div style="font-size:14px;font-weight:700">${vendor}</div><div style="font-size:11px;color:var(--muted)">${cat} · ${pct} deductible</div>${purpose?`<div style="font-size:11px;color:var(--muted)">${purpose}</div>`:''}</div><div style="text-align:right"><div style="font-size:15px;font-weight:800;color:var(--green)">$${amount.toFixed(2)}</div><span class="badge badge-green">LOGGED</span></div>`;
+  list.prepend(item);
+  document.getElementById('r-vendor').value='';
+  document.getElementById('r-amount').value='';
+  document.getElementById('r-purpose').value='';
+  toast('✅ Receipt logged');
+}
+
+function scanR(input){
+  if(input.files&&input.files[0]){
+    toast('🔍 Scanning receipt...');
+    setTimeout(()=>toast('✅ Receipt categorized as Business Travel · 100% deductible'),2000);
+  }
+}
+
+function buildTrip(){
+  const dest=document.getElementById('trip-dest').value;
+  if(!dest){toast('⚠️ Enter a destination');return;}
+  document.getElementById('trip-output').style.display='block';
+  toast('✅ Itinerary built');
+}
+
+function sendChat(){
+  const input=document.getElementById('chat-in');
+  const q=input.value.trim();
+  if(!q) return;
+  const msgs=document.getElementById('chat-msgs');
+  msgs.innerHTML+=`<div class="chat-msg chat-user">${q}</div>`;
+  input.value='';
+  setTimeout(()=>{
+    msgs.innerHTML+=`<div class="chat-msg chat-ai"><strong>📚 IRS Reference:</strong><br><br>${getTaxResponse(q)}</div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+  },600);
+}
+
+function askQ(q){
+  showPage('tax');
+  setTimeout(()=>{
+    taxTab('taxgpt',document.querySelectorAll('#pg-tax .tab')[2]);
+    document.getElementById('chat-in').value=q;
+    sendChat();
+  },200);
+}
+
+function joinWait(){
+  const e=document.getElementById('emailIn');
+  if(!e.value||!e.value.includes('@')){e.style.borderColor='var(--red)';return;}
+  document.getElementById('waitMsg').style.display='block';
+  e.style.display='none';
+  e.nextElementSibling.style.display='none';
+  toast('🎉 Welcome to EntangleWealth!');
+}
+
+function startTrial(){toast('🎉 30-day free trial started! Full access. No card needed.');}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bnav').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  document.getElementById('bn-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+
+setInterval(()=>{
+  const s=document.getElementById('sc');
+  if(s&&Math.random()>0.7) s.textContent=(parseInt(s.textContent.replace(',',''))+1).toLocaleString();
+},12000);
+
+renderAll();
+</script>
+</body>
+</html>

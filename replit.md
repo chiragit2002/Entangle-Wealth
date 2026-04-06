@@ -98,6 +98,12 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - MirofishTerminal with live order flow, news feed, system log panels
 - Commands: HELP, QUOTE, ANALYZE (AI), SEARCH (API), RISK, STATUS, SIGNALS, PORTFOLIO, CLEAR
 
+#### System Prompt (`src/lib/system-prompt.md`)
+- Comprehensive AI assistant identity document with 70 professions across 11 thematic clusters
+- Quantum entanglement metaphor as cross-disciplinary knowledge framework
+- Behavioral instructions, feature-specific guidance, and operational directives
+- Clusters: Financial Core, Technology & Engineering, Data & Intelligence, Security & Risk, Legal/Compliance, Design & Experience, Communication & Content, Career & Human Capital, Psychology & Decision Science, Operations & Product, Domain Specializations
+
 #### Design System
 - Fonts: JetBrains Mono (data), Inter (UI)
 - CSS utilities: `.electric-text` (blue gradient), `.gold-text` (gold gradient), `.glass-panel`

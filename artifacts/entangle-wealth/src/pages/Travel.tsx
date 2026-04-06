@@ -143,6 +143,7 @@ function escapeCSV(str: string): string {
     s = "'" + s;
   }
   return `"${s.replace(/"/g, '""')}"`;
+
 }
 
 function getDayCount(start: string, end: string): number {

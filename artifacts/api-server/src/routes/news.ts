@@ -198,9 +198,14 @@ function cleanText(raw: string): string {
   return text;
 }
 
+const ALLOWED_PROTOCOLS = new Set(["http:", "https:"]);
+
 async function fetchArticleBody(url: string): Promise<string> {
   if (!url) return "";
   try {
+    const parsed = new URL(url);
+    if (!ALLOWED_PROTOCOLS.has(parsed.protocol)) return "";
+    if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1" || parsed.hostname.startsWith("10.") || parsed.hostname.startsWith("192.168.")) return "";
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
     const res = await fetch(url, {

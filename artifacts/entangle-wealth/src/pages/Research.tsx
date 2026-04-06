@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, Fragment } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "wouter";
 import { Layout } from "@/components/layout/Layout";
 import { fetchNews, type NewsItem } from "@/lib/api";

@@ -1,10 +1,33 @@
-import { Router } from "express";
+import { Router, type Request, type Response, type NextFunction } from "express";
 import { logger } from "../lib/logger";
+import { requireAuth } from "@clerk/express";
 
 const router = Router();
 
 const ALPACA_DATA_URL = "https://data.alpaca.markets";
 const ALPACA_PAPER_URL = "https://paper-api.alpaca.markets";
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 60;
+const RATE_WINDOW = 60_000;
+
+function alpacaRateLimit(req: Request, res: Response, next: NextFunction) {
+  const ip = req.ip || req.socket.remoteAddress || "unknown";
+  const now = Date.now();
+  let entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    entry = { count: 0, resetAt: now + RATE_WINDOW };
+    rateLimitMap.set(ip, entry);
+  }
+  entry.count++;
+  if (entry.count > RATE_LIMIT) {
+    res.status(429).json({ error: "Rate limit exceeded. Try again later." });
+    return;
+  }
+  next();
+}
+
+router.use("/alpaca", alpacaRateLimit);
 
 function alpacaHeaders() {
   return {
@@ -32,7 +55,8 @@ router.get("/alpaca/snapshot/:symbol", async (req, res) => {
     );
     res.json(data);
   } catch (err: any) {
-    res.status(502).json({ error: err.message || "Failed to fetch snapshot" });
+    logger.error({ err }, "Alpaca snapshot fetch failed");
+    res.status(502).json({ error: "Failed to fetch snapshot" });
   }
 });
 
@@ -48,7 +72,8 @@ router.get("/alpaca/snapshots", async (req, res) => {
     );
     res.json(data);
   } catch (err: any) {
-    res.status(502).json({ error: err.message || "Failed to fetch snapshots" });
+    logger.error({ err }, "Alpaca snapshots fetch failed");
+    res.status(502).json({ error: "Failed to fetch snapshots" });
   }
 });
 
@@ -67,7 +92,8 @@ router.get("/alpaca/bars/:symbol", async (req, res) => {
     const data = await alpacaFetch(url);
     res.json(data);
   } catch (err: any) {
-    res.status(502).json({ error: err.message || "Failed to fetch bars" });
+    logger.error({ err }, "Alpaca bars fetch failed");
+    res.status(502).json({ error: "Failed to fetch bars" });
   }
 });
 
@@ -79,7 +105,8 @@ router.get("/alpaca/quote/:symbol", async (req, res) => {
     );
     res.json(data);
   } catch (err: any) {
-    res.status(502).json({ error: err.message || "Failed to fetch quote" });
+    logger.error({ err }, "Alpaca quote fetch failed");
+    res.status(502).json({ error: "Failed to fetch quote" });
   }
 });
 
@@ -91,7 +118,8 @@ router.get("/alpaca/trades/:symbol", async (req, res) => {
     );
     res.json(data);
   } catch (err: any) {
-    res.status(502).json({ error: err.message || "Failed to fetch trade" });
+    logger.error({ err }, "Alpaca trade fetch failed");
+    res.status(502).json({ error: "Failed to fetch trade" });
   }
 });
 
@@ -108,24 +136,24 @@ router.get("/alpaca/multibars", async (req, res) => {
     const data = await alpacaFetch(url);
     res.json(data);
   } catch (err: any) {
-    res.status(502).json({ error: err.message || "Failed to fetch multi bars" });
+    logger.error({ err }, "Alpaca multi bars fetch failed");
+    res.status(502).json({ error: "Failed to fetch multi bars" });
   }
 });
 
-router.get("/alpaca/account", async (req, res) => {
+router.get("/alpaca/account", requireAuth(), async (req, res) => {
   try {
     const data = await alpacaFetch(`${ALPACA_PAPER_URL}/v2/account`);
     res.json({
-      id: data.id,
       status: data.status,
       buying_power: data.buying_power,
-      cash: data.cash,
       portfolio_value: data.portfolio_value,
       equity: data.equity,
       currency: data.currency,
     });
   } catch (err: any) {
-    res.status(502).json({ error: err.message || "Failed to fetch account" });
+    logger.error({ err }, "Alpaca account fetch failed");
+    res.status(502).json({ error: "Failed to fetch account" });
   }
 });
 
@@ -156,7 +184,8 @@ router.get("/alpaca/movers", async (req, res) => {
       all: entries,
     });
   } catch (err: any) {
-    res.status(502).json({ error: err.message || "Failed to fetch movers" });
+    logger.error({ err }, "Alpaca movers fetch failed");
+    res.status(502).json({ error: "Failed to fetch movers" });
   }
 });
 

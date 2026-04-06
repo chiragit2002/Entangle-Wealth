@@ -30,6 +30,12 @@ export function Footer() {
             <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">Our Mission</Link>
             <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">Contact</Link>
           </div>
+          <div className="flex flex-col gap-3">
+            <span className="font-semibold text-white">Legal</span>
+            <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms of Use</Link>
+            <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">Risk Disclosure</Link>
+          </div>
         </div>
       </div>
       
@@ -37,9 +43,15 @@ export function Footer() {
         <p className="text-xs text-muted-foreground/70 leading-relaxed text-justify">
           Disclaimer: EntangleWealth is not a registered investment advisor or broker-dealer. The information provided on this platform is for educational and informational purposes only and should not be construed as financial advice, investment recommendations, or an offer to buy or sell any securities. Trading stocks and options involves significant risk and is not suitable for every investor. You could lose some or all of your initial investment. Past performance is not indicative of future results. Always consult with a qualified financial professional before making any investment decisions.
         </p>
-        <p className="text-xs text-muted-foreground/70 text-center md:text-left">
-          &copy; {new Date().getFullYear()} EntangleWealth LLC. All rights reserved.
-        </p>
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-2">
+          <p className="text-xs text-muted-foreground/70">
+            &copy; {new Date().getFullYear()} EntangleWealth LLC. All rights reserved.
+          </p>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground/50">
+            <Link href="/terms" className="hover:text-primary transition-colors">Terms of Use</Link>
+            <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+          </div>
+        </div>
       </div>
     </footer>
   );

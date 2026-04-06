@@ -95,14 +95,25 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **Security**: CSV exports use formula-injection-safe `escapeCSV()` (prefixes `=+\-@\t\r` with `'`), all inputs have `maxLength`, server-side rate limiting on TaxGPT API (10 req/min per IP), all buttons 44px min-height for mobile touch targets, dark select option styling
 
 #### Technical Analysis (/technical)
+- Professional TradingView-inspired layout with 3-panel design: watchlist sidebar, main analysis, agent/indicator views
 - 55+ technical indicators across 5 categories: Trend (SMA, EMA, WMA, DEMA, TEMA, HMA, KAMA, VWAP, Ichimoku, Parabolic SAR, Supertrend, ADX, Aroon, TRIX, DPO, Mass Index, Vortex), Momentum (RSI, MACD, Stochastic, Williams %R, CCI, ROC, MFI, CMO, UO, TSI, PPO, AO, Coppock, KST, Stoch RSI), Volatility (Bollinger, ATR, Keltner, Donchian, StdDev, HV, Chaikin Vol, Ulcer), Volume (OBV, A/D Line, CMF, Force Index, EMV, Vol RSI, Pivot Points, Fibonacci)
 - Indicator library: `src/lib/indicators.ts` with `runAllIndicators(data)`, `getOverallSignal(results)`, `generateMockOHLCV(basePrice)`
+- **Full stock search**: 130+ stocks (including RKLB/Rocket Lab, SOFI, RIVN, COIN, etc.) searchable by ticker or company name with sector labels; any typed ticker accepted
+- **Persistent watchlist**: localStorage-backed (`entangle-watchlist`), add/remove stocks, AI auto-analyzes with signal + confidence, refresh all watchlist signals
+- **Toggle views**: AI Agents view (6 agent cards) or Indicators view (sortable table with signal badges)
 - 6 AI agent reviews: Trend Analyst, Momentum Surgeon, Risk Manager, Volume Profiler, Devil's Advocate, Consensus Engine
-- Each agent provides verdict, signal, reasoning, and key metrics
-- Category filter tabs (All/Trend/Momentum/Volatility/Volume)
-- Overall signal summary with buy/sell/neutral counts and confidence percentage
-- Export all indicators to CSV
-- Stock search with autocomplete for 20 popular NASDAQ tickers
+- Category filter tabs (All/Trend/Momentum/Volatility/Volume) with buy/sell counts
+- Overall signal summary with confidence percentage
+- Export all indicators to CSV (formula-injection safe)
+- Race condition protection: `useRef` guards prevent stale analysis results from rapid searches
+
+#### Dashboard (/dashboard) — Command Center
+- **Full stock search**: 60+ stocks searchable by ticker or company name with dropdown autocomplete
+- **Quick Analysis**: clicking a stock from search runs 55+ indicators and shows signal/confidence inline with "Full Analysis" link to /technical
+- Stock Signals, Options Flow, Unusual Activity + Greeks sections
+- Portfolio chart (1D/1W/1M/3M), Options Income chart, Fear/Greed, Sector Heatmap, Risk Radar
+- WatchlistPanel + Live Analysis Feed + Signal History
+- Race condition protection on quick analysis
 
 #### Notification Center
 - Bell icon in navbar (desktop and mobile) with unread count badge

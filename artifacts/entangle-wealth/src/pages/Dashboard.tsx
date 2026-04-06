@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { FlashCouncil } from "@/components/FlashCouncil";
 import { MarketTicker } from "@/components/MarketTicker";
@@ -11,12 +11,56 @@ import { RiskRadar } from "@/components/RiskRadar";
 import { stockAlerts, optionsAlerts, unusualOptionsActivity, portfolioChartData, optionsIncomeData, agentLogMessages } from "@/lib/mock-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpRight, ArrowDownRight, Activity, AlertTriangle, Zap, Minus, TrendingUp, Shield, Eye, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, RefreshCw, Search } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Activity, AlertTriangle, Zap, Minus, TrendingUp, Shield, Eye, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, RefreshCw, Search, BarChart3, X } from "lucide-react";
+import { generateMockOHLCV, runAllIndicators, getOverallSignal } from "@/lib/indicators";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Area, AreaChart, Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from "recharts";
+
+const DASHBOARD_STOCKS: { symbol: string; name: string }[] = [
+  { symbol: "AAPL", name: "Apple Inc." }, { symbol: "MSFT", name: "Microsoft Corporation" },
+  { symbol: "GOOGL", name: "Alphabet Inc." }, { symbol: "AMZN", name: "Amazon.com Inc." },
+  { symbol: "NVDA", name: "NVIDIA Corporation" }, { symbol: "META", name: "Meta Platforms" },
+  { symbol: "TSLA", name: "Tesla Inc." }, { symbol: "AMD", name: "Advanced Micro Devices" },
+  { symbol: "NFLX", name: "Netflix Inc." }, { symbol: "CRM", name: "Salesforce Inc." },
+  { symbol: "RKLB", name: "Rocket Lab USA" }, { symbol: "PLTR", name: "Palantir Technologies" },
+  { symbol: "SOFI", name: "SoFi Technologies" }, { symbol: "RIVN", name: "Rivian Automotive" },
+  { symbol: "LCID", name: "Lucid Group" }, { symbol: "NIO", name: "NIO Inc." },
+  { symbol: "COIN", name: "Coinbase Global" }, { symbol: "SNOW", name: "Snowflake Inc." },
+  { symbol: "SQ", name: "Block Inc." }, { symbol: "SHOP", name: "Shopify Inc." },
+  { symbol: "ROKU", name: "Roku Inc." }, { symbol: "DKNG", name: "DraftKings" },
+  { symbol: "HOOD", name: "Robinhood Markets" }, { symbol: "UBER", name: "Uber Technologies" },
+  { symbol: "ABNB", name: "Airbnb Inc." }, { symbol: "SPOT", name: "Spotify Technology" },
+  { symbol: "JPM", name: "JPMorgan Chase" }, { symbol: "V", name: "Visa Inc." },
+  { symbol: "UNH", name: "UnitedHealth Group" }, { symbol: "JNJ", name: "Johnson & Johnson" },
+  { symbol: "PG", name: "Procter & Gamble" }, { symbol: "DIS", name: "Walt Disney" },
+  { symbol: "COST", name: "Costco Wholesale" }, { symbol: "INTC", name: "Intel Corporation" },
+  { symbol: "PYPL", name: "PayPal Holdings" }, { symbol: "BA", name: "Boeing Co." },
+  { symbol: "AVGO", name: "Broadcom Inc." }, { symbol: "ORCL", name: "Oracle Corporation" },
+  { symbol: "ADBE", name: "Adobe Inc." }, { symbol: "QCOM", name: "QUALCOMM Inc." },
+  { symbol: "MU", name: "Micron Technology" }, { symbol: "PANW", name: "Palo Alto Networks" },
+  { symbol: "CRWD", name: "CrowdStrike Holdings" }, { symbol: "NET", name: "Cloudflare Inc." },
+  { symbol: "SMCI", name: "Super Micro Computer" }, { symbol: "ARM", name: "Arm Holdings" },
+  { symbol: "MARA", name: "Marathon Digital" }, { symbol: "RIOT", name: "Riot Platforms" },
+  { symbol: "GME", name: "GameStop Corp." }, { symbol: "AMC", name: "AMC Entertainment" },
+  { symbol: "IONQ", name: "IonQ Inc." }, { symbol: "AI", name: "C3.ai Inc." },
+  { symbol: "SPCE", name: "Virgin Galactic" }, { symbol: "LUNR", name: "Intuitive Machines" },
+  { symbol: "LLY", name: "Eli Lilly" }, { symbol: "MRNA", name: "Moderna Inc." },
+  { symbol: "XOM", name: "Exxon Mobil" }, { symbol: "CVX", name: "Chevron Corporation" },
+  { symbol: "GS", name: "Goldman Sachs" }, { symbol: "BAC", name: "Bank of America" },
+  { symbol: "WMT", name: "Walmart Inc." }, { symbol: "MCD", name: "McDonald's Corp." },
+];
+
+interface QuickAnalysis {
+  symbol: string;
+  name: string;
+  signal: string;
+  confidence: number;
+  buyCount: number;
+  sellCount: number;
+}
 
 const timeRanges = ["1D", "1W", "1M", "3M"] as const;
 
@@ -44,6 +88,11 @@ export default function Dashboard() {
   const [savedStocks, setSavedStocks] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [quickAnalysis, setQuickAnalysis] = useState<QuickAnalysis | null>(null);
+  const [analyzingSymbol, setAnalyzingSymbol] = useState("");
+  const qaIdRef = useRef(0);
+  const qaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -77,6 +126,32 @@ export default function Dashboard() {
     if (!searchQuery) return optionsAlerts;
     return optionsAlerts.filter(a => a.symbol.toLowerCase().includes(searchQuery.toLowerCase()));
   }, [searchQuery]);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    return DASHBOARD_STOCKS.filter(s => s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)).slice(0, 8);
+  }, [searchQuery]);
+
+  useEffect(() => { return () => { if (qaTimerRef.current) clearTimeout(qaTimerRef.current); }; }, []);
+
+  const runQuickAnalysis = (sym: string) => {
+    const info = DASHBOARD_STOCKS.find(s => s.symbol === sym);
+    if (qaTimerRef.current) clearTimeout(qaTimerRef.current);
+    const id = ++qaIdRef.current;
+    setAnalyzingSymbol(sym);
+    setShowSearchDropdown(false);
+    qaTimerRef.current = setTimeout(() => {
+      if (qaIdRef.current !== id) return;
+      const bp = 50 + Math.abs([...sym].reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0) % 900) + Math.random() * 5;
+      const data = generateMockOHLCV(bp, 60);
+      const results = runAllIndicators(data);
+      const sig = getOverallSignal(results);
+      setQuickAnalysis({ symbol: sym, name: info?.name || sym, signal: sig.signal, confidence: sig.confidence, buyCount: sig.buyCount, sellCount: sig.sellCount });
+      setAnalyzingSymbol("");
+      toast({ title: `${sym} Analysis Complete`, description: `${sig.signal.replace("_", " ")} — ${sig.confidence}% confidence` });
+    }, 700);
+  };
 
   const currentChartData = chartDataByRange[chartRange];
   const pctChange = ((currentChartData[currentChartData.length - 1].value - currentChartData[0].value) / currentChartData[0].value * 100).toFixed(1);
@@ -116,14 +191,35 @@ export default function Dashboard() {
             <p className="text-muted-foreground mt-1">Analysis running across 6 models. Demo data shown below.</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="relative w-48">
+            <div className="relative w-56 md:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search tickers..."
+                placeholder="Search any ticker or name..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 h-9 bg-white/5 border-white/10 text-sm"
+                onChange={(e) => { setSearchQuery(e.target.value); setShowSearchDropdown(true); }}
+                onFocus={() => setShowSearchDropdown(true)}
+                onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
+                onKeyDown={(e) => { if (e.key === "Enter" && searchQuery.trim()) { e.preventDefault(); runQuickAnalysis(searchQuery.toUpperCase().trim()); } }}
+                className="pl-9 h-9 bg-white/5 border-white/10 text-sm font-mono"
               />
+              {showSearchDropdown && searchResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-[#0c0c1a] border border-white/10 rounded-xl z-50 max-h-[350px] overflow-y-auto shadow-2xl shadow-black/80">
+                  {searchResults.map(s => (
+                    <button key={s.symbol} onClick={() => { setSearchQuery(s.symbol); runQuickAnalysis(s.symbol); }}
+                      className="w-full text-left px-3 py-2.5 flex items-center gap-3 hover:bg-primary/[0.06] transition-colors border-b border-white/[0.03] last:border-0 min-h-[44px]">
+                      <div className="w-7 h-7 rounded-md bg-white/[0.04] flex items-center justify-center text-[10px] font-bold text-primary/50 font-mono flex-shrink-0">{s.symbol.slice(0, 2)}</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12px] font-bold font-mono truncate">{s.symbol}</p>
+                        <p className="text-[9px] text-white/25 truncate">{s.name}</p>
+                      </div>
+                      <BarChart3 className="w-3 h-3 text-white/10" />
+                    </button>
+                  ))}
+                  <a href="/technical" className="block w-full text-center px-3 py-2 text-[10px] text-primary/50 hover:text-primary transition-colors border-t border-white/[0.06]">
+                    Full Technical Analysis →
+                  </a>
+                </div>
+              )}
             </div>
             <Button
               variant="outline"
@@ -177,6 +273,51 @@ export default function Dashboard() {
             <span className="text-[10px] text-muted-foreground">Last 10 signals (demo)</span>
           </div>
         </div>
+
+        {(quickAnalysis || analyzingSymbol) && (
+          <div className="glass-panel rounded-2xl p-5 mb-8 border border-primary/10">
+            {analyzingSymbol ? (
+              <div className="flex items-center gap-3">
+                <RefreshCw className="w-5 h-5 text-primary animate-spin" />
+                <div>
+                  <p className="text-sm font-bold">Analyzing {analyzingSymbol}...</p>
+                  <p className="text-[11px] text-muted-foreground">Running 55+ technical indicators</p>
+                </div>
+              </div>
+            ) : quickAnalysis && (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${quickAnalysis.signal === "BUY" || quickAnalysis.signal === "STRONG_BUY" ? "bg-primary/10 border border-primary/20" : quickAnalysis.signal === "SELL" || quickAnalysis.signal === "STRONG_SELL" ? "bg-destructive/10 border border-destructive/20" : "bg-secondary/10 border border-secondary/20"}`}>
+                    <div className="text-center">
+                      <p className={`text-lg font-black font-mono ${quickAnalysis.signal === "BUY" || quickAnalysis.signal === "STRONG_BUY" ? "text-primary" : quickAnalysis.signal === "SELL" || quickAnalysis.signal === "STRONG_SELL" ? "text-destructive" : "text-secondary"}`}>{quickAnalysis.confidence}%</p>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-lg font-black font-mono">{quickAnalysis.symbol}</span>
+                      <span className="text-[11px] text-white/30">{quickAnalysis.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold ${quickAnalysis.signal === "BUY" || quickAnalysis.signal === "STRONG_BUY" ? "bg-primary/10 text-primary" : quickAnalysis.signal === "SELL" || quickAnalysis.signal === "STRONG_SELL" ? "bg-destructive/10 text-destructive" : "bg-secondary/10 text-secondary"}`}>
+                        {quickAnalysis.signal.replace("_", " ")}
+                      </span>
+                      <span className="text-[10px] text-[#00ff88] font-mono">{quickAnalysis.buyCount} Buy</span>
+                      <span className="text-[10px] text-[#ff3366] font-mono">{quickAnalysis.sellCount} Sell</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <a href="/technical" className="px-4 py-2 rounded-lg bg-primary/10 text-primary text-[11px] font-bold hover:bg-primary/20 transition-colors flex items-center gap-1.5">
+                    <BarChart3 className="w-3.5 h-3.5" /> Full Analysis
+                  </a>
+                  <button onClick={() => setQuickAnalysis(null)} className="px-3 py-2 rounded-lg bg-white/5 text-white/30 text-[11px] hover:bg-white/10 transition-colors">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div className="glass-panel rounded-2xl p-5">

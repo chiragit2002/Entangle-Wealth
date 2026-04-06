@@ -9,6 +9,7 @@ import kycRouter from "./kyc";
 import stripeRouter from "./stripe";
 import gigsRouter from "./gigs";
 import taxgptRouter from "./taxgpt";
+import alpacaRouter from "./alpaca";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(kycRouter);
 router.use(stripeRouter);
 router.use(gigsRouter);
 router.use(taxgptRouter);
+router.use(alpacaRouter);
 
 export default router;

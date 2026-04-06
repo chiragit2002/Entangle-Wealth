@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { generateMockOHLCV, runAllIndicators, getOverallSignal } from "@/lib/indicators";
+import { fetchSnapshots, fetchBars, barsToStockData, type AlpacaSnapshot } from "@/lib/alpaca";
 
 interface ScreenerStock {
   symbol: string;
@@ -85,9 +86,42 @@ export default function Screener() {
   const [showFilters, setShowFilters] = useState(true);
   const [analyzedStocks, setAnalyzedStocks] = useState<Map<string, { signal: string; confidence: number }>>(new Map());
   const [analyzing, setAnalyzing] = useState<Set<string>>(new Set());
+  const [liveStocks, setLiveStocks] = useState<ScreenerStock[]>(SCREENER_STOCKS);
+  const [isLive, setIsLive] = useState(false);
   const [watchlist, setWatchlist] = useState<Set<string>>(() => {
     try { const w = localStorage.getItem("entangle-watchlist"); return new Set(w ? JSON.parse(w).map((s: { symbol: string }) => s.symbol) : []); } catch { return new Set(); }
   });
+
+  useEffect(() => {
+    const symbols = SCREENER_STOCKS.map(s => s.symbol);
+    const batchSize = 30;
+    const batches: string[][] = [];
+    for (let i = 0; i < symbols.length; i += batchSize) {
+      batches.push(symbols.slice(i, i + batchSize));
+    }
+    Promise.all(batches.map(batch => fetchSnapshots(batch).catch(() => ({} as Record<string, AlpacaSnapshot>))))
+      .then(results => {
+        const merged: Record<string, AlpacaSnapshot> = {};
+        results.forEach(r => Object.assign(merged, r));
+        setLiveStocks(SCREENER_STOCKS.map(stock => {
+          const snap = merged[stock.symbol];
+          if (!snap?.dailyBar) return stock;
+          const price = snap.dailyBar.c;
+          const change = ((snap.dailyBar.c - snap.dailyBar.o) / snap.dailyBar.o) * 100;
+          const high = snap.dailyBar.h;
+          const low = snap.dailyBar.l;
+          return {
+            ...stock,
+            price: +price.toFixed(2),
+            change: +change.toFixed(2),
+            week52High: Math.max(stock.week52High, high),
+            week52Low: Math.min(stock.week52Low, low),
+          };
+        }));
+        setIsLive(true);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSort = useCallback((field: SortField) => {
     if (sortField === field) setSortDir(d => d === "asc" ? "desc" : "asc");
@@ -97,14 +131,27 @@ export default function Screener() {
   const analyzeStock = useCallback((sym: string) => {
     if (analyzing.has(sym) || analyzedStocks.has(sym)) return;
     setAnalyzing(prev => new Set(prev).add(sym));
-    setTimeout(() => {
-      const bp = mockPrice(sym);
-      const data = generateMockOHLCV(bp, 60);
-      const results = runAllIndicators(data);
-      const sig = getOverallSignal(results);
-      setAnalyzedStocks(prev => new Map(prev).set(sym, { signal: sig.signal, confidence: sig.confidence }));
-      setAnalyzing(prev => { const n = new Set(prev); n.delete(sym); return n; });
-    }, 400 + Math.random() * 300);
+    (async () => {
+      try {
+        const barsRes = await fetchBars(sym, { timeframe: "1Day", limit: 120 });
+        if (barsRes.bars && barsRes.bars.length >= 10) {
+          const sd = barsToStockData(barsRes.bars);
+          const results = runAllIndicators(sd);
+          const sig = getOverallSignal(results);
+          setAnalyzedStocks(prev => new Map(prev).set(sym, { signal: sig.signal, confidence: sig.confidence }));
+        } else {
+          throw new Error("insufficient bars");
+        }
+      } catch {
+        const bp = mockPrice(sym);
+        const data = generateMockOHLCV(bp, 60);
+        const results = runAllIndicators(data);
+        const sig = getOverallSignal(results);
+        setAnalyzedStocks(prev => new Map(prev).set(sym, { signal: sig.signal, confidence: sig.confidence }));
+      } finally {
+        setAnalyzing(prev => { const n = new Set(prev); n.delete(sym); return n; });
+      }
+    })();
   }, [analyzing, analyzedStocks]);
 
   const analyzeAll = useCallback(() => {
@@ -116,7 +163,7 @@ export default function Screener() {
   }, [analyzedStocks, analyzing, analyzeStock, toast]);
 
   const filteredStocks = useMemo(() => {
-    let stocks = [...SCREENER_STOCKS];
+    let stocks = [...liveStocks];
     if (search) {
       const q = search.toLowerCase();
       stocks = stocks.filter(s => s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q));
@@ -182,6 +229,7 @@ export default function Screener() {
               <Filter className="w-4 h-4 text-primary" />
               <span className="text-[13px] font-bold">Stock Screener</span>
               <span className="text-[10px] text-white/15 font-mono">{filteredStocks.length} stocks</span>
+              {isLive && <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#00ff88]/10 text-[#00ff88] animate-pulse">LIVE</span>}
             </div>
             <div className="flex items-center gap-2">
               <div className="relative">
@@ -297,7 +345,7 @@ export default function Screener() {
 
         <div className="mt-3 rounded-lg bg-white/[0.01] border border-white/[0.04] p-3">
           <p className="text-[10px] text-white/15 text-center">
-            Screener data is simulated. AI signals run 55+ technical indicators per stock. Results are for educational purposes only.
+            {isLive ? "Live prices powered by Alpaca Markets (IEX feed)." : "Prices are pre-loaded estimates."} AI signals run 55+ technical indicators on {isLive ? "real historical" : "simulated"} OHLCV data. Results are for educational purposes only.
           </p>
         </div>
       </div>

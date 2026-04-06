@@ -30,14 +30,15 @@ function smaArray(prices: number[], period: number): (number | null)[] {
 
 export function CandlestickChart({ data, symbol, width = 800, height = 380 }: CandlestickChartProps) {
   const bars: Bar[] = useMemo(() => {
+    const ohlcv = (data as any).ohlcv as { open: number; high: number; low: number; close: number; volume: number }[] | undefined;
     return data.closes.map((close, i) => ({
       idx: i,
-      open: i === 0 ? close * (1 + (Math.random() - 0.5) * 0.01) : data.closes[i - 1],
+      open: ohlcv?.[i]?.open ?? (i === 0 ? close * (1 + (Math.random() - 0.5) * 0.01) : data.closes[i - 1]),
       high: data.highs[i],
       low: data.lows[i],
       close,
       volume: data.volumes[i],
-      bullish: i === 0 ? true : close >= data.closes[i - 1],
+      bullish: ohlcv ? ohlcv[i].close >= ohlcv[i].open : (i === 0 ? true : close >= data.closes[i - 1]),
     }));
   }, [data]);
 

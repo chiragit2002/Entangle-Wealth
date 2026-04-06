@@ -1,11 +1,12 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Layout } from "@/components/layout/Layout";
 import {
   TrendingUp, TrendingDown, Activity, Globe, BarChart3,
   ArrowUpRight, ArrowDownRight, Minus, RefreshCw, Zap,
-  DollarSign, Landmark, Fuel, Bitcoin, Wheat,
+  DollarSign, Landmark, Fuel, Bitcoin, Wheat, Loader2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { fetchSnapshots, fetchMovers, type AlpacaSnapshot, type AlpacaMover } from "@/lib/alpaca";
 
 interface MarketIndex {
   name: string;
@@ -147,17 +148,74 @@ export default function MarketOverview() {
   const { toast } = useToast();
   const [clock, setClock] = useState(new Date());
   const [marketStatus] = useState<"open" | "pre" | "after" | "closed">("open");
+  const [liveSnapshots, setLiveSnapshots] = useState<Record<string, AlpacaSnapshot>>({});
+  const [liveMovers, setLiveMovers] = useState<{ gainers: AlpacaMover[]; losers: AlpacaMover[] } | null>(null);
+  const [liveLoading, setLiveLoading] = useState(true);
+  const [isLive, setIsLive] = useState(false);
+
+  const allSectorSymbols = useMemo(() => {
+    const syms = new Set<string>();
+    SECTORS.forEach(s => s.stocks.forEach(st => syms.add(st.symbol)));
+    return [...syms];
+  }, []);
+
+  const loadLiveData = useCallback(async () => {
+    setLiveLoading(true);
+    try {
+      const [snaps, movers] = await Promise.all([
+        fetchSnapshots(allSectorSymbols),
+        fetchMovers(),
+      ]);
+      setLiveSnapshots(snaps);
+      setLiveMovers({ gainers: movers.gainers, losers: movers.losers });
+      setIsLive(true);
+    } catch (err) {
+      console.error("Failed to load live data:", err);
+    } finally {
+      setLiveLoading(false);
+    }
+  }, [allSectorSymbols]);
+
+  useEffect(() => { loadLiveData(); }, [loadLiveData]);
 
   useEffect(() => {
     const t = setInterval(() => setClock(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
+  const liveSectors = useMemo(() => {
+    if (!isLive) return SECTORS;
+    return SECTORS.map(sector => {
+      const stocks = sector.stocks.map(st => {
+        const snap = liveSnapshots[st.symbol];
+        if (!snap?.dailyBar) return st;
+        const change = ((snap.dailyBar.c - snap.dailyBar.o) / snap.dailyBar.o) * 100;
+        return { ...st, change: +change.toFixed(2) };
+      });
+      const avgChange = stocks.reduce((sum, s) => sum + s.change, 0) / stocks.length;
+      return { ...sector, stocks, change: +avgChange.toFixed(2) };
+    });
+  }, [isLive, liveSnapshots]);
+
+  const liveGainers = useMemo(() => {
+    if (liveMovers) return liveMovers.gainers.slice(0, 8).map(m => ({
+      symbol: m.symbol, name: m.symbol, change: +m.change.toFixed(2), price: +m.price.toFixed(2),
+    }));
+    return TOP_GAINERS;
+  }, [liveMovers]);
+
+  const liveLosers = useMemo(() => {
+    if (liveMovers) return liveMovers.losers.slice(0, 8).map(m => ({
+      symbol: m.symbol, name: m.symbol, change: +m.change.toFixed(2), price: +m.price.toFixed(2),
+    }));
+    return TOP_LOSERS;
+  }, [liveMovers]);
+
   const advDecl = useMemo(() => {
     let adv = 0, decl = 0;
-    SECTORS.forEach(s => s.stocks.forEach(st => st.change >= 0 ? adv++ : decl++));
+    liveSectors.forEach(s => s.stocks.forEach(st => st.change >= 0 ? adv++ : decl++));
     return { adv, decl, ratio: (adv / (adv + decl) * 100).toFixed(0) };
-  }, []);
+  }, [liveSectors]);
 
   return (
     <Layout>
@@ -167,6 +225,8 @@ export default function MarketOverview() {
             <div className="flex items-center gap-3">
               <Globe className="w-4 h-4 text-primary" />
               <span className="text-[13px] font-bold">Market Overview</span>
+              {isLive && <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#00ff88]/10 text-[#00ff88] animate-pulse">LIVE</span>}
+              {liveLoading && <Loader2 className="w-3 h-3 text-primary animate-spin" />}
               <span className={`text-[9px] font-bold px-2 py-0.5 rounded ${marketStatus === "open" ? "bg-[#00ff88]/10 text-[#00ff88]" : "bg-[#ffd700]/10 text-[#ffd700]"}`}>
                 {marketStatus === "open" ? "MARKET OPEN" : "PRE-MARKET"}
               </span>
@@ -222,7 +282,7 @@ export default function MarketOverview() {
             <span className="text-[12px] font-bold text-white/50">SECTOR HEAT MAP</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
-            {SECTORS.slice(0, 9).map(sector => (
+            {liveSectors.slice(0, 9).map(sector => (
               <div key={sector.ticker} className={`bg-gradient-to-br ${sectorHeatBg(sector.change)} bg-[#0a0a16] border border-white/[0.04] rounded-xl p-3 hover:border-white/10 transition-all`}>
                 <div className="flex items-center justify-between mb-2">
                   <div>
@@ -259,7 +319,7 @@ export default function MarketOverview() {
               <span className="text-[11px] font-bold text-white/50">TOP GAINERS</span>
             </div>
             <div>
-              {TOP_GAINERS.map((s, i) => (
+              {liveGainers.map((s, i) => (
                 <div key={s.symbol} className="flex items-center px-4 py-2 border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors">
                   <span className="text-[10px] text-white/10 font-mono w-5">{i + 1}</span>
                   <div className="flex-1 min-w-0">
@@ -279,7 +339,7 @@ export default function MarketOverview() {
               <span className="text-[11px] font-bold text-white/50">TOP LOSERS</span>
             </div>
             <div>
-              {TOP_LOSERS.map((s, i) => (
+              {liveLosers.map((s, i) => (
                 <div key={s.symbol} className="flex items-center px-4 py-2 border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors">
                   <span className="text-[10px] text-white/10 font-mono w-5">{i + 1}</span>
                   <div className="flex-1 min-w-0">
@@ -320,7 +380,7 @@ export default function MarketOverview() {
 
         <div className="rounded-lg bg-white/[0.01] border border-white/[0.04] p-3">
           <p className="text-[10px] text-white/15 text-center">
-            Market data is simulated for demonstration. Real-time data requires an active subscription. All indices, prices, and economic indicators shown are illustrative only.
+            {isLive ? "Live market data powered by Alpaca Markets. Stock prices and heat map reflect real-time trading data via IEX feed." : "Loading live data... Falling back to illustrative values."} Economic indicators and global markets are for reference only.
           </p>
         </div>
       </div>

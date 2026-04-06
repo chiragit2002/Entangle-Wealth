@@ -14,6 +14,7 @@ import {
   generateMockOHLCV, runAllIndicators, getOverallSignal,
 } from "@/lib/indicators";
 import { CandlestickChart } from "@/components/CandlestickChart";
+import { fetchBars, fetchSnapshot, barsToStockData, type AlpacaBar } from "@/lib/alpaca";
 
 type Category = "all" | "trend" | "momentum" | "volatility" | "volume";
 
@@ -300,12 +301,31 @@ export default function TechnicalAnalysis() {
     setSearch("");
     setShowSearch(false);
     setExpandedAgent(null);
-    analyzeTimerRef.current = setTimeout(() => {
-      if (analyzeIdRef.current !== id) return;
-      const bp = mockPrice(s);
-      setStockData(generateMockOHLCV(bp, 60));
-      setLoading(false);
-    }, 900);
+
+    (async () => {
+      try {
+        const barsRes = await fetchBars(s, { timeframe: "1Day", limit: 120 });
+        if (analyzeIdRef.current !== id) return;
+        if (barsRes.bars && barsRes.bars.length >= 10) {
+          const sd = barsToStockData(barsRes.bars);
+          setStockData({
+            ...sd,
+            ohlcv: barsRes.bars.map(b => ({
+              open: b.o, high: b.h, low: b.l, close: b.c, volume: b.v,
+            })),
+          } as StockData);
+        } else {
+          const bp = mockPrice(s);
+          setStockData(generateMockOHLCV(bp, 60));
+        }
+      } catch {
+        if (analyzeIdRef.current !== id) return;
+        const bp = mockPrice(s);
+        setStockData(generateMockOHLCV(bp, 60));
+      } finally {
+        if (analyzeIdRef.current === id) setLoading(false);
+      }
+    })();
   }, []);
 
   const addToWatchlist = useCallback((sym: string) => {

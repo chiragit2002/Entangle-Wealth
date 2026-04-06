@@ -15,6 +15,7 @@ import Terminal from "@/pages/Terminal";
 import Stocks from "@/pages/Stocks";
 import Jobs from "@/pages/Jobs";
 import Gigs from "@/pages/Gigs";
+import Community from "@/pages/Community";
 import Tax from "@/pages/Tax";
 import Receipts from "@/pages/Receipts";
 import Travel from "@/pages/Travel";
@@ -107,6 +108,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/stocks" component={Stocks} />
             <Route path="/jobs" component={Jobs} />
             <Route path="/gigs" component={Gigs} />
+            <Route path="/community" component={Community} />
             <Route path="/tax" component={Tax} />
             <Route path="/receipts" component={Receipts} />
             <Route path="/travel" component={Travel} />

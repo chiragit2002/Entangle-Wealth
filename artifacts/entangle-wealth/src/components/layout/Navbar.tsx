@@ -18,6 +18,7 @@ export function Navbar() {
     { href: "/stocks", label: "Stocks" },
     { href: "/jobs", label: "Jobs" },
     { href: "/gigs", label: "Gigs" },
+    { href: "/community", label: "Community" },
     { href: "/tax", label: "TaxFlow" },
     { href: "/terminal", label: "Terminal" },
     { href: "/about", label: "About Us" },

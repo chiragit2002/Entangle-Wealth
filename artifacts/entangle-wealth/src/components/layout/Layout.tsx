@@ -16,7 +16,7 @@ export function Layout({ children }: LayoutProps) {
       </div>
       
       <Navbar />
-      <main className="flex-1 flex flex-col z-10 w-full relative pb-16 lg:pb-0">
+      <main className="flex-1 flex flex-col z-10 w-full relative pb-20 lg:pb-0">
         {children}
       </main>
       <Footer />

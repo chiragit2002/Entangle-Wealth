@@ -55,8 +55,10 @@ The project is a pnpm workspace monorepo with each package managing its own depe
 - **Options**: Detailed options chain with Greeks, expiration dates, and unusual options activity tables.
 - **Terminal**: Interactive terminal with commands like QUOTE, ANALYZE (AI), SEARCH, RISK, etc.
 
+- **Pricing** (`/pricing`): 3-tier pricing page (Starter $0, Pro $29/mo, Business $79/mo) with feature comparison, free trial CTA, and referral program section.
 - **Terms of Use** (`/terms`): Full legal terms covering acceptance, service description, financial advice disclaimer, market data & third-party services (Alpaca), user accounts, subscriptions, AI analysis disclosure, prohibited uses, IP, liability, risk disclosure, indemnification, and governing law.
 - **Privacy Policy** (`/privacy`): Comprehensive privacy policy covering data collection, usage, sharing, security, retention, user rights (CCPA), international transfers, and children's privacy.
+- **Mobile Design**: Fully responsive mobile-first design with bottom navigation (Home, Signals, Analysis, TaxFlow, Pricing), signal cards with confidence bars and indicator panels, quantum entanglement matrix canvas, live ticker tape, and mobile-optimized card components.
 
 ## API Server (`artifacts/api-server`)
 - Express 5 server with Clerk middleware for authentication.

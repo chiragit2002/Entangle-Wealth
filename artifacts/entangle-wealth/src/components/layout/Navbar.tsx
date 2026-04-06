@@ -23,6 +23,7 @@ export function Navbar() {
     { href: "/earn", label: "Earn" },
     { href: "/community", label: "Community" },
     { href: "/tax", label: "TaxFlow" },
+    { href: "/pricing", label: "Pricing" },
     { href: "/about", label: "About" },
   ];
 

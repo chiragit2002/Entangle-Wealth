@@ -27,6 +27,7 @@ import MarketOverview from "@/pages/MarketOverview";
 import Screener from "@/pages/Screener";
 import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
+import Pricing from "@/pages/Pricing";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -125,6 +126,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/about" component={About} />
             <Route path="/terms" component={Terms} />
             <Route path="/privacy" component={Privacy} />
+            <Route path="/pricing" component={Pricing} />
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?" component={SignUpPage} />
             <Route path="/resume">{() => <ProtectedRoute component={Resume} />}</Route>

@@ -1,0 +1,43 @@
+#1 - Godlike Multi-Discipline System Prompt
+
+What & Why
+
+Create a comprehensive, production-quality system prompt document for the EntangleWealth platform's AI assistant. The prompt should define the assistant as a polymath expert across 63+ professions — all woven together through the metaphor of "quantum entanglement," where each discipline's knowledge is interconnected and mutually reinforcing. This prompt will serve as the foundational identity and instruction set for the platform's AI capabilities (TaxGPT, analysis engine, terminal assistant, etc.).
+
+The professions must be genuinely relevant to what EntangleWealth does: financial analysis, wealth building, software engineering, UI/UX design, cybersecurity, mobile/web app design, and the broader ecosystem of tools, markets, careers, and life optimization the platform serves.
+
+Done looks like
+
+A single, well-structured markdown document (e.g., SYSTEM_PROMPT.md or similar) in the project that defines the AI assistant's identity and capabilities
+At least 63 clearly named professions/disciplines listed and described, each with a concise explanation of how it "entangles" with the platform's mission
+The professions should be organized into thematic clusters (e.g., "Financial Core," "Technology & Engineering," "Security & Risk," "Design & Experience," "Data & Intelligence," "Legal & Compliance," "Career & Human Capital," "Communication & Psychology," etc.)
+The quantum entanglement metaphor should be used thoughtfully — not just as decoration, but as a framework for how knowledge from one domain informs and strengthens another
+The prompt should be practical and usable, not just a list — it should instruct an AI on how to behave, respond, and leverage cross-disciplinary thinking
+The tone should be professional, authoritative, and empowering — aligned with EntangleWealth's mission of giving retail traders institutional-grade tools
+The 63+ professions must include (at minimum) these explicitly requested roles, plus others the writer identifies as relevant:
+
+Software Developer
+UI/UX Designer
+Cybersecurity Expert
+Mobile Application Design Expert
+Web Application Design Expert
+Debugging Expert / QA Engineer ...plus 57+ additional professions spanning finance, data science, law, behavioral psychology, technical writing, DevOps, quantitative analysis, risk management, compliance, and any other fields that genuinely connect to building and operating a platform like EntangleWealth.
+Out of scope
+
+Integrating the prompt into the actual AI pipeline or backend code — this task is about writing the document only
+Changing any existing application logic or UI
+Creating new API endpoints or features
+Tasks
+
+Create the system prompt document with an opening section that establishes the quantum entanglement framework and the AI assistant's identity
+Define and organize 63+ professions into thematic clusters, each with a brief description of its relevance to EntangleWealth
+Write behavioral instructions that explain how the assistant should leverage cross-disciplinary knowledge when responding to users
+Include specific guidance sections for the platform's key features: financial analysis, options trading, the terminal interface, income opportunities, tax guidance, and career tools
+Place the completed document in a logical location within the project (e.g., artifacts/entangle-wealth/src/lib/system-prompt.md or a dedicated docs/ folder)
+Relevant files
+
+artifacts/entangle-wealth/src/pages/About.tsx
+artifacts/entangle-wealth/src/components/MirofishTerminal.tsx
+artifacts/entangle-wealth/src/lib/mock-data.ts
+artifacts/entangle-wealth/src/pages/Dashboard.tsx
+artifacts/api-server/src/app.ts

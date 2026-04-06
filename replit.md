@@ -12,12 +12,17 @@ I prefer concise and direct communication. When making changes, prioritize funct
 The project is a pnpm workspace monorepo with each package managing its own dependencies.
 
 ## UI/UX and Design System
-- **Theme**: Dark theme with a black background, electric blue (`#00D4FF`), and gold (`#FFD700`) accents.
+- **Theme**: Dark theme with a black background, electric blue (`#00D4FF`), and gold (`#FFD700`) accents. Purple (`#9c27b0`) as tertiary accent.
 - **Fonts**: JetBrains Mono for data displays and Inter for UI elements.
-- **CSS Utilities**: Includes `.electric-text`, `.gold-text`, and `.glass-panel` for consistent styling.
+- **CSS Utilities**: Includes `.electric-text`, `.gold-text`, `.glass-panel`, `.glass-panel-gold`, `.mobile-card`, `.mobile-card-glow`, `.signal-card`, `.filter-pill` for consistent styling.
+- **Glassmorphism**: All panels use `blur(20px) saturate(1.2)` with gradient border overlays (cyan-to-gold) and hover effects (border glow + shadow lift).
+- **Scrollbar**: Custom styled with 6px width, transparent track, cyan hover thumb.
+- **Animations**: `orb-drift-1/2/3` for background mesh, `fade-up` for page transitions, `border-shimmer` for gradient borders, plus existing `pulse-glow`, `float`, `shimmer`, `rotate-slow`.
+- **Navbar**: Organized into dropdown groups (Trading, Tools, Research, More) with animated gradient bottom border. Logo uses `Entangle<span class="text-primary">Wealth</span>` treatment.
 - **Routing**: `wouter` for client-side routing.
-- **Responsiveness**: Mobile-responsive design with a hamburger navigation menu and a bottom navigation bar on screens smaller than 1024px.
+- **Responsiveness**: Mobile-responsive design with grouped hamburger menu (section headers: Trading, Tools, Research, More in 2-column grid) and bottom navigation bar on screens smaller than 1024px.
 - **Components**: Utilizes shadcn/ui components.
+- **Layout Background**: Three animated gradient orbs (cyan, gold, purple) with slow drift animations, plus a subtle dot grid overlay at 40px spacing.
 
 ## Technical Implementations
 - **Authentication**: Clerk for user authentication (email and Google sign-in).

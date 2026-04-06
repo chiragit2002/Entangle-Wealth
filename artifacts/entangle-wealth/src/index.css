@@ -259,6 +259,31 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+@keyframes orb-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(5%, -8%) scale(1.05); }
+  50% { transform: translate(-3%, 5%) scale(0.95); }
+  75% { transform: translate(7%, 3%) scale(1.02); }
+}
+@keyframes orb-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-6%, 4%) scale(0.97); }
+  50% { transform: translate(4%, -6%) scale(1.04); }
+  75% { transform: translate(-2%, -3%) scale(0.98); }
+}
+@keyframes orb-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(3%, 6%) scale(1.03); }
+  66% { transform: translate(-5%, -4%) scale(0.96); }
+}
+@keyframes border-shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 @layer base {
   * {
@@ -267,12 +292,22 @@
   body {
     @apply font-sans antialiased bg-background text-foreground selection:bg-primary selection:text-primary-foreground;
   }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.2); }
   
   .glass-panel {
-    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+    backdrop-filter: blur(20px) saturate(1.2);
+    border: 1px solid rgba(255,255,255,0.07);
     position: relative;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .glass-panel:hover {
+    border-color: rgba(0,212,255,0.12);
+    box-shadow: 0 4px 30px rgba(0,212,255,0.04), inset 0 1px 0 rgba(255,255,255,0.04);
   }
   .glass-panel::before {
     content: "";
@@ -280,7 +315,7 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, rgba(0,212,255,0.1), transparent 50%, rgba(255,215,0,0.05));
+    background: linear-gradient(135deg, rgba(0,212,255,0.12), transparent 40%, rgba(255,215,0,0.06));
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: exclude;
     -webkit-mask-composite: xor;
@@ -288,9 +323,14 @@
   }
 
   .glass-panel-gold {
-    background: linear-gradient(135deg, rgba(255,215,0,0.03) 0%, rgba(255,255,255,0.01) 100%);
-    backdrop-filter: blur(12px);
+    background: linear-gradient(135deg, rgba(255,215,0,0.04) 0%, rgba(255,255,255,0.01) 100%);
+    backdrop-filter: blur(20px) saturate(1.2);
     border: 1px solid rgba(255,215,0,0.12);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .glass-panel-gold:hover {
+    border-color: rgba(255,215,0,0.2);
+    box-shadow: 0 4px 30px rgba(255,215,0,0.06);
   }
 
   .glow-border {
@@ -376,16 +416,42 @@
 
 @layer components {
   .mobile-card {
-    background: rgba(10, 10, 26, 0.95);
+    background: rgba(10, 10, 26, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 16px;
     padding: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+  .mobile-card:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255,255,255,0.04);
   }
   .mobile-card-glow {
     background: linear-gradient(135deg, rgba(0, 200, 248, 0.06), rgba(245, 200, 66, 0.03));
-    border: 1px solid rgba(0, 200, 248, 0.12);
+    border: 1px solid rgba(0, 200, 248, 0.15);
     border-radius: 16px;
     padding: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .mobile-card-glow::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(0,212,255,0.15), transparent 50%, rgba(255,215,0,0.1));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+    padding: 1px;
+  }
+  .mobile-card-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px rgba(0,212,255,0.1), 0 0 0 1px rgba(0,212,255,0.08);
   }
   .signal-card {
     background: rgba(10, 10, 26, 0.95);

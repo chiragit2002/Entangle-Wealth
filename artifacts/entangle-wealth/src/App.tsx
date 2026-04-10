@@ -36,6 +36,7 @@ import SectorFlow from "@/pages/SectorFlow";
 import VolatilityLab from "@/pages/VolatilityLab";
 import CompetitiveAnalysis from "@/pages/CompetitiveAnalysis";
 import OpenSourceIntel from "@/pages/OpenSourceIntel";
+import CaseStudy from "@/pages/CaseStudy";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -141,6 +142,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/volatility" component={VolatilityLab} />
             <Route path="/competitive-intel" component={CompetitiveAnalysis} />
             <Route path="/open-source-intel" component={OpenSourceIntel} />
+            <Route path="/case-study" component={CaseStudy} />
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?" component={SignUpPage} />
             <Route path="/resume">{() => <ProtectedRoute component={Resume} />}</Route>

@@ -1,10 +1,18 @@
 import { Router, type IRouter } from "express";
 import { getTermHtml, getGlossaryIndexHtml } from "../seo/glossary";
 import { getIndicatorHtml, getIndicatorIndexHtml } from "../seo/indicators";
+import { getStrategyHtml, getStrategyIndexHtml } from "../seo/strategies";
+import { getPatternHtml, getPatternIndexHtml } from "../seo/patterns";
+import { getSectorHtml, getSectorIndexHtml } from "../seo/sectors";
+import { getComparisonHtml, getComparisonIndexHtml } from "../seo/comparisons";
 import {
   generateSitemapIndex,
   generateGlossarySitemap,
   generateIndicatorsSitemap,
+  generateStrategiesSitemap,
+  generatePatternsSitemap,
+  generateSectorsSitemap,
+  generateComparisonsSitemap,
   generatePagesSitemap,
   generateRobotsTxt,
 } from "../seo/sitemap";
@@ -51,6 +59,74 @@ router.get("/indicators/:slug", (req, res) => {
   res.send(html);
 });
 
+router.get("/strategies", (_req, res) => {
+  res.setHeader("Cache-Control", CACHE_INDEX);
+  res.setHeader("Content-Type", HTML_CT);
+  res.send(getStrategyIndexHtml());
+});
+
+router.get("/strategies/:slug", (req, res) => {
+  const html = getStrategyHtml(req.params.slug);
+  if (!html) {
+    res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Strategy not found", "/strategies"));
+    return;
+  }
+  res.setHeader("Cache-Control", CACHE_STATIC);
+  res.setHeader("Content-Type", HTML_CT);
+  res.send(html);
+});
+
+router.get("/patterns", (_req, res) => {
+  res.setHeader("Cache-Control", CACHE_INDEX);
+  res.setHeader("Content-Type", HTML_CT);
+  res.send(getPatternIndexHtml());
+});
+
+router.get("/patterns/:slug", (req, res) => {
+  const html = getPatternHtml(req.params.slug);
+  if (!html) {
+    res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Pattern not found", "/patterns"));
+    return;
+  }
+  res.setHeader("Cache-Control", CACHE_STATIC);
+  res.setHeader("Content-Type", HTML_CT);
+  res.send(html);
+});
+
+router.get("/sectors", (_req, res) => {
+  res.setHeader("Cache-Control", CACHE_INDEX);
+  res.setHeader("Content-Type", HTML_CT);
+  res.send(getSectorIndexHtml());
+});
+
+router.get("/sectors/:slug", (req, res) => {
+  const html = getSectorHtml(req.params.slug);
+  if (!html) {
+    res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Sector not found", "/sectors"));
+    return;
+  }
+  res.setHeader("Cache-Control", CACHE_STATIC);
+  res.setHeader("Content-Type", HTML_CT);
+  res.send(html);
+});
+
+router.get("/compare", (_req, res) => {
+  res.setHeader("Cache-Control", CACHE_INDEX);
+  res.setHeader("Content-Type", HTML_CT);
+  res.send(getComparisonIndexHtml());
+});
+
+router.get("/compare/:slug", (req, res) => {
+  const html = getComparisonHtml(req.params.slug);
+  if (!html) {
+    res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Comparison not found", "/compare"));
+    return;
+  }
+  res.setHeader("Cache-Control", CACHE_STATIC);
+  res.setHeader("Content-Type", HTML_CT);
+  res.send(html);
+});
+
 router.get("/sitemap.xml", (_req, res) => {
   res.setHeader("Content-Type", XML_CT);
   res.setHeader("Cache-Control", CACHE_INDEX);
@@ -67,6 +143,30 @@ router.get("/sitemap-indicators.xml", (_req, res) => {
   res.setHeader("Content-Type", XML_CT);
   res.setHeader("Cache-Control", CACHE_INDEX);
   res.send(generateIndicatorsSitemap());
+});
+
+router.get("/sitemap-strategies.xml", (_req, res) => {
+  res.setHeader("Content-Type", XML_CT);
+  res.setHeader("Cache-Control", CACHE_INDEX);
+  res.send(generateStrategiesSitemap());
+});
+
+router.get("/sitemap-patterns.xml", (_req, res) => {
+  res.setHeader("Content-Type", XML_CT);
+  res.setHeader("Cache-Control", CACHE_INDEX);
+  res.send(generatePatternsSitemap());
+});
+
+router.get("/sitemap-sectors.xml", (_req, res) => {
+  res.setHeader("Content-Type", XML_CT);
+  res.setHeader("Cache-Control", CACHE_INDEX);
+  res.send(generateSectorsSitemap());
+});
+
+router.get("/sitemap-comparisons.xml", (_req, res) => {
+  res.setHeader("Content-Type", XML_CT);
+  res.setHeader("Cache-Control", CACHE_INDEX);
+  res.send(generateComparisonsSitemap());
 });
 
 router.get("/sitemap-pages.xml", (_req, res) => {

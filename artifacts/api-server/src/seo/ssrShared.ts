@@ -33,6 +33,8 @@ function headerHtml(): string {
       <a href="${FRONTEND_BASE}/research" style="color:rgba(255,255,255,0.6);text-decoration:none;font-size:13px;font-weight:500;">Research</a>
       <a href="/learn" style="color:#00D4FF;text-decoration:none;font-size:13px;font-weight:600;">Learn</a>
       <a href="/indicators" style="color:#00D4FF;text-decoration:none;font-size:13px;font-weight:600;">Indicators</a>
+      <a href="/strategies" style="color:#00D4FF;text-decoration:none;font-size:13px;font-weight:600;">Strategies</a>
+      <a href="/patterns" style="color:#00D4FF;text-decoration:none;font-size:13px;font-weight:600;">Patterns</a>
     </nav>
   </header>`;
 }
@@ -61,8 +63,10 @@ function footerHtml(): string {
         <div style="display:flex;flex-direction:column;gap:8px;">
           <a href="/learn" style="color:rgba(255,255,255,0.4);text-decoration:none;font-size:13px;">Financial Glossary</a>
           <a href="/indicators" style="color:rgba(255,255,255,0.4);text-decoration:none;font-size:13px;">Technical Indicators</a>
-          <a href="/learn/options" style="color:rgba(255,255,255,0.4);text-decoration:none;font-size:13px;">Options Trading</a>
-          <a href="/learn/etf" style="color:rgba(255,255,255,0.4);text-decoration:none;font-size:13px;">ETFs</a>
+          <a href="/strategies" style="color:rgba(255,255,255,0.4);text-decoration:none;font-size:13px;">Trading Strategies</a>
+          <a href="/patterns" style="color:rgba(255,255,255,0.4);text-decoration:none;font-size:13px;">Chart Patterns</a>
+          <a href="/sectors" style="color:rgba(255,255,255,0.4);text-decoration:none;font-size:13px;">Sector Analysis</a>
+          <a href="/compare" style="color:rgba(255,255,255,0.4);text-decoration:none;font-size:13px;">Stock Comparisons</a>
         </div>
       </div>
       <div>

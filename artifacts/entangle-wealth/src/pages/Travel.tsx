@@ -6,10 +6,13 @@ import {
   MapPin, Clock, Download, CheckCircle2, FileText, Shield, Search,
   Building2, Briefcase, GraduationCap, Utensils, Car, Home, Wifi,
   Heart, DollarSign, Plus, Trash2, AlertTriangle, ChevronDown, ChevronUp,
+  Compass,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import PersonalTrip from "./travel/PersonalTrip";
 
+type TravelMode = "personal" | "business";
 type Step = 1 | 2 | 3 | 4;
 
 interface TripForm {
@@ -162,6 +165,7 @@ function formatDate(d: string): string {
 
 export default function Travel() {
   const { toast } = useToast();
+  const [travelMode, setTravelMode] = useState<TravelMode>("personal");
   const [step, setStep] = useState<Step>(1);
   const [trip, setTrip] = useState<TripForm>({
     tripType: "roundtrip",
@@ -369,12 +373,42 @@ export default function Travel() {
             <Plane className="w-5 h-5 text-black" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Business Travel Planner</h1>
-            <p className="text-[12px] text-muted-foreground">Tax-optimized trip planning powered by 80,000+ IRS pages</p>
+            <h1 className="text-2xl md:text-3xl font-bold">Travel Budget Planner</h1>
+            <p className="text-[12px] text-muted-foreground">
+              {travelMode === "personal"
+                ? "Plan your dream trip and track costs against your financial goals"
+                : "Tax-optimized trip planning powered by 80,000+ IRS pages"}
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-0 mt-6 mb-8 relative">
+        <div className="flex gap-1 mt-4 mb-6 bg-white/[0.04] rounded-xl p-1">
+          <button
+            onClick={() => setTravelMode("personal")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-[13px] font-semibold transition-all min-h-[44px] ${
+              travelMode === "personal"
+                ? "bg-primary/15 text-primary border border-primary/30"
+                : "text-white/40 hover:text-white/60"
+            }`}
+          >
+            <Compass className="w-4 h-4" /> Personal Trip
+          </button>
+          <button
+            onClick={() => setTravelMode("business")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-[13px] font-semibold transition-all min-h-[44px] ${
+              travelMode === "business"
+                ? "bg-primary/15 text-primary border border-primary/30"
+                : "text-white/40 hover:text-white/60"
+            }`}
+          >
+            <Briefcase className="w-4 h-4" /> Business Trip
+          </button>
+        </div>
+
+        {travelMode === "personal" && <PersonalTrip />}
+
+        {travelMode === "business" && (<>
+        <div className="flex items-center gap-0 mt-2 mb-8 relative">
           {[1, 2, 3, 4].map((s, i) => {
             const labels = ["Plan Trip", "IRS Deductions", "Build Itinerary", "Review & Export"];
             const icons = [Plane, FileText, Calendar, Download];
@@ -942,6 +976,7 @@ export default function Travel() {
             </Button>
           )}
         </div>
+        </>)}
       </div>
     </Layout>
   );

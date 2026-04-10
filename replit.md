@@ -53,7 +53,7 @@ The project is a pnpm workspace monorepo with each package managing its own depe
 - **TaxFlow Suite**:
     - **Tax Dashboard**: Compliance score, deduction tracking, and quick links.
     - **Receipt Scanner**: Upload and manual entry for receipts, with deductibility badges and CSV export. Client-side storage via `localStorage`.
-    - **Business Travel Planner**: 4-step wizard for trip planning, IRS deduction browsing, itinerary building, and export with compliance scoring.
+    - **Travel Budget Planner** (`/travel`): Dual-mode planner with Personal Trip and Business Trip modes. Personal Trip: origin/destination form, interactive Leaflet.js map (OpenStreetMap + Nominatim geocoding) with color-coded markers, day-by-day itinerary builder with per-item costs, budget summary dashboard with category breakdown and "trip cost vs. savings" widget, entry requirements alerts (visa, passport, vaccines, ETIAS) with official source links. Business Trip: preserved 4-step wizard for IRS deduction tracking, itinerary building, and CSV export with compliance scoring.
     - **TaxGPT**: AI chat for tax Q&A (gpt-4o-mini), with quick buttons and client-side fallback/rate limiting.
 - **Technical Analysis**: TradingView-inspired layout with 55+ technical indicators, full stock search, persistent watchlist, and candlestick charts with overlays. Features 6 AI agent reviews.
 - **Market Overview**: Dashboard for major indices, economic indicators, sector heatmaps, global markets, and market breadth.
@@ -95,5 +95,6 @@ The project is a pnpm workspace monorepo with each package managing its own depe
 - **Build**: esbuild
 - **Frontend**: React, Vite, Tailwind CSS, shadcn/ui, Clerk React, react-error-boundary
 - **Charts**: TradingView Lightweight Charts (candlestick/volume charts in Technical Analysis, reusable LightweightChart component)
+- **Maps**: Leaflet.js with OpenStreetMap tiles and Nominatim geocoding (Travel Budget Planner)
 - **Market Data**: Alpaca Markets API (paper trading keys, IEX feed)
 - **Client-side Routing**: wouter

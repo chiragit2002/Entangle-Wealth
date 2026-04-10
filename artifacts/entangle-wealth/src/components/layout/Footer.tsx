@@ -25,10 +25,10 @@ export function Footer() {
             <Link href="/terminal" className="text-muted-foreground hover:text-primary transition-colors">Terminal</Link>
           </div>
           <div className="flex flex-col gap-3">
-            <span className="font-semibold text-white">Company</span>
+            <span className="font-semibold text-white">Learn</span>
+            <a href="/learn" className="text-muted-foreground hover:text-primary transition-colors">Financial Glossary</a>
+            <a href="/indicators" className="text-muted-foreground hover:text-primary transition-colors">Technical Indicators</a>
             <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">About Us</Link>
-            <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">Our Mission</Link>
-            <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">Contact</Link>
           </div>
           <div className="flex flex-col gap-3">
             <span className="font-semibold text-white">Legal</span>

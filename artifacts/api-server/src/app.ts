@@ -6,6 +6,7 @@ import pinoHttp from "pino-http";
 import { clerkMiddleware } from "@clerk/express";
 import { CLERK_PROXY_PATH, clerkProxyMiddleware } from "./middlewares/clerkProxyMiddleware";
 import router from "./routes";
+import seoRouter from "./routes/seo";
 import { logger } from "./lib/logger";
 
 const app: Express = express();
@@ -70,6 +71,7 @@ app.use(clerkMiddleware());
 app.use("/api/taxgpt", aiLimiter);
 app.use("/api/analyze", aiLimiter);
 
+app.use(seoRouter);
 app.use("/api", router);
 
 export default app;

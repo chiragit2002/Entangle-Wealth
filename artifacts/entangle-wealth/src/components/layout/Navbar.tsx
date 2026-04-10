@@ -46,6 +46,15 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    label: "EntangleCoin",
+    items: [
+      { href: "/wallet", label: "Wallet", desc: "ENTGL balance & txns" },
+      { href: "/rewards", label: "Rewards", desc: "Monthly distributions" },
+      { href: "/marketplace", label: "Travel", desc: "Book with ENTGL" },
+      { href: "/token-admin", label: "Admin", desc: "Token management" },
+    ],
+  },
+  {
     label: "More",
     items: [
       { href: "/earn", label: "Earn", desc: "Gig marketplace" },
@@ -93,6 +102,15 @@ const MOBILE_SECTIONS = [
     links: [
       { href: "/leaderboard", label: "Leaderboard" },
       { href: "/achievements", label: "Achievements" },
+    ],
+  },
+  {
+    title: "EntangleCoin",
+    links: [
+      { href: "/wallet", label: "Wallet" },
+      { href: "/rewards", label: "Rewards" },
+      { href: "/marketplace", label: "Travel" },
+      { href: "/token-admin", label: "Admin" },
     ],
   },
   {

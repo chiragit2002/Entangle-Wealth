@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, real } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
   id: text("id").primaryKey(),
@@ -19,6 +19,8 @@ export const usersTable = pgTable("users", {
   kycVerifiedAt: timestamp("kyc_verified_at", { withTimezone: true }),
   isPublicProfile: boolean("is_public_profile").default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  walletAddress: text("wallet_address"),
+  tokenBalance: real("token_balance").default(0),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 

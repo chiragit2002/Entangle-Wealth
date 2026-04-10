@@ -40,6 +40,10 @@ import CaseStudy from "@/pages/CaseStudy";
 import Charts from "@/pages/Charts";
 import Leaderboard from "@/pages/Leaderboard";
 import Achievements from "@/pages/Achievements";
+import TokenWallet from "@/pages/TokenWallet";
+import TravelMarketplace from "@/pages/TravelMarketplace";
+import RewardHistory from "@/pages/RewardHistory";
+import TokenAdmin from "@/pages/TokenAdmin";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -153,6 +157,10 @@ function ClerkProviderWithRoutes() {
             <Route path="/sign-up/*?" component={SignUpPage} />
             <Route path="/resume">{() => <ProtectedRoute component={Resume} />}</Route>
             <Route path="/profile">{() => <ProtectedRoute component={Profile} />}</Route>
+            <Route path="/wallet">{() => <ProtectedRoute component={TokenWallet} />}</Route>
+            <Route path="/marketplace">{() => <ProtectedRoute component={TravelMarketplace} />}</Route>
+            <Route path="/rewards">{() => <ProtectedRoute component={RewardHistory} />}</Route>
+            <Route path="/token-admin">{() => <ProtectedRoute component={TokenAdmin} />}</Route>
             <Route component={NotFound} />
           </Switch>
           <Toaster />

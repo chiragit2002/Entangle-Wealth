@@ -12,6 +12,7 @@ import taxgptRouter from "./taxgpt";
 import alpacaRouter from "./alpaca";
 import newsRouter from "./news";
 import gamificationRouter from "./gamification";
+import tokenRouter from "./token";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use(taxgptRouter);
 router.use(alpacaRouter);
 router.use(newsRouter);
 router.use(gamificationRouter);
+router.use(tokenRouter);
 
 export default router;

@@ -15,7 +15,7 @@ The project uses a pnpm workspace monorepo, with each package managing its own d
 - **Theme**: Dark theme with black background, electric blue (`#00D4FF`), gold (`#FFD700`), and tertiary purple (`#9c27b0`) accents.
 - **Typography**: JetBrains Mono for data displays and Inter for UI elements.
 - **Visuals**: Glassmorphism effects with blurred panels and gradient borders. Custom scrollbars and a variety of animations for background elements and transitions.
-- **Navigation**: Navbar with dropdown groups (Trading, Tools, Research, Compete, More) and a mobile-responsive bottom navigation bar.
+- **Navigation**: Navbar with dropdown groups (Trading, Tools, Research, Compete, EntangleCoin, More) and a mobile-responsive bottom navigation bar.
 - **Components**: Utilizes shadcn/ui.
 - **Layout Background**: Animated gradient orbs and a subtle dot grid overlay.
 - **Core Features**:
@@ -65,6 +65,13 @@ The project uses a pnpm workspace monorepo, with each package managing its own d
 - **Sector Flow Radar** (`/sector-flow`): Real-time sector rotation visualization tracking 80 stocks across 8 sectors (Technology, Healthcare, Consumer Cyclical, Financials, Energy, Industrials, Comm Services, Real Estate). Features animated radar chart showing relative sector momentum, market regime indicator (Risk-On/Risk-Off/Neutral), sector breakdown cards with gainers/losers bars, volume data, and top/worst movers per sector. Uses live Alpaca snapshots.
 - **Volatility Lab** (`/volatility`): Multi-timeframe realized volatility analysis with institutional-grade risk metrics. Computes annualized vol at 5 timeframes (1W, 1M, 3M, 6M, 1Y) using log returns. Features vol term structure chart, daily return distribution histogram, vol regime detection (Low/Normal/Elevated/Extreme), and risk ratios: Sharpe, Sortino, Calmar, max drawdown. Quick-pick buttons for popular symbols.
 - **Legal**: Comprehensive Terms of Use and Privacy Policy.
+- **EntangleCoin Token System**:
+    - **Token Wallet** (`/wallet`): ENTGL balance display, Ethereum wallet linking (Sepolia testnet), transaction history, token valuation (25% of share price), supply info panel. Auth-protected.
+    - **Travel Marketplace** (`/marketplace`): 12 luxury hotel/flight listings bookable with ENTGL tokens. Blockchain transaction receipts, mock inventory with rating/destination/pricing. Auth-protected.
+    - **Reward History** (`/rewards`): Monthly reward distribution leaderboard, 6-tier reward structure (Rank 1: 5000 → 51-100: 200 ENTGL), personal reward history, expandable monthly leaderboards. Auth-protected.
+    - **Token Admin** (`/token-admin`): Supply overview, reward distribution trigger, share price/token valuation controls, marketplace stats. Admin-tier restricted.
+    - **Smart Contract**: EntangleCoin.sol ERC-20 (100M total supply, 75/25 founder/rewards split), batch distribution, travel booking burn, Hardhat + Sepolia deploy config.
+    - **DB Schema**: token_transactions, reward_distributions, travel_bookings, token_config tables; users extended with walletAddress + tokenBalance.
 - **Mobile Design**: Fully responsive, mobile-first design with bottom navigation and optimized components.
 
 ### API Server
@@ -72,7 +79,7 @@ The project uses a pnpm workspace monorepo, with each package managing its own d
 - **Integrations**: Stripe webhook endpoint.
 - **Market Data Proxy**: Alpaca Markets API proxy for real-time and historical stock data (snapshots, bars, quotes, trades, movers).
 - **News Intelligence**: `/api/news` endpoint for RSS feed scraping, relevance scoring, sentiment analysis, and caching.
-- **Routes**: Health checks, stock data, AI analysis, user management, résumé operations, job search, KYC, Stripe config, TaxGPT, Alpaca proxy, news intelligence, and gamification (XP, badges, challenges, streaks, leaderboard).
+- **Routes**: Health checks, stock data, AI analysis, user management, résumé operations, job search, KYC, Stripe config, TaxGPT, Alpaca proxy, news intelligence, gamification (XP, badges, challenges, streaks, leaderboard), and token system (wallet linking, balance, transactions, rewards, travel bookings, admin distribution/config).
 
 # External Dependencies
 

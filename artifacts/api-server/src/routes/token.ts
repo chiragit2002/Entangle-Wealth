@@ -6,6 +6,7 @@ import {
   rewardDistributionsTable,
   travelBookingsTable,
   tokenConfigTable,
+  userXpTable,
 } from "@workspace/db/schema";
 import { eq, desc, sql, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
@@ -13,6 +14,21 @@ import { requireAuth } from "../middlewares/requireAuth";
 const router = Router();
 
 const ETH_ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
+
+const TRAVEL_CATALOG: Record<string, { type: string; name: string; tokenPrice: number }> = {
+  h1: { type: "hotel", name: "The Ritz-Carlton", tokenPrice: 1200 },
+  h2: { type: "hotel", name: "Four Seasons Resort", tokenPrice: 2500 },
+  h3: { type: "hotel", name: "Mandarin Oriental", tokenPrice: 1800 },
+  h4: { type: "hotel", name: "Burj Al Arab", tokenPrice: 3500 },
+  h5: { type: "hotel", name: "Aman Venice", tokenPrice: 2200 },
+  h6: { type: "hotel", name: "Soneva Fushi", tokenPrice: 4000 },
+  f1: { type: "flight", name: "JFK → LHR", tokenPrice: 800 },
+  f2: { type: "flight", name: "LAX → NRT", tokenPrice: 1500 },
+  f3: { type: "flight", name: "SFO → CDG", tokenPrice: 950 },
+  f4: { type: "flight", name: "MIA → SIN", tokenPrice: 1800 },
+  f5: { type: "flight", name: "ORD → DXB", tokenPrice: 1200 },
+  f6: { type: "flight", name: "JFK → SYD", tokenPrice: 2000 },
+};
 
 const REWARD_TIERS = [
   { rankEnd: 1, tokens: 5000 },
@@ -208,14 +224,26 @@ router.get("/token/bookings", requireAuth, async (req, res) => {
   }
 });
 
+router.get("/token/catalog", (_req, res) => {
+  res.json(TRAVEL_CATALOG);
+});
+
 router.post("/token/book", requireAuth, async (req, res) => {
   const userId = (req as any).userId;
-  const { type, name, destination, checkIn, checkOut, tokenAmount, details } = req.body;
+  const { listingId, destination, checkIn, checkOut, details } = req.body;
 
-  if (!type || !name || !tokenAmount || tokenAmount <= 0) {
-    res.status(400).json({ error: "Missing required booking fields" });
+  if (!listingId) {
+    res.status(400).json({ error: "listingId is required" });
     return;
   }
+
+  const catalogItem = TRAVEL_CATALOG[listingId];
+  if (!catalogItem) {
+    res.status(400).json({ error: "Invalid listing ID" });
+    return;
+  }
+
+  const tokenAmount = catalogItem.tokenPrice;
 
   try {
     const [user] = await db.select().from(usersTable).where(eq(usersTable.clerkId, userId));
@@ -226,7 +254,7 @@ router.post("/token/book", requireAuth, async (req, res) => {
       return;
     }
 
-    const mockTxHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
+    const txHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
 
     const result = await db.transaction(async (tx) => {
       const [updated] = await tx.update(usersTable).set({
@@ -238,13 +266,13 @@ router.post("/token/book", requireAuth, async (req, res) => {
 
       const [booking] = await tx.insert(travelBookingsTable).values({
         userId: user.id,
-        type,
-        name,
+        type: catalogItem.type,
+        name: catalogItem.name,
         destination,
         checkIn,
         checkOut,
         tokenAmount,
-        txHash: mockTxHash,
+        txHash,
         details,
         status: "confirmed",
       }).returning();
@@ -253,15 +281,15 @@ router.post("/token/book", requireAuth, async (req, res) => {
         userId: user.id,
         type: "booking",
         amount: -tokenAmount,
-        description: `Travel booking: ${name} — ${destination || ""}`,
-        txHash: mockTxHash,
+        description: `Travel booking: ${catalogItem.name} — ${destination || ""}`,
+        txHash,
         status: "completed",
       });
 
       return { booking, newBalance: updated.tokenBalance };
     });
 
-    res.json({ booking: result.booking, txHash: mockTxHash, newBalance: result.newBalance });
+    res.json({ booking: result.booking, txHash, newBalance: result.newBalance });
   } catch (error: any) {
     console.error("Booking error:", error);
     if (error.message?.includes("Insufficient balance")) {
@@ -306,9 +334,12 @@ router.post("/token/admin/distribute", requireAuth, async (req, res) => {
         tokenBalance: usersTable.tokenBalance,
         firstName: usersTable.firstName,
         lastName: usersTable.lastName,
+        monthlyXp: userXpTable.monthlyXp,
+        totalXp: userXpTable.totalXp,
       })
       .from(usersTable)
-      .orderBy(desc(usersTable.tokenBalance))
+      .leftJoin(userXpTable, eq(usersTable.id, userXpTable.userId))
+      .orderBy(desc(userXpTable.monthlyXp), desc(userXpTable.totalXp))
       .limit(100);
 
     const distributions = [];
@@ -318,10 +349,10 @@ router.post("/token/admin/distribute", requireAuth, async (req, res) => {
       if (tokens <= 0) continue;
 
       const user = topUsers[i];
-      const mockTxHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
+      const txHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
 
       await db.update(usersTable).set({
-        tokenBalance: (user.tokenBalance || 0) + tokens,
+        tokenBalance: sql`COALESCE(${usersTable.tokenBalance}, 0) + ${tokens}`,
         updatedAt: new Date(),
       }).where(eq(usersTable.id, user.id));
 
@@ -330,16 +361,16 @@ router.post("/token/admin/distribute", requireAuth, async (req, res) => {
         userId: user.id,
         rank,
         tokensAwarded: tokens,
-        portfolioGain: Math.random() * 20 - 5,
-        txHash: mockTxHash,
+        portfolioGain: user.monthlyXp || 0,
+        txHash,
       }).returning();
 
       await db.insert(tokenTransactionsTable).values({
         userId: user.id,
         type: "reward",
         amount: tokens,
-        description: `Monthly reward — Rank #${rank} (${month})`,
-        txHash: mockTxHash,
+        description: `Monthly reward — Rank #${rank} (${month}) — ${user.monthlyXp || 0} XP`,
+        txHash,
         status: "completed",
       });
 

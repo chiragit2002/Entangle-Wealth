@@ -58,11 +58,9 @@ export default function TravelMarketplace() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          type: listing.type,
-          name: listing.name,
+          listingId: listing.id,
           destination: listing.destination,
           checkIn: listing.dates,
-          tokenAmount: listing.tokenPrice,
           details: listing.details,
         }),
       });

@@ -136,8 +136,8 @@ export default function RewardHistory() {
                     <div>
                       <p className="text-sm font-medium text-white">{r.month}</p>
                       <p className="text-xs text-muted-foreground">
-                        Portfolio gain: <span className={r.portfolioGain >= 0 ? "text-emerald-400" : "text-red-400"}>
-                          {r.portfolioGain >= 0 ? "+" : ""}{r.portfolioGain.toFixed(1)}%
+                        Monthly XP: <span className="text-primary">
+                          {Math.round(r.portfolioGain).toLocaleString()} XP
                         </span>
                       </p>
                     </div>
@@ -199,8 +199,8 @@ export default function RewardHistory() {
                                 <span className="text-sm text-white">{entry.name}</span>
                               </div>
                               <div className="flex items-center gap-4">
-                                <span className={`text-xs ${entry.gain >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                                  {entry.gain >= 0 ? "+" : ""}{entry.gain.toFixed(1)}%
+                                <span className="text-xs text-primary">
+                                  {Math.round(entry.gain).toLocaleString()} XP
                                 </span>
                                 <span className="font-mono text-sm text-yellow-400">{entry.tokens.toLocaleString()}</span>
                               </div>

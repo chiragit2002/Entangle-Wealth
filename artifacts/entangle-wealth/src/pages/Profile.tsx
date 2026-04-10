@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useUser, useAuth } from "@clerk/react";
-import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target } from "lucide-react";
+import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target, Wallet, Coins } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BottomNav } from "@/components/layout/BottomNav";
@@ -56,6 +56,7 @@ export default function Profile() {
   const [resume, setResume] = useState<ResumePreview | null>(null);
   const [gamification, setGamification] = useState<GamificationData | null>(null);
   const [myRank, setMyRank] = useState<number | null>(null);
+  const [tokenData, setTokenData] = useState<{ balance: number; walletAddress: string | null; tokenValue: number; totalValue: number } | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -73,6 +74,7 @@ export default function Profile() {
     loadSavedJobs();
     loadResume();
     loadGamification();
+    loadTokenData();
   }, [userLoaded]);
 
   const loadProfile = async () => {
@@ -140,6 +142,13 @@ export default function Profile() {
         const data = await rankRes.value.json();
         setMyRank(data.rank);
       }
+    } catch {}
+  };
+
+  const loadTokenData = async () => {
+    try {
+      const res = await fetchAuth("/token/balance");
+      if (res.ok) setTokenData(await res.json());
     } catch {}
   };
 
@@ -466,6 +475,57 @@ export default function Profile() {
           ) : (
             <p className="text-sm text-muted-foreground">Loading gamification data...</p>
           )}
+        </div>
+
+        <div className="glass-panel p-6 mb-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Coins className="w-5 h-5 text-yellow-400" /> EntangleCoin
+          </h3>
+          {tokenData ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+              <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+                <Coins className="w-5 h-5 text-yellow-400 mx-auto mb-1" />
+                <p className="text-[10px] text-muted-foreground uppercase">ENTGL Balance</p>
+                <p className="text-xl font-bold font-mono text-yellow-400">{(tokenData.balance || 0).toLocaleString()}</p>
+              </div>
+              <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+                <DollarSign className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
+                <p className="text-[10px] text-muted-foreground uppercase">USD Value</p>
+                <p className="text-xl font-bold font-mono text-emerald-400">${(tokenData.totalValue || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+              </div>
+              <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+                <TrendingUp className="w-5 h-5 text-primary mx-auto mb-1" />
+                <p className="text-[10px] text-muted-foreground uppercase">Token Value</p>
+                <p className="text-xl font-bold font-mono text-primary">${(tokenData.tokenValue || 0).toFixed(2)}</p>
+              </div>
+              <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+                <Wallet className="w-5 h-5 text-cyan-400 mx-auto mb-1" />
+                <p className="text-[10px] text-muted-foreground uppercase">Wallet</p>
+                <p className="text-sm font-mono text-cyan-400 truncate">
+                  {tokenData.walletAddress ? `${tokenData.walletAddress.slice(0, 6)}...${tokenData.walletAddress.slice(-4)}` : "Not linked"}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Loading token data...</p>
+          )}
+          <div className="flex gap-2">
+            <a href="/wallet">
+              <Button variant="outline" size="sm" className="border-yellow-500/30 text-yellow-400 gap-1">
+                <Wallet className="w-3.5 h-3.5" /> Wallet
+              </Button>
+            </a>
+            <a href="/rewards">
+              <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1">
+                <Trophy className="w-3.5 h-3.5" /> Rewards
+              </Button>
+            </a>
+            <a href="/marketplace">
+              <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1">
+                <ExternalLink className="w-3.5 h-3.5" /> Travel
+              </Button>
+            </a>
+          </div>
         </div>
 
         <div className="glass-panel p-6 mb-6">

@@ -37,6 +37,7 @@ import VolatilityLab from "@/pages/VolatilityLab";
 import CompetitiveAnalysis from "@/pages/CompetitiveAnalysis";
 import OpenSourceIntel from "@/pages/OpenSourceIntel";
 import CaseStudy from "@/pages/CaseStudy";
+import Charts from "@/pages/Charts";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -129,6 +130,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/travel" component={Travel} />
             <Route path="/taxgpt" component={TaxGPT} />
             <Route path="/technical" component={TechnicalAnalysis} />
+            <Route path="/charts" component={Charts} />
             <Route path="/market-overview" component={MarketOverview} />
             <Route path="/screener" component={Screener} />
             <Route path="/terminal" component={Terminal} />

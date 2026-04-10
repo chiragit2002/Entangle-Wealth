@@ -1,6 +1,6 @@
 # Overview
 
-EntangleWealth is a pnpm workspace monorepo using TypeScript, designed as a financial analysis platform. Its core mission is to help everyday families make better financial decisions by providing tools for stock analysis, job search, résumé building, gig marketplaces, and a comprehensive TaxFlow suite for tax management. The platform features a unique "quantum entanglement" AI analysis method where multiple AI agents cross-check each other for consensus-based signals. It integrates with Clerk for authentication, Stripe for payments, and OpenAI for AI capabilities. The platform aims to be honest and straightforward, avoiding hype or AI slop, and focuses on practical financial tools.
+EntangleWealth is a pnpm monorepo financial analysis platform designed to help families make better financial decisions. It offers tools for stock analysis, job searching, résumé building, gig marketplaces, and a comprehensive TaxFlow suite. The platform features a "quantum entanglement" AI analysis method where multiple AI agents cross-check each other for consensus-based signals, aiming to provide honest and practical financial insights.
 
 # User Preferences
 
@@ -9,34 +9,31 @@ I prefer concise and direct communication. When making changes, prioritize funct
 # System Architecture
 
 ## Monorepo Structure
-The project is a pnpm workspace monorepo with each package managing its own dependencies.
+The project uses a pnpm workspace monorepo, with each package managing its own dependencies.
 
 ## UI/UX and Design System
-- **Theme**: Dark theme with a black background, electric blue (`#00D4FF`), and gold (`#FFD700`) accents. Purple (`#9c27b0`) as tertiary accent.
-- **Fonts**: JetBrains Mono for data displays and Inter for UI elements.
-- **CSS Utilities**: Includes `.electric-text`, `.gold-text`, `.glass-panel`, `.glass-panel-gold`, `.mobile-card`, `.mobile-card-glow`, `.signal-card`, `.filter-pill` for consistent styling.
-- **Glassmorphism**: All panels use `blur(20px) saturate(1.2)` with gradient border overlays (cyan-to-gold) and hover effects (border glow + shadow lift).
-- **Scrollbar**: Custom styled with 6px width, transparent track, cyan hover thumb.
-- **Animations**: `orb-drift-1/2/3` for background mesh, `fade-up` for page transitions, `border-shimmer` for gradient borders, plus existing `pulse-glow`, `float`, `shimmer`, `rotate-slow`.
-- **Navbar**: Organized into dropdown groups (Trading, Tools, Research, More) with animated gradient bottom border. Logo uses `Entangle<span class="text-primary">Wealth</span>` treatment.
-- **Routing**: `wouter` for client-side routing.
-- **Responsiveness**: Mobile-responsive design with grouped hamburger menu (section headers: Trading, Tools, Research, More in 2-column grid) and bottom navigation bar on screens smaller than 1024px.
-- **Components**: Utilizes shadcn/ui components.
-- **Layout Background**: Three animated gradient orbs (cyan, gold, purple) with slow drift animations, plus a subtle dot grid overlay at 40px spacing.
-- **Competitive Intelligence**: `/competitive-intel` — Full quantum competitive analysis report with 7 competitors (Bloomberg, TradingView, Koyfin, Trade Ideas, TrendSpider, Danelfin, Robinhood), April Dunford positioning, feature matrix, 2x2 positioning map, Kano analysis, strategic action plan, and PDF export via jsPDF.
-- **Résumé Builder**: `/resume` (protected) — Quantum Résumé Entanglement Engine with three tabs: Resume Builder (5 templates, live preview, contact/summary/experience/education/skills/certifications sections), LinkedIn Import (URL-based profile import with AI enhancement), and Accounting Software Integration (QuickBooks, Xero, H&R Block connection cards for financial data entanglement). Includes Quantum Coherence Score (completion %) and gig/freelance work tagging.
-- **Open Source Intel**: `/open-source-intel` — GitHub Solution Entanglement Map showing 14 battle-tested open-source libraries (TradingView Lightweight Charts, Alpaca TypeScript SDK, TanStack Table, @react-pdf/renderer, Sonner, tsParticles, zustand, etc.) with priority filtering (Critical/High/Medium/Explore), category filtering, expandable details, install commands, license compliance matrix, and 3-phase integration strategy.
+- **Theme**: Dark theme with black background, electric blue (`#00D4FF`), gold (`#FFD700`), and tertiary purple (`#9c27b0`) accents.
+- **Typography**: JetBrains Mono for data displays and Inter for UI elements.
+- **Visuals**: Glassmorphism effects with blurred panels and gradient borders. Custom scrollbars and a variety of animations for background elements and transitions.
+- **Navigation**: Navbar with dropdown groups and a mobile-responsive bottom navigation bar.
+- **Components**: Utilizes shadcn/ui.
+- **Layout Background**: Animated gradient orbs and a subtle dot grid overlay.
+- **Core Features**:
+    - **Competitive Intelligence**: Full quantum competitive analysis with positioning, feature matrix, and PDF export.
+    - **Résumé Builder**: Quantum Résumé Entanglement Engine with templates, LinkedIn import, accounting software integration, and a Quantum Coherence Score.
+    - **Open Source Intel**: GitHub Solution Entanglement Map showcasing battle-tested open-source libraries with integration strategies.
+    - **TradingView Charts**: Professional charting platform with HTML5 candlestick engine, 40+ technical indicators, AI scanner, pattern detection, drawing tools, and price alerts.
 
 ## Technical Implementations
-- **Authentication**: Clerk for user authentication (email and Google sign-in).
-- **Database**: PostgreSQL with Drizzle ORM for data management.
-- **API**: Express 5 server handling all backend logic and API endpoints.
-- **AI Integration**: OpenAI via Replit AI Integrations proxy, specifically `gpt-4o-mini` for features like TaxGPT and "Quantum Entanglement Analysis".
+- **Authentication**: Clerk for user authentication (email, Google).
+- **Database**: PostgreSQL with Drizzle ORM.
+- **API**: Express 5 server handling backend logic.
+- **AI Integration**: OpenAI via Replit AI Integrations proxy, using `gpt-4o-mini`.
 - **Validation**: Zod for schema validation.
 - **Build**: `esbuild` for CJS bundle creation.
-- **Frontend**: React with Vite, styled using Tailwind CSS.
-- **Payments**: Stripe for subscription management and payment processing. KYC verification is a prerequisite for Stripe payment features.
-- **Data Management**: LocalStorage is used for client-side persistence of items like watchlist, alerts, and receipts.
+- **Frontend**: React with Vite and Tailwind CSS.
+- **Payments**: Stripe for subscriptions and payment processing, requiring KYC verification.
+- **Data Management**: LocalStorage for client-side persistence of user-specific data.
 
 ## Feature Specifications
 
@@ -66,32 +63,26 @@ The project is a pnpm workspace monorepo with each package managing its own depe
 - **"What If" Time Machine** (`/time-machine`): Historical investment simulator using real Alpaca market data. Enter any stock symbol, start date, and dollar amount to see what your investment would be worth today. Features interactive journey chart with investment baseline, stats for total return, annualized return, max drawdown, best/worst days, and share count. Quick-pick presets for popular scenarios (NVDA Jan 2020, AMD COVID Bottom, etc.).
 - **Sector Flow Radar** (`/sector-flow`): Real-time sector rotation visualization tracking 80 stocks across 8 sectors (Technology, Healthcare, Consumer Cyclical, Financials, Energy, Industrials, Comm Services, Real Estate). Features animated radar chart showing relative sector momentum, market regime indicator (Risk-On/Risk-Off/Neutral), sector breakdown cards with gainers/losers bars, volume data, and top/worst movers per sector. Uses live Alpaca snapshots.
 - **Volatility Lab** (`/volatility`): Multi-timeframe realized volatility analysis with institutional-grade risk metrics. Computes annualized vol at 5 timeframes (1W, 1M, 3M, 6M, 1Y) using log returns. Features vol term structure chart, daily return distribution histogram, vol regime detection (Low/Normal/Elevated/Extreme), and risk ratios: Sharpe, Sortino, Calmar, max drawdown. Quick-pick buttons for popular symbols.
+- **Legal**: Comprehensive Terms of Use and Privacy Policy.
+- **Mobile Design**: Fully responsive, mobile-first design with bottom navigation and optimized components.
 
-- **Pricing** (`/pricing`): 3-tier pricing page (Starter $0, Pro $29/mo, Business $79/mo) with feature comparison, free trial CTA, and referral program section.
-- **Terms of Use** (`/terms`): Full legal terms covering acceptance, service description, financial advice disclaimer, market data & third-party services (Alpaca), user accounts, subscriptions, AI analysis disclosure, prohibited uses, IP, liability, risk disclosure, indemnification, and governing law.
-- **Privacy Policy** (`/privacy`): Comprehensive privacy policy covering data collection, usage, sharing, security, retention, user rights (CCPA), international transfers, and children's privacy.
-- **Mobile Design**: Fully responsive mobile-first design with bottom navigation (Home, Signals, Analysis, TaxFlow, Pricing), signal cards with confidence bars and indicator panels, quantum entanglement matrix canvas, live ticker tape, and mobile-optimized card components.
-
-## API Server (`artifacts/api-server`)
-- Express 5 server with Clerk middleware for authentication.
-- **Security**: Helmet for HTTP security headers (CSP disabled for SPA compatibility). Global rate limit of 120 req/min with `express-rate-limit` (skips Clerk proxy and Stripe webhooks). AI-specific rate limit of 15 req/min on `/api/taxgpt` and `/api/analyze`.
-- Stripe webhook endpoint for payment events.
-- **Alpaca Market Data**: Proxy routes to Alpaca Markets API for real-time stock snapshots, historical OHLCV bars, quotes, trades, and market movers. Endpoints: `/api/alpaca/snapshot/:symbol`, `/api/alpaca/snapshots`, `/api/alpaca/bars/:symbol`, `/api/alpaca/quote/:symbol`, `/api/alpaca/trades/:symbol`, `/api/alpaca/multibars`, `/api/alpaca/movers`, `/api/alpaca/account`. Uses IEX feed. Falls back to mock data on auth errors.
-- **News Intelligence**: `/api/news` endpoint with RSS feed scraping via `rss-parser`, relevance scoring (35+ keywords), sentiment analysis, ticker extraction, category filtering, search, pagination, and 5-min cache. `/api/news/refresh` for manual cache invalidation. Rate-limited to 30 requests/min per IP.
-- **Routes**: Health check, stocks data, AI analysis (rate-limited), user management, résumé operations, job search/save, KYC submission, Stripe configuration/checkout, TaxGPT queries, Alpaca market data proxy, and news intelligence.
+### API Server
+- **Security**: Helmet for HTTP security, global rate limiting, and AI-specific rate limiting.
+- **Integrations**: Stripe webhook endpoint.
+- **Market Data Proxy**: Alpaca Markets API proxy for real-time and historical stock data (snapshots, bars, quotes, trades, movers).
+- **News Intelligence**: `/api/news` endpoint for RSS feed scraping, relevance scoring, sentiment analysis, and caching.
+- **Routes**: Health checks, stock data, AI analysis, user management, résumé operations, job search, KYC, Stripe config, TaxGPT, Alpaca proxy, news intelligence.
 
 # External Dependencies
 
 - **Monorepo tool**: pnpm workspaces
-- **Node.js version**: 24
-- **TypeScript version**: 5.9
 - **API framework**: Express 5
 - **Database**: PostgreSQL
 - **ORM**: Drizzle ORM
-- **Authentication**: Clerk (auto-provisioned via Replit)
-- **Payments**: Stripe (via Replit integration + `stripe-replit-sync`)
-- **AI**: OpenAI (via Replit AI Integrations proxy `@workspace/integrations-openai-ai-server`)
-- **Validation**: Zod (`zod/v4`), `drizzle-zod`
+- **Authentication**: Clerk
+- **Payments**: Stripe
+- **AI**: OpenAI (via Replit AI Integrations proxy)
+- **Validation**: Zod, `drizzle-zod`
 - **Build**: esbuild
 - **Frontend**: React, Vite, Tailwind CSS, shadcn/ui, Clerk React, react-error-boundary
 - **Charts**: TradingView Lightweight Charts (candlestick/volume charts in Technical Analysis, reusable LightweightChart component)

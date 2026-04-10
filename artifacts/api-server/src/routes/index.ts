@@ -11,6 +11,7 @@ import gigsRouter from "./gigs";
 import taxgptRouter from "./taxgpt";
 import alpacaRouter from "./alpaca";
 import newsRouter from "./news";
+import gamificationRouter from "./gamification";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use(gigsRouter);
 router.use(taxgptRouter);
 router.use(alpacaRouter);
 router.use(newsRouter);
+router.use(gamificationRouter);
 
 export default router;

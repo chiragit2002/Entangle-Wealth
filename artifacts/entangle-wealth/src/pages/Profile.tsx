@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useUser, useAuth } from "@clerk/react";
-import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe } from "lucide-react";
+import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BottomNav } from "@/components/layout/BottomNav";
@@ -8,6 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { authFetch } from "@/lib/authFetch";
+
+interface GamificationData {
+  xp: { totalXp: number; level: number; tier: string; monthlyXp: number; weeklyXp: number };
+  streak: { currentStreak: number; longestStreak: number; multiplier: number };
+  badges: { badge: { id: number; name: string; icon: string; description: string }; earnedAt: string }[];
+  levelProgress: number;
+  xpToNextLevel: number;
+}
 
 interface ProfileData {
   headline: string;
@@ -46,6 +54,8 @@ export default function Profile() {
   });
   const [savedJobs, setSavedJobs] = useState<SavedJob[]>([]);
   const [resume, setResume] = useState<ResumePreview | null>(null);
+  const [gamification, setGamification] = useState<GamificationData | null>(null);
+  const [myRank, setMyRank] = useState<number | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -62,6 +72,7 @@ export default function Profile() {
     loadProfile();
     loadSavedJobs();
     loadResume();
+    loadGamification();
   }, [userLoaded]);
 
   const loadProfile = async () => {
@@ -114,6 +125,22 @@ export default function Profile() {
         }
       }
     } catch { /* ignore */ }
+  };
+
+  const loadGamification = async () => {
+    try {
+      const [gamRes, rankRes] = await Promise.allSettled([
+        fetchAuth("/gamification/me"),
+        fetchAuth("/gamification/leaderboard/rank"),
+      ]);
+      if (gamRes.status === "fulfilled" && gamRes.value.ok) {
+        setGamification(await gamRes.value.json());
+      }
+      if (rankRes.status === "fulfilled" && rankRes.value.ok) {
+        const data = await rankRes.value.json();
+        setMyRank(data.rank);
+      }
+    } catch {}
   };
 
   const saveProfile = async () => {
@@ -361,6 +388,84 @@ export default function Profile() {
               <p className="text-xl font-bold font-mono text-[#ff3366]">8.4%</p>
             </div>
           </div>
+        </div>
+
+        <div className="glass-panel p-6 mb-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-yellow-400" /> Gamification
+          </h3>
+          {gamification ? (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+                  <Star className="w-5 h-5 text-primary mx-auto mb-1" />
+                  <p className="text-[10px] text-muted-foreground uppercase">Level</p>
+                  <p className="text-xl font-bold font-mono text-primary">{gamification.xp.level}</p>
+                  <p className="text-[9px] text-muted-foreground">{gamification.xp.tier}</p>
+                </div>
+                <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+                  <Zap className="w-5 h-5 text-yellow-400 mx-auto mb-1" />
+                  <p className="text-[10px] text-muted-foreground uppercase">Total XP</p>
+                  <p className="text-xl font-bold font-mono text-yellow-400">{gamification.xp.totalXp.toLocaleString()}</p>
+                </div>
+                <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+                  <Flame className="w-5 h-5 text-orange-400 mx-auto mb-1" />
+                  <p className="text-[10px] text-muted-foreground uppercase">Streak</p>
+                  <p className="text-xl font-bold font-mono text-orange-400">{gamification.streak.currentStreak}</p>
+                  <p className="text-[9px] text-muted-foreground">{gamification.streak.multiplier.toFixed(1)}x multi</p>
+                </div>
+                <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+                  <Trophy className="w-5 h-5 text-[#FFD700] mx-auto mb-1" />
+                  <p className="text-[10px] text-muted-foreground uppercase">Rank</p>
+                  <p className="text-xl font-bold font-mono text-[#FFD700]">{myRank ? `#${myRank}` : "--"}</p>
+                </div>
+              </div>
+              <div className="mb-4">
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="text-muted-foreground">Level {gamification.xp.level} Progress</span>
+                  <span className="text-muted-foreground">{gamification.xpToNextLevel} XP to next</span>
+                </div>
+                <div className="w-full bg-white/5 rounded-full h-2">
+                  <div
+                    className="h-2 rounded-full bg-gradient-to-r from-primary to-cyan-400 transition-all"
+                    style={{ width: `${gamification.levelProgress}%` }}
+                  />
+                </div>
+              </div>
+              {gamification.badges.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-2 flex items-center gap-1">
+                    <Award className="w-4 h-4 text-primary" /> Earned Badges
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {gamification.badges.map((b) => (
+                      <span
+                        key={b.badge.id}
+                        className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/30"
+                        title={b.badge.description}
+                      >
+                        {b.badge.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="mt-4 flex gap-2">
+                <a href="/leaderboard">
+                  <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1">
+                    <Trophy className="w-3.5 h-3.5" /> Leaderboard
+                  </Button>
+                </a>
+                <a href="/achievements">
+                  <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1">
+                    <Target className="w-3.5 h-3.5" /> Achievements
+                  </Button>
+                </a>
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">Loading gamification data...</p>
+          )}
         </div>
 
         <div className="glass-panel p-6 mb-6">

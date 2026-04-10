@@ -1,5 +1,5 @@
 import { useLocation, Link } from "wouter";
-import { Home, TrendingUp, BarChart3, Newspaper, FileText, Clock, Radar, Activity } from "lucide-react";
+import { Home, TrendingUp, BarChart3, Newspaper, Trophy, Clock, Radar, Activity } from "lucide-react";
 import { useState } from "react";
 
 const primaryItems = [
@@ -7,7 +7,7 @@ const primaryItems = [
   { href: "/dashboard", label: "Signals", icon: TrendingUp },
   { href: "/technical", label: "Analysis", icon: BarChart3 },
   { href: "/research", label: "Research", icon: Newspaper },
-  { href: "/tax", label: "TaxFlow", icon: FileText },
+  { href: "/leaderboard", label: "Compete", icon: Trophy },
 ];
 
 const moreItems = [

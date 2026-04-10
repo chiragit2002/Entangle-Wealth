@@ -38,6 +38,8 @@ import CompetitiveAnalysis from "@/pages/CompetitiveAnalysis";
 import OpenSourceIntel from "@/pages/OpenSourceIntel";
 import CaseStudy from "@/pages/CaseStudy";
 import Charts from "@/pages/Charts";
+import Leaderboard from "@/pages/Leaderboard";
+import Achievements from "@/pages/Achievements";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -145,6 +147,8 @@ function ClerkProviderWithRoutes() {
             <Route path="/competitive-intel" component={CompetitiveAnalysis} />
             <Route path="/open-source-intel" component={OpenSourceIntel} />
             <Route path="/case-study" component={CaseStudy} />
+            <Route path="/leaderboard" component={Leaderboard} />
+            <Route path="/achievements" component={Achievements} />
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?" component={SignUpPage} />
             <Route path="/resume">{() => <ProtectedRoute component={Resume} />}</Route>

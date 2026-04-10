@@ -39,6 +39,13 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    label: "Compete",
+    items: [
+      { href: "/leaderboard", label: "Leaderboard", desc: "Top 100 traders" },
+      { href: "/achievements", label: "Achievements", desc: "Badges & challenges" },
+    ],
+  },
+  {
     label: "More",
     items: [
       { href: "/earn", label: "Earn", desc: "Gig marketplace" },
@@ -79,6 +86,13 @@ const MOBILE_SECTIONS = [
     links: [
       { href: "/research", label: "News Intel" },
       { href: "/stocks", label: "Stocks" },
+    ],
+  },
+  {
+    title: "Compete",
+    links: [
+      { href: "/leaderboard", label: "Leaderboard" },
+      { href: "/achievements", label: "Achievements" },
     ],
   },
   {

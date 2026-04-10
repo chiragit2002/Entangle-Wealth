@@ -10,7 +10,7 @@ import { SignalHistory } from "@/components/SignalHistory";
 import { EconomicCalendar } from "@/components/EconomicCalendar";
 import { stockAlerts, optionsAlerts, unusualOptionsActivity, portfolioChartData, optionsIncomeData, agentLogMessages } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpRight, ArrowDownRight, Activity, Zap, Minus, TrendingUp, Shield, RefreshCw, Search, BarChart3, X, Terminal, Globe, Layers, Clock, Keyboard, ChevronUp, ChevronDown, Eye } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Activity, Zap, Minus, TrendingUp, Shield, RefreshCw, Search, BarChart3, X, Terminal, Globe, Layers, Clock, Keyboard, ChevronUp, ChevronDown, Eye, Trophy, Flame, Award } from "lucide-react";
 import { generateMockOHLCV, runAllIndicators, getOverallSignal } from "@/lib/indicators";
 import { useToast } from "@/hooks/use-toast";
 import { Area, AreaChart, Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from "recharts";
@@ -151,6 +151,52 @@ function DataRow({ label, value, change, mono = true, small = false }: { label: 
           </span>
         )}
       </div>
+    </div>
+  );
+}
+
+function GamificationBar() {
+  const [gamData, setGamData] = useState<{ rank: string; streak: string; badges: string } | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/gamification/leaderboard/rank");
+        const rankData = res.ok ? await res.json() : null;
+        const rankStr = rankData?.rank ? `#${rankData.rank}` : "#--";
+
+        setGamData({ rank: rankStr, streak: "0 days", badges: "0/12" });
+      } catch {
+        setGamData({ rank: "#--", streak: "0 days", badges: "0/12" });
+      }
+    })();
+  }, []);
+
+  const data = gamData || { rank: "#--", streak: "0 days", badges: "0/12" };
+
+  return (
+    <div className="grid grid-cols-3 gap-1.5 mb-2">
+      <a href="/leaderboard" className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 hover:border-[#FFD700]/20 transition-colors cursor-pointer">
+        <Trophy className="w-4 h-4 text-[#FFD700]" />
+        <div>
+          <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest">RANK</p>
+          <p className="text-[13px] font-mono font-black text-[#FFD700]">{data.rank}</p>
+        </div>
+      </a>
+      <a href="/achievements" className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 hover:border-orange-400/20 transition-colors cursor-pointer">
+        <Flame className="w-4 h-4 text-orange-400" />
+        <div>
+          <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest">STREAK</p>
+          <p className="text-[13px] font-mono font-black text-orange-400">{data.streak}</p>
+        </div>
+      </a>
+      <a href="/achievements" className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 hover:border-[#9c27b0]/20 transition-colors cursor-pointer">
+        <Award className="w-4 h-4 text-[#9c27b0]" />
+        <div>
+          <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest">BADGES</p>
+          <p className="text-[13px] font-mono font-black text-[#9c27b0]">{data.badges}</p>
+        </div>
+      </a>
     </div>
   );
 }
@@ -358,6 +404,8 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
+
+        <GamificationBar />
 
         {(quickAnalysis || analyzingSymbol) && (
           <div className="mb-2">

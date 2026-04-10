@@ -15,7 +15,7 @@ The project uses a pnpm workspace monorepo, with each package managing its own d
 - **Theme**: Dark theme with black background, electric blue (`#00D4FF`), gold (`#FFD700`), and tertiary purple (`#9c27b0`) accents.
 - **Typography**: JetBrains Mono for data displays and Inter for UI elements.
 - **Visuals**: Glassmorphism effects with blurred panels and gradient borders. Custom scrollbars and a variety of animations for background elements and transitions.
-- **Navigation**: Navbar with dropdown groups and a mobile-responsive bottom navigation bar.
+- **Navigation**: Navbar with dropdown groups (Trading, Tools, Research, Compete, More) and a mobile-responsive bottom navigation bar.
 - **Components**: Utilizes shadcn/ui.
 - **Layout Background**: Animated gradient orbs and a subtle dot grid overlay.
 - **Core Features**:
@@ -43,7 +43,8 @@ The project uses a pnpm workspace monorepo, with each package managing its own d
 - **Job Search**: Searchable job listings with filters, pagination, and job saving (requires sign-in). Fallback to demo listings if JSearch API is not configured.
 - **Résumé Builder**: Step-by-step guided builder with live preview, supporting traditional and gig work, and 3 customizable templates. Exports to PDF.
 - **Gig Marketplace**: Browse and post local service gigs with categories and search.
-- **Profile**: User profile management, investment progress stats, privacy settings, and KYC verification.
+- **Profile**: User profile management, investment progress stats, privacy settings, KYC verification, and gamification stats (level, XP, streak, rank, badges).
+- **Gamification & Leaderboard Engine**: Full competitive gamification system with tiered levels (Bronze → Silver → Gold → Platinum → Diamond), XP system with server-controlled rewards, achievement badges (12 badges across 5 categories), daily/weekly challenges with progress tracking, streak tracking with multiplier bonuses (up to 3x), and a live leaderboard showing top 100 users with time-period filters.
 - **KYC Verification**: Multi-step form for personal info and government ID, with status tracking.
 - **Stripe Payments**: Integration for subscription products (Pro, Enterprise) with checkout sessions and a customer portal. KYC is required before payment.
 - **Community**: 5-tab interface (Groups, Feed, Events, Jobs, Pricing) with client-side state for MVP.
@@ -71,7 +72,7 @@ The project uses a pnpm workspace monorepo, with each package managing its own d
 - **Integrations**: Stripe webhook endpoint.
 - **Market Data Proxy**: Alpaca Markets API proxy for real-time and historical stock data (snapshots, bars, quotes, trades, movers).
 - **News Intelligence**: `/api/news` endpoint for RSS feed scraping, relevance scoring, sentiment analysis, and caching.
-- **Routes**: Health checks, stock data, AI analysis, user management, résumé operations, job search, KYC, Stripe config, TaxGPT, Alpaca proxy, news intelligence.
+- **Routes**: Health checks, stock data, AI analysis, user management, résumé operations, job search, KYC, Stripe config, TaxGPT, Alpaca proxy, news intelligence, and gamification (XP, badges, challenges, streaks, leaderboard).
 
 # External Dependencies
 

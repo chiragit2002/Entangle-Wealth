@@ -199,7 +199,7 @@ export function MirofishTerminal() {
   ];
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-primary/20 bg-[#000810]">
+    <div className="overflow-hidden bg-[#000810]">
       <div className="flex items-center justify-between px-4 py-2 border-b border-primary/10 bg-primary/[0.03]">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
@@ -207,10 +207,10 @@ export function MirofishTerminal() {
             <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
             <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
           </div>
-          <span className="text-[10px] font-mono text-primary/60 uppercase tracking-widest">EntangleWealth Terminal v2.4</span>
+          <span className="text-[10px] font-mono text-primary/60 uppercase tracking-widest">EntangleWealth Terminal v3.0</span>
         </div>
         <div className="flex items-center gap-4 text-[10px] font-mono">
-          <span className="text-green-400">6 MODELS ONLINE</span>
+          <span className="text-green-400">7 MODELS ONLINE</span>
           <span className="text-muted-foreground">{clock}</span>
         </div>
       </div>

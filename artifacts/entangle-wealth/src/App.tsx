@@ -44,6 +44,7 @@ import TokenWallet from "@/pages/TokenWallet";
 import TravelMarketplace from "@/pages/TravelMarketplace";
 import RewardHistory from "@/pages/RewardHistory";
 import TokenAdmin from "@/pages/TokenAdmin";
+import TaxStrategy from "@/pages/TaxStrategy";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -134,6 +135,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/tax" component={Tax} />
             <Route path="/receipts" component={Receipts} />
             <Route path="/travel" component={Travel} />
+            <Route path="/tax-strategy" component={TaxStrategy} />
             <Route path="/taxgpt" component={TaxGPT} />
             <Route path="/technical" component={TechnicalAnalysis} />
             <Route path="/charts" component={Charts} />

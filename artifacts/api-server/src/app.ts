@@ -69,6 +69,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(clerkMiddleware());
 
 app.use("/api/taxgpt", aiLimiter);
+app.use("/api/analyze-document", aiLimiter);
 app.use("/api/analyze", aiLimiter);
 
 app.use(seoRouter);

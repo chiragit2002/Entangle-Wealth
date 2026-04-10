@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useUser, useClerk, Show } from "@clerk/react";
 import { Button } from "@/components/ui/button";
 import NotificationCenter from "@/components/NotificationCenter";
+import { TaxYearSelector } from "@/components/tax/TaxYearSelector";
 
 interface NavGroup {
   label: string;
@@ -59,7 +60,10 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/earn", label: "Earn", desc: "Gig marketplace" },
       { href: "/community", label: "Community", desc: "Groups & events" },
-      { href: "/tax", label: "TaxFlow", desc: "Tax suite" },
+      { href: "/tax", label: "TaxFlow", desc: "Tax dashboard" },
+      { href: "/tax-strategy", label: "Strategies", desc: "25+ tax strategies" },
+      { href: "/receipts", label: "Documents", desc: "Document vault" },
+      { href: "/taxgpt", label: "TaxGPT", desc: "AI tax assistant" },
       { href: "/pricing", label: "Pricing", desc: "Plans" },
       { href: "/resume", label: "Résumé Builder", desc: "Quantum résumé engine" },
       { href: "/about", label: "About", desc: "Our mission" },
@@ -119,6 +123,9 @@ const MOBILE_SECTIONS = [
       { href: "/earn", label: "Earn" },
       { href: "/community", label: "Community" },
       { href: "/tax", label: "TaxFlow" },
+      { href: "/tax-strategy", label: "Strategies" },
+      { href: "/receipts", label: "Documents" },
+      { href: "/taxgpt", label: "TaxGPT" },
       { href: "/pricing", label: "Pricing" },
       { href: "/resume", label: "Résumé Builder" },
       { href: "/about", label: "About" },
@@ -238,6 +245,7 @@ export function Navbar() {
         </div>
 
         <div className="hidden lg:flex items-center gap-2">
+          <TaxYearSelector />
           <NotificationCenter />
 
           <Show when="signed-in">

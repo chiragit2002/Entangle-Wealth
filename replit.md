@@ -48,11 +48,16 @@ The project uses a pnpm workspace monorepo, with each package managing its own d
 - **KYC Verification**: Multi-step form for personal info and government ID, with status tracking.
 - **Stripe Payments**: Integration for subscription products (Pro, Enterprise) with checkout sessions and a customer portal. KYC is required before payment.
 - **Community**: 5-tab interface (Groups, Feed, Events, Jobs, Pricing) with client-side state for MVP.
-- **TaxFlow Suite**:
-    - **Tax Dashboard**: Compliance score, deduction tracking, and quick links.
-    - **Receipt Scanner**: Upload and manual entry for receipts, with deductibility badges and CSV export. Client-side storage via `localStorage`.
-    - **Travel Budget Planner** (`/travel`): Dual-mode planner with Personal Trip and Business Trip modes. Personal Trip: origin/destination form, interactive Leaflet.js map (OpenStreetMap + Nominatim geocoding) with color-coded markers, day-by-day itinerary builder with per-item costs, budget summary dashboard with category breakdown and "trip cost vs. savings" widget, entry requirements alerts (visa, passport, vaccines, ETIAS) with official source links. Business Trip: preserved 4-step wizard for IRS deduction tracking, itinerary building, and CSV export with compliance scoring.
-    - **TaxGPT**: AI chat for tax Q&A (gpt-4o-mini), with quick buttons and client-side fallback/rate limiting.
+- **TaxFlow Intelligence Platform**:
+    - **Core Data Layer**: Shared types (`taxflow-types.ts`), IRS tax rate tables for 2024/2025/2026 (`taxflow-rates.ts`), 27 tax strategies engine (`taxflow-strategies.ts`), and localStorage profile management (`taxflow-profile.ts`).
+    - **Onboarding Wizard**: 4-step modal (entity type → business info → deduction checklist → review) that creates a user tax profile in localStorage. Shows automatically on first visit to any TaxFlow page.
+    - **Tax Year Selector**: Dropdown in navbar (2024–2026) that dispatches `taxflow-year-change` custom event; all TaxFlow pages listen and update accordingly.
+    - **Tax Dashboard** (`/tax`): Compliance score ring, deduction category breakdown (pie chart), missed opportunity alerts, side-by-side tax estimator (Federal + SE + State), CPA report text export, and CSV deduction export. Visual identity: green (#00e676) for deductions, amber (#ffb800) for warnings, red (#ff4757) for tax owed, purple (#9c27b0) for AI.
+    - **Tax Strategy Browser** (`/tax-strategy`): 27 filterable strategies by entity type (Contractor/LLC/S-Corp/C-Corp) and category (Retirement, Health, Equipment, etc.). Expandable cards with IRC references, risk badges, estimator functions, and "Add to Plan" / "Ask TaxGPT" actions. Plan strategies stored in localStorage.
+    - **Document Vault** (`/receipts`): Drag-and-drop upload with AI document analysis (via `/api/analyze-document`), document cards and ledger view, category filters, mileage log module with per-entry tracking, and mileage CSV export.
+    - **TaxGPT** (`/taxgpt`): Profile-aware AI tax assistant (gpt-4o-mini). Entity-specific quick chips, localStorage chat history persistence, profile context sent to backend for personalized answers.
+    - **Travel Budget Planner** (`/travel`): Dual-mode planner with Personal Trip and Business Trip modes. Personal Trip: interactive Leaflet.js map with color-coded markers, day-by-day itinerary builder with per-item costs, budget summary dashboard. Business Trip: 4-step wizard for IRS deduction tracking, itinerary building, and CSV export with compliance scoring.
+    - **Legal Disclaimers**: All TaxFlow pages include educational-only disclaimers advising users to consult a licensed CPA.
 - **Technical Analysis**: TradingView-inspired layout with 55+ technical indicators, full stock search, persistent watchlist, and candlestick charts with overlays. Features 6 AI agent reviews.
 - **Market Overview**: Dashboard for major indices, economic indicators, sector heatmaps, global markets, and market breadth.
 - **Stock Screener**: Filterable and sortable stock list with AI signal and confidence.
@@ -74,12 +79,13 @@ The project uses a pnpm workspace monorepo, with each package managing its own d
     - **DB Schema**: token_transactions, reward_distributions, travel_bookings, token_config tables; users extended with walletAddress + tokenBalance.
 - **Mobile Design**: Fully responsive, mobile-first design with bottom navigation and optimized components.
 
-### API Server
-- **Security**: Helmet for HTTP security, global rate limiting, and AI-specific rate limiting.
-- **Integrations**: Stripe webhook endpoint.
-- **Market Data Proxy**: Alpaca Markets API proxy for real-time and historical stock data (snapshots, bars, quotes, trades, movers).
-- **News Intelligence**: `/api/news` endpoint for RSS feed scraping, relevance scoring, sentiment analysis, and caching.
-- **Routes**: Health checks, stock data, AI analysis, user management, résumé operations, job search, KYC, Stripe config, TaxGPT, Alpaca proxy, news intelligence, gamification (XP, badges, challenges, streaks, leaderboard), and token system (wallet linking, balance, transactions, rewards, travel bookings, admin distribution/config).
+### API Server (`artifacts/api-server`)
+- Express 5 server with Clerk middleware for authentication.
+- **Security**: Helmet for HTTP security headers (CSP disabled for SPA compatibility). Global rate limit of 120 req/min with `express-rate-limit` (skips Clerk proxy and Stripe webhooks). AI-specific rate limit of 15 req/min on `/api/taxgpt`, `/api/analyze-document`, and `/api/analyze`.
+- Stripe webhook endpoint for payment events.
+- **Alpaca Market Data**: Proxy routes to Alpaca Markets API for real-time stock snapshots, historical OHLCV bars, quotes, trades, and market movers.
+- **News Intelligence**: `/api/news` endpoint with RSS feed scraping via `rss-parser`, relevance scoring (35+ keywords), sentiment analysis, ticker extraction, category filtering, search, pagination, and 5-min cache.
+- **Routes**: Health checks, stock data, AI analysis, user management, résumé operations, job search, KYC, Stripe config, TaxGPT (with profile context), document analysis (`/api/analyze-document`), Alpaca proxy, news intelligence, gamification (XP, badges, challenges, streaks, leaderboard), and token system (wallet linking, balance, transactions, rewards, travel bookings, admin distribution/config).
 
 # External Dependencies
 

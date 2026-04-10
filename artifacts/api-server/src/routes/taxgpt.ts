@@ -181,7 +181,7 @@ router.post("/taxgpt", async (req, res) => {
     return;
   }
 
-  const { question } = req.body;
+  const { question, profileContext } = req.body;
   if (!question || typeof question !== "string") {
     res.status(400).json({ error: "Question is required" });
     return;
@@ -199,10 +199,23 @@ router.post("/taxgpt", async (req, res) => {
   }
 
   try {
+    let systemPrompt = TAX_SYSTEM_PROMPT;
+    if (profileContext && typeof profileContext === "object") {
+      systemPrompt += `\n\n═══════════════════════════════════════\n  USER PROFILE CONTEXT\n═══════════════════════════════════════\n`;
+      if (profileContext.entityType) systemPrompt += `Entity Type: ${profileContext.entityType}\n`;
+      if (profileContext.businessName) systemPrompt += `Business: ${profileContext.businessName}\n`;
+      if (profileContext.industry) systemPrompt += `Industry: ${profileContext.industry}\n`;
+      if (profileContext.grossRevenue) systemPrompt += `Gross Revenue: $${Number(profileContext.grossRevenue).toLocaleString()}\n`;
+      if (profileContext.state) systemPrompt += `State: ${profileContext.state}\n`;
+      if (profileContext.hasHomeOffice) systemPrompt += `Has Home Office: Yes\n`;
+      if (profileContext.usesVehicle) systemPrompt += `Uses Vehicle for Business: Yes\n`;
+      systemPrompt += `\nPersonalize your answers to this user's entity type and situation. Reference strategies specific to their entity type.`;
+    }
+
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: TAX_SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         { role: "user", content: sanitized },
       ],
       max_tokens: 1500,

@@ -1,0 +1,99 @@
+ MANDATORY PROMPT — FOLLOW EVERY RULE WITHOUT EXCEPTION
+
+DO FIRST:
+
+    READ THIS PROMPT FULLY.
+
+    SCAN CODEBASE: list existing functions, API endpoints, env vars, DB tables you will touch.
+
+    PROPOSE PLAN: bullet scope, files, minimal diffs, test plan. WAIT FOR APPROVAL.
+
+CORE RULES:
+
+    No changes without approval.
+
+    Exact names only — reuse existing function/variable names; no variants. Search first.
+
+    No hardcoding — use config/env/params.
+
+    No workarounds — ask instead of inventing.
+
+    Exact string edits — copy exact text (incl. whitespace). If "No replacement performed," stop and fix.
+
+    Search before creating — no duplicate utilities/hooks/services.
+
+    Explain simply — non-technical language.
+
+    Test before next task — run and report results.
+
+ARCHITECTURE:
+
+    API-first: Frontend: UI + API calls only. Backend: business logic, validation, auth. DB: via ORM/store, accessed only through API routes.
+
+    No mixed patterns — never combine direct calls & API calls for same flow.
+
+    Follow API contracts exactly.
+
+LOGGING (SERVER):
+
+    All logs through single logger module: JSONL (ts, level, msg, requestId, context).
+
+    Mask PII/secrets before writing.
+
+    Rotate daily; keep 7 days.
+
+    POST /api/logs endpoint: batched, masked, includes X-Request-Id.
+
+    No console.log in app code.
+
+MOBILE (iOS/Android/RN):
+
+    One API client per platform; no new SDKs without approval.
+
+    Size limits: iOS ≤ 35 MB compressed; Android base APK ≤ 25 MB.
+
+    Feature per screen; no god classes.
+
+    MobileLogger only for all logs — batched, masked, sends to /api/logs with X-Request-Id.
+
+    Dev-only log window: ring buffer (500 entries), hidden in release builds.
+
+    Timeouts: 10s connect, 20s read; retries ×2 with backoff.
+
+    No background log services without approval.
+
+    No PII in logs; mask before enqueue.
+
+BEFORE RESPONDING, ANSWER YES/NO:
+
+    Read & followed all rules?
+
+    Using exact names?
+
+    Plan approved?
+
+    No hardcoding/workarounds?
+
+    String edits verified?
+
+    API-first intact?
+
+    All logs via approved logger?
+
+    Mobile log window off in release?
+
+    Size limits met?
+
+    RequestId + masking applied?
+
+OUTPUT FORMAT:
+
+    PLAN (bullets)
+
+    DIFF PREVIEW (file: path, unified diff)
+
+    COMMANDS TO RUN
+
+    TEST STEPS & EXPECTED RESULTS
+
+    RISKS/ROLLBACK )" }

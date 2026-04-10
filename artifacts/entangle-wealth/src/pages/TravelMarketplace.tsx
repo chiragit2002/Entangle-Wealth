@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { useAuth } from "@clerk/react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { Plane, Hotel, MapPin, Calendar, Star, Coins, Check, Loader2, ExternalLink } from "lucide-react";
+import { Plane, Hotel, MapPin, Calendar, Star, Coins, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { authFetch } from "@/lib/authFetch";
 
@@ -179,16 +179,7 @@ export default function TravelMarketplace() {
                   {isConfirmed && (
                     <div className="mt-3 pt-3 border-t border-white/5">
                       <p className="text-xs text-emerald-400 flex items-center gap-1">
-                        <Check className="w-3 h-3" /> Blockchain receipt:
-                        <a
-                          href={`https://sepolia.etherscan.io/tx/${confirmedBookings[listing.id]}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline font-mono"
-                        >
-                          {confirmedBookings[listing.id].slice(0, 12)}...
-                          <ExternalLink className="w-3 h-3 inline ml-0.5" />
-                        </a>
+                        <Check className="w-3 h-3" /> Booking confirmed — off-chain record logged
                       </p>
                     </div>
                   )}
@@ -201,8 +192,8 @@ export default function TravelMarketplace() {
         <div className="glass-panel p-5 rounded-xl text-center">
           <p className="text-xs text-muted-foreground/60">
             Travel listings are demo inventory. Real hotel/airline API integration coming soon.
-            All bookings generate a blockchain transaction hash for permanent audit trail.
-            Token prices shown in ENTGL (EntangleCoin).
+            All bookings are recorded off-chain in the platform database. On-chain ERC-20 integration
+            will be activated after mainnet deployment and security audit. Token prices shown in ENTGL (EntangleCoin).
           </p>
         </div>
       </div>

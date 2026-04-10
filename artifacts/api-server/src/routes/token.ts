@@ -254,7 +254,7 @@ router.post("/token/book", requireAuth, async (req, res) => {
       return;
     }
 
-    const txHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
+    const txHash = `sim_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
     const result = await db.transaction(async (tx) => {
       const [updated] = await tx.update(usersTable).set({
@@ -349,7 +349,7 @@ router.post("/token/admin/distribute", requireAuth, async (req, res) => {
       if (tokens <= 0) continue;
 
       const user = topUsers[i];
-      const txHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
+      const txHash = `sim_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
       await db.update(usersTable).set({
         tokenBalance: sql`COALESCE(${usersTable.tokenBalance}, 0) + ${tokens}`,

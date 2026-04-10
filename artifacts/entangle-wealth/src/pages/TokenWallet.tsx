@@ -184,7 +184,7 @@ export default function TokenWallet() {
                 <span className="text-xs text-muted-foreground uppercase tracking-wider">Network</span>
               </div>
               <p className="text-sm font-bold text-white">Ethereum (Sepolia Testnet)</p>
-              <p className="text-xs text-muted-foreground mt-1">Contract: ENTGL ERC-20</p>
+              <p className="text-xs text-muted-foreground mt-1">Off-chain ledger (pre-mainnet)</p>
             </div>
             <div className="glass-panel p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -217,7 +217,7 @@ export default function TokenWallet() {
             <div className="text-center py-12">
               <Coins className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
               <p className="text-muted-foreground">No transactions yet</p>
-              <p className="text-xs text-muted-foreground/60 mt-1">Earn ENTGL through monthly reward distributions</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">Earn ENTGL through monthly XP-based reward distributions</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -243,14 +243,9 @@ export default function TokenWallet() {
                       {tx.amount > 0 ? "+" : ""}{tx.amount.toLocaleString()} ENTGL
                     </p>
                     {tx.txHash && (
-                      <a
-                        href={`https://sepolia.etherscan.io/tx/${tx.txHash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[10px] text-primary hover:underline"
-                      >
-                        {tx.txHash.slice(0, 10)}...
-                      </a>
+                      <span className="text-[10px] text-muted-foreground font-mono">
+                        {tx.txHash.startsWith("sim_") ? "Off-chain record" : tx.txHash.slice(0, 10) + "..."}
+                      </span>
                     )}
                   </div>
                 </div>

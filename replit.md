@@ -74,6 +74,7 @@ The project is a pnpm workspace monorepo with each package managing its own depe
 
 ## API Server (`artifacts/api-server`)
 - Express 5 server with Clerk middleware for authentication.
+- **Security**: Helmet for HTTP security headers (CSP disabled for SPA compatibility). Global rate limit of 120 req/min with `express-rate-limit` (skips Clerk proxy and Stripe webhooks). AI-specific rate limit of 15 req/min on `/api/taxgpt` and `/api/analyze`.
 - Stripe webhook endpoint for payment events.
 - **Alpaca Market Data**: Proxy routes to Alpaca Markets API for real-time stock snapshots, historical OHLCV bars, quotes, trades, and market movers. Endpoints: `/api/alpaca/snapshot/:symbol`, `/api/alpaca/snapshots`, `/api/alpaca/bars/:symbol`, `/api/alpaca/quote/:symbol`, `/api/alpaca/trades/:symbol`, `/api/alpaca/multibars`, `/api/alpaca/movers`, `/api/alpaca/account`. Uses IEX feed. Falls back to mock data on auth errors.
 - **News Intelligence**: `/api/news` endpoint with RSS feed scraping via `rss-parser`, relevance scoring (35+ keywords), sentiment analysis, ticker extraction, category filtering, search, pagination, and 5-min cache. `/api/news/refresh` for manual cache invalidation. Rate-limited to 30 requests/min per IP.
@@ -92,6 +93,7 @@ The project is a pnpm workspace monorepo with each package managing its own depe
 - **AI**: OpenAI (via Replit AI Integrations proxy `@workspace/integrations-openai-ai-server`)
 - **Validation**: Zod (`zod/v4`), `drizzle-zod`
 - **Build**: esbuild
-- **Frontend**: React, Vite, Tailwind CSS, shadcn/ui, Clerk React
+- **Frontend**: React, Vite, Tailwind CSS, shadcn/ui, Clerk React, react-error-boundary
+- **Charts**: TradingView Lightweight Charts (candlestick/volume charts in Technical Analysis, reusable LightweightChart component)
 - **Market Data**: Alpaca Markets API (paper trading keys, IEX feed)
 - **Client-side Routing**: wouter

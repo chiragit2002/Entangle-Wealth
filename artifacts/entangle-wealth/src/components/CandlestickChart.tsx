@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useEffect, useRef, useMemo } from "react";
+import { createChart, CandlestickSeries, HistogramSeries, LineSeries, type IChartApi, type ISeriesApi, type CandlestickData, type HistogramData, ColorType, CrosshairMode, type Time } from "lightweight-charts";
 import type { StockData } from "@/lib/indicators";
 
 interface CandlestickChartProps {
@@ -6,16 +7,6 @@ interface CandlestickChartProps {
   symbol: string;
   width?: number;
   height?: number;
-}
-
-interface Bar {
-  idx: number;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-  bullish: boolean;
 }
 
 function smaArray(prices: number[], period: number): (number | null)[] {
@@ -28,73 +19,155 @@ function smaArray(prices: number[], period: number): (number | null)[] {
   return result;
 }
 
-export function CandlestickChart({ data, symbol, width = 800, height = 380 }: CandlestickChartProps) {
-  const bars: Bar[] = useMemo(() => {
+export function CandlestickChart({ data, symbol, height = 380 }: CandlestickChartProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<IChartApi | null>(null);
+
+  const bars = useMemo(() => {
     const ohlcv = (data as any).ohlcv as { open: number; high: number; low: number; close: number; volume: number }[] | undefined;
-    return data.closes.map((close, i) => ({
-      idx: i,
-      open: ohlcv?.[i]?.open ?? (i === 0 ? close * (1 + (Math.random() - 0.5) * 0.01) : data.closes[i - 1]),
-      high: data.highs[i],
-      low: data.lows[i],
-      close,
-      volume: data.volumes[i],
-      bullish: ohlcv ? ohlcv[i].close >= ohlcv[i].open : (i === 0 ? true : close >= data.closes[i - 1]),
-    }));
+    const timestamps = (data as any).timestamps as string[] | undefined;
+
+    return data.closes.map((close, i) => {
+      const open = ohlcv?.[i]?.open ?? (i === 0 ? close * (1 + (Math.random() - 0.5) * 0.01) : data.closes[i - 1]);
+      const ts = timestamps?.[i];
+      let time: string;
+      if (ts) {
+        time = ts.slice(0, 10);
+      } else {
+        const d = new Date();
+        d.setDate(d.getDate() - (data.closes.length - 1 - i));
+        time = d.toISOString().slice(0, 10);
+      }
+      return {
+        time,
+        open,
+        high: data.highs[i],
+        low: data.lows[i],
+        close,
+        volume: data.volumes[i],
+        bullish: close >= open,
+      };
+    });
   }, [data]);
 
-  const sma20 = useMemo(() => smaArray(data.closes, 20), [data]);
-  const sma50 = useMemo(() => smaArray(data.closes, 50), [data]);
+  const sma20Data = useMemo(() => {
+    const sma = smaArray(data.closes, 20);
+    return bars.map((b, i) => sma[i] != null ? { time: b.time, value: sma[i]! } : null).filter(Boolean) as { time: string; value: number }[];
+  }, [data, bars]);
 
-  const chartPadding = { top: 20, right: 60, bottom: 50, left: 10 };
-  const chartW = width - chartPadding.left - chartPadding.right;
-  const priceH = height * 0.7;
-  const volH = height * 0.2;
-  const gapH = height * 0.04;
-
-  const priceMin = Math.min(...bars.map(b => b.low)) * 0.998;
-  const priceMax = Math.max(...bars.map(b => b.high)) * 1.002;
-  const priceRange = priceMax - priceMin || 1;
-  const volMax = Math.max(...bars.map(b => b.volume));
-
-  const barW = Math.max(1, (chartW / bars.length) * 0.7);
-  const gap = (chartW / bars.length) * 0.3;
-
-  function priceY(p: number) {
-    return chartPadding.top + priceH - ((p - priceMin) / priceRange) * priceH;
-  }
-  function volY(v: number) {
-    return chartPadding.top + priceH + gapH + volH - (v / volMax) * volH;
-  }
-  function barX(i: number) {
-    return chartPadding.left + (i / bars.length) * chartW + gap / 2;
-  }
-
-  const gridLines = useMemo(() => {
-    const lines: number[] = [];
-    const step = priceRange / 5;
-    for (let i = 0; i <= 5; i++) lines.push(priceMin + step * i);
-    return lines;
-  }, [priceMin, priceRange]);
-
-  const xLabels = useMemo(() => {
-    const step = Math.max(1, Math.floor(bars.length / 6));
-    return bars.filter((_, i) => i % step === 0).map(b => ({
-      idx: b.idx,
-      label: `D${b.idx + 1}`,
-    }));
-  }, [bars]);
-
-  const smaPath = (arr: (number | null)[], color: string) => {
-    const pts = arr.map((v, i) => v != null ? `${barX(i) + barW / 2},${priceY(v)}` : null).filter(Boolean) as string[];
-    if (pts.length < 2) return null;
-    return <polyline points={pts.join(" ")} fill="none" stroke={color} strokeWidth="1" opacity="0.5" />;
-  };
+  const sma50Data = useMemo(() => {
+    const sma = smaArray(data.closes, 50);
+    return bars.map((b, i) => sma[i] != null ? { time: b.time, value: sma[i]! } : null).filter(Boolean) as { time: string; value: number }[];
+  }, [data, bars]);
 
   const lastBar = bars[bars.length - 1];
+  const firstBar = bars[0];
   const lastPrice = lastBar?.close ?? 0;
-  const firstPrice = bars[0]?.close ?? 0;
+  const firstPrice = firstBar?.close ?? 0;
   const pctChange = firstPrice ? ((lastPrice - firstPrice) / firstPrice * 100).toFixed(2) : "0";
   const isUp = lastPrice >= firstPrice;
+
+  useEffect(() => {
+    if (!containerRef.current || !bars.length) return;
+
+    const chart = createChart(containerRef.current, {
+      width: containerRef.current.clientWidth,
+      height,
+      layout: {
+        background: { type: ColorType.Solid, color: "#0a0a16" },
+        textColor: "rgba(255, 255, 255, 0.35)",
+        fontSize: 10,
+        fontFamily: "'JetBrains Mono', monospace",
+      },
+      grid: {
+        vertLines: { color: "rgba(255, 255, 255, 0.03)" },
+        horzLines: { color: "rgba(255, 255, 255, 0.03)" },
+      },
+      crosshair: {
+        mode: CrosshairMode.Normal,
+        vertLine: { color: "rgba(0, 212, 255, 0.25)", width: 1, style: 2, labelBackgroundColor: "#0a0a16" },
+        horzLine: { color: "rgba(0, 212, 255, 0.25)", width: 1, style: 2, labelBackgroundColor: "#0a0a16" },
+      },
+      rightPriceScale: {
+        borderColor: "rgba(255, 255, 255, 0.06)",
+        scaleMargins: { top: 0.1, bottom: 0.25 },
+      },
+      timeScale: {
+        borderColor: "rgba(255, 255, 255, 0.06)",
+        timeVisible: true,
+        secondsVisible: false,
+      },
+    });
+    chartRef.current = chart;
+
+    const candleSeries = chart.addSeries(CandlestickSeries, {
+      upColor: "#00ff88",
+      downColor: "#ff3366",
+      borderUpColor: "#00ff88",
+      borderDownColor: "#ff3366",
+      wickUpColor: "#00ff88",
+      wickDownColor: "#ff3366",
+    });
+
+    const deduped = deduplicateByTime(bars);
+    const candleData: CandlestickData[] = deduped.map((b) => ({
+      time: b.time as Time,
+      open: b.open,
+      high: b.high,
+      low: b.low,
+      close: b.close,
+    }));
+    candleSeries.setData(candleData);
+
+    const volumeSeries = chart.addSeries(HistogramSeries, {
+      priceFormat: { type: "volume" },
+      priceScaleId: "volume",
+    });
+    chart.priceScale("volume").applyOptions({
+      scaleMargins: { top: 0.85, bottom: 0 },
+    });
+    const volumeData: HistogramData[] = deduped.map((b) => ({
+      time: b.time as Time,
+      value: b.volume,
+      color: b.bullish ? "rgba(0, 255, 136, 0.15)" : "rgba(255, 51, 102, 0.15)",
+    }));
+    volumeSeries.setData(volumeData);
+
+    if (sma20Data.length >= 2) {
+      const sma20Series = chart.addSeries(LineSeries, {
+        color: "#ffd700",
+        lineWidth: 1,
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+      sma20Series.setData(deduplicateByTime(sma20Data).map(d => ({ time: d.time as Time, value: d.value })));
+    }
+
+    if (sma50Data.length >= 2) {
+      const sma50Series = chart.addSeries(LineSeries, {
+        color: "#a855f7",
+        lineWidth: 1,
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+      sma50Series.setData(deduplicateByTime(sma50Data).map(d => ({ time: d.time as Time, value: d.value })));
+    }
+
+    chart.timeScale().fitContent();
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        chart.applyOptions({ width: entry.contentRect.width });
+      }
+    });
+    resizeObserver.observe(containerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+      chart.remove();
+      chartRef.current = null;
+    };
+  }, [bars, sma20Data, sma50Data, height]);
 
   return (
     <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden">
@@ -102,7 +175,7 @@ export function CandlestickChart({ data, symbol, width = 800, height = 380 }: Ca
         <div className="flex items-center gap-3">
           <span className="text-[12px] font-bold font-mono">{symbol}</span>
           <span className="text-[11px] font-mono text-white/30">OHLCV</span>
-          <span className="text-[10px] text-white/15 font-mono">60 bars</span>
+          <span className="text-[10px] text-white/15 font-mono">{bars.length} bars</span>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-[11px] font-mono font-bold">${lastPrice.toFixed(2)}</span>
@@ -115,46 +188,16 @@ export function CandlestickChart({ data, symbol, width = 800, height = 380 }: Ca
           </div>
         </div>
       </div>
-      <div className="p-2">
-        <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
-          {gridLines.map((p, i) => (
-            <g key={i}>
-              <line x1={chartPadding.left} x2={width - chartPadding.right} y1={priceY(p)} y2={priceY(p)} stroke="white" strokeOpacity="0.03" strokeDasharray="2,4" />
-              <text x={width - chartPadding.right + 4} y={priceY(p) + 3} fill="white" fillOpacity="0.12" fontSize="8" fontFamily="JetBrains Mono, monospace">{p.toFixed(2)}</text>
-            </g>
-          ))}
-
-          <line x1={chartPadding.left} x2={width - chartPadding.right} y1={chartPadding.top + priceH + gapH / 2} y2={chartPadding.top + priceH + gapH / 2} stroke="white" strokeOpacity="0.04" />
-
-          {bars.map(bar => {
-            const x = barX(bar.idx);
-            const cx = x + barW / 2;
-            const bodyTop = priceY(Math.max(bar.open, bar.close));
-            const bodyBot = priceY(Math.min(bar.open, bar.close));
-            const bodyH = Math.max(1, bodyBot - bodyTop);
-            const wickTop = priceY(bar.high);
-            const wickBot = priceY(bar.low);
-            const vTop = volY(bar.volume);
-            const vBot = chartPadding.top + priceH + gapH + volH;
-            return (
-              <g key={bar.idx}>
-                <line x1={cx} x2={cx} y1={wickTop} y2={wickBot} stroke={bar.bullish ? "#00ff88" : "#ff3366"} strokeWidth="0.8" opacity="0.6" />
-                <rect x={x} y={bodyTop} width={barW} height={bodyH} fill={bar.bullish ? "#00ff88" : "#ff3366"} opacity={bar.bullish ? 0.8 : 0.9} rx="0.5" />
-                <rect x={x} y={vTop} width={barW} height={Math.max(0, vBot - vTop)} fill={bar.bullish ? "#00ff88" : "#ff3366"} opacity="0.15" rx="0.5" />
-              </g>
-            );
-          })}
-
-          {smaPath(sma20, "#ffd700")}
-          {smaPath(sma50, "#a855f7")}
-
-          {xLabels.map(xl => (
-            <text key={xl.idx} x={barX(xl.idx) + barW / 2} y={height - 8} fill="white" fillOpacity="0.08" fontSize="7" fontFamily="JetBrains Mono, monospace" textAnchor="middle">{xl.label}</text>
-          ))}
-
-          <text x={width - chartPadding.right + 4} y={chartPadding.top + priceH + gapH + 10} fill="white" fillOpacity="0.08" fontSize="7" fontFamily="JetBrains Mono, monospace">Vol</text>
-        </svg>
-      </div>
+      <div ref={containerRef} className="w-full" />
     </div>
   );
+}
+
+function deduplicateByTime<T extends { time: string }>(items: T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter(item => {
+    if (seen.has(item.time)) return false;
+    seen.add(item.time);
+    return true;
+  });
 }

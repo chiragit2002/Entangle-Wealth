@@ -27,8 +27,8 @@ const MISSING_DEDUCTIONS: Deduction[] = [
     id: "vehicle",
     title: "Vehicle Business Use",
     irsRef: "IRS Publication 463 · IRC Section 179",
-    description: "Standard mileage rate is 67 cents per mile for 2024. You must keep a contemporaneous mileage log with date, destination, business purpose, and miles.",
-    estimatedValue: "$2,010/yr (3,000 mi)",
+    description: "Standard mileage rate is 70 cents per mile for 2026. You must keep a contemporaneous mileage log with date, destination, business purpose, and miles.",
+    estimatedValue: "$2,100/yr (3,000 mi)",
     added: false,
   },
   {

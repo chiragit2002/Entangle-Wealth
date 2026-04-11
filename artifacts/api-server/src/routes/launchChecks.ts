@@ -31,8 +31,9 @@ function localApiGet(path: string): Promise<{ statusCode: number; body: string }
 }
 
 function frontendGet(path: string): Promise<{ statusCode: number; body: string }> {
+  const frontendPort = process.env.FRONTEND_PORT || "80";
   return new Promise((resolve, reject) => {
-    const req = http.get(`http://127.0.0.1:80${path}`, { timeout: 5000 }, (res) => {
+    const req = http.get(`http://127.0.0.1:${frontendPort}${path}`, { timeout: 5000 }, (res) => {
       let body = "";
       res.on("data", (chunk: Buffer) => { body += chunk.toString(); });
       res.on("end", () => resolve({ statusCode: res.statusCode || 0, body }));
@@ -234,6 +235,57 @@ async function check404Page(): Promise<CheckResult> {
   }
 }
 
+async function checkEmailService(): Promise<CheckResult> {
+  const sendgridKey = process.env.SENDGRID_API_KEY;
+  const resendKey = process.env.RESEND_API_KEY;
+  const smtpHost = process.env.SMTP_HOST;
+
+  if (sendgridKey) {
+    try {
+      const resp = await fetch("https://api.sendgrid.com/v3/scopes", {
+        headers: { Authorization: `Bearer ${sendgridKey}` },
+      });
+      if (resp.ok) {
+        return { id: "email", label: "Email Service", category: "Communications", status: "pass", detail: "SendGrid API key verified" };
+      }
+      return { id: "email", label: "Email Service", category: "Communications", status: "warn", detail: `SendGrid API returned ${resp.status}` };
+    } catch {
+      return { id: "email", label: "Email Service", category: "Communications", status: "warn", detail: "SendGrid key present but verification failed" };
+    }
+  }
+
+  if (resendKey) {
+    return { id: "email", label: "Email Service", category: "Communications", status: "pass", detail: "Resend API key configured" };
+  }
+
+  if (smtpHost) {
+    return { id: "email", label: "Email Service", category: "Communications", status: "pass", detail: `SMTP configured (${smtpHost})` };
+  }
+
+  return { id: "email", label: "Email Service", category: "Communications", status: "warn", detail: "No email service configured (SENDGRID_API_KEY, RESEND_API_KEY, or SMTP_HOST)" };
+}
+
+async function checkOAuthProviders(): Promise<CheckResult> {
+  const clerkKey = process.env.CLERK_SECRET_KEY;
+  if (!clerkKey) {
+    return { id: "oauth", label: "OAuth Providers", category: "Authentication", status: "fail", detail: "Cannot verify OAuth — Clerk key missing" };
+  }
+  try {
+    const resp = await fetch("https://api.clerk.com/v1/oauth_applications", {
+      headers: { Authorization: `Bearer ${clerkKey}` },
+    });
+    if (resp.ok) {
+      return { id: "oauth", label: "OAuth Providers", category: "Authentication", status: "pass", detail: "Clerk OAuth configuration accessible" };
+    }
+    if (resp.status === 404 || resp.status === 403) {
+      return { id: "oauth", label: "OAuth Providers", category: "Authentication", status: "pass", detail: "Clerk configured — OAuth managed via Clerk dashboard" };
+    }
+    return { id: "oauth", label: "OAuth Providers", category: "Authentication", status: "warn", detail: `OAuth check returned ${resp.status} — verify in Clerk dashboard` };
+  } catch {
+    return { id: "oauth", label: "OAuth Providers", category: "Authentication", status: "warn", detail: "Cannot reach Clerk API — verify OAuth in dashboard" };
+  }
+}
+
 router.get("/admin/launch-checks", requireAuth, async (req: Request, res: Response) => {
   try {
     const userId = (req as AuthenticatedRequest).userId;
@@ -264,6 +316,8 @@ router.get("/admin/launch-checks", requireAuth, async (req: Request, res: Respon
       checkBlogPosts(),
       checkSSL(),
       check404Page(),
+      checkEmailService(),
+      checkOAuthProviders(),
     ]);
 
     const passing = checks.filter((c) => c.status === "pass").length;

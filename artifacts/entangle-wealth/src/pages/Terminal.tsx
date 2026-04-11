@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import { Layout } from "@/components/layout/Layout";
 import { FlashCouncil } from "@/components/FlashCouncil";
@@ -10,6 +10,7 @@ import { RiskRadar } from "@/components/RiskRadar";
 import { SignalHistory } from "@/components/SignalHistory";
 import { Terminal as TerminalIcon, Calculator, TrendingUp, Shield, BarChart3, Clock, Keyboard, X } from "lucide-react";
 import { PaperTradingWidget } from "@/components/PaperTradingWidget";
+import { SpinWheel } from "@/components/SpinWheel";
 import { UpgradePrompt, useUpgradePrompt } from "@/components/UpgradePrompt";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
@@ -39,9 +40,14 @@ function BloombergPanel({ children, className = "" }: { children: React.ReactNod
 export default function Terminal() {
   const [clock, setClock] = useState("");
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [portfolioRefreshKey, setPortfolioRefreshKey] = useState(0);
   const [, navigate] = useLocation();
   const { getToken, isSignedIn, isLoaded } = useAuth();
   const { promptConfig, showUpgradePrompt, closePrompt } = useUpgradePrompt();
+
+  const handleSpinBalanceChange = useCallback(() => {
+    setPortfolioRefreshKey(k => k + 1);
+  }, []);
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
@@ -206,6 +212,18 @@ export default function Terminal() {
             <PanelHeader title="RISK RADAR" icon={<Shield className="w-3 h-3" />} color="red" />
             <div className="p-2">
               <RiskRadar />
+            </div>
+          </BloombergPanel>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-1.5 mb-1.5">
+          <div>
+            <SpinWheel onBalanceChange={handleSpinBalanceChange} />
+          </div>
+          <BloombergPanel>
+            <PanelHeader title="PAPER TRADING" icon={<TrendingUp className="w-3 h-3" />} color="green" />
+            <div className="p-2">
+              <PaperTradingWidget key={portfolioRefreshKey} variant="inline" />
             </div>
           </BloombergPanel>
         </div>

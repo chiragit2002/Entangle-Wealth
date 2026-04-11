@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, real, integer, serial } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, real, integer, serial, unique } from "drizzle-orm/pg-core";
 
 export const virtualCashPurchasesTable = pgTable("virtual_cash_purchases", {
   id: serial("id").primaryKey(),
@@ -36,3 +36,16 @@ export const paperPositionsTable = pgTable("paper_positions", {
   avgCost: real("avg_cost").notNull().default(0),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
+
+export const dailySpinTable = pgTable("daily_spins", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  prizeAmount: real("prize_amount").notNull(),
+  spinDate: text("spin_date").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+}, (table) => [
+  unique("daily_spins_user_date_unique").on(table.userId, table.spinDate),
+]);
+
+export type DailySpin = typeof dailySpinTable.$inferSelect;
+export type InsertDailySpin = typeof dailySpinTable.$inferInsert;

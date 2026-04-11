@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Bell, Plus, Trash2, ToggleLeft, ToggleRight, History, AlertTriangle, TrendingUp, TrendingDown, Zap, Activity, Settings, Pencil, X, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface AlertRule {
   id: number;
@@ -58,6 +59,7 @@ function needsThreshold(type: string): boolean {
 
 export default function Alerts() {
   const { getToken } = useAuth();
+  const { toast } = useToast();
   const [tab, setTab] = useState<"rules" | "history">("rules");
   const [rules, setRules] = useState<AlertRule[]>([]);
   const [history, setHistory] = useState<AlertHistoryItem[]>([]);
@@ -132,28 +134,47 @@ export default function Alerts() {
         setNewThreshold("");
         setShowForm(false);
         fetchRules();
+        toast({ title: "Alert created", description: `${newSymbol.trim().toUpperCase()} alert rule added.` });
+      } else {
+        const err = await res.json().catch(() => ({ error: "Failed to create alert" }));
+        toast({ title: "Error", description: err.error || "Failed to create alert", variant: "destructive" });
       }
-    } catch { /* ignore */ } finally {
+    } catch { toast({ title: "Error", description: "Network error", variant: "destructive" }); } finally {
       setCreating(false);
     }
   };
 
   const toggleAlert = async (id: number, currentEnabled: boolean) => {
+    setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
     try {
-      await authFetch(`/alerts/${id}`, getToken, {
+      const res = await authFetch(`/alerts/${id}`, getToken, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ enabled: !currentEnabled }),
       });
-      setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
-    } catch { /* ignore */ }
+      if (!res.ok) {
+        setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: currentEnabled } : r));
+        toast({ title: "Error", description: "Failed to toggle alert", variant: "destructive" });
+      }
+    } catch {
+      setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: currentEnabled } : r));
+      toast({ title: "Error", description: "Network error", variant: "destructive" });
+    }
   };
 
   const deleteAlert = async (id: number) => {
+    const prev = rules;
+    setRules(r => r.filter(x => x.id !== id));
     try {
-      await authFetch(`/alerts/${id}`, getToken, { method: "DELETE" });
-      setRules(prev => prev.filter(r => r.id !== id));
-    } catch { /* ignore */ }
+      const res = await authFetch(`/alerts/${id}`, getToken, { method: "DELETE" });
+      if (!res.ok) {
+        setRules(prev);
+        toast({ title: "Error", description: "Failed to delete alert", variant: "destructive" });
+      }
+    } catch {
+      setRules(prev);
+      toast({ title: "Error", description: "Network error", variant: "destructive" });
+    }
   };
 
   const startEdit = (rule: AlertRule) => {

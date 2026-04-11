@@ -24,7 +24,7 @@ function getAllowedOrigins(): Set<string> {
   const origins = new Set<string>();
   const domains = process.env.REPLIT_DOMAINS?.split(",") || [];
   for (const d of domains) {
-    origins.add(`https://${d}`);
+    origins.add(`https://${d.trim()}`);
   }
   const devDomain = process.env.REPLIT_DEV_DOMAIN;
   if (devDomain) {
@@ -33,6 +33,10 @@ function getAllowedOrigins(): Set<string> {
   origins.add("http://localhost");
   for (let p = 3000; p <= 3010; p++) {
     origins.add(`http://localhost:${p}`);
+  }
+  const port = process.env.PORT;
+  if (port) {
+    origins.add(`http://localhost:${port}`);
   }
   return origins;
 }
@@ -53,16 +57,9 @@ export const csrfProtection = (req: Request, res: Response, next: NextFunction) 
   }
 
   const allowed = getAllowedOrigins();
-  const originBase = origin.replace(/:\d+$/, "");
 
-  if (allowed.has(origin) || allowed.has(originBase)) {
+  if (allowed.has(origin)) {
     return next();
-  }
-
-  for (const a of allowed) {
-    if (origin.startsWith(a)) {
-      return next();
-    }
   }
 
   logger.warn({ ip: req.ip, path: req.path, origin }, "CSRF: blocked request from unknown origin");

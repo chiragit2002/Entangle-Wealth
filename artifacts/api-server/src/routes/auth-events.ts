@@ -13,6 +13,13 @@ const VALID_TYPES: Set<AuthEventType> = new Set([
   "signup",
 ]);
 
+const REQUIRES_AUTH: Set<AuthEventType> = new Set([
+  "login_success",
+  "logout",
+  "oauth_callback",
+  "signup",
+]);
+
 router.post("/auth/event", (req: Request, res: Response) => {
   const ip = req.ip || req.socket.remoteAddress || "unknown";
   const userAgent = req.headers["user-agent"];
@@ -27,6 +34,11 @@ router.post("/auth/event", (req: Request, res: Response) => {
 
   const eventType: AuthEventType = type;
 
+  if (REQUIRES_AUTH.has(eventType) && !userId) {
+    res.status(401).json({ error: "Authentication required for this event type" });
+    return;
+  }
+
   if (eventType === "login_failed") {
     recordFailedAttempt(ip);
   }
@@ -37,7 +49,7 @@ router.post("/auth/event", (req: Request, res: Response) => {
 
   logAuthEvent({
     type: eventType,
-    userId: userId || details?.userId,
+    userId,
     ip,
     method: req.method,
     path: "/auth/event",

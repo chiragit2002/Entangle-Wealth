@@ -40,3 +40,6 @@ VAPID_SUBJECT = "mailto:support@entanglewealth.com"
 
 [userenv.production]
 VITE_CLERK_PROXY_URL = "https://entanglewealth.com/api/__clerk"
+
+[objectStorage]
+defaultBucketID = "replit-objstore-4394a36d-c5bb-4bd2-8ce4-f93a77009407"

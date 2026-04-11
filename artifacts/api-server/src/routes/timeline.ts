@@ -15,6 +15,7 @@ import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
 import { getAuth } from "@clerk/express";
+import { calculateLevel, calculateTier } from "@workspace/xp";
 
 const router = Router();
 
@@ -189,12 +190,8 @@ async function awardXp(userId: string, amount: number, reason: string, category:
     }
 
     const newTotal = xpRow.totalXp + finalAmount;
-    const newLevel = Math.floor(Math.sqrt(newTotal / 100)) + 1;
-    let newTier = "Bronze";
-    if (newLevel >= 40 && newTotal >= 50000) newTier = "Diamond";
-    else if (newLevel >= 30 && newTotal >= 25000) newTier = "Platinum";
-    else if (newLevel >= 20 && newTotal >= 10000) newTier = "Gold";
-    else if (newLevel >= 10 && newTotal >= 3000) newTier = "Silver";
+    const newLevel = calculateLevel(newTotal);
+    const newTier = calculateTier(newLevel, newTotal);
 
     await db.update(userXpTable).set({
       totalXp: newTotal,

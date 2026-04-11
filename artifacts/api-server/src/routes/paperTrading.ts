@@ -6,6 +6,7 @@ import { requireAuth } from "../middlewares/requireAuth";
 import { resolveUserId } from "../lib/resolveUserId";
 import { logger } from "../lib/logger";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
+import { calculateLevel, calculateTier } from "@workspace/xp";
 
 const router = Router();
 
@@ -51,17 +52,6 @@ function pickPrize(): SpinReward {
   return SPIN_PRIZES[0];
 }
 
-function calculateLevel(totalXp: number): number {
-  return Math.floor(Math.sqrt(totalXp / 100)) + 1;
-}
-
-function calculateTier(level: number, totalXp: number): string {
-  if (level >= 40 || totalXp >= 50000) return "Diamond";
-  if (level >= 30 || totalXp >= 25000) return "Platinum";
-  if (level >= 20 || totalXp >= 10000) return "Gold";
-  if (level >= 10 || totalXp >= 3000) return "Silver";
-  return "Bronze";
-}
 
 function getTodayUTC(): string {
   return new Date().toISOString().split("T")[0];

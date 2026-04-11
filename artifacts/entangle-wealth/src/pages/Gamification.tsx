@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { fireConfetti, getCelebrationTier, getXpCelebrationTier } from "@/lib/confetti";
 import { BigWinOverlay } from "@/components/BigWinOverlay";
+import { calculateTier, TIER_THRESHOLDS } from "@workspace/xp";
 
 interface ActivityItem {
   id: string | number;
@@ -62,13 +63,17 @@ const WHEEL_SEGMENTS = [
   { label: "Streak+", color: "#ff6b35", textColor: "#fff" },
 ];
 
-const TIER_COLORS: Record<string, string> = {
+const TIER_COLOR_MAP: Record<string, string> = {
   Diamond: "#00c8f8",
   Platinum: "#b8c0cc",
   Gold: "#FFD700",
   Silver: "#c0c0c0",
   Bronze: "#cd7f32",
 };
+
+const TIER_COLORS = Object.fromEntries(
+  TIER_THRESHOLDS.map(t => [t.tier, TIER_COLOR_MAP[t.tier] ?? "#cd7f32"])
+);
 
 function SpinWheel({ canSpin, spinning, rotation }: { canSpin: boolean; spinning: boolean; rotation: number }) {
   const cx = 120;
@@ -297,7 +302,8 @@ export default function Gamification() {
     );
   }
 
-  const tierColor = TIER_COLORS[status?.xp?.tier || "Bronze"] || "#cd7f32";
+  const derivedTier = status ? calculateTier(status.xp.level, status.xp.totalXp) : "Bronze";
+  const tierColor = TIER_COLORS[derivedTier] || "#cd7f32";
 
   return (
     <Layout>
@@ -320,9 +326,9 @@ export default function Gamification() {
                 {status && (
                   <span
                     className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-sm shrink-0"
-                    style={{ color: TIER_COLORS[status.xp.tier] || "#cd7f32", background: `${TIER_COLORS[status.xp.tier] || "#cd7f32"}20`, border: `1px solid ${TIER_COLORS[status.xp.tier] || "#cd7f32"}30` }}
+                    style={{ color: tierColor, background: `${tierColor}20`, border: `1px solid ${tierColor}30` }}
                   >
-                    {status.xp.tier}
+                    {derivedTier}
                   </span>
                 )}
               </div>
@@ -332,7 +338,7 @@ export default function Gamification() {
                   <div className="w-24 relative h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
                     <div
                       className="absolute inset-y-0 left-0 rounded-full"
-                      style={{ width: `${status.levelProgress}%`, background: TIER_COLORS[status.xp.tier] || "#cd7f32" }}
+                      style={{ width: `${status.levelProgress}%`, background: tierColor }}
                     />
                   </div>
                 )}
@@ -375,7 +381,7 @@ export default function Gamification() {
                         className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-sm"
                         style={{ color: tierColor, background: `${tierColor}20`, border: `1px solid ${tierColor}30` }}
                       >
-                        {status.xp.tier}
+                        {derivedTier}
                       </span>
                       {status.isFounder && (
                         <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-sm text-[#f5c842] bg-[#f5c842]/10 border border-[#f5c842]/20 flex items-center gap-1">
@@ -514,7 +520,7 @@ export default function Gamification() {
                     <div className="grid grid-cols-2 gap-2">
                       {[
                         { label: "Level", value: status?.xp.level ?? 1, color: tierColor },
-                        { label: "Tier", value: status?.xp.tier ?? "Bronze", color: tierColor },
+                        { label: "Tier", value: derivedTier, color: tierColor },
                         { label: "To Next Lvl", value: `${status?.xpToNextLevel.toLocaleString() ?? 0} XP`, color: "#00D4FF" },
                         { label: "Multiplier", value: `${status?.streak.multiplier.toFixed(1) ?? "1.0"}x`, color: "#00ff88" },
                       ].map(stat => (

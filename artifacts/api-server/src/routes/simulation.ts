@@ -12,6 +12,7 @@ import { eq, desc, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
+import { calculateLevel, calculateTier } from "@workspace/xp";
 
 const router = Router();
 
@@ -77,11 +78,13 @@ async function awardXpIfEligible(userId: string, isFirstRun: boolean) {
       [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
     }
     const newTotalXp = xpRow.totalXp + amount;
-    const newLevel = Math.floor(Math.sqrt(newTotalXp / 100)) + 1;
+    const newLevel = calculateLevel(newTotalXp);
+    const newTier = calculateTier(newLevel, newTotalXp);
     await db.update(userXpTable)
       .set({
         totalXp: newTotalXp,
         level: newLevel,
+        tier: newTier,
         monthlyXp: xpRow.monthlyXp + amount,
         weeklyXp: xpRow.weeklyXp + amount,
         updatedAt: new Date(),
@@ -244,9 +247,10 @@ router.post("/simulation/project", requireAuth, async (req, res) => {
           [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
         }
         const newTotalXp = xpRow.totalXp + xpForMilestone;
-        const newLevel = Math.floor(Math.sqrt(newTotalXp / 100)) + 1;
+        const newLevel = calculateLevel(newTotalXp);
+        const newTier = calculateTier(newLevel, newTotalXp);
         await db.update(userXpTable)
-          .set({ totalXp: newTotalXp, level: newLevel, monthlyXp: xpRow.monthlyXp + xpForMilestone, weeklyXp: xpRow.weeklyXp + xpForMilestone, updatedAt: new Date() })
+          .set({ totalXp: newTotalXp, level: newLevel, tier: newTier, monthlyXp: xpRow.monthlyXp + xpForMilestone, weeklyXp: xpRow.weeklyXp + xpForMilestone, updatedAt: new Date() })
           .where(eq(userXpTable.userId, userId));
 
         xpAwarded += xpForMilestone;

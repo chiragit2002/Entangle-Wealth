@@ -1,4 +1,7 @@
 import { motion } from "framer-motion";
+import { TIER_THRESHOLDS } from "@workspace/xp";
+
+const TIER_NAMES = TIER_THRESHOLDS.map(t => t.tier);
 
 const TIER_GRADIENTS: Record<string, { start: string; end: string; glow: string }> = {
   Bronze: { start: "#cd7f32", end: "#a0522d", glow: "rgba(205,127,50,0.5)" },
@@ -17,7 +20,8 @@ interface XPBarProps {
 }
 
 export function XPBar({ level, levelProgress, xpToNextLevel, tier, variant = "compact" }: XPBarProps) {
-  const colors = TIER_GRADIENTS[tier] ?? TIER_GRADIENTS.Bronze;
+  const validTier = TIER_NAMES.includes(tier) ? tier : "Bronze";
+  const colors = TIER_GRADIENTS[validTier] ?? TIER_GRADIENTS.Bronze;
   const clampedProgress = Math.min(Math.max(levelProgress, 0), 100);
   const isCompact = variant === "compact";
 

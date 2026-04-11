@@ -18,36 +18,9 @@ import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
 import { evaluateStreak } from "../lib/streakUtils";
-import { applyMultiplier } from "../lib/xpUtils";
+import { calculateLevel, calculateTier, xpForLevel, xpForNextLevel, applyMultiplier, TIER_THRESHOLDS } from "@workspace/xp";
 
 const router = Router();
-
-const TIER_THRESHOLDS = [
-  { tier: "Diamond", minLevel: 40, minXp: 50000 },
-  { tier: "Platinum", minLevel: 30, minXp: 25000 },
-  { tier: "Gold", minLevel: 20, minXp: 10000 },
-  { tier: "Silver", minLevel: 10, minXp: 3000 },
-  { tier: "Bronze", minLevel: 1, minXp: 0 },
-];
-
-function calculateLevel(totalXp: number): number {
-  return Math.floor(Math.sqrt(totalXp / 100)) + 1;
-}
-
-function calculateTier(level: number, totalXp: number): string {
-  for (const t of TIER_THRESHOLDS) {
-    if (level >= t.minLevel && totalXp >= t.minXp) return t.tier;
-  }
-  return "Bronze";
-}
-
-function xpForLevel(level: number): number {
-  return (level - 1) * (level - 1) * 100;
-}
-
-function xpForNextLevel(level: number): number {
-  return level * level * 100;
-}
 
 router.get("/gamification/me", requireAuth, async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;

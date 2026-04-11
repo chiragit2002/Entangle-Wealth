@@ -191,6 +191,9 @@ importers:
       '@workspace/integrations-openai-ai-server':
         specifier: workspace:*
         version: link:../../lib/integrations-openai-ai-server
+      '@workspace/xp':
+        specifier: workspace:*
+        version: link:../../lib/xp
       compression:
         specifier: ^1.8.1
         version: 1.8.1
@@ -415,6 +418,9 @@ importers:
       '@workspace/api-client-react':
         specifier: workspace:*
         version: link:../../lib/api-client-react
+      '@workspace/xp':
+        specifier: workspace:*
+        version: link:../../lib/xp
       class-variance-authority:
         specifier: 'catalog:'
         version: 0.7.1
@@ -739,6 +745,8 @@ importers:
       p-retry:
         specifier: ^7.1.1
         version: 7.1.1
+
+  lib/xp: {}
 
   scripts:
     devDependencies:

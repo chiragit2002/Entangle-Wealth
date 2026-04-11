@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
-import { Menu, X, Activity, LogOut, User, ChevronDown } from "lucide-react";
+import { Menu, X, LogOut, User, ChevronDown } from "lucide-react";
+import logoImg from "@assets/Gemini_Generated_Image_nso2qnso2qnso2qn_1775900950533.png";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useUser, useClerk, Show } from "@clerk/react";
 import { Button } from "@/components/ui/button";
@@ -259,14 +260,11 @@ export function Navbar() {
 
       <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(0,212,255,0.3)]"
-            style={{
-              background: "linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,153,255,0.1))",
-              border: "1px solid rgba(0,212,255,0.25)",
-            }}
-          >
-            <Activity className="w-5 h-5 text-primary" />
-          </div>
+          <img
+            src={logoImg}
+            alt="EntangleWealth logo"
+            className="w-9 h-9 rounded-lg object-contain transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(0,212,255,0.3)]"
+          />
           <span className="font-bold text-lg tracking-tight text-white">
             Entangle<span className="text-primary">Wealth</span>
           </span>

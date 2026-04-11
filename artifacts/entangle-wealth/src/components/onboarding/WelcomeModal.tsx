@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
-import { X, ChevronRight, ChevronLeft, Sparkles, BarChart3, Shield, Zap, CheckCircle2 } from "lucide-react";
+import { X, ChevronRight, ChevronLeft, BarChart3, Shield, Zap, Sparkles, CheckCircle2 } from "lucide-react";
+import logoImg from "@assets/Gemini_Generated_Image_nso2qnso2qnso2qn_1775900950533.png";
 import { trackEvent } from "@/lib/trackEvent";
 
 const INTERESTS = [
@@ -89,9 +90,11 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
         <div className="px-6 pb-6 min-h-[320px] flex flex-col">
           {step === 0 && (
             <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 animate-in fade-in duration-300">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#00D4FF]/20 to-[#00ff88]/20 flex items-center justify-center border border-[#00D4FF]/20">
-                <Sparkles className="w-8 h-8 text-[#00D4FF]" />
-              </div>
+              <img
+                src={logoImg}
+                alt="EntangleWealth logo"
+                className="w-16 h-16 rounded-full object-contain"
+              />
               <h2 className="text-2xl font-bold text-white">
                 Welcome{firstName ? `, ${firstName}` : ""}!
               </h2>

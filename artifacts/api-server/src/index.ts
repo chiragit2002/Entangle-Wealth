@@ -8,7 +8,35 @@ import { trackConnections } from "./routes/health";
 import { ensureReferralBadgesExist } from "./lib/referralRewards";
 import { startAlertEvaluator } from "./routes/alerts";
 import { startDigestScheduler } from "./lib/emailDigest";
+import { startDailyContentScheduler } from "./routes/dailyContent";
 import { pool } from "@workspace/db";
+
+async function ensureDailyContentTable() {
+  try {
+    const client = await pool.connect();
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS daily_content_posts (
+          id SERIAL PRIMARY KEY,
+          batch_date DATE NOT NULL,
+          platform TEXT NOT NULL,
+          content TEXT NOT NULL,
+          theme TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'draft',
+          created_at TIMESTAMPTZ DEFAULT now(),
+          updated_at TIMESTAMPTZ DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_daily_content_batch_date ON daily_content_posts (batch_date);
+        CREATE INDEX IF NOT EXISTS idx_daily_content_status ON daily_content_posts (status);
+      `);
+      logger.info("Daily content table ensured");
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    logger.warn({ error: err }, "Failed to ensure daily content table (non-fatal)");
+  }
+}
 
 async function ensureAlertTables() {
   try {
@@ -223,12 +251,14 @@ const httpServer = server.listen(port, async () => {
   ensureReferralBadgesExist().catch((err) =>
     logger.warn({ error: err }, "Failed to seed referral badges (non-fatal)")
   );
+  await ensureDailyContentTable();
   await ensureAlertTables();
   ensurePerformanceIndexes().catch((err) =>
     logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
   );
   startAlertEvaluator();
   startDigestScheduler();
+  startDailyContentScheduler();
   await initStripe();
 });
 

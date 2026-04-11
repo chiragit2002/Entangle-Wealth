@@ -205,6 +205,7 @@ const ADMIN_NAV_GROUP: NavGroup = {
   items: [
     { href: "/token-admin", label: "Token Admin", desc: "Token management" },
     { href: "/marketing", label: "Marketing AI", desc: "9-agent command center" },
+    { href: "/daily-content", label: "Daily Content", desc: "Auto-generated daily batch" },
     { href: "/content-calendar", label: "Content Calendar", desc: "Schedule & review" },
     { href: "/reddit-engine", label: "Reddit Engine", desc: "Subreddit targeting" },
     { href: "/seo", label: "SEO Engine", desc: "Keywords & blog" },
@@ -221,6 +222,7 @@ const ADMIN_MOBILE_SECTION = {
   links: [
     { href: "/token-admin", label: "Token Admin" },
     { href: "/marketing", label: "Marketing AI" },
+    { href: "/daily-content", label: "Daily Content" },
     { href: "/content-calendar", label: "Calendar" },
     { href: "/reddit-engine", label: "Reddit Engine" },
     { href: "/seo", label: "SEO Engine" },

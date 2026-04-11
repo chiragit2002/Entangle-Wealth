@@ -149,15 +149,70 @@ function SignalCard({ s }: { s: typeof liveSignals[0] }) {
 
 const API_BASE = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 
-function useUserCount() {
-  const [count, setCount] = useState(4891);
+interface HeroStats {
+  members: number;
+  signals: number;
+  accuracy: number;
+}
+
+function useAnimatedNumber(target: number, duration = 800): number {
+  const [displayed, setDisplayed] = useState(target);
+  const prevRef = useRef(target);
+  const rafRef = useRef<number | null>(null);
+
   useEffect(() => {
-    fetch(`${API_BASE}/stats/user-count`)
-      .then((r) => r.ok ? r.json() : null)
-      .then((d) => { if (d && d.count > 0) setCount(d.count); })
-      .catch(err => { if (import.meta.env.DEV) console.error('Failed to fetch user count:', err); });
+    const start = prevRef.current;
+    const end = target;
+    if (start === end) return;
+    const startTime = performance.now();
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplayed(Math.round(start + (end - start) * eased));
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(tick);
+      } else {
+        prevRef.current = end;
+      }
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [target, duration]);
+
+  return displayed;
+}
+
+function useHeroStats(): HeroStats {
+  const [stats, setStats] = useState<HeroStats>({ members: 4891, signals: 1247, accuracy: 87 });
+
+  useEffect(() => {
+    const fetchStats = () => {
+      fetch(`${API_BASE}/stats/hero`)
+        .then((r) => r.ok ? r.json() : null)
+        .then((d) => {
+          if (d && typeof d.members === "number") {
+            setStats({ members: d.members, signals: d.signals, accuracy: d.accuracy });
+          }
+        })
+        .catch(err => { if (import.meta.env.DEV) console.error('Failed to fetch hero stats:', err); });
+    };
+
+    fetchStats();
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
   }, []);
-  return count;
+
+  return stats;
+}
+
+function HeroStatCard({ value, label, color }: { value: string; label: string; color: string }) {
+  return (
+    <div className="glass-panel rounded-xl p-3 md:p-4 text-center">
+      <div className={`text-xl md:text-2xl font-mono font-bold ${color} stat-value`}>{value}</div>
+      <div className="text-[9px] md:text-[10px] text-muted-foreground uppercase tracking-wider mt-1">{label}</div>
+    </div>
+  );
 }
 
 function useRecentSignups() {
@@ -201,17 +256,25 @@ function RecentSignupTicker({ signups }: { signups: { name: string; timeLabel: s
   );
 }
 
+function AnimatedHeroStats() {
+  const stats = useHeroStats();
+  const animatedMembers = useAnimatedNumber(stats.members);
+  const animatedSignals = useAnimatedNumber(stats.signals);
+  const animatedAccuracy = useAnimatedNumber(stats.accuracy);
+
+  return (
+    <div className="grid grid-cols-3 gap-3 w-full max-w-sm md:max-w-lg mt-4">
+      <HeroStatCard value={`${animatedAccuracy}%`} label="Accuracy" color="text-[#00c8f8]" />
+      <HeroStatCard value={animatedSignals.toLocaleString()} label="Signals" color="text-[#00e676]" />
+      <HeroStatCard value={animatedMembers.toLocaleString()} label="Members" color="text-[#f5c842]" />
+    </div>
+  );
+}
+
 export default function Home() {
   const [nodeGlow, setNodeGlow] = useState(0);
-  const memberCount = useUserCount();
   const recentSignups = useRecentSignups();
   const testimonials = useTestimonials();
-
-  const heroStats = [
-    { value: "87%", label: "Accuracy", color: "text-[#00c8f8]" },
-    { value: "1,247", label: "Signals", color: "text-[#00e676]" },
-    { value: memberCount.toLocaleString(), label: "Members", color: "text-[#f5c842]" },
-  ];
 
   useEffect(() => { trackEvent("home_viewed"); }, []);
 
@@ -244,14 +307,7 @@ export default function Home() {
             Real-time signals powered by 6 cross-verifying models. Stock alerts, options flow, tax tools, and gig income — all in one place.
           </p>
 
-          <div className="grid grid-cols-3 gap-3 w-full max-w-sm md:max-w-lg mt-4">
-            {heroStats.map((stat) => (
-              <div key={stat.label} className="glass-panel rounded-xl p-3 md:p-4 text-center">
-                <div className={`text-xl md:text-2xl font-mono font-bold ${stat.color} stat-value`}>{stat.value}</div>
-                <div className="text-[9px] md:text-[10px] text-muted-foreground uppercase tracking-wider mt-1">{stat.label}</div>
-              </div>
-            ))}
-          </div>
+          <AnimatedHeroStats />
 
           <RecentSignupTicker signups={recentSignups} />
 

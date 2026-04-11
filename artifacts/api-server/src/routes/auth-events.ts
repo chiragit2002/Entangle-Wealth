@@ -26,8 +26,8 @@ const REQUIRES_AUTH: Set<AuthEventType> = new Set([
 router.post("/auth/event", (req: Request, res: Response) => {
   const ip = req.ip || req.socket.remoteAddress || "unknown";
   const userAgent = req.headers["user-agent"];
-  const auth = getAuth(req);
-  const userId = (auth?.sessionClaims?.userId || auth?.userId) as string | undefined;
+  const { userId } = getAuth(req);
+  const resolvedUserId = userId ?? undefined;
   const { type, details } = req.body || {};
 
   if (!type || !VALID_TYPES.has(type)) {
@@ -37,7 +37,7 @@ router.post("/auth/event", (req: Request, res: Response) => {
 
   const eventType: AuthEventType = type;
 
-  if (REQUIRES_AUTH.has(eventType) && !userId) {
+  if (REQUIRES_AUTH.has(eventType) && !resolvedUserId) {
     res.status(401).json({ error: "Authentication required for this event type" });
     return;
   }
@@ -52,7 +52,7 @@ router.post("/auth/event", (req: Request, res: Response) => {
 
   logAuthEvent({
     type: eventType,
-    userId,
+    userId: resolvedUserId,
     ip,
     method: req.method,
     path: "/auth/event",
@@ -60,10 +60,10 @@ router.post("/auth/event", (req: Request, res: Response) => {
     details,
   });
 
-  if (eventType === "login_success" && userId) {
+  if (eventType === "login_success" && resolvedUserId) {
     const hashedIp = crypto.createHash("sha256").update(ip).digest("hex").slice(0, 16);
     sendZapierWebhook("login", {
-      userId,
+      userId: resolvedUserId,
       timestamp: new Date().toISOString(),
       ipHash: hashedIp,
     }).catch((err) => logger.warn({ err }, "Failed to send Zapier webhook for login event"));

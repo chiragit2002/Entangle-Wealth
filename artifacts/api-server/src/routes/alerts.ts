@@ -7,6 +7,7 @@ import { logger } from "../lib/logger";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { CircuitBreaker, registerCircuit } from "../lib/circuitBreaker";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 const router = Router();
 
@@ -23,10 +24,6 @@ type AlertType = (typeof ALERT_TYPES)[number];
 
 function isValidAlertType(t: string): t is AlertType {
   return (ALERT_TYPES as readonly string[]).includes(t);
-}
-
-interface AuthenticatedRequest extends Request {
-  userId?: string;
 }
 
 const FREE_DAILY_LIMIT = 10;

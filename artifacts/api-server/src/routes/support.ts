@@ -7,10 +7,7 @@ import { usersTable } from "@workspace/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { logger } from "../lib/logger";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
-
-interface AuthenticatedRequest extends Request {
-  userId: string;
-}
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 async function ensureSupportTables() {
   try {

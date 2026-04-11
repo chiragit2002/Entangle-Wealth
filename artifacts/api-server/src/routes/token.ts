@@ -11,6 +11,7 @@ import {
 import { eq, desc, sql, and, count } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 const router = Router();
 
@@ -48,7 +49,7 @@ function getRewardAmount(rank: number): number {
 }
 
 router.put("/token/wallet", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const { walletAddress } = req.body;
 
   if (!walletAddress || !ETH_ADDRESS_REGEX.test(walletAddress)) {
@@ -86,7 +87,7 @@ router.put("/token/wallet", requireAuth, async (req, res) => {
 });
 
 router.get("/token/balance", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
 
   try {
     const [user] = await db
@@ -123,7 +124,7 @@ router.get("/token/balance", requireAuth, async (req, res) => {
 });
 
 router.get("/token/transactions", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
   const offset = parseInt(req.query.offset as string) || 0;
 
@@ -148,7 +149,7 @@ router.get("/token/transactions", requireAuth, async (req, res) => {
 });
 
 router.get("/token/rewards", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
   const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
 
@@ -215,7 +216,7 @@ router.get("/token/rewards/history", async (req, res) => {
 });
 
 router.get("/token/bookings", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
   const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
 
@@ -244,7 +245,7 @@ router.get("/token/catalog", (_req, res) => {
 });
 
 router.post("/token/book", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const { listingId, destination, checkIn, checkOut, details } = req.body;
 
   if (!listingId) {
@@ -316,7 +317,7 @@ router.post("/token/book", requireAuth, async (req, res) => {
 });
 
 router.post("/token/admin/distribute", requireAuth, requireAdmin, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const { month } = req.body;
 
   if (!month) {
@@ -395,6 +396,7 @@ router.post("/token/admin/distribute", requireAuth, requireAdmin, async (req, re
 });
 
 router.get("/token/admin/stats", requireAuth, requireAdmin, async (req, res) => {
+  const userId = (req as AuthenticatedRequest).userId;
   try {
     const totalUsers = await db.select({ count: sql<number>`count(*)` }).from(usersTable);
     const walletsLinked = await db
@@ -439,6 +441,7 @@ router.get("/token/admin/stats", requireAuth, requireAdmin, async (req, res) => 
 });
 
 router.put("/token/admin/config", requireAuth, requireAdmin, async (req, res) => {
+  const userId = (req as AuthenticatedRequest).userId;
   const { sharePrice } = req.body;
 
   if (!sharePrice || sharePrice <= 0) {

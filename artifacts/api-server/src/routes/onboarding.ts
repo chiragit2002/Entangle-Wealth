@@ -4,10 +4,7 @@ import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { logger } from "../lib/logger";
-
-interface AuthenticatedRequest extends Request {
-  userId: string;
-}
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 const router = Router();
 

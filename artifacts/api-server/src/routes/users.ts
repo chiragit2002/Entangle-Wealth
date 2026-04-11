@@ -7,6 +7,7 @@ import {
 } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { getAuth } from "@clerk/express";
 import crypto from "crypto";
 import { processReferralMilestones } from "../lib/referralRewards";
@@ -16,7 +17,7 @@ import { logger } from "../lib/logger";
 const router = Router();
 
 router.get("/users/me", requireAuth, async (req, res) => {
-  const clerkId = (req as any).userId;
+  const clerkId = (req as AuthenticatedRequest).userId;
   try {
     const [user] = await db
       .select()
@@ -34,7 +35,7 @@ router.get("/users/me", requireAuth, async (req, res) => {
 });
 
 router.post("/users/sync", requireAuth, async (req, res) => {
-  const clerkId = (req as any).userId;
+  const clerkId = (req as AuthenticatedRequest).userId;
   const { email, firstName, lastName, photoUrl } = req.body;
 
   try {
@@ -142,7 +143,7 @@ router.post("/users/sync", requireAuth, async (req, res) => {
 });
 
 router.put("/users/me", requireAuth, async (req, res) => {
-  const clerkId = (req as any).userId;
+  const clerkId = (req as AuthenticatedRequest).userId;
   const { headline, bio, phone, location, isPublicProfile } = req.body;
 
   try {

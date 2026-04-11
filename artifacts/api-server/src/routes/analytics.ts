@@ -7,15 +7,12 @@ import { eq } from "drizzle-orm";
 import { getAuth } from "@clerk/express";
 import { logger } from "../lib/logger";
 
-interface AuthenticatedRequest extends Request {
-  userId?: string;
-}
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 const router = Router();
 
 router.post("/analytics/track", (req: Request, res: Response) => {
-  const auth = getAuth(req);
-  const userId = (auth?.sessionClaims?.userId || auth?.userId) as string | undefined;
+  const { userId } = getAuth(req);
   const { event, properties, sessionId } = req.body;
 
   if (!event || typeof event !== "string") {

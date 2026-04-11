@@ -1,11 +1,11 @@
 import { getAuth } from "@clerk/express";
 import type { Request, Response, NextFunction } from "express";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { logAuthEvent } from "../lib/authEventLogger";
 import { recordFailedAttempt, resetAttempts } from "./bruteForce";
 
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
-  const auth = getAuth(req);
-  const userId = auth?.sessionClaims?.userId || auth?.userId;
+  const { userId } = getAuth(req);
   const ip = req.ip || req.socket.remoteAddress || "unknown";
 
   if (!userId) {
@@ -22,6 +22,6 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
   }
 
   resetAttempts(ip);
-  (req as any).userId = userId;
+  (req as AuthenticatedRequest).userId = userId;
   next();
 };

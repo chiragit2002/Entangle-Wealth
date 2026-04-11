@@ -2,10 +2,7 @@ import { Router, type Request, type Response } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import { sendZapierWebhookTest } from "../lib/zapierWebhook";
-
-interface AuthenticatedRequest extends Request {
-  userId?: string;
-}
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 const router = Router();
 

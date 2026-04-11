@@ -206,11 +206,7 @@ async function initStripe() {
   }
 }
 
-const httpServer = server.listen(port, async (err) => {
-  if (err) {
-    logger.error({ err }, "Error listening on port");
-    process.exit(1);
-  }
+const httpServer = server.listen(port, async () => {
 
   logger.info({ port }, "Server listening");
   trackConnections(httpServer);
@@ -224,6 +220,15 @@ const httpServer = server.listen(port, async (err) => {
   startAlertEvaluator();
   startDigestScheduler();
   await initStripe();
+});
+
+httpServer.on("error", (err: NodeJS.ErrnoException) => {
+  if (err.code === "EADDRINUSE") {
+    logger.error({ port }, "Port is already in use");
+  } else {
+    logger.error({ err }, "Server error");
+  }
+  process.exit(1);
 });
 
 let isShuttingDown = false;

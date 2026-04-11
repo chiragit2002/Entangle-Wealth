@@ -1,6 +1,10 @@
 import { Router } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
+import { db } from "@workspace/db";
+import { usersTable } from "@workspace/db/schema";
+import { eq } from "drizzle-orm";
 import { aiQueue } from "../lib/aiQueue";
 import { anthropicCircuit } from "../lib/circuitBreaker";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
@@ -185,6 +189,7 @@ const TONE_INSTRUCTIONS: Record<string, string> = {
 };
 
 router.post("/marketing/generate", requireAuth, requireAdmin, async (req, res) => {
+  const userId = (req as AuthenticatedRequest).userId;
   const { agent, topic, tone, context } = req.body;
 
   if (!agent || !topic) {
@@ -257,7 +262,8 @@ router.post("/marketing/generate", requireAuth, requireAdmin, async (req, res) =
   }
 });
 
-router.get("/marketing/agents", requireAuth, requireAdmin, async (_req, res) => {
+router.get("/marketing/agents", requireAuth, requireAdmin, async (req, res) => {
+  const userId = (req as AuthenticatedRequest).userId;
   try {
     const agents = Object.entries(PLATFORM_CONFIGS).map(([key, config]) => ({
       id: key,

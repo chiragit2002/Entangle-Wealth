@@ -17,9 +17,7 @@ setInterval(() => {
 
 export const authEventTracker = (req: Request, _res: Response, next: NextFunction) => {
   try {
-    const auth = getAuth(req);
-    const userId = (auth?.sessionClaims?.userId || auth?.userId) as string | undefined;
-    const sessionId = auth?.sessionId as string | undefined;
+    const { userId, sessionId } = getAuth(req);
     const ip = req.ip || req.socket.remoteAddress || "unknown";
 
     if (userId && sessionId) {

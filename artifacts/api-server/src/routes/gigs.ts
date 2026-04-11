@@ -3,6 +3,7 @@ import { db } from "@workspace/db";
 import { gigsTable } from "@workspace/db/schema";
 import { eq, desc, ilike, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import crypto from "crypto";
 
 const router = Router();
@@ -63,7 +64,7 @@ router.get("/gigs", async (req, res) => {
 });
 
 router.post("/gigs", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const { title, description, price, category, contactName } = req.body;
 
   if (!title || !description || !price || !category) {
@@ -96,7 +97,7 @@ router.post("/gigs", requireAuth, async (req, res) => {
 });
 
 router.delete("/gigs/:id", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const gigId = req.params.id;
 
   try {

@@ -3,6 +3,7 @@ import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { getUncachableStripeClient, getStripePublishableKey } from "../stripeClient";
 
 const router = Router();
@@ -50,7 +51,7 @@ router.get("/stripe/products", async (_req, res) => {
 });
 
 router.post("/stripe/create-checkout", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const { priceId } = req.body;
 
   if (!priceId || typeof priceId !== "string" || !priceId.startsWith("price_")) {
@@ -116,7 +117,7 @@ router.post("/stripe/create-checkout", requireAuth, async (req, res) => {
 });
 
 router.get("/stripe/subscription", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
 
   try {
     const [user] = await db.select().from(usersTable).where(eq(usersTable.clerkId, userId));
@@ -141,7 +142,7 @@ router.get("/stripe/subscription", requireAuth, async (req, res) => {
 });
 
 router.post("/stripe/create-portal", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
 
   try {
     const [user] = await db.select().from(usersTable).where(eq(usersTable.clerkId, userId));

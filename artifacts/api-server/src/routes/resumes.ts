@@ -3,11 +3,12 @@ import { db } from "@workspace/db";
 import { resumesTable, resumeExperiencesTable, resumeEducationTable } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 const router = Router();
 
 router.get("/resumes", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   try {
     const resumes = await db.select().from(resumesTable).where(eq(resumesTable.userId, userId));
     res.json(resumes);
@@ -18,7 +19,7 @@ router.get("/resumes", requireAuth, async (req, res) => {
 });
 
 router.post("/resumes", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const { title, template, summary, skills, certifications } = req.body;
 
   try {
@@ -38,7 +39,7 @@ router.post("/resumes", requireAuth, async (req, res) => {
 });
 
 router.get("/resumes/:id", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const resumeId = parseInt(req.params.id);
 
   try {
@@ -64,7 +65,7 @@ router.get("/resumes/:id", requireAuth, async (req, res) => {
 });
 
 router.put("/resumes/:id", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const resumeId = parseInt(req.params.id);
   const { title, template, summary, skills, certifications, experiences, education } = req.body;
 
@@ -131,7 +132,7 @@ router.put("/resumes/:id", requireAuth, async (req, res) => {
 });
 
 router.delete("/resumes/:id", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const resumeId = parseInt(req.params.id);
 
   try {

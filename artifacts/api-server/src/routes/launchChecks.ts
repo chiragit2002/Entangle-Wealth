@@ -2,10 +2,7 @@ import { Router, type IRouter, type Request, type Response } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
 import { pool } from "@workspace/db";
 import http from "node:http";
-
-interface AuthenticatedRequest extends Request {
-  userId?: string;
-}
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 const router: IRouter = Router();
 

@@ -5,10 +5,7 @@ import { getMetricsSnapshot } from "../middlewares/metricsMiddleware";
 import { getAllCircuitStates } from "../lib/circuitBreaker";
 import { aiQueue } from "../lib/aiQueue";
 import { stockCache, newsCache } from "../lib/cache";
-
-interface AuthenticatedRequest extends Request {
-  userId?: string;
-}
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 const router = Router();
 

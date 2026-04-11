@@ -3,6 +3,7 @@ import { db } from "@workspace/db";
 import { referralsTable, testimonialsTable, usersTable, badgesTable, userBadgesTable } from "@workspace/db/schema";
 import { eq, desc, sql, count, and, like } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import crypto from "crypto";
 
 const router = Router();
@@ -20,7 +21,7 @@ async function generateUniqueReferralCode(): Promise<string> {
 }
 
 router.get("/viral/referral/code", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   try {
     let [user] = await db
       .select({ referralCode: usersTable.referralCode })
@@ -69,7 +70,7 @@ router.get("/viral/referral/code", requireAuth, async (req, res) => {
 });
 
 router.get("/viral/referral/badges", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   try {
     const [stats] = await db
       .select({ converted: count() })
@@ -158,7 +159,7 @@ router.get("/stats/recent-signups", async (req, res) => {
 });
 
 router.post("/viral/testimonials", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const { name, role, message, rating } = req.body;
 
   if (!name || !message || !rating) {

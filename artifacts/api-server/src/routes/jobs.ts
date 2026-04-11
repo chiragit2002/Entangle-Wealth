@@ -3,6 +3,7 @@ import { db } from "@workspace/db";
 import { savedJobsTable } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 const router = Router();
 
@@ -129,7 +130,7 @@ function generateMockJobs(query: string, location: string, page: number) {
 }
 
 router.get("/jobs/saved", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   try {
     const saved = await db.select().from(savedJobsTable).where(eq(savedJobsTable.userId, userId));
     res.json(saved);
@@ -140,7 +141,7 @@ router.get("/jobs/saved", requireAuth, async (req, res) => {
 });
 
 router.post("/jobs/save", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const { jobTitle, company, location, salary, jobType, sourceUrl, source, externalId } = req.body;
 
   try {
@@ -172,7 +173,7 @@ router.post("/jobs/save", requireAuth, async (req, res) => {
 });
 
 router.delete("/jobs/saved/:id", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const jobId = parseInt(req.params.id);
 
   try {

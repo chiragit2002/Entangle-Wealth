@@ -4,11 +4,12 @@ import { usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 const router = Router();
 
 router.get("/kyc/status", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   try {
     const [user] = await db.select({
       kycStatus: usersTable.kycStatus,
@@ -28,7 +29,7 @@ router.get("/kyc/status", requireAuth, async (req, res) => {
 });
 
 router.post("/kyc/submit", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const { fullLegalName, dateOfBirth, address, idType, idNumber } = req.body;
 
   if (!fullLegalName || !dateOfBirth || !address || !idType || !idNumber) {

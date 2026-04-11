@@ -13,6 +13,7 @@ import {
 } from "@workspace/db/schema";
 import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 const router = Router();
 
@@ -44,7 +45,7 @@ function xpForNextLevel(level: number): number {
 }
 
 router.get("/gamification/me", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   try {
     let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
     if (!xpRow) {
@@ -91,7 +92,7 @@ const XP_REWARDS: Record<string, Record<string, number>> = {
 const MAX_XP_PER_ACTION = 100;
 
 router.post("/gamification/xp", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const { reason, category } = req.body;
   if (!reason || !category) {
     res.status(400).json({ error: "reason and category are required" });
@@ -148,7 +149,7 @@ router.post("/gamification/xp", requireAuth, async (req, res) => {
 });
 
 router.post("/gamification/streak/checkin", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const today = new Date().toISOString().split("T")[0];
 
   try {
@@ -205,7 +206,7 @@ router.get("/gamification/badges", async (_req, res) => {
 });
 
 router.get("/gamification/badges/me", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   try {
     const allBadges = await db.select().from(badgesTable).orderBy(badgesTable.category, badgesTable.name);
     const earned = await db.select().from(userBadgesTable).where(eq(userBadgesTable.userId, userId));
@@ -238,7 +239,7 @@ router.get("/gamification/challenges", async (_req, res) => {
 });
 
 router.get("/gamification/challenges/me", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   try {
     const challenges = await db.select().from(challengesTable)
       .where(eq(challengesTable.isActive, true));
@@ -263,7 +264,7 @@ router.get("/gamification/challenges/me", requireAuth, async (req, res) => {
 });
 
 router.post("/gamification/challenges/:challengeId/progress", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const challengeId = parseInt(req.params.challengeId);
   const rawIncrement = parseInt(req.body.increment) || 1;
   const increment = Math.min(Math.max(rawIncrement, 1), 1);
@@ -348,7 +349,7 @@ router.get("/gamification/leaderboard", async (req, res) => {
 });
 
 router.get("/gamification/leaderboard/rank", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const period = (req.query.period as string) || "monthly";
   try {
     const [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
@@ -384,7 +385,7 @@ router.get("/gamification/leaderboard/rank", requireAuth, async (req, res) => {
 });
 
 router.get("/gamification/xp/history", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthenticatedRequest).userId;
   const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
   try {
     const history = await db.select().from(xpTransactionsTable)

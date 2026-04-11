@@ -1,6 +1,5 @@
 import { Router, type IRouter } from "express";
 import { getAuthEventStats } from "../lib/authEventLogger";
-import { requireAuth } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
 
@@ -17,10 +16,6 @@ export function trackConnections(server: any): void {
 }
 
 router.get("/healthz", (_req, res) => {
-  res.json({ status: "ok" });
-});
-
-router.get("/healthz/details", requireAuth, (_req, res) => {
   const mem = process.memoryUsage();
   const uptimeMs = Date.now() - startTime;
   const uptimeSeconds = Math.floor(uptimeMs / 1000);

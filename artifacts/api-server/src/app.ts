@@ -126,6 +126,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(csrfProtection);
 app.use(inputSanitizer);
 
+app.use("/api/auth", bruteForceGuard);
 app.use("/api/users", bruteForceGuard);
 app.use("/api/kyc", bruteForceGuard);
 app.use("/api/stripe", bruteForceGuard);

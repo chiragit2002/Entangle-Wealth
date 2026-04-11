@@ -18,7 +18,6 @@
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2",
-    "csrf-csrf": "^4.0.3",
     "drizzle-orm": "catalog:",
     "express": "^5",
     "express-rate-limit": "^8.3.2",

@@ -15,10 +15,12 @@ import newsRouter from "./news";
 import gamificationRouter from "./gamification";
 import tokenRouter from "./token";
 import marketingRouter from "./marketing";
+import authEventsRouter from "./auth-events";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
+router.use(authEventsRouter);
 router.use(stocksRouter);
 router.use(analyzeRouter);
 router.use(usersRouter);

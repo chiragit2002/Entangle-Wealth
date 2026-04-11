@@ -320,8 +320,13 @@ export function Navbar() {
 
           <Show when="signed-out">
             <Link href="/sign-in">
-              <Button size="sm" className="h-9 px-4 text-xs font-bold bg-primary text-black hover:bg-primary/90 shadow-[0_0_20px_rgba(0,212,255,0.2)]">
+              <Button variant="ghost" size="sm" className="h-9 px-4 text-xs font-medium text-white/70 hover:text-white hover:bg-white/[0.05]">
                 Sign In
+              </Button>
+            </Link>
+            <Link href="/sign-up">
+              <Button size="sm" className="h-9 px-4 text-xs font-bold bg-primary text-black hover:bg-primary/90 shadow-[0_0_20px_rgba(0,212,255,0.2)]">
+                Get Started
               </Button>
             </Link>
           </Show>
@@ -388,11 +393,18 @@ export function Navbar() {
                 </Button>
               </Show>
               <Show when="signed-out">
-                <Link href="/sign-in" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button className="w-full bg-primary text-black hover:bg-primary/90 h-11 font-bold shadow-[0_0_20px_rgba(0,212,255,0.2)]">
-                    Sign In
-                  </Button>
-                </Link>
+                <div className="grid grid-cols-2 gap-2">
+                  <Link href="/sign-in" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full border-white/10 text-white hover:bg-white/[0.05] h-11 font-medium">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/sign-up" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button className="w-full bg-primary text-black hover:bg-primary/90 h-11 font-bold shadow-[0_0_20px_rgba(0,212,255,0.2)]">
+                      Get Started
+                    </Button>
+                  </Link>
+                </div>
               </Show>
             </div>
           </div>

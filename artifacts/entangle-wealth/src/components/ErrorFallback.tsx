@@ -13,9 +13,9 @@ export default function ErrorFallback({ error, resetErrorBoundary }: ErrorFallba
           <AlertTriangle className="w-8 h-8 text-red-400" />
         </div>
         <div>
-          <h2 className="text-xl font-bold mb-2">Quantum Decoherence Detected</h2>
+          <h2 className="text-xl font-bold mb-2">Something went wrong</h2>
           <p className="text-muted-foreground text-sm">
-            Something went wrong while rendering this view. The error has been captured and we can attempt to re-entangle.
+            We ran into an unexpected issue loading this page. Please try again — if the problem persists, contact support.
           </p>
         </div>
         <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-left">
@@ -28,7 +28,7 @@ export default function ErrorFallback({ error, resetErrorBoundary }: ErrorFallba
           className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-black font-semibold hover:bg-primary/90 transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
-          Re-Entangle
+          Try Again
         </button>
       </div>
     </div>

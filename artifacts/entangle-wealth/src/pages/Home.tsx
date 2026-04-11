@@ -3,7 +3,6 @@ import { Link } from "wouter";
 import { Layout } from "@/components/layout/Layout";
 import { MarketTicker } from "@/components/MarketTicker";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Activity, Target, Zap, TrendingUp, ShieldAlert, BarChart3, Eye, DollarSign, ArrowRight, Terminal, UserPlus } from "lucide-react";
 import { ShareSignalCard } from "@/components/viral/ShareSignalCard";
 import { trackEvent } from "@/lib/trackEvent";
@@ -203,8 +202,6 @@ function RecentSignupTicker({ signups }: { signups: { name: string; timeLabel: s
 }
 
 export default function Home() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
   const [nodeGlow, setNodeGlow] = useState(0);
   const memberCount = useUserCount();
   const recentSignups = useRecentSignups();
@@ -222,14 +219,6 @@ export default function Home() {
     const t = setInterval(() => setNodeGlow((p) => (p + 1) % 6), 1500);
     return () => clearInterval(t);
   }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setSubmitted(true);
-      setEmail("");
-    }
-  };
 
   return (
     <Layout>
@@ -266,27 +255,13 @@ export default function Home() {
 
           <RecentSignupTicker signups={recentSignups} />
 
-          <form onSubmit={handleSubmit} className="w-full max-w-md flex flex-col sm:flex-row gap-3 mt-4">
-            {submitted ? (
-              <div className="w-full p-4 rounded-xl glass-panel text-primary text-center font-medium text-sm">
-                You're on the list. We'll be in touch.
-              </div>
-            ) : (
-              <>
-                <Input
-                  type="email"
-                  placeholder="Enter your email address"
-                  className="h-12 bg-black/50 border-white/20 focus-visible:ring-primary text-base"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <Button type="submit" size="lg" className="h-12 px-8 bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black font-bold hover:opacity-90">
-                  Start Free Trial →
-                </Button>
-              </>
-            )}
-          </form>
+          <div className="w-full max-w-md flex flex-col sm:flex-row gap-3 mt-4 justify-center">
+            <Link href="/sign-up">
+              <Button size="lg" className="h-12 px-8 bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black font-bold hover:opacity-90 text-base">
+                Get Started Free →
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

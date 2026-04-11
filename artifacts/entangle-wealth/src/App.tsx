@@ -1,5 +1,5 @@
 import { useEffect, useRef, lazy, Suspense } from "react";
-import { Switch, Route, useLocation, Router as WouterRouter, Redirect } from "wouter";
+import { Switch, Route, useLocation, Router as WouterRouter, Redirect, useSearch } from "wouter";
 import { ClerkProvider, SignIn, SignUp, Show, useClerk } from "@clerk/react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
@@ -14,6 +14,7 @@ import { captureReferralCode } from "@/lib/referral";
 import { trackEvent } from "@/lib/trackEvent";
 import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+import { Info } from "lucide-react";
 
 const Home = lazy(() => import("@/pages/Home"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -88,10 +89,56 @@ if (!clerkPubKey) {
 
 const queryClient = new QueryClient();
 
+const clerkAppearance = {
+  variables: {
+    colorPrimary: "#00D4FF",
+    colorBackground: "#0a0a14",
+    colorText: "#ffffff",
+    colorTextSecondary: "rgba(255,255,255,0.5)",
+    colorInputBackground: "rgba(255,255,255,0.05)",
+    colorInputText: "#ffffff",
+    borderRadius: "0.75rem",
+    fontFamily: "inherit",
+  },
+  elements: {
+    card: "bg-[#0a0a14] border border-white/10 shadow-2xl shadow-[#00D4FF]/5",
+    headerTitle: "text-white",
+    headerSubtitle: "text-white/50",
+    socialButtonsBlockButton: "border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08] font-medium",
+    socialButtonsBlockButtonText: "text-white font-medium",
+    formFieldLabel: "text-white/70",
+    formFieldInput: "bg-white/[0.05] border-white/10 text-white placeholder:text-white/30",
+    formButtonPrimary: "bg-[#00D4FF] text-black font-bold hover:bg-[#00D4FF]/90",
+    footerActionLink: "text-[#00D4FF] hover:text-[#00D4FF]/80",
+    dividerLine: "bg-white/10",
+    dividerText: "text-white/30",
+    identityPreviewEditButton: "text-[#00D4FF]",
+    formFieldAction: "text-[#00D4FF]",
+    alert: "bg-red-500/10 border-red-500/20 text-red-300",
+    alertText: "text-red-300",
+  },
+};
+
 function SignInPage() {
+  const searchString = useSearch();
+  const params = new URLSearchParams(searchString);
+  const redirectReason = params.get("reason");
+
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} />
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+      {redirectReason === "protected" && (
+        <div className="mb-4 flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#00D4FF]/10 border border-[#00D4FF]/20 text-[#00D4FF] text-sm max-w-md w-full">
+          <Info className="w-4 h-4 shrink-0" />
+          <span>Sign in to access this page</span>
+        </div>
+      )}
+      <SignIn
+        routing="path"
+        path={`${basePath}/sign-in`}
+        signUpUrl={`${basePath}/sign-up`}
+        fallbackRedirectUrl={`${basePath}/dashboard`}
+        appearance={clerkAppearance}
+      />
     </div>
   );
 }
@@ -99,7 +146,13 @@ function SignInPage() {
 function SignUpPage() {
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
+      <SignUp
+        routing="path"
+        path={`${basePath}/sign-up`}
+        signInUrl={`${basePath}/sign-in`}
+        fallbackRedirectUrl={`${basePath}/dashboard`}
+        appearance={clerkAppearance}
+      />
     </div>
   );
 }
@@ -135,13 +188,16 @@ function ClerkQueryClientCacheInvalidator() {
 }
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
+  const [location] = useLocation();
+
   return (
     <>
       <Show when="signed-in">
         <Component />
       </Show>
       <Show when="signed-out">
-        <Redirect to="/sign-in" />
+        {/* redirect param preserved for future return-to-origin support; currently users always land on /dashboard */}
+        <Redirect to={`/sign-in?reason=protected&redirect=${encodeURIComponent(location)}`} />
       </Show>
     </>
   );

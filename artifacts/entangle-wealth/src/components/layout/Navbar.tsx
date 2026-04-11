@@ -48,6 +48,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/leaderboard", label: "Leaderboard", desc: "Top 100 traders" },
       { href: "/achievements", label: "Achievements", desc: "Badges & challenges" },
+      { href: "/gamification", label: "Rewards", desc: "Spin wheel & XP" },
     ],
   },
   {
@@ -113,6 +114,7 @@ const MOBILE_SECTIONS = [
     links: [
       { href: "/leaderboard", label: "Leaderboard" },
       { href: "/achievements", label: "Achievements" },
+      { href: "/gamification", label: "Rewards" },
     ],
   },
   {

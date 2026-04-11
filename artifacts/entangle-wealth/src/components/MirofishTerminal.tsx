@@ -295,6 +295,7 @@ export function MirofishTerminal() {
         <form onSubmit={handleCommand} className="flex items-center gap-2">
           <span className="text-[10px] font-mono text-primary/40">entangle@core:~$</span>
           <input
+            data-tour="terminal-input"
             value={commandInput}
             onChange={(e) => setCommandInput(e.target.value)}
             className="flex-1 bg-transparent border-none outline-none text-[11px] font-mono text-primary caret-primary"

@@ -95,15 +95,23 @@ router.post("/onboarding/checklist", requireAuth, async (req: Request, res: Resp
     const existing = (rows[0]?.onboardingChecklist as Record<string, boolean>) ?? {};
     const updated = { ...existing, [item]: completed };
 
+    const CHECKLIST_ITEMS = ["view_signal", "run_tax_scan", "set_alert", "join_community", "enable_notifications"];
+    const allDone = CHECKLIST_ITEMS.every((key) => updated[key]);
+
+    const setFields: Record<string, unknown> = {
+      onboardingChecklist: updated,
+      updatedAt: new Date(),
+    };
+    if (allDone) {
+      setFields.checklistCompletedAt = new Date();
+    }
+
     await db
       .update(usersTable)
-      .set({
-        onboardingChecklist: updated,
-        updatedAt: new Date(),
-      })
+      .set(setFields)
       .where(eq(usersTable.clerkId, userId));
 
-    res.json({ ok: true, checklist: updated });
+    res.json({ ok: true, checklist: updated, allCompleted: allDone });
   } catch (err) {
     logger.error({ err }, "Failed to update checklist");
     res.status(500).json({ error: "Internal server error" });

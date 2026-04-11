@@ -99,7 +99,7 @@ export function OptionsChain() {
   const pcRatio = totalCallVol ? (totalPutVol / totalCallVol).toFixed(2) : "—";
 
   return (
-    <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden mb-6">
+    <div data-tour="options-chain" className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden mb-6">
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.04]">
         <div className="flex items-center gap-3">
           <span className="text-[13px] font-bold">Options Chain</span>

@@ -2,7 +2,7 @@ import { marketTickerData } from "@/lib/mock-data";
 
 export function MarketTicker() {
   return (
-    <div className="w-full bg-black/90 border-b border-white/10 overflow-hidden py-2 flex items-center relative z-20">
+    <div data-tour="market-ticker" className="w-full bg-black/90 border-b border-white/10 overflow-hidden py-2 flex items-center relative z-20">
       <div className="w-full flex space-x-8 overflow-hidden">
         <div className="flex space-x-8 animate-[ticker_30s_linear_infinite] whitespace-nowrap px-4 hover:[animation-play-state:paused]">
           {[...marketTickerData, ...marketTickerData, ...marketTickerData].map((item, i) => (

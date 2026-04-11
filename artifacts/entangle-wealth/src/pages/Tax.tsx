@@ -224,7 +224,7 @@ export default function Tax() {
           </div>
         )}
 
-        <div className="glass-panel rounded-2xl p-6 sm:p-8 text-center mb-8">
+        <div data-tour="tax-metrics" className="glass-panel rounded-2xl p-6 sm:p-8 text-center mb-8">
           <p className="text-[13px] text-muted-foreground uppercase tracking-wider mb-4">Compliance Score</p>
           <div className="relative w-[140px] h-[140px] mx-auto mb-4">
             <svg width="140" height="140" viewBox="0 0 140 140" className="-rotate-90" aria-label={`Compliance score: ${complianceScore} out of 100`} role="img">

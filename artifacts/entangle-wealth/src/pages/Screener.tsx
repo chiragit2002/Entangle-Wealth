@@ -293,6 +293,12 @@ export default function Screener() {
           </div>
 
           <div className="max-h-[calc(100vh-240px)] overflow-y-auto">
+            {filteredStocks.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-white/30 text-sm font-semibold mb-1">No stocks match your filters</p>
+                <p className="text-white/15 text-xs">Try adjusting your search or filter criteria.</p>
+              </div>
+            )}
             {filteredStocks.map((stock, i) => {
               const analysis = analyzedStocks.get(stock.symbol);
               const isAnalyzing = analyzing.has(stock.symbol);

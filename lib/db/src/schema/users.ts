@@ -28,6 +28,7 @@ export const usersTable = pgTable("users", {
   onboardingCompleted: boolean("onboarding_completed").default(false),
   onboardingInterests: jsonb("onboarding_interests"),
   onboardingChecklist: jsonb("onboarding_checklist"),
+  checklistCompletedAt: timestamp("checklist_completed_at", { withTimezone: true }),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 

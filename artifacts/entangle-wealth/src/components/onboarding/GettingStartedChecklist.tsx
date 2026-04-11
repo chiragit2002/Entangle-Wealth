@@ -24,7 +24,12 @@ const EVENTS_TO_CHECKLIST: Record<string, string> = {
   taxflow_scan: "run_tax_scan",
   alert_created: "set_alert",
   community_post: "join_community",
+  notifications_enabled: "enable_notifications",
 };
+
+interface OnboardingEventDetail {
+  event: string;
+}
 
 export function GettingStartedChecklist() {
   const { getToken, isSignedIn } = useAuth();
@@ -53,26 +58,16 @@ export function GettingStartedChecklist() {
     fetchState();
   }, [fetchState]);
 
-  useEffect(() => {
-    const handler = (e: CustomEvent<{ event: string }>) => {
-      const checklistKey = EVENTS_TO_CHECKLIST[e.detail.event];
-      if (checklistKey && !checklist[checklistKey]) {
-        markItem(checklistKey);
+  const markItem = useCallback(async (itemId: string) => {
+    setChecklist((prev) => {
+      const updated = { ...prev, [itemId]: true };
+      const allDone = ITEMS.every((item) => updated[item.id]);
+      if (allDone) {
+        setShowConfetti(true);
+        trackEvent("onboarding_checklist_completed");
       }
-    };
-    window.addEventListener("onboarding-event" as any, handler as any);
-    return () => window.removeEventListener("onboarding-event" as any, handler as any);
-  }, [checklist]);
-
-  const markItem = async (itemId: string) => {
-    const updated = { ...checklist, [itemId]: true };
-    setChecklist(updated);
-
-    const allDone = ITEMS.every((item) => updated[item.id]);
-    if (allDone) {
-      setShowConfetti(true);
-      trackEvent("onboarding_checklist_completed");
-    }
+      return updated;
+    });
 
     try {
       await authFetch("/onboarding/checklist", getToken, {
@@ -82,7 +77,19 @@ export function GettingStartedChecklist() {
       });
     } catch {
     }
-  };
+  }, [getToken]);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<OnboardingEventDetail>).detail;
+      const checklistKey = EVENTS_TO_CHECKLIST[detail.event];
+      if (checklistKey && !checklist[checklistKey]) {
+        markItem(checklistKey);
+      }
+    };
+    window.addEventListener("onboarding-event", handler);
+    return () => window.removeEventListener("onboarding-event", handler);
+  }, [checklist, markItem]);
 
   const completedCount = ITEMS.filter((item) => checklist[item.id]).length;
   const allDone = completedCount === ITEMS.length;

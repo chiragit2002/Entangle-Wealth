@@ -14,13 +14,37 @@ const TOOLTIPS: TooltipDef[] = [
   {
     id: "signal_cards",
     selector: ".signal-card",
-    message: "These are AI-generated signals with confidence scores from 6 models.",
+    message: "These are AI-generated signals with confidence scores from 6 cross-verifying models.",
     position: "top",
   },
   {
     id: "cmd_search",
     selector: "[data-cmd-search]",
     message: "Search any ticker here. Press / for quick access.",
+    position: "bottom",
+  },
+  {
+    id: "tax_dashboard",
+    selector: "[data-tour='tax-metrics']",
+    message: "Your tax dashboard shows deductions, mileage, and estimated savings at a glance.",
+    position: "bottom",
+  },
+  {
+    id: "options_chain",
+    selector: "[data-tour='options-chain']",
+    message: "The options chain shows real-time Greeks, IV, and unusual activity for any ticker.",
+    position: "top",
+  },
+  {
+    id: "terminal_input",
+    selector: "[data-tour='terminal-input']",
+    message: "Type commands here to analyze any stock. Try 'analyze AAPL' to get started.",
+    position: "bottom",
+  },
+  {
+    id: "market_ticker",
+    selector: "[data-tour='market-ticker']",
+    message: "Live market data streams across the top. Click any ticker for a quick analysis.",
     position: "bottom",
   },
 ];
@@ -76,13 +100,16 @@ export function FirstVisitTooltips() {
   const style: React.CSSProperties = {};
   if (activeTooltip.position === "bottom") {
     style.top = rect.bottom + 8;
-    style.left = Math.max(8, rect.left + rect.width / 2 - 140);
+    style.left = Math.max(8, Math.min(rect.left + rect.width / 2 - 140, window.innerWidth - 296));
   } else if (activeTooltip.position === "top") {
     style.bottom = window.innerHeight - rect.top + 8;
-    style.left = Math.max(8, rect.left + rect.width / 2 - 140);
-  } else {
+    style.left = Math.max(8, Math.min(rect.left + rect.width / 2 - 140, window.innerWidth - 296));
+  } else if (activeTooltip.position === "right") {
     style.top = rect.top;
     style.left = rect.right + 8;
+  } else {
+    style.top = rect.top;
+    style.right = window.innerWidth - rect.left + 8;
   }
 
   return (

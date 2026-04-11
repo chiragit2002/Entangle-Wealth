@@ -36,18 +36,28 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
     );
   };
 
-  const handleComplete = async () => {
-    setSaving(true);
+  const persistComplete = async (interests: string[]) => {
     try {
       await authFetch("/onboarding/complete-welcome", getToken, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ interests: selectedInterests }),
+        body: JSON.stringify({ interests }),
       });
-      trackEvent("onboarding_welcome_completed", { interests: selectedInterests });
     } catch {
     }
+  };
+
+  const handleComplete = async () => {
+    setSaving(true);
+    await persistComplete(selectedInterests);
+    trackEvent("onboarding_welcome_completed", { interests: selectedInterests });
     setSaving(false);
+    onComplete();
+  };
+
+  const handleSkip = async () => {
+    await persistComplete([]);
+    trackEvent("onboarding_welcome_skipped");
     onComplete();
   };
 
@@ -68,7 +78,7 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
             Step {step + 1} of 4
           </span>
           <button
-            onClick={onComplete}
+            onClick={handleSkip}
             className="text-white/20 hover:text-white/40 transition-colors"
             aria-label="Skip onboarding"
           >

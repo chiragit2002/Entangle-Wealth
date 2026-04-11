@@ -8,7 +8,7 @@ import {
   tokenConfigTable,
   userXpTable,
 } from "@workspace/db/schema";
-import { eq, desc, sql, and } from "drizzle-orm";
+import { eq, desc, sql, and, count } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 
 const router = Router();
@@ -130,6 +130,7 @@ router.get("/token/transactions", requireAuth, async (req, res) => {
     const [user] = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.clerkId, userId));
     if (!user) { res.status(404).json({ error: "User not found" }); return; }
 
+    const [totalResult] = await db.select({ c: count() }).from(tokenTransactionsTable).where(eq(tokenTransactionsTable.userId, user.id));
     const transactions = await db
       .select()
       .from(tokenTransactionsTable)
@@ -138,7 +139,7 @@ router.get("/token/transactions", requireAuth, async (req, res) => {
       .limit(limit)
       .offset(offset);
 
-    res.json(transactions);
+    res.json({ items: transactions, total: totalResult?.c || 0, limit, offset });
   } catch (error) {
     console.error("Transactions error:", error);
     res.status(500).json({ error: "Failed to fetch transactions" });
@@ -154,6 +155,7 @@ router.get("/token/rewards", requireAuth, async (req, res) => {
     const [user] = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.clerkId, userId));
     if (!user) { res.status(404).json({ error: "User not found" }); return; }
 
+    const [totalResult] = await db.select({ c: count() }).from(rewardDistributionsTable).where(eq(rewardDistributionsTable.userId, user.id));
     const rewards = await db
       .select()
       .from(rewardDistributionsTable)
@@ -162,7 +164,7 @@ router.get("/token/rewards", requireAuth, async (req, res) => {
       .limit(limit)
       .offset(offset);
 
-    res.json(rewards);
+    res.json({ items: rewards, total: totalResult?.c || 0, limit, offset });
   } catch (error) {
     console.error("Rewards error:", error);
     res.status(500).json({ error: "Failed to fetch rewards" });
@@ -220,6 +222,7 @@ router.get("/token/bookings", requireAuth, async (req, res) => {
     const [user] = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.clerkId, userId));
     if (!user) { res.status(404).json({ error: "User not found" }); return; }
 
+    const [totalResult] = await db.select({ c: count() }).from(travelBookingsTable).where(eq(travelBookingsTable.userId, user.id));
     const bookings = await db
       .select()
       .from(travelBookingsTable)
@@ -228,7 +231,7 @@ router.get("/token/bookings", requireAuth, async (req, res) => {
       .limit(limit)
       .offset(offset);
 
-    res.json(bookings);
+    res.json({ items: bookings, total: totalResult?.c || 0, limit, offset });
   } catch (error) {
     console.error("Bookings error:", error);
     res.status(500).json({ error: "Failed to fetch bookings" });

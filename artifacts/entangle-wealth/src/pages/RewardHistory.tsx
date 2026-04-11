@@ -49,7 +49,10 @@ export default function RewardHistory() {
           fetchAuth("/token/rewards"),
         ]);
         if (histRes.status === "fulfilled" && histRes.value.ok) setHistory(await histRes.value.json());
-        if (myRes.status === "fulfilled" && myRes.value.ok) setMyRewards(await myRes.value.json());
+        if (myRes.status === "fulfilled" && myRes.value.ok) {
+          const rewardsData = await myRes.value.json();
+          setMyRewards(Array.isArray(rewardsData) ? rewardsData : rewardsData.items || []);
+        }
       } catch {}
       setLoading(false);
     };

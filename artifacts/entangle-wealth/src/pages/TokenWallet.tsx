@@ -45,7 +45,10 @@ export default function TokenWallet() {
         fetchAuth("/token/transactions"),
       ]);
       if (balRes.status === "fulfilled" && balRes.value.ok) setBalance(await balRes.value.json());
-      if (txRes.status === "fulfilled" && txRes.value.ok) setTransactions(await txRes.value.json());
+      if (txRes.status === "fulfilled" && txRes.value.ok) {
+        const txData = await txRes.value.json();
+        setTransactions(Array.isArray(txData) ? txData : txData.items || []);
+      }
     } catch {}
     setLoading(false);
   }, [fetchAuth]);

@@ -42,8 +42,8 @@ router.get("/metrics", requireAuth, async (req: Request, res: Response) => {
       circuits,
       aiQueue: queueStatus,
       caches: {
-        stockCache: { size: stockCache.size },
-        newsCache: { size: newsCache.size },
+        stockCache: stockCache.getStats(),
+        newsCache: newsCache.getStats(),
       },
     });
   } catch {

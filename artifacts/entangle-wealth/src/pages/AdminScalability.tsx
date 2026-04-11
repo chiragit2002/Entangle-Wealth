@@ -40,8 +40,8 @@ interface MetricsData {
     totalFailed: number;
   };
   caches: {
-    stockCache: { size: number };
-    newsCache: { size: number };
+    stockCache: { label: string; size: number; hits: number; misses: number; hitRate: number };
+    newsCache: { label: string; size: number; hits: number; misses: number; hitRate: number };
   };
 }
 
@@ -284,14 +284,19 @@ export default function AdminScalability() {
                     Cache Status
                   </h2>
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                      <span className="text-white/70">Stock Cache</span>
-                      <span className="font-mono text-[#00D4FF]">{metrics.caches.stockCache.size} entries</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                      <span className="text-white/70">News Cache</span>
-                      <span className="font-mono text-[#00D4FF]">{metrics.caches.newsCache.size} entries</span>
-                    </div>
+                    {[metrics.caches.stockCache, metrics.caches.newsCache].map((c) => (
+                      <div key={c.label} className="p-3 bg-white/5 rounded-lg">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-white/70 capitalize">{c.label} Cache</span>
+                          <span className="font-mono text-[#00D4FF]">{c.size} entries</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-white/40">
+                          <span>Hits: <span className="text-[#00ff88] font-mono">{c.hits}</span></span>
+                          <span>Misses: <span className="text-[#ff3366] font-mono">{c.misses}</span></span>
+                          <span>Hit Rate: <span className="text-[#FFD700] font-mono">{c.hitRate}%</span></span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 

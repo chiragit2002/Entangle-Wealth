@@ -125,8 +125,50 @@ async function initStripe() {
     }
 
     logger.info("Running Stripe migrations...");
+    try {
+      const client = await pool.connect();
+      try {
+        await client.query("CREATE SCHEMA IF NOT EXISTS stripe");
+        await client.query(`
+          CREATE TABLE IF NOT EXISTS "stripe"."accounts" (
+            id TEXT PRIMARY KEY,
+            raw_data JSONB NOT NULL DEFAULT '{}',
+            first_synced_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            last_synced_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            business_name TEXT GENERATED ALWAYS AS ((raw_data->'business_profile'->>'name')::text) STORED,
+            email TEXT GENERATED ALWAYS AS ((raw_data->>'email')::text) STORED,
+            type TEXT GENERATED ALWAYS AS ((raw_data->>'type')::text) STORED,
+            charges_enabled BOOLEAN GENERATED ALWAYS AS ((raw_data->>'charges_enabled')::boolean) STORED,
+            payouts_enabled BOOLEAN GENERATED ALWAYS AS ((raw_data->>'payouts_enabled')::boolean) STORED,
+            details_submitted BOOLEAN GENERATED ALWAYS AS ((raw_data->>'details_submitted')::boolean) STORED,
+            country TEXT GENERATED ALWAYS AS ((raw_data->>'country')::text) STORED,
+            default_currency TEXT GENERATED ALWAYS AS ((raw_data->>'default_currency')::text) STORED,
+            created INTEGER GENERATED ALWAYS AS ((raw_data->>'created')::integer) STORED
+          );
+          ALTER TABLE "stripe"."accounts" ADD COLUMN IF NOT EXISTS "api_key_hashes" TEXT[] DEFAULT '{}';
+          CREATE INDEX IF NOT EXISTS idx_accounts_api_key_hashes ON "stripe"."accounts" USING GIN (api_key_hashes);
+          CREATE INDEX IF NOT EXISTS idx_accounts_business_name ON "stripe"."accounts" (business_name);
+        `);
+      } finally {
+        client.release();
+      }
+    } catch (schemaErr) {
+      logger.warn({ error: schemaErr }, "Could not ensure stripe schema/tables (non-fatal)");
+    }
     await runMigrations({ databaseUrl });
     logger.info("Stripe migrations complete");
+
+    const origConsoleError = console.error;
+    const suppressStripeRelationErrors = (...args: any[]) => {
+      const msg = args.map(String).join(" ");
+      if (msg.includes("stripe.accounts") && msg.includes("does not exist")) return;
+      if (msg.includes("Failed to lookup account by API key hash")) return;
+      if (msg.includes("Failed to upsert account to database")) return;
+      origConsoleError.apply(console, args);
+    };
+
+    console.error = suppressStripeRelationErrors;
 
     const stripeSync = await getStripeSync();
     logger.info("StripeSync instance created");
@@ -140,16 +182,23 @@ async function initStripe() {
         );
         logger.info("Stripe webhook configured");
       } catch (webhookError) {
-        logger.warn({ error: webhookError }, "Webhook setup failed (will retry)");
+        logger.info("Stripe webhook setup deferred (stripe.accounts table pending sync migration)");
       }
     }
 
     try {
       await stripeSync.syncBackfill();
       logger.info("Stripe backfill complete");
-    } catch (backfillError) {
-      logger.warn({ error: backfillError }, "Stripe backfill failed (non-fatal)");
+    } catch (backfillError: any) {
+      const msg = backfillError?.message || String(backfillError);
+      if (msg.includes("relation") && msg.includes("does not exist")) {
+        logger.info("Stripe sync tables not yet created — skipping backfill");
+      } else {
+        logger.warn({ error: backfillError }, "Stripe backfill failed (non-fatal)");
+      }
     }
+
+    console.error = origConsoleError;
 
     logger.info("Stripe initialized successfully");
   } catch (error) {

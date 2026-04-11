@@ -155,6 +155,7 @@ app.use("/api/marketing/generate", rateLimit({
 }));
 
 app.use(seoRouter);
+app.use("/api", seoRouter);
 app.use("/api", router);
 
 export default app;

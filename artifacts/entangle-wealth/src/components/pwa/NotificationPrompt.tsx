@@ -3,27 +3,22 @@ import { Bell, X } from "lucide-react";
 import { trackEvent } from "@/lib/trackEvent";
 
 const DISMISS_KEY = "ew_notif_prompt_dismissed";
+const ALERTS_ENABLED_KEY = "ew_inapp_alerts_enabled";
 
 export function NotificationPrompt() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (!("Notification" in window)) return;
-    if (Notification.permission !== "default") return;
     if (localStorage.getItem(DISMISS_KEY)) return;
+    if (localStorage.getItem(ALERTS_ENABLED_KEY)) return;
 
     const timer = setTimeout(() => setShow(true), 10000);
     return () => clearTimeout(timer);
   }, []);
 
-  const handleAllow = useCallback(async () => {
-    try {
-      const result = await Notification.requestPermission();
-      if (result === "granted") {
-        trackEvent("notifications_enabled");
-      }
-    } catch {
-    }
+  const handleAllow = useCallback(() => {
+    localStorage.setItem(ALERTS_ENABLED_KEY, "1");
+    trackEvent("inapp_alerts_enabled");
     setShow(false);
     localStorage.setItem(DISMISS_KEY, "1");
   }, []);
@@ -52,7 +47,7 @@ export function NotificationPrompt() {
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-white mb-1">Stay Updated</p>
           <p className="text-xs text-white/60 leading-relaxed">
-            Get notified about market alerts, price signals, and important updates.
+            Enable in-app alerts for market signals, price movements, and portfolio updates — displayed right inside the platform.
           </p>
           <button
             onClick={handleAllow}
@@ -60,7 +55,7 @@ export function NotificationPrompt() {
             style={{ background: "linear-gradient(135deg, #FFD700, #cc9900)" }}
           >
             <Bell className="w-3.5 h-3.5" />
-            Enable Notifications
+            Enable In-App Alerts
           </button>
         </div>
         <button

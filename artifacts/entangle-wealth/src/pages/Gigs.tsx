@@ -221,7 +221,16 @@ export default function Gigs() {
                     {CATEGORY_EMOJIS[gig.category]} {gig.category}
                   </span>
                 </div>
-                <Button className="w-full mt-3 bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold text-sm h-9">
+                <Button
+                  className="w-full mt-3 bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold text-sm h-9"
+                  onClick={() => {
+                    const name = gig.contactName || "Service Provider";
+                    toast({
+                      title: `Contact ${name}`,
+                      description: "Send an email to support@entanglewealth.com with the gig title to get connected with this provider.",
+                    });
+                  }}
+                >
                   Contact for Service
                 </Button>
               </div>

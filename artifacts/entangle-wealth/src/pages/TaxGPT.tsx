@@ -175,11 +175,15 @@ export default function TaxGPT() {
         const data = await res.json();
         const answer = data.answer + (data.answer.includes("Disclaimer") ? "" : "\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice. Consult a licensed CPA for your specific situation.");
         setMessages(prev => [...prev, { role: "ai", text: answer, timestamp: Date.now() }]);
+      } else if (res.status === 429) {
+        setMessages(prev => [...prev, { role: "ai", text: "You're sending questions too quickly. Please wait a moment and try again.\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice.", timestamp: Date.now() }]);
       } else {
-        setMessages(prev => [...prev, { role: "ai", text: getLocalResponse(question), timestamp: Date.now() }]);
+        const fallback = getLocalResponse(question);
+        setMessages(prev => [...prev, { role: "ai", text: fallback + "\n\n*Note: AI service temporarily unavailable. Showing cached response.*", timestamp: Date.now() }]);
       }
     } catch {
-      setMessages(prev => [...prev, { role: "ai", text: getLocalResponse(question), timestamp: Date.now() }]);
+      const fallback = getLocalResponse(question);
+      setMessages(prev => [...prev, { role: "ai", text: fallback + "\n\n*Note: Could not reach AI service. Showing cached response.*", timestamp: Date.now() }]);
     }
     setLoading(false);
   };

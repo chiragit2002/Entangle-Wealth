@@ -97,6 +97,9 @@ export default function TravelMarketplace() {
           <p className="text-muted-foreground mt-1">
             Book luxury hotels and flights using EntangleCoin — every transaction recorded on the blockchain
           </p>
+          <span className="inline-block mt-2 px-3 py-1 rounded-full bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 text-xs font-semibold">
+            DEMO MARKETPLACE — Real API integration coming soon
+          </span>
         </div>
 
         <div className="glass-panel p-1.5 inline-flex gap-1 mb-8 rounded-xl">
@@ -162,16 +165,17 @@ export default function TravelMarketplace() {
 
                     {isConfirmed ? (
                       <Button disabled className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 gap-1">
-                        <Check className="w-4 h-4" /> Booked
+                        <Check className="w-4 h-4" /> Booked (Demo)
                       </Button>
                     ) : (
                       <Button
                         className="bg-primary text-black hover:bg-primary/90 gap-1"
                         onClick={() => handleBook(listing)}
                         disabled={isBooking}
+                        title="Demo booking — real hotel/airline API integration coming soon"
                       >
                         {isBooking ? <Loader2 className="w-4 h-4 animate-spin" /> : <Coins className="w-4 h-4" />}
-                        Book Now
+                        Book Now (Demo)
                       </Button>
                     )}
                   </div>

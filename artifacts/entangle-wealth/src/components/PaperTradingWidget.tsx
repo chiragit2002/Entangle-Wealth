@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TrendingUp, ChevronUp, ChevronDown, RefreshCw, X, PlusCircle } from "lucide-react";
 import { BuyCashStore } from "./BuyCashStore";
 
-const STARTING_CASH = 100_000;
+const DEFAULT_STARTING_CASH = 100_000;
 
 interface PaperPortfolio {
   cashBalance: number;
@@ -13,14 +13,16 @@ interface PaperPortfolio {
   trades: { id: number; symbol: string; side: string; quantity: number; price: number; totalCost: number; createdAt: string }[];
   portfolioValue: number;
   totalValue: number;
+  startingCash: number;
 }
 
 const emptyPortfolio: PaperPortfolio = {
-  cashBalance: STARTING_CASH,
+  cashBalance: DEFAULT_STARTING_CASH,
   positions: [],
   trades: [],
   portfolioValue: 0,
-  totalValue: STARTING_CASH,
+  totalValue: DEFAULT_STARTING_CASH,
+  startingCash: DEFAULT_STARTING_CASH,
 };
 
 interface PaperTradingWidgetProps {
@@ -103,8 +105,8 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
     }
   }, [getToken, toast, loadPortfolio]);
 
-  const pnl = portfolio.totalValue - STARTING_CASH;
-  const pnlPct = ((pnl / STARTING_CASH) * 100).toFixed(2);
+  const pnl = portfolio.totalValue - portfolio.startingCash;
+  const pnlPct = ((pnl / portfolio.startingCash) * 100).toFixed(2);
 
   if (variant === "floating") {
     if (isMinimized) {

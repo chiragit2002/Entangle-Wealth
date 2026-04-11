@@ -40,6 +40,7 @@ export const usersTable = pgTable("users", {
   kycAddress: text("kyc_address"),
   kycIdType: text("kyc_id_type"),
   kycIdNumber: text("kyc_id_number"),
+  isEarlyAdopter: boolean("is_early_adopter").default(false),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   isBusinessOwner: boolean("is_business_owner").default(false),
   businessDocPaths: jsonb("business_doc_paths").default([]),

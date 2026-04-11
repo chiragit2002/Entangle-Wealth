@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, dailySpinTable, userXpTable, xpTransactionsTable, streaksTable } from "@workspace/db/schema";
+import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, dailySpinTable, userXpTable, xpTransactionsTable, streaksTable, usersTable } from "@workspace/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { resolveUserId } from "../lib/resolveUserId";
@@ -10,7 +10,8 @@ import { calculateLevel, calculateTier } from "@workspace/xp";
 
 const router = Router();
 
-const STARTING_CASH = 100_000;
+const DEFAULT_STARTING_CASH = 100_000;
+const EARLY_ADOPTER_STARTING_CASH = 1_000_000;
 
 type SpinRewardType = "cash" | "xp" | "multiplier" | "streak_protection";
 
@@ -57,6 +58,14 @@ function getTodayUTC(): string {
   return new Date().toISOString().split("T")[0];
 }
 
+async function getStartingCash(userId: string): Promise<number> {
+  const [user] = await db
+    .select({ isEarlyAdopter: usersTable.isEarlyAdopter })
+    .from(usersTable)
+    .where(eq(usersTable.id, userId));
+  return user?.isEarlyAdopter ? EARLY_ADOPTER_STARTING_CASH : DEFAULT_STARTING_CASH;
+}
+
 async function ensurePortfolio(userId: string) {
   const [existing] = await db
     .select()
@@ -65,9 +74,10 @@ async function ensurePortfolio(userId: string) {
 
   if (existing) return existing;
 
+  const startingCash = await getStartingCash(userId);
   const [created] = await db
     .insert(paperPortfoliosTable)
-    .values({ userId, cashBalance: STARTING_CASH })
+    .values({ userId, cashBalance: startingCash })
     .returning();
   return created;
 }
@@ -84,7 +94,7 @@ router.get("/paper-trading/portfolio", requireAuth, async (req, res) => {
     const clerkId = (req as AuthenticatedRequest).userId;
     const dbUserId = await resolveUserId(clerkId, req);
     if (!dbUserId) {
-      res.json({ cashBalance: STARTING_CASH, positions: [], trades: [], portfolioValue: 0, totalValue: STARTING_CASH });
+      res.json({ cashBalance: DEFAULT_STARTING_CASH, positions: [], trades: [], portfolioValue: 0, totalValue: DEFAULT_STARTING_CASH, startingCash: DEFAULT_STARTING_CASH });
       return;
     }
 
@@ -100,12 +110,19 @@ router.get("/paper-trading/portfolio", requireAuth, async (req, res) => {
     const activePositions = positions.filter(p => p.quantity > 0);
     const positionValue = activePositions.reduce((sum, p) => sum + (p.quantity * p.avgCost), 0);
 
+    const [userRow] = await db
+      .select({ isEarlyAdopter: usersTable.isEarlyAdopter })
+      .from(usersTable)
+      .where(eq(usersTable.id, dbUserId));
+    const startingCash = userRow?.isEarlyAdopter ? EARLY_ADOPTER_STARTING_CASH : DEFAULT_STARTING_CASH;
+
     res.json({
       cashBalance: portfolio.cashBalance,
       positions: activePositions,
       trades,
       portfolioValue: positionValue,
       totalValue: portfolio.cashBalance + positionValue,
+      startingCash,
     });
   } catch (err) {
     logger.error("Paper trading portfolio error:", err);
@@ -143,6 +160,7 @@ router.post("/paper-trading/trade", requireAuth, async (req, res) => {
 
     const totalCost = qty * px;
     const upperSymbol = symbol.toUpperCase();
+    const startingCash = await getStartingCash(dbUserId);
 
     const result = await db.transaction(async (tx) => {
       const [portfolio] = await tx
@@ -152,7 +170,7 @@ router.post("/paper-trading/trade", requireAuth, async (req, res) => {
 
       const currentPortfolio = portfolio || (await tx
         .insert(paperPortfoliosTable)
-        .values({ userId: dbUserId, cashBalance: STARTING_CASH })
+        .values({ userId: dbUserId, cashBalance: startingCash })
         .returning())[0];
 
       if (side === "buy") {
@@ -236,14 +254,17 @@ router.post("/paper-trading/reset", requireAuth, async (req, res) => {
       return;
     }
 
+    const startingCash = await getStartingCash(dbUserId);
+
     await db.delete(paperTradesTable).where(eq(paperTradesTable.userId, dbUserId));
     await db.delete(paperPositionsTable).where(eq(paperPositionsTable.userId, dbUserId));
     await db
       .update(paperPortfoliosTable)
-      .set({ cashBalance: STARTING_CASH, updatedAt: new Date() })
+      .set({ cashBalance: startingCash, updatedAt: new Date() })
       .where(eq(paperPortfoliosTable.userId, dbUserId));
 
-    res.json({ success: true, message: "Portfolio reset to $100,000" });
+    const formattedBalance = startingCash.toLocaleString("en-US");
+    res.json({ success: true, message: `Portfolio reset to $${formattedBalance}` });
   } catch (err) {
     logger.error("Paper trading reset error:", err);
     res.status(500).json({ error: "Failed to reset portfolio" });
@@ -295,6 +316,7 @@ router.post("/paper-trading/spin", requireAuth, async (req, res) => {
     tomorrow.setUTCHours(0, 0, 0, 0);
 
     const picked = pickPrize();
+    const startingCash = await getStartingCash(dbUserId);
 
     const txResult = await db.transaction(async (tx) => {
       const inserted = await tx
@@ -321,7 +343,7 @@ router.post("/paper-trading/spin", requireAuth, async (req, res) => {
         } else {
           await tx
             .insert(paperPortfoliosTable)
-            .values({ userId: dbUserId, cashBalance: STARTING_CASH + picked.cashAmount });
+            .values({ userId: dbUserId, cashBalance: startingCash + picked.cashAmount });
         }
       } else if (picked.rewardType === "xp" && picked.xpAmount > 0) {
         let [xpRow] = await tx.select().from(userXpTable).where(eq(userXpTable.userId, dbUserId));

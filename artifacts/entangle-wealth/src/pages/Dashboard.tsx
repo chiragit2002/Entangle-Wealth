@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useAuth } from "@clerk/react";
 import { Layout } from "@/components/layout/Layout";
 import { FlashCouncil } from "@/components/FlashCouncil";
@@ -205,27 +205,27 @@ function GamificationBar() {
 
   return (
     <div className="grid grid-cols-3 gap-1.5 mb-2">
-      <a href="/leaderboard" className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 hover:border-[#FFD700]/20 transition-colors cursor-pointer">
+      <Link href="/leaderboard" className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 hover:border-[#FFD700]/20 transition-colors cursor-pointer">
         <Trophy className="w-4 h-4 text-[#FFD700]" />
         <div>
           <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest">RANK</p>
           <p className="text-[13px] font-mono font-black text-[#FFD700]">{data.rank}</p>
         </div>
-      </a>
-      <a href="/achievements" className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 hover:border-orange-400/20 transition-colors cursor-pointer">
+      </Link>
+      <Link href="/achievements" className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 hover:border-orange-400/20 transition-colors cursor-pointer">
         <Flame className="w-4 h-4 text-orange-400" />
         <div>
           <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest">STREAK</p>
           <p className="text-[13px] font-mono font-black text-orange-400">{data.streak}</p>
         </div>
-      </a>
-      <a href="/achievements" className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 hover:border-[#9c27b0]/20 transition-colors cursor-pointer">
+      </Link>
+      <Link href="/achievements" className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 hover:border-[#9c27b0]/20 transition-colors cursor-pointer">
         <Award className="w-4 h-4 text-[#9c27b0]" />
         <div>
           <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest">BADGES</p>
           <p className="text-[13px] font-mono font-black text-[#9c27b0]">{data.badges}</p>
         </div>
-      </a>
+      </Link>
     </div>
   );
 }
@@ -473,9 +473,9 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </div>
-                    <a href="/technical" className="px-3 py-1.5 text-[9px] font-mono font-bold text-[#00D4FF] bg-[#00D4FF]/[0.06] border border-[#00D4FF]/20 rounded-sm hover:bg-[#00D4FF]/10 transition-colors">
+                    <Link href="/technical" className="px-3 py-1.5 text-[9px] font-mono font-bold text-[#00D4FF] bg-[#00D4FF]/[0.06] border border-[#00D4FF]/20 rounded-sm hover:bg-[#00D4FF]/10 transition-colors">
                       FULL ANALYSIS →
-                    </a>
+                    </Link>
                   </div>
                 )}
               </div>

@@ -138,7 +138,7 @@ export default function Earn() {
                             <span className="text-2xl">{getTypeIcon(opp.type)}</span>
                             <h3 className="font-bold text-lg">{opp.title}</h3>
                             <Badge variant="outline" className={`text-[10px] px-2 ${getTypeBadge(opp.type)}`}>{opp.type}</Badge>
-                            <button className="text-muted-foreground ml-auto sm:hidden">
+                            <button className="text-muted-foreground ml-auto sm:hidden" onClick={() => setExpandedId(isExpanded ? null : opp.id)} aria-label={isExpanded ? "Collapse" : "Expand"}>
                               {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                             </button>
                           </div>
@@ -149,7 +149,7 @@ export default function Earn() {
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="font-mono font-bold text-xl text-green-400">{opp.payout}</span>
-                          <button className="hidden sm:block text-muted-foreground">
+                          <button className="hidden sm:block text-muted-foreground" onClick={() => setExpandedId(isExpanded ? null : opp.id)} aria-label={isExpanded ? "Collapse" : "Expand"}>
                             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                           </button>
                         </div>

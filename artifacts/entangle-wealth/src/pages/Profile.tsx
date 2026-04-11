@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { Link } from "wouter";
 import { useUser, useAuth } from "@clerk/react";
 import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target, Wallet, Coins, Users } from "lucide-react";
 import { ReferralSection } from "@/components/viral/ReferralSection";
@@ -410,11 +411,11 @@ export default function Profile() {
           <div className="glass-panel p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold flex items-center gap-2"><FileText className="w-5 h-5 text-primary" /> My Résumé</h3>
-              <a href="/resume">
+              <Link href="/resume">
                 <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1">
                   Edit <ExternalLink className="w-3.5 h-3.5" />
                 </Button>
-              </a>
+              </Link>
             </div>
             <p className="text-sm font-medium mb-1">{resume.title}</p>
             {resume.summary && <p className="text-sm text-muted-foreground mb-3">{resume.summary.slice(0, 200)}...</p>}
@@ -526,16 +527,16 @@ export default function Profile() {
                 </div>
               )}
               <div className="mt-4 flex gap-2">
-                <a href="/leaderboard">
+                <Link href="/leaderboard">
                   <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1">
                     <Trophy className="w-3.5 h-3.5" /> Leaderboard
                   </Button>
-                </a>
-                <a href="/achievements">
+                </Link>
+                <Link href="/achievements">
                   <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1">
                     <Target className="w-3.5 h-3.5" /> Achievements
                   </Button>
-                </a>
+                </Link>
               </div>
             </>
           ) : (
@@ -576,21 +577,21 @@ export default function Profile() {
             <p className="text-sm text-muted-foreground">Loading token data...</p>
           )}
           <div className="flex gap-2">
-            <a href="/wallet">
+            <Link href="/wallet">
               <Button variant="outline" size="sm" className="border-yellow-500/30 text-yellow-400 gap-1">
                 <Wallet className="w-3.5 h-3.5" /> Wallet
               </Button>
-            </a>
-            <a href="/rewards">
+            </Link>
+            <Link href="/rewards">
               <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1">
                 <Trophy className="w-3.5 h-3.5" /> Rewards
               </Button>
-            </a>
-            <a href="/marketplace">
+            </Link>
+            <Link href="/marketplace">
               <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1">
                 <ExternalLink className="w-3.5 h-3.5" /> Travel
               </Button>
-            </a>
+            </Link>
           </div>
         </div>
 

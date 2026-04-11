@@ -277,7 +277,7 @@ export default function Options() {
                       onClick={() => setExpandedRow(isExpanded ? null : item.id)}>
                       <CardContent className="p-0">
                         <div className="flex items-center gap-4 px-4 py-4">
-                          <button className="w-8 flex items-center justify-center text-muted-foreground">
+                          <button className="w-8 flex items-center justify-center text-muted-foreground" onClick={() => setExpandedRow(isExpanded ? null : item.id)} aria-label={isExpanded ? "Collapse" : "Expand"}>
                             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                           </button>
                           {visibleCols.time && <div className="w-20 text-sm font-mono text-muted-foreground">{item.time}</div>}

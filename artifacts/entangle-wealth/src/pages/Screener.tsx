@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
+import { Link } from "wouter";
 import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -310,7 +311,7 @@ export default function Screener() {
                   <span className="text-[10px] text-white/10 font-mono">{i + 1}</span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <a href="/technical" className="text-[13px] font-bold font-mono hover:text-primary transition-colors">{stock.symbol}</a>
+                      <Link href="/technical" className="text-[13px] font-bold font-mono hover:text-primary transition-colors">{stock.symbol}</Link>
                       <span className="text-[9px] text-white/15 px-1.5 py-0.5 rounded bg-white/[0.02] border border-white/[0.04]">{stock.sector}</span>
                     </div>
                     <p className="text-[9px] text-white/20 truncate">{stock.name}</p>

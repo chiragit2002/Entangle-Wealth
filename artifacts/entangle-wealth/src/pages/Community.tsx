@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -120,6 +121,7 @@ function sanitize(str: string): string {
 
 export default function Community() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const { getToken, isSignedIn } = useAuth();
   const [referralCode, setReferralCode] = useState("");
   const [tab, setTab] = useState<Tab>("communities");
@@ -558,7 +560,7 @@ export default function Community() {
                   <p key={i} className="text-[13px] text-[#aaa] py-2 border-b border-white/5 last:border-0">✅ {f}</p>
                 ))}
               </div>
-              <Button className="w-full mt-4 bg-gradient-to-r from-secondary to-[#cc9900] text-black font-bold min-h-[44px]" onClick={() => { window.location.href = "/pricing"; }}>
+              <Button className="w-full mt-4 bg-gradient-to-r from-secondary to-[#cc9900] text-black font-bold min-h-[44px]" onClick={() => setLocation("/pricing")}>
                 Start Free 30-Day Trial →
               </Button>
             </div>
@@ -572,7 +574,7 @@ export default function Community() {
                   <p key={i} className="text-[13px] text-[#aaa] py-2 border-b border-white/5 last:border-0">✅ {f}</p>
                 ))}
               </div>
-              <Button className="w-full mt-4 bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold min-h-[44px]" onClick={() => { window.location.href = "/pricing"; }}>
+              <Button className="w-full mt-4 bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold min-h-[44px]" onClick={() => setLocation("/pricing")}>
                 Start Free 30-Day Trial →
               </Button>
             </div>

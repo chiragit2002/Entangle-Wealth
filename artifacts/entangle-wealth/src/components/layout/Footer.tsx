@@ -28,12 +28,12 @@ export function Footer() {
           </div>
           <div className="flex flex-col gap-3">
             <span className="font-semibold text-white">Learn</span>
-            <a href="/api/learn" className="text-muted-foreground hover:text-primary transition-colors">Financial Glossary</a>
-            <a href="/api/indicators" className="text-muted-foreground hover:text-primary transition-colors">Technical Indicators</a>
-            <a href="/api/strategies" className="text-muted-foreground hover:text-primary transition-colors">Trading Strategies</a>
-            <a href="/api/patterns" className="text-muted-foreground hover:text-primary transition-colors">Chart Patterns</a>
-            <a href="/api/sectors" className="text-muted-foreground hover:text-primary transition-colors">Sector Analysis</a>
-            <a href="/api/compare" className="text-muted-foreground hover:text-primary transition-colors">Stock Comparisons</a>
+            <Link href="/blog" className="text-muted-foreground hover:text-primary transition-colors">Financial Glossary</Link>
+            <Link href="/technical" className="text-muted-foreground hover:text-primary transition-colors">Technical Indicators</Link>
+            <Link href="/tax-strategy" className="text-muted-foreground hover:text-primary transition-colors">Trading Strategies</Link>
+            <Link href="/charts" className="text-muted-foreground hover:text-primary transition-colors">Chart Patterns</Link>
+            <Link href="/sector-flow" className="text-muted-foreground hover:text-primary transition-colors">Sector Analysis</Link>
+            <Link href="/screener" className="text-muted-foreground hover:text-primary transition-colors">Stock Comparisons</Link>
           </div>
           <div className="flex flex-col gap-3">
             <span className="font-semibold text-white">Legal</span>

@@ -1,10 +1,13 @@
 import express, { type Express } from "express";
 import cors from "cors";
 import helmet from "helmet";
+import compression from "compression";
 import rateLimit from "express-rate-limit";
 import pinoHttp from "pino-http";
 import { clerkMiddleware } from "@clerk/express";
 import { CLERK_PROXY_PATH, clerkProxyMiddleware } from "./middlewares/clerkProxyMiddleware";
+import { inputSanitizer } from "./middlewares/inputSanitizer";
+import { bruteForceGuard } from "./middlewares/bruteForce";
 import router from "./routes";
 import seoRouter from "./routes/seo";
 import { logger } from "./lib/logger";
@@ -15,12 +18,65 @@ app.set("trust proxy", 1);
 
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "'unsafe-eval'",
+          "https://*.clerk.accounts.dev",
+          "https://js.stripe.com",
+          "https://challenges.cloudflare.com",
+        ],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+        imgSrc: ["'self'", "data:", "blob:", "https:", "http:"],
+        connectSrc: [
+          "'self'",
+          "https://*.clerk.accounts.dev",
+          "https://api.stripe.com",
+          "https://data.alpaca.markets",
+          "https://paper-api.alpaca.markets",
+          "wss://stream.data.alpaca.markets",
+          "https://*.replit.dev",
+          "https://*.replit.app",
+          "https://*.repl.co",
+        ],
+        frameSrc: [
+          "'self'",
+          "https://*.clerk.accounts.dev",
+          "https://js.stripe.com",
+          "https://challenges.cloudflare.com",
+        ],
+        workerSrc: ["'self'", "blob:"],
+        childSrc: ["'self'", "blob:"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'self'", "https://*.replit.dev", "https://*.replit.app", "https://*.repl.co"],
+      },
+    },
     crossOriginEmbedderPolicy: false,
     crossOriginOpenerPolicy: false,
     crossOriginResourcePolicy: { policy: "cross-origin" },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    xContentTypeOptions: true,
+    xDnsPrefetchControl: { allow: false },
+    xDownloadOptions: true,
+    xFrameOptions: false,
+    xPermittedCrossDomainPolicies: { permittedPolicies: "none" },
+    xPoweredBy: false,
+    xXssProtection: true,
   })
 );
+
+app.use(compression());
 
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -65,6 +121,12 @@ app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 app.use(cors({ credentials: true, origin: true }));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
+
+app.use(inputSanitizer);
+
+app.use("/api/users", bruteForceGuard);
+app.use("/api/kyc", bruteForceGuard);
+app.use("/api/stripe", bruteForceGuard);
 
 app.use(clerkMiddleware());
 

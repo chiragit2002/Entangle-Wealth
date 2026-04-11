@@ -7,6 +7,7 @@ import {
   getSectorSummary,
   getStocksBySector,
 } from "../data/nasdaq-stocks";
+import { stockCache } from "../lib/cache";
 
 const router = Router();
 
@@ -59,13 +60,27 @@ router.get("/stocks", (req, res) => {
 });
 
 router.get("/stocks/movers", (_req, res) => {
+  const cacheKey = "movers:20";
+  const cached = stockCache.get(cacheKey);
+  if (cached) {
+    res.json(cached);
+    return;
+  }
   const movers = getTopMovers(20);
+  stockCache.set(cacheKey, movers);
   res.json(movers);
 });
 
 router.get("/stocks/sectors", (_req, res) => {
-  const summary = getSectorSummary();
-  res.json({ sectors: summary });
+  const cacheKey = "sectors:summary";
+  const cached = stockCache.get(cacheKey);
+  if (cached) {
+    res.json(cached);
+    return;
+  }
+  const result = { sectors: getSectorSummary() };
+  stockCache.set(cacheKey, result);
+  res.json(result);
 });
 
 router.get("/stocks/sectors/:sector", (req, res) => {

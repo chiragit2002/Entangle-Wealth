@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { X, Gift, Clock, Zap, Shield, Star } from "lucide-react";
 import { fireCelebration, CelebrationTier } from "@/lib/confetti";
 import { BigWinOverlay } from "@/components/BigWinOverlay";
+import { motion, useMotionValue, animate, AnimatePresence } from "framer-motion";
 
 const WHEEL_SEGMENTS = [
   { label: "+500 XP", color: "#00D4FF", icon: "⚡" },
@@ -29,11 +30,11 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
   const [canSpin, setCanSpin] = useState(false);
   const [nextSpinAt, setNextSpinAt] = useState<string | null>(null);
   const [result, setResult] = useState<{ reward: string; rewardType: string; rewardValue: number } | null>(null);
-  const [rotation, setRotation] = useState(0);
   const [countdown, setCountdown] = useState("");
   const [resultTier, setResultTier] = useState<CelebrationTier | null>(null);
   const [showBigWin, setShowBigWin] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rotationDeg = useMotionValue(0);
 
   const checkStatus = useCallback(async () => {
     try {
@@ -81,11 +82,6 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
 
     ctx.clearRect(0, 0, size, size);
 
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate((rotation * Math.PI) / 180);
-    ctx.translate(-cx, -cy);
-
     WHEEL_SEGMENTS.forEach((seg, i) => {
       const startAngle = i * segAngle - Math.PI / 2;
       const endAngle = startAngle + segAngle;
@@ -123,8 +119,6 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
       ctx.restore();
     });
 
-    ctx.restore();
-
     ctx.beginPath();
     ctx.arc(cx, cy, 28, 0, 2 * Math.PI);
     const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 28);
@@ -152,7 +146,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
     ctx.strokeStyle = "#0a0a0f";
     ctx.lineWidth = 1.5;
     ctx.stroke();
-  }, [rotation]);
+  }, []);
 
   const spin = useCallback(async () => {
     if (spinning || !canSpin) return;
@@ -176,23 +170,18 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
       );
       const targetIdx = rewardIndex >= 0 ? rewardIndex : 0;
 
-      const segAngle = 360 / WHEEL_SEGMENTS.length;
-      const targetAngle = 360 - (targetIdx * segAngle + segAngle / 2);
-      const totalRotation = 360 * 5 + targetAngle;
+      const segDeg = 360 / WHEEL_SEGMENTS.length;
+      const targetOffset = 360 - (targetIdx * segDeg + segDeg / 2);
+      const currentDeg = rotationDeg.get();
+      const normalizedCurrent = ((currentDeg % 360) + 360) % 360;
+      let delta = targetOffset - normalizedCurrent;
+      if (delta < 0) delta += 360;
+      const totalRotation = currentDeg + 5 * 360 + delta;
 
-      let start: number | null = null;
-      const duration = 4000;
-
-      const animate = (timestamp: number) => {
-        if (!start) start = timestamp;
-        const elapsed = timestamp - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 4);
-        setRotation(eased * totalRotation);
-
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
+      animate(rotationDeg, totalRotation, {
+        duration: 4,
+        ease: [0.2, 0.85, 0.4, 1],
+        onComplete: () => {
           setResult(data);
           setCanSpin(false);
           setNextSpinAt(data.nextSpinAt);
@@ -203,15 +192,13 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
           setResultTier(tier);
           if (tier === "jackpot") setShowBigWin(true);
           onReward?.(data.reward);
-        }
-      };
-
-      requestAnimationFrame(animate);
+        },
+      });
     } catch {
       toast({ title: "Spin failed", description: "Please try again", variant: "destructive" });
       setSpinning(false);
     }
-  }, [spinning, canSpin, getToken, toast, onReward]);
+  }, [spinning, canSpin, getToken, toast, rotationDeg, onReward]);
 
   if (!isOpen) return null;
 
@@ -227,37 +214,63 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
             <Gift className="w-4 h-4 text-[#FFD700]" />
             <span className="text-sm font-bold font-mono text-[#FFD700] tracking-wider">DAILY SPIN</span>
           </div>
-          <button onClick={onClose} className="text-white/30 hover:text-white/60 transition-colors">
+          <motion.button
+            onClick={onClose}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
+            className="text-white/30 hover:text-white/60 transition-colors"
+          >
             <X className="w-4 h-4" />
-          </button>
+          </motion.button>
         </div>
 
         <div className="relative flex flex-col items-center py-6 px-4">
           <div className="relative">
             <div className="absolute inset-0 rounded-full bg-[#00D4FF]/10 blur-xl" />
-            <canvas
-              ref={canvasRef}
-              className={`relative cursor-pointer transition-transform ${spinning ? "" : canSpin ? "hover:scale-[1.02]" : "opacity-60"}`}
+            <motion.div
+              style={{ rotate: rotationDeg, width: 280, height: 280 }}
+              className={`relative cursor-pointer rounded-full ${!spinning && !canSpin ? "opacity-60" : ""}`}
               onClick={spin}
-              style={{ width: 280, height: 280 }}
-            />
+              whileHover={canSpin && !spinning ? { scale: 1.02 } : {}}
+              whileTap={canSpin && !spinning ? { scale: 0.98 } : {}}
+            >
+              <canvas
+                ref={canvasRef}
+                style={{ width: 280, height: 280, display: "block" }}
+              />
+            </motion.div>
           </div>
 
-          {result && (
-            <div className={`mt-4 w-full p-3 rounded-lg bg-[#FFD700]/10 border border-[#FFD700]/20 text-center animate-in fade-in duration-500${resultTier === "jackpot" ? " glow" : ""}`}>
-              <p className="text-[10px] font-mono text-[#FFD700]/60 uppercase tracking-widest">YOU WON</p>
-              <p className="text-lg font-bold font-mono text-[#FFD700] mt-1">{result.reward}</p>
-              {result.rewardType === "xp" && (
-                <p className="text-[10px] font-mono text-white/30 mt-1">+{result.rewardValue} XP added to your account</p>
-              )}
-              {result.rewardType === "multiplier" && (
-                <p className="text-[10px] font-mono text-white/30 mt-1">Your next session earns 2x XP</p>
-              )}
-              {result.rewardType === "streak_protection" && (
-                <p className="text-[10px] font-mono text-white/30 mt-1">Your streak is protected for 1 missed day</p>
-              )}
-            </div>
-          )}
+          <AnimatePresence>
+            {result && (
+              <motion.div
+                key={result.reward}
+                initial={{ opacity: 0, scale: 0.75, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className={`mt-4 w-full p-3 rounded-lg text-center ${
+                  resultTier === "jackpot"
+                    ? "bg-[#FFD700]/15 border border-[#FFD700]/40"
+                    : resultTier === "big"
+                    ? "bg-[#00D4FF]/10 border border-[#00D4FF]/30"
+                    : "bg-[#FFD700]/10 border border-[#FFD700]/20"
+                }`}
+              >
+                <p className="text-[10px] font-mono text-[#FFD700]/60 uppercase tracking-widest">YOU WON</p>
+                <p className="text-lg font-bold font-mono text-[#FFD700] mt-1">{result.reward}</p>
+                {result.rewardType === "xp" && (
+                  <p className="text-[10px] font-mono text-white/30 mt-1">+{result.rewardValue} XP added to your account</p>
+                )}
+                {result.rewardType === "multiplier" && (
+                  <p className="text-[10px] font-mono text-white/30 mt-1">Your next session earns 2x XP</p>
+                )}
+                {result.rewardType === "streak_protection" && (
+                  <p className="text-[10px] font-mono text-white/30 mt-1">Your streak is protected for 1 missed day</p>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {!result && (
             <div className="mt-4 text-center">
@@ -277,6 +290,20 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
         </div>
 
         <div className="px-4 pb-4">
+          <motion.button
+            onClick={spin}
+            disabled={spinning || !canSpin}
+            whileHover={canSpin && !spinning ? { scale: 1.03 } : {}}
+            whileTap={canSpin && !spinning ? { scale: 0.97 } : {}}
+            className={`w-full py-2.5 mb-3 rounded-lg text-[11px] font-bold font-mono tracking-wider transition-colors disabled:opacity-40 ${
+              canSpin && !spinning
+                ? "bg-gradient-to-r from-[#FFD700] to-[#f59e0b] text-black shadow-lg shadow-[#FFD700]/20"
+                : "bg-white/[0.05] text-white/30 border border-white/[0.08]"
+            }`}
+          >
+            {spinning ? "SPINNING..." : canSpin ? "SPIN NOW" : `NEXT SPIN: ${countdown}`}
+          </motion.button>
+
           <div className="grid grid-cols-3 gap-1.5">
             <div className="flex items-center gap-1.5 bg-white/[0.02] rounded px-2 py-1.5">
               <Zap className="w-3 h-3 text-[#00D4FF]" />

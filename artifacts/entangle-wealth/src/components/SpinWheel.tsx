@@ -3,6 +3,7 @@ import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
 import { Gift, Clock, Trophy, ChevronDown, ChevronUp } from "lucide-react";
+import { motion, useMotionValue, animate, AnimatePresence } from "framer-motion";
 
 const PRIZES = [
   { amount: 1_000, label: "$1K", color: "#1a3a2a", textColor: "#00ff88" },
@@ -63,17 +64,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
   const { isSignedIn, getToken } = useAuth();
   const { toast } = useToast();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const angleRef = useRef(0);
-  const animFrameRef = useRef<number>(0);
-  const spinStateRef = useRef<{
-    active: boolean;
-    startAngle: number;
-    totalRotation: number;
-    duration: number;
-    startTime: number;
-    prize: number;
-    onDone: () => void;
-  } | null>(null);
+  const rotationDeg = useMotionValue(0);
 
   const [status, setStatus] = useState<SpinStatus | null>(null);
   const [spinning, setSpinning] = useState(false);
@@ -107,7 +98,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
     if (showHistory && !historyLoaded) loadHistory();
   }, [showHistory, historyLoaded, loadHistory]);
 
-  const drawWheel = useCallback((angle: number) => {
+  const drawWheel = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -127,7 +118,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
     ctx.restore();
 
     PRIZES.forEach((prize, i) => {
-      const start = angle + i * SEG_ANGLE - Math.PI / 2;
+      const start = i * SEG_ANGLE - Math.PI / 2;
       const end = start + SEG_ANGLE;
 
       ctx.beginPath();
@@ -170,33 +161,9 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
     ctx.fillText("SPIN", cx, cy);
   }, []);
 
-  const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
-
-  const animateSpin = useCallback(() => {
-    const s = spinStateRef.current;
-    if (!s) return;
-
-    const elapsed = Date.now() - s.startTime;
-    const t = Math.min(elapsed / s.duration, 1);
-    const easedT = easeOut(t);
-    const currentAngle = s.startAngle + easedT * s.totalRotation;
-
-    angleRef.current = currentAngle;
-    drawWheel(currentAngle);
-
-    if (t < 1) {
-      animFrameRef.current = requestAnimationFrame(animateSpin);
-    } else {
-      spinStateRef.current = null;
-      s.onDone();
-    }
-  }, [drawWheel]);
-
   useEffect(() => {
-    drawWheel(0);
+    drawWheel();
   }, [drawWheel]);
-
-  useEffect(() => () => cancelAnimationFrame(animFrameRef.current), []);
 
   const handleSpin = useCallback(async () => {
     if (!isSignedIn) {
@@ -222,40 +189,31 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
       const prize = data.prize as number;
       const prizeIndex = PRIZES.findIndex(p => p.amount === prize);
 
-      const startAngle = angleRef.current;
-      const normalizedStart = ((startAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      const currentDeg = rotationDeg.get();
+      const segDeg = 360 / PRIZES.length;
+      const targetOffset = 360 - (prizeIndex * segDeg + segDeg / 2);
+      const normalizedCurrent = ((currentDeg % 360) + 360) % 360;
+      let delta = targetOffset - normalizedCurrent;
+      if (delta < 0) delta += 360;
 
-      const targetOffset = (Math.PI * 2) - ((prizeIndex * SEG_ANGLE) + SEG_ANGLE / 2) + (Math.PI / 2);
-      const normalizedTarget = ((targetOffset % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      const totalRotation = currentDeg + 5 * 360 + delta;
 
-      let delta = normalizedTarget - normalizedStart;
-      if (delta < 0) delta += 2 * Math.PI;
-
-      const fullRotations = 5 * 2 * Math.PI;
-      const totalRotation = fullRotations + delta;
-
-      spinStateRef.current = {
-        active: true,
-        startAngle,
-        totalRotation,
-        duration: 4500,
-        startTime: Date.now(),
-        prize,
-        onDone: () => {
+      animate(rotationDeg, totalRotation, {
+        duration: 4.5,
+        ease: [0.2, 0.85, 0.4, 1],
+        onComplete: () => {
           setSpinning(false);
           setWinPrize(prize);
           loadStatus();
           onBalanceChange?.();
           setHistoryLoaded(prev => { if (prev) loadHistory(); return prev; });
         },
-      };
-
-      animFrameRef.current = requestAnimationFrame(animateSpin);
+      });
     } catch {
       toast({ title: "Spin failed", description: "Please try again", variant: "destructive" });
       setSpinning(false);
     }
-  }, [isSignedIn, spinning, status, getToken, toast, animateSpin, loadStatus, onBalanceChange]);
+  }, [isSignedIn, spinning, status, getToken, toast, rotationDeg, loadStatus, onBalanceChange, loadHistory]);
 
   return (
     <div className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm overflow-hidden">
@@ -294,14 +252,18 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
                 filter: "drop-shadow(0 0 4px #FFD700)",
               }}
             />
-            <canvas
-              ref={canvasRef}
-              width={180}
-              height={180}
+            <motion.div
+              style={{ rotate: rotationDeg, width: 180, height: 180 }}
               className="rounded-full cursor-pointer"
-              style={{ display: "block" }}
               onClick={handleSpin}
-            />
+            >
+              <canvas
+                ref={canvasRef}
+                width={180}
+                height={180}
+                style={{ display: "block" }}
+              />
+            </motion.div>
           </div>
 
           <div className="flex-1 flex flex-col justify-between min-w-0">
@@ -327,30 +289,41 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
               </div>
             </div>
 
-            <button
+            <motion.button
               onClick={handleSpin}
               disabled={spinning || !status?.canSpin || !isSignedIn}
-              className={`mt-2 w-full h-8 text-[10px] font-mono font-bold rounded-sm transition-all disabled:opacity-40 ${
+              whileHover={!spinning && status?.canSpin && isSignedIn ? { scale: 1.04 } : {}}
+              whileTap={!spinning && status?.canSpin && isSignedIn ? { scale: 0.96 } : {}}
+              className={`mt-2 w-full h-8 text-[10px] font-mono font-bold rounded-sm transition-colors disabled:opacity-40 ${
                 status?.canSpin && isSignedIn && !spinning
-                  ? "bg-[#FFD700] text-black hover:bg-[#FFD700]/80 shadow-lg shadow-[#FFD700]/20"
+                  ? "bg-[#FFD700] text-black shadow-lg shadow-[#FFD700]/20"
                   : "bg-white/[0.05] text-white/30 border border-white/[0.08]"
               }`}
             >
               {!isSignedIn ? "SIGN IN TO SPIN" : spinning ? "SPINNING..." : status?.canSpin ? "SPIN NOW" : `NEXT: ${countdown}`}
-            </button>
+            </motion.button>
           </div>
         </div>
 
-        {winPrize !== null && (
-          <div className="mt-3 p-3 bg-[#FFD700]/10 border border-[#FFD700]/30 rounded-sm text-center animate-pulse">
-            <Trophy className="w-5 h-5 text-[#FFD700] mx-auto mb-1" />
-            <p className="text-[9px] font-mono text-white/50 mb-0.5">YOU WON</p>
-            <p className="text-xl font-mono font-bold text-[#FFD700]">
-              +${winPrize.toLocaleString()}
-            </p>
-            <p className="text-[8px] font-mono text-white/30 mt-0.5">Added to paper trading balance</p>
-          </div>
-        )}
+        <AnimatePresence>
+          {winPrize !== null && (
+            <motion.div
+              key={winPrize}
+              initial={{ opacity: 0, scale: 0.8, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
+              className="mt-3 p-3 bg-[#FFD700]/10 border border-[#FFD700]/30 rounded-sm text-center"
+            >
+              <Trophy className="w-5 h-5 text-[#FFD700] mx-auto mb-1" />
+              <p className="text-[9px] font-mono text-white/50 mb-0.5">YOU WON</p>
+              <p className="text-xl font-mono font-bold text-[#FFD700]">
+                +${winPrize.toLocaleString()}
+              </p>
+              <p className="text-[8px] font-mono text-white/30 mt-0.5">Added to paper trading balance</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {!isSignedIn && (
           <p className="mt-2 text-[9px] font-mono text-[#FFD700]/60 text-center">Sign in to claim your free daily spin</p>

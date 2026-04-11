@@ -46,6 +46,62 @@ interface ResumePreview {
   experiences: { company: string; title: string; isGigWork: string }[];
 }
 
+function AlertDigestSettings() {
+  const { getToken } = useAuth();
+  const [freq, setFreq] = useState("off");
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    authFetch("/alerts/digest-preference", getToken)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) setFreq(data.digestFrequency || "off");
+        setLoaded(true);
+      })
+      .catch(() => setLoaded(true));
+  }, [getToken]);
+
+  const update = (val: string) => {
+    setFreq(val);
+    authFetch("/alerts/digest-preference", getToken, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ frequency: val }),
+    }).catch(() => { /* ignore */ });
+  };
+
+  if (!loaded) return null;
+
+  return (
+    <div className="glass-panel p-6 mb-6">
+      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <Bell className="w-5 h-5 text-primary" /> Alert Digest
+      </h3>
+      <p className="text-xs text-muted-foreground mb-3">Receive a summary of triggered alerts via email</p>
+      <div className="flex gap-2">
+        {[
+          { value: "off", label: "Off" },
+          { value: "daily", label: "Daily" },
+          { value: "weekly", label: "Weekly" },
+        ].map(opt => (
+          <button
+            key={opt.value}
+            onClick={() => update(opt.value)}
+            className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${freq === opt.value ? "bg-primary/15 text-primary border border-primary/30" : "bg-white/[0.03] text-muted-foreground border border-white/[0.06] hover:text-white/50"}`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+      {freq !== "off" && (
+        <p className="text-[10px] text-green-400/60 mt-2">
+          {freq === "daily" ? "Daily digest at 8:00 AM UTC" : "Weekly digest every Monday at 8:00 AM UTC"}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function Profile() {
   const { user, isLoaded: userLoaded } = useUser();
   const { getToken } = useAuth();
@@ -578,8 +634,10 @@ export default function Profile() {
               </div>
             ))}
           </div>
-          <p className="text-[10px] text-muted-foreground mt-3">Additional privacy controls (portfolio visibility, gig profile, notifications) coming soon.</p>
+          <p className="text-[10px] text-muted-foreground mt-3">Additional privacy controls (portfolio visibility, gig profile) coming soon.</p>
         </div>
+
+        <AlertDigestSettings />
 
         {savedJobs.length > 0 && (
           <div className="glass-panel p-6">

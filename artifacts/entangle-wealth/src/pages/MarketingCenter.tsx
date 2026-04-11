@@ -32,16 +32,7 @@ import {
   Linkedin,
 } from "lucide-react";
 
-interface QueueItem {
-  id: string;
-  platform: string;
-  platformName: string;
-  content: string;
-  tone: string;
-  status: "draft" | "approved" | "posted" | "archived";
-  createdAt: string;
-  topic: string;
-}
+import { type QueueItem, getQueueFromStorage, saveQueueToStorage } from "@/lib/marketingQueue";
 
 interface AgentConfig {
   id: string;
@@ -70,19 +61,6 @@ const TONES = [
   { value: "data-driven", label: "Data-Driven", emoji: "📊" },
   { value: "casual", label: "Casual", emoji: "💬" },
 ];
-
-function getQueueFromStorage(): QueueItem[] {
-  try {
-    const data = localStorage.getItem("entangle_marketing_queue");
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveQueueToStorage(queue: QueueItem[]) {
-  localStorage.setItem("entangle_marketing_queue", JSON.stringify(queue));
-}
 
 function AgentPanel({
   agent,

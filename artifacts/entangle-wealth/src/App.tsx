@@ -46,6 +46,7 @@ import RewardHistory from "@/pages/RewardHistory";
 import TokenAdmin from "@/pages/TokenAdmin";
 import TaxStrategy from "@/pages/TaxStrategy";
 import MarketingCenter from "@/pages/MarketingCenter";
+import ContentCalendar from "@/pages/ContentCalendar";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -165,6 +166,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/rewards">{() => <ProtectedRoute component={RewardHistory} />}</Route>
             <Route path="/token-admin">{() => <ProtectedRoute component={TokenAdmin} />}</Route>
             <Route path="/marketing">{() => <ProtectedRoute component={MarketingCenter} />}</Route>
+            <Route path="/content-calendar">{() => <ProtectedRoute component={ContentCalendar} />}</Route>
             <Route component={NotFound} />
           </Switch>
           <Toaster />

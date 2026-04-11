@@ -196,6 +196,7 @@ const ADMIN_NAV_GROUP: NavGroup = {
   items: [
     { href: "/token-admin", label: "Token Admin", desc: "Token management" },
     { href: "/marketing", label: "Marketing AI", desc: "9-agent command center" },
+    { href: "/content-calendar", label: "Content Calendar", desc: "Schedule & review" },
   ],
 };
 
@@ -204,6 +205,7 @@ const ADMIN_MOBILE_SECTION = {
   links: [
     { href: "/token-admin", label: "Token Admin" },
     { href: "/marketing", label: "Marketing AI" },
+    { href: "/content-calendar", label: "Calendar" },
   ],
 };
 

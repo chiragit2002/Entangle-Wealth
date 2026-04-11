@@ -15,6 +15,7 @@ import {
 } from "@/lib/indicators";
 import { CandlestickChart } from "@/components/CandlestickChart";
 import { fetchBars, fetchSnapshot, barsToStockData, type AlpacaBar } from "@/lib/alpaca";
+import { trackEvent } from "@/lib/trackEvent";
 
 type Category = "all" | "trend" | "momentum" | "volatility" | "volume";
 
@@ -273,6 +274,8 @@ export default function TechnicalAnalysis() {
   });
   const [showWatchlist, setShowWatchlist] = useState(true);
   const [agentView, setAgentView] = useState(true);
+
+  useEffect(() => { trackEvent("signal_viewed"); }, []);
   const analyzeIdRef = useRef(0);
   const analyzeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

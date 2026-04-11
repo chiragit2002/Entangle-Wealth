@@ -18,6 +18,7 @@ import {
   type IndicatorSeries, AVAILABLE_INDICATORS, computeIndicator,
 } from "@/lib/chartIndicators";
 import { detectCandlestickPatterns, detectChartPatterns, type PatternResult, type ChartPattern } from "@/lib/patterns";
+import { trackEvent } from "@/lib/trackEvent";
 import { runScanner, runClaudeAnalysis, type ScanResult, type ClaudeAnalysis, SCAN_TICKERS } from "@/lib/scanner";
 
 const TIMEFRAMES = [
@@ -90,6 +91,8 @@ function dedup<T extends { time: string }>(items: T[]): T[] {
 
 export default function Charts() {
   const { toast } = useToast();
+
+  useEffect(() => { trackEvent("chart_viewed"); }, []);
 
   const [symbol, setSymbol] = useState("AAPL");
   const [searchText, setSearchText] = useState("");

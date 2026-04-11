@@ -37,6 +37,17 @@ async function ensureAlertTables() {
           triggered_at TIMESTAMPTZ DEFAULT now()
         );
         ALTER TABLE users ADD COLUMN IF NOT EXISTS alert_email_digest TEXT DEFAULT 'off';
+        CREATE TABLE IF NOT EXISTS analytics_events (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT,
+          event TEXT NOT NULL,
+          properties JSONB,
+          session_id TEXT,
+          created_at TIMESTAMPTZ DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_analytics_event ON analytics_events (event);
+        CREATE INDEX IF NOT EXISTS idx_analytics_created_at ON analytics_events (created_at);
+        CREATE INDEX IF NOT EXISTS idx_analytics_user_id ON analytics_events (user_id);
       `);
       logger.info("Alert tables ensured");
     } finally {

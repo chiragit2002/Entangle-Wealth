@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Users, MessageSquare, Calendar, Briefcase, CreditCard, Plus, ThumbsUp, MessageCircle, Share2, X, Search } from "lucide-react";
 import { ReferralSection } from "@/components/viral/ReferralSection";
 import { TestimonialForm } from "@/components/viral/TestimonialForm";
+import { trackEvent } from "@/lib/trackEvent";
 
 type Tab = "communities" | "feed" | "events" | "jobs" | "pricing";
 
@@ -116,6 +117,7 @@ function sanitize(str: string): string {
 }
 
 export default function Community() {
+  useEffect(() => { trackEvent("community_viewed"); }, []);
   const { toast } = useToast();
   const [tab, setTab] = useState<Tab>("communities");
   const [commFilter, setCommFilter] = useState("all");

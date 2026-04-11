@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Activity, Target, Zap, TrendingUp, ShieldAlert, BarChart3, Eye, DollarSign, ArrowRight, Terminal, UserPlus } from "lucide-react";
 import { ShareSignalCard } from "@/components/viral/ShareSignalCard";
+import { trackEvent } from "@/lib/trackEvent";
 
 const modelScores = [
   { name: "Price Action", pct: 92 },
@@ -214,6 +215,8 @@ export default function Home() {
     { value: "1,247", label: "Signals", color: "text-[#00e676]" },
     { value: memberCount.toLocaleString(), label: "Members", color: "text-[#f5c842]" },
   ];
+
+  useEffect(() => { trackEvent("home_viewed"); }, []);
 
   useEffect(() => {
     const t = setInterval(() => setNodeGlow((p) => (p + 1) % 6), 1500);

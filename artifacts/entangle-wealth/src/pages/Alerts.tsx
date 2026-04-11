@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Bell, Plus, Trash2, ToggleLeft, ToggleRight, History, AlertTriangle, TrendingUp, TrendingDown, Zap, Activity, Settings, Pencil, X, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { trackEvent } from "@/lib/trackEvent";
 
 interface AlertRule {
   id: number;
@@ -135,6 +136,7 @@ export default function Alerts() {
         setShowForm(false);
         fetchRules();
         toast({ title: "Alert created", description: `${newSymbol.trim().toUpperCase()} alert rule added.` });
+        trackEvent("alert_created", { symbol: newSymbol.trim().toUpperCase(), type: newType });
       } else {
         const err = await res.json().catch(() => ({ error: "Failed to create alert" }));
         toast({ title: "Error", description: err.error || "Failed to create alert", variant: "destructive" });

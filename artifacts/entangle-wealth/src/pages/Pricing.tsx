@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Check, X, Sparkles, Users, Zap } from "lucide-react";
+import { trackEvent } from "@/lib/trackEvent";
 
 const plans = [
   {
@@ -68,6 +70,7 @@ const plans = [
 
 export default function Pricing() {
   const { toast } = useToast();
+  useEffect(() => { trackEvent("upgrade_modal_shown"); }, []);
   const handleCta = (plan: string) => {
     if (plan === "Starter") {
       toast({ title: "You are on the free plan" });

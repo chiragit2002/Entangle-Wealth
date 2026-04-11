@@ -203,6 +203,7 @@ const ADMIN_NAV_GROUP: NavGroup = {
     { href: "/content-calendar", label: "Content Calendar", desc: "Schedule & review" },
     { href: "/reddit-engine", label: "Reddit Engine", desc: "Subreddit targeting" },
     { href: "/seo", label: "SEO Engine", desc: "Keywords & blog" },
+    { href: "/analytics", label: "Analytics", desc: "Platform metrics" },
   ],
 };
 
@@ -214,6 +215,7 @@ const ADMIN_MOBILE_SECTION = {
     { href: "/content-calendar", label: "Calendar" },
     { href: "/reddit-engine", label: "Reddit Engine" },
     { href: "/seo", label: "SEO Engine" },
+    { href: "/analytics", label: "Analytics" },
   ],
 };
 

@@ -4,6 +4,7 @@ import { Copy, Check, Users, Award, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
+import { trackEvent } from "@/lib/trackEvent";
 
 const BADGE_TIERS = [
   { tier: "Bronze", icon: "🥉", threshold: 3, color: "#cd7f32" },
@@ -49,6 +50,7 @@ export function ReferralSection() {
     if (!referralLink) return;
     await navigator.clipboard.writeText(referralLink);
     setCopied(true);
+    trackEvent("referral_click", { action: "copy" });
     toast({ title: "Copied", description: "Referral link copied to clipboard." });
     setTimeout(() => setCopied(false), 2000);
   }, [referralLink, toast]);

@@ -7,6 +7,7 @@ import { useLocation } from "wouter";
 import type { ChatMessage, UserProfile } from "@/lib/taxflow-types";
 import { ENTITY_SHORT_LABELS } from "@/lib/taxflow-types";
 import { getActiveProfile, getChatHistory, saveChatHistory } from "@/lib/taxflow-profile";
+import { trackEvent } from "@/lib/trackEvent";
 
 interface AuditRisk {
   title: string;
@@ -102,6 +103,8 @@ export default function TaxGPT() {
   const [, setLocation] = useLocation();
   const profile = getActiveProfile();
   const profileId = profile?.id || "default";
+
+  useEffect(() => { trackEvent("taxgpt_used"); }, []);
 
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     const saved = getChatHistory(profileId);

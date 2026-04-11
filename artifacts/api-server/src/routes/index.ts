@@ -18,6 +18,7 @@ import marketingRouter from "./marketing";
 import authEventsRouter from "./auth-events";
 import viralRouter from "./viral";
 import alertsRouter from "./alerts";
+import analyticsRouter from "./analytics";
 
 const router: IRouter = Router();
 
@@ -40,5 +41,6 @@ router.use(tokenRouter);
 router.use(marketingRouter);
 router.use(viralRouter);
 router.use(alertsRouter);
+router.use(analyticsRouter);
 
 export default router;

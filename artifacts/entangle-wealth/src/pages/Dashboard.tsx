@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, ArrowDownRight, Activity, Zap, Minus, TrendingUp, Shield, RefreshCw, Search, BarChart3, X, Terminal, Globe, Layers, Clock, Keyboard, ChevronUp, ChevronDown, Eye, Trophy, Flame, Award } from "lucide-react";
 import { generateMockOHLCV, runAllIndicators, getOverallSignal } from "@/lib/indicators";
 import { useToast } from "@/hooks/use-toast";
+import { trackEvent } from "@/lib/trackEvent";
 import { Area, AreaChart, Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from "recharts";
 
 const DASHBOARD_STOCKS: { symbol: string; name: string }[] = [
@@ -216,6 +217,8 @@ export default function Dashboard() {
   const [, navigate] = useLocation();
   const qaIdRef = useRef(0);
   const qaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => { trackEvent("dashboard_viewed"); }, []);
 
   useEffect(() => {
     const update = () => {

@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { generateMockOHLCV, runAllIndicators, getOverallSignal } from "@/lib/indicators";
 import { fetchSnapshots, fetchBars, barsToStockData, type AlpacaSnapshot } from "@/lib/alpaca";
+import { trackEvent } from "@/lib/trackEvent";
 
 interface ScreenerStock {
   symbol: string;
@@ -88,6 +89,8 @@ export default function Screener() {
   const [analyzing, setAnalyzing] = useState<Set<string>>(new Set());
   const [liveStocks, setLiveStocks] = useState<ScreenerStock[]>(SCREENER_STOCKS);
   const [isLive, setIsLive] = useState(false);
+
+  useEffect(() => { trackEvent("screener_used"); }, []);
   const [watchlist, setWatchlist] = useState<Set<string>>(() => {
     try { const w = localStorage.getItem("entangle-watchlist"); return new Set(w ? JSON.parse(w).map((s: { symbol: string }) => s.symbol) : []); } catch { return new Set(); }
   });

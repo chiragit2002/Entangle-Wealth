@@ -543,7 +543,7 @@ export default function Profile() {
                   </div>
                 </div>
               )}
-              <div className="mt-4 flex gap-2">
+              <div className="mt-4 flex gap-2 flex-wrap">
                 <Link href="/leaderboard">
                   <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1">
                     <Trophy className="w-3.5 h-3.5" /> Leaderboard
@@ -554,6 +554,23 @@ export default function Profile() {
                     <Target className="w-3.5 h-3.5" /> Achievements
                   </Button>
                 </Link>
+                <Link href="/giveaway">
+                  <Button variant="outline" size="sm" className="border-[#f5c842]/40 text-[#f5c842] gap-1">
+                    <Star className="w-3.5 h-3.5" /> Anniversary Giveaway
+                  </Button>
+                </Link>
+              </div>
+              <div
+                className="mt-4 rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:opacity-90 transition-opacity"
+                style={{ background: "linear-gradient(135deg, rgba(245,200,66,0.08), rgba(0,212,255,0.06))", border: "1px solid rgba(245,200,66,0.2)" }}
+                onClick={() => window.location.href = "/giveaway"}
+              >
+                <div className="flex-shrink-0 text-2xl">🎉</div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-[#f5c842]">$50,000 Anniversary Giveaway</p>
+                  <p className="text-xs text-white/50 mt-0.5">Your XP, trades, streak & referrals earn entries. Plus share in the <span className="text-[#00d4ff] font-medium">$36K referral bonus pool</span>.</p>
+                </div>
+                <div className="text-[#f5c842] text-lg">→</div>
               </div>
             </>
           ) : (

@@ -16,6 +16,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { EmailCapture } from "@/components/EmailCapture";
+import { AnniversaryGiveawayBanner } from "@/components/viral/AnniversaryGiveawayBanner";
 import { trackEvent } from "@/lib/trackEvent";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
@@ -389,6 +390,11 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Anniversary Giveaway Banner */}
+        <div className="container mx-auto px-4 max-w-3xl pb-4">
+          <AnniversaryGiveawayBanner />
+        </div>
+
         {/* Problem */}
         <section className="py-16 lg:py-24 px-4 border-t border-white/5">
           <div className="container mx-auto max-w-2xl text-center space-y-6">
@@ -511,9 +517,8 @@ export default function Home() {
                   >
                     {step.num}
                   </div>
-                    <h3 className="text-base font-bold text-white mb-2">{step.title}</h3>
-                    <p className="text-sm text-white/50 leading-relaxed">{step.desc}</p>
-                  </div>
+                  <h3 className="text-base font-bold text-white mb-2">{step.title}</h3>
+                  <p className="text-sm text-white/50 leading-relaxed">{step.desc}</p>
                 </div>
               ))}
             </div>

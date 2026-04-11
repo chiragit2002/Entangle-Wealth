@@ -4,11 +4,12 @@ import { FlashCouncil } from "@/components/FlashCouncil";
 import { incomeOpportunities, optionsIncomeData } from "@/lib/mock-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, MapPin, Clock, Briefcase, TrendingUp, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, CheckCircle, Info, Target } from "lucide-react";
+import { DollarSign, MapPin, Clock, Briefcase, TrendingUp, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, CheckCircle, Info, Target, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { ReferralSection } from "@/components/viral/ReferralSection";
+import { AnniversaryGiveawayBanner } from "@/components/viral/AnniversaryGiveawayBanner";
 
 const categories = ["All", "Gig", "Freelance", "Options"] as const;
 
@@ -233,6 +234,7 @@ export default function Earn() {
           <p className="text-xs text-muted-foreground/60 text-center">Income opportunities shown are examples and not guaranteed. Actual earnings depend on availability, location, effort, and market conditions. Options strategies involve risk of loss. This is demo data.</p>
         </div>
 
+        <AnniversaryGiveawayBanner />
         <ReferralSection />
       </div>
     </Layout>

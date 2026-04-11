@@ -235,8 +235,14 @@ export default function Pricing() {
 
         <div className="mobile-card-glow text-center p-6 md:p-8">
           <div className="text-2xl font-black tracking-tight mb-2">Referral Program</div>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f5c842]/10 border border-[#f5c842]/25 text-[#f5c842] text-xs font-bold mb-3">
+            🏆 $36,000 Anniversary Bonus Pool — Invite friends, earn your share
+          </div>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-1">
             Earn <strong className="text-[#f5c842]">20% monthly</strong> for every person you refer. For life. Build your own income stream.
+          </p>
+          <p className="text-xs text-white/40 mb-4">
+            Plus: every referral earns you 5 entries into the $50K anniversary drawing and a share of the $36K referral bonus pool.
           </p>
           <Button
             onClick={async () => {

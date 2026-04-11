@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@clerk/react";
-import { Copy, Check, Users, Award, Share2, ChevronRight } from "lucide-react";
+import { Copy, Check, Users, Award, Share2, ChevronRight, Trophy, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/trackEvent";
+import { Link } from "wouter";
 
 const BADGE_TIERS = [
   { tier: "Bronze", icon: "🥉", threshold: 3, color: "#cd7f32" },
@@ -102,9 +103,22 @@ export function ReferralSection() {
 
   return (
     <div className="glass-panel rounded-xl p-5">
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-3">
         <Users className="w-5 h-5 text-primary" />
         <h3 className="text-base font-bold">Refer & Earn</h3>
+      </div>
+
+      <div className="mb-4 rounded-xl border border-[#f5c842]/25 bg-[#f5c842]/5 p-3 flex items-center gap-3">
+        <Trophy className="w-5 h-5 text-[#f5c842] shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-bold text-[#f5c842]">$36,000 Referral Bonus Pool</p>
+          <p className="text-[10px] text-white/50 leading-tight mt-0.5">Invite friends — earn your share of the $36K pool + 5 entries into the $50K giveaway per referral.</p>
+        </div>
+        <Link href="/giveaway">
+          <button className="shrink-0 text-[#f5c842]/60 hover:text-[#f5c842] transition-colors">
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </Link>
       </div>
 
       <p className="text-xs text-muted-foreground mb-4">

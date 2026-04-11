@@ -108,6 +108,22 @@ export const founderStatusTable = pgTable("founder_status", {
   grantedAt: timestamp("granted_at", { withTimezone: true }).defaultNow(),
 });
 
+export const giveawayEntriesTable = pgTable("giveaway_entries", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }).unique(),
+  totalEntries: integer("total_entries").notNull().default(0),
+  tradeEntries: integer("trade_entries").notNull().default(0),
+  streakEntries: integer("streak_entries").notNull().default(0),
+  loginEntries: integer("login_entries").notNull().default(0),
+  xpMilestoneEntries: integer("xp_milestone_entries").notNull().default(0),
+  referralEntries: integer("referral_entries").notNull().default(0),
+  referralBonusShare: real("referral_bonus_share").notNull().default(0),
+  convertedReferrals: integer("converted_referrals").notNull().default(0),
+  drawingWon: boolean("drawing_won").default(false),
+  drawnAt: timestamp("drawn_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
 export type DailySpin = typeof dailySpinsTable.$inferSelect;
 export type FounderStatus = typeof founderStatusTable.$inferSelect;
 export type UserXp = typeof userXpTable.$inferSelect;
@@ -119,3 +135,4 @@ export type Challenge = typeof challengesTable.$inferSelect;
 export type UserChallenge = typeof userChallengesTable.$inferSelect;
 export type Streak = typeof streaksTable.$inferSelect;
 export type LeaderboardSnapshot = typeof leaderboardSnapshotsTable.$inferSelect;
+export type GiveawayEntry = typeof giveawayEntriesTable.$inferSelect;

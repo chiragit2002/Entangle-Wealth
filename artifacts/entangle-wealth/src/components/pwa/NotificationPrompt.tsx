@@ -120,9 +120,9 @@ export function NotificationPrompt() {
           <Bell className="w-5 h-5 text-[#FFD700]" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white mb-1">Stay Updated</p>
+          <p className="text-sm font-semibold text-white mb-1">Stay Updated + Earn Giveaway Entries</p>
           <p className="text-xs text-white/60 leading-relaxed">
-            Enable in-app alerts for market signals, price movements, and portfolio updates — displayed right inside the platform.
+            Enable alerts for market signals and portfolio updates. Every login earns entries into the <span className="text-[#f5c842] font-medium">$50K anniversary giveaway</span>.
           </p>
           <button
             onClick={handleAllow}

@@ -75,8 +75,9 @@ const AdminTicketsPage = lazy(() => import("@/pages/AdminTickets"));
 const AdminStatusPage = lazy(() => import("@/pages/AdminStatus"));
 const AdminScalabilityPage = lazy(() => import("@/pages/AdminScalability"));
 const LaunchReadinessPage = lazy(() => import("@/pages/LaunchReadiness"));
-const DailyContentPage = lazy(() => import("@/pages/DailyContent"));
 const GamificationPage = lazy(() => import("@/pages/Gamification"));
+const GiveawayPage = lazy(() => import("@/pages/Giveaway"));
+const DailyContentPage = lazy(() => import("@/pages/DailyContent"));
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -328,6 +329,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/launch">{() => <LazyProtected component={LaunchReadinessPage} />}</Route>
             <Route path="/daily-content">{() => <LazyProtected component={DailyContentPage} />}</Route>
             <Route path="/gamification">{() => <LazyProtected component={GamificationPage} />}</Route>
+            <Route path="/giveaway">{() => <LazyPage component={GiveawayPage} />}</Route>
             <Route component={NotFound} />
           </Switch>
           <OnboardingProvider />

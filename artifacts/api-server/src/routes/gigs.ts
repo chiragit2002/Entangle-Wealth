@@ -101,17 +101,17 @@ router.delete("/gigs/:id", requireAuth, async (req, res) => {
   const gigId = req.params.id;
 
   try {
-    const [gig] = await db.select().from(gigsTable).where(eq(gigsTable.id, gigId));
-    if (!gig) {
-      res.status(404).json({ error: "Gig not found" });
-      return;
-    }
-    if (gig.userId !== userId) {
-      res.status(403).json({ error: "Not authorized" });
+    const [updated] = await db
+      .update(gigsTable)
+      .set({ isActive: false })
+      .where(and(eq(gigsTable.id, gigId), eq(gigsTable.userId, userId)))
+      .returning({ id: gigsTable.id });
+
+    if (!updated) {
+      res.status(404).json({ error: "Gig not found or not authorized" });
       return;
     }
 
-    await db.update(gigsTable).set({ isActive: false }).where(eq(gigsTable.id, gigId));
     res.json({ success: true });
   } catch (error) {
     console.error("Error deleting gig:", error);

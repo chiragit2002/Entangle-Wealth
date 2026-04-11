@@ -1,7 +1,4 @@
 import type { Request, Response, NextFunction } from "express";
-import { db } from "@workspace/db";
-import { usersTable } from "@workspace/db/schema";
-import { eq } from "drizzle-orm";
 import { logger } from "../lib/logger";
 
 interface AuthenticatedRequest extends Request {
@@ -23,19 +20,6 @@ export const requireAdmin = async (req: Request, res: Response, next: NextFuncti
     return next();
   }
 
-  try {
-    const [user] = await db
-      .select({ subscriptionTier: usersTable.subscriptionTier })
-      .from(usersTable)
-      .where(eq(usersTable.clerkId, userId))
-      .limit(1);
-
-    if (user && user.subscriptionTier === "admin") {
-      return next();
-    }
-  } catch (err) {
-    logger.error({ err, userId }, "Admin check failed");
-  }
-
+  logger.warn({ userId, path: req.path }, "Admin access denied — userId not in ADMIN_CLERK_IDS");
   res.status(403).json({ error: "Admin access required" });
 };

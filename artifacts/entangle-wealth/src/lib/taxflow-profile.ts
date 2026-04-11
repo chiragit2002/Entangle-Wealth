@@ -27,12 +27,33 @@ function safeSet(key: string, value: unknown): void {
   }
 }
 
+function sanitizeProfileForStorage(profile: UserProfile): UserProfile {
+  return {
+    ...profile,
+    kyc: {
+      ...profile.kyc,
+      idNumber: "",
+    },
+  };
+}
+
 export function getProfiles(): UserProfile[] {
   return safeGet<UserProfile[]>(PROFILE_KEY, []);
 }
 
 export function saveProfiles(profiles: UserProfile[]): void {
-  safeSet(PROFILE_KEY, profiles);
+  safeSet(PROFILE_KEY, profiles.map(sanitizeProfileForStorage));
+}
+
+export function purgeSensitiveStoredData(): void {
+  try {
+    const profiles = getProfiles();
+    const hasIdNumbers = profiles.some(p => p.kyc?.idNumber);
+    if (hasIdNumbers) {
+      saveProfiles(profiles);
+    }
+  } catch {
+  }
 }
 
 export function getActiveProfileId(): string | null {
@@ -178,3 +199,5 @@ export function getDefaultDeductionCategories(): DeductionCategory[] {
     { id: "phone", label: "Phone & Internet", found: 0, documented: 0 },
   ];
 }
+
+purgeSensitiveStoredData();

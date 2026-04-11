@@ -203,7 +203,6 @@ router.get("/users/:userId/profile", async (req, res) => {
         headline: usersTable.headline,
         bio: usersTable.bio,
         location: usersTable.location,
-        subscriptionTier: usersTable.subscriptionTier,
         createdAt: usersTable.createdAt,
         isPublicProfile: usersTable.isPublicProfile,
       })

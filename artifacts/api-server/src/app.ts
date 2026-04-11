@@ -1,4 +1,4 @@
-import express, { type Express } from "express";
+import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
@@ -184,5 +184,13 @@ app.use("/api/marketing/generate", rateLimit({
 app.use(seoRouter);
 app.use("/api", seoRouter);
 app.use("/api", router);
+
+app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
+  const statusCode = (err as { status?: number; statusCode?: number })?.status
+    || (err as { status?: number; statusCode?: number })?.statusCode
+    || 500;
+  logger.error({ err, method: req.method, url: req.url }, "Unhandled error");
+  res.status(statusCode).json({ error: "An unexpected error occurred. Please try again." });
+});
 
 export default app;

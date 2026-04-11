@@ -1,5 +1,21 @@
 export type EntityType = "contractor" | "llc" | "multi_llc" | "scorp" | "ccorp" | "sole_prop" | "multiple";
 
+export interface BusinessTripDeduction {
+  id: string;
+  destination: string;
+  purpose: string;
+  estimatedCost: number;
+}
+
+export interface KycData {
+  fullLegalName: string;
+  dateOfBirth: string;
+  address: string;
+  idType: string;
+  idNumber: string;
+  submitted: boolean;
+}
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -10,6 +26,7 @@ export interface UserProfile {
   yearStarted: string;
   primaryActivity: string;
   homeState: string;
+  ein: string;
   grossRevenue: number;
   w2Income: number;
   employeeCount: number;
@@ -17,11 +34,13 @@ export interface UserProfile {
   homeOfficeSqft: number;
   usesVehicle: boolean;
   vehicleBusinessPct: number;
-  primaryGoal: "se_tax" | "income_tax" | "both";
+  businessTripDeductions: BusinessTripDeduction[];
+  primaryGoal: "se_tax" | "income_tax" | "both" | "";
   hasCPA: boolean;
-  filingTime: "ontime" | "extension";
+  filingTime: "ontime" | "extension" | "";
   taxYear: number;
   createdAt: string;
+  kyc: KycData;
 }
 
 export interface TaxStrategy {

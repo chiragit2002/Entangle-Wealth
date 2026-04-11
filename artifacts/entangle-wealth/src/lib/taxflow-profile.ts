@@ -81,6 +81,7 @@ export function createDefaultProfile(): UserProfile {
     yearStarted: "",
     primaryActivity: "",
     homeState: "",
+    ein: "",
     grossRevenue: 0,
     w2Income: 0,
     employeeCount: 0,
@@ -88,11 +89,20 @@ export function createDefaultProfile(): UserProfile {
     homeOfficeSqft: 0,
     usesVehicle: false,
     vehicleBusinessPct: 0,
-    primaryGoal: "both",
+    businessTripDeductions: [],
+    primaryGoal: "",
     hasCPA: false,
-    filingTime: "ontime",
+    filingTime: "",
     taxYear: 2026,
     createdAt: new Date().toISOString(),
+    kyc: {
+      fullLegalName: "",
+      dateOfBirth: "",
+      address: "",
+      idType: "",
+      idNumber: "",
+      submitted: false,
+    },
   };
 }
 

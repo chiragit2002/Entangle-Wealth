@@ -1,5 +1,14 @@
 import { pgTable, text, timestamp, real, integer, serial } from "drizzle-orm/pg-core";
 
+export const virtualCashPurchasesTable = pgTable("virtual_cash_purchases", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  stripeSessionId: text("stripe_session_id").notNull().unique(),
+  amountPaidCents: integer("amount_paid_cents").notNull(),
+  virtualAmountCredited: real("virtual_amount_credited").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
 export const paperPortfoliosTable = pgTable("paper_portfolios", {
   id: serial("id").primaryKey(),
   userId: text("user_id").notNull().unique(),

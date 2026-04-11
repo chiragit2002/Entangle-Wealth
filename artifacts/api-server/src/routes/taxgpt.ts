@@ -1,5 +1,6 @@
 import { Router, type Request } from "express";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
+import { requireAuth } from "../middlewares/requireAuth";
 
 let openai: any = null;
 try {
@@ -176,7 +177,7 @@ This analysis is for educational purposes only. Consult a licensed CPA or tax pr
 6. Keep the disclaimer prominent in every response.
 7. For quick questions, give a concise answer (no need for full review format). Use the structured format only for situation reviews.`;
 
-router.post("/taxgpt", async (req, res) => {
+router.post("/taxgpt", requireAuth, async (req, res) => {
   if (!checkRateLimit(req)) {
     res.status(429).json({ error: "Rate limit exceeded. Please wait before sending another question." });
     return;

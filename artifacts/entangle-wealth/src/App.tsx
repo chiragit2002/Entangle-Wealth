@@ -1,4 +1,4 @@
-import { useEffect, useRef, lazy, Suspense } from "react";
+import { useEffect, useRef, useMemo, lazy, Suspense } from "react";
 import { Switch, Route, useLocation, Router as WouterRouter, Redirect, useSearch } from "wouter";
 import { ClerkProvider, SignIn, SignUp, Show, useClerk } from "@clerk/react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
@@ -15,6 +15,8 @@ import { trackEvent } from "@/lib/trackEvent";
 import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { Info } from "lucide-react";
+import { AuthErrorHandler } from "@/components/AuthErrorHandler";
+import { AuthTokenError } from "@/lib/authFetch";
 
 const Home = lazy(() => import("@/pages/Home"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -87,7 +89,18 @@ if (!clerkPubKey) {
   throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
 }
 
-const queryClient = new QueryClient();
+function createQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: (failureCount, error) => {
+          if (error instanceof AuthTokenError) return false;
+          return failureCount < 3;
+        },
+      },
+    },
+  });
+}
 
 const clerkAppearance = {
   variables: {
@@ -189,15 +202,14 @@ function ClerkQueryClientCacheInvalidator() {
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const [location] = useLocation();
-
+  const returnUrl = encodeURIComponent(location);
   return (
     <>
       <Show when="signed-in">
         <Component />
       </Show>
       <Show when="signed-out">
-        {/* redirect param preserved for future return-to-origin support; currently users always land on /dashboard */}
-        <Redirect to={`/sign-in?reason=protected&redirect=${encodeURIComponent(location)}`} />
+        <Redirect to={`/sign-in?reason=protected&redirect_url=${returnUrl}`} />
       </Show>
     </>
   );
@@ -237,6 +249,7 @@ function LazyProtected({ component: Component }: { component: React.ComponentTyp
 
 function ClerkProviderWithRoutes() {
   const [, setLocation] = useLocation();
+  const queryClient = useMemo(() => createQueryClient(), []);
 
   return (
     <ClerkProvider
@@ -247,6 +260,7 @@ function ClerkProviderWithRoutes() {
     >
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
+        <AuthErrorHandler />
         <TooltipProvider>
           <Switch>
             <Route path="/">{() => <LazyPage component={Home} />}</Route>

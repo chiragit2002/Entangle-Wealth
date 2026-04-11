@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
+import { requireAdmin } from "../middlewares/requireAdmin";
 import { imageCompressionMiddleware } from "../middlewares/imageCompression";
 import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
@@ -151,15 +152,8 @@ router.get("/support/tickets", requireAuth, async (req: Request, res: Response) 
   }
 });
 
-router.get("/support/admin/tickets", requireAuth, async (req: Request, res: Response) => {
-  const { userId } = req as AuthenticatedRequest;
-
+router.get("/support/admin/tickets", requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
-    const adminUser = await db.select({ subscriptionTier: usersTable.subscriptionTier }).from(usersTable).where(eq(usersTable.clerkId, userId)).limit(1);
-    if (!adminUser[0] || adminUser[0].subscriptionTier !== "admin") {
-      return res.status(403).json({ error: "Admin access required" });
-    }
-
     const statusFilter = (req.query.status as string) || "";
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
     const offset = parseInt(req.query.offset as string) || 0;
@@ -198,7 +192,7 @@ router.get("/support/admin/tickets", requireAuth, async (req: Request, res: Resp
   }
 });
 
-router.patch("/support/admin/tickets/:id", requireAuth, async (req: Request, res: Response) => {
+router.patch("/support/admin/tickets/:id", requireAuth, requireAdmin, async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
   const ticketId = parseInt(req.params.id, 10);
   const { status, adminNotes } = req.body;
@@ -216,10 +210,6 @@ router.patch("/support/admin/tickets/:id", requireAuth, async (req: Request, res
   }
 
   try {
-    const adminUser = await db.select({ subscriptionTier: usersTable.subscriptionTier }).from(usersTable).where(eq(usersTable.clerkId, userId)).limit(1);
-    if (!adminUser[0] || adminUser[0].subscriptionTier !== "admin") {
-      return res.status(403).json({ error: "Admin access required" });
-    }
 
     const resolvedAt = status === "resolved" || status === "closed" ? sql`NOW()` : sql`resolved_at`;
 
@@ -272,7 +262,7 @@ router.get("/status/incidents", async (req: Request, res: Response) => {
   }
 });
 
-router.patch("/status/admin/services/:name", requireAuth, async (req: Request, res: Response) => {
+router.patch("/status/admin/services/:name", requireAuth, requireAdmin, async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
   const serviceName = decodeURIComponent(req.params.name);
   const { status } = req.body;
@@ -282,10 +272,6 @@ router.patch("/status/admin/services/:name", requireAuth, async (req: Request, r
   }
 
   try {
-    const adminUser = await db.select({ subscriptionTier: usersTable.subscriptionTier }).from(usersTable).where(eq(usersTable.clerkId, userId)).limit(1);
-    if (!adminUser[0] || adminUser[0].subscriptionTier !== "admin") {
-      return res.status(403).json({ error: "Admin access required" });
-    }
 
     await db.execute(sql`
       UPDATE service_status
@@ -301,7 +287,7 @@ router.patch("/status/admin/services/:name", requireAuth, async (req: Request, r
   }
 });
 
-router.post("/status/admin/incidents", requireAuth, async (req: Request, res: Response) => {
+router.post("/status/admin/incidents", requireAuth, requireAdmin, async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
   const { serviceName, title, description, severity } = req.body;
 
@@ -310,10 +296,6 @@ router.post("/status/admin/incidents", requireAuth, async (req: Request, res: Re
   }
 
   try {
-    const adminUser = await db.select({ subscriptionTier: usersTable.subscriptionTier }).from(usersTable).where(eq(usersTable.clerkId, userId)).limit(1);
-    if (!adminUser[0] || adminUser[0].subscriptionTier !== "admin") {
-      return res.status(403).json({ error: "Admin access required" });
-    }
 
     const result = await db.execute(sql`
       INSERT INTO status_incidents (service_name, title, description, severity)

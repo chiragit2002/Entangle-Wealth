@@ -1,8 +1,6 @@
 import { Router } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
-import { db } from "@workspace/db";
-import { usersTable } from "@workspace/db/schema";
-import { eq } from "drizzle-orm";
+import { requireAdmin } from "../middlewares/requireAdmin";
 import { aiQueue } from "../lib/aiQueue";
 import { anthropicCircuit } from "../lib/circuitBreaker";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
@@ -186,8 +184,7 @@ const TONE_INSTRUCTIONS: Record<string, string> = {
   casual: "Use a casual, conversational tone. Write like you're texting a friend who's interested in finance. Use humor where appropriate."
 };
 
-router.post("/marketing/generate", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+router.post("/marketing/generate", requireAuth, requireAdmin, async (req, res) => {
   const { agent, topic, tone, context } = req.body;
 
   if (!agent || !topic) {
@@ -208,12 +205,6 @@ router.post("/marketing/generate", requireAuth, async (req, res) => {
   }
 
   try {
-    const [adminUser] = await db.select().from(usersTable).where(eq(usersTable.clerkId, userId));
-    if (!adminUser || adminUser.subscriptionTier !== "admin") {
-      res.status(403).json({ error: "Admin access required" });
-      return;
-    }
-
     const client = await getAnthropicClient();
     if (!client) {
       res.status(503).json({ error: "AI content generation is temporarily unavailable. Anthropic integration is not configured." });
@@ -266,15 +257,8 @@ router.post("/marketing/generate", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/marketing/agents", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+router.get("/marketing/agents", requireAuth, requireAdmin, async (_req, res) => {
   try {
-    const [adminUser] = await db.select().from(usersTable).where(eq(usersTable.clerkId, userId));
-    if (!adminUser || adminUser.subscriptionTier !== "admin") {
-      res.status(403).json({ error: "Admin access required" });
-      return;
-    }
-
     const agents = Object.entries(PLATFORM_CONFIGS).map(([key, config]) => ({
       id: key,
       name: config.name,

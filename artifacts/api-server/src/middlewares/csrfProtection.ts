@@ -53,7 +53,9 @@ export const csrfProtection = (req: Request, res: Response, next: NextFunction) 
   const origin = getOrigin(req);
 
   if (!origin) {
-    return next();
+    logger.warn({ ip: req.ip, path: req.path }, "CSRF: blocked request with no Origin/Referer header");
+    res.status(403).json({ error: "Forbidden: missing Origin header" });
+    return;
   }
 
   const allowed = getAllowedOrigins();

@@ -4,6 +4,7 @@ import { logger } from "../lib/logger";
 import Parser from "rss-parser";
 import { getAllSymbols } from "../data/nasdaq-stocks";
 import { newsCache } from "../lib/cache";
+import { requireAuth } from "../middlewares/requireAuth";
 
 const router = Router();
 const rssParser = new Parser({
@@ -430,7 +431,7 @@ router.get("/news", async (req: Request, res: Response) => {
 let lastRefreshRequest = 0;
 const REFRESH_COOLDOWN = 60_000;
 
-router.get("/news/refresh", async (_req: Request, res: Response) => {
+router.get("/news/refresh", requireAuth, async (_req: Request, res: Response) => {
   try {
     const now = Date.now();
     if (now - lastRefreshRequest < REFRESH_COOLDOWN) {

@@ -1,6 +1,6 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { logger } from "../lib/logger";
-import { requireAuth } from "@clerk/express";
+import { requireAuth } from "../middlewares/requireAuth";
 import { TTLCache } from "../lib/cache";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { alpacaCircuit } from "../lib/circuitBreaker";
@@ -192,7 +192,7 @@ router.get("/alpaca/multibars", async (req, res) => {
   }
 });
 
-router.get("/alpaca/account", requireAuth(), async (req, res) => {
+router.get("/alpaca/account", requireAuth, async (req, res) => {
   try {
     const data = await alpacaFetch(`${ALPACA_PAPER_URL}/v2/account`);
     res.json({

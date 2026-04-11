@@ -128,7 +128,34 @@ app.use(metricsMiddleware);
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
-app.use(cors({ credentials: true, origin: true }));
+const allowedOrigins = new Set<string>();
+const replitDomains = process.env.REPLIT_DOMAINS?.split(",") || [];
+for (const d of replitDomains) {
+  allowedOrigins.add(`https://${d.trim()}`);
+}
+const replitDevDomain = process.env.REPLIT_DEV_DOMAIN;
+if (replitDevDomain) {
+  allowedOrigins.add(`https://${replitDevDomain}`);
+}
+allowedOrigins.add("http://localhost");
+for (let p = 3000; p <= 3010; p++) {
+  allowedOrigins.add(`http://localhost:${p}`);
+}
+const envPort = process.env.PORT;
+if (envPort) {
+  allowedOrigins.add(`http://localhost:${envPort}`);
+}
+
+app.use(cors({
+  credentials: true,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.has(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
+}));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 

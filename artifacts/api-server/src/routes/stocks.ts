@@ -11,6 +11,8 @@ import { stockCache } from "../lib/cache";
 
 const router = Router();
 
+// Stock data endpoints are intentionally public — market data is non-sensitive
+// and allows unauthenticated browsing to support the public-facing experience.
 router.get("/stocks", (req, res) => {
   const query = (req.query.q as string) || "";
   const sector = req.query.sector as string | undefined;

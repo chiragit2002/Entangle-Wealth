@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
+import { requireAdmin } from "../middlewares/requireAdmin";
 import { db, pool } from "@workspace/db";
 import { analyticsEventsTable, usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
@@ -38,22 +39,8 @@ router.post("/analytics/track", (req: Request, res: Response) => {
     });
 });
 
-router.get("/analytics/dashboard", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get("/analytics/dashboard", requireAuth, requireAdmin, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = req.userId;
-    if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
-
-    const [adminUser] = await db
-      .select({ subscriptionTier: usersTable.subscriptionTier })
-      .from(usersTable)
-      .where(eq(usersTable.clerkId, userId))
-      .limit(1);
-
-    if (!adminUser || adminUser.subscriptionTier !== "admin") {
-      res.status(403).json({ error: "Admin access required" });
-      return;
-    }
-
     const client = await pool.connect();
     try {
       const totalUsersResult = await client.query("SELECT COUNT(*) as count FROM users");

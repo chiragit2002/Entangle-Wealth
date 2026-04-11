@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import type { Server } from "node:http";
 import type { Socket } from "node:net";
 import { getAuthEventStats } from "../lib/authEventLogger";
+import { requireAuth } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
 
@@ -21,7 +22,15 @@ export function trackConnections(server: Server): void {
   });
 }
 
-function buildHealthResponse() {
+router.get("/healthz", (_req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+router.get("/health", (_req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+router.get("/health/detailed", requireAuth, (_req, res) => {
   const mem = process.memoryUsage();
   const uptimeMs = Date.now() - startTime;
   const uptimeSeconds = Math.floor(uptimeMs / 1000);
@@ -29,7 +38,7 @@ function buildHealthResponse() {
   const minutes = Math.floor((uptimeSeconds % 3600) / 60);
   const seconds = uptimeSeconds % 60;
 
-  return {
+  res.json({
     status: "ok",
     uptime: {
       seconds: uptimeSeconds,
@@ -46,15 +55,7 @@ function buildHealthResponse() {
     platform: process.platform,
     auth: getAuthEventStats(),
     timestamp: new Date().toISOString(),
-  };
-}
-
-router.get("/healthz", (_req, res) => {
-  res.json(buildHealthResponse());
-});
-
-router.get("/health", (_req, res) => {
-  res.json(buildHealthResponse());
+  });
 });
 
 export default router;

@@ -3,6 +3,7 @@ import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
+import { requireAdmin } from "../middlewares/requireAdmin";
 
 const router = Router();
 
@@ -63,15 +64,7 @@ router.post("/kyc/submit", requireAuth, async (req, res) => {
   }
 });
 
-const ADMIN_CLERK_IDS = (process.env.ADMIN_CLERK_IDS || "").split(",").filter(Boolean);
-
-router.post("/kyc/approve/:userId", requireAuth, async (req, res) => {
-  const callerClerkId = (req as any).userId;
-  if (!ADMIN_CLERK_IDS.includes(callerClerkId)) {
-    res.status(403).json({ error: "Admin access required" });
-    return;
-  }
-
+router.post("/kyc/approve/:userId", requireAuth, requireAdmin, async (req, res) => {
   const targetUserId = req.params.userId;
 
   try {

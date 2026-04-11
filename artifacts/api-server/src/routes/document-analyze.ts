@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { requireAuth } from "../middlewares/requireAuth";
 
 let openai: any = null;
 try {
@@ -10,7 +11,7 @@ try {
 
 const router = Router();
 
-router.post("/analyze-document", async (req, res) => {
+router.post("/analyze-document", requireAuth, async (req, res) => {
   const { fileData, fileType, fileName } = req.body;
 
   if (!fileData || !fileType) {

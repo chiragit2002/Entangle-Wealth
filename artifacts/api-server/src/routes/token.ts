@@ -10,6 +10,7 @@ import {
 } from "@workspace/db/schema";
 import { eq, desc, sql, and, count } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
+import { requireAdmin } from "../middlewares/requireAdmin";
 
 const router = Router();
 
@@ -314,7 +315,7 @@ router.post("/token/book", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/token/admin/distribute", requireAuth, async (req, res) => {
+router.post("/token/admin/distribute", requireAuth, requireAdmin, async (req, res) => {
   const userId = (req as any).userId;
   const { month } = req.body;
 
@@ -324,11 +325,6 @@ router.post("/token/admin/distribute", requireAuth, async (req, res) => {
   }
 
   try {
-    const [adminUser] = await db.select().from(usersTable).where(eq(usersTable.clerkId, userId));
-    if (!adminUser || adminUser.subscriptionTier !== "admin") {
-      res.status(403).json({ error: "Admin access required" });
-      return;
-    }
 
     const existingDist = await db
       .select()
@@ -398,16 +394,8 @@ router.post("/token/admin/distribute", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/token/admin/stats", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
-
+router.get("/token/admin/stats", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const [adminUser] = await db.select().from(usersTable).where(eq(usersTable.clerkId, userId));
-    if (!adminUser || adminUser.subscriptionTier !== "admin") {
-      res.status(403).json({ error: "Admin access required" });
-      return;
-    }
-
     const totalUsers = await db.select({ count: sql<number>`count(*)` }).from(usersTable);
     const walletsLinked = await db
       .select({ count: sql<number>`count(*)` })
@@ -450,8 +438,7 @@ router.get("/token/admin/stats", requireAuth, async (req, res) => {
   }
 });
 
-router.put("/token/admin/config", requireAuth, async (req, res) => {
-  const userId = (req as any).userId;
+router.put("/token/admin/config", requireAuth, requireAdmin, async (req, res) => {
   const { sharePrice } = req.body;
 
   if (!sharePrice || sharePrice <= 0) {
@@ -460,11 +447,6 @@ router.put("/token/admin/config", requireAuth, async (req, res) => {
   }
 
   try {
-    const [adminUser] = await db.select().from(usersTable).where(eq(usersTable.clerkId, userId));
-    if (!adminUser || adminUser.subscriptionTier !== "admin") {
-      res.status(403).json({ error: "Admin access required" });
-      return;
-    }
 
     const existing = await db.select().from(tokenConfigTable).where(eq(tokenConfigTable.key, "share_price"));
 

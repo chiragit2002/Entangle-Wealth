@@ -53,10 +53,12 @@ I prefer concise and direct communication. When making changes, prioritize funct
     - **Mobile Design**: Fully responsive, mobile-first design with bottom navigation.
 
 ## API Server
-- **Security**: Helmet, global and AI-specific rate limits.
+- **Security**: Helmet, global and AI-specific rate limits, CSRF protection (blocks missing Origin on mutations), CORS restricted to known Replit/localhost origins.
+- **Authentication**: All AI endpoints (analyze, taxgpt, document-analyze), news/refresh, and Alpaca routes require `requireAuth` middleware. Centralized `requireAdmin` middleware for admin routes (KYC approve, token admin, support admin, analytics dashboard, status admin).
+- **Health Endpoint**: Public `/health` and `/healthz` return minimal `{status, timestamp}` only. Detailed operational data at `/health/detailed` behind auth.
 - **Integrations**: Stripe webhook endpoint, Zapier webhook integration for platform events.
 - **Data Proxies**: Alpaca Markets API proxy with circuit breaker and exponential backoff.
-- **News Intelligence**: `/api/news` endpoint with RSS scraping, sentiment analysis, and caching.
+- **News Intelligence**: `/api/news` endpoint with RSS scraping, sentiment analysis, and caching. `/api/news/refresh` requires auth.
 - **Performance**: Metrics middleware, AI request queuing, circuit breakers for external APIs, image compression.
 - **Routes**: Comprehensive API routes for all platform features including stock data, AI analysis, user management, KYC, payments, tax, gamification, token system, marketing, and support.
 

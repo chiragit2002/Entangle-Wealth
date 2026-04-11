@@ -1,6 +1,7 @@
 import { Router, type Request } from "express";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { getStockBySymbol } from "../data/nasdaq-stocks";
+import { requireAuth } from "../middlewares/requireAuth";
 
 const router = Router();
 
@@ -26,7 +27,7 @@ function checkRateLimit(req: Request): boolean {
   return true;
 }
 
-router.post("/stocks/:symbol/analyze", async (req, res) => {
+router.post("/stocks/:symbol/analyze", requireAuth, async (req, res) => {
   if (!checkRateLimit(req)) {
     res.status(429).json({ error: "Rate limit exceeded. Please wait before requesting another analysis." });
     return;
@@ -129,7 +130,7 @@ Then synthesize with the Flash Council and deliver the consensus signal.`;
   }
 });
 
-router.post("/stocks/:symbol/quick-analyze", async (req, res) => {
+router.post("/stocks/:symbol/quick-analyze", requireAuth, async (req, res) => {
   if (!checkRateLimit(req)) {
     res.status(429).json({ error: "Rate limit exceeded. Please wait before requesting another analysis." });
     return;

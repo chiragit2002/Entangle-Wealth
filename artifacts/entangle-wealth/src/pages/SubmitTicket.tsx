@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@clerk/react";
-import { ArrowLeft, Send, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Send, CheckCircle2, Upload, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { authFetch } from "@/lib/authFetch";
 
@@ -23,8 +23,32 @@ export default function SubmitTicket() {
   const [subject, setSubject] = useState("");
   const [category, setCategory] = useState("general");
   const [description, setDescription] = useState("");
+  const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState<{ ticketId: number } | null>(null);
+
+  const handleScreenshot = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Screenshot must be under 5MB" });
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Invalid file", description: "Please upload an image file" });
+      return;
+    }
+    setScreenshotFile(file);
+    const reader = new FileReader();
+    reader.onload = () => setScreenshotPreview(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const removeScreenshot = () => {
+    setScreenshotFile(null);
+    setScreenshotPreview(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +62,12 @@ export default function SubmitTicket() {
       const res = await authFetch("/support/tickets", getToken, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject: subject.trim(), category, description: description.trim() }),
+        body: JSON.stringify({
+          subject: subject.trim(),
+          category,
+          description: description.trim(),
+          screenshotUrl: screenshotPreview || undefined,
+        }),
       });
       const data = await res.json();
       if (data.success) {
@@ -123,6 +152,29 @@ export default function SubmitTicket() {
               className="w-full px-4 py-3 text-sm bg-white/[0.03] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/40 transition-colors resize-none"
             />
             <p className="text-[10px] text-white/15 mt-1 text-right">{description.length}/5000</p>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-2">Screenshot (optional)</label>
+            {screenshotPreview ? (
+              <div className="relative inline-block">
+                <img src={screenshotPreview} alt="Screenshot preview" className="max-h-40 rounded-lg border border-white/[0.08]" />
+                <button
+                  type="button"
+                  onClick={removeScreenshot}
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-[#ff3366] rounded-full flex items-center justify-center"
+                >
+                  <X className="w-3 h-3 text-white" />
+                </button>
+                <p className="text-[10px] text-white/20 mt-1">{screenshotFile?.name}</p>
+              </div>
+            ) : (
+              <label className="flex items-center justify-center gap-2 w-full h-20 border-2 border-dashed border-white/[0.08] rounded-xl cursor-pointer hover:border-[#00D4FF]/30 transition-colors">
+                <Upload className="w-4 h-4 text-white/20" />
+                <span className="text-xs text-white/20">Click to upload a screenshot (max 5MB)</span>
+                <input type="file" accept="image/*" onChange={handleScreenshot} className="hidden" />
+              </label>
+            )}
           </div>
 
           <button

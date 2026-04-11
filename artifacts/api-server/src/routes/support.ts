@@ -37,8 +37,8 @@ router.post("/support/tickets", requireAuth, async (req: Request, res: Response)
     return res.status(400).json({ error: "Invalid category" });
   }
 
-  if (screenshotUrl && (typeof screenshotUrl !== "string" || screenshotUrl.length > 2000)) {
-    return res.status(400).json({ error: "Invalid screenshot URL" });
+  if (screenshotUrl && (typeof screenshotUrl !== "string" || screenshotUrl.length > 7_000_000)) {
+    return res.status(400).json({ error: "Screenshot too large" });
   }
 
   try {

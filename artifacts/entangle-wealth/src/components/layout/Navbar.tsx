@@ -209,6 +209,7 @@ const ADMIN_NAV_GROUP: NavGroup = {
     { href: "/seo", label: "SEO Engine", desc: "Keywords & blog" },
     { href: "/analytics", label: "Analytics", desc: "Platform metrics" },
     { href: "/admin/tickets", label: "Support Tickets", desc: "Manage tickets" },
+    { href: "/admin/status", label: "Status Manager", desc: "Service health control" },
   ],
 };
 
@@ -222,6 +223,7 @@ const ADMIN_MOBILE_SECTION = {
     { href: "/seo", label: "SEO Engine" },
     { href: "/analytics", label: "Analytics" },
     { href: "/admin/tickets", label: "Support Tickets" },
+    { href: "/admin/status", label: "Status Manager" },
   ],
 };
 

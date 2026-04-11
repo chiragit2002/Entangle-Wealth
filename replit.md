@@ -103,3 +103,7 @@ The project uses a pnpm workspace monorepo, with each package managing its own d
 - **Maps**: Leaflet.js with OpenStreetMap tiles and Nominatim geocoding (Travel Budget Planner)
 - **Market Data**: Alpaca Markets API (paper trading keys, IEX feed)
 - **Client-side Routing**: wouter
+
+# Documentation
+
+- **Product Requirements Document**: `docs/PRD.md` — Comprehensive PRD covering product overview, architecture, feature inventory, database schema, external dependencies, subscription tiers, project status, non-goals, open questions/risks, and success metrics.

@@ -25,6 +25,7 @@
     "http-proxy-middleware": "^3.0.5",
     "pino": "^9",
     "pino-http": "^10",
+    "resend": "^6.10.0",
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {

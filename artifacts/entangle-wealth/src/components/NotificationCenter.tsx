@@ -192,8 +192,18 @@ export default function NotificationCenter() {
     if (open) {
       fetchHistory();
       if (tab === "alerts") fetchAlertRules();
+      if (tab === "notifications" && unreadCount > 0) {
+        authFetch("/alerts/mark-read", getToken, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        }).then(() => {
+          setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+          setUnreadCount(0);
+        }).catch(() => { /* ignore */ });
+      }
     }
-  }, [open, tab, fetchHistory, fetchAlertRules]);
+  }, [open, tab, fetchHistory, fetchAlertRules, unreadCount, getToken]);
 
   useEffect(() => {
     if (!open) return;

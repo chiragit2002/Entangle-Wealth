@@ -494,6 +494,41 @@ async function evaluateAlerts() {
 
 let evaluationInterval: ReturnType<typeof setInterval> | null = null;
 
+router.get("/alerts/digest-preference", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.userId;
+  if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
+  try {
+    const [user] = await db
+      .select({ alertEmailDigest: usersTable.alertEmailDigest })
+      .from(usersTable)
+      .where(eq(usersTable.clerkId, userId));
+    res.json({ digestFrequency: user?.alertEmailDigest || "off" });
+  } catch (err) {
+    logger.error({ err }, "Failed to get digest preference");
+    res.status(500).json({ error: "Failed to get digest preference" });
+  }
+});
+
+router.patch("/alerts/digest-preference", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.userId;
+  if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
+  const { frequency } = req.body;
+  if (!frequency || !["off", "daily", "weekly"].includes(frequency)) {
+    res.status(400).json({ error: "frequency must be off, daily, or weekly" });
+    return;
+  }
+  try {
+    await db
+      .update(usersTable)
+      .set({ alertEmailDigest: frequency, updatedAt: new Date() })
+      .where(eq(usersTable.clerkId, userId));
+    res.json({ success: true, digestFrequency: frequency });
+  } catch (err) {
+    logger.error({ err }, "Failed to update digest preference");
+    res.status(500).json({ error: "Failed to update digest preference" });
+  }
+});
+
 export function startAlertEvaluator() {
   if (evaluationInterval) return;
   logger.info("Starting alert evaluation engine (60s interval)");

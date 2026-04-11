@@ -7,6 +7,7 @@ import { getStripeSync } from "./stripeClient";
 import { trackConnections } from "./routes/health";
 import { ensureReferralBadgesExist } from "./lib/referralRewards";
 import { startAlertEvaluator } from "./routes/alerts";
+import { startDigestScheduler } from "./lib/emailDigest";
 
 const rawPort = process.env["PORT"];
 
@@ -99,5 +100,6 @@ const httpServer = server.listen(port, async (err) => {
     logger.warn({ error: err }, "Failed to seed referral badges (non-fatal)")
   );
   startAlertEvaluator();
+  startDigestScheduler();
   await initStripe();
 });

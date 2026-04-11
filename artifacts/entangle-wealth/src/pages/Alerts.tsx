@@ -3,7 +3,7 @@ import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Bell, Plus, Trash2, ToggleLeft, ToggleRight, History, AlertTriangle, TrendingUp, TrendingDown, Zap, Activity, Settings } from "lucide-react";
+import { Bell, Plus, Trash2, ToggleLeft, ToggleRight, History, AlertTriangle, TrendingUp, TrendingDown, Zap, Activity, Settings, Pencil, X, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AlertRule {
@@ -70,6 +70,10 @@ export default function Alerts() {
   const [newThreshold, setNewThreshold] = useState("");
   const [creating, setCreating] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editType, setEditType] = useState("");
+  const [editThreshold, setEditThreshold] = useState("");
+  const [digestFrequency, setDigestFrequency] = useState("off");
 
   const fetchRules = useCallback(async () => {
     try {
@@ -94,10 +98,20 @@ export default function Alerts() {
     } catch { /* ignore */ }
   }, [getToken]);
 
+  const fetchDigestPref = useCallback(async () => {
+    try {
+      const res = await authFetch("/alerts/digest-preference", getToken);
+      if (res.ok) {
+        const data = await res.json();
+        setDigestFrequency(data.digestFrequency || "off");
+      }
+    } catch { /* ignore */ }
+  }, [getToken]);
+
   useEffect(() => {
     setLoading(true);
-    Promise.all([fetchRules(), fetchHistory()]).finally(() => setLoading(false));
-  }, [fetchRules, fetchHistory]);
+    Promise.all([fetchRules(), fetchHistory(), fetchDigestPref()]).finally(() => setLoading(false));
+  }, [fetchRules, fetchHistory, fetchDigestPref]);
 
   const createAlert = async () => {
     if (!newSymbol.trim()) return;
@@ -142,6 +156,33 @@ export default function Alerts() {
     } catch { /* ignore */ }
   };
 
+  const startEdit = (rule: AlertRule) => {
+    setEditingId(rule.id);
+    setEditType(rule.alertType);
+    setEditThreshold(rule.threshold != null ? String(rule.threshold) : "");
+  };
+
+  const saveEdit = async (id: number) => {
+    try {
+      const body: Record<string, unknown> = { alertType: editType };
+      if (needsThreshold(editType)) {
+        body.threshold = parseFloat(editThreshold) || null;
+      } else {
+        body.threshold = null;
+      }
+      const res = await authFetch(`/alerts/${id}`, getToken, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setRules(prev => prev.map(r => r.id === id ? { ...r, alertType: updated.alertType, threshold: updated.threshold } : r));
+        setEditingId(null);
+      }
+    } catch { /* ignore */ }
+  };
+
   const markAllRead = async () => {
     try {
       await authFetch("/alerts/mark-read", getToken, {
@@ -150,6 +191,17 @@ export default function Alerts() {
         body: JSON.stringify({}),
       });
       setHistory(prev => prev.map(h => ({ ...h, read: true })));
+    } catch { /* ignore */ }
+  };
+
+  const updateDigestPref = async (freq: string) => {
+    setDigestFrequency(freq);
+    try {
+      await authFetch("/alerts/digest-preference", getToken, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ frequency: freq }),
+      });
     } catch { /* ignore */ }
   };
 
@@ -278,43 +330,82 @@ export default function Alerts() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {rules.map(rule => {
                   const color = getAlertTypeColor(rule.alertType);
+                  const isEditing = editingId === rule.id;
                   return (
                     <div
                       key={rule.id}
                       className={`rounded-xl border p-4 transition-all ${rule.enabled ? "bg-white/[0.02] border-white/[0.08]" : "bg-white/[0.01] border-white/[0.04] opacity-50"}`}
                       style={{ borderLeftWidth: "3px", borderLeftColor: rule.enabled ? color : "transparent" }}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${color}10` }}>
-                            <span className="text-sm font-bold font-[family-name:var(--font-mono)]" style={{ color }}>
-                              {rule.symbol.slice(0, 4)}
-                            </span>
+                      {isEditing ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-bold text-[#00D4FF] font-[family-name:var(--font-mono)]">Edit: {rule.symbol}</p>
+                            <button onClick={() => setEditingId(null)} className="p-1 text-white/30 hover:text-white">
+                              <X className="w-4 h-4" />
+                            </button>
                           </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-bold text-white font-[family-name:var(--font-mono)]">{rule.symbol}</p>
-                            <p className="text-xs text-white/30">
-                              {getAlertTypeLabel(rule.alertType)}
-                              {rule.threshold != null ? ` @ $${rule.threshold.toFixed(2)}` : ""}
-                            </p>
+                          <select
+                            value={editType}
+                            onChange={e => setEditType(e.target.value)}
+                            className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none [&>option]:bg-[#0d0d1a] [&>option]:text-white"
+                          >
+                            {ALERT_TYPE_OPTIONS.map(o => (
+                              <option key={o.value} value={o.value}>{o.label}</option>
+                            ))}
+                          </select>
+                          {needsThreshold(editType) && (
+                            <input
+                              placeholder="Threshold ($)"
+                              value={editThreshold}
+                              onChange={e => setEditThreshold(e.target.value.replace(/[^0-9.]/g, ""))}
+                              className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/30 font-[family-name:var(--font-mono)]"
+                            />
+                          )}
+                          <div className="flex gap-2">
+                            <Button onClick={() => saveEdit(rule.id)} className="flex-1 bg-[#00D4FF] text-black font-bold text-xs">Save</Button>
+                            <Button onClick={() => setEditingId(null)} variant="ghost" className="text-white/40 text-xs">Cancel</Button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => toggleAlert(rule.id, rule.enabled)}
-                            className="p-1.5 transition-colors"
-                            style={{ color: rule.enabled ? "#00ff88" : "rgba(255,255,255,0.2)" }}
-                          >
-                            {rule.enabled ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
-                          </button>
-                          <button
-                            onClick={() => deleteAlert(rule.id)}
-                            className="p-1.5 text-white/20 hover:text-[#ff3366] transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                      ) : (
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${color}10` }}>
+                              <span className="text-sm font-bold font-[family-name:var(--font-mono)]" style={{ color }}>
+                                {rule.symbol.slice(0, 4)}
+                              </span>
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-bold text-white font-[family-name:var(--font-mono)]">{rule.symbol}</p>
+                              <p className="text-xs text-white/30">
+                                {getAlertTypeLabel(rule.alertType)}
+                                {rule.threshold != null ? ` @ $${rule.threshold.toFixed(2)}` : ""}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => startEdit(rule)}
+                              className="p-1.5 text-white/20 hover:text-[#00D4FF] transition-colors"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => toggleAlert(rule.id, rule.enabled)}
+                              className="p-1.5 transition-colors"
+                              style={{ color: rule.enabled ? "#00ff88" : "rgba(255,255,255,0.2)" }}
+                            >
+                              {rule.enabled ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
+                            </button>
+                            <button
+                              onClick={() => deleteAlert(rule.id)}
+                              className="p-1.5 text-white/20 hover:text-[#ff3366] transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   );
                 })}
@@ -377,18 +468,48 @@ export default function Alerts() {
           </div>
         )}
 
-        <div className="mt-8 rounded-xl bg-white/[0.02] border border-white/[0.06] p-4">
-          <p className="text-xs font-bold text-white/30 mb-2 font-[family-name:var(--font-mono)]">SUPPORTED ALERT TYPES</p>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-            {ALERT_TYPE_OPTIONS.map(opt => {
-              const Icon = opt.icon;
-              return (
-                <div key={opt.value} className="rounded-lg bg-white/[0.02] border border-white/[0.04] p-3 text-center">
-                  <Icon className="w-5 h-5 mx-auto mb-1" style={{ color: opt.color }} />
-                  <p className="text-[11px] font-semibold text-white/60">{opt.label}</p>
-                </div>
-              );
-            })}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-4">
+            <p className="text-xs font-bold text-white/30 mb-2 font-[family-name:var(--font-mono)]">SUPPORTED ALERT TYPES</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {ALERT_TYPE_OPTIONS.map(opt => {
+                const Icon = opt.icon;
+                return (
+                  <div key={opt.value} className="rounded-lg bg-white/[0.02] border border-white/[0.04] p-3 text-center">
+                    <Icon className="w-5 h-5 mx-auto mb-1" style={{ color: opt.color }} />
+                    <p className="text-[11px] font-semibold text-white/60">{opt.label}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Mail className="w-4 h-4 text-[#00D4FF]" />
+              <p className="text-xs font-bold text-white/30 font-[family-name:var(--font-mono)]">EMAIL DIGEST</p>
+            </div>
+            <p className="text-xs text-white/30 mb-3">Receive a summary of your triggered alerts via email</p>
+            <div className="flex gap-2">
+              {[
+                { value: "off", label: "Off" },
+                { value: "daily", label: "Daily" },
+                { value: "weekly", label: "Weekly" },
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => updateDigestPref(opt.value)}
+                  className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${digestFrequency === opt.value ? "bg-[#00D4FF]/15 text-[#00D4FF] border border-[#00D4FF]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06] hover:text-white/50"}`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            {digestFrequency !== "off" && (
+              <p className="text-[10px] text-[#00ff88]/60 mt-2">
+                {digestFrequency === "daily" ? "You'll receive a daily digest at 8:00 AM UTC" : "You'll receive a weekly digest every Monday at 8:00 AM UTC"}
+              </p>
+            )}
           </div>
         </div>
       </div>

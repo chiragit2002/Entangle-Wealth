@@ -24,6 +24,7 @@ export const usersTable = pgTable("users", {
   referralCode: text("referral_code").unique(),
   referredBy: text("referred_by"),
   referralCouponApplied: boolean("referral_coupon_applied").default(false),
+  alertEmailDigest: text("alert_email_digest").default("off"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 

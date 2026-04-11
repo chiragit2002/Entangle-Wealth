@@ -2,6 +2,7 @@ const CACHE_NAME = "entangle-wealth-v1";
 const OFFLINE_URL = "/offline.html";
 
 const APP_SHELL = [
+  "/",
   "/offline.html",
   "/manifest.json",
   "/favicon.svg",

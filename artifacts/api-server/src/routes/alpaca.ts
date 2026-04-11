@@ -1,6 +1,9 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { logger } from "../lib/logger";
 import { requireAuth } from "@clerk/express";
+import { TTLCache } from "../lib/cache";
+
+const alpacaCache = new TTLCache(60_000, 300);
 
 const router = Router();
 
@@ -67,9 +70,16 @@ async function alpacaFetch(url: string) {
 router.get("/alpaca/snapshot/:symbol", async (req, res) => {
   try {
     const symbol = req.params.symbol.toUpperCase();
+    const cacheKey = `snapshot:${symbol}`;
+    const cached = alpacaCache.get(cacheKey);
+    if (cached) {
+      res.json(cached);
+      return;
+    }
     const data = await alpacaFetch(
       `${ALPACA_DATA_URL}/v2/stocks/${symbol}/snapshot`
     );
+    alpacaCache.set(cacheKey, data);
     res.json(data);
   } catch (err: any) {
     logger.error({ err }, "Alpaca snapshot fetch failed");
@@ -84,9 +94,16 @@ router.get("/alpaca/snapshots", async (req, res) => {
       res.status(400).json({ error: "symbols query param required" });
       return;
     }
+    const cacheKey = `snapshots:${symbols}`;
+    const cached = alpacaCache.get(cacheKey);
+    if (cached) {
+      res.json(cached);
+      return;
+    }
     const data = await alpacaFetch(
       `${ALPACA_DATA_URL}/v2/stocks/snapshots?symbols=${encodeURIComponent(symbols)}`
     );
+    alpacaCache.set(cacheKey, data);
     res.json(data);
   } catch (err: any) {
     logger.error({ err }, "Alpaca snapshots fetch failed");
@@ -176,6 +193,12 @@ router.get("/alpaca/account", requireAuth(), async (req, res) => {
 
 router.get("/alpaca/movers", async (req, res) => {
   try {
+    const cacheKey = "alpaca:movers";
+    const cached = alpacaCache.get(cacheKey);
+    if (cached) {
+      res.json(cached);
+      return;
+    }
     const topSymbols = "AAPL,MSFT,NVDA,GOOGL,AMZN,META,TSLA,AMD,NFLX,RKLB,PLTR,SOFI,COIN,SMCI,ARM,AVGO,CRM,UBER,SHOP,SNOW,JPM,V,BA,CRWD,PANW,LLY,UNH,XOM,GS,RIVN";
     const data = await alpacaFetch(
       `${ALPACA_DATA_URL}/v2/stocks/snapshots?symbols=${encodeURIComponent(topSymbols)}`
@@ -194,12 +217,14 @@ router.get("/alpaca/movers", async (req, res) => {
 
     entries.sort((a, b) => b.change - a.change);
 
-    res.json({
+    const result = {
       gainers: entries.filter(e => e.change > 0).slice(0, 10),
       losers: entries.filter(e => e.change < 0).sort((a, b) => a.change - b.change).slice(0, 10),
       mostActive: [...entries].sort((a, b) => b.volume - a.volume).slice(0, 10),
       all: entries,
-    });
+    };
+    alpacaCache.set(cacheKey, result);
+    res.json(result);
   } catch (err: any) {
     logger.error({ err }, "Alpaca movers fetch failed");
     res.status(502).json({ error: "Failed to fetch movers" });

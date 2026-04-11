@@ -3,6 +3,7 @@ import { createHash } from "crypto";
 import { logger } from "../lib/logger";
 import Parser from "rss-parser";
 import { getAllSymbols } from "../data/nasdaq-stocks";
+import { newsCache } from "../lib/cache";
 
 const router = Router();
 const rssParser = new Parser({
@@ -372,12 +373,19 @@ router.use("/news", newsRateLimit);
 
 router.get("/news", async (req: Request, res: Response) => {
   try {
-    const items = await scrapeAllFeeds();
-
     const topic = (req.query.topic as string) || "";
     const search = (req.query.search as string) || "";
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
     const offset = parseInt(req.query.offset as string) || 0;
+
+    const newsCacheKey = `news:${topic}:${search}:${limit}:${offset}`;
+    const cached = newsCache.get(newsCacheKey);
+    if (cached) {
+      res.json(cached);
+      return;
+    }
+
+    const items = await scrapeAllFeeds();
 
     let filtered = items;
 
@@ -404,13 +412,15 @@ router.get("/news", async (req: Request, res: Response) => {
       topicCounts[i.topic] = (topicCounts[i.topic] || 0) + 1;
     }
 
-    res.json({
+    const response = {
       items: paged,
       total,
       topics: topicCounts,
       cachedAt: cacheTime,
       feedCount: FEEDS.length,
-    });
+    };
+    newsCache.set(newsCacheKey, response);
+    res.json(response);
   } catch (err: any) {
     logger.error({ err }, "News endpoint failed");
     res.status(500).json({ error: "Failed to fetch news" });

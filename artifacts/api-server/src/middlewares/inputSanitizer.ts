@@ -70,5 +70,12 @@ export const inputSanitizer = (req: Request, res: Response, next: NextFunction) 
     return;
   }
 
+  const paramsThreat = checkObjectForThreats(req.params);
+  if (paramsThreat) {
+    logger.warn({ ip, path: req.path, threatType: paramsThreat }, "Blocked malicious input in params");
+    res.status(400).json({ error: "Invalid input detected" });
+    return;
+  }
+
   next();
 };

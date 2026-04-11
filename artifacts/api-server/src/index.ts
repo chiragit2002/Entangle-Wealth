@@ -4,6 +4,7 @@ import { logger } from "./lib/logger";
 import { WebhookHandlers } from "./webhookHandlers";
 import { runMigrations } from "stripe-replit-sync";
 import { getStripeSync } from "./stripeClient";
+import { trackConnections } from "./routes/health";
 
 const rawPort = process.env["PORT"];
 
@@ -84,12 +85,13 @@ async function initStripe() {
   }
 }
 
-server.listen(port, async (err) => {
+const httpServer = server.listen(port, async (err) => {
   if (err) {
     logger.error({ err }, "Error listening on port");
     process.exit(1);
   }
 
   logger.info({ port }, "Server listening");
+  trackConnections(httpServer);
   await initStripe();
 });

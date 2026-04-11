@@ -5,6 +5,16 @@ import { requireAuth } from "../middlewares/requireAuth";
 const router: IRouter = Router();
 
 const startTime = Date.now();
+let activeConnections = 0;
+
+export function trackConnections(server: any): void {
+  server.on("connection", (socket: any) => {
+    activeConnections++;
+    socket.on("close", () => {
+      activeConnections--;
+    });
+  });
+}
 
 router.get("/healthz", (_req, res) => {
   res.json({ status: "ok" });
@@ -30,6 +40,7 @@ router.get("/healthz/details", requireAuth, (_req, res) => {
       heapTotal: `${Math.round(mem.heapTotal / 1024 / 1024)}MB`,
       external: `${Math.round(mem.external / 1024 / 1024)}MB`,
     },
+    connections: activeConnections,
     node: process.version,
     platform: process.platform,
     auth: getAuthEventStats(),

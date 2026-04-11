@@ -21,6 +21,7 @@ import alertsRouter from "./alerts";
 import analyticsRouter from "./analytics";
 import onboardingRouter from "./onboarding";
 import supportRouter from "./support";
+import metricsRouter from "./metrics";
 
 const router: IRouter = Router();
 
@@ -46,5 +47,6 @@ router.use(alertsRouter);
 router.use(analyticsRouter);
 router.use(onboardingRouter);
 router.use(supportRouter);
+router.use(metricsRouter);
 
 export default router;

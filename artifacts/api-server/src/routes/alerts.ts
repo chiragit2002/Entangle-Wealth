@@ -164,6 +164,8 @@ router.get("/alerts/history", requireAuth, async (req: AuthenticatedRequest, res
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
   try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
+    const offset = parseInt(req.query.offset as string) || 0;
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const rows = await db
@@ -176,8 +178,18 @@ router.get("/alerts/history", requireAuth, async (req: AuthenticatedRequest, res
         )
       )
       .orderBy(desc(alertHistoryTable.triggeredAt))
-      .limit(200);
-    res.json({ history: rows });
+      .limit(limit)
+      .offset(offset);
+    const [totalResult] = await db
+      .select({ c: count() })
+      .from(alertHistoryTable)
+      .where(
+        and(
+          eq(alertHistoryTable.userId, userId),
+          gte(alertHistoryTable.triggeredAt, thirtyDaysAgo)
+        )
+      );
+    res.json({ history: rows, total: totalResult?.c || 0, limit, offset });
   } catch (err) {
     logger.error({ err }, "Failed to fetch alert history");
     res.status(500).json({ error: "Failed to fetch alert history" });

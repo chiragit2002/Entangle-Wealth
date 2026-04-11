@@ -70,6 +70,7 @@ const SubmitTicketPage = lazy(() => import("@/pages/SubmitTicket"));
 const StatusPage = lazy(() => import("@/pages/Status"));
 const AdminTicketsPage = lazy(() => import("@/pages/AdminTickets"));
 const AdminStatusPage = lazy(() => import("@/pages/AdminStatus"));
+const AdminScalabilityPage = lazy(() => import("@/pages/AdminScalability"));
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -248,6 +249,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/status">{() => <LazyPage component={StatusPage} />}</Route>
             <Route path="/admin/tickets">{() => <LazyProtected component={AdminTicketsPage} />}</Route>
             <Route path="/admin/status">{() => <LazyProtected component={AdminStatusPage} />}</Route>
+            <Route path="/admin/scalability">{() => <LazyProtected component={AdminScalabilityPage} />}</Route>
             <Route component={NotFound} />
           </Switch>
           <OnboardingProvider />

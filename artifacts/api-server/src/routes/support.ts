@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
+import { imageCompressionMiddleware } from "../middlewares/imageCompression";
 import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
 import { eq, sql } from "drizzle-orm";
@@ -73,7 +74,7 @@ const MAX_NOTES_LENGTH = 5000;
 
 const router = Router();
 
-router.post("/support/tickets", requireAuth, async (req: Request, res: Response) => {
+router.post("/support/tickets", requireAuth, imageCompressionMiddleware, async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
   const { subject, category, description, screenshotUrl } = req.body;
 
@@ -119,6 +120,8 @@ router.post("/support/tickets", requireAuth, async (req: Request, res: Response)
 
 router.get("/support/tickets", requireAuth, async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
+  const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
+  const offset = parseInt(req.query.offset as string) || 0;
 
   try {
     const result = await db.execute(sql`
@@ -126,10 +129,15 @@ router.get("/support/tickets", requireAuth, async (req: Request, res: Response) 
       FROM support_tickets
       WHERE user_id = ${userId}
       ORDER BY created_at DESC
-      LIMIT 50
+      LIMIT ${limit} OFFSET ${offset}
     `);
 
-    res.json({ tickets: result.rows });
+    const totalResult = await db.execute(sql`
+      SELECT COUNT(*) as count FROM support_tickets WHERE user_id = ${userId}
+    `);
+    const total = parseInt(totalResult.rows[0]?.count as string, 10) || 0;
+
+    res.json({ tickets: result.rows, total, limit, offset });
   } catch (err) {
     logger.error(err, "Failed to fetch user tickets");
     res.status(500).json({ error: "Failed to fetch tickets" });
@@ -146,23 +154,37 @@ router.get("/support/admin/tickets", requireAuth, async (req: Request, res: Resp
     }
 
     const statusFilter = (req.query.status as string) || "";
-    let query = sql`
-      SELECT id, user_id, user_email, subject, category, description, screenshot_url, status, admin_notes, created_at, updated_at, resolved_at
-      FROM support_tickets
-    `;
+    const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    let result;
+    let totalResult;
 
     if (statusFilter && statusFilter !== "all") {
-      query = sql`
+      result = await db.execute(sql`
         SELECT id, user_id, user_email, subject, category, description, screenshot_url, status, admin_notes, created_at, updated_at, resolved_at
         FROM support_tickets
         WHERE status = ${statusFilter}
-      `;
+        ORDER BY created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `);
+      totalResult = await db.execute(sql`
+        SELECT COUNT(*) as count FROM support_tickets WHERE status = ${statusFilter}
+      `);
+    } else {
+      result = await db.execute(sql`
+        SELECT id, user_id, user_email, subject, category, description, screenshot_url, status, admin_notes, created_at, updated_at, resolved_at
+        FROM support_tickets
+        ORDER BY created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `);
+      totalResult = await db.execute(sql`
+        SELECT COUNT(*) as count FROM support_tickets
+      `);
     }
 
-    query = sql`${query} ORDER BY created_at DESC LIMIT 200`;
-
-    const result = await db.execute(query);
-    res.json({ tickets: result.rows });
+    const total = parseInt(totalResult.rows[0]?.count as string, 10) || 0;
+    res.json({ tickets: result.rows, total, limit, offset });
   } catch (err) {
     logger.error(err, "Failed to fetch admin tickets");
     res.status(500).json({ error: "Failed to fetch tickets" });

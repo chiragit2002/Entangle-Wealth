@@ -58,6 +58,25 @@ async function ensureAlertTables() {
   }
 }
 
+async function ensurePerformanceIndexes() {
+  try {
+    const client = await pool.connect();
+    try {
+      await client.query(`
+        CREATE INDEX IF NOT EXISTS idx_users_created_at ON users (created_at);
+        CREATE INDEX IF NOT EXISTS idx_users_subscription_tier ON users (subscription_tier);
+        CREATE INDEX IF NOT EXISTS idx_alert_history_user_triggered ON alert_history (user_id, triggered_at);
+        CREATE INDEX IF NOT EXISTS idx_support_tickets_user_status ON support_tickets (user_id, status);
+      `);
+      logger.info("Performance indexes ensured");
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    logger.warn({ error: err }, "Failed to ensure performance indexes (non-fatal)");
+  }
+}
+
 const rawPort = process.env["PORT"];
 
 if (!rawPort) {
@@ -149,6 +168,9 @@ const httpServer = server.listen(port, async (err) => {
     logger.warn({ error: err }, "Failed to seed referral badges (non-fatal)")
   );
   await ensureAlertTables();
+  ensurePerformanceIndexes().catch((err) =>
+    logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
+  );
   startAlertEvaluator();
   startDigestScheduler();
   await initStripe();

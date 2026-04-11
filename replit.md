@@ -72,6 +72,7 @@ The project uses a pnpm workspace monorepo.
 - **Volatility Lab**: Multi-timeframe realized volatility analysis with institutional-grade risk metrics. Computes annualized vol at 5 timeframes, vol term structure chart, daily return distribution histogram, vol regime detection, and risk ratios.
 - **Legal**: Terms of Use, Privacy Policy, Cookie Policy, Financial Disclaimer, DMCA Policy, Accessibility Statement. CookieConsentBanner (localStorage `ew_cookie_consent`), FinancialDisclaimerBanner (dismissible per page on Dashboard/Analysis/Options/Market pages). All pages have attorney-review flags.
 - **Support System**: Help Center (`/help`) with searchable FAQ (35 questions, 6 categories), ticket submission (`/submit-ticket`) with auth-protected form, System Status page (`/status`) with 5 service monitors and 30-day incident history, Admin Tickets page (`/admin/tickets`) for managing support tickets with status workflow. Floating HelpWidget on all pages with quick FAQ search. DB tables: `support_tickets`, `service_status`, `status_incidents`.
+- **Performance & Scalability**: All list endpoints paginated (max 50 per page). DB indexes on frequently queried columns (users.createdAt, subscriptionTier, alert_history userId+triggeredAt, support_tickets userId+status). AI request queue (max 5 concurrent Claude calls, FIFO). Exponential backoff with jitter on Alpaca/Anthropic calls (1s-8s). Circuit breaker pattern (5 failures → 60s open). Image compression via sharp (1200px, 80% JPEG). `/api/metrics` endpoint with uptime, memory, event loop lag, request counts, circuit states, AI queue status. Slow request logging (>2s). Admin Scalability Dashboard (`/admin/scalability`) with real-time health checklist, circuit breaker states, AI queue depth, and cache stats.
 - **EntangleCoin Token System**:
     - **Token Wallet**: ENTGL balance, Ethereum wallet linking (Sepolia testnet), transaction history, token valuation, supply info.
     - **Travel Marketplace**: Luxury hotel/flight listings bookable with ENTGL tokens.
@@ -89,9 +90,10 @@ The project uses a pnpm workspace monorepo.
 - Express 5 server with Clerk middleware.
 - **Security**: Helmet for HTTP security headers. Global rate limit of 120 req/min with `express-rate-limit`. AI-specific rate limit of 15 req/min on AI-related endpoints.
 - Stripe webhook endpoint for payment events.
-- **Alpaca Market Data**: Proxy routes to Alpaca Markets API.
+- **Alpaca Market Data**: Proxy routes to Alpaca Markets API with circuit breaker and exponential backoff retry.
 - **News Intelligence**: `/api/news` endpoint with RSS feed scraping, relevance scoring, sentiment analysis, ticker extraction, category filtering, search, pagination, and 5-min cache.
-- **Routes**: Health checks, stock data, AI analysis, user management, résumé operations, job search, KYC, Stripe config, TaxGPT, document analysis, Alpaca proxy, news intelligence, gamification, token system, and marketing content generation.
+- **Performance**: Metrics middleware (request count, avg response time, slow request logging >2s). AI request queue (max 5 concurrent). Circuit breakers for Alpaca and Anthropic. Exponential backoff with jitter for external API calls. Image compression middleware (sharp). DB performance indexes added at startup.
+- **Routes**: Health checks, stock data, AI analysis, user management, résumé operations, job search, KYC, Stripe config, TaxGPT, document analysis, Alpaca proxy, news intelligence, gamification, token system, marketing content generation, metrics, and support.
 
 # External Dependencies
 

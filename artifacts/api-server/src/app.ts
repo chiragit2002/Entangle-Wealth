@@ -10,6 +10,7 @@ import { inputSanitizer } from "./middlewares/inputSanitizer";
 import { bruteForceGuard } from "./middlewares/bruteForce";
 import { csrfProtection } from "./middlewares/csrfProtection";
 import { authEventTracker } from "./middlewares/authEventTracker";
+import { metricsMiddleware } from "./middlewares/metricsMiddleware";
 import router from "./routes";
 import seoRouter from "./routes/seo";
 import { logger } from "./lib/logger";
@@ -122,6 +123,8 @@ app.use(
     },
   }),
 );
+
+app.use(metricsMiddleware);
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 

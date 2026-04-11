@@ -3,6 +3,9 @@ import { requireAuth } from "../middlewares/requireAuth";
 import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
+import { aiQueue } from "../lib/aiQueue";
+import { anthropicCircuit } from "../lib/circuitBreaker";
+import { retryWithBackoff } from "../lib/retryWithBackoff";
 
 const router = Router();
 
@@ -220,17 +223,25 @@ router.post("/marketing/generate", requireAuth, async (req, res) => {
     const toneInstruction = tone ? TONE_INSTRUCTIONS[tone] : TONE_INSTRUCTIONS.educational;
     const contextBlock = context ? `\n\nAdditional context from the user:\n${context}` : "";
 
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 8192,
-      system: `${platformConfig.systemPrompt}\n\n${toneInstruction}\n\nPlatform character limit: ${platformConfig.maxChars} characters. Stay well within this limit.`,
-      messages: [
-        {
-          role: "user",
-          content: `Create ${platformConfig.name} content about the following topic:\n\n${topic}${contextBlock}`
-        }
-      ]
-    });
+    const message = await aiQueue.enqueue(() =>
+      anthropicCircuit.execute(() =>
+        retryWithBackoff(
+          () =>
+            client.messages.create({
+              model: "claude-sonnet-4-6",
+              max_tokens: 8192,
+              system: `${platformConfig.systemPrompt}\n\n${toneInstruction}\n\nPlatform character limit: ${platformConfig.maxChars} characters. Stay well within this limit.`,
+              messages: [
+                {
+                  role: "user",
+                  content: `Create ${platformConfig.name} content about the following topic:\n\n${topic}${contextBlock}`,
+                },
+              ],
+            }),
+          { label: "anthropic-marketing", maxRetries: 2 }
+        )
+      )
+    );
 
     const block = message.content?.[0];
     const content = block && block.type === "text" ? block.text : "";

@@ -2,6 +2,8 @@ import { Router, type Request, type Response, type NextFunction } from "express"
 import { logger } from "../lib/logger";
 import { requireAuth } from "@clerk/express";
 import { TTLCache } from "../lib/cache";
+import { retryWithBackoff } from "../lib/retryWithBackoff";
+import { alpacaCircuit } from "../lib/circuitBreaker";
 
 const alpacaCache = new TTLCache(60_000, 300);
 
@@ -57,7 +59,7 @@ function alpacaHeaders() {
   };
 }
 
-async function alpacaFetch(url: string) {
+async function alpacaFetchRaw(url: string) {
   const res = await fetch(url, { headers: alpacaHeaders() });
   if (!res.ok) {
     const body = await res.text();
@@ -65,6 +67,12 @@ async function alpacaFetch(url: string) {
     throw new Error(`Alpaca ${res.status}: ${body}`);
   }
   return res.json();
+}
+
+async function alpacaFetch(url: string) {
+  return alpacaCircuit.execute(
+    () => retryWithBackoff(() => alpacaFetchRaw(url), { label: "alpaca", maxRetries: 3 }),
+  );
 }
 
 router.get("/alpaca/snapshot/:symbol", async (req, res) => {

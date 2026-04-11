@@ -172,21 +172,25 @@ router.put("/users/me", requireAuth, async (req, res) => {
 router.get("/users/:userId/profile", async (req, res) => {
   try {
     const [user] = await db
-      .select()
+      .select({
+        id: usersTable.id,
+        firstName: usersTable.firstName,
+        lastName: usersTable.lastName,
+        photoUrl: usersTable.photoUrl,
+        headline: usersTable.headline,
+        bio: usersTable.bio,
+        location: usersTable.location,
+        subscriptionTier: usersTable.subscriptionTier,
+        createdAt: usersTable.createdAt,
+        isPublicProfile: usersTable.isPublicProfile,
+      })
       .from(usersTable)
       .where(eq(usersTable.id, req.params.userId));
     if (!user || !user.isPublicProfile) {
       res.status(404).json({ error: "Profile not found" });
       return;
     }
-    const {
-      stripeCustomerId,
-      stripeSubscriptionId,
-      kycStatus,
-      kycSubmittedAt,
-      kycVerifiedAt,
-      ...publicProfile
-    } = user;
+    const { isPublicProfile, ...publicProfile } = user;
     res.json(publicProfile);
   } catch (error) {
     console.error("Error fetching profile:", error);

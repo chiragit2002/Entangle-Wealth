@@ -339,6 +339,147 @@ function escapeCsvField(val: string): string {
   return val;
 }
 
+const BEST_TIME_DEFAULTS: Record<string, string> = {
+  reddit: "09:00",
+  facebook: "13:00",
+  instagram: "10:00",
+  twitter: "12:00",
+  linkedin: "08:00",
+  github: "10:00",
+  blog: "09:00",
+  email: "06:00",
+  community: "09:00",
+};
+
+function ExportModal({
+  queue,
+  onClose,
+}: {
+  queue: QueueItem[];
+  onClose: () => void;
+}) {
+  const { toast } = useToast();
+  const [exportStatus, setExportStatus] = useState<QueueItem["status"] | "all">("all");
+  const [exportFrom, setExportFrom] = useState("");
+  const [exportTo, setExportTo] = useState("");
+
+  const filteredForExport = useMemo(() => {
+    let items = queue.filter((q) => q.scheduledDate);
+    if (exportStatus !== "all") items = items.filter((q) => q.status === exportStatus);
+    if (exportFrom) items = items.filter((q) => (q.scheduledDate || "") >= exportFrom);
+    if (exportTo) items = items.filter((q) => (q.scheduledDate || "") <= exportTo);
+    return items.sort((a, b) => (a.scheduledDate || "").localeCompare(b.scheduledDate || ""));
+  }, [queue, exportStatus, exportFrom, exportTo]);
+
+  const doExport = () => {
+    if (filteredForExport.length === 0) {
+      toast({ title: "Nothing to export", description: "No content matches your filters", variant: "destructive" });
+      return;
+    }
+    const rows = [
+      ["Date", "Time", "Platform", "Content", "Status"].join(","),
+      ...filteredForExport.map((item) => {
+        const time = BEST_TIME_DEFAULTS[item.platform] || "09:00";
+        return [
+          item.scheduledDate || "",
+          time,
+          escapeCsvField(item.platformName),
+          escapeCsvField(item.content),
+          item.status.charAt(0).toUpperCase() + item.status.slice(1),
+        ].join(",");
+      }),
+    ];
+    const blob = new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `entangle-content-${toDateKey(new Date())}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: "Exported", description: `${filteredForExport.length} items exported to CSV` });
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="w-full max-w-md rounded-xl border border-white/[0.08] p-5 space-y-4"
+        style={{ background: "rgba(8,8,20,0.98)" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+            <Download className="w-4 h-4 text-primary" /> Export to CSV
+          </h3>
+          <button onClick={onClose} className="text-muted-foreground hover:text-white"><X className="w-4 h-4" /></button>
+        </div>
+
+        <div>
+          <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Filter by Status</label>
+          <div className="flex flex-wrap gap-1.5">
+            {(["all", "draft", "approved", "posted", "archived"] as const).map((s) => (
+              <button
+                key={s}
+                onClick={() => setExportStatus(s)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  exportStatus === s
+                    ? "bg-primary/20 text-primary border border-primary/30"
+                    : "bg-white/[0.03] text-white/50 border border-white/[0.06] hover:bg-white/[0.06]"
+                }`}
+              >
+                {s.charAt(0).toUpperCase() + s.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">From Date</label>
+            <input
+              type="date"
+              value={exportFrom}
+              onChange={(e) => setExportFrom(e.target.value)}
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/40"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">To Date</label>
+            <input
+              type="date"
+              value={exportTo}
+              onChange={(e) => setExportTo(e.target.value)}
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/40"
+            />
+          </div>
+        </div>
+
+        <div className="text-[10px] text-muted-foreground">
+          {filteredForExport.length} item{filteredForExport.length !== 1 ? "s" : ""} match your filters. Time defaults to each platform's best posting time (HH:MM format).
+        </div>
+
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="border-white/10 text-xs flex-1" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            className="bg-primary/20 text-primary hover:bg-primary/30 border border-primary/20 text-xs flex-1 gap-1.5"
+            onClick={doExport}
+            disabled={filteredForExport.length === 0}
+          >
+            <Download className="w-3.5 h-3.5" /> Export {filteredForExport.length} Items
+          </Button>
+        </div>
+
+        <p className="text-[9px] text-muted-foreground">
+          CSV format: Date, Time, Platform, Content, Status — compatible with Buffer, Hootsuite, and Later.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function ContentCalendar() {
   const { getToken } = useAuth();
   const { toast } = useToast();
@@ -346,6 +487,7 @@ export default function ContentCalendar() {
   const [authorized, setAuthorized] = useState(false);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [showExport, setShowExport] = useState(false);
 
   const now = new Date();
   const [viewYear, setViewYear] = useState(now.getFullYear());
@@ -401,39 +543,6 @@ export default function ContentCalendar() {
 
   const unscheduledItems = useMemo(() => queue.filter((q) => !q.scheduledDate), [queue]);
 
-  const exportCsv = () => {
-    const scheduled = queue.filter((q) => q.scheduledDate);
-    if (scheduled.length === 0) {
-      toast({ title: "Nothing to export", description: "No scheduled content found", variant: "destructive" });
-      return;
-    }
-    const rows = [
-      ["Date", "Time", "Platform", "Content", "Status", "Topic", "Tone"].join(","),
-      ...scheduled
-        .sort((a, b) => (a.scheduledDate || "").localeCompare(b.scheduledDate || ""))
-        .map((item) => {
-          const bestTime = BEST_TIMES[item.platform];
-          return [
-            item.scheduledDate || "",
-            bestTime ? `${bestTime.time} ${bestTime.timezone}` : "",
-            escapeCsvField(item.platformName),
-            escapeCsvField(item.content),
-            item.status,
-            escapeCsvField(item.topic),
-            item.tone,
-          ].join(",");
-        }),
-    ];
-    const blob = new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `entangle-content-calendar-${toDateKey(now)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast({ title: "Exported", description: `${scheduled.length} items exported to CSV` });
-  };
-
   const scheduleUnscheduled = (itemId: string) => {
     const today = toDateKey(now);
     updateQueue(queue.map((q) => (q.id === itemId ? { ...q, scheduledDate: today } : q)));
@@ -480,7 +589,7 @@ export default function ContentCalendar() {
             <p className="text-muted-foreground mt-1 text-sm">Schedule, review, and track content across all platforms</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="border-white/10 gap-1.5 text-xs" onClick={exportCsv}>
+            <Button variant="outline" size="sm" className="border-white/10 gap-1.5 text-xs" onClick={() => setShowExport(true)}>
               <Download className="w-3.5 h-3.5" /> Export CSV
             </Button>
           </div>
@@ -577,6 +686,8 @@ export default function ContentCalendar() {
           </p>
         </div>
       </div>
+
+      {showExport && <ExportModal queue={queue} onClose={() => setShowExport(false)} />}
     </Layout>
   );
 }

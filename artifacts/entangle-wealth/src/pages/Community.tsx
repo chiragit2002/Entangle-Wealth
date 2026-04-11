@@ -117,7 +117,7 @@ function sanitize(str: string): string {
 }
 
 export default function Community() {
-  useEffect(() => { trackEvent("community_viewed"); }, []);
+  useEffect(() => { trackEvent("community_post"); }, []);
   const { toast } = useToast();
   const [tab, setTab] = useState<Tab>("communities");
   const [commFilter, setCommFilter] = useState("all");

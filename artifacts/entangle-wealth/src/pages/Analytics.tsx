@@ -37,16 +37,23 @@ interface DashboardData {
     wau: number;
     mau: number;
     proUsers: number;
+    businessUsers: number;
     freeUsers: number;
     conversionRate: number;
     totalEvents: number;
+    mrr: number;
+    arr: number;
+    churnRate: number;
+    ltv: number;
+    visitors: number;
   };
   tierCounts: Record<string, number>;
+  conversionFunnel: { stage: string; value: number }[];
   dailySignups: { date: string; count: number }[];
   featureUsage: { event: string; count: number }[];
   dailyEvents: { date: string; count: number }[];
   referralFunnel: { clicks: number; signups: number; conversions: number };
-  contentByPlatform: { platform: string; count: number }[];
+  contentByPlatform: { platform: string; status: string; count: number }[];
 }
 
 const COLORS = ["#00D4FF", "#FFD700", "#00ff88", "#ff3366", "#9c27b0", "#ff9800", "#4caf50", "#2196f3"];
@@ -140,12 +147,13 @@ export default function Analytics() {
     fetchDashboard();
   }, []);
 
+  const FUNNEL_COLORS = ["#00D4FF", "#FFD700", "#00ff88", "#9c27b0"];
   const funnelData = data
-    ? [
-        { name: "Total Users", value: data.kpi.totalUsers, fill: "#00D4FF" },
-        { name: "Free Users", value: data.kpi.freeUsers, fill: "#FFD700" },
-        { name: "Pro Users", value: data.kpi.proUsers, fill: "#00ff88" },
-      ]
+    ? data.conversionFunnel.map((item, i) => ({
+        name: item.stage,
+        value: item.value,
+        fill: FUNNEL_COLORS[i % FUNNEL_COLORS.length],
+      }))
     : [];
 
   const tierPieData = data
@@ -204,10 +212,10 @@ export default function Analytics() {
               <KPICard label="DAU (24h)" value={data.kpi.dau.toLocaleString()} icon={Activity} color="#00ff88" />
               <KPICard label="WAU (7d)" value={data.kpi.wau.toLocaleString()} icon={TrendingUp} color="#FFD700" />
               <KPICard label="MAU (30d)" value={data.kpi.mau.toLocaleString()} icon={Zap} color="#9c27b0" />
-              <KPICard label="Pro Users" value={data.kpi.proUsers.toLocaleString()} icon={Target} color="#00ff88" trend="up" />
-              <KPICard label="Free Users" value={data.kpi.freeUsers.toLocaleString()} icon={Users} color="#FFD700" />
-              <KPICard label="Conversion Rate" value={`${data.kpi.conversionRate}%`} icon={ArrowUpRight} color="#ff9800" />
-              <KPICard label="Total Events" value={data.kpi.totalEvents.toLocaleString()} icon={BarChart3} color="#2196f3" />
+              <KPICard label="MRR" value={`$${data.kpi.mrr.toLocaleString()}`} icon={BarChart3} color="#00ff88" trend="up" />
+              <KPICard label="ARR" value={`$${data.kpi.arr.toLocaleString()}`} icon={TrendingUp} color="#FFD700" />
+              <KPICard label="Churn Rate" value={`${data.kpi.churnRate}%`} icon={ArrowDownRight} color="#ff3366" trend={data.kpi.churnRate > 5 ? "down" : "neutral"} />
+              <KPICard label="LTV" value={`$${data.kpi.ltv.toLocaleString()}`} icon={Target} color="#00D4FF" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -269,7 +277,7 @@ export default function Analytics() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-              <ChartCard title="Conversion Funnel">
+              <ChartCard title="Conversion Funnel: Visitor → Free → Pro → Business">
                 <div className="space-y-4">
                   {funnelData.map((item, i) => {
                     const maxVal = funnelData[0].value || 1;
@@ -395,26 +403,19 @@ export default function Analytics() {
                 </div>
               </ChartCard>
 
-              <ChartCard title="Content by Platform">
+              <ChartCard title="Content by Platform & Status">
                 {data.contentByPlatform.length > 0 ? (
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={data.contentByPlatform}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                        <XAxis dataKey="platform" stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 11, fill: "rgba(255,255,255,0.4)" }} />
-                        <YAxis stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 11, fill: "rgba(255,255,255,0.4)" }} />
-                        <Tooltip
-                          contentStyle={{
-                            background: "rgba(8,8,20,0.95)",
-                            border: "1px solid rgba(255,255,255,0.1)",
-                            borderRadius: "8px",
-                            color: "white",
-                            fontSize: "12px",
-                          }}
-                        />
-                        <Bar dataKey="count" fill="#FFD700" radius={[4, 4, 0, 0]} name="Content Items" />
-                      </BarChart>
-                    </ResponsiveContainer>
+                  <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
+                    {data.contentByPlatform.map((item, i) => (
+                      <div key={`${item.platform}-${item.status}-${i}`} className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
+                          <span className="text-white/70">{item.platform}</span>
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono" style={{ background: "rgba(255,255,255,0.05)", color: item.status === "published" ? "#00ff88" : item.status === "draft" ? "#FFD700" : "#fff6" }}>{item.status}</span>
+                        </div>
+                        <span className="text-white font-mono">{item.count.toLocaleString()}</span>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <div className="h-80 flex items-center justify-center text-white/30 text-sm">

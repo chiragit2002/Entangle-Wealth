@@ -90,9 +90,44 @@ router.get("/analytics/dashboard", requireAuth, async (req: AuthenticatedRequest
         tierCounts[row.subscription_tier || "free"] = parseInt(row.count, 10);
       }
 
-      const proUsers = (tierCounts["pro"] || 0) + (tierCounts["business"] || 0);
+      const proUsers = tierCounts["pro"] || 0;
+      const businessUsers = tierCounts["business"] || 0;
       const freeUsers = tierCounts["free"] || 0;
-      const conversionRate = totalUsers > 0 ? ((proUsers / totalUsers) * 100).toFixed(1) : "0";
+      const paidUsers = proUsers + businessUsers;
+      const conversionRate = totalUsers > 0 ? ((paidUsers / totalUsers) * 100).toFixed(1) : "0";
+
+      const proPriceMonthly = 29;
+      const businessPriceMonthly = 99;
+      const mrr = proUsers * proPriceMonthly + businessUsers * businessPriceMonthly;
+      const arr = mrr * 12;
+
+      const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+      const churnResult = await client.query(
+        `SELECT COUNT(*) as count FROM users
+         WHERE subscription_tier = 'free'
+         AND updated_at >= $1
+         AND stripe_subscription_id IS NOT NULL`,
+        [thirtyDaysAgo]
+      );
+      const churnedUsers = parseInt(churnResult.rows[0].count, 10);
+      const activeSubsLastMonth = await client.query(
+        `SELECT COUNT(*) as count FROM users
+         WHERE subscription_tier IN ('pro', 'business')
+         OR (subscription_tier = 'free' AND stripe_subscription_id IS NOT NULL AND updated_at >= $1)`,
+        [sixtyDaysAgo]
+      );
+      const totalSubBase = parseInt(activeSubsLastMonth.rows[0].count, 10) || 1;
+      const churnRate = parseFloat(((churnedUsers / totalSubBase) * 100).toFixed(1));
+
+      const avgRevenuePerUser = paidUsers > 0 ? mrr / paidUsers : 0;
+      const monthlyChurnDecimal = churnRate / 100 || 0.01;
+      const ltv = parseFloat((avgRevenuePerUser / monthlyChurnDecimal).toFixed(0));
+
+      const visitorResult = await client.query(
+        "SELECT COUNT(DISTINCT session_id) as count FROM analytics_events WHERE created_at >= $1 AND user_id IS NULL",
+        [thirtyDaysAgo]
+      );
+      const visitors = parseInt(visitorResult.rows[0].count, 10);
 
       const dailySignupsResult = await client.query(
         `SELECT DATE(created_at) as day, COUNT(*) as count
@@ -150,15 +185,17 @@ router.get("/analytics/dashboard", requireAuth, async (req: AuthenticatedRequest
       const contentResult = await client.query(
         `SELECT
            COALESCE((properties->>'platform')::text, 'unknown') as platform,
+           COALESCE((properties->>'status')::text, 'unknown') as status,
            COUNT(*) as count
          FROM analytics_events
          WHERE event LIKE 'content_%' AND created_at >= $1
-         GROUP BY platform
+         GROUP BY platform, status
          ORDER BY count DESC`,
         [thirtyDaysAgo]
       );
-      const contentByPlatform = contentResult.rows.map((r: { platform: string; count: string }) => ({
+      const contentByPlatform = contentResult.rows.map((r: { platform: string; status: string; count: string }) => ({
         platform: r.platform,
+        status: r.status,
         count: parseInt(r.count, 10),
       }));
 
@@ -172,11 +209,23 @@ router.get("/analytics/dashboard", requireAuth, async (req: AuthenticatedRequest
           wau,
           mau,
           proUsers,
+          businessUsers,
           freeUsers,
           conversionRate: parseFloat(conversionRate),
           totalEvents,
+          mrr,
+          arr,
+          churnRate,
+          ltv,
+          visitors,
         },
         tierCounts,
+        conversionFunnel: [
+          { stage: "Visitors", value: visitors },
+          { stage: "Free", value: freeUsers },
+          { stage: "Pro", value: proUsers },
+          { stage: "Business", value: businessUsers },
+        ],
         dailySignups,
         featureUsage,
         dailyEvents,

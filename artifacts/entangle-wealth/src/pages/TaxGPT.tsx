@@ -104,7 +104,7 @@ export default function TaxGPT() {
   const profile = getActiveProfile();
   const profileId = profile?.id || "default";
 
-  useEffect(() => { trackEvent("taxgpt_used"); }, []);
+  useEffect(() => { trackEvent("taxflow_scan"); }, []);
 
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     const saved = getChatHistory(profileId);

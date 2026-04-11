@@ -11,6 +11,7 @@ import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { NotificationPrompt } from "@/components/pwa/NotificationPrompt";
 import { PageSkeleton, ChartSkeleton, TableSkeleton } from "@/components/pwa/PageSkeleton";
 import { captureReferralCode } from "@/lib/referral";
+import { trackEvent } from "@/lib/trackEvent";
 
 import Home from "@/pages/Home";
 
@@ -101,6 +102,17 @@ function ClerkQueryClientCacheInvalidator() {
       const userId = user?.id ?? null;
       if (prevUserIdRef.current !== undefined && prevUserIdRef.current !== userId) {
         qc.clear();
+      }
+      if (userId && prevUserIdRef.current === null) {
+        const accounts = user?.externalAccounts || [];
+        const provider = accounts.length > 0 ? accounts[0].provider : "email";
+        if (provider === "google" || provider === "oauth_google") {
+          trackEvent("login_oauth_google");
+        } else if (provider === "github" || provider === "oauth_github") {
+          trackEvent("login_oauth_github");
+        } else {
+          trackEvent("login_email");
+        }
       }
       prevUserIdRef.current = userId;
     });

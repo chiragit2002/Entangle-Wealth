@@ -38,6 +38,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/research", label: "News Intel", desc: "MiroFish feeds" },
       { href: "/stocks", label: "Stocks", desc: "5,000 NASDAQ" },
+      { href: "/blog", label: "Blog", desc: "Insights & education" },
     ],
   },
   {
@@ -99,6 +100,7 @@ const MOBILE_SECTIONS = [
     links: [
       { href: "/research", label: "News Intel" },
       { href: "/stocks", label: "Stocks" },
+      { href: "/blog", label: "Blog" },
     ],
   },
   {
@@ -198,6 +200,7 @@ const ADMIN_NAV_GROUP: NavGroup = {
     { href: "/marketing", label: "Marketing AI", desc: "9-agent command center" },
     { href: "/content-calendar", label: "Content Calendar", desc: "Schedule & review" },
     { href: "/reddit-engine", label: "Reddit Engine", desc: "Subreddit targeting" },
+    { href: "/seo", label: "SEO Engine", desc: "Keywords & blog" },
   ],
 };
 
@@ -208,6 +211,7 @@ const ADMIN_MOBILE_SECTION = {
     { href: "/marketing", label: "Marketing AI" },
     { href: "/content-calendar", label: "Calendar" },
     { href: "/reddit-engine", label: "Reddit Engine" },
+    { href: "/seo", label: "SEO Engine" },
   ],
 };
 

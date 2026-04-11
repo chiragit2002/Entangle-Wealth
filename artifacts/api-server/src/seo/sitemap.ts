@@ -98,6 +98,7 @@ export function generatePagesSitemap(): string {
     { path: "/about", priority: "0.4", freq: "monthly" },
     { path: "/terms", priority: "0.3", freq: "yearly" },
     { path: "/privacy", priority: "0.3", freq: "yearly" },
+    { path: "/blog", priority: "0.8", freq: "daily" },
   ];
   return urlset(pages.map(p => ({ loc: `${SITE_URL}${p.path}`, freq: p.freq, priority: p.priority })));
 }
@@ -115,15 +116,26 @@ Allow: /strategies/
 Allow: /patterns/
 Allow: /sectors/
 Allow: /compare/
+Allow: /blog/
 Disallow: /api/
 Disallow: /sign-in
 Disallow: /sign-up
 Disallow: /profile
+Disallow: /token-admin
+Disallow: /marketing
+Disallow: /content-calendar
+Disallow: /reddit-engine
+Disallow: /seo
 
 User-agent: *
 Disallow: /api/
 Disallow: /sign-in
 Disallow: /sign-up
 Disallow: /profile
+Disallow: /token-admin
+Disallow: /marketing
+Disallow: /content-calendar
+Disallow: /reddit-engine
+Disallow: /seo
 `;
 }

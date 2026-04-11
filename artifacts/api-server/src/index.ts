@@ -118,6 +118,25 @@ async function ensureGamificationTables() {
         );
         CREATE INDEX IF NOT EXISTS idx_daily_spins_user ON daily_spins (user_id);
       `);
+
+      const colTypeResult = await client.query(`
+        SELECT data_type FROM information_schema.columns
+        WHERE table_name = 'streaks' AND column_name = 'last_activity_date';
+      `);
+      if (colTypeResult.rows[0]?.data_type === 'text') {
+        await client.query(`
+          ALTER TABLE streaks
+          ALTER COLUMN last_activity_date TYPE timestamptz
+          USING CASE
+            WHEN last_activity_date IS NULL THEN NULL
+            WHEN last_activity_date ~ '^\\d{4}-\\d{2}-\\d{2}$'
+              THEN (last_activity_date || 'T00:00:00Z')::timestamptz
+            ELSE last_activity_date::timestamptz
+          END;
+        `);
+        logger.info("Migrated streaks.last_activity_date from text to timestamptz");
+      }
+
       logger.info("Gamification tables ensured");
     } finally {
       client.release();

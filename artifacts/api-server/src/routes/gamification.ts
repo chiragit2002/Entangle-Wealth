@@ -17,6 +17,7 @@ import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
+import { evaluateStreak } from "../lib/streakUtils";
 
 const router = Router();
 
@@ -165,7 +166,7 @@ router.post("/gamification/xp", requireAuth, async (req, res) => {
 
 router.post("/gamification/streak/checkin", requireAuth, async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
-  const today = new Date().toISOString().split("T")[0];
+  const now = new Date();
 
   try {
     const userId = await resolveUserId(clerkId, req);
@@ -176,23 +177,16 @@ router.post("/gamification/streak/checkin", requireAuth, async (req, res) => {
 
     let [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
     if (!streak) {
-      [streak] = await db.insert(streaksTable).values({ userId, currentStreak: 1, longestStreak: 1, lastActivityDate: today, multiplier: 1.0 }).returning();
+      [streak] = await db.insert(streaksTable).values({ userId, currentStreak: 1, longestStreak: 1, lastActivityDate: now, multiplier: 1.0 }).returning();
       res.json(streak);
       return;
     }
 
-    if (streak.lastActivityDate === today) {
+    const { newStreak, alreadyActive } = evaluateStreak(streak.lastActivityDate, streak.currentStreak, now);
+
+    if (alreadyActive) {
       res.json({ ...streak, alreadyCheckedIn: true });
       return;
-    }
-
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split("T")[0];
-
-    let newStreak = 1;
-    if (streak.lastActivityDate === yesterdayStr) {
-      newStreak = streak.currentStreak + 1;
     }
 
     const newMultiplier = Math.min(1.0 + (newStreak - 1) * 0.1, 3.0);
@@ -202,9 +196,9 @@ router.post("/gamification/streak/checkin", requireAuth, async (req, res) => {
       .set({
         currentStreak: newStreak,
         longestStreak: newLongest,
-        lastActivityDate: today,
+        lastActivityDate: now,
         multiplier: newMultiplier,
-        updatedAt: new Date(),
+        updatedAt: now,
       })
       .where(eq(streaksTable.userId, userId))
       .returning();
@@ -647,18 +641,15 @@ router.post("/gamification/spin", requireAuth, async (req, res) => {
       [streak] = await db.insert(streaksTable).values({ userId, currentStreak: 0, longestStreak: 0, multiplier: 1.0 }).returning();
     }
 
-    const today = now.toISOString().split("T")[0];
-    const yesterday = new Date(now);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split("T")[0];
+    const { newStreak: spinNewStreak, alreadyActive: spinAlreadyActive } = evaluateStreak(streak.lastActivityDate, streak.currentStreak, now);
 
     let newStreak = streak.currentStreak;
-    if (streak.lastActivityDate !== today) {
-      newStreak = streak.lastActivityDate === yesterdayStr ? streak.currentStreak + 1 : 1;
+    if (!spinAlreadyActive) {
+      newStreak = spinNewStreak;
       const newMultiplier = Math.min(1.0 + (newStreak - 1) * 0.1, 3.0);
       const newLongest = Math.max(streak.longestStreak, newStreak);
       [streak] = await db.update(streaksTable)
-        .set({ currentStreak: newStreak, longestStreak: newLongest, lastActivityDate: today, multiplier: newMultiplier, updatedAt: new Date() })
+        .set({ currentStreak: newStreak, longestStreak: newLongest, lastActivityDate: now, multiplier: newMultiplier, updatedAt: now })
         .where(eq(streaksTable.userId, userId))
         .returning();
     }
@@ -773,8 +764,7 @@ router.get("/gamification/status", requireAuth, async (req, res) => {
       ? Math.min(Math.max(((xpRow.totalXp - currentLevelXp) / (nextLevelXp - currentLevelXp)) * 100, 0), 100)
       : 100;
 
-    const today = new Date().toISOString().split("T")[0];
-    const alreadyClaimedDaily = streak.lastActivityDate === today;
+    const { alreadyActive: alreadyClaimedDaily } = evaluateStreak(streak?.lastActivityDate, streak?.currentStreak ?? 0);
 
     res.json({
       xp: xpRow,
@@ -800,7 +790,7 @@ router.get("/gamification/status", requireAuth, async (req, res) => {
 
 router.post("/gamification/claim-daily", requireAuth, async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
-  const today = new Date().toISOString().split("T")[0];
+  const now = new Date();
 
   try {
     const userId = await resolveUserId(clerkId, req);
@@ -808,28 +798,22 @@ router.post("/gamification/claim-daily", requireAuth, async (req, res) => {
 
     let [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
     if (!streak) {
-      [streak] = await db.insert(streaksTable).values({ userId, currentStreak: 1, longestStreak: 1, lastActivityDate: today, multiplier: 1.0 }).returning();
+      [streak] = await db.insert(streaksTable).values({ userId, currentStreak: 1, longestStreak: 1, lastActivityDate: now, multiplier: 1.0 }).returning();
     }
 
-    if (streak.lastActivityDate === today) {
+    const { newStreak: dailyNewStreak, alreadyActive: dailyAlreadyActive } = evaluateStreak(streak.lastActivityDate, streak.currentStreak, now);
+
+    if (dailyAlreadyActive) {
       res.status(409).json({ error: "Already claimed today", alreadyClaimed: true });
       return;
     }
 
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split("T")[0];
-
-    let newStreak = 1;
-    if (streak.lastActivityDate === yesterdayStr) {
-      newStreak = streak.currentStreak + 1;
-    }
-
+    const newStreak = dailyNewStreak;
     const newMultiplier = Math.min(1.0 + (newStreak - 1) * 0.1, 3.0);
     const newLongest = Math.max(streak.longestStreak, newStreak);
 
     const [updatedStreak] = await db.update(streaksTable)
-      .set({ currentStreak: newStreak, longestStreak: newLongest, lastActivityDate: today, multiplier: newMultiplier, updatedAt: new Date() })
+      .set({ currentStreak: newStreak, longestStreak: newLongest, lastActivityDate: now, multiplier: newMultiplier, updatedAt: now })
       .where(eq(streaksTable.userId, userId))
       .returning();
 

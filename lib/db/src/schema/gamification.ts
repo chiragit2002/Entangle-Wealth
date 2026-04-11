@@ -75,7 +75,7 @@ export const streaksTable = pgTable("streaks", {
   userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }).unique(),
   currentStreak: integer("current_streak").notNull().default(0),
   longestStreak: integer("longest_streak").notNull().default(0),
-  lastActivityDate: text("last_activity_date"),
+  lastActivityDate: timestamp("last_activity_date", { withTimezone: true }),
   multiplier: real("multiplier").notNull().default(1.0),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });

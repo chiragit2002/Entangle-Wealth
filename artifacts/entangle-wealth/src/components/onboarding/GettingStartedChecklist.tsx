@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { CheckCircle2, Circle, ChevronDown, ChevronUp, X, Rocket } from "lucide-react";
-import { Confetti } from "./Confetti";
+import { fireConfetti } from "@/lib/confetti";
 import { trackEvent } from "@/lib/trackEvent";
 
 interface ChecklistItem {
@@ -37,7 +37,6 @@ export function GettingStartedChecklist() {
   const [checklist, setChecklist] = useState<Record<string, boolean>>({});
   const [collapsed, setCollapsed] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
   const [daysSinceSignup, setDaysSinceSignup] = useState(0);
   const [loaded, setLoaded] = useState(false);
 
@@ -64,7 +63,7 @@ export function GettingStartedChecklist() {
       const updated = { ...prev, [itemId]: true };
       const allDone = ITEMS.every((item) => updated[item.id]);
       if (allDone) {
-        setShowConfetti(true);
+        fireConfetti();
         trackEvent("onboarding_checklist_completed");
       }
       return updated;
@@ -97,7 +96,7 @@ export function GettingStartedChecklist() {
   const progressPct = (completedCount / ITEMS.length) * 100;
 
   if (!loaded || !isSignedIn || dismissed || daysSinceSignup > 14 || allDone) {
-    return showConfetti ? <Confetti onDone={() => setShowConfetti(false)} /> : null;
+    return null;
   }
 
   const localDismissed = localStorage.getItem("ew_checklist_dismissed");
@@ -105,7 +104,6 @@ export function GettingStartedChecklist() {
 
   return (
     <>
-      {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
       <div className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-50 w-72">
         <div className="bg-[#0a0a14] border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden">
           <div

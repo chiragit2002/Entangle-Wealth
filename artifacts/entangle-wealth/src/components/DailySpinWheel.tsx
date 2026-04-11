@@ -3,6 +3,7 @@ import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
 import { X, Gift, Clock, Zap, Shield, Star } from "lucide-react";
+import { fireConfetti } from "@/lib/confetti";
 
 const WHEEL_SEGMENTS = [
   { label: "+500 XP", color: "#00D4FF", icon: "⚡" },
@@ -193,6 +194,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
           setCanSpin(false);
           setNextSpinAt(data.nextSpinAt);
           setSpinning(false);
+          fireConfetti();
           onReward?.(data.reward);
         }
       };

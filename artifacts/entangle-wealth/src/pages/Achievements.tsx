@@ -6,6 +6,7 @@ import { Award, Lock, CheckCircle, Target, Flame, Zap, Star, Trophy, TrendingUp,
 import { Button } from "@/components/ui/button";
 import { DailySpinWheel } from "@/components/DailySpinWheel";
 import { useToast } from "@/hooks/use-toast";
+import { fireConfetti } from "@/lib/confetti";
 
 interface BadgeData {
   id: number;
@@ -123,8 +124,24 @@ export default function Achievements() {
       ]);
 
       if (badgesRes.status === "fulfilled" && badgesRes.value.ok) {
-        const data = await badgesRes.value.json();
-        if (data.length > 0) setBadges(data);
+        const data: BadgeData[] = await badgesRes.value.json();
+        if (data.length > 0) {
+          const seenKey = "ew_celebrated_badges";
+          let seenSlugs: string[] = [];
+          try {
+            seenSlugs = JSON.parse(localStorage.getItem(seenKey) ?? "[]");
+          } catch {}
+          const seenSet = new Set(seenSlugs);
+          const newlyEarned = data.filter(b => b.earned && !seenSet.has(b.slug));
+          if (newlyEarned.length > 0) {
+            fireConfetti();
+            newlyEarned.forEach(b => seenSet.add(b.slug));
+            try {
+              localStorage.setItem(seenKey, JSON.stringify(Array.from(seenSet)));
+            } catch {}
+          }
+          setBadges(data);
+        }
       }
       if (challengesRes.status === "fulfilled" && challengesRes.value.ok) {
         const data = await challengesRes.value.json();

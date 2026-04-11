@@ -4,6 +4,7 @@ import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { X, Share2, Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { fireConfetti } from "@/lib/confetti";
 
 interface Milestone {
   threshold: number;
@@ -39,6 +40,7 @@ export function MilestoneCelebrationModal() {
           const data = await milestoneRes.json();
           if (data.newMilestones?.length > 0) {
             setQueue(data.newMilestones);
+            fireConfetti();
           }
         }
         if (codeRes.ok) {

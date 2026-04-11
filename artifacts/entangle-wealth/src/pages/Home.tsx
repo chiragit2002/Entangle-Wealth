@@ -15,6 +15,7 @@ import {
   AlertCircle,
   RefreshCw,
 } from "lucide-react";
+import { EmailCapture } from "@/components/EmailCapture";
 import { trackEvent } from "@/lib/trackEvent";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
@@ -510,7 +511,6 @@ export default function Home() {
                   >
                     {step.num}
                   </div>
-                  <div>
                     <h3 className="text-base font-bold text-white mb-2">{step.title}</h3>
                     <p className="text-sm text-white/50 leading-relaxed">{step.desc}</p>
                   </div>
@@ -519,6 +519,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <EmailCapture />
 
         {/* Trust */}
         <section className="py-16 lg:py-24 px-4 border-t border-white/5">

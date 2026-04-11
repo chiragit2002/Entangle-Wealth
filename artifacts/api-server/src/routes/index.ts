@@ -27,6 +27,7 @@ import launchChecksRouter from "./launchChecks";
 import zapierRouter from "./zapier";
 import pushRouter from "./push";
 import paperTradingRouter from "./paperTrading";
+import subscribersRouter from "./subscribers";
 
 const router: IRouter = Router();
 
@@ -58,5 +59,6 @@ router.use(metricsRouter);
 router.use(launchChecksRouter);
 router.use(zapierRouter);
 router.use(paperTradingRouter);
+router.use(subscribersRouter);
 
 export default router;

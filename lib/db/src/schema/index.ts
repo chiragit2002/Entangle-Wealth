@@ -7,3 +7,4 @@ export * from "./viral";
 export * from "./alerts";
 export * from "./analytics";
 export * from "./paperTrading";
+export * from "./emailSubscribers";

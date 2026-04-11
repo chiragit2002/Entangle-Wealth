@@ -9,6 +9,7 @@ import { ensureReferralBadgesExist } from "./lib/referralRewards";
 import { startAlertEvaluator } from "./routes/alerts";
 import { startDigestScheduler } from "./lib/emailDigest";
 import { startDailyContentScheduler } from "./routes/dailyContent";
+import { startDripScheduler } from "./lib/dripEmails";
 import { pool } from "@workspace/db";
 
 async function ensureDailyContentTable() {
@@ -176,6 +177,36 @@ async function ensurePaperTradingTables() {
   }
 }
 
+async function ensureEmailSubscribersTable() {
+  try {
+    const client = await pool.connect();
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS email_subscribers (
+          id TEXT PRIMARY KEY,
+          email TEXT NOT NULL UNIQUE,
+          preference TEXT NOT NULL DEFAULT 'tips',
+          drip_stage INTEGER NOT NULL DEFAULT 0,
+          subscribed BOOLEAN NOT NULL DEFAULT true,
+          unsubscribe_token TEXT NOT NULL,
+          converted BOOLEAN NOT NULL DEFAULT false,
+          next_send_at TIMESTAMPTZ,
+          created_at TIMESTAMPTZ DEFAULT now(),
+          updated_at TIMESTAMPTZ DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_email_subscribers_email ON email_subscribers (email);
+        CREATE INDEX IF NOT EXISTS idx_email_subscribers_next_send ON email_subscribers (next_send_at)
+          WHERE subscribed = true AND converted = false;
+      `);
+      logger.info("Email subscribers table ensured");
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    logger.warn({ error: err }, "Failed to ensure email_subscribers table (non-fatal)");
+  }
+}
+
 async function ensurePerformanceIndexes() {
   try {
     const client = await pool.connect();
@@ -335,12 +366,14 @@ const httpServer = server.listen(port, async () => {
   await ensureAlertTables();
   await ensurePaperTradingTables();
   await ensureGamificationTables();
+  await ensureEmailSubscribersTable();
   ensurePerformanceIndexes().catch((err) =>
     logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
   );
   startAlertEvaluator();
   startDigestScheduler();
   startDailyContentScheduler();
+  startDripScheduler();
   await initStripe();
 });
 

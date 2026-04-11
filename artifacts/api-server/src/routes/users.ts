@@ -4,6 +4,7 @@ import {
   usersTable,
   referralsTable,
   analyticsEventsTable,
+  emailSubscribersTable,
 } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
@@ -56,6 +57,15 @@ router.post("/users/sync", requireAuth, async (req, res) => {
         })
         .where(eq(usersTable.clerkId, clerkId))
         .returning();
+
+      const resolvedEmail = (email || existing.email || "").toLowerCase();
+      if (resolvedEmail) {
+        db.update(emailSubscribersTable)
+          .set({ converted: true, nextSendAt: null, updatedAt: new Date() })
+          .where(eq(emailSubscribersTable.email, resolvedEmail))
+          .catch(err => logger.warn({ err, email: resolvedEmail }, 'Failed to mark existing user email subscriber as converted'));
+      }
+
       res.json(updated);
     } else {
       let referralCode =
@@ -94,6 +104,13 @@ router.post("/users/sync", requireAuth, async (req, res) => {
         signupTimestamp:
           created.createdAt?.toISOString() || new Date().toISOString(),
       }).catch(err => logger.warn({ err, email: created.email }, 'Failed to send user_signup Zapier webhook'));
+
+      if (created.email) {
+        db.update(emailSubscribersTable)
+          .set({ converted: true, nextSendAt: null, updatedAt: new Date() })
+          .where(eq(emailSubscribersTable.email, created.email.toLowerCase()))
+          .catch(err => logger.warn({ err, email: created.email }, 'Failed to mark email subscriber as converted'));
+      }
 
       if (req.body.referredBy) {
         db.insert(analyticsEventsTable)

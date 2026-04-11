@@ -22,7 +22,7 @@ router.get("/users/me", requireAuth, async (req, res) => {
       .from(usersTable)
       .where(eq(usersTable.clerkId, clerkId));
     if (!user) {
-      res.status(404).json({ error: "User not found" });
+      res.status(200).json({ needsSync: true });
       return;
     }
     res.json(user);

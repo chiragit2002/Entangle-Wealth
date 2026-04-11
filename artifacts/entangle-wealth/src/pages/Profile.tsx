@@ -137,34 +137,39 @@ export default function Profile() {
 
   const loadProfile = async () => {
     try {
-      if (user) {
-        const referredBy = getStoredReferralCode();
-        await fetchAuth("/users/sync", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: user.primaryEmailAddress?.emailAddress,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            photoUrl: user.imageUrl,
-            ...(referredBy ? { referredBy } : {}),
-          }),
-        });
-        if (referredBy) clearStoredReferralCode();
-      }
-
-      const res = await fetchAuth("/users/me");
+      let res = await fetchAuth("/users/me");
       if (res.ok) {
-        const data = await res.json();
-        setProfile({
-          headline: data.headline || "",
-          bio: data.bio || "",
-          phone: data.phone || "",
-          location: data.location || "",
-          isPublicProfile: data.isPublicProfile ?? true,
-          kycStatus: data.kycStatus || "not_started",
-          subscriptionTier: data.subscriptionTier || "free",
-        });
+        let data = await res.json();
+        if (data.needsSync && user) {
+          const referredBy = getStoredReferralCode();
+          await fetchAuth("/users/sync", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: user.primaryEmailAddress?.emailAddress,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              photoUrl: user.imageUrl,
+              ...(referredBy ? { referredBy } : {}),
+            }),
+          });
+          if (referredBy) clearStoredReferralCode();
+          res = await fetchAuth("/users/me");
+          if (res.ok) {
+            data = await res.json();
+          }
+        }
+        if (!data.needsSync) {
+          setProfile({
+            headline: data.headline || "",
+            bio: data.bio || "",
+            phone: data.phone || "",
+            location: data.location || "",
+            isPublicProfile: data.isPublicProfile ?? true,
+            kycStatus: data.kycStatus || "not_started",
+            subscriptionTier: data.subscriptionTier || "free",
+          });
+        }
       }
     } catch { /* ignore */ }
     setLoading(false);

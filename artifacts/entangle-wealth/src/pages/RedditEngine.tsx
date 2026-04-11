@@ -265,7 +265,10 @@ export default function RedditEngine() {
 
             <select
               value={engagementFilter}
-              onChange={(e) => setEngagementFilter(e.target.value as any)}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v === "All" || v === "High" || v === "Medium" || v === "Low") setEngagementFilter(v);
+              }}
               className="bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white/80 focus:outline-none focus:border-primary/40"
             >
               <option value="All" className="bg-[#0a0a0f]">All Engagement</option>
@@ -276,7 +279,10 @@ export default function RedditEngine() {
 
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v === "All" || v === "Active Target" || v === "Research Only" || v === "Avoid") setStatusFilter(v);
+              }}
               className="bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white/80 focus:outline-none focus:border-primary/40"
             >
               <option value="All" className="bg-[#0a0a0f]">All Statuses</option>

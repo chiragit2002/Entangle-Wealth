@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import ErrorFallback from "@/components/ErrorFallback";
 import NotFound from "@/pages/not-found";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
+import { NotificationPrompt } from "@/components/pwa/NotificationPrompt";
 import { PageSkeleton, ChartSkeleton, TableSkeleton } from "@/components/pwa/PageSkeleton";
 
 import Home from "@/pages/Home";
@@ -205,6 +206,7 @@ function ClerkProviderWithRoutes() {
             <Route component={NotFound} />
           </Switch>
           <InstallPrompt />
+          <NotificationPrompt />
           <Toaster />
         </TooltipProvider>
       </QueryClientProvider>

@@ -1,13 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
 import { X, Download, Smartphone } from "lucide-react";
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
 const VISIT_KEY = "ew_visit_count";
 const DISMISS_KEY = "ew_install_dismissed";
 const MIN_VISITS = 3;
 
 export function InstallPrompt() {
   const [show, setShow] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
     const dismissed = localStorage.getItem(DISMISS_KEY);
@@ -16,12 +21,12 @@ export function InstallPrompt() {
     const count = parseInt(localStorage.getItem(VISIT_KEY) || "0", 10) + 1;
     localStorage.setItem(VISIT_KEY, String(count));
 
-    if (count < MIN_VISITS) return;
-
     const handler = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e);
-      setShow(true);
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      if (count >= MIN_VISITS) {
+        setShow(true);
+      }
     };
 
     window.addEventListener("beforeinstallprompt", handler);
@@ -30,8 +35,8 @@ export function InstallPrompt() {
 
   const handleInstall = useCallback(async () => {
     if (!deferredPrompt) return;
-    (deferredPrompt as any).prompt();
-    const result = await (deferredPrompt as any).userChoice;
+    await deferredPrompt.prompt();
+    const result = await deferredPrompt.userChoice;
     if (result.outcome === "accepted") {
       setShow(false);
       localStorage.setItem(DISMISS_KEY, "installed");

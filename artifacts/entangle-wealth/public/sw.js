@@ -1,13 +1,17 @@
 const CACHE_NAME = "entangle-wealth-v1";
 const OFFLINE_URL = "/offline.html";
 
-const PRECACHE_URLS = [
+const APP_SHELL = [
   "/offline.html",
+  "/manifest.json",
+  "/favicon.svg",
+  "/icons/icon-192.svg",
+  "/icons/icon-512.svg",
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
   );
   self.skipWaiting();
 });
@@ -25,12 +29,31 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const { request } = event;
-
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
 
-  if (url.pathname.startsWith("/api/")) return;
+  if (url.pathname.startsWith("/api/")) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() =>
+          caches.match(request).then((cached) =>
+            cached || new Response(JSON.stringify({ error: "Offline" }), {
+              status: 503,
+              headers: { "Content-Type": "application/json" },
+            })
+          )
+        )
+    );
+    return;
+  }
 
   if (
     request.destination === "style" ||
@@ -42,18 +65,11 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       caches.open(CACHE_NAME).then((cache) =>
         cache.match(request).then((cached) => {
-          if (cached) {
-            fetch(request)
-              .then((response) => {
-                if (response.ok) cache.put(request, response.clone());
-              })
-              .catch(() => {});
-            return cached;
-          }
-          return fetch(request).then((response) => {
+          const networkFetch = fetch(request).then((response) => {
             if (response.ok) cache.put(request, response.clone());
             return response;
           });
+          return cached || networkFetch;
         })
       )
     );
@@ -62,9 +78,21 @@ self.addEventListener("fetch", (event) => {
 
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request).catch(() =>
-        caches.match(OFFLINE_URL).then((cached) => cached || new Response("Offline", { status: 503 }))
-      )
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() =>
+          caches.match(request).then((cached) =>
+            cached || caches.match(OFFLINE_URL).then((offline) =>
+              offline || new Response("Offline", { status: 503 })
+            )
+          )
+        )
     );
     return;
   }

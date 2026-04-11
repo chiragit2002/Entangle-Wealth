@@ -1,6 +1,10 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { usersTable, referralsTable, analyticsEventsTable } from "@workspace/db/schema";
+import {
+  usersTable,
+  referralsTable,
+  analyticsEventsTable,
+} from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { getAuth } from "@clerk/express";
@@ -13,7 +17,10 @@ const router = Router();
 router.get("/users/me", requireAuth, async (req, res) => {
   const clerkId = (req as any).userId;
   try {
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.clerkId, clerkId));
+    const [user] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.clerkId, clerkId));
     if (!user) {
       res.status(404).json({ error: "User not found" });
       return;
@@ -30,10 +37,14 @@ router.post("/users/sync", requireAuth, async (req, res) => {
   const { email, firstName, lastName, photoUrl } = req.body;
 
   try {
-    const [existing] = await db.select().from(usersTable).where(eq(usersTable.clerkId, clerkId));
+    const [existing] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.clerkId, clerkId));
 
     if (existing) {
-      const [updated] = await db.update(usersTable)
+      const [updated] = await db
+        .update(usersTable)
         .set({
           email: email || existing.email,
           firstName: firstName || existing.firstName,
@@ -45,36 +56,51 @@ router.post("/users/sync", requireAuth, async (req, res) => {
         .returning();
       res.json(updated);
     } else {
-      let referralCode = "EW-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+      let referralCode =
+        "EW-" + crypto.randomBytes(4).toString("hex").toUpperCase();
       for (let i = 0; i < 4; i++) {
-        const [dup] = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.referralCode, referralCode));
+        const [dup] = await db
+          .select({ id: usersTable.id })
+          .from(usersTable)
+          .where(eq(usersTable.referralCode, referralCode));
         if (!dup) break;
-        referralCode = "EW-" + crypto.randomBytes(4 + i).toString("hex").toUpperCase();
+        referralCode =
+          "EW-" +
+          crypto
+            .randomBytes(4 + i)
+            .toString("hex")
+            .toUpperCase();
       }
-      const [created] = await db.insert(usersTable).values({
-        id: clerkId,
-        clerkId,
-        email: email || "",
-        firstName,
-        lastName,
-        photoUrl,
-        referralCode,
-        referredBy: req.body.referredBy || null,
-      }).returning();
+      const [created] = await db
+        .insert(usersTable)
+        .values({
+          id: clerkId,
+          clerkId,
+          email: email || "",
+          firstName,
+          lastName,
+          photoUrl,
+          referralCode,
+          referredBy: req.body.referredBy || null,
+        })
+        .returning();
 
       sendZapierWebhook("user_signup", {
         email: created.email,
         name: `${created.firstName || ""} ${created.lastName || ""}`.trim(),
         referralCode: created.referralCode,
-        signupTimestamp: created.createdAt?.toISOString() || new Date().toISOString(),
+        signupTimestamp:
+          created.createdAt?.toISOString() || new Date().toISOString(),
       }).catch(() => {});
 
       if (req.body.referredBy) {
-        db.insert(analyticsEventsTable).values({
-          userId: clerkId,
-          event: "referral_signup",
-          properties: { referralCode: req.body.referredBy },
-        }).catch(() => {});
+        db.insert(analyticsEventsTable)
+          .values({
+            userId: clerkId,
+            event: "referral_signup",
+            properties: { referralCode: req.body.referredBy },
+          })
+          .catch(() => {});
         const [referrer] = await db
           .select()
           .from(usersTable)
@@ -95,10 +121,13 @@ router.post("/users/sync", requireAuth, async (req, res) => {
             }).catch(() => {});
 
             processReferralMilestones(referrer.clerkId).catch((err) =>
-              console.error("[referral] milestone processing failed:", err)
+              console.error("[referral] milestone processing failed:", err),
             );
           } catch (refErr) {
-            console.error("[referral] Failed to create referral record:", refErr);
+            console.error(
+              "[referral] Failed to create referral record:",
+              refErr,
+            );
           }
         }
       }
@@ -116,7 +145,8 @@ router.put("/users/me", requireAuth, async (req, res) => {
   const { headline, bio, phone, location, isPublicProfile } = req.body;
 
   try {
-    const [updated] = await db.update(usersTable)
+    const [updated] = await db
+      .update(usersTable)
       .set({
         headline,
         bio,
@@ -141,12 +171,22 @@ router.put("/users/me", requireAuth, async (req, res) => {
 
 router.get("/users/:userId/profile", async (req, res) => {
   try {
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, req.params.userId));
+    const [user] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, req.params.userId));
     if (!user || !user.isPublicProfile) {
       res.status(404).json({ error: "Profile not found" });
       return;
     }
-    const { stripeCustomerId, stripeSubscriptionId, kycStatus, kycSubmittedAt, kycVerifiedAt, ...publicProfile } = user;
+    const {
+      stripeCustomerId,
+      stripeSubscriptionId,
+      kycStatus,
+      kycSubmittedAt,
+      kycVerifiedAt,
+      ...publicProfile
+    } = user;
     res.json(publicProfile);
   } catch (error) {
     console.error("Error fetching profile:", error);

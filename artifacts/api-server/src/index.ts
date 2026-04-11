@@ -5,6 +5,7 @@ import { WebhookHandlers } from "./webhookHandlers";
 import { runMigrations } from "stripe-replit-sync";
 import { getStripeSync } from "./stripeClient";
 import { trackConnections } from "./routes/health";
+import { ensureReferralBadgesExist } from "./lib/referralRewards";
 
 const rawPort = process.env["PORT"];
 
@@ -93,5 +94,8 @@ const httpServer = server.listen(port, async (err) => {
 
   logger.info({ port }, "Server listening");
   trackConnections(httpServer);
+  ensureReferralBadgesExist().catch((err) =>
+    logger.warn({ error: err }, "Failed to seed referral badges (non-fatal)")
+  );
   await initStripe();
 });

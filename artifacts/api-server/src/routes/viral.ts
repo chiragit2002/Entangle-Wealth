@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { referralConversionsTable, testimonialsTable, usersTable } from "@workspace/db/schema";
-import { eq, desc, sql, count } from "drizzle-orm";
+import { referralConversionsTable, testimonialsTable, usersTable, badgesTable, userBadgesTable } from "@workspace/db/schema";
+import { eq, desc, sql, count, and, like } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import crypto from "crypto";
 
@@ -53,11 +53,35 @@ router.get("/viral/referral/badges", requireAuth, async (req, res) => {
       .where(eq(referralConversionsTable.referrerId, userId));
 
     const referralCount = Number(stats?.converted || 0);
-    const badges = [];
-    if (referralCount >= 3) badges.push({ tier: "Bronze", icon: "bronze", threshold: 3 });
-    if (referralCount >= 10) badges.push({ tier: "Silver", icon: "silver", threshold: 10 });
-    if (referralCount >= 25) badges.push({ tier: "Gold", icon: "gold", threshold: 25 });
-    if (referralCount >= 50) badges.push({ tier: "Platinum", icon: "platinum", threshold: 50 });
+
+    const earnedBadges = await db
+      .select({
+        slug: badgesTable.slug,
+        name: badgesTable.name,
+        icon: badgesTable.icon,
+        threshold: badgesTable.threshold,
+        earnedAt: userBadgesTable.earnedAt,
+      })
+      .from(userBadgesTable)
+      .innerJoin(badgesTable, eq(userBadgesTable.badgeId, badgesTable.id))
+      .where(
+        and(
+          eq(userBadgesTable.userId, userId),
+          like(badgesTable.slug, "referral-%")
+        )
+      );
+
+    const TIERS = [
+      { tier: "Bronze", slug: "referral-bronze", icon: "bronze", threshold: 3 },
+      { tier: "Silver", slug: "referral-silver", icon: "silver", threshold: 10 },
+      { tier: "Gold", slug: "referral-gold", icon: "gold", threshold: 25 },
+      { tier: "Platinum", slug: "referral-platinum", icon: "platinum", threshold: 50 },
+    ];
+
+    const badges = TIERS.map((t) => ({
+      ...t,
+      earned: earnedBadges.some((b) => b.slug === t.slug),
+    }));
 
     res.json({ referralCount, badges });
   } catch (error) {

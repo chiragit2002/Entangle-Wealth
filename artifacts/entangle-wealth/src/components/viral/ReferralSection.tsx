@@ -17,7 +17,7 @@ export function ReferralSection() {
   const { toast } = useToast();
   const [code, setCode] = useState("");
   const [stats, setStats] = useState({ totalConverted: 0 });
-  const [badges, setBadges] = useState<{ tier: string; icon: string; threshold: number }[]>([]);
+  const [badges, setBadges] = useState<{ tier: string; icon: string; threshold: number; earned: boolean }[]>([]);
   const [copied, setCopied] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -115,25 +115,22 @@ export function ReferralSection() {
           <Award className="w-3.5 h-3.5" /> Referral Badges
         </p>
         <div className="flex gap-2">
-          {BADGE_TIERS.map((b) => {
-            const earned = badges.some((eb) => eb.tier === b.tier);
-            return (
-              <div
-                key={b.tier}
-                className={`flex-1 rounded-lg p-2 text-center border transition-all ${
-                  earned
-                    ? "bg-white/[0.06] border-white/15"
-                    : "bg-white/[0.02] border-white/5 opacity-40"
-                }`}
-              >
-                <span className="text-lg">{b.icon}</span>
-                <p className="text-[9px] font-bold mt-0.5" style={{ color: earned ? b.color : undefined }}>
-                  {b.tier}
-                </p>
-                <p className="text-[8px] text-muted-foreground">{b.threshold}+</p>
-              </div>
-            );
-          })}
+          {(badges.length > 0 ? badges : BADGE_TIERS.map((b) => ({ ...b, earned: false }))).map((b) => (
+            <div
+              key={b.tier}
+              className={`flex-1 rounded-lg p-2 text-center border transition-all ${
+                b.earned
+                  ? "bg-white/[0.06] border-white/15"
+                  : "bg-white/[0.02] border-white/5 opacity-40"
+              }`}
+            >
+              <span className="text-lg">{BADGE_TIERS.find((t) => t.tier === b.tier)?.icon || ""}</span>
+              <p className="text-[9px] font-bold mt-0.5" style={{ color: b.earned ? BADGE_TIERS.find((t) => t.tier === b.tier)?.color : undefined }}>
+                {b.tier}
+              </p>
+              <p className="text-[8px] text-muted-foreground">{b.threshold}+</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>

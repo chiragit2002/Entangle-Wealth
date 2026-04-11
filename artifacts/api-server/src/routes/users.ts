@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { getAuth } from "@clerk/express";
 import crypto from "crypto";
+import { processReferralMilestones } from "../lib/referralRewards";
 
 const router = Router();
 
@@ -66,6 +67,9 @@ router.post("/users/sync", requireAuth, async (req, res) => {
               referrerId: referrer.clerkId,
               referredUserId: clerkId,
             });
+            processReferralMilestones(referrer.clerkId).catch((err) =>
+              console.error("[referral] milestone processing failed:", err)
+            );
           } catch (_e) {}
         }
       }

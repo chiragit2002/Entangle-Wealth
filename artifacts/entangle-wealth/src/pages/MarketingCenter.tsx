@@ -447,6 +447,12 @@ export default function MarketingCenter() {
     setQueue(getQueueFromStorage());
   }, [checkAccess]);
 
+  useEffect(() => {
+    if (!authorized) return;
+    const interval = setInterval(fetchQueueStatus, 15_000);
+    return () => clearInterval(interval);
+  }, [authorized, fetchQueueStatus]);
+
   const addToQueue = (item: Omit<QueueItem, "id" | "status" | "createdAt">) => {
     const newItem: QueueItem = {
       ...item,

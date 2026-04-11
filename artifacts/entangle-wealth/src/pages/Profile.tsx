@@ -529,9 +529,36 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen bg-black text-white pb-20 lg:pb-0">
         <Navbar />
-        <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+        <main className="container mx-auto px-4 md:px-6 py-8 max-w-4xl" aria-busy="true" aria-label="Loading profile">
+          <div className="glass-panel p-8 mb-6 animate-pulse">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-20 h-20 rounded-full bg-white/[0.06] shrink-0" />
+              <div className="flex-1 space-y-2 pt-2">
+                <div className="h-7 bg-white/[0.06] rounded-lg w-48" />
+                <div className="h-4 bg-white/[0.04] rounded w-36" />
+                <div className="h-3 bg-white/[0.03] rounded w-56" />
+              </div>
+              <div className="w-20 h-9 bg-white/[0.04] rounded-lg" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="glass-panel p-4 h-20 animate-pulse">
+                <div className="h-full bg-white/[0.03] rounded-lg" />
+              </div>
+            ))}
+          </div>
+          <div className="glass-panel p-6 mb-6 h-48 animate-pulse">
+            <div className="h-6 bg-white/[0.06] rounded w-40 mb-4" />
+            <div className="space-y-3">
+              <div className="h-10 bg-white/[0.04] rounded-lg" />
+              <div className="h-20 bg-white/[0.04] rounded-lg" />
+            </div>
+          </div>
+        </main>
+        <BottomNav />
       </div>
     );
   }

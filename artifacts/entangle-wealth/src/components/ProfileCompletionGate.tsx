@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useUser, useAuth } from "@clerk/react";
 import { useLocation } from "wouter";
-import { User, MapPin, Loader2, ChevronRight, Briefcase, Building2, Upload, X, FileText, CheckCircle } from "lucide-react";
+import { User, MapPin, Loader2, ChevronRight, Briefcase, Building2, Upload, X, FileText, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authFetch } from "@/lib/authFetch";
@@ -14,6 +14,13 @@ interface ProfileGateData {
   lastName: string;
   headline: string;
   location: string;
+}
+
+interface FieldErrors {
+  firstName?: string;
+  lastName?: string;
+  headline?: string;
+  location?: string;
 }
 
 function getCompletionPct(data: ProfileGateData, isBusinessOwner: boolean, docPaths: string[]): number {
@@ -44,6 +51,23 @@ const DOC_LABELS: Record<string, string> = {
   articles_of_incorporation: "Articles of Incorporation",
 };
 
+function validateField(name: keyof ProfileGateData, value: string): string | undefined {
+  if (!value.trim()) {
+    const labels: Record<keyof ProfileGateData, string> = {
+      firstName: "First name",
+      lastName: "Last name",
+      headline: "Headline",
+      location: "Location",
+    };
+    return `${labels[name]} is required`;
+  }
+  if (name === "firstName" || name === "lastName") {
+    if (value.trim().length < 2) return "Must be at least 2 characters";
+  }
+  if (name === "headline" && value.trim().length < 5) return "Please enter a more descriptive headline";
+  return undefined;
+}
+
 export function ProfileCompletionGate({ children }: { children: React.ReactNode }) {
   const { user, isLoaded, isSignedIn } = useUser();
   const { getToken } = useAuth();
@@ -52,6 +76,8 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
   const [showGate, setShowGate] = useState(false);
   const [checking, setChecking] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [touched, setTouched] = useState<Partial<Record<keyof ProfileGateData, boolean>>>({});
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [form, setForm] = useState<ProfileGateData>({ firstName: "", lastName: "", headline: "", location: "" });
 
   const [isBusinessOwner, setIsBusinessOwner] = useState<boolean | null>(null);
@@ -127,6 +153,20 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
     checkProfile();
   }, [checkProfile]);
 
+  const handleFieldChange = (field: keyof ProfileGateData, value: string) => {
+    setForm(p => ({ ...p, [field]: value }));
+    if (touched[field]) {
+      const err = validateField(field, value);
+      setErrors(prev => ({ ...prev, [field]: err }));
+    }
+  };
+
+  const handleBlur = (field: keyof ProfileGateData) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    const err = validateField(field, form[field]);
+    setErrors(prev => ({ ...prev, [field]: err }));
+  };
+
   const handleFileAdd = (files: FileList | null) => {
     if (!files) return;
     for (const file of Array.from(files)) {
@@ -179,10 +219,18 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
   };
 
   const handleSave = async () => {
-    if (!isProfileComplete(form)) {
-      toast({ title: "All fields required", description: "Please fill in your first name, last name, headline, and location.", variant: "destructive" });
-      return;
-    }
+    const allFields: (keyof ProfileGateData)[] = ["firstName", "lastName", "headline", "location"];
+    const newTouched: Partial<Record<keyof ProfileGateData, boolean>> = {};
+    const newErrors: FieldErrors = {};
+    allFields.forEach(f => {
+      newTouched[f] = true;
+      const err = validateField(f, form[f]);
+      if (err) newErrors[f] = err;
+    });
+    setTouched(newTouched);
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
 
     if (isBusinessOwner && docFiles.length === 0 && uploadedPaths.length === 0) {
       toast({ title: "Documents required", description: "Please upload at least one business document.", variant: "destructive" });
@@ -249,7 +297,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
       setShowGate(false);
       toast({ title: "Profile completed!", description: "Welcome to EntangleWealth." });
     } catch {
-      toast({ title: "Error", description: "Failed to save profile.", variant: "destructive" });
+      toast({ title: "Error", description: "Failed to save profile. Please try again.", variant: "destructive" });
     } finally {
       setSaving(false);
       setUploadingDocs(false);
@@ -258,8 +306,11 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
 
   if (checking && isSignedIn && !shouldBypass) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-black flex items-center justify-center" role="status" aria-label="Loading">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-xs text-white/30 font-mono">Checking your profile...</p>
+        </div>
       </div>
     );
   }
@@ -274,70 +325,128 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
   const canSave = profileDone && businessOwnerAnswered && !needsBusinessDocs;
 
   return (
-    <div className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0d0f18] p-8 my-4">
+    <div className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="profile-gate-title">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0d0f18] p-8 my-4 shadow-2xl shadow-black/50 animate-in fade-in zoom-in-95 duration-300">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[#0099cc] flex items-center justify-center">
-            <User className="w-5 h-5 text-black" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[#0099cc] flex items-center justify-center shrink-0">
+            <User className="w-5 h-5 text-black" aria-hidden="true" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Complete Your Profile</h2>
+            <h2 id="profile-gate-title" className="text-xl font-bold text-white">Complete Your Profile</h2>
             <p className="text-xs text-white/50">Required before accessing EntangleWealth</p>
           </div>
         </div>
 
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-1">
+        <div className="mb-6" aria-label={`Profile ${pct}% complete`}>
+          <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs text-white/40">Profile completion</span>
-            <span className="text-xs text-primary font-bold">{pct}%</span>
+            <span className="text-xs text-primary font-bold tabular-nums">{pct}%</span>
           </div>
-          <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
-            <div className="h-full rounded-full bg-primary transition-all duration-300" style={{ width: `${pct}%` }} />
+          <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
+              style={{ width: `${pct}%` }}
+            />
           </div>
         </div>
 
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[11px] text-white/50 mb-1 block">First Name <span className="text-primary">*</span></label>
+              <label htmlFor="gate-firstName" className="text-[11px] text-white/50 mb-1 block">
+                First Name <span className="text-primary" aria-hidden="true">*</span>
+              </label>
               <Input
+                id="gate-firstName"
                 placeholder="John"
                 value={form.firstName}
-                onChange={e => setForm(p => ({ ...p, firstName: e.target.value }))}
-                className="bg-white/5 border-white/10"
+                onChange={e => handleFieldChange("firstName", e.target.value)}
+                onBlur={() => handleBlur("firstName")}
+                className={`bg-white/5 border-white/10 transition-colors ${errors.firstName ? "border-red-500/50 focus:border-red-500" : "focus:border-primary/50"}`}
+                aria-invalid={!!errors.firstName}
+                aria-describedby={errors.firstName ? "gate-firstName-error" : undefined}
+                autoComplete="given-name"
               />
+              {errors.firstName && (
+                <p id="gate-firstName-error" className="text-[10px] text-red-400 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  {errors.firstName}
+                </p>
+              )}
             </div>
             <div>
-              <label className="text-[11px] text-white/50 mb-1 block">Last Name <span className="text-primary">*</span></label>
+              <label htmlFor="gate-lastName" className="text-[11px] text-white/50 mb-1 block">
+                Last Name <span className="text-primary" aria-hidden="true">*</span>
+              </label>
               <Input
+                id="gate-lastName"
                 placeholder="Doe"
                 value={form.lastName}
-                onChange={e => setForm(p => ({ ...p, lastName: e.target.value }))}
-                className="bg-white/5 border-white/10"
+                onChange={e => handleFieldChange("lastName", e.target.value)}
+                onBlur={() => handleBlur("lastName")}
+                className={`bg-white/5 border-white/10 transition-colors ${errors.lastName ? "border-red-500/50 focus:border-red-500" : "focus:border-primary/50"}`}
+                aria-invalid={!!errors.lastName}
+                aria-describedby={errors.lastName ? "gate-lastName-error" : undefined}
+                autoComplete="family-name"
               />
+              {errors.lastName && (
+                <p id="gate-lastName-error" className="text-[10px] text-red-400 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  {errors.lastName}
+                </p>
+              )}
             </div>
           </div>
           <div>
-            <label className="text-[11px] text-white/50 mb-1 block">
-              <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> Headline <span className="text-primary">*</span></span>
+            <label htmlFor="gate-headline" className="text-[11px] text-white/50 mb-1 flex items-center gap-1">
+              <Briefcase className="w-3 h-3" aria-hidden="true" />
+              Headline <span className="text-primary" aria-hidden="true">*</span>
             </label>
             <Input
+              id="gate-headline"
               placeholder="e.g., Freelance Developer & Investor"
               value={form.headline}
-              onChange={e => setForm(p => ({ ...p, headline: e.target.value }))}
-              className="bg-white/5 border-white/10"
+              onChange={e => handleFieldChange("headline", e.target.value)}
+              onBlur={() => handleBlur("headline")}
+              className={`bg-white/5 border-white/10 transition-colors ${errors.headline ? "border-red-500/50 focus:border-red-500" : "focus:border-primary/50"}`}
+              aria-invalid={!!errors.headline}
+              aria-describedby={errors.headline ? "gate-headline-error" : undefined}
             />
+            {errors.headline && (
+              <p id="gate-headline-error" className="text-[10px] text-red-400 mt-1 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3 shrink-0" />
+                {errors.headline}
+              </p>
+            )}
+            {form.headline.trim().length > 0 && !errors.headline && (
+              <p className="text-[10px] text-primary/60 mt-1 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 shrink-0" />
+                Looks good!
+              </p>
+            )}
           </div>
           <div>
-            <label className="text-[11px] text-white/50 mb-1 block">
-              <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> Location <span className="text-primary">*</span></span>
+            <label htmlFor="gate-location" className="text-[11px] text-white/50 mb-1 flex items-center gap-1">
+              <MapPin className="w-3 h-3" aria-hidden="true" />
+              Location <span className="text-primary" aria-hidden="true">*</span>
             </label>
             <Input
+              id="gate-location"
               placeholder="City, State"
               value={form.location}
-              onChange={e => setForm(p => ({ ...p, location: e.target.value }))}
-              className="bg-white/5 border-white/10"
+              onChange={e => handleFieldChange("location", e.target.value)}
+              onBlur={() => handleBlur("location")}
+              className={`bg-white/5 border-white/10 transition-colors ${errors.location ? "border-red-500/50 focus:border-red-500" : "focus:border-primary/50"}`}
+              aria-invalid={!!errors.location}
+              aria-describedby={errors.location ? "gate-location-error" : undefined}
+              autoComplete="address-level2"
             />
+            {errors.location && (
+              <p id="gate-location-error" className="text-[10px] text-red-400 mt-1 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3 shrink-0" />
+                {errors.location}
+              </p>
+            )}
           </div>
 
           <div className="border-t border-white/10 pt-3">
@@ -349,6 +458,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
                 type="button"
                 onClick={() => { setIsBusinessOwner(true); setBusinessOwnerAnswered(true); }}
                 className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all border ${isBusinessOwner === true ? "bg-primary/15 text-primary border-primary/40" : "bg-white/[0.03] text-white/50 border-white/[0.06] hover:border-white/20"}`}
+                aria-pressed={isBusinessOwner === true}
               >
                 Yes
               </button>
@@ -356,6 +466,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
                 type="button"
                 onClick={() => { setIsBusinessOwner(false); setBusinessOwnerAnswered(true); setDocFiles([]); }}
                 className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all border ${isBusinessOwner === false ? "bg-white/10 text-white border-white/30" : "bg-white/[0.03] text-white/50 border-white/[0.06] hover:border-white/20"}`}
+                aria-pressed={isBusinessOwner === false}
               >
                 No
               </button>
@@ -392,7 +503,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
                           ))}
                         </select>
                       </div>
-                      <button onClick={() => removeDoc(idx)} className="text-white/30 hover:text-white/70">
+                      <button onClick={() => removeDoc(idx)} className="text-white/30 hover:text-white/70" aria-label={`Remove ${doc.file.name}`}>
                         <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -400,53 +511,56 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
                 </div>
               )}
 
-              {uploadedPaths.length > 0 && docFiles.length === 0 && (
-                <div className="flex items-center gap-2 text-green-400 text-xs mb-3">
-                  <CheckCircle className="w-3.5 h-3.5" /> {uploadedPaths.length} document{uploadedPaths.length !== 1 ? "s" : ""} already uploaded
-                </div>
-              )}
-
-              {docFiles.length < 3 && uploadedPaths.length === 0 && (
-                <>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf"
-                    multiple
-                    className="hidden"
-                    onChange={e => handleFileAdd(e.target.files)}
-                  />
-                  <div
-                    onClick={() => fileInputRef.current?.click()}
-                    onDragOver={e => { e.preventDefault(); setDragActive(true); }}
-                    onDragLeave={() => setDragActive(false)}
-                    onDrop={e => { e.preventDefault(); setDragActive(false); handleFileAdd(e.dataTransfer.files); }}
-                    className={`w-full h-20 border border-dashed rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${dragActive ? "border-primary/60 bg-primary/10" : "border-white/20 hover:border-primary/40 hover:bg-primary/5"}`}
-                  >
-                    <Upload className="w-4 h-4 text-white/30" />
-                    <span className="text-[10px] text-white/30">{dragActive ? "Drop to upload" : "Click or drag files here"}</span>
-                  </div>
-                </>
-              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={ALLOWED_DOC_MIME_TYPES.join(",")}
+                multiple
+                className="hidden"
+                onChange={e => handleFileAdd(e.target.files)}
+                aria-label="Upload business documents"
+              />
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={e => { e.preventDefault(); setDragActive(true); }}
+                onDragLeave={() => setDragActive(false)}
+                onDrop={e => { e.preventDefault(); setDragActive(false); handleFileAdd(e.dataTransfer.files); }}
+                className={`w-full py-6 border border-dashed rounded-xl flex flex-col items-center gap-1.5 cursor-pointer transition-colors ${dragActive ? "border-primary/60 bg-primary/10" : "border-white/15 hover:border-primary/40 hover:bg-primary/5"}`}
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => e.key === "Enter" || e.key === " " ? fileInputRef.current?.click() : undefined}
+                aria-label="Click or drag to upload business documents"
+              >
+                <Upload className="w-5 h-5 text-white/30" aria-hidden="true" />
+                <span className="text-[11px] text-white/40">{dragActive ? "Drop files here" : "Click or drag to upload"}</span>
+                <span className="text-[10px] text-white/20">JPG, PNG, WebP, PDF · Max 10MB</span>
+              </div>
             </div>
           )}
         </div>
 
         <Button
-          className="w-full mt-6 bg-primary text-black font-bold gap-1"
+          className="w-full mt-6 bg-primary text-black font-bold gap-1 h-12 text-sm hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
           onClick={handleSave}
-          disabled={saving || !canSave}
+          disabled={saving || !businessOwnerAnswered}
+          aria-busy={saving}
         >
           {saving ? (
-            <><Loader2 className="w-4 h-4 animate-spin" /> {uploadingDocs ? "Uploading documents..." : "Saving..."}</>
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+              <span>{uploadingDocs ? "Uploading documents..." : "Saving..."}</span>
+            </>
           ) : (
-            <>Save & Continue <ChevronRight className="w-4 h-4" /></>
+            <>
+              Save & Continue
+              <ChevronRight className="w-4 h-4" aria-hidden="true" />
+            </>
           )}
         </Button>
 
         {!canSave && (
-          <p className="text-center text-xs text-white/30 mt-2">
-            {!businessOwnerAnswered ? "Please answer all questions to continue" : needsBusinessDocs ? "Upload at least one business document to continue" : "All fields are required to continue"}
+          <p className="text-center text-xs text-white/30 mt-2" aria-live="polite">
+            {!businessOwnerAnswered ? "Please answer all required questions to continue" : "All fields are required to continue"}
           </p>
         )}
       </div>

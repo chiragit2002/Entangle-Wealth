@@ -217,7 +217,9 @@ export default function Pricing() {
                 <Button
                   onClick={() => handleCta(plan)}
                   disabled={isLoading}
-                  className={`w-full mt-5 h-12 font-bold text-sm ${
+                  aria-busy={isLoading}
+                  aria-label={isLoading ? `Redirecting to checkout for ${plan.name}` : plan.cta}
+                  className={`w-full mt-5 h-12 font-bold text-sm active:scale-[0.98] transition-all ${
                     plan.ctaStyle === "gold"
                       ? "bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black hover:opacity-90"
                       : plan.ctaStyle === "blue"
@@ -225,8 +227,12 @@ export default function Pricing() {
                       : "bg-white/5 border border-white/10 text-muted-foreground hover:bg-white/10"
                   }`}
                 >
-                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  {isLoading ? "Redirecting to checkout..." : plan.cta}
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" aria-hidden="true" />
+                      Redirecting...
+                    </>
+                  ) : plan.cta}
                 </Button>
               </div>
             );

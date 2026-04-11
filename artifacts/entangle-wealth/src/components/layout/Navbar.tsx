@@ -160,29 +160,45 @@ function DropdownMenu({ group, isOpen, onToggle }: { group: NavGroup; isOpen: bo
   const [location] = useLocation();
   const ref = useRef<HTMLDivElement>(null);
   const isGroupActive = group.items.some((i) => location === i.href);
+  const dropdownId = `nav-dropdown-${group.label.toLowerCase().replace(/\s+/g, "-")}`;
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) onToggle();
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        if (isOpen) onToggle();
+      }
     }
-    if (isOpen) document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape" && isOpen) onToggle();
+    }
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleEscape);
+    };
   }, [isOpen, onToggle]);
 
   return (
     <div ref={ref} className="relative">
       <button
         onClick={onToggle}
-        className={`flex items-center gap-1 text-sm font-medium transition-all duration-200 hover:text-primary ${
+        aria-expanded={isOpen}
+        aria-controls={dropdownId}
+        aria-haspopup="true"
+        className={`flex items-center gap-1 text-sm font-medium px-2 py-1.5 rounded-lg transition-all duration-200 hover:text-primary hover:bg-white/[0.03] ${
           isGroupActive ? "text-primary" : "text-muted-foreground"
         }`}
       >
         {group.label}
-        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} aria-hidden="true" />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-52 rounded-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
+        <div
+          id={dropdownId}
+          role="menu"
+          className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-52 rounded-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
           style={{
             background: "rgba(8,8,20,0.96)",
             backdropFilter: "blur(24px) saturate(1.3)",
@@ -196,6 +212,7 @@ function DropdownMenu({ group, isOpen, onToggle }: { group: NavGroup; isOpen: bo
                 key={item.href}
                 href={item.href}
                 onClick={onToggle}
+                role="menuitem"
                 className={`flex flex-col px-3 py-2.5 rounded-lg transition-all duration-150 ${
                   location === item.href
                     ? "bg-primary/10 text-primary"
@@ -261,6 +278,14 @@ export function Navbar() {
     setSoundMuted(next);
   };
 
+  useEffect(() => {
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape" && isMobileMenuOpen) setIsMobileMenuOpen(false);
+    }
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isMobileMenuOpen]);
+
   const navGroups = useMemo(() => {
     return isAdmin ? [...NAV_GROUPS, ADMIN_NAV_GROUP] : NAV_GROUPS;
   }, [isAdmin]);
@@ -270,7 +295,7 @@ export function Navbar() {
   }, [isAdmin]);
 
   return (
-    <nav className="sticky top-0 z-50 w-full" style={{
+    <nav className="sticky top-0 z-50 w-full" aria-label="Main navigation" style={{
       background: "rgba(0,0,0,0.7)",
       backdropFilter: "blur(20px) saturate(1.3)",
       borderBottom: "1px solid rgba(255,255,255,0.06)",
@@ -294,6 +319,7 @@ export function Navbar() {
         <div className="hidden lg:flex items-center gap-1">
           <Link
             href="/"
+            aria-current={location === "/" ? "page" : undefined}
             className={`text-sm font-medium px-3 py-2 rounded-lg transition-all duration-200 hover:text-primary hover:bg-white/[0.03] ${
               location === "/" ? "text-primary bg-primary/[0.06]" : "text-muted-foreground"
             }`}
@@ -339,10 +365,11 @@ export function Navbar() {
               <Button
                 variant="ghost"
                 size="sm"
+                aria-label="Sign out"
                 className="text-muted-foreground hover:text-red-400 h-9 w-9 p-0"
                 onClick={() => signOut(() => setLocation("/"))}
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
               </Button>
             </div>
           </Show>
@@ -376,6 +403,9 @@ export function Navbar() {
       {isMobileMenuOpen && (
         <div
           className="lg:hidden absolute top-16 left-0 w-full border-b border-white/[0.06] animate-in slide-in-from-top-2 duration-200 max-h-[calc(100dvh-4rem)] overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile navigation menu"
           style={{
             background: "rgba(4,4,14,0.97)",
             backdropFilter: "blur(24px)",

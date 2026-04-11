@@ -6,6 +6,7 @@ import { eq, and, desc, gte, sql, count } from "drizzle-orm";
 import { logger } from "../lib/logger";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { CircuitBreaker, registerCircuit } from "../lib/circuitBreaker";
+import { sendZapierWebhook } from "../lib/zapierWebhook";
 
 const router = Router();
 
@@ -534,6 +535,14 @@ async function evaluateAlerts() {
           message,
           triggeredAt: histEntry.triggeredAt?.toISOString(),
         });
+
+        sendZapierWebhook("alert_triggered", {
+          userId: alert.userId,
+          alertType: alert.alertType,
+          symbol: alert.symbol,
+          condition: message,
+          triggeredValue,
+        }).catch(() => {});
       }
     }
   } catch (err) {

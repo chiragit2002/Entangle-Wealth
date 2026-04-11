@@ -5,6 +5,7 @@ import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { logger } from "../lib/logger";
+import { sendZapierWebhook } from "../lib/zapierWebhook";
 
 interface AuthenticatedRequest extends Request {
   userId: string;
@@ -110,6 +111,12 @@ router.post("/support/tickets", requireAuth, imageCompressionMiddleware, async (
 
     const ticket = result.rows[0];
     logger.info({ ticketId: ticket.id, userId }, "Support ticket created");
+
+    sendZapierWebhook("support_ticket_submitted", {
+      userId,
+      subject,
+      category,
+    }).catch(() => {});
 
     res.json({ success: true, ticketId: ticket.id, createdAt: ticket.created_at });
   } catch (err) {

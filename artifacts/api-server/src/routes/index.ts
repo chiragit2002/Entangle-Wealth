@@ -23,6 +23,7 @@ import onboardingRouter from "./onboarding";
 import supportRouter from "./support";
 import metricsRouter from "./metrics";
 import launchChecksRouter from "./launchChecks";
+import zapierRouter from "./zapier";
 
 const router: IRouter = Router();
 
@@ -50,5 +51,6 @@ router.use(onboardingRouter);
 router.use(supportRouter);
 router.use(metricsRouter);
 router.use(launchChecksRouter);
+router.use(zapierRouter);
 
 export default router;

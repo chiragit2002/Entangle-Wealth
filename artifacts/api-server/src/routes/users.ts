@@ -6,6 +6,7 @@ import { requireAuth } from "../middlewares/requireAuth";
 import { getAuth } from "@clerk/express";
 import crypto from "crypto";
 import { processReferralMilestones } from "../lib/referralRewards";
+import { sendZapierWebhook } from "../lib/zapierWebhook";
 
 const router = Router();
 
@@ -61,6 +62,13 @@ router.post("/users/sync", requireAuth, async (req, res) => {
         referredBy: req.body.referredBy || null,
       }).returning();
 
+      sendZapierWebhook("user_signup", {
+        email: created.email,
+        name: `${created.firstName || ""} ${created.lastName || ""}`.trim(),
+        referralCode: created.referralCode,
+        signupTimestamp: created.createdAt?.toISOString() || new Date().toISOString(),
+      }).catch(() => {});
+
       if (req.body.referredBy) {
         db.insert(analyticsEventsTable).values({
           userId: clerkId,
@@ -79,6 +87,13 @@ router.post("/users/sync", requireAuth, async (req, res) => {
               converted: true,
               convertedAt: new Date(),
             });
+
+            sendZapierWebhook("referral_conversion", {
+              referrerId: referrer.clerkId,
+              referredUserEmail: created.email,
+              referralCode: req.body.referredBy,
+            }).catch(() => {});
+
             processReferralMilestones(referrer.clerkId).catch((err) =>
               console.error("[referral] milestone processing failed:", err)
             );

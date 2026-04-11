@@ -2,6 +2,8 @@ import { Router, type Request, type Response } from "express";
 import { getAuth } from "@clerk/express";
 import { logAuthEvent, type AuthEventType } from "../lib/authEventLogger";
 import { recordFailedAttempt, resetAttempts } from "../middlewares/bruteForce";
+import { sendZapierWebhook } from "../lib/zapierWebhook";
+import crypto from "crypto";
 
 const router = Router();
 
@@ -56,6 +58,15 @@ router.post("/auth/event", (req: Request, res: Response) => {
     userAgent,
     details,
   });
+
+  if (eventType === "login_success" && userId) {
+    const hashedIp = crypto.createHash("sha256").update(ip).digest("hex").slice(0, 16);
+    sendZapierWebhook("login", {
+      userId,
+      timestamp: new Date().toISOString(),
+      ipHash: hashedIp,
+    }).catch(() => {});
+  }
 
   res.json({ logged: true });
 });

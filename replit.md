@@ -91,6 +91,7 @@ The project uses a pnpm workspace monorepo.
 - Express 5 server with Clerk middleware.
 - **Security**: Helmet for HTTP security headers. Global rate limit of 120 req/min with `express-rate-limit`. AI-specific rate limit of 15 req/min on AI-related endpoints.
 - Stripe webhook endpoint for payment events.
+- **Zapier Webhook Integration**: Fire-and-forget webhook dispatch to Zapier for key platform events (user signup, login, subscription, payment, referral conversion, alert triggered, support ticket). Centralized `zapierWebhook` utility with in-memory circuit breaker. Admin test endpoint at `POST /api/webhooks/zapier/test`. Configured via `ZAPIER_WEBHOOK_URL` env var.
 - **Alpaca Market Data**: Proxy routes to Alpaca Markets API with circuit breaker and exponential backoff retry.
 - **News Intelligence**: `/api/news` endpoint with RSS feed scraping, relevance scoring, sentiment analysis, ticker extraction, category filtering, search, pagination, and 5-min cache.
 - **Performance**: Metrics middleware (request count, avg response time, slow request logging >2s). AI request queue (max 5 concurrent). Circuit breakers for Alpaca and Anthropic. Exponential backoff with jitter for external API calls. Image compression middleware (sharp). DB performance indexes added at startup.

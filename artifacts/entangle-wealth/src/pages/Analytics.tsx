@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/react";
+import { useLocation } from "wouter";
 import { authFetch } from "@/lib/authFetch";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
@@ -120,9 +122,17 @@ function ChartCard({ title, children }: { title: string; children: React.ReactNo
 
 export default function Analytics() {
   const { getToken } = useAuth();
+  const isAdmin = useIsAdmin();
+  const [, setLocation] = useLocation();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isAdmin === false) {
+      setLocation("/dashboard");
+    }
+  }, [isAdmin, setLocation]);
 
   const fetchDashboard = async () => {
     setLoading(true);

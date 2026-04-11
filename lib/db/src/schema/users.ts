@@ -23,6 +23,7 @@ export const usersTable = pgTable("users", {
   tokenBalance: real("token_balance").default(0),
   referralCode: text("referral_code").unique(),
   referredBy: text("referred_by"),
+  referralCouponApplied: boolean("referral_coupon_applied").default(false),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 

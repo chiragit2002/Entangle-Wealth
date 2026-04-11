@@ -44,7 +44,12 @@ router.post("/users/sync", requireAuth, async (req, res) => {
         .returning();
       res.json(updated);
     } else {
-      const referralCode = "EW-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+      let referralCode = "EW-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+      for (let i = 0; i < 4; i++) {
+        const [dup] = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.referralCode, referralCode));
+        if (!dup) break;
+        referralCode = "EW-" + crypto.randomBytes(4 + i).toString("hex").toUpperCase();
+      }
       const [created] = await db.insert(usersTable).values({
         id: clerkId,
         clerkId,
@@ -72,7 +77,9 @@ router.post("/users/sync", requireAuth, async (req, res) => {
             processReferralMilestones(referrer.clerkId).catch((err) =>
               console.error("[referral] milestone processing failed:", err)
             );
-          } catch (_e) {}
+          } catch (refErr) {
+            console.error("[referral] Failed to create referral record:", refErr);
+          }
         }
       }
 

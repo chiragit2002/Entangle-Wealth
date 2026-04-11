@@ -133,10 +133,19 @@ async function applyStripeCouponIfEligible(referrerId: string, referralCount: nu
       return;
     }
 
+    if (user.referralCouponApplied) {
+      console.log(`[referral] Coupon already applied for user ${referrerId}`);
+      return;
+    }
+
     const stripe = await getUncachableStripeClient();
     await stripe.subscriptions.update(user.stripeSubscriptionId, {
       coupon: couponId,
     });
+    await db
+      .update(usersTable)
+      .set({ referralCouponApplied: true, updatedAt: new Date() })
+      .where(eq(usersTable.clerkId, referrerId));
     console.log(`[referral] Applied coupon ${couponId} to subscription for user ${referrerId}`);
   } catch (error) {
     console.error(`[referral] Failed to apply Stripe coupon for user ${referrerId}:`, error);

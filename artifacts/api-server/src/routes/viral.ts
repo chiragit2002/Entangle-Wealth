@@ -7,6 +7,18 @@ import crypto from "crypto";
 
 const router = Router();
 
+async function generateUniqueReferralCode(): Promise<string> {
+  for (let i = 0; i < 5; i++) {
+    const code = "EW-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+    const [existing] = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.referralCode, code));
+    if (!existing) return code;
+  }
+  return "EW-" + crypto.randomBytes(6).toString("hex").toUpperCase();
+}
+
 router.get("/viral/referral/code", requireAuth, async (req, res) => {
   const userId = (req as any).userId;
   try {
@@ -16,7 +28,7 @@ router.get("/viral/referral/code", requireAuth, async (req, res) => {
       .where(eq(usersTable.clerkId, userId));
 
     if (!user) {
-      const code = "EW-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+      const code = await generateUniqueReferralCode();
       await db.insert(usersTable).values({
         id: userId,
         clerkId: userId,
@@ -27,7 +39,7 @@ router.get("/viral/referral/code", requireAuth, async (req, res) => {
     }
 
     if (!user.referralCode) {
-      const code = "EW-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+      const code = await generateUniqueReferralCode();
       await db
         .update(usersTable)
         .set({ referralCode: code })

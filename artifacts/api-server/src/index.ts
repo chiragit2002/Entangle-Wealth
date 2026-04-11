@@ -226,6 +226,79 @@ async function ensureEmailSubscribersTable() {
   }
 }
 
+async function ensureTimelineTables() {
+  try {
+    const client = await pool.connect();
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS timelines (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+          name TEXT NOT NULL DEFAULT 'My Timeline',
+          annotation TEXT,
+          monthly_income REAL NOT NULL DEFAULT 5000,
+          savings_rate REAL NOT NULL DEFAULT 0.15,
+          monthly_debt REAL NOT NULL DEFAULT 500,
+          investment_rate REAL NOT NULL DEFAULT 0.07,
+          current_net_worth REAL NOT NULL DEFAULT 0,
+          emergency_fund_months REAL NOT NULL DEFAULT 0,
+          is_baseline BOOLEAN DEFAULT false,
+          metadata JSONB DEFAULT '{}',
+          created_at TIMESTAMPTZ DEFAULT now(),
+          updated_at TIMESTAMPTZ DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_timelines_user_id ON timelines (user_id);
+
+        CREATE TABLE IF NOT EXISTS timeline_results (
+          id SERIAL PRIMARY KEY,
+          timeline_id INTEGER NOT NULL REFERENCES timelines(id) ON DELETE CASCADE,
+          horizon TEXT NOT NULL,
+          projected_net_worth REAL NOT NULL,
+          savings_accumulated REAL NOT NULL,
+          debt_remaining REAL NOT NULL,
+          investment_value REAL NOT NULL,
+          stability_score REAL NOT NULL,
+          stress_index REAL NOT NULL,
+          opportunity_score REAL NOT NULL,
+          milestones JSONB DEFAULT '[]',
+          created_at TIMESTAMPTZ DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_timeline_results_timeline ON timeline_results (timeline_id);
+
+        CREATE TABLE IF NOT EXISTS timeline_comparisons (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+          timeline_a_id INTEGER NOT NULL REFERENCES timelines(id) ON DELETE CASCADE,
+          timeline_b_id INTEGER NOT NULL REFERENCES timelines(id) ON DELETE CASCADE,
+          delta_net_worth_5yr REAL,
+          delta_net_worth_10yr REAL,
+          delta_net_worth_20yr REAL,
+          delta_stress REAL,
+          delta_opportunity REAL,
+          summary TEXT,
+          created_at TIMESTAMPTZ DEFAULT now()
+        );
+
+        CREATE TABLE IF NOT EXISTS user_identity_stages (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+          stage TEXT NOT NULL DEFAULT 'Aware',
+          simulations_run INTEGER NOT NULL DEFAULT 0,
+          snapshots_saved INTEGER NOT NULL DEFAULT 0,
+          scenarios_explored INTEGER NOT NULL DEFAULT 0,
+          updated_at TIMESTAMPTZ DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_user_identity_stages_user ON user_identity_stages (user_id);
+      `);
+      logger.info("Timeline tables ensured");
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    logger.warn({ error: err }, "Failed to ensure timeline tables (non-fatal)");
+  }
+}
+
 async function ensurePerformanceIndexes() {
   try {
     const client = await pool.connect();
@@ -386,6 +459,7 @@ const httpServer = server.listen(port, async () => {
   await ensurePaperTradingTables();
   await ensureGamificationTables();
   await ensureEmailSubscribersTable();
+  await ensureTimelineTables();
   ensurePerformanceIndexes().catch((err) =>
     logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
   );

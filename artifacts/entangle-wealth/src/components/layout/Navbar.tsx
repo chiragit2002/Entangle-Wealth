@@ -32,6 +32,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/time-machine", label: "Time Machine", desc: "What-if simulator" },
       { href: "/wealth-sim", label: "Wealth Sim", desc: "Compound growth engine" },
+      { href: "/alternate-timeline", label: "Alternate Timeline", desc: "Dual-pane comparison" },
       { href: "/sector-flow", label: "Sector Flow", desc: "Rotation radar" },
       { href: "/volatility", label: "Vol Lab", desc: "Risk analytics" },
       { href: "/terminal", label: "Terminal", desc: "Pro commands" },
@@ -99,6 +100,7 @@ const MOBILE_SECTIONS = [
     links: [
       { href: "/time-machine", label: "Time Machine" },
       { href: "/wealth-sim", label: "Wealth Sim" },
+      { href: "/alternate-timeline", label: "Alternate Timeline" },
       { href: "/sector-flow", label: "Sector Flow" },
       { href: "/volatility", label: "Vol Lab" },
       { href: "/terminal", label: "Terminal" },

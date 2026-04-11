@@ -31,6 +31,7 @@ import paperTradingRouter from "./paperTrading";
 import subscribersRouter from "./subscribers";
 import giveawayRouter from "./giveaway";
 import simulationRouter from "./simulation";
+import timelineRouter from "./timeline";
 
 const router: IRouter = Router();
 
@@ -66,5 +67,6 @@ router.use(paperTradingRouter);
 router.use(subscribersRouter);
 router.use(giveawayRouter);
 router.use(simulationRouter);
+router.use(timelineRouter);
 
 export default router;

@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
+import { PaperTradingWidget } from "@/components/PaperTradingWidget";
 
 type SortField = "time" | "symbol" | "strike" | "delta" | "gamma" | "theta" | "ivRank" | "strength";
 type SortDir = "asc" | "desc";
@@ -402,6 +403,7 @@ export default function Options() {
           <p className="text-xs text-muted-foreground/60 text-center">Options trading carries substantial risk. The data shown above is for demonstration purposes. Signal strength is a composite score based on volume, premium size, and IV rank — it is not a recommendation to trade.</p>
         </div>
       </div>
+      <PaperTradingWidget variant="floating" />
     </Layout>
   );
 }

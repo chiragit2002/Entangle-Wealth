@@ -21,6 +21,7 @@ import { detectCandlestickPatterns, detectChartPatterns, type PatternResult, typ
 import { trackEvent } from "@/lib/trackEvent";
 import { runScanner, runClaudeAnalysis, type ScanResult, type ClaudeAnalysis, SCAN_TICKERS } from "@/lib/scanner";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
+import { PaperTradingWidget } from "@/components/PaperTradingWidget";
 
 const TIMEFRAMES = [
   { label: "1m", tf: "1Min", limit: 390 },
@@ -1061,6 +1062,7 @@ export default function Charts() {
         )}
       </div>
       <FinancialDisclaimerBanner pageKey="charts" />
+      <PaperTradingWidget variant="floating" initialSymbol={symbol} />
     </Layout>
   );
 }

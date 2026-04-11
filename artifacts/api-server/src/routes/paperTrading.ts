@@ -96,69 +96,85 @@ router.post("/paper-trading/trade", requireAuth, async (req, res) => {
     }
 
     const totalCost = qty * px;
-    const portfolio = await ensurePortfolio(dbUserId);
+    const upperSymbol = symbol.toUpperCase();
 
-    if (side === "buy") {
-      if (portfolio.cashBalance < totalCost) {
-        res.status(400).json({ error: `Insufficient funds. Available: $${portfolio.cashBalance.toFixed(2)}, Required: $${totalCost.toFixed(2)}` });
-        return;
-      }
-
-      await db
-        .update(paperPortfoliosTable)
-        .set({ cashBalance: portfolio.cashBalance - totalCost, updatedAt: new Date() })
+    const result = await db.transaction(async (tx) => {
+      const [portfolio] = await tx
+        .select()
+        .from(paperPortfoliosTable)
         .where(eq(paperPortfoliosTable.userId, dbUserId));
 
-      const [existingPos] = await db
-        .select()
-        .from(paperPositionsTable)
-        .where(and(eq(paperPositionsTable.userId, dbUserId), eq(paperPositionsTable.symbol, symbol.toUpperCase())));
+      const currentPortfolio = portfolio || (await tx
+        .insert(paperPortfoliosTable)
+        .values({ userId: dbUserId, cashBalance: STARTING_CASH })
+        .returning())[0];
 
-      if (existingPos) {
-        const newQty = existingPos.quantity + qty;
-        const newAvgCost = ((existingPos.quantity * existingPos.avgCost) + totalCost) / newQty;
-        await db
-          .update(paperPositionsTable)
-          .set({ quantity: newQty, avgCost: newAvgCost, updatedAt: new Date() })
-          .where(eq(paperPositionsTable.id, existingPos.id));
+      if (side === "buy") {
+        if (currentPortfolio.cashBalance < totalCost) {
+          return { error: `Insufficient funds. Available: $${currentPortfolio.cashBalance.toFixed(2)}, Required: $${totalCost.toFixed(2)}` };
+        }
+
+        await tx
+          .update(paperPortfoliosTable)
+          .set({ cashBalance: currentPortfolio.cashBalance - totalCost, updatedAt: new Date() })
+          .where(eq(paperPortfoliosTable.userId, dbUserId));
+
+        const [existingPos] = await tx
+          .select()
+          .from(paperPositionsTable)
+          .where(and(eq(paperPositionsTable.userId, dbUserId), eq(paperPositionsTable.symbol, upperSymbol)));
+
+        if (existingPos) {
+          const newQty = existingPos.quantity + qty;
+          const newAvgCost = ((existingPos.quantity * existingPos.avgCost) + totalCost) / newQty;
+          await tx
+            .update(paperPositionsTable)
+            .set({ quantity: newQty, avgCost: newAvgCost, updatedAt: new Date() })
+            .where(eq(paperPositionsTable.id, existingPos.id));
+        } else {
+          await tx
+            .insert(paperPositionsTable)
+            .values({ userId: dbUserId, symbol: upperSymbol, quantity: qty, avgCost: px });
+        }
       } else {
-        await db
-          .insert(paperPositionsTable)
-          .values({ userId: dbUserId, symbol: symbol.toUpperCase(), quantity: qty, avgCost: px });
+        const [existingPos] = await tx
+          .select()
+          .from(paperPositionsTable)
+          .where(and(eq(paperPositionsTable.userId, dbUserId), eq(paperPositionsTable.symbol, upperSymbol)));
+
+        if (!existingPos || existingPos.quantity < qty) {
+          return { error: `Insufficient shares. You own ${existingPos?.quantity ?? 0} shares of ${upperSymbol}` };
+        }
+
+        await tx
+          .update(paperPortfoliosTable)
+          .set({ cashBalance: currentPortfolio.cashBalance + totalCost, updatedAt: new Date() })
+          .where(eq(paperPortfoliosTable.userId, dbUserId));
+
+        const newQty = existingPos.quantity - qty;
+        await tx
+          .update(paperPositionsTable)
+          .set({ quantity: newQty, updatedAt: new Date() })
+          .where(eq(paperPositionsTable.id, existingPos.id));
       }
-    } else {
-      const [existingPos] = await db
-        .select()
-        .from(paperPositionsTable)
-        .where(and(eq(paperPositionsTable.userId, dbUserId), eq(paperPositionsTable.symbol, symbol.toUpperCase())));
 
-      if (!existingPos || existingPos.quantity < qty) {
-        res.status(400).json({ error: `Insufficient shares. You own ${existingPos?.quantity ?? 0} shares of ${symbol.toUpperCase()}` });
-        return;
-      }
+      await tx.insert(paperTradesTable).values({
+        userId: dbUserId,
+        symbol: upperSymbol,
+        side,
+        quantity: qty,
+        price: px,
+        totalCost,
+      });
 
-      await db
-        .update(paperPortfoliosTable)
-        .set({ cashBalance: portfolio.cashBalance + totalCost, updatedAt: new Date() })
-        .where(eq(paperPortfoliosTable.userId, dbUserId));
-
-      const newQty = existingPos.quantity - qty;
-      await db
-        .update(paperPositionsTable)
-        .set({ quantity: newQty, updatedAt: new Date() })
-        .where(eq(paperPositionsTable.id, existingPos.id));
-    }
-
-    await db.insert(paperTradesTable).values({
-      userId: dbUserId,
-      symbol: symbol.toUpperCase(),
-      side,
-      quantity: qty,
-      price: px,
-      totalCost,
+      return { success: true, message: `${side.toUpperCase()} ${qty} ${upperSymbol} @ $${px.toFixed(2)}` };
     });
 
-    res.json({ success: true, message: `${side.toUpperCase()} ${qty} ${symbol.toUpperCase()} @ $${px.toFixed(2)}` });
+    if (result.error) {
+      res.status(400).json({ error: result.error });
+      return;
+    }
+    res.json(result);
   } catch (err) {
     logger.error("Paper trading error:", err);
     res.status(500).json({ error: "Trade execution failed" });

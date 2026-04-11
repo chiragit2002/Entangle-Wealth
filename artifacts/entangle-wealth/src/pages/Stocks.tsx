@@ -26,6 +26,7 @@ import {
   Brain,
   Filter,
 } from "lucide-react";
+import { PaperTradingWidget } from "@/components/PaperTradingWidget";
 
 const SECTORS = [
   "Technology", "Healthcare", "Consumer Cyclical", "Communication Services",
@@ -490,6 +491,7 @@ export default function Stocks() {
         </section>
       </main>
       <Footer />
+      <PaperTradingWidget variant="floating" initialSymbol={selectedStock?.symbol || ""} />
     </div>
   );
 }

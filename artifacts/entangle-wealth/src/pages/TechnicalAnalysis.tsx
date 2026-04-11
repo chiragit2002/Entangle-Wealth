@@ -17,6 +17,7 @@ import { CandlestickChart } from "@/components/CandlestickChart";
 import { fetchBars, fetchSnapshot, barsToStockData, type AlpacaBar } from "@/lib/alpaca";
 import { trackEvent } from "@/lib/trackEvent";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
+import { PaperTradingWidget } from "@/components/PaperTradingWidget";
 
 type Category = "all" | "trend" | "momentum" | "volatility" | "volume";
 
@@ -705,6 +706,7 @@ export default function TechnicalAnalysis() {
           </div>
         </div>
       </div>
+      <PaperTradingWidget variant="floating" initialSymbol={activeSymbol} />
     </Layout>
   );
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Bell, X } from "lucide-react";
+import { trackEvent } from "@/lib/trackEvent";
 
 const DISMISS_KEY = "ew_notif_prompt_dismissed";
 
@@ -17,9 +18,11 @@ export function NotificationPrompt() {
 
   const handleAllow = useCallback(async () => {
     try {
-      await Notification.requestPermission();
+      const result = await Notification.requestPermission();
+      if (result === "granted") {
+        trackEvent("notifications_enabled");
+      }
     } catch {
-      // ignore
     }
     setShow(false);
     localStorage.setItem(DISMISS_KEY, "1");

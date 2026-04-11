@@ -21,6 +21,7 @@ const ITEMS: ChecklistItem[] = [
 
 const EVENTS_TO_CHECKLIST: Record<string, string> = {
   signal_viewed: "view_signal",
+  dashboard_viewed: "view_signal",
   taxflow_scan: "run_tax_scan",
   alert_created: "set_alert",
   community_post: "join_community",

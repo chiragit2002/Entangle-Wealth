@@ -114,7 +114,7 @@ router.post("/support/tickets", requireAuth, imageCompressionMiddleware, async (
       userId,
       subject,
       category,
-    }).catch((err) => logger.warn({ err }, "Failed to send Zapier webhook for support ticket submitted"));
+    }).catch(err => logger.warn({ err, userId, subject, category }, 'Failed to send support_ticket_submitted Zapier webhook'));
 
     res.json({ success: true, ticketId: ticket.id, createdAt: ticket.created_at });
   } catch (err) {

@@ -34,7 +34,7 @@ export function trackEvent(event: string, properties?: Record<string, unknown>):
         headers: { "Content-Type": "application/json" },
         body,
         keepalive: true,
-      }).catch((err) => console.warn("Failed to send analytics event", err));
+      }).catch(err => console.error('Failed to send analytics event:', event, err));
     }
 
     window.dispatchEvent(

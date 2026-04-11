@@ -108,7 +108,7 @@ export class WebhookHandlers {
             planTier,
             amount: session.amount_total,
             subscriptionStatus: 'active',
-          }).catch((err) => logger.warn({ err }, "Failed to send Zapier webhook for subscription created"));
+          }).catch(err => logger.warn({ err, userId, planTier }, 'Failed to send subscription_changed (created) Zapier webhook'));
           break;
         }
         case 'customer.subscription.updated': {
@@ -126,7 +126,7 @@ export class WebhookHandlers {
             planTier,
             amount: sub.items?.data?.[0]?.price?.unit_amount || null,
             subscriptionStatus: sub.status || null,
-          }).catch((err) => logger.warn({ err }, "Failed to send Zapier webhook for subscription updated"));
+          }).catch(err => logger.warn({ err, userId, planTier }, 'Failed to send subscription_changed (updated) Zapier webhook'));
           break;
         }
         case 'invoice.payment_succeeded': {
@@ -139,7 +139,7 @@ export class WebhookHandlers {
             userId,
             amount: invoice.amount_paid,
             invoiceId: invoice.id,
-          }).catch((err) => logger.warn({ err }, "Failed to send Zapier webhook for payment received"));
+          }).catch(err => logger.warn({ err, userId, invoiceId: invoice.id }, 'Failed to send payment_received Zapier webhook'));
           break;
         }
       }

@@ -103,8 +103,8 @@ export default function Stocks() {
     fetchMovers().then((data) => {
       setMoversGainers(data.gainers.slice(0, 5));
       setMoversLosers(data.losers.slice(0, 5));
-    }).catch((err) => console.warn("Failed to fetch market movers", err));
-    fetchSectors().then((data) => setSectors(data.sectors)).catch((err) => console.warn("Failed to fetch sectors", err));
+    }).catch(err => { if (import.meta.env.DEV) console.error('Failed to fetch market movers:', err); });
+    fetchSectors().then((data) => setSectors(data.sectors)).catch(err => { if (import.meta.env.DEV) console.error('Failed to fetch sectors:', err); });
   }, []);
 
   const handleSort = (field: string) => {

@@ -66,7 +66,7 @@ router.post("/auth/event", (req: Request, res: Response) => {
       userId: resolvedUserId,
       timestamp: new Date().toISOString(),
       ipHash: hashedIp,
-    }).catch((err) => logger.warn({ err }, "Failed to send Zapier webhook for login event"));
+    }).catch(err => logger.warn({ err, userId }, 'Failed to send login Zapier webhook'));
   }
 
   res.json({ logged: true });

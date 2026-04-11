@@ -103,7 +103,7 @@ export default function Screener() {
     for (let i = 0; i < symbols.length; i += batchSize) {
       batches.push(symbols.slice(i, i + batchSize));
     }
-    Promise.all(batches.map(batch => fetchSnapshots(batch).catch(() => ({} as Record<string, AlpacaSnapshot>))))
+    Promise.all(batches.map(batch => fetchSnapshots(batch).catch(err => { if (import.meta.env.DEV) console.error('Failed to fetch stock snapshots batch:', err); return {} as Record<string, AlpacaSnapshot>; })))
       .then(results => {
         const merged: Record<string, AlpacaSnapshot> = {};
         results.forEach(r => Object.assign(merged, r));
@@ -124,7 +124,7 @@ export default function Screener() {
         }));
         setIsLive(true);
       })
-      .catch((err) => console.warn("Failed to fetch live stock snapshots", err));
+      .catch(err => { if (import.meta.env.DEV) console.error('Failed to process stock snapshots:', err); });
   }, []);
 
   const handleSort = useCallback((field: SortField) => {

@@ -167,7 +167,7 @@ export function AnniversaryGiveawayBanner() {
             ) : (
               <div className="text-center px-4 py-2 rounded-xl bg-[#f5c842]/10 border border-[#f5c842]/30">
                 <p className="text-sm font-bold text-[#f5c842]">Drawing has occurred!</p>
-                <p className="text-[10px] text-white/50">Winner announced soon</p>
+                <p className="text-[10px] text-white/50">Winner announced on our 1 year anniversary</p>
               </div>
             )}
 

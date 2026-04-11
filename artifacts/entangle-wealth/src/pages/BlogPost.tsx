@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { Link, useParams } from "wouter";
 import { Layout } from "@/components/layout/Layout";
 import { ArrowLeft, Calendar, Clock, FileText } from "lucide-react";
@@ -38,6 +38,40 @@ export default function BlogPostPage() {
     const posts = loadBlogPosts();
     return posts.find((p) => p.slug === params.slug && p.status === "published") || null;
   }, [params.slug]);
+
+  useEffect(() => {
+    if (!post) return;
+    const prevTitle = document.title;
+    document.title = post.metaTitle || post.title;
+    let metaDesc = document.querySelector('meta[name="description"]');
+    const prevDesc = metaDesc?.getAttribute("content") || "";
+    if (post.metaDescription) {
+      if (!metaDesc) {
+        metaDesc = document.createElement("meta");
+        metaDesc.setAttribute("name", "description");
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.setAttribute("content", post.metaDescription);
+    }
+    let ogTitle = document.querySelector('meta[property="og:title"]');
+    if (!ogTitle) {
+      ogTitle = document.createElement("meta");
+      ogTitle.setAttribute("property", "og:title");
+      document.head.appendChild(ogTitle);
+    }
+    ogTitle.setAttribute("content", post.metaTitle || post.title);
+    let ogDesc = document.querySelector('meta[property="og:description"]');
+    if (!ogDesc) {
+      ogDesc = document.createElement("meta");
+      ogDesc.setAttribute("property", "og:description");
+      document.head.appendChild(ogDesc);
+    }
+    ogDesc.setAttribute("content", post.metaDescription);
+    return () => {
+      document.title = prevTitle;
+      if (metaDesc) metaDesc.setAttribute("content", prevDesc);
+    };
+  }, [post]);
 
   if (!post) {
     return (

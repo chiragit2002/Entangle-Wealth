@@ -49,7 +49,9 @@ import {
   loadBacklinks,
   saveBacklinks,
   addBacklink,
+  updateBacklink,
   deleteBacklink,
+  updateKeyword,
   slugify,
 } from "@/lib/seoStore";
 
@@ -68,10 +70,16 @@ function KeywordsTab() {
   const [sortField, setSortField] = useState<"keyword" | "volume" | "difficulty" | "rank">("volume");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [showAdd, setShowAdd] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [newKw, setNewKw] = useState("");
   const [newVol, setNewVol] = useState("");
   const [newDiff, setNewDiff] = useState("");
   const [newRank, setNewRank] = useState("");
+  const [editKw, setEditKw] = useState("");
+  const [editVol, setEditVol] = useState("");
+  const [editDiff, setEditDiff] = useState("");
+  const [editRank, setEditRank] = useState("");
+  const [editTrend, setEditTrend] = useState<"up" | "down" | "stable">("stable");
 
   const filtered = useMemo(() => {
     let list = keywords;
@@ -111,6 +119,28 @@ function KeywordsTab() {
     setNewDiff("");
     setNewRank("");
     setShowAdd(false);
+  };
+
+  const startEdit = (kw: SeoKeyword) => {
+    setEditingId(kw.id);
+    setEditKw(kw.keyword);
+    setEditVol(String(kw.volume));
+    setEditDiff(String(kw.difficulty));
+    setEditRank(String(kw.rank));
+    setEditTrend(kw.trend);
+  };
+
+  const handleEdit = () => {
+    if (!editingId || !editKw.trim()) return;
+    updateKeyword(editingId, {
+      keyword: editKw.trim(),
+      volume: parseInt(editVol) || 0,
+      difficulty: parseInt(editDiff) || 0,
+      rank: parseInt(editRank) || 0,
+      trend: editTrend,
+    });
+    setKeywords(loadKeywords());
+    setEditingId(null);
   };
 
   const handleDelete = (id: string) => {
@@ -165,24 +195,49 @@ function KeywordsTab() {
                 <th className="text-right px-4 py-3 text-muted-foreground text-xs uppercase tracking-wider font-semibold"><SortBtn field="difficulty" label="Difficulty" /></th>
                 <th className="text-right px-4 py-3 text-muted-foreground text-xs uppercase tracking-wider font-semibold"><SortBtn field="rank" label="Rank" /></th>
                 <th className="text-center px-4 py-3 text-muted-foreground text-xs uppercase tracking-wider font-semibold">Trend</th>
-                <th className="px-4 py-3 w-12" />
+                <th className="px-4 py-3 w-24" />
               </tr>
             </thead>
             <tbody>
-              {filtered.map((kw) => (
-                <tr key={kw.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
-                  <td className="px-4 py-3 font-mono text-sm text-white/90">{kw.keyword}</td>
-                  <td className="px-4 py-3 text-right font-mono text-sm text-white/70">{kw.volume.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-right">
-                    <span className={`font-mono text-sm ${kw.difficulty <= 30 ? "text-emerald-400" : kw.difficulty <= 60 ? "text-yellow-400" : "text-red-400"}`}>{kw.difficulty}</span>
-                  </td>
-                  <td className="px-4 py-3 text-right font-mono text-sm text-white/70">{kw.rank || "—"}</td>
-                  <td className="px-4 py-3 text-center"><TrendIcon trend={kw.trend} /></td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => handleDelete(kw.id)} className="text-red-400/60 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map((kw) =>
+                editingId === kw.id ? (
+                  <tr key={kw.id} className="border-b border-primary/20 bg-primary/5">
+                    <td className="px-4 py-2"><Input value={editKw} onChange={(e) => setEditKw(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm h-8" /></td>
+                    <td className="px-4 py-2"><Input type="number" value={editVol} onChange={(e) => setEditVol(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm h-8 text-right w-24 ml-auto" /></td>
+                    <td className="px-4 py-2"><Input type="number" value={editDiff} onChange={(e) => setEditDiff(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm h-8 text-right w-20 ml-auto" /></td>
+                    <td className="px-4 py-2"><Input type="number" value={editRank} onChange={(e) => setEditRank(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm h-8 text-right w-20 ml-auto" /></td>
+                    <td className="px-4 py-2 text-center">
+                      <select value={editTrend} onChange={(e) => setEditTrend(e.target.value as "up" | "down" | "stable")} className="bg-white/[0.03] border border-white/[0.08] rounded px-2 py-1 text-xs text-white">
+                        <option value="up">↑ Up</option>
+                        <option value="down">↓ Down</option>
+                        <option value="stable">— Stable</option>
+                      </select>
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="flex items-center gap-1">
+                        <button onClick={handleEdit} className="text-emerald-400 hover:text-emerald-300 transition-colors"><Save className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => setEditingId(null)} className="text-white/40 hover:text-white transition-colors"><X className="w-3.5 h-3.5" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  <tr key={kw.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                    <td className="px-4 py-3 font-mono text-sm text-white/90">{kw.keyword}</td>
+                    <td className="px-4 py-3 text-right font-mono text-sm text-white/70">{kw.volume.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right">
+                      <span className={`font-mono text-sm ${kw.difficulty <= 30 ? "text-emerald-400" : kw.difficulty <= 60 ? "text-yellow-400" : "text-red-400"}`}>{kw.difficulty}</span>
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono text-sm text-white/70">{kw.rank || "—"}</td>
+                    <td className="px-4 py-3 text-center"><TrendIcon trend={kw.trend} /></td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => startEdit(kw)} className="text-blue-400/60 hover:text-blue-400 transition-colors"><Edit3 className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => handleDelete(kw.id)} className="text-red-400/60 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              )}
             </tbody>
           </table>
         </div>
@@ -490,9 +545,13 @@ function MetaTagsTab() {
 function BacklinksTab() {
   const [links, setLinks] = useState<Backlink[]>(loadBacklinks);
   const [showAdd, setShowAdd] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [newUrl, setNewUrl] = useState("");
   const [newSource, setNewSource] = useState("");
   const [newAnchor, setNewAnchor] = useState("");
+  const [editUrl, setEditUrl] = useState("");
+  const [editSource, setEditSource] = useState("");
+  const [editAnchor, setEditAnchor] = useState("");
 
   const handleAdd = () => {
     if (!newUrl.trim() || !newSource.trim()) return;
@@ -504,6 +563,20 @@ function BacklinksTab() {
     setShowAdd(false);
   };
 
+  const startEdit = (link: Backlink) => {
+    setEditingId(link.id);
+    setEditUrl(link.url);
+    setEditSource(link.sourceDomain);
+    setEditAnchor(link.anchorText);
+  };
+
+  const handleEdit = () => {
+    if (!editingId || !editUrl.trim()) return;
+    updateBacklink(editingId, { url: editUrl.trim(), sourceDomain: editSource.trim(), anchorText: editAnchor.trim() });
+    setLinks(loadBacklinks());
+    setEditingId(null);
+  };
+
   const handleDelete = (id: string) => {
     deleteBacklink(id);
     setLinks(links.filter((l) => l.id !== id));
@@ -511,9 +584,8 @@ function BacklinksTab() {
 
   const toggleStatus = (link: Backlink) => {
     const newStatus: "active" | "broken" = link.status === "active" ? "broken" : "active";
-    const updated = links.map((l) => (l.id === link.id ? { ...l, status: newStatus } : l));
-    setLinks(updated);
-    saveBacklinks(updated);
+    updateBacklink(link.id, { status: newStatus });
+    setLinks(loadBacklinks());
   };
 
   return (
@@ -544,31 +616,54 @@ function BacklinksTab() {
                 <th className="text-left px-4 py-3 text-muted-foreground text-xs uppercase tracking-wider font-semibold hidden md:table-cell">Anchor Text</th>
                 <th className="text-center px-4 py-3 text-muted-foreground text-xs uppercase tracking-wider font-semibold">Status</th>
                 <th className="text-left px-4 py-3 text-muted-foreground text-xs uppercase tracking-wider font-semibold hidden lg:table-cell">Added</th>
-                <th className="px-4 py-3 w-12" />
+                <th className="px-4 py-3 w-24" />
               </tr>
             </thead>
             <tbody>
-              {links.map((link) => (
-                <tr key={link.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
-                  <td className="px-4 py-3">
-                    <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1 text-xs font-mono truncate max-w-56">
-                      {link.url} <ExternalLink className="w-3 h-3 shrink-0 opacity-50" />
-                    </a>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-white/70">{link.sourceDomain}</td>
-                  <td className="px-4 py-3 text-xs text-white/50 hidden md:table-cell">{link.anchorText || "—"}</td>
-                  <td className="px-4 py-3 text-center">
-                    <button onClick={() => toggleStatus(link)} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${link.status === "active" ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}`}>
-                      {link.status === "active" ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
-                      {link.status}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-white/40 hidden lg:table-cell">{new Date(link.addedAt).toLocaleDateString()}</td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => handleDelete(link.id)} className="text-red-400/60 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
-                  </td>
-                </tr>
-              ))}
+              {links.map((link) =>
+                editingId === link.id ? (
+                  <tr key={link.id} className="border-b border-primary/20 bg-primary/5">
+                    <td className="px-4 py-2"><Input value={editUrl} onChange={(e) => setEditUrl(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-xs h-8" /></td>
+                    <td className="px-4 py-2"><Input value={editSource} onChange={(e) => setEditSource(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-xs h-8" /></td>
+                    <td className="px-4 py-2 hidden md:table-cell"><Input value={editAnchor} onChange={(e) => setEditAnchor(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-xs h-8" /></td>
+                    <td className="px-4 py-2 text-center">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${link.status === "active" ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}`}>
+                        {link.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 hidden lg:table-cell text-xs text-white/40">{new Date(link.addedAt).toLocaleDateString()}</td>
+                    <td className="px-4 py-2">
+                      <div className="flex items-center gap-1">
+                        <button onClick={handleEdit} className="text-emerald-400 hover:text-emerald-300 transition-colors"><Save className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => setEditingId(null)} className="text-white/40 hover:text-white transition-colors"><X className="w-3.5 h-3.5" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  <tr key={link.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                    <td className="px-4 py-3">
+                      <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1 text-xs font-mono truncate max-w-56">
+                        {link.url} <ExternalLink className="w-3 h-3 shrink-0 opacity-50" />
+                      </a>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-white/70">{link.sourceDomain}</td>
+                    <td className="px-4 py-3 text-xs text-white/50 hidden md:table-cell">{link.anchorText || "—"}</td>
+                    <td className="px-4 py-3 text-center">
+                      <button onClick={() => toggleStatus(link)} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${link.status === "active" ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}`}>
+                        {link.status === "active" ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                        {link.status}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-white/40 hidden lg:table-cell">{new Date(link.addedAt).toLocaleDateString()}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => startEdit(link)} className="text-blue-400/60 hover:text-blue-400 transition-colors"><Edit3 className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => handleDelete(link.id)} className="text-red-400/60 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              )}
             </tbody>
           </table>
         </div>

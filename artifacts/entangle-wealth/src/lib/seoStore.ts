@@ -81,6 +81,12 @@ export function addKeyword(kw: Omit<SeoKeyword, "id" | "updatedAt">): SeoKeyword
   saveKeywords(list);
   return entry;
 }
+export function updateKeyword(id: string, patch: Partial<SeoKeyword>) {
+  const list = loadKeywords().map((k) =>
+    k.id === id ? { ...k, ...patch, updatedAt: new Date().toISOString() } : k
+  );
+  saveKeywords(list);
+}
 export function deleteKeyword(id: string) {
   saveKeywords(loadKeywords().filter((k) => k.id !== id));
 }
@@ -132,6 +138,10 @@ export function addBacklink(link: Omit<Backlink, "id" | "addedAt">): Backlink {
   list.push(entry);
   saveBacklinks(list);
   return entry;
+}
+export function updateBacklink(id: string, patch: Partial<Backlink>) {
+  const list = loadBacklinks().map((b) => (b.id === id ? { ...b, ...patch } : b));
+  saveBacklinks(list);
 }
 export function deleteBacklink(id: string) {
   saveBacklinks(loadBacklinks().filter((b) => b.id !== id));

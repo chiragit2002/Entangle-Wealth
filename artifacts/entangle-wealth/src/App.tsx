@@ -15,8 +15,7 @@ import { trackEvent } from "@/lib/trackEvent";
 import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
-import Home from "@/pages/Home";
-
+const Home = lazy(() => import("@/pages/Home"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const Earn = lazy(() => import("@/pages/Earn"));
 const Options = lazy(() => import("@/pages/Options"));
@@ -193,7 +192,7 @@ function ClerkProviderWithRoutes() {
         <ClerkQueryClientCacheInvalidator />
         <TooltipProvider>
           <Switch>
-            <Route path="/" component={Home} />
+            <Route path="/">{() => <LazyPage component={Home} />}</Route>
             <Route path="/dashboard">{() => <LazyPage component={Dashboard} />}</Route>
             <Route path="/earn">{() => <LazyPage component={Earn} />}</Route>
             <Route path="/options">{() => <LazyPage component={Options} />}</Route>

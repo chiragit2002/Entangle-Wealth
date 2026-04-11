@@ -3,14 +3,28 @@ import { logger } from "../lib/logger";
 
 let totalRequests = 0;
 let totalResponseTimeMs = 0;
+let activeRequestCount = 0;
+let lastEventLoopLagMs = 0;
 
 const SLOW_REQUEST_THRESHOLD_MS = 2000;
+
+function measureEventLoopLag() {
+  const start = process.hrtime.bigint();
+  setTimeout(() => {
+    const elapsed = Number(process.hrtime.bigint() - start) / 1_000_000;
+    lastEventLoopLagMs = Math.max(0, elapsed - 1);
+    measureEventLoopLag();
+  }, 1);
+}
+measureEventLoopLag();
 
 export function metricsMiddleware(req: Request, res: Response, next: NextFunction) {
   const start = process.hrtime.bigint();
   totalRequests++;
+  activeRequestCount++;
 
   res.on("finish", () => {
+    activeRequestCount--;
     const durationNs = Number(process.hrtime.bigint() - start);
     const durationMs = durationNs / 1_000_000;
     totalResponseTimeMs += durationMs;
@@ -35,12 +49,6 @@ export function getMetricsSnapshot() {
   const mem = process.memoryUsage();
   const uptimeSeconds = Math.floor(process.uptime());
 
-  let eventLoopLagMs = 0;
-  const lagStart = process.hrtime.bigint();
-  setImmediate(() => {
-    eventLoopLagMs = Number(process.hrtime.bigint() - lagStart) / 1_000_000;
-  });
-
   return {
     uptime: {
       seconds: uptimeSeconds,
@@ -54,11 +62,12 @@ export function getMetricsSnapshot() {
     },
     requests: {
       total: totalRequests,
+      active: activeRequestCount,
       avgResponseTimeMs: totalRequests > 0
         ? Math.round(totalResponseTimeMs / totalRequests)
         : 0,
     },
-    eventLoopLagMs: Math.round(eventLoopLagMs * 100) / 100,
+    eventLoopLagMs: Math.round(lastEventLoopLagMs * 100) / 100,
     node: process.version,
     timestamp: new Date().toISOString(),
   };

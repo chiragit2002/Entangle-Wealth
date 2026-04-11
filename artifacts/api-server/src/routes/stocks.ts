@@ -16,7 +16,7 @@ router.get("/stocks", (req, res) => {
   const sector = req.query.sector as string | undefined;
   const capTier = req.query.capTier as string | undefined;
   const page = Math.max(1, parseInt(req.query.page as string) || 1);
-  const limit = Math.max(1, Math.min(parseInt(req.query.limit as string) || 50, 200));
+  const limit = Math.max(1, Math.min(parseInt(req.query.limit as string) || 50, 50));
   const sortBy = (req.query.sortBy as string) || "symbol";
   const sortDir = (req.query.sortDir as string) === "desc" ? "desc" : "asc";
 

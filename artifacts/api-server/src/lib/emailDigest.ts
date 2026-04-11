@@ -3,6 +3,7 @@ import { db } from "@workspace/db";
 import { usersTable, alertHistoryTable } from "@workspace/db/schema";
 import { eq, and, gte, desc } from "drizzle-orm";
 import { logger } from "./logger";
+import { retryWithBackoff } from "./retryWithBackoff";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = process.env.ALERT_FROM_EMAIL || "alerts@entanglewealth.com";
@@ -87,12 +88,16 @@ async function sendDigestForUser(userId: string, email: string, since: Date, res
   const period = since.getTime() > Date.now() - 2 * 86_400_000 ? "Daily" : "Weekly";
 
   try {
-    await resend.emails.send({
-      from: FROM_EMAIL,
-      to: email,
-      subject: `${period} Alert Digest — ${alerts.length} alert${alerts.length > 1 ? "s" : ""} triggered`,
-      html,
-    });
+    await retryWithBackoff(
+      () =>
+        resend.emails.send({
+          from: FROM_EMAIL,
+          to: email,
+          subject: `${period} Alert Digest — ${alerts.length} alert${alerts.length > 1 ? "s" : ""} triggered`,
+          html,
+        }),
+      { label: "resend-digest", maxRetries: 3 }
+    );
     logger.info({ userId, alertCount: alerts.length, period }, "Sent alert digest email");
   } catch (err) {
     logger.error({ err, userId }, "Failed to send alert digest email");

@@ -35,9 +35,9 @@ export class CircuitBreaker {
 
     try {
       const result = await fn();
+      this.failureCount = 0;
       if (this.state === "half-open") {
         this.state = "closed";
-        this.failureCount = 0;
         logger.info({ circuit: this.name }, "Circuit closed after successful probe");
       }
       return result;
@@ -45,15 +45,15 @@ export class CircuitBreaker {
       this.failureCount++;
       this.lastFailureTime = Date.now();
 
-      if (this.failureCount >= this.failureThreshold) {
+      if (this.failureCount >= this.failureThreshold && this.state !== "open") {
         this.state = "open";
         logger.error(
           { circuit: this.name, failureCount: this.failureCount },
-          "Circuit breaker OPENED"
+          "Circuit breaker OPENED after consecutive failures"
         );
       }
 
-      if (fallback && this.state === "open") return fallback();
+      if (fallback) return fallback();
       throw err;
     }
   }

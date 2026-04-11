@@ -22,7 +22,7 @@ import {
 interface MetricsData {
   uptime: { seconds: number; formatted: string };
   memory: { rss: number; heapUsed: number; heapTotal: number; external: number };
-  requests: { total: number; avgResponseTimeMs: number };
+  requests: { total: number; active: number; avgResponseTimeMs: number };
   eventLoopLagMs: number;
   node: string;
   timestamp: string;
@@ -75,7 +75,9 @@ export default function AdminScalability() {
   const fetchMetrics = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await authFetch("metrics", getToken);
+      const res = await authFetch("/metrics", getToken);
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
       setMetrics(data);
       setError("");
     } catch {
@@ -196,7 +198,7 @@ export default function AdminScalability() {
                   icon={BarChart3}
                   label="Requests"
                   value={metrics.requests.total.toLocaleString()}
-                  sub={`Avg: ${metrics.requests.avgResponseTimeMs}ms`}
+                  sub={`Active: ${metrics.requests.active} | Avg: ${metrics.requests.avgResponseTimeMs}ms`}
                 />
                 <MetricCard
                   icon={Activity}

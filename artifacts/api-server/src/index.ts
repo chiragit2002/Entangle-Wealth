@@ -67,6 +67,7 @@ async function ensurePerformanceIndexes() {
         CREATE INDEX IF NOT EXISTS idx_users_subscription_tier ON users (subscription_tier);
         CREATE INDEX IF NOT EXISTS idx_alert_history_user_triggered ON alert_history (user_id, triggered_at);
         CREATE INDEX IF NOT EXISTS idx_support_tickets_user_status ON support_tickets (user_id, status);
+        CREATE INDEX IF NOT EXISTS idx_analytics_event_timestamp ON analytics_events (event, created_at);
       `);
       logger.info("Performance indexes ensured");
     } finally {

@@ -69,9 +69,16 @@ async function alpacaFetchRaw(url: string) {
   return res.json();
 }
 
-async function alpacaFetch(url: string) {
+async function alpacaFetch(url: string, cacheKey?: string) {
   return alpacaCircuit.execute(
     () => retryWithBackoff(() => alpacaFetchRaw(url), { label: "alpaca", maxRetries: 3 }),
+    cacheKey
+      ? () => {
+          const cached = alpacaCache.get(cacheKey);
+          if (cached) return cached;
+          throw new Error("Alpaca circuit open and no cached data available");
+        }
+      : undefined,
   );
 }
 
@@ -85,7 +92,8 @@ router.get("/alpaca/snapshot/:symbol", async (req, res) => {
       return;
     }
     const data = await alpacaFetch(
-      `${ALPACA_DATA_URL}/v2/stocks/${symbol}/snapshot`
+      `${ALPACA_DATA_URL}/v2/stocks/${symbol}/snapshot`,
+      cacheKey
     );
     alpacaCache.set(cacheKey, data);
     res.json(data);
@@ -109,7 +117,8 @@ router.get("/alpaca/snapshots", async (req, res) => {
       return;
     }
     const data = await alpacaFetch(
-      `${ALPACA_DATA_URL}/v2/stocks/snapshots?symbols=${encodeURIComponent(symbols)}`
+      `${ALPACA_DATA_URL}/v2/stocks/snapshots?symbols=${encodeURIComponent(symbols)}`,
+      cacheKey
     );
     alpacaCache.set(cacheKey, data);
     res.json(data);

@@ -402,6 +402,14 @@ function QueuePanel({
   );
 }
 
+interface AIQueueStatus {
+  active: number;
+  queued: number;
+  maxConcurrent: number;
+  totalProcessed: number;
+  totalFailed: number;
+}
+
 export default function MarketingCenter() {
   const { getToken } = useAuth();
   const { toast } = useToast();
@@ -409,16 +417,30 @@ export default function MarketingCenter() {
   const [authorized, setAuthorized] = useState(false);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [activeTab, setActiveTab] = useState<"agents" | "queue">("agents");
+  const [aiQueueStatus, setAiQueueStatus] = useState<AIQueueStatus | null>(null);
+
+  const fetchQueueStatus = useCallback(async () => {
+    try {
+      const res = await authFetch("/metrics", getToken);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.aiQueue) {
+          setAiQueueStatus(data.aiQueue);
+        }
+      }
+    } catch {}
+  }, [getToken]);
 
   const checkAccess = useCallback(async () => {
     try {
       const res = await authFetch("/marketing/agents", getToken);
       if (res.ok) {
         setAuthorized(true);
+        fetchQueueStatus();
       }
     } catch {}
     setLoading(false);
-  }, [getToken]);
+  }, [getToken, fetchQueueStatus]);
 
   useEffect(() => {
     checkAccess();
@@ -498,6 +520,24 @@ export default function MarketingCenter() {
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">9 AI agents generating platform-optimized content for your marketing channels</p>
         </div>
+
+        {aiQueueStatus && (
+          <div className="mb-4 p-3 rounded-lg border border-white/[0.06] bg-white/[0.02] flex items-center gap-4 text-xs">
+            <div className="flex items-center gap-1.5">
+              <div className={`w-2 h-2 rounded-full ${aiQueueStatus.active > 0 ? "bg-[#00D4FF] animate-pulse" : "bg-[#00ff88]"}`} />
+              <span className="text-white/60">AI Queue:</span>
+            </div>
+            <span className="text-white/80 font-mono">{aiQueueStatus.active}/{aiQueueStatus.maxConcurrent} active</span>
+            {aiQueueStatus.queued > 0 && (
+              <span className="text-[#FFD700] font-mono">{aiQueueStatus.queued} waiting</span>
+            )}
+            <span className="text-white/40">|</span>
+            <span className="text-[#00ff88] font-mono">{aiQueueStatus.totalProcessed} processed</span>
+            {aiQueueStatus.totalFailed > 0 && (
+              <span className="text-[#ff3366] font-mono">{aiQueueStatus.totalFailed} failed</span>
+            )}
+          </div>
+        )}
 
         <div className="flex gap-2 mb-6">
           <button

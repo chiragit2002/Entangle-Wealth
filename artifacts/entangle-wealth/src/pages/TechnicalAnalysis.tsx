@@ -16,6 +16,7 @@ import {
 import { CandlestickChart } from "@/components/CandlestickChart";
 import { fetchBars, fetchSnapshot, barsToStockData, type AlpacaBar } from "@/lib/alpaca";
 import { trackEvent } from "@/lib/trackEvent";
+import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
 
 type Category = "all" | "trend" | "momentum" | "volatility" | "volume";
 
@@ -404,6 +405,7 @@ export default function TechnicalAnalysis() {
 
   return (
     <Layout>
+      <FinancialDisclaimerBanner pageKey="technical-analysis" />
       <div className="w-full border-b border-white/[0.06] bg-[#060610]">
         <div className="container mx-auto px-4 max-w-[1400px]">
           <div className="flex items-center justify-between h-14">

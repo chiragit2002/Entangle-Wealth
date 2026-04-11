@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { fetchSnapshots, fetchMovers, type AlpacaSnapshot, type AlpacaMover } from "@/lib/alpaca";
+import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
 
 interface MarketIndex {
   name: string;
@@ -219,6 +220,7 @@ export default function MarketOverview() {
 
   return (
     <Layout>
+      <FinancialDisclaimerBanner pageKey="market-overview" />
       <div className="w-full border-b border-white/[0.04] bg-[#060610]">
         <div className="container mx-auto px-4 max-w-[1600px]">
           <div className="flex items-center justify-between h-11">

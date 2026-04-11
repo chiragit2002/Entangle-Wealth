@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
+import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
 
 type SortField = "time" | "symbol" | "strike" | "delta" | "gamma" | "theta" | "ivRank" | "strength";
 type SortDir = "asc" | "desc";
@@ -101,6 +102,7 @@ export default function Options() {
     <Layout>
       <FlashCouncil />
       <MarketTicker />
+      <FinancialDisclaimerBanner pageKey="options" />
       
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         <OptionsChain />

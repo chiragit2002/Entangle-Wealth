@@ -13,6 +13,7 @@ import { PageSkeleton, ChartSkeleton, TableSkeleton } from "@/components/pwa/Pag
 import { captureReferralCode } from "@/lib/referral";
 import { trackEvent } from "@/lib/trackEvent";
 import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
 import Home from "@/pages/Home";
 
@@ -60,6 +61,10 @@ const BlogIndex = lazy(() => import("@/pages/BlogIndex"));
 const BlogPostPage = lazy(() => import("@/pages/BlogPost"));
 const AlertsPage = lazy(() => import("@/pages/Alerts"));
 const AnalyticsPage = lazy(() => import("@/pages/Analytics"));
+const CookiesPage = lazy(() => import("@/pages/Cookies"));
+const DisclaimerPage = lazy(() => import("@/pages/Disclaimer"));
+const DmcaPage = lazy(() => import("@/pages/Dmca"));
+const AccessibilityPage = lazy(() => import("@/pages/Accessibility"));
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -229,9 +234,14 @@ function ClerkProviderWithRoutes() {
             <Route path="/analytics">{() => <LazyProtected component={AnalyticsPage} />}</Route>
             <Route path="/blog">{() => <LazyPage component={BlogIndex} />}</Route>
             <Route path="/blog/:slug">{() => <LazyPage component={BlogPostPage} />}</Route>
+            <Route path="/cookies">{() => <LazyPage component={CookiesPage} />}</Route>
+            <Route path="/disclaimer">{() => <LazyPage component={DisclaimerPage} />}</Route>
+            <Route path="/dmca">{() => <LazyPage component={DmcaPage} />}</Route>
+            <Route path="/accessibility">{() => <LazyPage component={AccessibilityPage} />}</Route>
             <Route component={NotFound} />
           </Switch>
           <OnboardingProvider />
+          <CookieConsentBanner />
           <InstallPrompt />
           <NotificationPrompt />
           <Toaster />

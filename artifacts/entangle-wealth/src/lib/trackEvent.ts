@@ -7,8 +7,18 @@ function getSessionId(): string {
   return sessionId;
 }
 
+function hasAnalyticsConsent(): boolean {
+  try {
+    return localStorage.getItem("ew_cookie_consent") !== "declined";
+  } catch {
+    return true;
+  }
+}
+
 export function trackEvent(event: string, properties?: Record<string, unknown>): void {
   try {
+    if (!hasAnalyticsConsent()) return;
+
     const body = JSON.stringify({
       event,
       properties: properties || undefined,

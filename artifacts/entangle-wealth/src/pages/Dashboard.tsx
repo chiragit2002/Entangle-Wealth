@@ -15,6 +15,7 @@ import { generateMockOHLCV, runAllIndicators, getOverallSignal } from "@/lib/ind
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/trackEvent";
 import { Area, AreaChart, Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from "recharts";
+import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
 
 const DASHBOARD_STOCKS: { symbol: string; name: string }[] = [
   { symbol: "AAPL", name: "Apple Inc." }, { symbol: "MSFT", name: "Microsoft Corporation" },
@@ -302,6 +303,7 @@ export default function Dashboard() {
     <Layout>
       <FlashCouncil />
       <MarketTicker />
+      <FinancialDisclaimerBanner pageKey="dashboard" />
 
       <div className="bg-[#040408] border-b border-white/[0.06] px-3 py-1.5 flex items-center justify-between">
         <div className="flex items-center gap-4">

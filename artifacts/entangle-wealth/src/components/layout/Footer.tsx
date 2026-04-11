@@ -37,7 +37,10 @@ export function Footer() {
             <span className="font-semibold text-white">Legal</span>
             <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms of Use</Link>
             <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">Risk Disclosure</Link>
+            <Link href="/disclaimer" className="text-muted-foreground hover:text-primary transition-colors">Financial Disclaimer</Link>
+            <Link href="/cookies" className="text-muted-foreground hover:text-primary transition-colors">Cookie Policy</Link>
+            <Link href="/dmca" className="text-muted-foreground hover:text-primary transition-colors">DMCA Policy</Link>
+            <Link href="/accessibility" className="text-muted-foreground hover:text-primary transition-colors">Accessibility</Link>
           </div>
         </div>
       </div>
@@ -51,8 +54,12 @@ export function Footer() {
             &copy; {new Date().getFullYear()} EntangleWealth LLC. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-xs text-muted-foreground/50">
-            <Link href="/terms" className="hover:text-primary transition-colors">Terms of Use</Link>
-            <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-primary transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
+            <Link href="/disclaimer" className="hover:text-primary transition-colors">Disclaimer</Link>
+            <Link href="/cookies" className="hover:text-primary transition-colors">Cookies</Link>
+            <Link href="/dmca" className="hover:text-primary transition-colors">DMCA</Link>
+            <Link href="/accessibility" className="hover:text-primary transition-colors">Accessibility</Link>
           </div>
         </div>
       </div>

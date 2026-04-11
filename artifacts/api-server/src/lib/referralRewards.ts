@@ -1,6 +1,6 @@
 import { db } from "@workspace/db";
 import {
-  referralConversionsTable,
+  referralsTable,
   badgesTable,
   userBadgesTable,
   userXpTable,
@@ -43,8 +43,8 @@ export async function ensureReferralBadgesExist(): Promise<void> {
 export async function processReferralMilestones(referrerId: string): Promise<void> {
   const [stats] = await db
     .select({ converted: count() })
-    .from(referralConversionsTable)
-    .where(eq(referralConversionsTable.referrerId, referrerId));
+    .from(referralsTable)
+    .where(and(eq(referralsTable.referrerId, referrerId), eq(referralsTable.converted, true)));
 
   const referralCount = Number(stats?.converted || 0);
 

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { referralConversionsTable, testimonialsTable, usersTable, badgesTable, userBadgesTable } from "@workspace/db/schema";
+import { referralsTable, testimonialsTable, usersTable, badgesTable, userBadgesTable } from "@workspace/db/schema";
 import { eq, desc, sql, count, and, like } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import crypto from "crypto";
@@ -16,8 +16,14 @@ router.get("/viral/referral/code", requireAuth, async (req, res) => {
       .where(eq(usersTable.clerkId, userId));
 
     if (!user) {
-      res.status(404).json({ error: "User not found" });
-      return;
+      const code = "EW-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+      await db.insert(usersTable).values({
+        id: userId,
+        clerkId: userId,
+        email: "",
+        referralCode: code,
+      });
+      user = { referralCode: code };
     }
 
     if (!user.referralCode) {
@@ -29,14 +35,20 @@ router.get("/viral/referral/code", requireAuth, async (req, res) => {
       user = { referralCode: code };
     }
 
-    const [stats] = await db
+    const [totalStats] = await db
+      .select({ total: count() })
+      .from(referralsTable)
+      .where(eq(referralsTable.referrerId, userId));
+
+    const [convertedStats] = await db
       .select({ converted: count() })
-      .from(referralConversionsTable)
-      .where(eq(referralConversionsTable.referrerId, userId));
+      .from(referralsTable)
+      .where(and(eq(referralsTable.referrerId, userId), eq(referralsTable.converted, true)));
 
     res.json({
       code: user.referralCode,
-      totalConverted: Number(stats?.converted || 0),
+      totalReferred: Number(totalStats?.total || 0),
+      totalConverted: Number(convertedStats?.converted || 0),
     });
   } catch (error) {
     console.error("Error getting referral code:", error);
@@ -49,8 +61,8 @@ router.get("/viral/referral/badges", requireAuth, async (req, res) => {
   try {
     const [stats] = await db
       .select({ converted: count() })
-      .from(referralConversionsTable)
-      .where(eq(referralConversionsTable.referrerId, userId));
+      .from(referralsTable)
+      .where(and(eq(referralsTable.referrerId, userId), eq(referralsTable.converted, true)));
 
     const referralCount = Number(stats?.converted || 0);
 

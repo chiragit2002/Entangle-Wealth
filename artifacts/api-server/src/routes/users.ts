@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { usersTable, referralConversionsTable } from "@workspace/db/schema";
+import { usersTable, referralsTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { getAuth } from "@clerk/express";
@@ -63,9 +63,11 @@ router.post("/users/sync", requireAuth, async (req, res) => {
           .where(eq(usersTable.referralCode, req.body.referredBy));
         if (referrer) {
           try {
-            await db.insert(referralConversionsTable).values({
+            await db.insert(referralsTable).values({
               referrerId: referrer.clerkId,
               referredUserId: clerkId,
+              converted: true,
+              convertedAt: new Date(),
             });
             processReferralMilestones(referrer.clerkId).catch((err) =>
               console.error("[referral] milestone processing failed:", err)

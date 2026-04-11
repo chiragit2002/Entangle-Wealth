@@ -8,6 +8,7 @@ import type { ChatMessage, UserProfile } from "@/lib/taxflow-types";
 import { ENTITY_SHORT_LABELS } from "@/lib/taxflow-types";
 import { getActiveProfile, getChatHistory, saveChatHistory } from "@/lib/taxflow-profile";
 import { trackEvent } from "@/lib/trackEvent";
+import { UpgradePrompt, useUpgradePrompt } from "@/components/UpgradePrompt";
 
 interface AuditRisk {
   title: string;
@@ -101,6 +102,7 @@ const RATE_LIMIT_WINDOW = 60_000;
 
 export default function TaxGPT() {
   const [, setLocation] = useLocation();
+  const { promptConfig, showUpgradePrompt, closePrompt } = useUpgradePrompt();
   const profile = getActiveProfile();
   const profileId = profile?.id || "default";
 
@@ -176,7 +178,17 @@ export default function TaxGPT() {
         const answer = data.answer + (data.answer.includes("Disclaimer") ? "" : "\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice. Consult a licensed CPA for your specific situation.");
         setMessages(prev => [...prev, { role: "ai", text: answer, timestamp: Date.now(), source: "ai" as const }]);
       } else if (res.status === 429) {
-        setMessages(prev => [...prev, { role: "ai", text: "You're sending questions too quickly. Please wait a moment and try again.\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice.", timestamp: Date.now(), source: "ai" as const }]);
+        setMessages(prev => [...prev, { role: "ai", text: "You've reached the TaxGPT rate limit. Upgrade to Pro for unlimited queries.\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice.", timestamp: Date.now(), source: "ai" as const }]);
+        showUpgradePrompt({
+          limitType: "taxgpt",
+          limitLabel: "TaxGPT queries",
+          unlocks: [
+            "Unlimited TaxGPT queries",
+            "Advanced tax profile context",
+            "Full AI agent suite",
+            "Unlimited signals & indicators",
+          ],
+        });
       } else {
         const fallback = getLocalResponse(question);
         setMessages(prev => [...prev, { role: "ai", text: fallback, timestamp: Date.now(), source: "cached" as const }]);
@@ -206,6 +218,7 @@ export default function TaxGPT() {
 
   return (
     <Layout>
+      {promptConfig && <UpgradePrompt config={promptConfig} onClose={closePrompt} />}
       <div className="container mx-auto px-4 py-6 max-w-3xl">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9c27b0] to-[#6a1b9a] flex items-center justify-center">

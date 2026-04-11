@@ -18,6 +18,9 @@ import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/trackEvent";
 import { Area, AreaChart, Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from "recharts";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
+import { WeeklyProgressCard } from "@/components/WeeklyProgressCard";
+import { StreakNudge } from "@/components/StreakNudge";
+import { FinishSetupNudge } from "@/components/FinishSetupNudge";
 
 const DASHBOARD_STOCKS: { symbol: string; name: string }[] = [
   { symbol: "AAPL", name: "Apple Inc." }, { symbol: "MSFT", name: "Microsoft Corporation" },
@@ -509,6 +512,12 @@ export default function Dashboard() {
         </div>
 
         <GamificationBar />
+
+        <div className="grid grid-cols-12 gap-1.5 mb-0">
+          <WeeklyProgressCard />
+          <StreakNudge />
+          <FinishSetupNudge />
+        </div>
 
         {(quickAnalysis || analyzingSymbol) && (
           <div className="mb-2">

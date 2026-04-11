@@ -447,4 +447,79 @@ router.get("/gamification/xp/history", requireAuth, async (req, res) => {
   }
 });
 
+router.get("/gamification/weekly-summary", requireAuth, async (req, res) => {
+  const clerkId = (req as AuthenticatedRequest).userId;
+  try {
+    const userId = await resolveUserId(clerkId, req);
+    if (!userId) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+    if (!xpRow) {
+      [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
+    }
+
+    let [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
+    if (!streak) {
+      [streak] = await db.insert(streaksTable).values({ userId, currentStreak: 0, longestStreak: 0, multiplier: 1.0 }).returning();
+    }
+
+    const weeklyXpTxns = await db
+      .select()
+      .from(xpTransactionsTable)
+      .where(and(
+        eq(xpTransactionsTable.userId, userId),
+        gte(xpTransactionsTable.createdAt, weekAgo)
+      ));
+
+    const weeklyXpEarned = weeklyXpTxns.reduce((sum, t) => sum + t.amount, 0);
+    const signalsViewed = weeklyXpTxns.filter(t => t.reason === "signal_used" || t.reason === "analysis_run").length;
+
+    const completedChallenges = await db
+      .select()
+      .from(userChallengesTable)
+      .where(and(
+        eq(userChallengesTable.userId, userId),
+        eq(userChallengesTable.completed, true),
+        gte(userChallengesTable.completedAt, weekAgo)
+      ));
+
+    const [rankRow] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(userXpTable)
+      .where(sql`${userXpTable.totalXp} > ${xpRow.totalXp}`);
+
+    const [totalUsersRow] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(userXpTable);
+
+    const totalUsers = Number(totalUsersRow?.count || 1);
+    const rank = Number(rankRow?.count || 0) + 1;
+    const percentile = totalUsers > 1 ? Math.max(1, Math.round((1 - (rank / totalUsers)) * 100)) : 50;
+
+    res.json({
+      weeklyXp: weeklyXpEarned,
+      totalXp: xpRow.totalXp,
+      level: xpRow.level,
+      tier: xpRow.tier,
+      currentStreak: streak.currentStreak,
+      longestStreak: streak.longestStreak,
+      lastActivityDate: streak.lastActivityDate,
+      signalsViewed,
+      challengesCompleted: completedChallenges.length,
+      rank,
+      totalUsers,
+      percentile,
+    });
+  } catch (error) {
+    console.error("Error fetching weekly summary:", error);
+    res.status(500).json({ error: "Failed to fetch weekly summary" });
+  }
+});
+
 export default router;

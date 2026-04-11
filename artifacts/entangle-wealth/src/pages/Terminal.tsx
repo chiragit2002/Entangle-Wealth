@@ -10,6 +10,9 @@ import { RiskRadar } from "@/components/RiskRadar";
 import { SignalHistory } from "@/components/SignalHistory";
 import { Terminal as TerminalIcon, Calculator, TrendingUp, Shield, BarChart3, Clock, Keyboard, X } from "lucide-react";
 import { PaperTradingWidget } from "@/components/PaperTradingWidget";
+import { UpgradePrompt, useUpgradePrompt } from "@/components/UpgradePrompt";
+import { useAuth } from "@clerk/react";
+import { authFetch } from "@/lib/authFetch";
 
 function PanelHeader({ title, icon, color = "cyan", rightContent }: { title: string; icon?: React.ReactNode; color?: string; rightContent?: React.ReactNode }) {
   const borderColor = color === "cyan" ? "border-l-[#00D4FF]" : color === "gold" ? "border-l-[#FFD700]" : color === "green" ? "border-l-[#00ff88]" : color === "red" ? "border-l-[#ff3366]" : color === "purple" ? "border-l-[#9c27b0]" : "border-l-white/20";
@@ -37,6 +40,36 @@ export default function Terminal() {
   const [clock, setClock] = useState("");
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [, navigate] = useLocation();
+  const { getToken, isSignedIn, isLoaded } = useAuth();
+  const { promptConfig, showUpgradePrompt, closePrompt } = useUpgradePrompt();
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+    const shownKey = "ew_terminal_upsell_shown";
+    if (localStorage.getItem(shownKey) === "true") return;
+    authFetch("/stripe/subscription", getToken)
+      .then(r => r.ok ? r.json() : null)
+      .then((data: { tier?: string } | null) => {
+        if (!data || data.tier === "pro" || data.tier === "enterprise") return;
+        showUpgradePrompt({
+          limitType: "terminal",
+          limitLabel: "Bloomberg Terminal",
+          unlocks: [
+            "Full Bloomberg-style terminal",
+            "Live order flow & system log",
+            "Position calculator & P&L simulator",
+            "Unlimited signals & Greeks",
+          ],
+        });
+      })
+      .catch(() => {});
+  }, [isLoaded, isSignedIn, getToken, showUpgradePrompt]);
+
+  useEffect(() => {
+    if (promptConfig?.limitType === "terminal") {
+      localStorage.setItem("ew_terminal_upsell_shown", "true");
+    }
+  }, [promptConfig]);
 
   useEffect(() => {
     const update = () => {
@@ -75,6 +108,7 @@ export default function Terminal() {
 
   return (
     <Layout>
+      {promptConfig && <UpgradePrompt config={promptConfig} onClose={closePrompt} />}
       <FlashCouncil />
       <MarketTicker />
 

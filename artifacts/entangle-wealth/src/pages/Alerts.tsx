@@ -7,6 +7,7 @@ import { Bell, Plus, Trash2, ToggleLeft, ToggleRight, History, AlertTriangle, Tr
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/trackEvent";
+import { UpgradePrompt, useUpgradePrompt } from "@/components/UpgradePrompt";
 
 interface AlertRule {
   id: number;
@@ -61,6 +62,7 @@ function needsThreshold(type: string): boolean {
 export default function Alerts() {
   const { getToken } = useAuth();
   const { toast } = useToast();
+  const { promptConfig, showUpgradePrompt, closePrompt } = useUpgradePrompt();
   const [tab, setTab] = useState<"rules" | "history">("rules");
   const [rules, setRules] = useState<AlertRule[]>([]);
   const [history, setHistory] = useState<AlertHistoryItem[]>([]);
@@ -135,9 +137,43 @@ export default function Alerts() {
     Promise.all([fetchRules(), fetchHistory(), fetchDigestPref()]).finally(() => setLoading(false));
   }, [fetchRules, fetchHistory, fetchDigestPref]);
 
+  useEffect(() => {
+    if (dailyLimit !== null && dailyUsed >= dailyLimit && tier === "free") {
+      showUpgradePrompt({
+        limitType: "alert_triggers",
+        limitLabel: "Daily alert triggers",
+        currentUsage: dailyUsed,
+        maxUsage: dailyLimit,
+        unlocks: [
+          "Unlimited daily alert triggers",
+          "Priority alert processing",
+          "Email & push notifications",
+          "Unlimited alert rules",
+        ],
+      });
+    }
+  }, [dailyUsed, dailyLimit, tier, showUpgradePrompt]);
+
   const createAlert = async () => {
     if (!newSymbol.trim()) return;
     if (needsThreshold(newType) && !newThreshold.trim()) return;
+
+    if (tier === "free" && rules.length >= 20) {
+      showUpgradePrompt({
+        limitType: "alert_rules",
+        limitLabel: "Alert rules",
+        currentUsage: rules.length,
+        maxUsage: 20,
+        unlocks: [
+          "Unlimited alert rules",
+          "10+ daily trigger events",
+          "Priority alert processing",
+          "All 6 alert types",
+        ],
+      });
+      return;
+    }
+
     setCreating(true);
     try {
       const res = await authFetch("/alerts", getToken, {
@@ -158,7 +194,22 @@ export default function Alerts() {
         trackEvent("alert_created", { symbol: newSymbol.trim().toUpperCase(), type: newType });
       } else {
         const err = await res.json().catch(() => ({ error: "Failed to create alert" }));
-        toast({ title: "Error", description: err.error || "Failed to create alert", variant: "destructive" });
+        if (res.status === 403) {
+          showUpgradePrompt({
+            limitType: "alert_rules",
+            limitLabel: "Alert rules",
+            currentUsage: rules.length,
+            maxUsage: 20,
+            unlocks: [
+              "Unlimited alert rules",
+              "10+ daily trigger events",
+              "Priority alert processing",
+              "All 6 alert types",
+            ],
+          });
+        } else {
+          toast({ title: "Error", description: err.error || "Failed to create alert", variant: "destructive" });
+        }
       }
     } catch { toast({ title: "Error", description: "Network error", variant: "destructive" }); } finally {
       setCreating(false);
@@ -249,6 +300,7 @@ export default function Alerts() {
 
   return (
     <div className="min-h-screen bg-[#020204] text-white">
+      {promptConfig && <UpgradePrompt config={promptConfig} onClose={closePrompt} />}
       <Navbar />
       <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">

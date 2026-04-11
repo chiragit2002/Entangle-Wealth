@@ -9,6 +9,7 @@ import { CLERK_PROXY_PATH, clerkProxyMiddleware } from "./middlewares/clerkProxy
 import { inputSanitizer } from "./middlewares/inputSanitizer";
 import { bruteForceGuard } from "./middlewares/bruteForce";
 import { csrfProtection } from "./middlewares/csrfProtection";
+import { authEventTracker } from "./middlewares/authEventTracker";
 import router from "./routes";
 import seoRouter from "./routes/seo";
 import { logger } from "./lib/logger";
@@ -132,6 +133,7 @@ app.use("/api/kyc", bruteForceGuard);
 app.use("/api/stripe", bruteForceGuard);
 
 app.use(clerkMiddleware());
+app.use(authEventTracker);
 
 app.use("/api/taxgpt", aiLimiter);
 app.use("/api/analyze-document", aiLimiter);

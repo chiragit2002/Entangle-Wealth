@@ -1,6 +1,29 @@
 import confetti from "canvas-confetti";
 
-export type CelebrationTier = "small" | "medium" | "big";
+export type CelebrationTier = "small" | "medium" | "large" | "jackpot";
+export type CelebrationAmountType = "xp" | "money" | "special";
+
+const MUTE_KEY = "ew_celebration_muted";
+
+export function isMuted(): boolean {
+  try {
+    return localStorage.getItem(MUTE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+export function setMuted(muted: boolean): void {
+  try {
+    localStorage.setItem(MUTE_KEY, muted ? "true" : "false");
+  } catch {}
+}
+
+export function toggleMute(): boolean {
+  const next = !isMuted();
+  setMuted(next);
+  return next;
+}
 
 let _audioCtx: AudioContext | null = null;
 
@@ -18,162 +41,335 @@ function getAudioContext(): AudioContext | null {
   }
 }
 
-function playSmallDing() {
+function playSoftChime(): void {
   const ctx = getAudioContext();
   if (!ctx) return;
+
+  const gainNode = ctx.createGain();
+  gainNode.connect(ctx.destination);
+  gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+
   const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
   osc.type = "sine";
-  osc.frequency.setValueAtTime(880, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.1);
-  gain.gain.setValueAtTime(0.25, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+  osc.frequency.setValueAtTime(1047, ctx.currentTime);
+  osc.frequency.setValueAtTime(1319, ctx.currentTime + 0.1);
+  osc.connect(gainNode);
   osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 0.4);
+  osc.stop(ctx.currentTime + 0.8);
 }
 
-function playMediumChord() {
+function playCoinDrop(): void {
   const ctx = getAudioContext();
   if (!ctx) return;
-  const notes = [523.25, 659.25, 783.99];
-  notes.forEach((freq, i) => {
+
+  const gainNode = ctx.createGain();
+  gainNode.connect(ctx.destination);
+  gainNode.gain.setValueAtTime(0.4, ctx.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.9);
+
+  [0, 0.07, 0.14].forEach((delay) => {
     const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
     osc.type = "triangle";
-    osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.04);
-    gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.04);
-    gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + i * 0.04 + 0.05);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.04 + 0.6);
-    osc.start(ctx.currentTime + i * 0.04);
-    osc.stop(ctx.currentTime + i * 0.04 + 0.6);
+    osc.frequency.setValueAtTime(1600, ctx.currentTime + delay);
+    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + delay + 0.2);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.4, ctx.currentTime + delay);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.3);
+    osc.connect(g);
+    g.connect(ctx.destination);
+    osc.start(ctx.currentTime + delay);
+    osc.stop(ctx.currentTime + delay + 0.3);
   });
 }
 
-function playBigFanfare() {
+function playFanfare(): void {
   const ctx = getAudioContext();
   if (!ctx) return;
-  const sequence = [
-    { freq: 392, time: 0, dur: 0.15 },
-    { freq: 523.25, time: 0.12, dur: 0.15 },
-    { freq: 659.25, time: 0.24, dur: 0.15 },
-    { freq: 783.99, time: 0.36, dur: 0.3 },
-    { freq: 1046.5, time: 0.6, dur: 0.5 },
+
+  const notes = [
+    { freq: 523, time: 0 },
+    { freq: 659, time: 0.1 },
+    { freq: 784, time: 0.2 },
+    { freq: 1047, time: 0.3 },
+    { freq: 1319, time: 0.45 },
   ];
-  sequence.forEach(({ freq, time, dur }) => {
+
+  notes.forEach(({ freq, time }) => {
     const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = "sawtooth";
+    const g = ctx.createGain();
+    osc.type = "square";
     osc.frequency.setValueAtTime(freq, ctx.currentTime + time);
-    gain.gain.setValueAtTime(0, ctx.currentTime + time);
-    gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + time + 0.03);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + time + dur);
+    g.gain.setValueAtTime(0.2, ctx.currentTime + time);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + time + 0.25);
+    osc.connect(g);
+    g.connect(ctx.destination);
     osc.start(ctx.currentTime + time);
-    osc.stop(ctx.currentTime + time + dur);
+    osc.stop(ctx.currentTime + time + 0.25);
   });
 }
 
-export function fireConfetti(tier: CelebrationTier = "small") {
-  if (tier === "small") {
-    playSmallDing();
+function playFireworkBurst(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  [0, 0.15, 0.3].forEach((delay) => {
+    const bufSize = ctx.sampleRate * 0.25;
+    const buffer = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 2);
+    }
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(2000 - delay * 500, ctx.currentTime + delay);
+    filter.Q.setValueAtTime(0.5, ctx.currentTime + delay);
+
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.5, ctx.currentTime + delay);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.5);
+
+    source.connect(filter);
+    filter.connect(g);
+    g.connect(ctx.destination);
+    source.start(ctx.currentTime + delay);
+    source.stop(ctx.currentTime + delay + 0.5);
+  });
+
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(200, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.5);
+  g.gain.setValueAtTime(0.3, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+  osc.connect(g);
+  g.connect(ctx.destination);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.5);
+}
+
+function playSound(tier: CelebrationTier): void {
+  if (isMuted()) return;
+  try {
+    switch (tier) {
+      case "small":
+        playSoftChime();
+        break;
+      case "medium":
+        playCoinDrop();
+        break;
+      case "large":
+        playFanfare();
+        break;
+      case "jackpot":
+        playFireworkBurst();
+        break;
+    }
+  } catch {}
+}
+
+function determineTier(amount: number, type: CelebrationAmountType = "xp"): CelebrationTier {
+  if (type === "special") return "jackpot";
+
+  if (type === "xp") {
+    if (amount >= 1000) return "large";
+    if (amount >= 500) return "medium";
+    return "small";
+  }
+
+  if (type === "money") {
+    if (amount >= 10000) return "jackpot";
+    if (amount >= 1000) return "large";
+    if (amount >= 100) return "medium";
+    return "small";
+  }
+
+  return "small";
+}
+
+function fireSmall(): void {
+  confetti({
+    particleCount: 40,
+    spread: 50,
+    origin: { y: 0.6 },
+    colors: ["#C0C0C0", "#FFFFFF", "#E8E8E8", "#AAAAAA"],
+    ticks: 100,
+    gravity: 1.2,
+    scalar: 0.8,
+  });
+}
+
+function fireMedium(): void {
+  confetti({
+    particleCount: 80,
+    spread: 65,
+    origin: { y: 0.6 },
+    colors: ["#00ff88", "#00D4FF", "#00cc6a", "#00b8cc", "#00e07a"],
+    ticks: 150,
+    gravity: 1.0,
+  });
+
+  setTimeout(() => {
+    confetti({
+      particleCount: 40,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0, y: 0.65 },
+      colors: ["#00ff88", "#00D4FF"],
+    });
+    confetti({
+      particleCount: 40,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1, y: 0.65 },
+      colors: ["#00ff88", "#00D4FF"],
+    });
+  }, 150);
+}
+
+function fireLarge(): void {
+  const colors = ["#FFD700", "#FFA500", "#FF8C00", "#FFEC6E", "#FFC832"];
+
+  confetti({
+    particleCount: 120,
+    spread: 80,
+    origin: { y: 0.55 },
+    colors,
+    ticks: 200,
+    gravity: 0.9,
+  });
+
+  setTimeout(() => {
     confetti({
       particleCount: 60,
-      spread: 50,
-      origin: { y: 0.6 },
-      colors: ["#e0e0e0", "#ffffff", "#c0c0c0", "#d4d4d4", "#f5f5f5"],
-      scalar: 0.85,
-      gravity: 1.2,
-    });
-  } else if (tier === "medium") {
-    playMediumChord();
-    confetti({
-      particleCount: 120,
+      angle: 75,
       spread: 70,
-      origin: { y: 0.55 },
-      colors: ["#00D4FF", "#00bcd4", "#0099cc", "#00e5ff", "#26c6da", "#80deea"],
-      scalar: 1,
-      gravity: 0.9,
+      origin: { x: 0.1, y: 0.6 },
+      colors,
     });
-    setTimeout(() => {
-      confetti({
-        particleCount: 60,
-        spread: 40,
-        origin: { x: 0.2, y: 0.6 },
-        colors: ["#00D4FF", "#00bcd4", "#0099cc"],
-        scalar: 0.9,
-      });
-      confetti({
-        particleCount: 60,
-        spread: 40,
-        origin: { x: 0.8, y: 0.6 },
-        colors: ["#00D4FF", "#00bcd4", "#0099cc"],
-        scalar: 0.9,
-      });
-    }, 300);
-  } else {
-    playBigFanfare();
-    const goldColors = ["#FFD700", "#FFA500", "#FF6347", "#ff3366", "#00ff88", "#00D4FF", "#9c27b0"];
     confetti({
-      particleCount: 200,
-      spread: 90,
+      particleCount: 60,
+      angle: 105,
+      spread: 70,
+      origin: { x: 0.9, y: 0.6 },
+      colors,
+    });
+  }, 200);
+
+  setTimeout(() => {
+    confetti({
+      particleCount: 50,
+      spread: 100,
+      origin: { y: 0.3 },
+      colors,
+      gravity: 0.6,
+      scalar: 1.2,
+    });
+  }, 400);
+}
+
+function fireJackpot(): void {
+  const rainbowColors = [
+    "#FF0000", "#FF7F00", "#FFFF00", "#00FF00",
+    "#0000FF", "#8B00FF", "#FF69B4", "#FFD700",
+    "#00D4FF", "#FF3366",
+  ];
+  const goldColors = ["#FFD700", "#FFA500", "#FFEC6E", "#FFC832"];
+
+  const burst = () => {
+    confetti({
+      particleCount: 80,
+      spread: 100,
+      origin: { x: Math.random(), y: Math.random() * 0.4 + 0.1 },
+      colors: rainbowColors,
+      ticks: 300,
+      gravity: 0.7,
+      scalar: 1.3,
+    });
+  };
+
+  burst();
+  setTimeout(burst, 150);
+  setTimeout(burst, 300);
+
+  setTimeout(() => {
+    confetti({
+      particleCount: 150,
+      spread: 120,
       origin: { y: 0.5 },
       colors: goldColors,
-      scalar: 1.2,
-      gravity: 0.7,
+      ticks: 350,
+      gravity: 0.8,
+      scalar: 1.4,
     });
-    setTimeout(() => {
-      confetti({
-        particleCount: 100,
-        spread: 60,
-        origin: { x: 0.1, y: 0.4 },
-        colors: goldColors,
-        scalar: 1,
-        angle: 60,
-      });
-      confetti({
-        particleCount: 100,
-        spread: 60,
-        origin: { x: 0.9, y: 0.4 },
-        colors: goldColors,
-        scalar: 1,
-        angle: 120,
-      });
-    }, 300);
-    setTimeout(() => {
-      confetti({
-        particleCount: 150,
-        spread: 100,
-        origin: { x: 0.5, y: 0.3 },
-        colors: goldColors,
-        scalar: 1.1,
-        gravity: 0.6,
-        shapes: ["circle", "square"],
-      });
-    }, 700);
+  }, 200);
+
+  setTimeout(() => {
+    confetti({
+      particleCount: 60,
+      angle: 60,
+      spread: 80,
+      origin: { x: 0, y: 0.7 },
+      colors: rainbowColors,
+    });
+    confetti({
+      particleCount: 60,
+      angle: 120,
+      spread: 80,
+      origin: { x: 1, y: 0.7 },
+      colors: rainbowColors,
+    });
+  }, 400);
+
+  setTimeout(burst, 500);
+  setTimeout(burst, 700);
+}
+
+export function fireCelebration(
+  amount: number = 0,
+  type: CelebrationAmountType = "xp",
+  forceTier?: CelebrationTier
+): CelebrationTier {
+  const tier = forceTier ?? determineTier(amount, type);
+
+  playSound(tier);
+
+  switch (tier) {
+    case "small":
+      fireSmall();
+      break;
+    case "medium":
+      fireMedium();
+      break;
+    case "large":
+      fireLarge();
+      break;
+    case "jackpot":
+      fireJackpot();
+      break;
   }
+
+  return tier;
 }
 
 export function getCelebrationTier(rewardType: string, rewardValue: number): CelebrationTier {
-  if (
-    rewardType === "multiplier" ||
-    rewardType === "streak_protection" ||
-    rewardValue >= 750
-  ) {
-    return "big";
+  if (rewardType === "multiplier" || rewardType === "streak_protection" || rewardValue >= 750) {
+    return "jackpot";
   }
-  if (rewardValue >= 250) {
-    return "medium";
-  }
+  if (rewardValue >= 250) return "medium";
   return "small";
 }
 
 export function getXpCelebrationTier(xp: number): CelebrationTier {
-  if (xp >= 750) return "big";
-  if (xp >= 250) return "medium";
+  if (xp >= 1000) return "large";
+  if (xp >= 500) return "medium";
   return "small";
+}
+
+export function fireConfetti(): void {
+  fireCelebration(0, "xp", "medium");
 }

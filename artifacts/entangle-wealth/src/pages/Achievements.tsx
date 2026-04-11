@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { DailySpinWheel } from "@/components/DailySpinWheel";
 import { XPBar } from "@/components/XPBar";
 import { useToast } from "@/hooks/use-toast";
-import { fireConfetti, getCelebrationTier } from "@/lib/confetti";
+import { fireCelebration } from "@/lib/confetti";
 import { BigWinOverlay } from "@/components/BigWinOverlay";
 
 interface BadgeData {
@@ -135,13 +135,12 @@ export default function Achievements() {
             seenSlugs = JSON.parse(localStorage.getItem(seenKey) ?? "[]");
           } catch {}
           const seenSet = new Set(seenSlugs);
-          const newlyEarned = data.filter(b => b.earned && !seenSet.has(b.slug));
+          const newlyEarned = data.filter((b: BadgeData) => b.earned && !seenSet.has(b.slug));
           if (newlyEarned.length > 0) {
-            const maxXp = Math.max(...newlyEarned.map(b => b.xpReward));
-            const tier = getCelebrationTier("xp", maxXp);
-            fireConfetti(tier);
-            if (tier === "big") setShowBigWin(true);
-            newlyEarned.forEach(b => seenSet.add(b.slug));
+            const maxXp = Math.max(...newlyEarned.map((b: BadgeData) => b.xpReward));
+            fireCelebration(maxXp, "xp");
+            if (maxXp >= 500) setShowBigWin(true);
+            newlyEarned.forEach((b: BadgeData) => seenSet.add(b.slug));
             try {
               localStorage.setItem(seenKey, JSON.stringify(Array.from(seenSet)));
             } catch {}

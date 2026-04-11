@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { CheckCircle2, Circle, ChevronDown, ChevronUp, X, Rocket } from "lucide-react";
-import { fireConfetti } from "@/lib/confetti";
+import { fireCelebration } from "@/lib/confetti";
 import { BigWinOverlay } from "@/components/BigWinOverlay";
 import { trackEvent } from "@/lib/trackEvent";
 
@@ -65,7 +65,7 @@ export function GettingStartedChecklist() {
       const updated = { ...prev, [itemId]: true };
       const allDone = ITEMS.every((item) => updated[item.id]);
       if (allDone) {
-        fireConfetti("big");
+        fireCelebration(1000, "xp");
         setShowBigWin(true);
         trackEvent("onboarding_checklist_completed");
       }

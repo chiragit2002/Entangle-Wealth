@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Menu, X, LogOut, User, ChevronDown } from "lucide-react";
+import { Menu, X, LogOut, User, ChevronDown, Volume2, VolumeX } from "lucide-react";
 import logoImg from "@assets/Gemini_Generated_Image_nso2qnso2qnso2qn_1775900950533.png";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useUser, useClerk, Show } from "@clerk/react";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import NotificationCenter from "@/components/NotificationCenter";
 import { TaxYearSelector } from "@/components/tax/TaxYearSelector";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { isMuted, toggleMute } from "@/lib/confetti";
 
 interface NavGroup {
   label: string;
@@ -242,9 +243,15 @@ export function Navbar() {
   const [location, setLocation] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [soundMuted, setSoundMuted] = useState(() => isMuted());
   const { user } = useUser();
   const { signOut } = useClerk();
   const isAdmin = useIsAdmin();
+
+  const handleToggleMute = () => {
+    const next = toggleMute();
+    setSoundMuted(next);
+  };
 
   const navGroups = useMemo(() => {
     return isAdmin ? [...NAV_GROUPS, ADMIN_NAV_GROUP] : NAV_GROUPS;
@@ -298,6 +305,14 @@ export function Navbar() {
 
         <div className="hidden lg:flex items-center gap-2">
           <TaxYearSelector />
+          <button
+            onClick={handleToggleMute}
+            title={soundMuted ? "Unmute celebration sounds" : "Mute celebration sounds"}
+            className="w-9 h-9 flex items-center justify-center rounded-lg text-white/40 hover:text-white/70 hover:bg-white/[0.05] transition-colors"
+            aria-label={soundMuted ? "Unmute celebration sounds" : "Mute celebration sounds"}
+          >
+            {soundMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+          </button>
           <NotificationCenter />
 
           <Show when="signed-in">
@@ -382,6 +397,13 @@ export function Navbar() {
             ))}
 
             <div className="pt-3 border-t border-white/[0.06]">
+              <button
+                onClick={handleToggleMute}
+                className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:bg-white/[0.04] hover:text-white/80 transition-colors mb-2"
+              >
+                {soundMuted ? <VolumeX className="w-4 h-4 text-white/40" /> : <Volume2 className="w-4 h-4 text-white/40" />}
+                {soundMuted ? "Unmute celebration sounds" : "Mute celebration sounds"}
+              </button>
               <Show when="signed-in">
                 <div className="grid grid-cols-2 gap-1.5 mb-3">
                   <Link href="/resume" onClick={() => setIsMobileMenuOpen(false)}>

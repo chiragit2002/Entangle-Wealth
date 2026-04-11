@@ -4,7 +4,7 @@ import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { X, Share2, Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { fireConfetti } from "@/lib/confetti";
+import { fireCelebration } from "@/lib/confetti";
 import { BigWinOverlay } from "@/components/BigWinOverlay";
 
 interface Milestone {
@@ -42,8 +42,14 @@ export function MilestoneCelebrationModal() {
           const data = await milestoneRes.json();
           if (data.newMilestones?.length > 0) {
             setQueue(data.newMilestones);
-            fireConfetti("big");
-            setShowBigWin(true);
+            const topMilestone: Milestone = data.newMilestones.reduce(
+              (best: Milestone, m: Milestone) => (m.threshold > best.threshold ? m : best),
+              data.newMilestones[0]
+            );
+            fireCelebration(topMilestone.threshold >= 10 ? 1000 : topMilestone.threshold >= 5 ? 500 : 100, "xp");
+            if (topMilestone.threshold >= 5) {
+              setShowBigWin(true);
+            }
           }
         }
         if (codeRes.ok) {

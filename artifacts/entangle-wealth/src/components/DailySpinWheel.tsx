@@ -3,7 +3,7 @@ import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
 import { X, Gift, Clock, Zap, Shield, Star } from "lucide-react";
-import { fireConfetti, getCelebrationTier } from "@/lib/confetti";
+import { fireCelebration, CelebrationTier } from "@/lib/confetti";
 import { BigWinOverlay } from "@/components/BigWinOverlay";
 
 const WHEEL_SEGMENTS = [
@@ -31,8 +31,8 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
   const [result, setResult] = useState<{ reward: string; rewardType: string; rewardValue: number } | null>(null);
   const [rotation, setRotation] = useState(0);
   const [countdown, setCountdown] = useState("");
+  const [resultTier, setResultTier] = useState<CelebrationTier | null>(null);
   const [showBigWin, setShowBigWin] = useState(false);
-  const [celebrationTier, setCelebrationTier] = useState<"small" | "medium" | "big">("small");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const checkStatus = useCallback(async () => {
@@ -197,10 +197,11 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
           setCanSpin(false);
           setNextSpinAt(data.nextSpinAt);
           setSpinning(false);
-          const tier = getCelebrationTier(data.rewardType, data.rewardValue ?? 0);
-          setCelebrationTier(tier);
-          fireConfetti(tier);
-          if (tier === "big") setShowBigWin(true);
+          const tier = (data.rewardType === "multiplier" || data.rewardType === "streak_protection")
+            ? fireCelebration(0, "special")
+            : fireCelebration(data.rewardValue ?? 0, "xp");
+          setResultTier(tier);
+          if (tier === "jackpot") setShowBigWin(true);
           onReward?.(data.reward);
         }
       };
@@ -243,13 +244,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
           </div>
 
           {result && (
-            <div className={`mt-4 w-full p-3 rounded-lg text-center animate-in fade-in duration-500 transition-all ${
-              celebrationTier === "big"
-                ? "bg-[#FFD700]/15 border border-[#FFD700]/40 animate-pulse-glow-gold"
-                : celebrationTier === "medium"
-                ? "bg-[#00D4FF]/10 border border-[#00D4FF]/30 animate-pulse-glow"
-                : "bg-[#FFD700]/10 border border-[#FFD700]/20"
-            }`}>
+            <div className={`mt-4 w-full p-3 rounded-lg bg-[#FFD700]/10 border border-[#FFD700]/20 text-center animate-in fade-in duration-500${resultTier === "jackpot" ? " glow" : ""}`}>
               <p className="text-[10px] font-mono text-[#FFD700]/60 uppercase tracking-widest">YOU WON</p>
               <p className="text-lg font-bold font-mono text-[#FFD700] mt-1">{result.reward}</p>
               {result.rewardType === "xp" && (

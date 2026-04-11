@@ -1,7 +1,7 @@
 {
-  "name": "EntangleWealth — Institutional Intelligence For Everyone",
+  "name": "EntangleWealth: AI Stock Signals & Financial Analysis",
   "short_name": "EntangleWealth",
-  "description": "Bloomberg Terminal-parity financial analysis with AI-powered signals, 5,000+ NASDAQ stocks, 55+ technical indicators, and real-time market intelligence.",
+  "description": "Free AI stock signals, options flow alerts, tax optimization, and real-time market intelligence. 6 cross-verifying models deliver institutional-grade analysis — covering 5,000+ NASDAQ stocks with 55+ technical indicators.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -9,6 +9,7 @@
   "theme_color": "#00D4FF",
   "background_color": "#020204",
   "categories": ["finance", "business", "productivity"],
+  "keywords": "AI stock signals, stock alerts, options flow, tax optimization, financial analysis, trading signals, NASDAQ stocks, technical indicators",
   "icons": [
     {
       "src": "/icons/icon-192.png",

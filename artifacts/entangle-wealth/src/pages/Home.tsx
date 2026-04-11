@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { Layout } from "@/components/layout/Layout";
 import { MarketTicker } from "@/components/MarketTicker";
 import { Button } from "@/components/ui/button";
-import { Activity, Target, Zap, TrendingUp, ShieldAlert, BarChart3, Eye, DollarSign, ArrowRight, Terminal, UserPlus } from "lucide-react";
+import { Activity, Target, Zap, TrendingUp, ShieldAlert, BarChart3, Eye, DollarSign, ArrowRight, Terminal, UserPlus, Check, X, ShieldCheck, Lock } from "lucide-react";
 import { ShareSignalCard } from "@/components/viral/ShareSignalCard";
 import { trackEvent } from "@/lib/trackEvent";
 
@@ -256,8 +256,7 @@ function RecentSignupTicker({ signups }: { signups: { name: string; timeLabel: s
   );
 }
 
-function AnimatedHeroStats() {
-  const stats = useHeroStats();
+function AnimatedHeroStats({ stats }: { stats: HeroStats }) {
   const animatedMembers = useAnimatedNumber(stats.members);
   const animatedSignals = useAnimatedNumber(stats.signals);
   const animatedAccuracy = useAnimatedNumber(stats.accuracy);
@@ -271,10 +270,168 @@ function AnimatedHeroStats() {
   );
 }
 
+function TrustBadges() {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
+      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-[10px] font-mono text-white/60">
+        <ShieldCheck className="w-3 h-3 text-[#00e676]" />
+        <span>SOC 2 Compliant</span>
+      </div>
+      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-[10px] font-mono text-white/60">
+        <Lock className="w-3 h-3 text-[#00c8f8]" />
+        <span>256-bit Encryption</span>
+      </div>
+      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-[10px] font-mono text-[#f5c842]">
+        <span className="font-bold">Free forever</span>
+        <span className="text-white/40">· No credit card</span>
+      </div>
+    </div>
+  );
+}
+
+function ComparisonTable({ members }: { members: number }) {
+  const features = [
+    { label: "AI Stock Signals", ew: true, bloomberg: true, apps: false },
+    { label: "Options Flow Analysis", ew: true, bloomberg: true, apps: false },
+    { label: "Tax Optimization Tools", ew: true, bloomberg: false, apps: false },
+    { label: "Gig Income Analysis", ew: true, bloomberg: false, apps: false },
+    { label: "6-Model Cross-Verification", ew: true, bloomberg: false, apps: false },
+    { label: "Real-Time Alerts", ew: true, bloomberg: true, apps: true },
+    { label: "Confidence Scores", ew: true, bloomberg: false, apps: false },
+    { label: "Risk Parameters per Signal", ew: true, bloomberg: false, apps: false },
+    { label: "Free Tier", ew: true, bloomberg: false, apps: false },
+  ];
+
+  return (
+    <section className="py-12 lg:py-20 bg-black border-t border-white/5">
+      <div className="container mx-auto px-4 max-w-5xl">
+        <div className="text-center mb-10 lg:mb-14">
+          <div className="inline-block px-3 py-1 rounded-full border border-[#f5c842]/20 bg-[#f5c842]/5 text-[10px] font-mono text-[#f5c842] uppercase tracking-widest mb-4">
+            Why EntangleWealth
+          </div>
+          <h2 className="text-2xl md:text-4xl font-bold mb-4">The analysis Bloomberg charges<br /><span className="electric-text">$24,000/yr for — free.</span></h2>
+          <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto">Stop paying for multiple apps that don't talk to each other. EntangleWealth bundles everything into one terminal — built for people, not hedge funds.</p>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr>
+                <th className="text-left pb-4 pr-4 text-muted-foreground font-medium text-xs uppercase tracking-wider w-1/2">Feature</th>
+                <th className="pb-4 px-4 text-center">
+                  <div className="inline-flex flex-col items-center gap-1">
+                    <span className="text-[#00c8f8] font-bold text-sm">EntangleWealth</span>
+                    <span className="text-[#00e676] font-mono font-bold text-xs">Free</span>
+                  </div>
+                </th>
+                <th className="pb-4 px-4 text-center">
+                  <div className="inline-flex flex-col items-center gap-1">
+                    <span className="text-white/60 font-bold text-sm">Bloomberg</span>
+                    <span className="text-[#ff4466] font-mono font-bold text-xs">$24,000/yr</span>
+                  </div>
+                </th>
+                <th className="pb-4 px-4 text-center">
+                  <div className="inline-flex flex-col items-center gap-1">
+                    <span className="text-white/60 font-bold text-sm">Multiple Apps</span>
+                    <span className="text-[#ff4466] font-mono font-bold text-xs">$800+/yr</span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {features.map((f, i) => (
+                <tr key={f.label} className={`border-t ${i === 0 ? "border-white/10" : "border-white/[0.04]"}`}>
+                  <td className="py-3 pr-4 text-white/70 text-xs md:text-sm">{f.label}</td>
+                  <td className="py-3 px-4 text-center">
+                    {f.ew ? (
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#00e676]/10">
+                        <Check className="w-3 h-3 text-[#00e676]" />
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/[0.03]">
+                        <X className="w-3 h-3 text-white/20" />
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-3 px-4 text-center">
+                    {f.bloomberg ? (
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/[0.03]">
+                        <Check className="w-3 h-3 text-white/40" />
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/[0.03]">
+                        <X className="w-3 h-3 text-white/20" />
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-3 px-4 text-center">
+                    {f.apps ? (
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/[0.03]">
+                        <Check className="w-3 h-3 text-white/40" />
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/[0.03]">
+                        <X className="w-3 h-3 text-white/20" />
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-8 text-center">
+          <Link href="/sign-up">
+            <Button size="lg" className="h-12 px-8 bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black font-bold hover:opacity-90 text-base">
+              Start Free — No Credit Card →
+            </Button>
+          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
+            <span className="text-[10px] text-muted-foreground font-mono">
+              ✓ {members.toLocaleString()}+ traders already inside
+            </span>
+            <span className="text-[10px] text-muted-foreground font-mono">✓ Free forever tier</span>
+            <span className="text-[10px] text-muted-foreground font-mono">✓ Cancel anytime</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CredibilityBar({ members, signals, accuracy }: { members: number; signals: number; accuracy: number }) {
+  const stats = [
+    { value: `${members.toLocaleString()}+`, label: "Active Traders" },
+    { value: `${signals.toLocaleString()}+`, label: "Signals Delivered" },
+    { value: `${accuracy}%`, label: "Avg Signal Accuracy" },
+    { value: "5,000+", label: "NASDAQ Stocks Covered" },
+    { value: "55+", label: "Technical Indicators" },
+  ];
+
+  return (
+    <div className="border-y border-white/[0.06] bg-white/[0.01] py-5">
+      <div className="container mx-auto px-4 max-w-5xl">
+        <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
+          {stats.map((s) => (
+            <div key={s.label} className="text-center">
+              <div className="text-base md:text-xl font-mono font-bold text-[#00c8f8]">{s.value}</div>
+              <div className="text-[9px] md:text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [nodeGlow, setNodeGlow] = useState(0);
   const recentSignups = useRecentSignups();
   const testimonials = useTestimonials();
+  const stats = useHeroStats();
+  const animatedMembers = useAnimatedNumber(stats.members);
+  const animatedSignals = useAnimatedNumber(stats.signals);
 
   useEffect(() => { trackEvent("home_viewed"); }, []);
 
@@ -304,10 +461,14 @@ export default function Home() {
           </h1>
 
           <p className="max-w-2xl text-sm md:text-lg lg:text-xl text-muted-foreground leading-relaxed">
-            Real-time signals powered by 6 cross-verifying models. Stock alerts, options flow, tax tools, and gig income — all in one place.
+            Most traders lose because they're flying blind — no real signals, no context, no risk controls. EntangleWealth gives retail investors the same AI-powered analysis, options flow, and tax tools that institutional desks pay six figures for.
           </p>
 
-          <AnimatedHeroStats />
+          <p className="text-sm md:text-base font-semibold text-[#f5c842]">
+            The analysis Bloomberg charges $24,000/yr for — free.
+          </p>
+
+          <AnimatedHeroStats stats={stats} />
 
           <RecentSignupTicker signups={recentSignups} />
 
@@ -318,8 +479,12 @@ export default function Home() {
               </Button>
             </Link>
           </div>
+
+          <TrustBadges />
         </div>
       </section>
+
+      <CredibilityBar members={stats.members} signals={stats.signals} accuracy={stats.accuracy} />
 
       <MarketTicker />
 
@@ -357,6 +522,7 @@ export default function Home() {
                 View All Signals →
               </Button>
             </Link>
+            <p className="text-[10px] text-muted-foreground font-mono mt-2">✓ Free to use · ✓ No credit card · ✓ {animatedMembers.toLocaleString()}+ members · ✓ {animatedSignals.toLocaleString()}+ signals</p>
           </div>
         </div>
       </section>
@@ -408,6 +574,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <ComparisonTable members={stats.members} />
 
       <section className="py-12 lg:py-20 bg-black border-t border-white/5">
         <div className="container mx-auto px-4 max-w-5xl">
@@ -474,12 +642,38 @@ export default function Home() {
             Built for people who need results,<br />
             <span className="gold-text">not entertainment.</span>
           </h2>
+
+          {testimonials.length > 0 && (
+            <div className="glass-panel rounded-2xl p-5 mb-6 text-left max-w-lg w-full border border-white/[0.08]">
+              <div className="flex gap-1 mb-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <span key={i} className="text-sm text-[#FFD700]">★</span>
+                ))}
+              </div>
+              <p className="text-sm text-white/80 leading-relaxed italic">"{testimonials[0].message}"</p>
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/5">
+                <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
+                  {testimonials[0].name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-xs font-semibold">{testimonials[0].name}</p>
+                  {testimonials[0].role && <p className="text-[10px] text-muted-foreground">{testimonials[0].role}</p>}
+                </div>
+              </div>
+            </div>
+          )}
+
           <p className="text-sm md:text-lg text-muted-foreground mb-3 md:mb-4">This is a financial analysis tool. It won't guarantee profits — nothing can. But it gives you the same data and analysis that institutional traders use, presented clearly so you can make better decisions faster.</p>
-          <p className="text-xs text-muted-foreground/60 mb-8 md:mb-10 max-w-xl">Trading involves real risk. Past signals are not guarantees of future results. Only trade with money you can afford to lose.</p>
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto">
-            <Link href="/dashboard">
-              <Button size="lg" className="h-12 md:h-14 px-8 md:px-10 text-base md:text-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-full shadow-[0_0_30px_rgba(0,212,255,0.3)] w-full sm:w-auto">
-                See the Dashboard
+          <p className="text-xs text-muted-foreground/60 mb-6 md:mb-8 max-w-xl">Trading involves real risk. Past signals are not guarantees of future results. Only trade with money you can afford to lose.</p>
+
+          <p className="text-sm font-semibold text-[#00e676] mb-6">
+            Join {animatedMembers.toLocaleString()}+ traders already using EntangleWealth
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto mb-4">
+            <Link href="/sign-up">
+              <Button size="lg" className="h-12 md:h-14 px-8 md:px-10 text-base md:text-lg bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black hover:opacity-90 font-bold rounded-full shadow-[0_0_30px_rgba(245,200,66,0.2)] w-full sm:w-auto">
+                Start Free Today →
               </Button>
             </Link>
             <Link href="/pricing">
@@ -487,6 +681,12 @@ export default function Home() {
                 View Pricing
               </Button>
             </Link>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] text-muted-foreground font-mono">
+            <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-[#00e676]" /> No credit card required</span>
+            <span className="flex items-center gap-1"><Lock className="w-3 h-3 text-[#00c8f8]" /> Secure & encrypted</span>
+            <span>✓ Free forever tier</span>
           </div>
         </div>
       </section>

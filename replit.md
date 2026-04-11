@@ -39,7 +39,7 @@ I prefer concise and direct communication. When making changes, prioritize funct
     - **Community**: Groups, Feed, Events, Jobs, Pricing.
     - **TaxFlow Intelligence Platform**: Core data layer with IRS tax rates, 27 strategies, onboarding wizard (4-step: entity selection, business info with EIN + KYC verification, income profile with business trip deductions, goals with filing time), tax dashboard, strategy browser, document vault with AI analysis, TaxGPT, travel budget planner, and legal disclaimers. UserProfile includes `ein`, `businessTripDeductions[]`, and `kyc` fields. KYC PII is submitted to backend `/kyc/submit` and sensitive fields (ID number, DOB) are stripped from localStorage after submission.
     - **Market Analysis**: Technical Analysis (TradingView-inspired), Market Overview, Stock Screener, Dashboard (Bloomberg-style Command Center), Options Chain, "What If" Time Machine, Sector Flow Radar, Volatility Lab.
-    - **Alerts & Notifications**: Real-time SSE-powered notification center and a full-stack alert engine with server-side evaluation.
+    - **Alerts & Notifications**: Real-time SSE-powered notification center, web push notifications (VAPID/service worker), and a full-stack alert engine with server-side evaluation. Push subscriptions stored in `push_subscriptions` table. Backend uses `web-push` package.
     - **Terminal**: Bloomberg-style Analysis Terminal with multi-panel interface and command support.
     - **Research/News**: Live news intelligence with scraping, sentiment analysis, and caching.
     - **Legal**: Comprehensive legal pages (Terms, Privacy, Disclaimers, etc.).

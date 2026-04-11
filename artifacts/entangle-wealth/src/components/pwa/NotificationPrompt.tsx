@@ -1,12 +1,69 @@
 import { useState, useEffect, useCallback } from "react";
 import { Bell, X } from "lucide-react";
 import { trackEvent } from "@/lib/trackEvent";
+import { useAuth } from "@clerk/react";
 
 const DISMISS_KEY = "ew_notif_prompt_dismissed";
 const ALERTS_ENABLED_KEY = "ew_inapp_alerts_enabled";
 
+async function subscribeToPush(getToken: () => Promise<string | null>) {
+  try {
+    const res = await fetch("/api/push/vapid-public-key");
+    const { publicKey } = await res.json();
+    if (!publicKey) return;
+
+    const registration = await navigator.serviceWorker.ready;
+
+    const existing = await registration.pushManager.getSubscription();
+    if (existing) {
+      const token = await getToken();
+      if (token) {
+        await fetch("/api/push/subscribe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ subscription: existing.toJSON() }),
+        });
+      }
+      return;
+    }
+
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    });
+
+    const token = await getToken();
+    if (token) {
+      await fetch("/api/push/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ subscription: subscription.toJSON() }),
+      });
+    }
+  } catch {
+  }
+}
+
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
 export function NotificationPrompt() {
   const [show, setShow] = useState(false);
+  const { getToken } = useAuth();
 
   useEffect(() => {
     if (localStorage.getItem(DISMISS_KEY)) return;
@@ -16,12 +73,30 @@ export function NotificationPrompt() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleAllow = useCallback(() => {
+  useEffect(() => {
+    if (
+      "Notification" in window &&
+      Notification.permission === "granted" &&
+      "serviceWorker" in navigator
+    ) {
+      subscribeToPush(getToken);
+    }
+  }, [getToken]);
+
+  const handleAllow = useCallback(async () => {
     localStorage.setItem(ALERTS_ENABLED_KEY, "1");
     trackEvent("inapp_alerts_enabled");
+    try {
+      const result = await Notification.requestPermission();
+      if (result === "granted") {
+        trackEvent("notifications_enabled");
+        await subscribeToPush(getToken);
+      }
+    } catch {
+    }
     setShow(false);
     localStorage.setItem(DISMISS_KEY, "1");
-  }, []);
+  }, [getToken]);
 
   const handleDismiss = useCallback(() => {
     setShow(false);

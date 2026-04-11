@@ -188,6 +188,8 @@ function ClerkQueryClientCacheInvalidator() {
           trackEvent("login_oauth_google");
         } else if (provider === "github" || provider === "oauth_github") {
           trackEvent("login_oauth_github");
+        } else if (provider === "apple" || provider === "oauth_apple") {
+          trackEvent("login_oauth_apple");
         } else {
           trackEvent("login_email");
         }

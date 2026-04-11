@@ -24,11 +24,13 @@ import supportRouter from "./support";
 import metricsRouter from "./metrics";
 import launchChecksRouter from "./launchChecks";
 import zapierRouter from "./zapier";
+import pushRouter from "./push";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
 router.use(authEventsRouter);
+router.use(pushRouter);
 router.use(stocksRouter);
 router.use(analyzeRouter);
 router.use(usersRouter);

@@ -37,6 +37,16 @@ async function ensureAlertTables() {
           triggered_at TIMESTAMPTZ DEFAULT now()
         );
         ALTER TABLE users ADD COLUMN IF NOT EXISTS alert_email_digest TEXT DEFAULT 'off';
+        CREATE TABLE IF NOT EXISTS push_subscriptions (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          endpoint TEXT NOT NULL,
+          subscription_json TEXT NOT NULL,
+          created_at TIMESTAMPTZ DEFAULT now(),
+          updated_at TIMESTAMPTZ DEFAULT now(),
+          UNIQUE(user_id, endpoint)
+        );
+        CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user_id ON push_subscriptions (user_id);
         CREATE TABLE IF NOT EXISTS analytics_events (
           id SERIAL PRIMARY KEY,
           user_id TEXT,

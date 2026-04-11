@@ -9,6 +9,7 @@ import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { CircuitBreaker, registerCircuit } from "../lib/circuitBreaker";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
+import { sendPushNotificationToUser } from "./push";
 
 const router = Router();
 
@@ -290,11 +291,19 @@ router.get("/alerts/stream", requireAuth, (req: AuthenticatedRequest, res: Respo
 
 export function pushAlertToUser(userId: string, data: Record<string, unknown>) {
   const clients = sseClients.get(userId);
-  if (!clients) return;
-  const payload = `data: ${JSON.stringify(data)}\n\n`;
-  for (const res of clients) {
-    try { res.write(payload); } catch { /* client gone */ }
+  if (clients) {
+    const payload = `data: ${JSON.stringify(data)}\n\n`;
+    for (const res of clients) {
+      try { res.write(payload); } catch { /* client gone */ }
+    }
   }
+
+  sendPushNotificationToUser(userId, {
+    title: (data.symbol as string) ? `Alert: ${data.symbol}` : "Market Alert",
+    body: (data.message as string) || "A market alert has been triggered.",
+    icon: "/icons/icon-192.png",
+    url: "/alerts",
+  }).catch(() => {});
 }
 
 const ALPACA_DATA_URL = "https://data.alpaca.markets";

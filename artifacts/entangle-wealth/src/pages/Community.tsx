@@ -271,7 +271,11 @@ export default function Community() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-6 max-w-3xl">
+      <div className="container mx-auto px-4 py-10 max-w-3xl">
+        <div className="mb-7">
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Community</h1>
+          <p className="text-white/40 text-sm">Connect, learn, and grow with fellow traders & investors</p>
+        </div>
         <div className="flex overflow-x-auto gap-1 mb-6 bg-[#0d0d1a] border border-[rgba(0,212,255,0.15)] rounded-xl p-1">
           {tabs.map(t => {
             const Icon = t.icon;

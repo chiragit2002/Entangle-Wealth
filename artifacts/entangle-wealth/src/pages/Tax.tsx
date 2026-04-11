@@ -218,7 +218,11 @@ export default function Tax() {
           onClose={() => setShowOnboarding(false)}
         />
       )}
-      <div className="container mx-auto px-4 py-6 max-w-3xl">
+      <div className="container mx-auto px-4 py-10 max-w-3xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">TaxFlow</h1>
+          <p className="text-white/40 text-sm">Track deductions, plan strategies, and estimate savings</p>
+        </div>
         {isSignedIn && kycStatus && (
           <div className={`rounded-xl p-4 mb-4 border flex items-start gap-3 ${
             kycStatus === "verified"

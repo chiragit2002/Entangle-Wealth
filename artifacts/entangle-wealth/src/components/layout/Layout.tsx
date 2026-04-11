@@ -23,7 +23,7 @@ export function Layout({ children }: LayoutProps) {
           }}
         />
         <div
-          className="absolute w-[500px] h-[500px] rounded-full opacity-[0.03]"
+          className="absolute w-[500px] h-[500px] rounded-full opacity-[0.025]"
           style={{
             bottom: "-10%",
             right: "-5%",
@@ -32,19 +32,9 @@ export function Layout({ children }: LayoutProps) {
             animation: "orb-drift-2 30s ease-in-out infinite",
           }}
         />
-        <div
-          className="absolute w-[400px] h-[400px] rounded-full opacity-[0.025]"
-          style={{
-            top: "40%",
-            right: "20%",
-            background: "radial-gradient(circle, #9c27b0 0%, transparent 70%)",
-            filter: "blur(100px)",
-            animation: "orb-drift-3 35s ease-in-out infinite",
-          }}
-        />
 
         <div
-          className="absolute inset-0 opacity-[0.015]"
+          className="absolute inset-0 opacity-[0.012]"
           style={{
             backgroundImage: `radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px)`,
             backgroundSize: "40px 40px",

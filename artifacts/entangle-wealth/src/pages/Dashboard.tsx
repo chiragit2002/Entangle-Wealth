@@ -125,36 +125,34 @@ const emptyPortfolio: PaperPortfolio = {
   totalValue: STARTING_CASH,
 };
 
-function PanelHeader({ title, icon, color = "cyan", rightContent }: { title: string; icon?: React.ReactNode; color?: string; rightContent?: React.ReactNode }) {
-  const borderColor = color === "cyan" ? "border-l-[#00D4FF]" : color === "gold" ? "border-l-[#FFD700]" : color === "green" ? "border-l-[#00ff88]" : color === "red" ? "border-l-[#ff3366]" : color === "purple" ? "border-l-[#9c27b0]" : "border-l-white/20";
-  const textColor = color === "cyan" ? "text-[#00D4FF]" : color === "gold" ? "text-[#FFD700]" : color === "green" ? "text-[#00ff88]" : color === "red" ? "text-[#ff3366]" : color === "purple" ? "text-[#9c27b0]" : "text-white/60";
+function Panel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 ${borderColor}`}>
-      <div className="flex items-center gap-1.5">
-        {icon && <span className={textColor}>{icon}</span>}
-        <span className={`text-[10px] font-bold uppercase tracking-widest font-mono ${textColor}`}>{title}</span>
+    <div className={`bg-[#0a0a0f] border border-white/[0.06] rounded-xl overflow-hidden ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+function PanelHeader({ title, icon, rightContent }: { title: string; icon?: React.ReactNode; rightContent?: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+      <div className="flex items-center gap-2">
+        {icon && <span className="text-primary">{icon}</span>}
+        <span className="text-xs font-semibold text-white/70 uppercase tracking-wider">{title}</span>
       </div>
       {rightContent}
     </div>
   );
 }
 
-function BloombergPanel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function DataRow({ label, value, change }: { label: string; value: string; change?: number }) {
   return (
-    <div className={`bg-[#0a0a0f] border border-white/[0.06] rounded-sm overflow-hidden ${className}`}>
-      {children}
-    </div>
-  );
-}
-
-function DataRow({ label, value, change, mono = true, small = false }: { label: string; value: string; change?: number; mono?: boolean; small?: boolean }) {
-  return (
-    <div className={`flex items-center justify-between px-2 ${small ? 'py-0.5' : 'py-1'} hover:bg-white/[0.02] transition-colors`}>
-      <span className={`${small ? 'text-[9px]' : 'text-[10px]'} text-white/40 ${mono ? 'font-mono' : ''}`}>{label}</span>
+    <div className="flex items-center justify-between px-4 py-2 hover:bg-white/[0.02] transition-colors">
+      <span className="text-xs text-white/40 font-mono">{label}</span>
       <div className="flex items-center gap-2">
-        <span className={`${small ? 'text-[9px]' : 'text-[10px]'} font-mono font-medium text-white/80`}>{value}</span>
+        <span className="text-xs font-mono font-medium text-white/80">{value}</span>
         {change !== undefined && (
-          <span className={`${small ? 'text-[8px]' : 'text-[9px]'} font-mono font-bold ${change >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>
+          <span className={`text-[10px] font-mono font-semibold ${change >= 0 ? 'text-[#00D4FF]' : 'text-red-400'}`}>
             {change >= 0 ? '+' : ''}{Math.abs(change).toFixed(2)}%
           </span>
         )}
@@ -163,77 +161,7 @@ function DataRow({ label, value, change, mono = true, small = false }: { label: 
   );
 }
 
-function GamificationBar() {
-  const { isSignedIn, isLoaded } = useAuth();
-  const [gamData, setGamData] = useState<{ rank: string; streak: string; badges: string } | null>(null);
-
-  useEffect(() => {
-    if (!isLoaded) return;
-    if (!isSignedIn) {
-      setGamData(null);
-      return;
-    }
-    (async () => {
-      try {
-        const res = await fetch("/api/gamification/leaderboard/rank");
-        const rankData = res.ok ? await res.json() : null;
-        const rankStr = rankData?.rank ? `#${rankData.rank}` : "#00";
-
-        setGamData({ rank: rankStr, streak: "0 days", badges: "0/12" });
-      } catch {
-        setGamData({ rank: "#00", streak: "0 days", badges: "0/12" });
-      }
-    })();
-  }, [isLoaded, isSignedIn]);
-
-  if (isLoaded && !isSignedIn) {
-    return (
-      <div className="grid grid-cols-3 gap-1.5 mb-2">
-        {[
-          { icon: <Trophy className="w-4 h-4 text-[#FFD700]" />, label: "RANK", color: "hover:border-[#FFD700]/20" },
-          { icon: <Flame className="w-4 h-4 text-orange-400" />, label: "STREAK", color: "hover:border-orange-400/20" },
-          { icon: <Award className="w-4 h-4 text-[#9c27b0]" />, label: "BADGES", color: "hover:border-[#9c27b0]/20" },
-        ].map(({ icon, label, color }) => (
-          <a key={label} href="/sign-in" className={`bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 ${color} transition-colors cursor-pointer`}>
-            {icon}
-            <div>
-              <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest">{label}</p>
-              <p className="text-[10px] font-mono font-semibold text-white/30">Sign in to view</p>
-            </div>
-          </a>
-        ))}
-      </div>
-    );
-  }
-
-  const data = gamData || { rank: "#00", streak: "0 days", badges: "0/12" };
-
-  return (
-    <div className="grid grid-cols-3 gap-1.5 mb-2">
-      <Link href="/leaderboard" className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 hover:border-[#FFD700]/20 transition-colors cursor-pointer">
-        <Trophy className="w-4 h-4 text-[#FFD700]" />
-        <div>
-          <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest">RANK</p>
-          <p className="text-[13px] font-mono font-black text-[#FFD700]">{data.rank}</p>
-        </div>
-      </Link>
-      <Link href="/achievements" className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 hover:border-orange-400/20 transition-colors cursor-pointer">
-        <Flame className="w-4 h-4 text-orange-400" />
-        <div>
-          <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest">STREAK</p>
-          <p className="text-[13px] font-mono font-black text-orange-400">{data.streak}</p>
-        </div>
-      </Link>
-      <Link href="/achievements" className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 hover:border-[#9c27b0]/20 transition-colors cursor-pointer">
-        <Award className="w-4 h-4 text-[#9c27b0]" />
-        <div>
-          <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest">BADGES</p>
-          <p className="text-[13px] font-mono font-black text-[#9c27b0]">{data.badges}</p>
-        </div>
-      </Link>
-    </div>
-  );
-}
+type SecondaryTab = "signals" | "options" | "market" | "calendar";
 
 export default function Dashboard() {
   const { toast } = useToast();
@@ -251,7 +179,7 @@ export default function Dashboard() {
   const [analyzingSymbol, setAnalyzingSymbol] = useState("");
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [activeAssetTab, setActiveAssetTab] = useState<"crypto" | "forex" | "commodities" | "bonds">("crypto");
-  const [visibleLogs, setVisibleLogs] = useState(5);
+  const [secondaryTab, setSecondaryTab] = useState<SecondaryTab>("signals");
   const [clock, setClock] = useState("");
   const [expandedSignal, setExpandedSignal] = useState<number | null>(null);
   const [, navigate] = useLocation();
@@ -315,7 +243,6 @@ export default function Dashboard() {
     }
   }, [getToken, toast, loadPortfolio]);
 
-  const portfolioValueDisplay = portfolio.portfolioValue;
   const pnl = portfolio.totalValue - STARTING_CASH;
   const pnlPct = ((pnl / STARTING_CASH) * 100).toFixed(2);
   const portfolioChartPoints = portfolio.trades.length > 0
@@ -333,13 +260,6 @@ export default function Dashboard() {
     update();
     const t = setInterval(update, 1000);
     return () => clearInterval(t);
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setVisibleLogs(prev => Math.min(prev + 1, agentLogMessages.length));
-    }, 3000);
-    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -401,90 +321,90 @@ export default function Dashboard() {
     return totalMin >= 13 * 60 + 30 && totalMin < 20 * 60;
   })();
 
+  const SECONDARY_TABS: { key: SecondaryTab; label: string }[] = [
+    { key: "signals", label: "Stock Signals" },
+    { key: "options", label: "Options Flow" },
+    { key: "market", label: "Market Data" },
+    { key: "calendar", label: "Calendar" },
+  ];
+
   return (
     <Layout>
       <FlashCouncil />
       <MarketTicker />
       <FinancialDisclaimerBanner pageKey="dashboard" />
 
-      <div className="bg-[#040408] border-b border-white/[0.06] px-3 py-1.5 flex items-center justify-between">
+      {/* Command Bar */}
+      <div className="bg-[#040408] border-b border-white/[0.05] px-4 py-2 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
-            <Terminal className="w-3.5 h-3.5 text-[#00D4FF]" />
-            <span className="text-[11px] font-mono font-bold text-[#00D4FF] tracking-wider">ENTANGLEWEALTH COMMAND CENTER</span>
-          </div>
-          <div className="h-3 w-px bg-white/10" />
-          <div className="flex items-center gap-1.5">
             <span className={`relative flex h-2 w-2`}>
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isMarketOpen ? 'bg-[#00ff88]' : 'bg-[#FFD700]'} opacity-75`} />
-              <span className={`relative inline-flex rounded-full h-2 w-2 ${isMarketOpen ? 'bg-[#00ff88]' : 'bg-[#FFD700]'}`} />
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isMarketOpen ? 'bg-[#00D4FF]' : 'bg-[#FFD700]'} opacity-60`} />
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${isMarketOpen ? 'bg-[#00D4FF]' : 'bg-[#FFD700]'}`} />
             </span>
-            <span className={`text-[9px] font-mono font-bold uppercase tracking-wider ${isMarketOpen ? 'text-[#00ff88]' : 'text-[#FFD700]'}`}>
+            <span className={`text-[10px] font-mono font-semibold tracking-wider ${isMarketOpen ? 'text-[#00D4FF]' : 'text-[#FFD700]'}`}>
               {isMarketOpen ? "MARKET OPEN" : "MARKET CLOSED"}
             </span>
           </div>
-          <div className="h-3 w-px bg-white/10" />
-          <span className="text-[9px] font-mono text-white/30">DEMO MODE · SIMULATED DATA</span>
+          <span className="text-[9px] font-mono text-white/25 hidden sm:inline">DEMO MODE · SIMULATED DATA</span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-white/20" />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20" />
             <input
               data-cmd-search
-              placeholder="Search ticker... ( / )"
+              placeholder="Search ticker..."
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setShowSearchDropdown(true); }}
               onFocus={() => setShowSearchDropdown(true)}
               onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
               onKeyDown={(e) => { if (e.key === "Enter" && searchQuery.trim()) { e.preventDefault(); runQuickAnalysis(searchQuery.toUpperCase().trim()); } }}
-              className="w-48 h-6 pl-7 pr-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30"
+              className="w-44 h-7 pl-7 pr-2 text-xs bg-white/[0.04] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40 transition-colors"
             />
             {showSearchDropdown && searchResults.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-0.5 bg-[#0a0a14] border border-white/10 rounded-sm z-50 shadow-2xl">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-[#0a0a14] border border-white/10 rounded-xl z-50 shadow-2xl overflow-hidden">
                 {searchResults.map(s => (
                   <button key={s.symbol} onClick={() => { setSearchQuery(s.symbol); runQuickAnalysis(s.symbol); }}
-                    className="w-full text-left px-2 py-1.5 flex items-center gap-2 hover:bg-[#00D4FF]/[0.06] transition-colors border-b border-white/[0.03] last:border-0">
-                    <span className="text-[10px] font-bold font-mono text-[#00D4FF]">{s.symbol}</span>
-                    <span className="text-[9px] text-white/25 truncate">{s.name}</span>
+                    className="w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-primary/[0.06] transition-colors border-b border-white/[0.03] last:border-0">
+                    <span className="text-xs font-bold font-mono text-primary">{s.symbol}</span>
+                    <span className="text-[10px] text-white/30 truncate">{s.name}</span>
                   </button>
                 ))}
               </div>
             )}
           </div>
-          <button onClick={() => setShowShortcuts(v => !v)} aria-label="Show keyboard shortcuts" className="flex items-center gap-1 text-[9px] font-mono text-white/20 hover:text-white/40 transition-colors">
-            <Keyboard className="w-3 h-3" />
-            <span>?</span>
+          <button onClick={() => setShowShortcuts(v => !v)} aria-label="Keyboard shortcuts" className="text-white/25 hover:text-white/50 transition-colors">
+            <Keyboard className="w-3.5 h-3.5" />
           </button>
           <div className="flex items-center gap-1.5">
             <Clock className="w-3 h-3 text-white/20" />
-            <span className="text-[11px] font-mono font-bold text-white/60 tabular-nums">{clock}</span>
+            <span className="text-[11px] font-mono font-semibold text-white/50 tabular-nums">{clock}</span>
           </div>
         </div>
       </div>
 
       {showShortcuts && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowShortcuts(false)} role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
-          <div className="bg-[#0a0a14] border border-white/10 rounded-sm p-6 max-w-md w-full" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-[12px] font-mono font-bold text-[#00D4FF] tracking-wider">KEYBOARD SHORTCUTS</span>
-              <button onClick={() => setShowShortcuts(false)} aria-label="Close shortcuts" className="text-white/20 hover:text-white/40"><X className="w-4 h-4" /></button>
+          <div className="bg-[#0a0a14] border border-white/10 rounded-2xl p-6 max-w-sm w-full mx-4" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <span className="text-sm font-bold text-white">Keyboard Shortcuts</span>
+              <button onClick={() => setShowShortcuts(false)} aria-label="Close" className="text-white/30 hover:text-white/60"><X className="w-4 h-4" /></button>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-2">
               {[
                 ["/", "Focus search"],
                 ["1", "Dashboard"],
                 ["2", "Terminal"],
-                ["3", "Market Overview"],
+                ["3", "Markets"],
                 ["4", "Technical Analysis"],
-                ["5", "Stock Explorer"],
+                ["5", "Stocks"],
                 ["6", "Screener"],
-                ["7", "Options"],
                 ["?", "Toggle shortcuts"],
                 ["Esc", "Close / Dismiss"],
               ].map(([key, desc]) => (
-                <div key={key} className="flex items-center gap-3 py-1">
-                  <kbd className="min-w-[28px] text-center px-1.5 py-0.5 bg-white/[0.04] border border-white/10 rounded-sm text-[10px] font-mono font-bold text-white/60">{key}</kbd>
-                  <span className="text-[10px] text-white/40">{desc}</span>
+                <div key={key} className="flex items-center gap-3">
+                  <kbd className="min-w-[28px] text-center px-1.5 py-0.5 bg-white/[0.06] border border-white/10 rounded text-[10px] font-mono font-bold text-white/50">{key}</kbd>
+                  <span className="text-xs text-white/40">{desc}</span>
                 </div>
               ))}
             </div>
@@ -492,453 +412,387 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="px-2 py-2 bg-[#020204]">
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1.5 mb-2">
+      <div className="px-4 py-5 space-y-5 max-w-[1600px] mx-auto w-full">
+
+        {/* Section 1: Hero — Portfolio + Key Metrics */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: "PORTFOLIO", value: `${pnl >= 0 ? '+' : ''}${Math.abs(parseFloat(pnlPct)).toFixed(2)}%`, sub: `$${portfolio.totalValue.toLocaleString(undefined, {maximumFractionDigits: 0})}`, color: pnl >= 0 ? "#00ff88" : "#ff3366" },
-            { label: "OPTIONS P&L", value: `+$${todayOptionsIncome}`, sub: "Theta today", color: "#FFD700" },
-            { label: "WIN RATE", value: "80%", sub: "Last 10 signals", color: "#9c27b0" },
-            { label: "RISK LEVEL", value: "8.4%", sub: "Exposure", color: "#00ff88" },
-            { label: "VIX", value: MARKET_INTERNALS.vix.current.toFixed(2), sub: `${MARKET_INTERNALS.vix.change > 0 ? '+' : ''}${Math.abs(MARKET_INTERNALS.vix.change)}%`, color: MARKET_INTERNALS.vix.change > 0 ? "#ff3366" : "#00ff88" },
-            { label: "TICK", value: `${MARKET_INTERNALS.tick.current > 0 ? '+' : ''}${Math.abs(MARKET_INTERNALS.tick.current)}`, sub: `H:${MARKET_INTERNALS.tick.high} L:${Math.abs(MARKET_INTERNALS.tick.low)}`, color: MARKET_INTERNALS.tick.current > 0 ? "#00ff88" : "#ff3366" },
-            { label: "A/D RATIO", value: MARKET_INTERNALS.advDecl.ratio.toFixed(2), sub: `${MARKET_INTERNALS.advDecl.advancing}/${MARKET_INTERNALS.advDecl.declining}`, color: MARKET_INTERNALS.advDecl.ratio > 1 ? "#00ff88" : "#ff3366" },
-            { label: "P/C RATIO", value: MARKET_INTERNALS.putCall.ratio.toFixed(2), sub: `Eq:${MARKET_INTERNALS.putCall.equity} Ix:${MARKET_INTERNALS.putCall.index}`, color: MARKET_INTERNALS.putCall.ratio < 0.8 ? "#00ff88" : MARKET_INTERNALS.putCall.ratio > 1.0 ? "#ff3366" : "#FFD700" },
+            {
+              label: "Portfolio",
+              value: `$${portfolio.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+              sub: `${pnl >= 0 ? '+' : ''}${Math.abs(parseFloat(pnlPct)).toFixed(2)}% P&L`,
+              color: pnl >= 0 ? "#00D4FF" : "#ff4757",
+              isPositive: pnl >= 0,
+            },
+            {
+              label: "Options Income",
+              value: `+$${todayOptionsIncome}`,
+              sub: "Theta today",
+              color: "#FFD700",
+              isPositive: true,
+            },
+            {
+              label: "VIX",
+              value: MARKET_INTERNALS.vix.current.toFixed(2),
+              sub: `${MARKET_INTERNALS.vix.change > 0 ? '+' : ''}${MARKET_INTERNALS.vix.change}% · ${MARKET_INTERNALS.vix.percentile}th %ile`,
+              color: MARKET_INTERNALS.vix.change > 0 ? "#ff4757" : "#00D4FF",
+              isPositive: MARKET_INTERNALS.vix.change <= 0,
+            },
+            {
+              label: "A/D Ratio",
+              value: MARKET_INTERNALS.advDecl.ratio.toFixed(2),
+              sub: `${MARKET_INTERNALS.advDecl.advancing} adv / ${MARKET_INTERNALS.advDecl.declining} dec`,
+              color: MARKET_INTERNALS.advDecl.ratio > 1 ? "#00D4FF" : "#ff4757",
+              isPositive: MARKET_INTERNALS.advDecl.ratio > 1,
+            },
           ].map((stat) => (
-            <div key={stat.label} className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 text-center">
-              <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest mb-0.5">{stat.label}</p>
-              <p className="text-[14px] font-mono font-black tabular-nums" style={{ color: stat.color }}>{stat.value}</p>
-              <p className="text-[8px] font-mono text-white/20">{stat.sub}</p>
+            <div key={stat.label} className="bg-[#0a0a0f] border border-white/[0.06] rounded-xl px-4 py-4">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40 mb-1.5">{stat.label}</p>
+              <p className="text-2xl font-bold tabular-nums" style={{ color: stat.color }}>{stat.value}</p>
+              <p className="text-[11px] text-white/30 mt-1">{stat.sub}</p>
             </div>
           ))}
         </div>
 
-        <GamificationBar />
+        {/* Quick Analysis result */}
+        {(quickAnalysis || analyzingSymbol) && (
+          <Panel>
+            <PanelHeader title="Quick Analysis" icon={<BarChart3 className="w-3.5 h-3.5" />} rightContent={
+              <button onClick={() => { setQuickAnalysis(null); setAnalyzingSymbol(""); }} className="text-white/30 hover:text-white/60"><X className="w-4 h-4" /></button>
+            } />
+            <div className="px-4 py-4">
+              {analyzingSymbol ? (
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4 text-primary animate-spin" />
+                  <span className="text-sm text-white/60">Running 55+ indicators on {analyzingSymbol}...</span>
+                </div>
+              ) : quickAnalysis && (
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex items-center gap-6">
+                    <div className="text-center">
+                      <p className={`text-3xl font-bold ${quickAnalysis.signal.includes("BUY") ? "text-[#00D4FF]" : quickAnalysis.signal.includes("SELL") ? "text-red-400" : "text-[#FFD700]"}`}>{quickAnalysis.confidence}%</p>
+                      <p className="text-[10px] text-white/30 uppercase tracking-wider mt-0.5">Confidence</p>
+                    </div>
+                    <div className="h-10 w-px bg-white/10" />
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <span className="text-lg font-bold text-white">{quickAnalysis.symbol}</span>
+                        <span className="text-sm text-white/30">{quickAnalysis.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-lg ${quickAnalysis.signal.includes("BUY") ? "bg-primary/10 text-primary" : quickAnalysis.signal.includes("SELL") ? "bg-red-400/10 text-red-400" : "bg-[#FFD700]/10 text-[#FFD700]"}`}>
+                          {quickAnalysis.signal.replace("_", " ")}
+                        </span>
+                        <span className="text-xs text-primary/70">{quickAnalysis.buyCount} buy signals</span>
+                        <span className="text-xs text-red-400/70">{quickAnalysis.sellCount} sell signals</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Link href="/technical" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
+                    Full Analysis →
+                  </Link>
+                </div>
+              )}
+            </div>
+          </Panel>
+        )}
 
-        <div className="grid grid-cols-12 gap-1.5 mb-0">
+        {/* Nudge cards */}
+        <div className="grid grid-cols-12 gap-3">
           <WeeklyProgressCard />
           <StreakNudge />
           <FinishSetupNudge />
         </div>
 
-        {(quickAnalysis || analyzingSymbol) && (
-          <div className="mb-2">
-            <BloombergPanel>
-              <PanelHeader title="QUICK ANALYSIS" icon={<BarChart3 className="w-3 h-3" />} color="cyan" rightContent={
-                <button onClick={() => { setQuickAnalysis(null); setAnalyzingSymbol(""); }} className="text-white/20 hover:text-white/40"><X className="w-3 h-3" /></button>
+        {/* Section 2: Hero Panels — QuantumViz + Portfolio + Watchlist */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 space-y-4">
+            <Panel>
+              <PanelHeader title="Quantum Entanglement Matrix" icon={<Activity className="w-3.5 h-3.5" />} rightContent={
+                <span className="text-[10px] text-white/30">6 models · consensus signal</span>
               } />
-              <div className="p-3">
-                {analyzingSymbol ? (
-                  <div className="flex items-center gap-2">
-                    <RefreshCw className="w-3.5 h-3.5 text-[#00D4FF] animate-spin" />
-                    <span className="text-[10px] font-mono text-white/60">Running 55+ indicators on {analyzingSymbol}...</span>
-                  </div>
-                ) : quickAnalysis && (
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="text-center">
-                        <p className={`text-[18px] font-mono font-black ${quickAnalysis.signal.includes("BUY") ? "text-[#00ff88]" : quickAnalysis.signal.includes("SELL") ? "text-[#ff3366]" : "text-[#FFD700]"}`}>{quickAnalysis.confidence}%</p>
-                        <p className="text-[8px] font-mono text-white/20">CONFIDENCE</p>
-                      </div>
-                      <div className="h-8 w-px bg-white/10" />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[13px] font-mono font-black text-white">{quickAnalysis.symbol}</span>
-                          <span className="text-[9px] text-white/20">{quickAnalysis.name}</span>
+              <div className="p-4">
+                <QuantumViz />
+              </div>
+            </Panel>
+
+            <Panel>
+              <PanelHeader title="Paper Portfolio" icon={<TrendingUp className="w-3.5 h-3.5" />} rightContent={
+                <div className="flex items-center gap-3">
+                  <span className={`text-sm font-semibold ${pnl >= 0 ? 'text-primary' : 'text-red-400'}`}>
+                    {pnl >= 0 ? '+' : ''}{Math.abs(parseFloat(pnlPct)).toFixed(2)}%
+                  </span>
+                  <button onClick={() => setShowTradePanel(v => !v)} className="text-xs font-semibold text-primary/70 hover:text-primary transition-colors border border-primary/20 rounded-lg px-2.5 py-1">
+                    {showTradePanel ? "View Chart" : "Trade"}
+                  </button>
+                </div>
+              } />
+              <div className="p-4">
+                {showTradePanel ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-4 gap-3">
+                      {[
+                        { label: "Cash", value: `$${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: "text-primary" },
+                        { label: "Positions", value: `$${portfolio.portfolioValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: "text-white/70" },
+                        { label: "Total", value: `$${portfolio.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: "text-white" },
+                        { label: "P&L", value: `${pnl >= 0 ? '+' : ''}$${Math.abs(pnl).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: pnl >= 0 ? "text-primary" : "text-red-400" },
+                      ].map(s => (
+                        <div key={s.label} className="bg-white/[0.03] rounded-xl p-3 text-center">
+                          <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">{s.label}</p>
+                          <p className={`text-sm font-semibold font-mono ${s.color}`}>{s.value}</p>
                         </div>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className={`px-1.5 py-0.5 text-[9px] font-mono font-bold rounded-sm ${quickAnalysis.signal.includes("BUY") ? "bg-[#00ff88]/10 text-[#00ff88]" : quickAnalysis.signal.includes("SELL") ? "bg-[#ff3366]/10 text-[#ff3366]" : "bg-[#FFD700]/10 text-[#FFD700]"}`}>
-                            {quickAnalysis.signal.replace("_", " ")}
-                          </span>
-                          <span className="text-[9px] font-mono text-[#00ff88]">{quickAnalysis.buyCount} BUY</span>
-                          <span className="text-[9px] font-mono text-[#ff3366]">{quickAnalysis.sellCount} SELL</span>
-                        </div>
-                      </div>
+                      ))}
                     </div>
-                    <Link href="/technical" className="px-3 py-1.5 text-[9px] font-mono font-bold text-[#00D4FF] bg-[#00D4FF]/[0.06] border border-[#00D4FF]/20 rounded-sm hover:bg-[#00D4FF]/10 transition-colors">
-                      FULL ANALYSIS →
-                    </Link>
+                    <div className="flex gap-2">
+                      <button onClick={() => setTradeSide("buy")} className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-colors ${tradeSide === "buy" ? "bg-primary/15 text-primary border border-primary/30" : "bg-white/[0.03] text-white/40 border border-white/[0.06]"}`}>Buy</button>
+                      <button onClick={() => setTradeSide("sell")} className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-colors ${tradeSide === "sell" ? "bg-red-500/15 text-red-400 border border-red-500/30" : "bg-white/[0.03] text-white/40 border border-white/[0.06]"}`}>Sell</button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <input value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40" />
+                      <input value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40" />
+                      <input value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40" />
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} className={`flex-1 h-10 text-sm font-bold rounded-xl transition-colors ${tradeSide === "buy" ? "bg-primary text-black hover:bg-primary/90" : "bg-red-500 text-white hover:bg-red-500/90"} disabled:opacity-40`}>
+                        {tradeLoading ? "Executing..." : `${tradeSide === "buy" ? "Buy" : "Sell"} Order`}
+                      </button>
+                      <button onClick={resetPortfolio} className="px-4 h-10 text-sm font-medium text-white/40 bg-white/[0.03] border border-white/[0.06] rounded-xl hover:text-white/60 transition-colors">
+                        Reset
+                      </button>
+                    </div>
+                    {portfolio.positions.length > 0 && (
+                      <div className="border-t border-white/[0.06] pt-3">
+                        <p className="text-[10px] text-white/30 uppercase tracking-wider mb-2">Open Positions</p>
+                        {portfolio.positions.map(p => (
+                          <div key={p.id} className="flex items-center justify-between py-1.5 border-b border-white/[0.03] last:border-0">
+                            <span className="text-sm font-semibold text-primary">{p.symbol}</span>
+                            <span className="text-xs text-white/40">{p.quantity} @ ${p.avgCost.toFixed(2)}</span>
+                            <span className="text-sm font-mono text-white/70">${(p.quantity * p.avgCost).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {!isSignedIn && <p className="text-xs text-[#FFD700] text-center">Sign in to start paper trading</p>}
+                  </div>
+                ) : (
+                  <div>
+                    {portfolio.trades.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <TrendingUp className="w-10 h-10 text-white/10 mb-3" />
+                        <p className="text-sm text-white/40 mb-1">$100,000 starting balance</p>
+                        <p className="text-xs text-white/25 mb-4">Place your first paper trade to start tracking</p>
+                        <button onClick={() => setShowTradePanel(true)} className="px-4 py-2 text-sm font-semibold text-primary bg-primary/10 rounded-xl hover:bg-primary/20 transition-colors border border-primary/20">
+                          Start Trading
+                        </button>
+                      </div>
+                    ) : (
+                      <ResponsiveContainer width="100%" height={200}>
+                        <AreaChart data={portfolioChartPoints}>
+                          <defs>
+                            <linearGradient id="pgGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor={pnl >= 0 ? "#00D4FF" : "#ff4757"} stopOpacity={0.2} />
+                              <stop offset="95%" stopColor={pnl >= 0 ? "#00D4FF" : "#ff4757"} stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
+                          <XAxis dataKey="time" tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} />
+                          <YAxis tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(1)}k`} domain={['dataMin - 500', 'dataMax + 500']} width={48} />
+                          <Tooltip contentStyle={{ background: '#0a0a0f', border: '1px solid rgba(0,212,255,0.15)', borderRadius: 12, color: '#fff', fontSize: 12 }} formatter={(value: number) => [`$${value.toLocaleString()}`, '']} />
+                          <Area type="monotone" dataKey="value" stroke={pnl >= 0 ? "#00D4FF" : "#ff4757"} strokeWidth={2} fill="url(#pgGrad)" />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    )}
                   </div>
                 )}
               </div>
-            </BloombergPanel>
+            </Panel>
           </div>
-        )}
 
-        <div className="grid grid-cols-12 gap-1.5">
-          <div className="col-span-12 lg:col-span-8">
-            <div className="grid grid-cols-12 gap-1.5">
-              <div className="col-span-12">
-                <BloombergPanel>
-                  <PanelHeader title="QUANTUM ENTANGLEMENT MATRIX" icon={<Activity className="w-3 h-3" />} color="cyan" rightContent={
-                    <span className="text-[8px] font-mono text-white/20">6 MODELS · CONSENSUS SIGNAL</span>
-                  } />
-                  <div className="p-2">
-                    <QuantumViz />
-                  </div>
-                </BloombergPanel>
+          <div className="space-y-4">
+            <Panel>
+              <PanelHeader title="Fear & Greed" icon={<Shield className="w-3.5 h-3.5" />} />
+              <div className="p-4">
+                <FearGreedGauge />
               </div>
+            </Panel>
+            <Panel>
+              <PanelHeader title="Watchlist" icon={<Eye className="w-3.5 h-3.5" />} />
+              <div className="p-2">
+                <WatchlistPanel />
+              </div>
+            </Panel>
+            <Panel>
+              <PanelHeader title="Multi-Asset" icon={<Globe className="w-3.5 h-3.5" />} rightContent={
+                <div className="flex gap-1">
+                  {(["crypto", "forex", "commodities", "bonds"] as const).map(tab => (
+                    <button key={tab} onClick={() => setActiveAssetTab(tab)}
+                      className={`px-2 py-0.5 text-[10px] font-semibold rounded-lg transition-colors ${activeAssetTab === tab ? 'bg-[#FFD700]/15 text-[#FFD700]' : 'text-white/25 hover:text-white/50'}`}>
+                      {tab === "commodities" ? "Cmdty" : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              } />
+              <div className="divide-y divide-white/[0.03]">
+                {activeAssetTab === "crypto" && MULTI_ASSET_DATA.crypto.map(c => (
+                  <DataRow key={c.symbol} label={c.symbol} value={c.price >= 100 ? `$${c.price.toLocaleString(undefined, { maximumFractionDigits: 0 })}` : `$${c.price.toFixed(c.price < 1 ? 3 : 2)}`} change={c.change} />
+                ))}
+                {activeAssetTab === "forex" && MULTI_ASSET_DATA.forex.map(f => (
+                  <DataRow key={f.symbol} label={f.symbol} value={f.price.toFixed(4)} change={f.change} />
+                ))}
+                {activeAssetTab === "commodities" && MULTI_ASSET_DATA.commodities.map(c => (
+                  <DataRow key={c.symbol} label={c.symbol} value={`$${c.price.toFixed(2)}`} change={c.change} />
+                ))}
+                {activeAssetTab === "bonds" && MULTI_ASSET_DATA.bonds.map(b => (
+                  <DataRow key={b.symbol} label={b.symbol} value={`${b.yield.toFixed(2)}%`} change={b.change} />
+                ))}
+              </div>
+            </Panel>
+          </div>
+        </div>
 
-              <div className="col-span-12 lg:col-span-7">
-                <BloombergPanel>
-                  <PanelHeader title="PAPER PORTFOLIO" icon={<TrendingUp className="w-3 h-3" />} color="green" rightContent={
-                    <div className="flex items-center gap-2">
-                      <span className="text-[9px] font-mono text-white/30">$100K STARTING CASH</span>
-                      <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>
-                        {pnl >= 0 ? '+' : ''}{Math.abs(parseFloat(pnlPct)).toFixed(2)}%
+        {/* Section 3: Tabbed secondary data */}
+        <Panel>
+          <div className="border-b border-white/[0.06]">
+            <div className="flex px-2 py-1 gap-1">
+              {SECONDARY_TABS.map(t => (
+                <button
+                  key={t.key}
+                  onClick={() => setSecondaryTab(t.key)}
+                  className={`px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors ${
+                    secondaryTab === t.key
+                      ? "bg-primary/10 text-primary"
+                      : "text-white/40 hover:text-white/70 hover:bg-white/[0.03]"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {secondaryTab === "signals" && (
+            <div className="divide-y divide-white/[0.04]">
+              {stockAlerts.map((alert) => (
+                <div key={alert.id} className="hover:bg-white/[0.01] transition-colors cursor-pointer" onClick={() => setExpandedSignal(expandedSignal === alert.id ? null : alert.id)}>
+                  <div className="flex items-center justify-between px-4 py-3">
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm font-bold font-mono text-white w-14">{alert.symbol}</span>
+                      <span className="text-xs text-white/40">${alert.price.toFixed(2)}</span>
+                      <span className="text-xs text-white/25 hidden md:inline">{alert.pattern}</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-20 hidden sm:block">
+                        <div className="flex justify-between text-[10px] mb-1">
+                          <span className="text-white/25">Conf</span>
+                          <span className="text-white/50">{alert.confidence}%</span>
+                        </div>
+                        <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${alert.type === 'BUY' ? 'bg-primary' : alert.type === 'SELL' ? 'bg-red-400' : 'bg-[#FFD700]'}`} style={{ width: `${alert.confidence}%` }} />
+                        </div>
+                      </div>
+                      <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-lg ${alert.type === 'BUY' ? 'bg-primary/10 text-primary' : alert.type === 'SELL' ? 'bg-red-400/10 text-red-400' : 'bg-[#FFD700]/10 text-[#FFD700]'}`}>
+                        {alert.type}
                       </span>
-                      <button onClick={() => setShowTradePanel(v => !v)} className="px-1.5 py-0.5 text-[8px] font-mono font-bold bg-[#00D4FF]/10 text-[#00D4FF] rounded-sm hover:bg-[#00D4FF]/20 transition-colors">
-                        {showTradePanel ? "CHART" : "TRADE"}
-                      </button>
+                      {expandedSignal === alert.id ? <ChevronUp className="w-4 h-4 text-white/25" /> : <ChevronDown className="w-4 h-4 text-white/25" />}
                     </div>
-                  } />
-                  <div className="p-2">
-                    {showTradePanel ? (
-                      <div className="space-y-2">
-                        <div className="grid grid-cols-4 gap-1.5">
-                          <div className="bg-white/[0.03] rounded-sm p-2 text-center">
-                            <p className="text-[8px] font-mono text-white/30">CASH</p>
-                            <p className="text-[11px] font-mono font-bold text-[#00ff88]">${portfolio.cashBalance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
-                          </div>
-                          <div className="bg-white/[0.03] rounded-sm p-2 text-center">
-                            <p className="text-[8px] font-mono text-white/30">POSITIONS</p>
-                            <p className="text-[11px] font-mono font-bold text-[#00D4FF]">${portfolioValueDisplay.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
-                          </div>
-                          <div className="bg-white/[0.03] rounded-sm p-2 text-center">
-                            <p className="text-[8px] font-mono text-white/30">TOTAL</p>
-                            <p className="text-[11px] font-mono font-bold text-white">${portfolio.totalValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
-                          </div>
-                          <div className="bg-white/[0.03] rounded-sm p-2 text-center">
-                            <p className="text-[8px] font-mono text-white/30">P&L</p>
-                            <p className={`text-[11px] font-mono font-bold ${pnl >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>{pnl >= 0 ? '+' : ''}${Math.abs(pnl).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
-                          </div>
+                  </div>
+                  {expandedSignal === alert.id && (
+                    <div className="px-4 pb-3 animate-in fade-in slide-in-from-top-1 duration-150">
+                      <div className="bg-white/[0.02] rounded-xl p-3 text-xs text-white/40 space-y-1">
+                        <div className="flex gap-3">
+                          <span className="text-primary">{alert.source}</span>
+                          <span>·</span>
+                          <span>{alert.pattern}</span>
                         </div>
-                        <div className="flex gap-1">
-                          <button onClick={() => setTradeSide("buy")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00ff88]/20 text-[#00ff88] border border-[#00ff88]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>BUY</button>
-                          <button onClick={() => setTradeSide("sell")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "sell" ? "bg-[#ff3366]/20 text-[#ff3366] border border-[#ff3366]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>SELL</button>
+                        <p>{alert.note}</p>
+                        <div className="flex gap-4 pt-1">
+                          <span>Risk: 2.0%</span>
+                          <span>R:R 1:{alert.confidence > 80 ? '4' : alert.confidence > 60 ? '3' : '2'}</span>
                         </div>
-                        <div className="grid grid-cols-3 gap-1">
-                          <input value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30" />
-                          <input value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30" />
-                          <input value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30" />
-                        </div>
-                        <div className="flex gap-1">
-                          <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} className={`flex-1 h-7 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00ff88] text-black hover:bg-[#00ff88]/80" : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"} disabled:opacity-40`}>
-                            {tradeLoading ? "EXECUTING..." : `${tradeSide.toUpperCase()} ORDER`}
-                          </button>
-                          <button onClick={resetPortfolio} className="px-2 h-7 text-[9px] font-mono font-bold text-white/30 bg-white/[0.03] border border-white/[0.06] rounded-sm hover:text-white/50 transition-colors">
-                            RESET
-                          </button>
-                        </div>
-                        {portfolio.positions.length > 0 && (
-                          <div className="border-t border-white/[0.06] pt-1.5">
-                            <p className="text-[8px] font-mono text-white/25 mb-1">OPEN POSITIONS</p>
-                            {portfolio.positions.map(p => (
-                              <div key={p.id} className="flex items-center justify-between py-0.5">
-                                <span className="text-[10px] font-mono font-bold text-[#00D4FF]">{p.symbol}</span>
-                                <span className="text-[9px] font-mono text-white/40">{p.quantity} shares @ ${p.avgCost.toFixed(2)}</span>
-                                <span className="text-[9px] font-mono text-white/60">${(p.quantity * p.avgCost).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        {!isSignedIn && <p className="text-[9px] font-mono text-[#FFD700] text-center">Sign in to start paper trading</p>}
                       </div>
-                    ) : (
-                      <div>
-                        {portfolio.trades.length === 0 ? (
-                          <div className="flex flex-col items-center justify-center h-[180px] text-center">
-                            <TrendingUp className="w-8 h-8 text-white/10 mb-2" />
-                            <p className="text-[11px] font-mono text-white/30">$0.00 Portfolio Value</p>
-                            <p className="text-[9px] font-mono text-white/15 mt-1">Place your first paper trade to start tracking</p>
-                            <button onClick={() => setShowTradePanel(true)} className="mt-2 px-3 py-1 text-[9px] font-mono font-bold text-[#00D4FF] bg-[#00D4FF]/10 rounded-sm hover:bg-[#00D4FF]/20 transition-colors">
-                              START TRADING
-                            </button>
-                          </div>
-                        ) : (
-                          <ResponsiveContainer width="100%" height={180}>
-                            <AreaChart data={portfolioChartPoints}>
-                              <defs>
-                                <linearGradient id="pgBB" x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="5%" stopColor={pnl >= 0 ? "#00ff88" : "#ff3366"} stopOpacity={0.2} />
-                                  <stop offset="95%" stopColor={pnl >= 0 ? "#00ff88" : "#ff3366"} stopOpacity={0} />
-                                </linearGradient>
-                              </defs>
-                              <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
-                              <XAxis dataKey="time" tick={{ fill: '#333', fontSize: 9, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} />
-                              <YAxis tick={{ fill: '#333', fontSize: 9, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(1)}k`} domain={['dataMin - 500', 'dataMax + 500']} width={45} />
-                              <Tooltip contentStyle={{ background: '#0a0a0f', border: '1px solid rgba(0,212,255,0.15)', borderRadius: 2, color: '#fff', fontSize: 10, fontFamily: 'JetBrains Mono' }} formatter={(value: number) => [`$${value.toLocaleString()}`, '']} />
-                              <Area type="monotone" dataKey="value" stroke={pnl >= 0 ? "#00ff88" : "#ff3366"} strokeWidth={1.5} fill="url(#pgBB)" />
-                            </AreaChart>
-                          </ResponsiveContainer>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </BloombergPanel>
-              </div>
-
-              <div className="col-span-12 lg:col-span-5">
-                <BloombergPanel>
-                  <PanelHeader title="OPTIONS INCOME" icon={<Zap className="w-3 h-3" />} color="gold" rightContent={
-                    <span className="text-[9px] font-mono text-[#FFD700]">${optionsIncomeData.reduce((a, b) => a + b.income, 0).toLocaleString()} wk</span>
-                  } />
-                  <div className="p-2">
-                    <ResponsiveContainer width="100%" height={180}>
-                      <BarChart data={optionsIncomeData}>
-                        <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
-                        <XAxis dataKey="day" tick={{ fill: '#333', fontSize: 9, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fill: '#333', fontSize: 9, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} width={35} />
-                        <Tooltip contentStyle={{ background: '#0a0a0f', border: '1px solid rgba(255,215,0,0.15)', borderRadius: 2, color: '#fff', fontSize: 10, fontFamily: 'JetBrains Mono' }} />
-                        <Bar dataKey="income" fill="#FFD700" radius={[2, 2, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </BloombergPanel>
-              </div>
-
-              <div className="col-span-12 lg:col-span-5">
-                <GamificationWidget />
-              </div>
-
-              <div className="col-span-12">
-                <BloombergPanel>
-                  <PanelHeader title="STOCK SIGNALS" icon={<Activity className="w-3 h-3" />} color="green" rightContent={
-                    <span className="text-[8px] font-mono text-white/20">{stockAlerts.length} ACTIVE</span>
-                  } />
-                  <div className="divide-y divide-white/[0.04]">
-                    {stockAlerts.map((alert) => (
-                      <div key={alert.id} className="hover:bg-white/[0.01] transition-colors cursor-pointer" onClick={() => setExpandedSignal(expandedSignal === alert.id ? null : alert.id)}>
-                        <div className="flex items-center justify-between px-3 py-2">
-                          <div className="flex items-center gap-3">
-                            <span className="text-[12px] font-mono font-black text-white w-12">{alert.symbol}</span>
-                            <span className="text-[10px] font-mono text-white/40">${alert.price.toFixed(2)}</span>
-                            <span className="text-[9px] text-white/20 hidden sm:inline">{alert.pattern}</span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <div className="w-16">
-                              <div className="flex justify-between text-[8px] font-mono mb-0.5">
-                                <span className="text-white/20">CONF</span>
-                                <span className="text-white/40">{alert.confidence}%</span>
-                              </div>
-                              <div className="h-1 bg-white/[0.04] rounded-full overflow-hidden">
-                                <div className={`h-full rounded-full ${alert.type === 'BUY' ? 'bg-[#00ff88]' : alert.type === 'SELL' ? 'bg-[#ff3366]' : 'bg-[#FFD700]'}`} style={{ width: `${alert.confidence}%` }} />
-                              </div>
-                            </div>
-                            <span className={`px-2 py-0.5 text-[9px] font-mono font-bold rounded-sm ${alert.type === 'BUY' ? 'bg-[#00ff88]/10 text-[#00ff88]' : alert.type === 'SELL' ? 'bg-[#ff3366]/10 text-[#ff3366]' : 'bg-[#FFD700]/10 text-[#FFD700]'}`}>
-                              {alert.type}
-                            </span>
-                            {expandedSignal === alert.id ? <ChevronUp className="w-3 h-3 text-white/20" /> : <ChevronDown className="w-3 h-3 text-white/20" />}
-                          </div>
-                        </div>
-                        {expandedSignal === alert.id && (
-                          <div className="px-3 pb-2 animate-in fade-in slide-in-from-top-1 duration-150">
-                            <div className="bg-white/[0.02] rounded-sm p-2 text-[9px] font-mono text-white/40">
-                              <div className="flex gap-3 mb-1">
-                                <span className="text-[#00D4FF]">{alert.source}</span>
-                                <span className="text-white/10">|</span>
-                                <span>{alert.pattern}</span>
-                              </div>
-                              <p className="text-white/30">{alert.note}</p>
-                              <div className="flex gap-4 mt-1.5">
-                                <span>Risk: 2.0%</span>
-                                <span>R:R: 1:{alert.confidence > 80 ? '4' : alert.confidence > 60 ? '3' : '2'}</span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </BloombergPanel>
-              </div>
-
-              <div className="col-span-12">
-                <BloombergPanel>
-                  <PanelHeader title="OPTIONS FLOW" icon={<Zap className="w-3 h-3" />} color="gold" rightContent={
-                    <span className="text-[8px] font-mono text-white/20">{optionsAlerts.length} ALERTS</span>
-                  } />
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-white/[0.06]">
-                          {["SYMBOL", "TYPE", "STRIKE", "EXP", "PREMIUM", "FLOW"].map(h => (
-                            <th key={h} className="px-3 py-1.5 text-left text-[8px] font-mono font-bold text-white/20 uppercase tracking-wider">{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/[0.03]">
-                        {optionsAlerts.map(a => (
-                          <tr key={a.id} className="hover:bg-white/[0.01] transition-colors">
-                            <td className="px-3 py-1.5 text-[10px] font-mono font-bold text-white">{a.symbol}</td>
-                            <td className="px-3 py-1.5">
-                              <span className={`px-1.5 py-0.5 text-[9px] font-mono font-bold rounded-sm ${a.type === 'CALL' ? 'bg-[#00ff88]/10 text-[#00ff88]' : 'bg-[#ff3366]/10 text-[#ff3366]'}`}>{a.type}</span>
-                            </td>
-                            <td className="px-3 py-1.5 text-[10px] font-mono text-white/60">${a.strike}</td>
-                            <td className="px-3 py-1.5 text-[10px] font-mono text-white/40">{new Date(a.exp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
-                            <td className="px-3 py-1.5 text-[10px] font-mono font-bold text-[#FFD700]">{a.premium}</td>
-                            <td className="px-3 py-1.5 text-[9px] font-mono text-white/30 max-w-[200px] truncate">{a.flowType}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </BloombergPanel>
-              </div>
-
-              <div className="col-span-12">
-                <BloombergPanel>
-                  <PanelHeader title="UNUSUAL OPTIONS + GREEKS" icon={<Layers className="w-3 h-3" />} color="purple" rightContent={
-                    <span className="text-[8px] font-mono text-white/20">{unusualOptionsActivity.length} ENTRIES</span>
-                  } />
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-white/[0.06]">
-                          {["SYM", "TYPE", "STRIKE", "DELTA", "GAMMA", "THETA", "IV%", "STR", "STRATEGY"].map(h => (
-                            <th key={h} className="px-2 py-1.5 text-left text-[8px] font-mono font-bold text-white/20 uppercase tracking-wider">{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/[0.03]">
-                        {unusualOptionsActivity.map(e => (
-                          <tr key={e.id} className="hover:bg-white/[0.01] transition-colors">
-                            <td className="px-2 py-1.5 text-[10px] font-mono font-bold text-white">{e.symbol}</td>
-                            <td className="px-2 py-1.5">
-                              <span className={`px-1 py-0.5 text-[8px] font-mono font-bold rounded-sm ${e.type === 'CALL' ? 'bg-[#00ff88]/10 text-[#00ff88]' : 'bg-[#ff3366]/10 text-[#ff3366]'}`}>{e.type}</span>
-                            </td>
-                            <td className="px-2 py-1.5 text-[10px] font-mono text-white/60">${e.strike}</td>
-                            <td className={`px-2 py-1.5 text-[10px] font-mono font-bold ${e.delta > 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>{e.delta > 0 ? '+' : ''}{Math.abs(e.delta)}</td>
-                            <td className="px-2 py-1.5 text-[10px] font-mono text-[#00D4FF]">{Math.abs(e.gamma)}</td>
-                            <td className="px-2 py-1.5 text-[10px] font-mono text-[#ff3366]">{Math.abs(e.theta)}</td>
-                            <td className={`px-2 py-1.5 text-[10px] font-mono font-bold ${e.ivRank >= 70 ? 'text-[#FFD700]' : 'text-white/40'}`}>{e.ivRank}%</td>
-                            <td className="px-2 py-1.5">
-                              <div className="flex items-center gap-1">
-                                <div className="w-10 h-1 bg-white/[0.04] rounded-full overflow-hidden">
-                                  <div className={`h-full rounded-full ${e.strength >= 85 ? 'bg-[#00ff88]' : e.strength >= 60 ? 'bg-[#00D4FF]' : 'bg-white/20'}`} style={{ width: `${e.strength}%` }} />
-                                </div>
-                                <span className="text-[8px] font-mono text-white/30">{e.strength}%</span>
-                              </div>
-                            </td>
-                            <td className="px-2 py-1.5 text-[9px] font-mono text-[#00D4FF]/60">{e.strategy}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </BloombergPanel>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-span-12 lg:col-span-4">
-            <div className="flex flex-col gap-1.5">
-              <BloombergPanel>
-                <PanelHeader title="MARKET INTERNALS" icon={<Activity className="w-3 h-3" />} color="cyan" />
-                <div className="divide-y divide-white/[0.03]">
-                  <DataRow label="ADV/DECL" value={`${MARKET_INTERNALS.advDecl.advancing} / ${MARKET_INTERNALS.advDecl.declining}`} change={((MARKET_INTERNALS.advDecl.advancing / MARKET_INTERNALS.advDecl.declining) - 1) * 100} />
-                  <DataRow label="UNCHANGED" value={`${MARKET_INTERNALS.advDecl.unchanged}`} />
-                  <DataRow label="TICK" value={`${MARKET_INTERNALS.tick.current > 0 ? '+' : ''}${Math.abs(MARKET_INTERNALS.tick.current)}`} />
-                  <DataRow label="TICK HIGH/LOW" value={`${Math.abs(MARKET_INTERNALS.tick.high)} / ${Math.abs(MARKET_INTERNALS.tick.low)}`} />
-                  <DataRow label="TRIN (ARMS)" value={MARKET_INTERNALS.trin.value.toFixed(2)} />
-                  <DataRow label="P/C RATIO" value={MARKET_INTERNALS.putCall.ratio.toFixed(2)} />
-                  <DataRow label="P/C EQUITY" value={MARKET_INTERNALS.putCall.equity.toFixed(2)} />
-                  <DataRow label="P/C INDEX" value={MARKET_INTERNALS.putCall.index.toFixed(2)} />
-                  <DataRow label="VIX" value={MARKET_INTERNALS.vix.current.toFixed(2)} change={MARKET_INTERNALS.vix.change} />
-                  <DataRow label="VIX %ILE" value={`${MARKET_INTERNALS.vix.percentile}th`} />
-                  <DataRow label=">50 SMA" value={`${MARKET_INTERNALS.breadth.above50sma}%`} />
-                  <DataRow label=">200 SMA" value={`${MARKET_INTERNALS.breadth.above200sma}%`} />
-                  <DataRow label="NEW HIGHS" value={`${MARKET_INTERNALS.breadth.newHighs}`} />
-                  <DataRow label="NEW LOWS" value={`${MARKET_INTERNALS.breadth.newLows}`} />
-                </div>
-              </BloombergPanel>
-
-              <BloombergPanel>
-                <PanelHeader title="MULTI-ASSET" icon={<Globe className="w-3 h-3" />} color="gold" rightContent={
-                  <div className="flex gap-0.5">
-                    {(["crypto", "forex", "commodities", "bonds"] as const).map(tab => (
-                      <button key={tab} onClick={() => setActiveAssetTab(tab)}
-                        className={`px-1.5 py-0.5 text-[7px] font-mono font-bold uppercase rounded-sm transition-colors ${activeAssetTab === tab ? 'bg-[#FFD700]/20 text-[#FFD700]' : 'text-white/15 hover:text-white/30'}`}>
-                        {tab === "commodities" ? "CMDTY" : tab.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                } />
-                <div className="divide-y divide-white/[0.03]">
-                  {activeAssetTab === "crypto" && MULTI_ASSET_DATA.crypto.map(c => (
-                    <DataRow key={c.symbol} label={c.symbol} value={c.price >= 100 ? `$${c.price.toLocaleString(undefined, { maximumFractionDigits: 0 })}` : `$${c.price.toFixed(c.price < 1 ? 3 : 2)}`} change={c.change} />
-                  ))}
-                  {activeAssetTab === "forex" && MULTI_ASSET_DATA.forex.map(f => (
-                    <DataRow key={f.symbol} label={f.symbol} value={f.price.toFixed(4)} change={f.change} />
-                  ))}
-                  {activeAssetTab === "commodities" && MULTI_ASSET_DATA.commodities.map(c => (
-                    <DataRow key={c.symbol} label={c.symbol} value={`$${c.price.toFixed(2)}`} change={c.change} />
-                  ))}
-                  {activeAssetTab === "bonds" && MULTI_ASSET_DATA.bonds.map(b => (
-                    <DataRow key={b.symbol} label={b.symbol} value={`${b.yield.toFixed(2)}%`} change={b.change} />
-                  ))}
-                </div>
-              </BloombergPanel>
-
-              <BloombergPanel>
-                <PanelHeader title="FEAR & GREED" icon={<Shield className="w-3 h-3" />} color="green" />
-                <div className="p-2">
-                  <FearGreedGauge />
-                </div>
-              </BloombergPanel>
-
-              <BloombergPanel>
-                <PanelHeader title="WATCHLIST" icon={<Eye className="w-3 h-3" />} color="cyan" />
-                <div className="p-1">
-                  <WatchlistPanel />
-                </div>
-              </BloombergPanel>
-
-              <BloombergPanel>
-                <PanelHeader title="AI MODEL FEED" icon={<Eye className="w-3 h-3" />} color="purple" rightContent={
-                  <span className="text-[8px] font-mono text-white/15">{visibleLogs} events</span>
-                } />
-                <div className="max-h-48 overflow-y-auto">
-                  {agentLogMessages.slice(0, visibleLogs).map((log, i) => (
-                    <div key={i} className="flex gap-2 px-2 py-1 text-[9px] font-mono border-b border-white/[0.02] last:border-0 hover:bg-white/[0.01]">
-                      <span className="text-[#00D4FF]/40 shrink-0 w-12">{log.time}</span>
-                      <span className="text-white/30">{log.message}</span>
                     </div>
-                  ))}
+                  )}
                 </div>
-              </BloombergPanel>
+              ))}
             </div>
-          </div>
+          )}
 
-          <div className="col-span-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-1.5">
-              <BloombergPanel>
-                <PanelHeader title="SIGNAL HISTORY" icon={<BarChart3 className="w-3 h-3" />} color="cyan" />
-                <div className="p-2">
-                  <SignalHistory />
-                </div>
-              </BloombergPanel>
-              <BloombergPanel>
-                <PanelHeader title="ECONOMIC CALENDAR" icon={<Clock className="w-3 h-3" />} color="gold" />
-                <div className="p-2">
-                  <EconomicCalendar />
-                </div>
-              </BloombergPanel>
+          {secondaryTab === "options" && (
+            <div>
+              <div className="divide-y divide-white/[0.04]">
+                {optionsAlerts.map(a => (
+                  <div key={a.id} className="flex items-center gap-4 px-4 py-3 hover:bg-white/[0.01] transition-colors flex-wrap">
+                    <span className="text-sm font-bold text-white w-14">{a.symbol}</span>
+                    <span className={`px-2 py-0.5 text-xs font-semibold rounded-lg ${a.type === 'CALL' ? 'bg-primary/10 text-primary' : 'bg-red-400/10 text-red-400'}`}>{a.type}</span>
+                    <span className="text-xs text-white/50">${a.strike}</span>
+                    <span className="text-xs text-white/30">{new Date(a.exp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                    <span className="text-sm font-semibold text-[#FFD700]">{a.premium}</span>
+                    <span className="text-xs text-white/30 ml-auto hidden md:inline truncate max-w-[200px]">{a.flowType}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="border-t border-white/[0.06] p-4">
+                <p className="text-xs text-white/40 uppercase tracking-wider mb-3 font-semibold">Options Income (Weekly)</p>
+                <ResponsiveContainer width="100%" height={160}>
+                  <BarChart data={optionsIncomeData}>
+                    <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
+                    <XAxis dataKey="day" tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} width={40} />
+                    <Tooltip contentStyle={{ background: '#0a0a0f', border: '1px solid rgba(255,215,0,0.15)', borderRadius: 12, color: '#fff', fontSize: 11 }} />
+                    <Bar dataKey="income" fill="#FFD700" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-          </div>
-        </div>
+          )}
 
-        <div className="mt-2 flex items-center justify-between px-2 py-1 bg-[#0a0a0f] border border-white/[0.04] rounded-sm">
-          <div className="flex items-center gap-4 text-[8px] font-mono text-white/15">
-            <span>ENTANGLEWEALTH v3.0</span>
-            <span>·</span>
-            <span>6 AI MODELS</span>
-            <span>·</span>
-            <span>55+ INDICATORS</span>
-            <span>·</span>
-            <span>5,000 NASDAQ STOCKS</span>
-          </div>
-          <span className="text-[7px] font-mono text-white/10">Demo data · Not financial advice · Press ? for shortcuts</span>
-        </div>
+          {secondaryTab === "market" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
+              <div className="divide-y divide-white/[0.03]">
+                <div className="px-4 py-2.5">
+                  <p className="text-[10px] text-white/30 uppercase tracking-wider font-semibold">Market Internals</p>
+                </div>
+                <DataRow label="Advancing / Declining" value={`${MARKET_INTERNALS.advDecl.advancing} / ${MARKET_INTERNALS.advDecl.declining}`} change={((MARKET_INTERNALS.advDecl.advancing / MARKET_INTERNALS.advDecl.declining) - 1) * 100} />
+                <DataRow label="TICK" value={`${MARKET_INTERNALS.tick.current > 0 ? '+' : ''}${Math.abs(MARKET_INTERNALS.tick.current)}`} />
+                <DataRow label="TRIN (ARMS)" value={MARKET_INTERNALS.trin.value.toFixed(2)} />
+                <DataRow label="Put/Call Ratio" value={MARKET_INTERNALS.putCall.ratio.toFixed(2)} />
+                <DataRow label="VIX" value={MARKET_INTERNALS.vix.current.toFixed(2)} change={MARKET_INTERNALS.vix.change} />
+                <DataRow label="VIX Percentile" value={`${MARKET_INTERNALS.vix.percentile}th`} />
+                <DataRow label="Above 50 SMA" value={`${MARKET_INTERNALS.breadth.above50sma}%`} />
+                <DataRow label="Above 200 SMA" value={`${MARKET_INTERNALS.breadth.above200sma}%`} />
+                <DataRow label="New Highs / Lows" value={`${MARKET_INTERNALS.breadth.newHighs} / ${MARKET_INTERNALS.breadth.newLows}`} />
+              </div>
+              <div className="divide-y divide-white/[0.03]">
+                <div className="px-4 py-2.5">
+                  <p className="text-[10px] text-white/30 uppercase tracking-wider font-semibold">Options Greeks (Unusual Activity)</p>
+                </div>
+                {unusualOptionsActivity.slice(0, 8).map(e => (
+                  <div key={e.id} className="flex items-center gap-3 px-4 py-2 hover:bg-white/[0.01] transition-colors">
+                    <span className="text-xs font-bold text-white w-12">{e.symbol}</span>
+                    <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${e.type === 'CALL' ? 'bg-primary/10 text-primary' : 'bg-red-400/10 text-red-400'}`}>{e.type}</span>
+                    <span className="text-[10px] text-white/40">${e.strike}</span>
+                    <span className={`text-[10px] font-mono font-semibold ml-auto ${e.delta > 0 ? 'text-primary' : 'text-red-400'}`}>Δ {e.delta > 0 ? '+' : ''}{Math.abs(e.delta)}</span>
+                    <span className={`text-[10px] font-semibold ${e.ivRank >= 70 ? 'text-[#FFD700]' : 'text-white/30'}`}>IV {e.ivRank}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {secondaryTab === "calendar" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
+              <div className="p-4">
+                <p className="text-[10px] text-white/30 uppercase tracking-wider font-semibold mb-3">Signal History</p>
+                <SignalHistory />
+              </div>
+              <div className="p-4">
+                <p className="text-[10px] text-white/30 uppercase tracking-wider font-semibold mb-3">Economic Calendar</p>
+                <EconomicCalendar />
+              </div>
+            </div>
+          )}
+        </Panel>
+
       </div>
     </Layout>
   );

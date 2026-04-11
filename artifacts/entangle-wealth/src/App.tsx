@@ -80,6 +80,7 @@ const GamificationPage = lazy(() => import("@/pages/Gamification"));
 const GiveawayPage = lazy(() => import("@/pages/Giveaway"));
 const DailyContentPage = lazy(() => import("@/pages/DailyContent"));
 const AdminKycPage = lazy(() => import("@/pages/AdminKyc"));
+const WealthSimPage = lazy(() => import("@/pages/WealthSim"));
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -373,6 +374,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/gamification">{() => <LazyProtected component={GamificationPage} />}</Route>
             <Route path="/giveaway">{() => <LazyPage component={GiveawayPage} />}</Route>
             <Route path="/admin/kyc">{() => <LazyProtected component={AdminKycPage} />}</Route>
+            <Route path="/wealth-sim">{() => <LazyPage component={WealthSimPage} />}</Route>
             <Route component={NotFound} />
           </Switch>
           </ProfileCompletionGate>

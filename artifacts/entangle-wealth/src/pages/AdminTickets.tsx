@@ -41,25 +41,30 @@ export default function AdminTickets() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [editNotes, setEditNotes] = useState<Record<number, string>>({});
+  const [ticketsTotal, setTicketsTotal] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     if (isAdmin === false) navigate("/dashboard");
   }, [isAdmin, navigate]);
 
-  const fetchTickets = useCallback(async () => {
-    setLoading(true);
+  const fetchTickets = useCallback(async (append = false) => {
+    if (!append) setLoading(true);
     try {
-      const res = await authFetch(`/support/admin/tickets?status=${statusFilter}`, getToken);
+      const offset = append ? tickets.length : 0;
+      const res = await authFetch(`/support/admin/tickets?status=${statusFilter}&limit=50&offset=${offset}`, getToken);
       if (res.ok) {
         const data = await res.json();
-        setTickets(data.tickets);
+        setTickets(prev => append ? [...prev, ...data.tickets] : data.tickets);
+        setTicketsTotal(data.total || data.tickets.length);
       }
     } catch {
       toast({ title: "Error", description: "Failed to load tickets" });
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
-  }, [statusFilter, toast, getToken]);
+  }, [statusFilter, toast, getToken, tickets.length]);
 
   useEffect(() => {
     if (isAdmin) fetchTickets();
@@ -244,6 +249,17 @@ export default function AdminTickets() {
                 </div>
               );
             })}
+          </div>
+        )}
+        {tickets.length > 0 && tickets.length < ticketsTotal && (
+          <div className="text-center mt-4">
+            <button
+              onClick={() => { setLoadingMore(true); fetchTickets(true); }}
+              disabled={loadingMore}
+              className="text-[#00D4FF] text-xs font-semibold hover:underline"
+            >
+              {loadingMore ? "Loading..." : `Load More (${tickets.length}/${ticketsTotal})`}
+            </button>
           </div>
         )}
       </div>

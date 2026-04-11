@@ -77,6 +77,12 @@ export class CircuitBreaker {
 export const alpacaCircuit = new CircuitBreaker({ name: "alpaca", failureThreshold: 5, resetTimeMs: 60_000 });
 export const anthropicCircuit = new CircuitBreaker({ name: "anthropic", failureThreshold: 5, resetTimeMs: 60_000 });
 
+const registeredCircuits: CircuitBreaker[] = [alpacaCircuit, anthropicCircuit];
+
+export function registerCircuit(cb: CircuitBreaker): void {
+  registeredCircuits.push(cb);
+}
+
 export function getAllCircuitStates() {
-  return [alpacaCircuit.getState(), anthropicCircuit.getState()];
+  return registeredCircuits.map((c) => c.getState());
 }

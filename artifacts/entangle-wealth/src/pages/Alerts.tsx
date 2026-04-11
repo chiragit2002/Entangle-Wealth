@@ -77,29 +77,48 @@ export default function Alerts() {
   const [editType, setEditType] = useState("");
   const [editThreshold, setEditThreshold] = useState("");
   const [digestFrequency, setDigestFrequency] = useState("off");
+  const [rulesTotal, setRulesTotal] = useState(0);
+  const [historyTotal, setHistoryTotal] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
 
-  const fetchRules = useCallback(async () => {
+  const fetchRules = useCallback(async (append = false) => {
     try {
-      const res = await authFetch("/alerts", getToken);
+      const offset = append ? rules.length : 0;
+      const res = await authFetch(`/alerts?limit=50&offset=${offset}`, getToken);
       if (res.ok) {
         const data = await res.json();
-        setRules(data.alerts);
+        setRules(prev => append ? [...prev, ...data.alerts] : data.alerts);
+        setRulesTotal(data.total || 0);
         setTier(data.tier);
         setDailyLimit(data.dailyLimit);
         setDailyUsed(data.dailyUsed);
       }
     } catch { /* ignore */ }
-  }, [getToken]);
+  }, [getToken, rules.length]);
 
-  const fetchHistory = useCallback(async () => {
+  const fetchHistory = useCallback(async (append = false) => {
     try {
-      const res = await authFetch("/alerts/history", getToken);
+      const offset = append ? history.length : 0;
+      const res = await authFetch(`/alerts/history?limit=50&offset=${offset}`, getToken);
       if (res.ok) {
         const data = await res.json();
-        setHistory(data.history);
+        setHistory(prev => append ? [...prev, ...data.history] : data.history);
+        setHistoryTotal(data.total || 0);
       }
     } catch { /* ignore */ }
-  }, [getToken]);
+  }, [getToken, history.length]);
+
+  const loadMoreRules = async () => {
+    setLoadingMore(true);
+    await fetchRules(true);
+    setLoadingMore(false);
+  };
+
+  const loadMoreHistory = async () => {
+    setLoadingMore(true);
+    await fetchHistory(true);
+    setLoadingMore(false);
+  };
 
   const fetchDigestPref = useCallback(async () => {
     try {
@@ -437,6 +456,13 @@ export default function Alerts() {
                 })}
               </div>
             )}
+            {rules.length > 0 && rules.length < rulesTotal && (
+              <div className="text-center mt-4">
+                <Button onClick={loadMoreRules} disabled={loadingMore} variant="ghost" className="text-[#00D4FF] text-xs">
+                  {loadingMore ? "Loading..." : `Load More (${rules.length}/${rulesTotal})`}
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <div>
@@ -489,6 +515,13 @@ export default function Alerts() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+            {history.length > 0 && history.length < historyTotal && (
+              <div className="text-center mt-4">
+                <Button onClick={loadMoreHistory} disabled={loadingMore} variant="ghost" className="text-[#00D4FF] text-xs">
+                  {loadingMore ? "Loading..." : `Load More (${history.length}/${historyTotal})`}
+                </Button>
               </div>
             )}
           </div>

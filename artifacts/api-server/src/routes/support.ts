@@ -247,14 +247,16 @@ router.get("/status/services", async (_req: Request, res: Response) => {
   }
 });
 
-router.get("/status/incidents", async (_req: Request, res: Response) => {
+router.get("/status/incidents", async (req: Request, res: Response) => {
   try {
+    const limit = Math.min(Math.max(parseInt(String(req.query.limit)) || 50, 1), 50);
+    const offset = Math.max(parseInt(String(req.query.offset)) || 0, 0);
     const result = await db.execute(sql`
       SELECT id, service_name, title, description, severity, status, created_at, resolved_at
       FROM status_incidents
       WHERE created_at > NOW() - INTERVAL '30 days'
       ORDER BY created_at DESC
-      LIMIT 50
+      LIMIT ${limit} OFFSET ${offset}
     `);
     res.json({ incidents: result.rows });
   } catch (err) {

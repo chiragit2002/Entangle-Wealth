@@ -5,7 +5,7 @@ import { alertsTable, alertHistoryTable, usersTable } from "@workspace/db/schema
 import { eq, and, desc, gte, sql, count } from "drizzle-orm";
 import { logger } from "../lib/logger";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
-import { CircuitBreaker } from "../lib/circuitBreaker";
+import { CircuitBreaker, registerCircuit } from "../lib/circuitBreaker";
 
 const router = Router();
 
@@ -300,10 +300,12 @@ export function pushAlertToUser(userId: string, data: Record<string, unknown>) {
 
 const ALPACA_DATA_URL = "https://data.alpaca.markets";
 
-const alertsAlpacaCircuit = new CircuitBreaker("alerts-alpaca", {
+const alertsAlpacaCircuit = new CircuitBreaker({
+  name: "alerts-alpaca",
   failureThreshold: 5,
-  resetTimeoutMs: 60_000,
+  resetTimeMs: 60_000,
 });
+registerCircuit(alertsAlpacaCircuit);
 
 function alpacaHeaders() {
   const keyId = process.env.ALPACA_KEY_ID || process.env.ALPACA_API_KEY || "";

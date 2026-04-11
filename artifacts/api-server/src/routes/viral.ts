@@ -124,8 +124,10 @@ router.get("/stats/user-count", async (_req, res) => {
   }
 });
 
-router.get("/stats/recent-signups", async (_req, res) => {
+router.get("/stats/recent-signups", async (req, res) => {
   try {
+    const limit = Math.min(Math.max(parseInt(String(req.query.limit)) || 10, 1), 50);
+    const offset = Math.max(parseInt(String(req.query.offset)) || 0, 0);
     const recent = await db
       .select({
         firstName: usersTable.firstName,
@@ -134,7 +136,8 @@ router.get("/stats/recent-signups", async (_req, res) => {
       })
       .from(usersTable)
       .orderBy(desc(usersTable.createdAt))
-      .limit(10);
+      .limit(limit)
+      .offset(offset);
 
     const anonymized = recent.map((u) => {
       const first = u.firstName || "User";
@@ -192,14 +195,17 @@ router.post("/viral/testimonials", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/viral/testimonials", async (_req, res) => {
+router.get("/viral/testimonials", async (req, res) => {
   try {
+    const limit = Math.min(Math.max(parseInt(String(req.query.limit)) || 20, 1), 50);
+    const offset = Math.max(parseInt(String(req.query.offset)) || 0, 0);
     const testimonials = await db
       .select()
       .from(testimonialsTable)
       .where(eq(testimonialsTable.approved, true))
       .orderBy(desc(testimonialsTable.createdAt))
-      .limit(20);
+      .limit(limit)
+      .offset(offset);
 
     res.json(testimonials);
   } catch (error) {

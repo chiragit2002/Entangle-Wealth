@@ -1,154 +1,23 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Link } from "wouter";
+import { useState, useEffect, useRef, Component, ReactNode } from "react";
+import { Link, useLocation } from "wouter";
 import { Layout } from "@/components/layout/Layout";
-import { MarketTicker } from "@/components/MarketTicker";
 import { Button } from "@/components/ui/button";
-import { Activity, Target, Zap, TrendingUp, ShieldAlert, BarChart3, Eye, DollarSign, ArrowRight, Terminal, UserPlus, Check, X, ShieldCheck, Lock } from "lucide-react";
-import { ShareSignalCard } from "@/components/viral/ShareSignalCard";
+import {
+  CheckCircle,
+  UserPlus,
+  ShieldCheck,
+  Lock,
+  Star,
+  ChevronRight,
+  Lightbulb,
+  TrendingUp,
+  Heart,
+  AlertCircle,
+  RefreshCw,
+} from "lucide-react";
 import { trackEvent } from "@/lib/trackEvent";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
-
-const modelScores = [
-  { name: "Price Action", pct: 92 },
-  { name: "Volume Analysis", pct: 88 },
-  { name: "Options Flow", pct: 95 },
-  { name: "RSI + MACD", pct: 84 },
-  { name: "Sentiment", pct: 71 },
-  { name: "Risk Mgmt", pct: 90 },
-];
-
-const liveSignals = [
-  { sym: "NVDA", price: "$875.40", chg: "+3.2%", sig: "buy" as const, conf: 92, tgt: "$920", stop: "$850", reason: "Bull flag breakout confirmed. Volume 2.8x average. Institutional accumulation detected.", rsi: 62, macd: "Bullish crossover" },
-  { sym: "TSLA", price: "$198.45", chg: "-1.8%", sig: "sell" as const, conf: 85, tgt: "$180", stop: "$210", reason: "RSI bearish divergence on 4H. Lower highs while price tests resistance. $3.1M put sweep.", rsi: 71, macd: "Bearish divergence" },
-  { sym: "AMD", price: "$162.75", chg: "+2.1%", sig: "buy" as const, conf: 88, tgt: "$178", stop: "$155", reason: "Wyckoff spring at support. Institutional accumulation. RSI recovering from oversold.", rsi: 44, macd: "Bullish crossover" },
-];
-
-function QuantumCanvas({ className }: { className?: string }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  const draw = useCallback(() => {
-    const c = canvasRef.current;
-    if (!c) return;
-    const ctx = c.getContext("2d");
-    if (!ctx) return;
-    const cx = 100, cy = 100, r = 70;
-    ctx.clearRect(0, 0, 200, 200);
-    const nodes = [
-      { label: "RSI", angle: -90, color: "#00c8f8" },
-      { label: "MACD", angle: -30, color: "#00e676" },
-      { label: "Flow", angle: 30, color: "#f5c842" },
-      { label: "Price", angle: 90, color: "#00c8f8" },
-      { label: "Vol", angle: 150, color: "#00e676" },
-      { label: "Risk", angle: 210, color: "#f5c842" },
-    ];
-    const positions = nodes.map((n) => ({
-      x: cx + r * Math.cos((n.angle * Math.PI) / 180),
-      y: cy + r * Math.sin((n.angle * Math.PI) / 180),
-      ...n,
-    }));
-    positions.forEach((a) => {
-      positions.forEach((b) => {
-        if (a !== b) {
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
-          ctx.strokeStyle = "rgba(0,200,248,0.08)";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-        }
-      });
-    });
-    positions.forEach((n) => {
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, 16, 0, Math.PI * 2);
-      ctx.fillStyle = n.color + "22";
-      ctx.fill();
-      ctx.strokeStyle = n.color + "88";
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-      ctx.fillStyle = n.color;
-      ctx.font = "bold 9px Inter,sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(n.label, n.x, n.y);
-    });
-    ctx.beginPath();
-    ctx.arc(cx, cy, 28, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(0,200,248,0.08)";
-    ctx.fill();
-    ctx.strokeStyle = "rgba(0,200,248,0.6)";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.fillStyle = "#00c8f8";
-    ctx.font = "bold 14px Inter,sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("87%", cx, cy - 6);
-    ctx.font = "bold 8px Inter,sans-serif";
-    ctx.fillStyle = "rgba(0,200,248,0.6)";
-    ctx.fillText("CONSENSUS", cx, cy + 8);
-  }, []);
-
-  useEffect(() => {
-    draw();
-  }, [draw]);
-
-  return <canvas ref={canvasRef} width={200} height={200} className={className} />;
-}
-
-function SignalCard({ s, referralLink }: { s: typeof liveSignals[0]; referralLink?: string }) {
-  const badgeClass = s.sig === "buy" ? "mobile-badge-green" : s.sig === "sell" ? "mobile-badge-red" : "mobile-badge-gold";
-  const confGradient = s.sig === "buy" ? "linear-gradient(90deg, #00c8f8, #00e676)" : s.sig === "sell" ? "linear-gradient(90deg, #ff4466, #ff8888)" : "linear-gradient(90deg, #f5c842, #ffaa00)";
-  const rsiColor = s.rsi < 30 ? "#00e676" : s.rsi > 70 ? "#ff4466" : "#f5c842";
-  const rsiLabel = s.rsi < 30 ? "Oversold" : s.rsi > 70 ? "Overbought" : "Neutral";
-  const rsiClass = s.rsi < 30 ? "bull" : s.rsi > 70 ? "bear" : "neut";
-  const macdClass = s.macd.includes("Bull") ? "bull" : s.macd.includes("Bear") ? "bear" : "neut";
-
-  return (
-    <div className={`signal-card ${s.sig} mb-3`}>
-      <div className="flex justify-between items-start mb-3">
-        <div>
-          <div className="text-xl font-black tracking-tight">{s.sym}</div>
-          <div className="text-xs text-muted-foreground font-medium">{s.price} · {s.chg}</div>
-        </div>
-        <span className={`mobile-badge ${badgeClass}`}>{s.sig.toUpperCase()}</span>
-      </div>
-      <div className="grid grid-cols-3 gap-2 mb-3">
-        <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Target<span className="block text-sm font-bold text-[#00e676] mt-0.5">{s.tgt}</span></div>
-        <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Stop Loss<span className="block text-sm font-bold text-[#ff4466] mt-0.5">{s.stop}</span></div>
-        <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Confidence<span className="block text-sm font-bold text-[#00c8f8] mt-0.5">{s.conf}%</span></div>
-      </div>
-      <div className="conf-bar mb-3"><div className="conf-fill" style={{ width: `${s.conf}%`, background: confGradient }} /></div>
-      <div className="text-xs text-muted-foreground leading-relaxed border-t border-white/[0.06] pt-2.5 mb-2.5">{s.reason}</div>
-      <div className="bg-[#0f0f22] border border-white/[0.06] rounded-xl p-3">
-        <div className="ind-row">
-          <span className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">RSI (14)</span>
-          <span className="text-sm font-bold" style={{ color: rsiColor }}>{s.rsi}</span>
-          <span className={`ind-signal ${rsiClass}`}>{rsiLabel}</span>
-        </div>
-        <div className="ind-row">
-          <span className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">MACD</span>
-          <span className="text-sm font-bold text-white">{s.macd}</span>
-          <span className={`ind-signal ${macdClass}`}>{s.macd.includes("Bull") ? "BULL" : s.macd.includes("Bear") ? "BEAR" : "NEUT"}</span>
-        </div>
-      </div>
-      <div className="mt-3 pt-3 border-t border-white/[0.06]">
-        <ShareSignalCard
-          referralLink={referralLink}
-          data={{
-            symbol: s.sym,
-            signal: s.sig,
-            confidence: s.conf,
-            price: s.price,
-            target: s.tgt,
-            change: s.chg,
-          }}
-        />
-      </div>
-    </div>
-  );
-}
 
 const API_BASE = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 
@@ -158,11 +27,97 @@ interface HeroStats {
   accuracy: number;
 }
 
+interface FetchState<T> {
+  data: T | null;
+  error: boolean;
+  loading: boolean;
+}
+
+function useHeroStats(): FetchState<HeroStats> & { defaultStats: HeroStats } {
+  const defaultStats: HeroStats = { members: 4891, signals: 1247, accuracy: 87 };
+  const [state, setState] = useState<FetchState<HeroStats>>({
+    data: defaultStats,
+    error: false,
+    loading: false,
+  });
+
+  useEffect(() => {
+    const fetchStats = () => {
+      setState((prev) => ({ ...prev, loading: true, error: false }));
+      fetch(`${API_BASE}/stats/hero`)
+        .then((r) => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return r.json();
+        })
+        .then((d) => {
+          if (d && typeof d.members === "number") {
+            setState({ data: d, error: false, loading: false });
+          } else {
+            setState((prev) => ({ ...prev, loading: false }));
+          }
+        })
+        .catch(() => {
+          setState((prev) => ({ ...prev, loading: false, error: true }));
+        });
+    };
+    fetchStats();
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return { ...state, defaultStats };
+}
+
+function useRecentSignups(): FetchState<{ name: string; timeLabel: string }[]> {
+  const [state, setState] = useState<FetchState<{ name: string; timeLabel: string }[]>>({
+    data: null,
+    error: false,
+    loading: true,
+  });
+  useEffect(() => {
+    fetch(`${API_BASE}/stats/recent-signups`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((d) => {
+        setState({ data: Array.isArray(d) && d.length > 0 ? d : null, error: false, loading: false });
+      })
+      .catch(() => {
+        setState({ data: null, error: true, loading: false });
+      });
+  }, []);
+  return state;
+}
+
+function useTestimonials(): FetchState<
+  { id: number; name: string; role: string | null; message: string; rating: number }[]
+> {
+  const [state, setState] = useState<
+    FetchState<{ id: number; name: string; role: string | null; message: string; rating: number }[]>
+  >({ data: null, error: false, loading: true });
+
+  useEffect(() => {
+    fetch(`${API_BASE}/viral/testimonials`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((d) => {
+        setState({ data: Array.isArray(d) ? d : null, error: false, loading: false });
+      })
+      .catch(() => {
+        setState({ data: null, error: true, loading: false });
+      });
+  }, []);
+
+  return state;
+}
+
 function useAnimatedNumber(target: number, duration = 800): number {
   const [displayed, setDisplayed] = useState(target);
   const prevRef = useRef(target);
   const rafRef = useRef<number | null>(null);
-
   useEffect(() => {
     const start = prevRef.current;
     const end = target;
@@ -180,529 +135,531 @@ function useAnimatedNumber(target: number, duration = 800): number {
       }
     };
     rafRef.current = requestAnimationFrame(tick);
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, [target, duration]);
-
   return displayed;
 }
 
-function useHeroStats(): HeroStats {
-  const [stats, setStats] = useState<HeroStats>({ members: 4891, signals: 1247, accuracy: 87 });
-
-  useEffect(() => {
-    const fetchStats = () => {
-      fetch(`${API_BASE}/stats/hero`)
-        .then((r) => r.ok ? r.json() : null)
-        .then((d) => {
-          if (d && typeof d.members === "number") {
-            setStats({ members: d.members, signals: d.signals, accuracy: d.accuracy });
-          }
-        })
-        .catch(err => { if (import.meta.env.DEV) console.error('Failed to fetch hero stats:', err); });
-    };
-
-    fetchStats();
-    const interval = setInterval(fetchStats, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return stats;
-}
-
-function HeroStatCard({ value, label, color }: { value: string; label: string; color: string }) {
+function InlineError({ message, retry }: { message: string; retry?: () => void }) {
   return (
-    <div className="glass-panel rounded-xl p-3 md:p-4 text-center">
-      <div className={`text-xl md:text-2xl font-mono font-bold ${color} stat-value`}>{value}</div>
-      <div className="text-[9px] md:text-[10px] text-muted-foreground uppercase tracking-wider mt-1">{label}</div>
+    <div className="flex items-center gap-2 text-xs text-white/40 px-3 py-2 rounded-lg border border-white/[0.06] bg-white/[0.02]">
+      <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-white/30" />
+      <span>{message}</span>
+      {retry && (
+        <button
+          onClick={retry}
+          className="ml-auto flex items-center gap-1 text-[#00c8f8]/60 hover:text-[#00c8f8] transition-colors"
+        >
+          <RefreshCw className="w-3 h-3" /> Retry
+        </button>
+      )}
     </div>
   );
 }
 
-function useRecentSignups() {
-  const [signups, setSignups] = useState<{ name: string; timeLabel: string }[]>([]);
-  useEffect(() => {
-    fetch(`${API_BASE}/stats/recent-signups`)
-      .then((r) => r.ok ? r.json() : null)
-      .then((d) => { if (d && d.length > 0) setSignups(d); })
-      .catch(err => { if (import.meta.env.DEV) console.error('Failed to fetch recent signups:', err); });
-  }, []);
-  return signups;
+interface ErrorBoundaryState {
+  hasError: boolean;
 }
 
-function useTestimonials() {
-  const [testimonials, setTestimonials] = useState<{ id: number; name: string; role: string | null; message: string; rating: number }[]>([]);
-  useEffect(() => {
-    fetch(`${API_BASE}/viral/testimonials`)
-      .then((r) => r.ok ? r.json() : null)
-      .then((d) => { if (d) setTestimonials(d); })
-      .catch(err => { if (import.meta.env.DEV) console.error('Failed to fetch testimonials:', err); });
-  }, []);
-  return testimonials;
+class HomeErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(): ErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 px-4 text-center space-y-4">
+          <AlertCircle className="w-10 h-10 text-white/20" />
+          <p className="text-base text-white/50 font-medium">Something went wrong loading this page.</p>
+          <p className="text-sm text-white/30">Please refresh to try again.</p>
+          <Button
+            variant="outline"
+            className="border-white/10 text-white/50 hover:bg-white/5"
+            onClick={() => window.location.reload()}
+          >
+            Refresh page
+          </Button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
-function RecentSignupTicker({ signups }: { signups: { name: string; timeLabel: string }[] }) {
+function RecentSignupTicker({
+  signups,
+  error,
+}: {
+  signups: { name: string; timeLabel: string }[] | null;
+  error: boolean;
+}) {
   const [idx, setIdx] = useState(0);
   useEffect(() => {
-    if (signups.length === 0) return;
+    if (!signups || signups.length === 0) return;
     const t = setInterval(() => setIdx((p) => (p + 1) % signups.length), 3000);
     return () => clearInterval(t);
-  }, [signups.length]);
+  }, [signups?.length]);
 
-  if (signups.length === 0) return null;
+  if (error) {
+    return (
+      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] text-white/25">
+        <AlertCircle className="w-3 h-3" />
+        <span>Live activity unavailable</span>
+      </div>
+    );
+  }
+
+  if (!signups || signups.length === 0) return null;
   const s = signups[idx];
-
   return (
-    <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#00ff88]/15 bg-[#00ff88]/5 text-[11px] font-mono text-[#00ff88] animate-in fade-in duration-500">
-      <UserPlus className="w-3 h-3" />
-      <span>{s.name} just joined {s.timeLabel}</span>
+    <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#00ff88]/15 bg-[#00ff88]/5 text-[11px] font-medium text-[#00ff88]">
+      <UserPlus className="w-3 h-3 flex-shrink-0" />
+      <span>
+        {s.name} just joined {s.timeLabel}
+      </span>
     </div>
   );
 }
 
-function AnimatedHeroStats({ stats }: { stats: HeroStats }) {
-  const animatedMembers = useAnimatedNumber(stats.members);
-  const animatedSignals = useAnimatedNumber(stats.signals);
-  const animatedAccuracy = useAnimatedNumber(stats.accuracy);
+const GOAL_OPTIONS = [
+  { id: "clarity", label: "Get clarity on my finances", icon: Lightbulb },
+  { id: "invest", label: "Start investing smarter", icon: TrendingUp },
+  { id: "stress", label: "Reduce money stress", icon: Heart },
+];
+
+function GoalSelector({ onSelect }: { onSelect: (goal: string) => void }) {
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const handleSelect = (id: string) => {
+    setSelected(id);
+    trackEvent("goal_selected", { goal: id });
+    setTimeout(() => onSelect(id), 400);
+  };
 
   return (
-    <div className="grid grid-cols-3 gap-3 w-full max-w-sm md:max-w-lg mt-4">
-      <HeroStatCard value={`${animatedAccuracy}%`} label="Accuracy" color="text-[#00c8f8]" />
-      <HeroStatCard value={animatedSignals.toLocaleString()} label="Signals" color="text-[#00e676]" />
-      <HeroStatCard value={animatedMembers.toLocaleString()} label="Members" color="text-[#f5c842]" />
+    <div className="w-full max-w-sm mx-auto space-y-3">
+      <p className="text-sm text-white/70 mb-4">What brings you here?</p>
+      {GOAL_OPTIONS.map(({ id, label, icon: Icon }) => (
+        <button
+          key={id}
+          onClick={() => handleSelect(id)}
+          className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border text-left transition-all duration-200 text-sm font-medium
+            ${
+              selected === id
+                ? "border-[#00c8f8] bg-[#00c8f8]/10 text-white"
+                : "border-white/10 bg-white/[0.03] text-white/80 hover:border-white/20 hover:bg-white/[0.06]"
+            }`}
+        >
+          <Icon
+            className={`w-4 h-4 flex-shrink-0 ${selected === id ? "text-[#00c8f8]" : "text-white/40"}`}
+          />
+          <span>{label}</span>
+          {selected === id && <CheckCircle className="w-4 h-4 text-[#00c8f8] ml-auto" />}
+        </button>
+      ))}
     </div>
   );
 }
 
-function TrustBadges() {
-  return (
-    <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
-      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-[10px] font-mono text-white/60">
-        <ShieldCheck className="w-3 h-3 text-[#00e676]" />
-        <span>SOC 2 Compliant</span>
+function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
+  const [, navigate] = useLocation();
+  const [step, setStep] = useState<"cta" | "goal" | "done">("cta");
+
+  const handleGoalSelect = (goal: string) => {
+    setStep("done");
+    const signUpUrl = referralCode
+      ? `/sign-up?goal=${goal}&ref=${referralCode}`
+      : `/sign-up?goal=${goal}`;
+    setTimeout(() => navigate(signUpUrl), 600);
+  };
+
+  if (step === "cta") {
+    return (
+      <Button
+        size="lg"
+        onClick={() => {
+          setStep("goal");
+          trackEvent("hero_cta_clicked");
+        }}
+        className="h-12 px-8 bg-gradient-to-r from-[#00c8f8] to-[#0088cc] text-black font-bold hover:opacity-90 text-base rounded-full shadow-[0_0_24px_rgba(0,200,248,0.25)]"
+      >
+        Get clarity — it's free
+      </Button>
+    );
+  }
+
+  if (step === "goal") {
+    return (
+      <div className="w-full max-w-sm mx-auto animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <GoalSelector onSelect={handleGoalSelect} />
       </div>
-      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-[10px] font-mono text-white/60">
-        <Lock className="w-3 h-3 text-[#00c8f8]" />
-        <span>256-bit Encryption</span>
-      </div>
-      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-[10px] font-mono text-[#f5c842]">
-        <span className="font-bold">Free forever</span>
-        <span className="text-white/40">· No credit card</span>
-      </div>
-    </div>
-  );
-}
-
-function ComparisonTable({ members }: { members: number }) {
-  const features = [
-    { label: "AI Stock Signals", ew: true, bloomberg: true, apps: false },
-    { label: "Options Flow Analysis", ew: true, bloomberg: true, apps: false },
-    { label: "Tax Optimization Tools", ew: true, bloomberg: false, apps: false },
-    { label: "Gig Income Analysis", ew: true, bloomberg: false, apps: false },
-    { label: "6-Model Cross-Verification", ew: true, bloomberg: false, apps: false },
-    { label: "Real-Time Alerts", ew: true, bloomberg: true, apps: true },
-    { label: "Confidence Scores", ew: true, bloomberg: false, apps: false },
-    { label: "Risk Parameters per Signal", ew: true, bloomberg: false, apps: false },
-    { label: "Free Tier", ew: true, bloomberg: false, apps: false },
-  ];
-
-  return (
-    <section className="py-12 lg:py-20 bg-black border-t border-white/5">
-      <div className="container mx-auto px-4 max-w-5xl">
-        <div className="text-center mb-10 lg:mb-14">
-          <div className="inline-block px-3 py-1 rounded-full border border-[#f5c842]/20 bg-[#f5c842]/5 text-[10px] font-mono text-[#f5c842] uppercase tracking-widest mb-4">
-            Why EntangleWealth
-          </div>
-          <h2 className="text-2xl md:text-4xl font-bold mb-4">The analysis Bloomberg charges<br /><span className="electric-text">$24,000/yr for — free.</span></h2>
-          <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto">Stop paying for multiple apps that don't talk to each other. EntangleWealth bundles everything into one terminal — built for people, not hedge funds.</p>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr>
-                <th className="text-left pb-4 pr-4 text-muted-foreground font-medium text-xs uppercase tracking-wider w-1/2">Feature</th>
-                <th className="pb-4 px-4 text-center">
-                  <div className="inline-flex flex-col items-center gap-1">
-                    <span className="text-[#00c8f8] font-bold text-sm">EntangleWealth</span>
-                    <span className="text-[#00e676] font-mono font-bold text-xs">Free</span>
-                  </div>
-                </th>
-                <th className="pb-4 px-4 text-center">
-                  <div className="inline-flex flex-col items-center gap-1">
-                    <span className="text-white/60 font-bold text-sm">Bloomberg</span>
-                    <span className="text-[#ff4466] font-mono font-bold text-xs">$24,000/yr</span>
-                  </div>
-                </th>
-                <th className="pb-4 px-4 text-center">
-                  <div className="inline-flex flex-col items-center gap-1">
-                    <span className="text-white/60 font-bold text-sm">Multiple Apps</span>
-                    <span className="text-[#ff4466] font-mono font-bold text-xs">$800+/yr</span>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {features.map((f, i) => (
-                <tr key={f.label} className={`border-t ${i === 0 ? "border-white/10" : "border-white/[0.04]"}`}>
-                  <td className="py-3 pr-4 text-white/70 text-xs md:text-sm">{f.label}</td>
-                  <td className="py-3 px-4 text-center">
-                    {f.ew ? (
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#00e676]/10">
-                        <Check className="w-3 h-3 text-[#00e676]" />
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/[0.03]">
-                        <X className="w-3 h-3 text-white/20" />
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-3 px-4 text-center">
-                    {f.bloomberg ? (
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/[0.03]">
-                        <Check className="w-3 h-3 text-white/40" />
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/[0.03]">
-                        <X className="w-3 h-3 text-white/20" />
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-3 px-4 text-center">
-                    {f.apps ? (
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/[0.03]">
-                        <Check className="w-3 h-3 text-white/40" />
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/[0.03]">
-                        <X className="w-3 h-3 text-white/20" />
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-8 text-center">
-          <Link href="/sign-up">
-            <Button size="lg" className="h-12 px-8 bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black font-bold hover:opacity-90 text-base">
-              Start Free — No Credit Card →
-            </Button>
-          </Link>
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
-            <span className="text-[10px] text-muted-foreground font-mono">
-              ✓ {members.toLocaleString()}+ traders already inside
-            </span>
-            <span className="text-[10px] text-muted-foreground font-mono">✓ Free forever tier</span>
-            <span className="text-[10px] text-muted-foreground font-mono">✓ Cancel anytime</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CredibilityBar({ members, signals, accuracy }: { members: number; signals: number; accuracy: number }) {
-  const stats = [
-    { value: `${members.toLocaleString()}+`, label: "Active Traders" },
-    { value: `${signals.toLocaleString()}+`, label: "Signals Delivered" },
-    { value: `${accuracy}%`, label: "Avg Signal Accuracy" },
-    { value: "5,000+", label: "NASDAQ Stocks Covered" },
-    { value: "55+", label: "Technical Indicators" },
-  ];
+    );
+  }
 
   return (
-    <div className="border-y border-white/[0.06] bg-white/[0.01] py-5">
-      <div className="container mx-auto px-4 max-w-5xl">
-        <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center">
-              <div className="text-base md:text-xl font-mono font-bold text-[#00c8f8]">{s.value}</div>
-              <div className="text-[9px] md:text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="flex items-center gap-2 text-[#00e676] text-sm font-medium animate-in fade-in duration-300">
+      <CheckCircle className="w-5 h-5" />
+      <span>Great — taking you there now...</span>
     </div>
   );
 }
 
 export default function Home() {
-  const [nodeGlow, setNodeGlow] = useState(0);
-  const [referralLink, setReferralLink] = useState("");
-  const recentSignups = useRecentSignups();
-  const testimonials = useTestimonials();
-  const stats = useHeroStats();
+  const [referralCode, setReferralCode] = useState("");
+  const [referralError, setReferralError] = useState(false);
+  const signupsState = useRecentSignups();
+  const testimonialsState = useTestimonials();
+  const heroStatsState = useHeroStats();
+  const stats = heroStatsState.data ?? heroStatsState.defaultStats;
   const animatedMembers = useAnimatedNumber(stats.members);
-  const animatedSignals = useAnimatedNumber(stats.signals);
   const { getToken, isSignedIn } = useAuth();
 
-  useEffect(() => { trackEvent("home_viewed"); }, []);
-
   useEffect(() => {
-    const t = setInterval(() => setNodeGlow((p) => (p + 1) % 6), 1500);
-    return () => clearInterval(t);
+    trackEvent("home_viewed");
   }, []);
 
   useEffect(() => {
     if (!isSignedIn) return;
+    setReferralError(false);
     authFetch("/viral/referral/code", getToken)
-      .then(res => res.ok ? res.json() : null)
-      .then(data => { if (data?.code) setReferralLink(`${window.location.origin}?ref=${data.code}`); })
-      .catch(() => {});
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (data?.code) setReferralCode(data.code);
+      })
+      .catch(() => {
+        setReferralError(true);
+      });
   }, [isSignedIn, getToken]);
 
   return (
     <Layout>
-      <section className="relative min-h-[80vh] lg:min-h-[90vh] flex flex-col items-center justify-center pt-12 lg:pt-20 pb-16 lg:pb-24 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-        <div className="absolute inset-0 scan-line pointer-events-none opacity-30" />
+      <HomeErrorBoundary>
+        {/* Hero */}
+        <section className="relative flex flex-col items-center justify-center pt-20 pb-24 px-4 overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808006_1px,transparent_1px),linear-gradient(to_bottom,#80808006_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+          <div className="container relative z-10 max-w-3xl mx-auto flex flex-col items-center text-center space-y-6">
+            <RecentSignupTicker signups={signupsState.data} error={signupsState.error} />
 
-        <div className="container relative z-10 max-w-5xl mx-auto flex flex-col items-center text-center space-y-6 lg:space-y-8">
-          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-[11px] font-mono text-primary">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-            </span>
-            6 Analysis Models Running Simultaneously
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
+              Stop guessing what to do
+              <br />
+              <span className="text-[#00c8f8]">with your money.</span>
+            </h1>
+
+            <p className="max-w-xl text-base md:text-xl text-white/60 leading-relaxed">
+              Entangled Wealth gives you clear, plain-language guidance on your finances — no charts
+              to decipher, no jargon to decode. Just answers you can act on.
+            </p>
+
+            <MicroConversionFlow referralCode={referralCode || undefined} />
+
+            {isSignedIn && referralError && (
+              <InlineError message="Couldn't load your referral link right now." />
+            )}
+
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-1">
+              <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#00e676]" />
+                No credit card needed
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
+                <Lock className="w-3.5 h-3.5 text-[#00c8f8]" />
+                Your data stays private
+              </span>
+              <span className="text-[11px] text-white/40 font-medium">Free to start</span>
+            </div>
+
+            {!heroStatsState.error && stats.members > 0 && (
+              <p className="text-[11px] text-white/30 font-medium">
+                {animatedMembers.toLocaleString()}+ people already use Entangled Wealth
+              </p>
+            )}
           </div>
+        </section>
 
-          <h1 className="text-4xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter text-white">
-            Institutional Intelligence<br />
-            <span className="electric-text">For Everyone.</span>
-          </h1>
-
-          <p className="max-w-2xl text-sm md:text-lg lg:text-xl text-muted-foreground leading-relaxed">
-            Most traders lose because they're flying blind — no real signals, no context, no risk controls. EntangleWealth gives retail investors the same AI-powered analysis, options flow, and tax tools that institutional desks pay six figures for.
-          </p>
-
-          <p className="text-sm md:text-base font-semibold text-[#f5c842]">
-            The analysis Bloomberg charges $24,000/yr for — free.
-          </p>
-
-          <AnimatedHeroStats stats={stats} />
-
-          <RecentSignupTicker signups={recentSignups} />
-
-          <div className="w-full max-w-md flex flex-col sm:flex-row gap-3 mt-4 justify-center">
-            <Link href="/sign-up">
-              <Button size="lg" className="h-12 px-8 bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black font-bold hover:opacity-90 text-base">
-                Get Started Free →
-              </Button>
-            </Link>
-          </div>
-
-          <TrustBadges />
-        </div>
-      </section>
-
-      <CredibilityBar members={stats.members} signals={stats.signals} accuracy={stats.accuracy} />
-
-      <MarketTicker />
-
-      <section className="py-8 lg:py-12 px-4">
-        <div className="container mx-auto max-w-5xl">
-          <div className="mobile-card-glow p-6 text-center mb-8">
-            <div className="text-[11px] text-[#00c8f8] font-bold tracking-[1px] uppercase mb-4">⚛ Quantum Entanglement Matrix</div>
-            <QuantumCanvas className="mx-auto mb-4" />
-            <div className="max-w-md mx-auto space-y-2">
-              {modelScores.map((m) => (
-                <div key={m.name} className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-semibold text-white flex-shrink-0 w-28 text-left">{m.name}</span>
-                  <div className="flex-1 h-1 bg-white/[0.06] rounded-full overflow-hidden">
-                    <div className="h-full rounded-full bg-gradient-to-r from-[#00c8f8] to-[#00e676]" style={{ width: `${m.pct}%` }} />
-                  </div>
-                  <span className="text-sm font-bold text-[#00c8f8] w-10 text-right">{m.pct}%</span>
+        {/* Problem */}
+        <section className="py-16 lg:py-24 px-4 border-t border-white/5">
+          <div className="container mx-auto max-w-2xl text-center space-y-6">
+            <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00c8f8]/60">
+              Sound familiar?
+            </p>
+            <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
+              Most people feel lost with money — and it's not their fault.
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+              {[
+                {
+                  text: "You know you should be doing something with your money. You just don't know what.",
+                },
+                {
+                  text: "You've tried apps and articles, but the advice is confusing, conflicting, or just not for you.",
+                },
+                {
+                  text: "Every time you think about it, you feel overwhelmed — so you put it off again.",
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="glass-panel rounded-2xl p-5 text-sm text-white/60 leading-relaxed text-left"
+                >
+                  {item.text}
                 </div>
               ))}
             </div>
           </div>
+        </section>
 
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold">Live Signals</h2>
-            <span className="live-dot">LIVE</span>
-          </div>
-          <div className="space-y-3 mb-8">
-            {liveSignals.map((s) => (
-              <SignalCard key={s.sym} s={s} referralLink={referralLink || undefined} />
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Link href="/dashboard">
-              <Button className="bg-gradient-to-r from-[#00c8f8] to-[#0099cc] text-black font-bold h-12 px-8 hover:opacity-90">
-                View All Signals →
-              </Button>
-            </Link>
-            <p className="text-[10px] text-muted-foreground font-mono mt-2">✓ Free to use · ✓ No credit card · ✓ {animatedMembers.toLocaleString()}+ members · ✓ {animatedSignals.toLocaleString()}+ signals</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-12 lg:py-20 bg-black border-t border-white/5">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <div className="text-center mb-10 lg:mb-16">
-            <h2 className="text-2xl md:text-5xl font-bold mb-4">How It Works</h2>
-            <p className="text-muted-foreground text-sm md:text-lg max-w-2xl mx-auto">Multiple analysis models run simultaneously. They cross-verify each other. Only when multiple methods agree does a signal fire.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12 lg:mb-16">
-            {[
-              { num: "01", title: "Analyze", desc: "Price action, volume, options flow, Greeks, sentiment, and institutional data are processed simultaneously across 6 independent models.", icon: BarChart3 },
-              { num: "02", title: "Cross-Check", desc: "Each analysis method challenges the others. Disagreements are flagged. Only consensus signals pass through — like quantum entanglement.", icon: Target },
-              { num: "03", title: "Deliver", desc: "You get a clear signal with a confidence score, the reasoning behind it, and specific risk parameters. No guessing.", icon: ArrowRight },
-            ].map((step) => (
-              <div key={step.num} className="glass-panel p-5 md:p-6 rounded-2xl hover:-translate-y-1 transition-transform duration-300 group">
-                <div className="flex items-center gap-3 mb-3 md:mb-4">
-                  <span className="text-primary font-mono font-bold text-xl md:text-2xl">{step.num}</span>
-                  <step.icon className="w-5 h-5 text-primary/50 group-hover:text-primary transition-colors" />
+        {/* Solution */}
+        <section className="py-16 lg:py-24 px-4 border-t border-white/5">
+          <div className="container mx-auto max-w-2xl text-center space-y-6">
+            <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00e676]/60">
+              Here's the difference
+            </p>
+            <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
+              Entangled Wealth makes the complicated simple.
+            </h2>
+            <p className="text-base text-white/50 max-w-lg mx-auto leading-relaxed">
+              We take your financial picture, apply smart analysis behind the scenes, and give you
+              clear, actionable guidance — in plain English. No expertise required.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+              {[
+                {
+                  title: "Clarity",
+                  desc: "Know exactly where you stand and what to focus on next.",
+                  color: "text-[#00c8f8]",
+                  border: "border-[#00c8f8]/20",
+                },
+                {
+                  title: "Simplicity",
+                  desc: "No charts, no jargon. Just the guidance you need.",
+                  color: "text-[#00e676]",
+                  border: "border-[#00e676]/20",
+                },
+                {
+                  title: "Confidence",
+                  desc: "Make financial decisions without the second-guessing.",
+                  color: "text-[#f5c842]",
+                  border: "border-[#f5c842]/20",
+                },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className={`glass-panel rounded-2xl p-5 text-left border ${item.border}`}
+                >
+                  <p className={`text-base font-bold mb-2 ${item.color}`}>{item.title}</p>
+                  <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
                 </div>
-                <h3 className="font-bold text-base md:text-lg mb-2">{step.title}</h3>
-                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+        </section>
 
-          <div className="relative glass-panel rounded-2xl p-6 md:p-8 mb-12 lg:mb-16 overflow-hidden">
-            <div className="absolute inset-0 scan-line pointer-events-none opacity-20" />
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <span className="text-[10px] font-mono text-primary/60 uppercase tracking-widest">Quantum Entanglement — Live Preview</span>
-              </div>
-              <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-                {["Price Action", "Volume", "Options Flow", "Greeks", "Sentiment", "Risk Mgmt"].map((name, i) => (
+        {/* How It Works */}
+        <section className="py-16 lg:py-24 px-4 border-t border-white/5">
+          <div className="container mx-auto max-w-3xl">
+            <div className="text-center mb-12">
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-white/30 mb-3">
+                How it works
+              </p>
+              <h2 className="text-2xl md:text-4xl font-bold text-white">
+                Three steps to feeling in control
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {[
+                {
+                  num: "1",
+                  title: "Understand your situation",
+                  desc: "Tell us a bit about where you are financially. No forms, no complexity — just the basics.",
+                  color: "text-[#00c8f8]",
+                  bg: "bg-[#00c8f8]/10",
+                },
+                {
+                  num: "2",
+                  title: "Get clear guidance",
+                  desc: "We analyze your picture and give you simple, specific next steps — no financial degree needed.",
+                  color: "text-[#00e676]",
+                  bg: "bg-[#00e676]/10",
+                },
+                {
+                  num: "3",
+                  title: "Make better decisions",
+                  desc: "Act with confidence. Whether you're saving, investing, or just getting organized — you'll know what to do.",
+                  color: "text-[#f5c842]",
+                  bg: "bg-[#f5c842]/10",
+                },
+              ].map((step) => (
+                <div
+                  key={step.num}
+                  className="glass-panel p-6 rounded-2xl flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300"
+                >
                   <div
-                    key={name}
-                    className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-full border transition-all duration-500 ${nodeGlow === i ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(0,212,255,0.3)]" : "border-white/10 bg-white/[0.02]"}`}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center ${step.bg} ${step.color} text-base font-bold flex-shrink-0`}
                   >
-                    <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${nodeGlow === i ? "bg-primary" : "bg-white/20"}`} />
-                    <span className={`text-xs font-mono transition-colors duration-500 ${nodeGlow === i ? "text-primary" : "text-muted-foreground"}`}>{name}</span>
+                    {step.num}
                   </div>
-                ))}
-              </div>
-              <p className="text-center text-xs text-muted-foreground/50 mt-4">Models cross-check continuously. Signal fires only on consensus agreement.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <ComparisonTable members={stats.members} />
-
-      <section className="py-12 lg:py-20 bg-black border-t border-white/5">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <div className="text-center mb-10 lg:mb-16">
-            <h2 className="text-2xl md:text-5xl font-bold mb-4">What You Get</h2>
-            <p className="text-muted-foreground text-sm md:text-lg max-w-2xl mx-auto">Everything you need to trade smarter — one platform.</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
-            {[
-              { icon: BarChart3, color: "text-primary", title: "Stock Signals", desc: "BUY, SELL, or HOLD — with a confidence percentage and the specific technical reasoning behind each call." },
-              { icon: TrendingUp, color: "text-secondary", title: "Options Flow", desc: "See where big money is moving. Large premium sweeps, unusual volume, institutional block trades." },
-              { icon: DollarSign, color: "text-green-400", title: "Income Opportunities", desc: "Gig economy, freelance work, and options income strategies — all filtered for your situation." },
-              { icon: Eye, color: "text-green-400", title: "Greeks Dashboard", desc: "Delta, Gamma, Theta, IV Rank — displayed clearly on every options contract. Know your exposure." },
-              { icon: Activity, color: "text-red-400", title: "Risk Management", desc: "Every signal comes with position sizing. Risk capped at 2% per trade. Capital preservation first." },
-              { icon: Terminal, color: "text-purple-400", title: "Analysis Terminal", desc: "Bloomberg-style multi-panel terminal with live order flow, news feed, and command interface." },
-            ].map((item) => (
-              <div key={item.title} className="glass-panel p-5 md:p-6 rounded-2xl flex flex-col gap-3 hover:-translate-y-1 transition-transform duration-300 group">
-                <item.icon className={`w-6 md:w-7 h-6 md:h-7 ${item.color} group-hover:scale-110 transition-transform`} />
-                <h3 className="text-base md:text-lg font-bold">{item.title}</h3>
-                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {testimonials.length > 0 && (
-        <section className="py-12 lg:py-20 bg-black border-t border-white/5">
-          <div className="container mx-auto px-4 max-w-5xl">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl md:text-4xl font-bold mb-3">What Our Members Say</h2>
-              <p className="text-muted-foreground text-sm md:text-base">Real experiences from EntangleWealth users.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {testimonials.slice(0, 6).map((t) => (
-                <div key={t.id} className="glass-panel rounded-xl p-5">
-                  <div className="flex gap-1 mb-3">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <span key={i} className={`text-sm ${i < t.rating ? "text-[#FFD700]" : "text-white/10"}`}>★</span>
-                    ))}
-                  </div>
-                  <p className="text-sm text-white/80 leading-relaxed mb-4">"{t.message}"</p>
-                  <div className="flex items-center gap-2 pt-3 border-t border-white/5">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
-                      {t.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold">{t.name}</p>
-                      {t.role && <p className="text-[10px] text-muted-foreground">{t.role}</p>}
-                    </div>
+                  <div>
+                    <h3 className="text-base font-bold text-white mb-2">{step.title}</h3>
+                    <p className="text-sm text-white/50 leading-relaxed">{step.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
         </section>
-      )}
 
-      <section className="py-16 lg:py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-        <div className="container mx-auto px-4 relative z-10 text-center flex flex-col items-center max-w-3xl">
-          <h2 className="text-2xl md:text-5xl font-bold mb-4 md:mb-6">
-            Built for people who need results,<br />
-            <span className="gold-text">not entertainment.</span>
-          </h2>
+        {/* Trust */}
+        <section className="py-16 lg:py-24 px-4 border-t border-white/5">
+          <div className="container mx-auto max-w-2xl text-center space-y-6">
+            <p className="text-[11px] font-semibold tracking-widest uppercase text-white/30 mb-3">
+              Why people trust us
+            </p>
+            <h2 className="text-2xl md:text-4xl font-bold text-white">
+              Built to simplify — not overwhelm.
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 text-left">
+              {[
+                {
+                  icon: CheckCircle,
+                  color: "text-[#00e676]",
+                  title: "No confusing financial jargon",
+                  desc: "Every piece of guidance is written for real people, not finance professionals.",
+                },
+                {
+                  icon: ShieldCheck,
+                  color: "text-[#00c8f8]",
+                  title: "Your privacy is protected",
+                  desc: "Your data is encrypted and never sold. You're a person, not a product.",
+                },
+                {
+                  icon: Lock,
+                  color: "text-[#f5c842]",
+                  title: "No pressure, no upsells",
+                  desc: "Start free and upgrade only if you want more. No gotchas, no dark patterns.",
+                },
+                {
+                  icon: Heart,
+                  color: "text-[#ff8888]",
+                  title: "Designed for your peace of mind",
+                  desc: "We measure success by how much clearer and calmer you feel about your finances.",
+                },
+              ].map((item) => (
+                <div key={item.title} className="glass-panel rounded-2xl p-5 flex gap-4">
+                  <item.icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${item.color}`} />
+                  <div>
+                    <p className="text-sm font-semibold text-white mb-1">{item.title}</p>
+                    <p className="text-xs text-white/50 leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-sm text-white/30 font-medium">
+              {heroStatsState.error ? (
+                <InlineError message="Live stats unavailable right now." />
+              ) : (
+                <>
+                  <span>{stats.accuracy}% guidance accuracy</span>
+                  <span>·</span>
+                  <span>{animatedMembers.toLocaleString()}+ members</span>
+                  <span>·</span>
+                  <span>Free forever tier</span>
+                </>
+              )}
+            </div>
+          </div>
+        </section>
 
-          {testimonials.length > 0 && (
-            <div className="glass-panel rounded-2xl p-5 mb-6 text-left max-w-lg w-full border border-white/[0.08]">
-              <div className="flex gap-1 mb-2">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <span key={i} className="text-sm text-[#FFD700]">★</span>
+        {/* Testimonials */}
+        <section className="py-16 lg:py-24 px-4 border-t border-white/5">
+          <div className="container mx-auto max-w-3xl">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl md:text-4xl font-bold text-white mb-3">
+                What members are saying
+              </h2>
+              <p className="text-sm text-white/40">Real experiences from Entangled Wealth users.</p>
+            </div>
+
+            {testimonialsState.error && (
+              <InlineError message="Couldn't load member reviews right now. Please refresh to try again." />
+            )}
+
+            {!testimonialsState.error && !testimonialsState.loading && testimonialsState.data === null && (
+              <p className="text-center text-sm text-white/30">No reviews yet — be the first!</p>
+            )}
+
+            {testimonialsState.data && testimonialsState.data.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {testimonialsState.data.slice(0, 6).map((t) => (
+                  <div key={t.id} className="glass-panel rounded-xl p-5 flex flex-col gap-3">
+                    <div className="flex gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-3.5 h-3.5 ${
+                            i < t.rating
+                              ? "text-[#FFD700] fill-[#FFD700]"
+                              : "text-white/10 fill-white/10"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-sm text-white/70 leading-relaxed flex-1">"{t.message}"</p>
+                    <div className="flex items-center gap-2 pt-3 border-t border-white/5">
+                      <div className="w-7 h-7 rounded-full bg-[#00c8f8]/20 flex items-center justify-center text-xs font-bold text-[#00c8f8]">
+                        {t.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-white">{t.name}</p>
+                        {t.role && <p className="text-[10px] text-white/30">{t.role}</p>}
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
-              <p className="text-sm text-white/80 leading-relaxed italic">"{testimonials[0].message}"</p>
-              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/5">
-                <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
-                  {testimonials[0].name.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <p className="text-xs font-semibold">{testimonials[0].name}</p>
-                  {testimonials[0].role && <p className="text-[10px] text-muted-foreground">{testimonials[0].role}</p>}
-                </div>
-              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="py-20 lg:py-28 px-4 border-t border-white/5">
+          <div className="container mx-auto max-w-2xl text-center flex flex-col items-center space-y-6">
+            <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
+              Ready to feel good about your money?
+            </h2>
+            <p className="text-base text-white/50 max-w-md leading-relaxed">
+              It starts with a single step. No commitment, no credit card, no overwhelm — just
+              clarity.
+            </p>
+
+            <MicroConversionFlow referralCode={referralCode || undefined} />
+
+            <p className="text-[11px] text-white/25 max-w-xs leading-relaxed">
+              This is a financial guidance tool. It won't guarantee outcomes — nothing can. But it
+              will help you feel more informed and in control.
+            </p>
+
+            <div className="flex items-center gap-2 text-[11px] text-white/30">
+              <Link href="/pricing">
+                <button className="flex items-center gap-1 hover:text-white/60 transition-colors">
+                  See what's included <ChevronRight className="w-3 h-3" />
+                </button>
+              </Link>
             </div>
-          )}
-
-          <p className="text-sm md:text-lg text-muted-foreground mb-3 md:mb-4">This is a financial analysis tool. It won't guarantee profits — nothing can. But it gives you the same data and analysis that institutional traders use, presented clearly so you can make better decisions faster.</p>
-          <p className="text-xs text-muted-foreground/60 mb-6 md:mb-8 max-w-xl">Trading involves real risk. Past signals are not guarantees of future results. Only trade with money you can afford to lose.</p>
-
-          <p className="text-sm font-semibold text-[#00e676] mb-6">
-            Join {animatedMembers.toLocaleString()}+ traders already using EntangleWealth
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto mb-4">
-            <Link href="/sign-up">
-              <Button size="lg" className="h-12 md:h-14 px-8 md:px-10 text-base md:text-lg bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black hover:opacity-90 font-bold rounded-full shadow-[0_0_30px_rgba(245,200,66,0.2)] w-full sm:w-auto">
-                Start Free Today →
-              </Button>
-            </Link>
-            <Link href="/pricing">
-              <Button size="lg" variant="outline" className="h-12 md:h-14 px-8 md:px-10 text-base md:text-lg border-white/20 hover:bg-white/5 font-bold rounded-full w-full sm:w-auto">
-                View Pricing
-              </Button>
-            </Link>
           </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] text-muted-foreground font-mono">
-            <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-[#00e676]" /> No credit card required</span>
-            <span className="flex items-center gap-1"><Lock className="w-3 h-3 text-[#00c8f8]" /> Secure & encrypted</span>
-            <span>✓ Free forever tier</span>
-          </div>
-        </div>
-      </section>
+        </section>
+      </HomeErrorBoundary>
     </Layout>
   );
 }

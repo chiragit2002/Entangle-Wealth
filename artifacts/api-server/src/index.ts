@@ -225,3 +225,31 @@ const httpServer = server.listen(port, async (err) => {
   startDigestScheduler();
   await initStripe();
 });
+
+let isShuttingDown = false;
+
+function gracefulShutdown(signal: string) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
+  logger.info({ signal }, "Received shutdown signal, closing server...");
+  httpServer.close(() => {
+    logger.info("HTTP server closed");
+    pool.end().then(() => {
+      logger.info("Database pool closed");
+      process.exit(0);
+    }).catch((err) => {
+      logger.error({ error: err }, "Error closing database pool");
+      process.exit(1);
+    });
+  });
+
+  const timer = setTimeout(() => {
+    logger.warn("Graceful shutdown timed out, forcing exit");
+    process.exit(1);
+  }, 10_000);
+  timer.unref();
+}
+
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));

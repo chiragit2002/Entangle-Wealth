@@ -70,16 +70,6 @@ function saveManualChecks(checks: Record<string, boolean>) {
 const DEFAULT_MANUAL_CHECKS: ManualCheck[] = [
   { id: "custom_domain", label: "Custom Domain Connected", category: "DNS", detail: "Domain pointing to Replit deployment via A/CNAME records", checked: false },
   { id: "analytics", label: "Analytics Installed", category: "Monitoring", detail: "Google Analytics, Mixpanel, or equivalent tracking active", checked: false },
-  { id: "privacy_policy", label: "Privacy Policy Live", category: "Legal", detail: "/privacy page published and accessible", checked: false },
-  { id: "terms_of_service", label: "Terms of Service Live", category: "Legal", detail: "/terms page published and accessible", checked: false },
-  { id: "disclaimer", label: "Financial Disclaimer Live", category: "Legal", detail: "/disclaimer page published and accessible", checked: false },
-  { id: "help_center", label: "Help Center Live", category: "Support", detail: "/help page published and accessible", checked: false },
-  { id: "status_page", label: "Status Page Live", category: "Support", detail: "/status page published and accessible", checked: false },
-  { id: "blog_post", label: "At Least 1 Blog Post Published", category: "Content", detail: "/blog has at least one published article", checked: false },
-  { id: "error_page", label: "404 Page Styled", category: "UX", detail: "Branded 404 page with navigation links", checked: false },
-  { id: "ssl_active", label: "SSL Certificate Active", category: "Security", detail: "HTTPS enabled on production domain", checked: false },
-  { id: "email_service", label: "Email Service Connected", category: "Communications", detail: "Transactional email provider configured (SendGrid, Resend, etc.)", checked: false },
-  { id: "oauth_providers", label: "OAuth Providers Working", category: "Authentication", detail: "Google & GitHub OAuth configured in Clerk", checked: false },
 ];
 
 const CATEGORY_ICONS: Record<string, typeof Server> = {

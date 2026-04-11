@@ -14,6 +14,7 @@ import {
   Heart,
   AlertCircle,
   RefreshCw,
+  Globe,
 } from "lucide-react";
 import { EmailCapture } from "@/components/EmailCapture";
 import { AnniversaryGiveawayBanner } from "@/components/viral/AnniversaryGiveawayBanner";
@@ -271,6 +272,76 @@ function GoalSelector({ onSelect }: { onSelect: (goal: string) => void }) {
   );
 }
 
+const LANGUAGES = [
+  { code: "en", label: "English", flag: "🇺🇸" },
+  { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "zh", label: "中文", flag: "🇨🇳" },
+  { code: "hi", label: "हिन्दी", flag: "🇮🇳" },
+  { code: "ar", label: "العربية", flag: "🇸🇦" },
+  { code: "pt", label: "Português", flag: "🇧🇷" },
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "ja", label: "日本語", flag: "🇯🇵" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪" },
+] as const;
+
+function LanguageSelector() {
+  const [selected, setSelected] = useState("en");
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("ew_lang");
+    if (saved) setSelected(saved);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const current = LANGUAGES.find((l) => l.code === selected) || LANGUAGES[0];
+
+  return (
+    <div ref={ref} className="relative inline-block">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/70 hover:text-white text-xs font-medium transition-all"
+      >
+        <Globe className="w-3.5 h-3.5 text-[#00c8f8]" />
+        <span>{current.flag}</span>
+        <span>{current.label}</span>
+      </button>
+      {open && (
+        <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 z-50 w-44 bg-[#0a0a0f] border border-white/10 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
+          {LANGUAGES.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => {
+                setSelected(lang.code);
+                localStorage.setItem("ew_lang", lang.code);
+                setOpen(false);
+                trackEvent("language_selected", { language: lang.code });
+              }}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
+                selected === lang.code
+                  ? "bg-[#00c8f8]/10 text-[#00c8f8]"
+                  : "text-white/70 hover:bg-white/[0.06] hover:text-white"
+              }`}
+            >
+              <span className="text-base">{lang.flag}</span>
+              <span>{lang.label}</span>
+              {selected === lang.code && <CheckCircle className="w-3.5 h-3.5 ml-auto text-[#00c8f8]" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
   const [, navigate] = useLocation();
   const [step, setStep] = useState<"cta" | "goal" | "done">("cta");
@@ -352,6 +423,8 @@ export default function Home() {
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808006_1px,transparent_1px),linear-gradient(to_bottom,#80808006_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
           <div className="container relative z-10 max-w-3xl mx-auto flex flex-col items-center text-center space-y-6">
             <RecentSignupTicker signups={signupsState.data} error={signupsState.error} />
+
+            <LanguageSelector />
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
               Stop guessing what to do

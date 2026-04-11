@@ -10,6 +10,7 @@ import NotFound from "@/pages/not-found";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { NotificationPrompt } from "@/components/pwa/NotificationPrompt";
 import { PageSkeleton, ChartSkeleton, TableSkeleton } from "@/components/pwa/PageSkeleton";
+import { captureReferralCode } from "@/lib/referral";
 
 import Home from "@/pages/Home";
 
@@ -215,6 +216,10 @@ function ClerkProviderWithRoutes() {
 }
 
 function App() {
+  useEffect(() => {
+    captureReferralCode();
+  }, []);
+
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <WouterRouter base={basePath}>

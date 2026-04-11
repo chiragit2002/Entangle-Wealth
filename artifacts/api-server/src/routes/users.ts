@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { usersTable } from "@workspace/db/schema";
+import { usersTable, referralConversionsTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { getAuth } from "@clerk/express";
+import crypto from "crypto";
 
 const router = Router();
 
@@ -42,6 +43,7 @@ router.post("/users/sync", requireAuth, async (req, res) => {
         .returning();
       res.json(updated);
     } else {
+      const referralCode = "EW-" + crypto.randomBytes(4).toString("hex").toUpperCase();
       const [created] = await db.insert(usersTable).values({
         id: clerkId,
         clerkId,
@@ -49,7 +51,25 @@ router.post("/users/sync", requireAuth, async (req, res) => {
         firstName,
         lastName,
         photoUrl,
+        referralCode,
+        referredBy: req.body.referredBy || null,
       }).returning();
+
+      if (req.body.referredBy) {
+        const [referrer] = await db
+          .select()
+          .from(usersTable)
+          .where(eq(usersTable.referralCode, req.body.referredBy));
+        if (referrer) {
+          try {
+            await db.insert(referralConversionsTable).values({
+              referrerId: referrer.clerkId,
+              referredUserId: clerkId,
+            });
+          } catch (_e) {}
+        }
+      }
+
       res.json(created);
     }
   } catch (error) {

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { authFetch } from "@/lib/authFetch";
+import { getStoredReferralCode, clearStoredReferralCode } from "@/lib/referral";
 
 interface GamificationData {
   xp: { totalXp: number; level: number; tier: string; monthlyXp: number; weeklyXp: number };
@@ -81,6 +82,7 @@ export default function Profile() {
   const loadProfile = async () => {
     try {
       if (user) {
+        const referredBy = getStoredReferralCode();
         await fetchAuth("/users/sync", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -89,8 +91,10 @@ export default function Profile() {
             firstName: user.firstName,
             lastName: user.lastName,
             photoUrl: user.imageUrl,
+            ...(referredBy ? { referredBy } : {}),
           }),
         });
+        if (referredBy) clearStoredReferralCode();
       }
 
       const res = await fetchAuth("/users/me");

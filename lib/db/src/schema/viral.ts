@@ -1,13 +1,10 @@
-import { pgTable, text, timestamp, boolean, integer, serial, real } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, integer, serial } from "drizzle-orm/pg-core";
 
-export const referralsTable = pgTable("referrals", {
+export const referralConversionsTable = pgTable("referral_conversions", {
   id: serial("id").primaryKey(),
   referrerId: text("referrer_id").notNull(),
-  referredUserId: text("referred_user_id"),
-  referralCode: text("referral_code").notNull().unique(),
-  converted: boolean("converted").default(false),
+  referredUserId: text("referred_user_id").notNull().unique(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-  convertedAt: timestamp("converted_at", { withTimezone: true }),
 });
 
 export const testimonialsTable = pgTable("testimonials", {
@@ -21,7 +18,7 @@ export const testimonialsTable = pgTable("testimonials", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
-export type Referral = typeof referralsTable.$inferSelect;
-export type InsertReferral = typeof referralsTable.$inferInsert;
+export type ReferralConversion = typeof referralConversionsTable.$inferSelect;
+export type InsertReferralConversion = typeof referralConversionsTable.$inferInsert;
 export type Testimonial = typeof testimonialsTable.$inferSelect;
 export type InsertTestimonial = typeof testimonialsTable.$inferInsert;

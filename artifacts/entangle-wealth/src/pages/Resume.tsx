@@ -197,6 +197,8 @@ export default function Resume() {
   const syncUser = async () => {
     if (!user) return;
     try {
+      const { getStoredReferralCode, clearStoredReferralCode } = await import("@/lib/referral");
+      const referredBy = getStoredReferralCode();
       await fetchAuth("/users/sync", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -205,8 +207,10 @@ export default function Resume() {
           firstName: user.firstName,
           lastName: user.lastName,
           photoUrl: user.imageUrl,
+          ...(referredBy ? { referredBy } : {}),
         }),
       });
+      if (referredBy) clearStoredReferralCode();
     } catch { /* ignore */ }
   };
 

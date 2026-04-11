@@ -21,6 +21,8 @@ export const usersTable = pgTable("users", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   walletAddress: text("wallet_address"),
   tokenBalance: real("token_balance").default(0),
+  referralCode: text("referral_code").unique(),
+  referredBy: text("referred_by"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 

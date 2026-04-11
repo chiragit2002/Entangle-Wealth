@@ -16,7 +16,7 @@ export function ReferralSection() {
   const { getToken, isSignedIn } = useAuth();
   const { toast } = useToast();
   const [code, setCode] = useState("");
-  const [stats, setStats] = useState({ totalReferred: 0, totalConverted: 0 });
+  const [stats, setStats] = useState({ totalConverted: 0 });
   const [badges, setBadges] = useState<{ tier: string; icon: string; threshold: number }[]>([]);
   const [copied, setCopied] = useState(false);
 
@@ -30,7 +30,7 @@ export function ReferralSection() {
       if (codeRes.ok) {
         const data = await codeRes.json();
         setCode(data.code);
-        setStats({ totalReferred: data.totalReferred, totalConverted: data.totalConverted });
+        setStats({ totalConverted: data.totalConverted });
       }
       if (badgeRes.ok) {
         const data = await badgeRes.json();
@@ -103,14 +103,10 @@ export function ReferralSection() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-white/[0.03] rounded-lg p-3 text-center border border-white/5">
-          <p className="text-xl font-bold font-mono text-primary">{stats.totalReferred}</p>
-          <p className="text-[10px] text-muted-foreground uppercase">Referred</p>
-        </div>
+      <div className="mb-4">
         <div className="bg-white/[0.03] rounded-lg p-3 text-center border border-white/5">
           <p className="text-xl font-bold font-mono text-[#00ff88]">{stats.totalConverted}</p>
-          <p className="text-[10px] text-muted-foreground uppercase">Converted</p>
+          <p className="text-[10px] text-muted-foreground uppercase">Successful Referrals</p>
         </div>
       </div>
 

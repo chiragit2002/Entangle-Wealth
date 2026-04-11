@@ -4,13 +4,8 @@ import { Layout } from "@/components/layout/Layout";
 import { MarketTicker } from "@/components/MarketTicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Activity, Target, Zap, TrendingUp, ShieldAlert, BarChart3, Eye, DollarSign, ArrowRight, Terminal } from "lucide-react";
-
-const heroStats = [
-  { value: "87%", label: "Accuracy", color: "text-[#00c8f8]" },
-  { value: "1,247", label: "Signals", color: "text-[#00e676]" },
-  { value: "4,891", label: "Members", color: "text-[#f5c842]" },
-];
+import { Activity, Target, Zap, TrendingUp, ShieldAlert, BarChart3, Eye, DollarSign, ArrowRight, Terminal, UserPlus } from "lucide-react";
+import { ShareSignalCard } from "@/components/viral/ShareSignalCard";
 
 const modelScores = [
   { name: "Price Action", pct: 92 },
@@ -136,6 +131,72 @@ function SignalCard({ s }: { s: typeof liveSignals[0] }) {
           <span className={`ind-signal ${macdClass}`}>{s.macd.includes("Bull") ? "BULL" : s.macd.includes("Bear") ? "BEAR" : "NEUT"}</span>
         </div>
       </div>
+      <div className="mt-3 pt-3 border-t border-white/[0.06]">
+        <ShareSignalCard
+          data={{
+            symbol: s.sym,
+            signal: s.sig,
+            confidence: s.conf,
+            price: s.price,
+            target: s.tgt,
+            change: s.chg,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+const API_BASE = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
+
+function useUserCount() {
+  const [count, setCount] = useState(4891);
+  useEffect(() => {
+    fetch(`${API_BASE}/stats/user-count`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d && d.count > 0) setCount(d.count); })
+      .catch(() => {});
+  }, []);
+  return count;
+}
+
+function useRecentSignups() {
+  const [signups, setSignups] = useState<{ name: string; timeLabel: string }[]>([]);
+  useEffect(() => {
+    fetch(`${API_BASE}/stats/recent-signups`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d && d.length > 0) setSignups(d); })
+      .catch(() => {});
+  }, []);
+  return signups;
+}
+
+function useTestimonials() {
+  const [testimonials, setTestimonials] = useState<{ id: number; name: string; role: string | null; message: string; rating: number }[]>([]);
+  useEffect(() => {
+    fetch(`${API_BASE}/viral/testimonials`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d) setTestimonials(d); })
+      .catch(() => {});
+  }, []);
+  return testimonials;
+}
+
+function RecentSignupTicker({ signups }: { signups: { name: string; timeLabel: string }[] }) {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (signups.length === 0) return;
+    const t = setInterval(() => setIdx((p) => (p + 1) % signups.length), 3000);
+    return () => clearInterval(t);
+  }, [signups.length]);
+
+  if (signups.length === 0) return null;
+  const s = signups[idx];
+
+  return (
+    <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#00ff88]/15 bg-[#00ff88]/5 text-[11px] font-mono text-[#00ff88] animate-in fade-in duration-500">
+      <UserPlus className="w-3 h-3" />
+      <span>{s.name} just joined {s.timeLabel}</span>
     </div>
   );
 }
@@ -144,6 +205,15 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [nodeGlow, setNodeGlow] = useState(0);
+  const memberCount = useUserCount();
+  const recentSignups = useRecentSignups();
+  const testimonials = useTestimonials();
+
+  const heroStats = [
+    { value: "87%", label: "Accuracy", color: "text-[#00c8f8]" },
+    { value: "1,247", label: "Signals", color: "text-[#00e676]" },
+    { value: memberCount.toLocaleString(), label: "Members", color: "text-[#f5c842]" },
+  ];
 
   useEffect(() => {
     const t = setInterval(() => setNodeGlow((p) => (p + 1) % 6), 1500);
@@ -190,6 +260,8 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+          <RecentSignupTicker signups={recentSignups} />
 
           <form onSubmit={handleSubmit} className="w-full max-w-md flex flex-col sm:flex-row gap-3 mt-4">
             {submitted ? (
@@ -328,6 +400,38 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {testimonials.length > 0 && (
+        <section className="py-12 lg:py-20 bg-black border-t border-white/5">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl md:text-4xl font-bold mb-3">What Our Members Say</h2>
+              <p className="text-muted-foreground text-sm md:text-base">Real experiences from EntangleWealth users.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {testimonials.slice(0, 6).map((t) => (
+                <div key={t.id} className="glass-panel rounded-xl p-5">
+                  <div className="flex gap-1 mb-3">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <span key={i} className={`text-sm ${i < t.rating ? "text-[#FFD700]" : "text-white/10"}`}>★</span>
+                    ))}
+                  </div>
+                  <p className="text-sm text-white/80 leading-relaxed mb-4">"{t.message}"</p>
+                  <div className="flex items-center gap-2 pt-3 border-t border-white/5">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
+                      {t.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold">{t.name}</p>
+                      {t.role && <p className="text-[10px] text-muted-foreground">{t.role}</p>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="py-16 lg:py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />

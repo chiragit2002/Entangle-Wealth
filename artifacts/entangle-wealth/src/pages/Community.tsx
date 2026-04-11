@@ -4,6 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Users, MessageSquare, Calendar, Briefcase, CreditCard, Plus, ThumbsUp, MessageCircle, Share2, X, Search } from "lucide-react";
+import { ReferralSection } from "@/components/viral/ReferralSection";
+import { TestimonialForm } from "@/components/viral/TestimonialForm";
 
 type Tab = "communities" | "feed" | "events" | "jobs" | "pricing";
 
@@ -331,6 +333,9 @@ export default function Community() {
 
         {tab === "feed" && (
           <div>
+            <div className="mb-4">
+              <ReferralSection />
+            </div>
             <div className="flex items-center pb-2 border-b border-white/10 mb-4">
               <h2 className="text-lg font-bold">Community Feed</h2>
             </div>
@@ -385,6 +390,9 @@ export default function Community() {
                   </div>
                 </div>
               ))}
+            </div>
+            <div className="mt-6">
+              <TestimonialForm />
             </div>
           </div>
         )}

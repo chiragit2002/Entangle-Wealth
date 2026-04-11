@@ -4,8 +4,9 @@ import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertTriangle, Receipt, MessageCircle, TrendingUp, Shield, Download,
-  ChevronDown, ChevronUp, Calculator, FileText, Lightbulb,
+  ChevronDown, ChevronUp, Calculator, FileText, Lightbulb, Share2,
 } from "lucide-react";
+import { ShareTaxCard } from "@/components/viral/ShareTaxCard";
 import { Button } from "@/components/ui/button";
 import { OnboardingWizard } from "@/components/tax/OnboardingWizard";
 import type { UserProfile, DeductionCategory } from "@/lib/taxflow-types";
@@ -386,6 +387,18 @@ export default function Tax() {
                 <p className="text-[11px] text-muted-foreground uppercase mb-1">Total Estimated Savings</p>
                 <p className="text-2xl font-black font-mono text-[#00e676]">{formatDollar(Math.round(Math.max(0, estimator.savings)))}</p>
               </div>
+              {estimator.savings > 0 && (
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <p className="text-xs text-muted-foreground mb-2">Share your tax savings</p>
+                  <ShareTaxCard
+                    data={{
+                      savings: Math.round(Math.max(0, estimator.savings)),
+                      deductionsFound: totalFound,
+                      strategiesUsed: planIds.length,
+                    }}
+                  />
+                </div>
+              )}
             </div>
           )}
           {expandEstimator && !estimator && (

@@ -16,6 +16,7 @@ import gamificationRouter from "./gamification";
 import tokenRouter from "./token";
 import marketingRouter from "./marketing";
 import authEventsRouter from "./auth-events";
+import viralRouter from "./viral";
 
 const router: IRouter = Router();
 
@@ -36,5 +37,6 @@ router.use(newsRouter);
 router.use(gamificationRouter);
 router.use(tokenRouter);
 router.use(marketingRouter);
+router.use(viralRouter);
 
 export default router;

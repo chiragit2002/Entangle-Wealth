@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useUser, useAuth } from "@clerk/react";
-import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target, Wallet, Coins } from "lucide-react";
+import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target, Wallet, Coins, Users } from "lucide-react";
+import { ReferralSection } from "@/components/viral/ReferralSection";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BottomNav } from "@/components/layout/BottomNav";
@@ -526,6 +527,10 @@ export default function Profile() {
               </Button>
             </a>
           </div>
+        </div>
+
+        <div className="mb-6">
+          <ReferralSection />
         </div>
 
         <div className="glass-panel p-6 mb-6">

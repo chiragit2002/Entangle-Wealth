@@ -1,6 +1,8 @@
 import { Router, type Request } from "express";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { requireAuth } from "../middlewares/requireAuth";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
+import { checkTaxGptLimit, incrementTaxGptCount } from "../lib/userDailyLimits";
 
 let openai: any = null;
 try {
@@ -183,6 +185,20 @@ router.post("/taxgpt", requireAuth, async (req, res) => {
     return;
   }
 
+  const clerkId = (req as AuthenticatedRequest).userId;
+  const taxGptCheck = await checkTaxGptLimit(clerkId);
+  if (!taxGptCheck.allowed) {
+    const upgradeMsg = taxGptCheck.referralBonus
+      ? " Refer 10 friends to unlock unlimited TaxGPT for a month!"
+      : " Upgrade to Pro for unlimited TaxGPT, or refer 10 friends to unlock unlimited access for a month!";
+    res.status(429).json({
+      error: `Daily TaxGPT limit reached (${taxGptCheck.maxAllowed} questions/day).${upgradeMsg}`,
+      limitType: "daily_taxgpt",
+      maxAllowed: taxGptCheck.maxAllowed,
+    });
+    return;
+  }
+
   const { question, profileContext } = req.body;
   if (!question || typeof question !== "string") {
     res.status(400).json({ error: "Question is required" });
@@ -229,6 +245,7 @@ router.post("/taxgpt", requireAuth, async (req, res) => {
     );
 
     const answer = completion.choices?.[0]?.message?.content || "I couldn't generate a response. Please try rephrasing your question.";
+    incrementTaxGptCount(clerkId);
     res.json({ answer });
   } catch (error) {
     console.error("TaxGPT error:", error);

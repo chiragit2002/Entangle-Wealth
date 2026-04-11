@@ -122,6 +122,7 @@ export default function Profile() {
   const [kycForm, setKycForm] = useState({ fullLegalName: "", dateOfBirth: "", address: "", idType: "drivers_license", idNumber: "" });
   const [showKyc, setShowKyc] = useState(false);
   const [submittingKyc, setSubmittingKyc] = useState(false);
+  const [isAmbassador, setIsAmbassador] = useState(false);
 
   const fetchAuth = useCallback((path: string, options: RequestInit = {}) => {
     return authFetch(path, getToken, options);
@@ -134,6 +135,15 @@ export default function Profile() {
     loadResume();
     loadGamification();
     loadTokenData();
+    fetchAuth("/viral/referral/milestones")
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.milestones) {
+          const amb = data.milestones.find((m: { key: string; unlocked: boolean }) => m.key === "ambassador");
+          if (amb?.unlocked) setIsAmbassador(true);
+        }
+      })
+      .catch(() => {});
   }, [userLoaded]);
 
   const loadProfile = async () => {
@@ -310,7 +320,14 @@ export default function Profile() {
                 </div>
               )}
               <div>
-                <h1 className="text-2xl font-bold">{user?.fullName || "Your Profile"}</h1>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-2xl font-bold">{user?.fullName || "Your Profile"}</h1>
+                  {isAmbassador && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border border-yellow-500/40 bg-yellow-500/10 text-yellow-400">
+                      🏆 Ambassador
+                    </span>
+                  )}
+                </div>
                 {profile.headline && <p className="text-primary">{profile.headline}</p>}
                 <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                   {user?.primaryEmailAddress && <span className="flex items-center gap-1"><Mail className="w-3.5 h-3.5" />{user.primaryEmailAddress.emailAddress}</span>}

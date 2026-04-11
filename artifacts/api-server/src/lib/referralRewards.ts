@@ -18,10 +18,51 @@ const REFERRAL_BADGES = [
   { slug: "referral-platinum", name: "Referral Platinum", icon: "platinum", description: "Referred 50 users who signed up", category: "referral", xpReward: 1000, threshold: 50 },
 ];
 
+const AMBASSADOR_BADGE = {
+  slug: "referral-ambassador",
+  name: "Ambassador",
+  icon: "ambassador",
+  description: "Referred 25+ users — permanent Ambassador status",
+  category: "referral",
+  xpReward: 750,
+  threshold: 25,
+};
+
+export const REFERRAL_MILESTONES = [
+  {
+    threshold: 3,
+    key: "extra_signals",
+    title: "5 Extra Daily Signals",
+    description: "You've unlocked 5 bonus trading signals per day for the next 30 days!",
+    icon: "⚡",
+  },
+  {
+    threshold: 5,
+    key: "pro_trial",
+    title: "1 Month Pro Trial",
+    description: "You've unlocked a free month of Pro access!",
+    icon: "🚀",
+  },
+  {
+    threshold: 10,
+    key: "taxgpt_unlimited",
+    title: "Unlimited TaxGPT for a Month",
+    description: "You've unlocked unlimited TaxGPT access for 30 days!",
+    icon: "🧾",
+  },
+  {
+    threshold: 25,
+    key: "ambassador",
+    title: "Ambassador Badge",
+    description: "You've earned the permanent Ambassador badge — displayed on your profile and community posts!",
+    icon: "🏆",
+  },
+];
+
 const STRIPE_REWARD_THRESHOLD = 5;
 
 export async function ensureReferralBadgesExist(): Promise<void> {
-  for (const badge of REFERRAL_BADGES) {
+  for (const badge of [...REFERRAL_BADGES, AMBASSADOR_BADGE]) {
     const [existing] = await db
       .select()
       .from(badgesTable)
@@ -41,11 +82,11 @@ export async function ensureReferralBadgesExist(): Promise<void> {
   }
 }
 
-export async function processReferralMilestones(referrerId: string): Promise<void> {
+export async function processReferralMilestones(referrerId: string): Promise<{ newMilestones: string[] }> {
   const userId = await resolveUserId(referrerId);
   if (!userId) {
     console.warn(`[referral] Could not resolve DB user ID for Clerk ID ${referrerId}`);
-    return;
+    return { newMilestones: [] };
   }
 
   const [stats] = await db
@@ -115,8 +156,90 @@ export async function processReferralMilestones(referrerId: string): Promise<voi
     }
   }
 
+  await applyFeatureUnlocks(referrerId, userId, referralCount);
+
   if (referralCount >= STRIPE_REWARD_THRESHOLD) {
     await applyStripeCouponIfEligible(referrerId, referralCount);
+  }
+
+  return { newMilestones: [] };
+}
+
+async function applyFeatureUnlocks(referrerId: string, userId: string, referralCount: number): Promise<void> {
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.clerkId, referrerId));
+
+  if (!user) return;
+
+  const updates: Partial<typeof usersTable.$inferInsert> = {};
+  const now = new Date();
+  const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+  if (referralCount >= 3) {
+    const current = user.referralExtraSignalsUntil;
+    if (!current || current < now) {
+      updates.referralExtraSignalsUntil = thirtyDaysFromNow;
+    }
+  }
+
+  if (referralCount >= 10) {
+    const current = user.referralTaxGptUntil;
+    if (!current || current < now) {
+      updates.referralTaxGptUntil = thirtyDaysFromNow;
+    }
+  }
+
+  if (referralCount >= 25 && !user.referralAmbassador) {
+    updates.referralAmbassador = true;
+
+    const [ambBadge] = await db
+      .select()
+      .from(badgesTable)
+      .where(eq(badgesTable.slug, AMBASSADOR_BADGE.slug));
+
+    if (ambBadge) {
+      const [existingAmbBadge] = await db
+        .select()
+        .from(userBadgesTable)
+        .where(and(eq(userBadgesTable.userId, userId), eq(userBadgesTable.badgeId, ambBadge.id)));
+
+      if (!existingAmbBadge) {
+        await db.insert(userBadgesTable).values({ userId, badgeId: ambBadge.id });
+
+        if (AMBASSADOR_BADGE.xpReward > 0) {
+          await db.insert(xpTransactionsTable).values({
+            userId,
+            amount: AMBASSADOR_BADGE.xpReward,
+            reason: `Earned ${AMBASSADOR_BADGE.name} badge`,
+            category: "referral",
+          });
+
+          const [xp] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+          if (xp) {
+            await db.update(userXpTable).set({
+              totalXp: xp.totalXp + AMBASSADOR_BADGE.xpReward,
+              monthlyXp: xp.monthlyXp + AMBASSADOR_BADGE.xpReward,
+              weeklyXp: xp.weeklyXp + AMBASSADOR_BADGE.xpReward,
+              updatedAt: new Date(),
+            }).where(eq(userXpTable.userId, userId));
+          } else {
+            await db.insert(userXpTable).values({
+              userId,
+              totalXp: AMBASSADOR_BADGE.xpReward,
+              monthlyXp: AMBASSADOR_BADGE.xpReward,
+              weeklyXp: AMBASSADOR_BADGE.xpReward,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  if (Object.keys(updates).length > 0) {
+    updates.updatedAt = now;
+    await db.update(usersTable).set(updates).where(eq(usersTable.clerkId, referrerId));
   }
 }
 

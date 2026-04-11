@@ -8,7 +8,12 @@ interface TaxSavingsData {
   strategiesUsed: number;
 }
 
-export function ShareTaxCard({ data }: { data: TaxSavingsData }) {
+interface Props {
+  data: TaxSavingsData;
+  referralLink?: string;
+}
+
+export function ShareTaxCard({ data, referralLink }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const formatDollar = (n: number) => "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 });
@@ -117,12 +122,27 @@ export function ShareTaxCard({ data }: { data: TaxSavingsData }) {
     if (!dataUrl) return;
     const blob = await (await fetch(dataUrl)).blob();
     const file = new File([blob], "tax-savings.png", { type: "image/png" });
-    if (navigator.share && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: "My Tax Savings — EntangleWealth" });
-    } else {
+
+    const caption = `I just found ${formatDollar(data.savings)} in potential tax savings using EntangleWealth TaxFlow!`;
+    const url = referralLink || window.location.origin;
+    const shareText = `${caption} ${url}`;
+
+    if (navigator.share) {
+      try {
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: "My Tax Savings — EntangleWealth", text: shareText });
+          return;
+        }
+        await navigator.share({ title: "My Tax Savings — EntangleWealth", text: shareText, url });
+        return;
+      } catch {}
+    }
+    try {
+      await navigator.clipboard.writeText(shareText);
+    } catch {
       handleDownload();
     }
-  }, [generate, handleDownload]);
+  }, [generate, data, referralLink, handleDownload]);
 
   return (
     <div>

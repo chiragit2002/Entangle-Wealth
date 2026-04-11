@@ -11,7 +11,12 @@ interface SignalData {
   change: string;
 }
 
-export function ShareSignalCard({ data }: { data: SignalData }) {
+interface Props {
+  data: SignalData;
+  referralLink?: string;
+}
+
+export function ShareSignalCard({ data, referralLink }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const generate = useCallback(() => {
@@ -120,12 +125,27 @@ export function ShareSignalCard({ data }: { data: SignalData }) {
     if (!dataUrl) return;
     const blob = await (await fetch(dataUrl)).blob();
     const file = new File([blob], `signal-${data.symbol}.png`, { type: "image/png" });
-    if (navigator.share && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: `${data.symbol} Signal — EntangleWealth` });
-    } else {
+
+    const caption = `${data.signal.toUpperCase()} signal on ${data.symbol} — ${data.confidence}% confidence. Check out EntangleWealth for institutional-grade AI signals!`;
+    const url = referralLink || window.location.origin;
+    const shareText = `${caption} ${url}`;
+
+    if (navigator.share) {
+      try {
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: `${data.symbol} Signal — EntangleWealth`, text: shareText });
+          return;
+        }
+        await navigator.share({ title: `${data.symbol} Signal — EntangleWealth`, text: shareText, url });
+        return;
+      } catch {}
+    }
+    try {
+      await navigator.clipboard.writeText(shareText);
+    } catch {
       handleDownload();
     }
-  }, [generate, data.symbol, handleDownload]);
+  }, [generate, data, referralLink, handleDownload]);
 
   return (
     <div>

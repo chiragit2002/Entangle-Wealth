@@ -124,6 +124,7 @@ export default function Community() {
   const [, setLocation] = useLocation();
   const { getToken, isSignedIn } = useAuth();
   const [referralCode, setReferralCode] = useState("");
+  const [isAmbassador, setIsAmbassador] = useState(false);
   const [tab, setTab] = useState<Tab>("communities");
 
   useEffect(() => {
@@ -131,6 +132,10 @@ export default function Community() {
     authFetch("/viral/referral/code", getToken)
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data?.code) setReferralCode(data.code); })
+      .catch(() => {});
+    authFetch("/viral/referral/milestones", getToken)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data?.milestones) { const amb = data.milestones.find((m: { key: string; unlocked: boolean }) => m.key === "ambassador"); if (amb?.unlocked) setIsAmbassador(true); } })
       .catch(() => {});
   }, [isSignedIn, getToken]);
   const [commFilter, setCommFilter] = useState("all");
@@ -382,7 +387,14 @@ export default function Community() {
                       {p.avatar}
                     </div>
                     <div>
-                      <p className="text-sm font-bold">{p.author}</p>
+                      <p className="text-sm font-bold flex items-center gap-1.5">
+                        {p.author}
+                        {p.author === "You" && isAmbassador && (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-[rgba(255,215,0,0.15)] text-[#ffd700] border border-[rgba(255,215,0,0.3)]">
+                            🏆 Ambassador
+                          </span>
+                        )}
+                      </p>
                       <p className="text-[11px] text-[#555]">{p.time}</p>
                     </div>
                   </div>
@@ -399,10 +411,19 @@ export default function Community() {
                     </button>
                     <button
                       onClick={async () => {
-                        const postUrl = `${window.location.origin}/community?post=${p.id}`;
+                        const postUrl = referralCode
+                          ? `${window.location.origin}/community?post=${p.id}&ref=${referralCode}`
+                          : `${window.location.origin}/community?post=${p.id}`;
+                        const shareText = `Check out this post on EntangleWealth: "${p.body.slice(0, 80)}${p.body.length > 80 ? "..." : ""}" — ${postUrl}`;
+                        if (navigator.share) {
+                          try {
+                            await navigator.share({ title: "EntangleWealth Community", text: shareText, url: postUrl });
+                            return;
+                          } catch {}
+                        }
                         try {
-                          await navigator.clipboard.writeText(postUrl);
-                          toast({ title: "Link copied", description: "Post link copied to clipboard." });
+                          await navigator.clipboard.writeText(shareText);
+                          toast({ title: "Link copied", description: "Post link with your referral code copied to clipboard." });
                         } catch {
                           toast({ title: "Could not copy link", description: "Please copy manually: " + postUrl, variant: "destructive" });
                         }

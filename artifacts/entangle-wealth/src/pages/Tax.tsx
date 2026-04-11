@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { ShareTaxCard } from "@/components/viral/ShareTaxCard";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@clerk/react";
+import { authFetch } from "@/lib/authFetch";
 import { OnboardingWizard } from "@/components/tax/OnboardingWizard";
 import type { UserProfile, DeductionCategory } from "@/lib/taxflow-types";
 import { ENTITY_SHORT_LABELS } from "@/lib/taxflow-types";
@@ -31,12 +33,22 @@ export default function Tax() {
   const [categories, setCategories] = useState<DeductionCategory[]>(getDeductionCategories());
   const [expandEstimator, setExpandEstimator] = useState(false);
   const [taxYear, setTaxYr] = useState(getTaxYear());
+  const [referralLink, setReferralLink] = useState("");
+  const { getToken, isSignedIn } = useAuth();
 
   useEffect(() => {
     const p = getActiveProfile();
     setProfile(p);
     if (!isOnboardingDone()) setShowOnboarding(true);
   }, []);
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+    authFetch("/viral/referral/code", getToken)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data?.code) setReferralLink(`${window.location.origin}?ref=${data.code}`); })
+      .catch(() => {});
+  }, [isSignedIn, getToken]);
 
   useEffect(() => {
     const handler = (e: Event) => setTaxYr((e as CustomEvent).detail);
@@ -391,6 +403,7 @@ export default function Tax() {
                 <div className="mt-4 pt-4 border-t border-white/10">
                   <p className="text-xs text-muted-foreground mb-2">Share your tax savings</p>
                   <ShareTaxCard
+                    referralLink={referralLink || undefined}
                     data={{
                       savings: Math.round(Math.max(0, estimator.savings)),
                       deductionsFound: totalFound,

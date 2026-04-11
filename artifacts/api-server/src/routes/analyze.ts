@@ -2,6 +2,8 @@ import { Router, type Request } from "express";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { getStockBySymbol } from "../data/nasdaq-stocks";
 import { requireAuth } from "../middlewares/requireAuth";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
+import { checkSignalLimit, incrementSignalCount } from "../lib/userDailyLimits";
 
 const router = Router();
 
@@ -30,6 +32,19 @@ function checkRateLimit(req: Request): boolean {
 router.post("/stocks/:symbol/analyze", requireAuth, async (req, res) => {
   if (!checkRateLimit(req)) {
     res.status(429).json({ error: "Rate limit exceeded. Please wait before requesting another analysis." });
+    return;
+  }
+
+  const clerkId = (req as AuthenticatedRequest).userId;
+  const signalCheck = await checkSignalLimit(clerkId);
+  if (!signalCheck.allowed) {
+    const bonusMsg = signalCheck.referralBonus ? " (including your referral bonus)" : "";
+    res.status(429).json({
+      error: `Daily signal limit reached. You've used all ${signalCheck.maxAllowed} signals${bonusMsg} for today. Upgrade to Pro for unlimited signals or refer more friends.`,
+      limitType: "daily_signals",
+      maxAllowed: signalCheck.maxAllowed,
+      referralBonus: signalCheck.referralBonus,
+    });
     return;
   }
 
@@ -121,6 +136,7 @@ Then synthesize with the Flash Council and deliver the consensus signal.`;
     }
 
     const analysis = JSON.parse(content);
+    incrementSignalCount(clerkId);
     res.json(analysis);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Analysis failed";

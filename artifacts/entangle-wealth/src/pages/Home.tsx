@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Activity, Target, Zap, TrendingUp, ShieldAlert, BarChart3, Eye, DollarSign, ArrowRight, Terminal, UserPlus, Check, X, ShieldCheck, Lock } from "lucide-react";
 import { ShareSignalCard } from "@/components/viral/ShareSignalCard";
 import { trackEvent } from "@/lib/trackEvent";
+import { useAuth } from "@clerk/react";
+import { authFetch } from "@/lib/authFetch";
 
 const modelScores = [
   { name: "Price Action", pct: 92 },
@@ -95,7 +97,7 @@ function QuantumCanvas({ className }: { className?: string }) {
   return <canvas ref={canvasRef} width={200} height={200} className={className} />;
 }
 
-function SignalCard({ s }: { s: typeof liveSignals[0] }) {
+function SignalCard({ s, referralLink }: { s: typeof liveSignals[0]; referralLink?: string }) {
   const badgeClass = s.sig === "buy" ? "mobile-badge-green" : s.sig === "sell" ? "mobile-badge-red" : "mobile-badge-gold";
   const confGradient = s.sig === "buy" ? "linear-gradient(90deg, #00c8f8, #00e676)" : s.sig === "sell" ? "linear-gradient(90deg, #ff4466, #ff8888)" : "linear-gradient(90deg, #f5c842, #ffaa00)";
   const rsiColor = s.rsi < 30 ? "#00e676" : s.rsi > 70 ? "#ff4466" : "#f5c842";
@@ -133,6 +135,7 @@ function SignalCard({ s }: { s: typeof liveSignals[0] }) {
       </div>
       <div className="mt-3 pt-3 border-t border-white/[0.06]">
         <ShareSignalCard
+          referralLink={referralLink}
           data={{
             symbol: s.sym,
             signal: s.sig,
@@ -427,11 +430,13 @@ function CredibilityBar({ members, signals, accuracy }: { members: number; signa
 
 export default function Home() {
   const [nodeGlow, setNodeGlow] = useState(0);
+  const [referralLink, setReferralLink] = useState("");
   const recentSignups = useRecentSignups();
   const testimonials = useTestimonials();
   const stats = useHeroStats();
   const animatedMembers = useAnimatedNumber(stats.members);
   const animatedSignals = useAnimatedNumber(stats.signals);
+  const { getToken, isSignedIn } = useAuth();
 
   useEffect(() => { trackEvent("home_viewed"); }, []);
 
@@ -439,6 +444,14 @@ export default function Home() {
     const t = setInterval(() => setNodeGlow((p) => (p + 1) % 6), 1500);
     return () => clearInterval(t);
   }, []);
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+    authFetch("/viral/referral/code", getToken)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data?.code) setReferralLink(`${window.location.origin}?ref=${data.code}`); })
+      .catch(() => {});
+  }, [isSignedIn, getToken]);
 
   return (
     <Layout>
@@ -512,7 +525,7 @@ export default function Home() {
           </div>
           <div className="space-y-3 mb-8">
             {liveSignals.map((s) => (
-              <SignalCard key={s.sym} s={s} />
+              <SignalCard key={s.sym} s={s} referralLink={referralLink || undefined} />
             ))}
           </div>
 

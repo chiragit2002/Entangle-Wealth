@@ -17,6 +17,7 @@ import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { Info } from "lucide-react";
 import { AuthErrorHandler } from "@/components/AuthErrorHandler";
 import { AuthTokenError } from "@/lib/authFetch";
+import { MilestoneCelebrationModal } from "@/components/viral/MilestoneCelebrationModal";
 
 const Home = lazy(() => import("@/pages/Home"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -328,6 +329,7 @@ function ClerkProviderWithRoutes() {
             <Route component={NotFound} />
           </Switch>
           <OnboardingProvider />
+          <MilestoneCelebrationModal />
           <CookieConsentBanner />
           <InstallPrompt />
           <NotificationPrompt />

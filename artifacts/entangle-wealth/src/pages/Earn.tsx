@@ -8,6 +8,7 @@ import { DollarSign, MapPin, Clock, Briefcase, TrendingUp, ChevronDown, ChevronU
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { ReferralSection } from "@/components/viral/ReferralSection";
 
 const categories = ["All", "Gig", "Freelance", "Options"] as const;
 
@@ -231,6 +232,8 @@ export default function Earn() {
         <div className="p-4 rounded-lg border border-white/5 bg-white/[0.01]">
           <p className="text-xs text-muted-foreground/60 text-center">Income opportunities shown are examples and not guaranteed. Actual earnings depend on availability, location, effort, and market conditions. Options strategies involve risk of loss. This is demo data.</p>
         </div>
+
+        <ReferralSection />
       </div>
     </Layout>
   );

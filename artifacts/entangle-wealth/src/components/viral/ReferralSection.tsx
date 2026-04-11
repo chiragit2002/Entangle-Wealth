@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@clerk/react";
-import { Copy, Check, Users, Award, Share2 } from "lucide-react";
+import { Copy, Check, Users, Award, Share2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +13,13 @@ const BADGE_TIERS = [
   { tier: "Platinum", icon: "💎", threshold: 50, color: "#00d4ff" },
 ];
 
+const MILESTONES = [
+  { key: "extra_signals", threshold: 3, label: "5 Extra Daily Signals", icon: "⚡" },
+  { key: "pro_trial", threshold: 5, label: "1 Month Pro Trial", icon: "🚀" },
+  { key: "taxgpt_unlimited", threshold: 10, label: "Unlimited TaxGPT", icon: "🧾" },
+  { key: "ambassador", threshold: 25, label: "Ambassador Badge", icon: "🏆" },
+];
+
 export function ReferralSection() {
   const { getToken, isSignedIn } = useAuth();
   const { toast } = useToast();
@@ -20,13 +27,16 @@ export function ReferralSection() {
   const [stats, setStats] = useState({ totalReferred: 0, totalConverted: 0 });
   const [badges, setBadges] = useState<{ tier: string; icon: string; threshold: number; earned: boolean }[]>([]);
   const [copied, setCopied] = useState(false);
+  const [nextMilestone, setNextMilestone] = useState<{ threshold: number; label: string; icon: string; remaining: number } | null>(null);
+  const [referralCount, setReferralCount] = useState(0);
 
   const fetchData = useCallback(async () => {
     if (!isSignedIn) return;
     try {
-      const [codeRes, badgeRes] = await Promise.all([
+      const [codeRes, badgeRes, milestoneRes] = await Promise.all([
         authFetch("/viral/referral/code", getToken),
         authFetch("/viral/referral/badges", getToken),
+        authFetch("/viral/referral/milestones", getToken),
       ]);
       if (codeRes.ok) {
         const data = await codeRes.json();
@@ -36,6 +46,17 @@ export function ReferralSection() {
       if (badgeRes.ok) {
         const data = await badgeRes.json();
         setBadges(data.badges);
+        setReferralCount(data.referralCount || 0);
+      }
+      if (milestoneRes.ok) {
+        const data = await milestoneRes.json();
+        if (data.nextMilestone) {
+          const ms = MILESTONES.find((m) => m.threshold === data.nextMilestone.threshold);
+          setNextMilestone(ms ? { ...ms, remaining: data.nextMilestone.remaining } : null);
+        } else {
+          setNextMilestone(null);
+        }
+        if (data.referralCount !== undefined) setReferralCount(data.referralCount);
       }
     } catch {}
   }, [getToken, isSignedIn]);
@@ -70,6 +91,15 @@ export function ReferralSection() {
 
   if (!isSignedIn) return null;
 
+  const progressMilestone = nextMilestone || MILESTONES[MILESTONES.length - 1];
+  const prevThreshold = (() => {
+    const idx = MILESTONES.findIndex((m) => m.threshold === progressMilestone.threshold);
+    return idx > 0 ? MILESTONES[idx - 1].threshold : 0;
+  })();
+  const progressPct = nextMilestone
+    ? Math.min(((referralCount - prevThreshold) / (progressMilestone.threshold - prevThreshold)) * 100, 100)
+    : 100;
+
   return (
     <div className="glass-panel rounded-xl p-5">
       <div className="flex items-center gap-2 mb-4">
@@ -78,7 +108,7 @@ export function ReferralSection() {
       </div>
 
       <p className="text-xs text-muted-foreground mb-4">
-        Share your link and earn referral badges. At 5 referrals, get 1 month of Pro free.
+        Share your link and unlock real features: extra signals, Pro trial, TaxGPT, and more.
       </p>
 
       {code && (
@@ -113,6 +143,47 @@ export function ReferralSection() {
         <div className="bg-white/[0.03] rounded-lg p-3 text-center border border-white/5">
           <p className="text-xl font-bold font-mono text-[#00ff88]">{stats.totalConverted}</p>
           <p className="text-[10px] text-muted-foreground uppercase">Converted</p>
+        </div>
+      </div>
+
+      <div className="mb-4 bg-white/[0.02] rounded-lg border border-white/5 p-3">
+        <div className="flex items-center justify-between mb-1.5">
+          <p className="text-xs font-semibold text-white/70 flex items-center gap-1">
+            {progressMilestone.icon} {nextMilestone ? "Next unlock" : "All milestones reached!"}
+          </p>
+          {nextMilestone && (
+            <p className="text-xs text-muted-foreground flex items-center gap-0.5">
+              <span className="font-mono font-bold text-primary">{nextMilestone.remaining}</span>
+              <ChevronRight className="w-3 h-3" />
+              <span>{progressMilestone.label}</span>
+            </p>
+          )}
+        </div>
+        <div className="w-full bg-white/5 rounded-full h-2 mb-1.5">
+          <div
+            className="h-2 rounded-full bg-gradient-to-r from-primary to-[#00ff88] transition-all duration-500"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+        {nextMilestone && (
+          <p className="text-[10px] text-muted-foreground">
+            {referralCount} / {progressMilestone.threshold} referrals — {nextMilestone.remaining} more to unlock {progressMilestone.label}
+          </p>
+        )}
+
+        <div className="mt-3 space-y-1.5">
+          {MILESTONES.map((m) => {
+            const done = referralCount >= m.threshold;
+            return (
+              <div key={m.key || m.threshold} className="flex items-center gap-2 text-xs">
+                <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold ${done ? "bg-[#00ff88] text-black" : "bg-white/10 text-white/30"}`}>
+                  {done ? "✓" : m.threshold}
+                </span>
+                <span className={done ? "text-white/70" : "text-white/30"}>{m.icon} {m.label}</span>
+                <span className="ml-auto text-[9px] text-muted-foreground/50">{m.threshold} refs</span>
+              </div>
+            );
+          })}
         </div>
       </div>
 

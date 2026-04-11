@@ -5,6 +5,7 @@ import { eq, desc, sql, count, and, like } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import crypto from "crypto";
+import { REFERRAL_MILESTONES } from "../lib/referralRewards";
 
 const router = Router();
 
@@ -66,6 +67,84 @@ router.get("/viral/referral/code", requireAuth, async (req, res) => {
   } catch (error) {
     console.error("Error getting referral code:", error);
     res.status(500).json({ error: "Failed to get referral code" });
+  }
+});
+
+router.get("/viral/referral/milestones", requireAuth, async (req, res) => {
+  const userId = (req as AuthenticatedRequest).userId;
+  try {
+    const [stats] = await db
+      .select({ converted: count() })
+      .from(referralsTable)
+      .where(and(eq(referralsTable.referrerId, userId), eq(referralsTable.converted, true)));
+
+    const referralCount = Number(stats?.converted || 0);
+
+    const [user] = await db
+      .select({
+        referralExtraSignalsUntil: usersTable.referralExtraSignalsUntil,
+        referralTaxGptUntil: usersTable.referralTaxGptUntil,
+        referralAmbassador: usersTable.referralAmbassador,
+        referralMilestonesSeen: usersTable.referralMilestonesSeen,
+      })
+      .from(usersTable)
+      .where(eq(usersTable.clerkId, userId));
+
+    const now = new Date();
+    const seenKeys: string[] = Array.isArray(user?.referralMilestonesSeen) ? (user.referralMilestonesSeen as string[]) : [];
+
+    const milestonesWithStatus = REFERRAL_MILESTONES.map((m) => {
+      const reached = referralCount >= m.threshold;
+      let unlocked = false;
+      if (m.key === "extra_signals") unlocked = !!(user?.referralExtraSignalsUntil && new Date(user.referralExtraSignalsUntil) > now);
+      else if (m.key === "pro_trial") unlocked = reached;
+      else if (m.key === "taxgpt_unlimited") unlocked = !!(user?.referralTaxGptUntil && new Date(user.referralTaxGptUntil) > now);
+      else if (m.key === "ambassador") unlocked = !!(user?.referralAmbassador);
+
+      return {
+        ...m,
+        reached,
+        unlocked,
+        seen: seenKeys.includes(m.key),
+      };
+    });
+
+    const nextMilestone = REFERRAL_MILESTONES.find((m) => referralCount < m.threshold) || null;
+    const newMilestones = milestonesWithStatus.filter((m) => m.reached && !m.seen);
+
+    res.json({
+      referralCount,
+      milestones: milestonesWithStatus,
+      nextMilestone: nextMilestone ? { ...nextMilestone, remaining: nextMilestone.threshold - referralCount } : null,
+      newMilestones,
+    });
+  } catch (error) {
+    console.error("Error getting referral milestones:", error);
+    res.status(500).json({ error: "Failed to get referral milestones" });
+  }
+});
+
+router.post("/viral/referral/milestones/seen", requireAuth, async (req, res) => {
+  const userId = (req as AuthenticatedRequest).userId;
+  const { keys } = req.body;
+  if (!Array.isArray(keys)) {
+    res.status(400).json({ error: "keys must be an array" });
+    return;
+  }
+  try {
+    const [user] = await db
+      .select({ referralMilestonesSeen: usersTable.referralMilestonesSeen })
+      .from(usersTable)
+      .where(eq(usersTable.clerkId, userId));
+
+    const existing: string[] = Array.isArray(user?.referralMilestonesSeen) ? (user.referralMilestonesSeen as string[]) : [];
+    const merged = Array.from(new Set([...existing, ...keys.filter((k: unknown) => typeof k === "string")]));
+
+    await db.update(usersTable).set({ referralMilestonesSeen: merged, updatedAt: new Date() }).where(eq(usersTable.clerkId, userId));
+    res.json({ ok: true });
+  } catch (error) {
+    console.error("Error marking milestones seen:", error);
+    res.status(500).json({ error: "Failed to mark milestones seen" });
   }
 });
 

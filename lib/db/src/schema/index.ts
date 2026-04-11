@@ -6,3 +6,4 @@ export * from "./token";
 export * from "./viral";
 export * from "./alerts";
 export * from "./analytics";
+export * from "./paperTrading";

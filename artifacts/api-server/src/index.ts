@@ -96,6 +96,48 @@ async function ensureAlertTables() {
   }
 }
 
+async function ensurePaperTradingTables() {
+  try {
+    const client = await pool.connect();
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS paper_portfolios (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL UNIQUE,
+          cash_balance REAL NOT NULL DEFAULT 100000,
+          created_at TIMESTAMPTZ DEFAULT now(),
+          updated_at TIMESTAMPTZ DEFAULT now()
+        );
+        CREATE TABLE IF NOT EXISTS paper_trades (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          symbol TEXT NOT NULL,
+          side TEXT NOT NULL,
+          quantity INTEGER NOT NULL,
+          price REAL NOT NULL,
+          total_cost REAL NOT NULL,
+          created_at TIMESTAMPTZ DEFAULT now()
+        );
+        CREATE TABLE IF NOT EXISTS paper_positions (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          symbol TEXT NOT NULL,
+          quantity INTEGER NOT NULL DEFAULT 0,
+          avg_cost REAL NOT NULL DEFAULT 0,
+          updated_at TIMESTAMPTZ DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_paper_trades_user ON paper_trades (user_id);
+        CREATE INDEX IF NOT EXISTS idx_paper_positions_user ON paper_positions (user_id);
+      `);
+      logger.info("Paper trading tables ensured");
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    logger.warn({ error: err }, "Failed to ensure paper trading tables (non-fatal)");
+  }
+}
+
 async function ensurePerformanceIndexes() {
   try {
     const client = await pool.connect();
@@ -253,6 +295,7 @@ const httpServer = server.listen(port, async () => {
   );
   await ensureDailyContentTable();
   await ensureAlertTables();
+  await ensurePaperTradingTables();
   ensurePerformanceIndexes().catch((err) =>
     logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
   );

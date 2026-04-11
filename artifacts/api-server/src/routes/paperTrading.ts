@@ -1,0 +1,191 @@
+import { Router } from "express";
+import { db } from "@workspace/db";
+import { paperPortfoliosTable, paperTradesTable, paperPositionsTable } from "@workspace/db/schema";
+import { eq, and, desc } from "drizzle-orm";
+import { requireAuth } from "../middlewares/requireAuth";
+import { resolveUserId } from "../lib/resolveUserId";
+import { logger } from "../lib/logger";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
+
+const router = Router();
+
+const STARTING_CASH = 100_000;
+
+async function ensurePortfolio(userId: string) {
+  const [existing] = await db
+    .select()
+    .from(paperPortfoliosTable)
+    .where(eq(paperPortfoliosTable.userId, userId));
+
+  if (existing) return existing;
+
+  const [created] = await db
+    .insert(paperPortfoliosTable)
+    .values({ userId, cashBalance: STARTING_CASH })
+    .returning();
+  return created;
+}
+
+async function getPositions(userId: string) {
+  return db
+    .select()
+    .from(paperPositionsTable)
+    .where(and(eq(paperPositionsTable.userId, userId)));
+}
+
+router.get("/paper-trading/portfolio", requireAuth, async (req, res) => {
+  try {
+    const clerkId = (req as AuthenticatedRequest).userId;
+    const dbUserId = await resolveUserId(clerkId, req);
+    if (!dbUserId) {
+      res.json({ cashBalance: STARTING_CASH, positions: [], trades: [], portfolioValue: 0, totalValue: STARTING_CASH });
+      return;
+    }
+
+    const portfolio = await ensurePortfolio(dbUserId);
+    const positions = await getPositions(dbUserId);
+    const trades = await db
+      .select()
+      .from(paperTradesTable)
+      .where(eq(paperTradesTable.userId, dbUserId))
+      .orderBy(desc(paperTradesTable.createdAt))
+      .limit(50);
+
+    const activePositions = positions.filter(p => p.quantity > 0);
+    const positionValue = activePositions.reduce((sum, p) => sum + (p.quantity * p.avgCost), 0);
+
+    res.json({
+      cashBalance: portfolio.cashBalance,
+      positions: activePositions,
+      trades,
+      portfolioValue: positionValue,
+      totalValue: portfolio.cashBalance + positionValue,
+    });
+  } catch (err) {
+    logger.error("Paper trading portfolio error:", err);
+    res.status(500).json({ error: "Failed to load portfolio" });
+  }
+});
+
+router.post("/paper-trading/trade", requireAuth, async (req, res) => {
+  try {
+    const clerkId = (req as AuthenticatedRequest).userId;
+    const dbUserId = await resolveUserId(clerkId, req);
+    if (!dbUserId) {
+      res.status(400).json({ error: "User not found. Please complete onboarding first." });
+      return;
+    }
+
+    const { symbol, side, quantity, price } = req.body;
+
+    if (!symbol || !side || !quantity || !price) {
+      res.status(400).json({ error: "Missing required fields: symbol, side, quantity, price" });
+      return;
+    }
+
+    if (!["buy", "sell"].includes(side)) {
+      res.status(400).json({ error: "Side must be 'buy' or 'sell'" });
+      return;
+    }
+
+    const qty = Math.floor(Number(quantity));
+    const px = Number(price);
+    if (qty <= 0 || px <= 0) {
+      res.status(400).json({ error: "Quantity and price must be positive" });
+      return;
+    }
+
+    const totalCost = qty * px;
+    const portfolio = await ensurePortfolio(dbUserId);
+
+    if (side === "buy") {
+      if (portfolio.cashBalance < totalCost) {
+        res.status(400).json({ error: `Insufficient funds. Available: $${portfolio.cashBalance.toFixed(2)}, Required: $${totalCost.toFixed(2)}` });
+        return;
+      }
+
+      await db
+        .update(paperPortfoliosTable)
+        .set({ cashBalance: portfolio.cashBalance - totalCost, updatedAt: new Date() })
+        .where(eq(paperPortfoliosTable.userId, dbUserId));
+
+      const [existingPos] = await db
+        .select()
+        .from(paperPositionsTable)
+        .where(and(eq(paperPositionsTable.userId, dbUserId), eq(paperPositionsTable.symbol, symbol.toUpperCase())));
+
+      if (existingPos) {
+        const newQty = existingPos.quantity + qty;
+        const newAvgCost = ((existingPos.quantity * existingPos.avgCost) + totalCost) / newQty;
+        await db
+          .update(paperPositionsTable)
+          .set({ quantity: newQty, avgCost: newAvgCost, updatedAt: new Date() })
+          .where(eq(paperPositionsTable.id, existingPos.id));
+      } else {
+        await db
+          .insert(paperPositionsTable)
+          .values({ userId: dbUserId, symbol: symbol.toUpperCase(), quantity: qty, avgCost: px });
+      }
+    } else {
+      const [existingPos] = await db
+        .select()
+        .from(paperPositionsTable)
+        .where(and(eq(paperPositionsTable.userId, dbUserId), eq(paperPositionsTable.symbol, symbol.toUpperCase())));
+
+      if (!existingPos || existingPos.quantity < qty) {
+        res.status(400).json({ error: `Insufficient shares. You own ${existingPos?.quantity ?? 0} shares of ${symbol.toUpperCase()}` });
+        return;
+      }
+
+      await db
+        .update(paperPortfoliosTable)
+        .set({ cashBalance: portfolio.cashBalance + totalCost, updatedAt: new Date() })
+        .where(eq(paperPortfoliosTable.userId, dbUserId));
+
+      const newQty = existingPos.quantity - qty;
+      await db
+        .update(paperPositionsTable)
+        .set({ quantity: newQty, updatedAt: new Date() })
+        .where(eq(paperPositionsTable.id, existingPos.id));
+    }
+
+    await db.insert(paperTradesTable).values({
+      userId: dbUserId,
+      symbol: symbol.toUpperCase(),
+      side,
+      quantity: qty,
+      price: px,
+      totalCost,
+    });
+
+    res.json({ success: true, message: `${side.toUpperCase()} ${qty} ${symbol.toUpperCase()} @ $${px.toFixed(2)}` });
+  } catch (err) {
+    logger.error("Paper trading error:", err);
+    res.status(500).json({ error: "Trade execution failed" });
+  }
+});
+
+router.post("/paper-trading/reset", requireAuth, async (req, res) => {
+  try {
+    const clerkId = (req as AuthenticatedRequest).userId;
+    const dbUserId = await resolveUserId(clerkId, req);
+    if (!dbUserId) {
+      res.status(400).json({ error: "User not found" });
+      return;
+    }
+
+    await db.delete(paperTradesTable).where(eq(paperTradesTable.userId, dbUserId));
+    await db.delete(paperPositionsTable).where(eq(paperPositionsTable.userId, dbUserId));
+    await db
+      .update(paperPortfoliosTable)
+      .set({ cashBalance: STARTING_CASH, updatedAt: new Date() })
+      .where(eq(paperPortfoliosTable.userId, dbUserId));
+
+    res.json({ success: true, message: "Portfolio reset to $100,000" });
+  } catch (err) {
+    logger.error("Paper trading reset error:", err);
+    res.status(500).json({ error: "Failed to reset portfolio" });
+  }
+});
+
+export default router;

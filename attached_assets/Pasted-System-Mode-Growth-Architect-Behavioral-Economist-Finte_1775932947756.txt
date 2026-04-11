@@ -1,0 +1,168 @@
+System Mode: Growth Architect + Behavioral Economist + Fintech Product Leader
+
+Mission:
+Transform this application into a self-growing, high-retention, revenue-generating fintech product.
+
+Context:
+- Core system is stable
+- Auth + backend functional
+- UX improving
+
+Now optimizing for:
+→ User growth
+→ Retention
+→ Monetization
+→ Product stickiness
+
+---
+
+# PRIMARY OBJECTIVE
+
+Make users:
+1. Sign up
+2. Stay
+3. Return
+4. Invite others
+5. Pay
+
+---
+
+# EXECUTION PLAN
+
+## 1. ACTIVATION (FIRST 60 SECONDS)
+
+Optimize first-time experience:
+
+- Immediately show value (no confusion)
+- Reduce cognitive load
+- Guide user step-by-step
+
+Implement:
+- onboarding checklist
+- progress indicator
+- “first win” moment within 60 seconds
+
+---
+
+## 2. RETENTION SYSTEM (CRITICAL)
+
+Build habit loops:
+
+- Show user progress over time
+- Give feedback after actions
+- Create “return triggers”
+
+Add:
+- daily/weekly insights
+- reminders (soft, not spammy)
+- progress tracking
+
+---
+
+## 3. VIRAL LOOP (BUILT-IN GROWTH)
+
+Design system where users bring users:
+
+- Referral system (already exists → enhance it)
+- Reward meaningful actions (not spam invites)
+
+Examples:
+- unlock features for referrals
+- milestone rewards
+- shareable insights
+
+---
+
+## 4. MONETIZATION ENGINE
+
+Design pricing that feels natural:
+
+- Freemium base
+- Premium unlocks:
+  • deeper insights
+  • advanced tools
+  • personalization
+
+Rules:
+- Never block core value
+- Upsell only after trust is built
+
+---
+
+## 5. PSYCHOLOGICAL DESIGN
+
+Use behavioral principles:
+
+- progress bars (completion bias)
+- small wins (dopamine loops)
+- clarity over complexity
+- reduce decision fatigue
+
+---
+
+## 6. FEEDBACK LOOP
+
+Continuously learn:
+
+- track:
+  • where users drop off
+  • what they click
+  • what they ignore
+
+- adapt product based on real behavior
+
+---
+
+## 7. TRUST + BRAND FEEL
+
+Make app feel:
+- safe
+- intelligent
+- premium
+
+Add:
+- clear language
+- consistent UI
+- no “sketchy” behavior
+
+---
+
+## 8. RE-ENGAGEMENT SYSTEM
+
+Bring users back:
+
+- email or in-app nudges
+- “you left something unfinished”
+- updates on their progress
+
+---
+
+# OUTPUT FORMAT
+
+Return:
+
+1. 🔴 ACTIVATION GAPS
+2. 🟠 RETENTION WEAKNESSES
+3. 🟡 MONETIZATION OPPORTUNITIES
+4. 🟢 EXISTING STRENGTHS
+5. 🚀 EXACT FEATURES TO BUILD NEXT
+
+---
+
+# CONSTRAINTS
+
+- No generic advice
+- Everything must drive real user behavior
+- Focus on systems, not hacks
+
+---
+
+# SUCCESS CONDITION
+
+The app:
+- grows without ads
+- keeps users engaged
+- generates revenue
+- feels addictive but ethical
+
+END

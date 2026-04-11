@@ -9,7 +9,8 @@ import { FearGreedGauge } from "@/components/FearGreedGauge";
 import { WatchlistPanel } from "@/components/WatchlistPanel";
 import { SignalHistory } from "@/components/SignalHistory";
 import { EconomicCalendar } from "@/components/EconomicCalendar";
-import { stockAlerts, optionsAlerts, unusualOptionsActivity, portfolioChartData, optionsIncomeData, agentLogMessages } from "@/lib/mock-data";
+import { stockAlerts, optionsAlerts, unusualOptionsActivity, optionsIncomeData, agentLogMessages } from "@/lib/mock-data";
+import { authFetch } from "@/lib/authFetch";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, ArrowDownRight, Activity, Zap, Minus, TrendingUp, Shield, RefreshCw, Search, BarChart3, X, Terminal, Globe, Layers, Clock, Keyboard, ChevronUp, ChevronDown, Eye, Trophy, Flame, Award } from "lucide-react";
 import { generateMockOHLCV, runAllIndicators, getOverallSignal } from "@/lib/indicators";
@@ -102,22 +103,22 @@ const MARKET_INTERNALS = {
   breadth: { above50sma: 62.4, above200sma: 71.2, newHighs: 148, newLows: 42 },
 };
 
-const timeRanges = ["1D", "1W", "1M", "3M"] as const;
+const STARTING_CASH = 100_000;
 
-const chartDataByRange = {
-  "1D": portfolioChartData,
-  "1W": [
-    { time: "Mon", value: 14100 }, { time: "Tue", value: 14350 }, { time: "Wed", value: 14200 },
-    { time: "Thu", value: 14680 }, { time: "Fri", value: 15100 }, { time: "Sat", value: 15300 }, { time: "Sun", value: 15620 },
-  ],
-  "1M": [
-    { time: "Wk1", value: 12500 }, { time: "Wk2", value: 13100 }, { time: "Wk3", value: 12900 },
-    { time: "Wk4", value: 14200 }, { time: "Now", value: 15620 },
-  ],
-  "3M": [
-    { time: "Jan", value: 10200 }, { time: "Feb", value: 11400 }, { time: "Mar", value: 12800 },
-    { time: "Apr", value: 13500 }, { time: "May", value: 14100 }, { time: "Jun", value: 15620 },
-  ],
+interface PaperPortfolio {
+  cashBalance: number;
+  positions: { id: number; symbol: string; quantity: number; avgCost: number }[];
+  trades: { id: number; symbol: string; side: string; quantity: number; price: number; totalCost: number; createdAt: string }[];
+  portfolioValue: number;
+  totalValue: number;
+}
+
+const emptyPortfolio: PaperPortfolio = {
+  cashBalance: STARTING_CASH,
+  positions: [],
+  trades: [],
+  portfolioValue: 0,
+  totalValue: STARTING_CASH,
 };
 
 function PanelHeader({ title, icon, color = "cyan", rightContent }: { title: string; icon?: React.ReactNode; color?: string; rightContent?: React.ReactNode }) {
@@ -232,7 +233,14 @@ function GamificationBar() {
 
 export default function Dashboard() {
   const { toast } = useToast();
-  const [chartRange, setChartRange] = useState<typeof timeRanges[number]>("1D");
+  const { isSignedIn, getToken } = useAuth();
+  const [portfolio, setPortfolio] = useState<PaperPortfolio>(emptyPortfolio);
+  const [tradeSymbol, setTradeSymbol] = useState("");
+  const [tradeQty, setTradeQty] = useState("");
+  const [tradePrice, setTradePrice] = useState("");
+  const [tradeSide, setTradeSide] = useState<"buy" | "sell">("buy");
+  const [tradeLoading, setTradeLoading] = useState(false);
+  const [showTradePanel, setShowTradePanel] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [quickAnalysis, setQuickAnalysis] = useState<QuickAnalysis | null>(null);
@@ -247,6 +255,71 @@ export default function Dashboard() {
   const qaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { trackEvent("dashboard_viewed"); }, []);
+
+  const loadPortfolio = useCallback(async () => {
+    if (!isSignedIn) return;
+    try {
+      const res = await authFetch("/paper-trading/portfolio", getToken);
+      if (res.ok) {
+        const data = await res.json();
+        setPortfolio(data);
+      }
+    } catch { /* not signed in or auth error */ }
+  }, [isSignedIn, getToken]);
+
+  useEffect(() => { loadPortfolio(); }, [loadPortfolio]);
+
+  const executeTrade = useCallback(async () => {
+    if (!tradeSymbol.trim() || !tradeQty || !tradePrice) {
+      toast({ title: "Missing fields", description: "Enter symbol, quantity, and price", variant: "destructive" });
+      return;
+    }
+    setTradeLoading(true);
+    try {
+      const res = await authFetch("/paper-trading/trade", getToken, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ symbol: tradeSymbol.toUpperCase(), side: tradeSide, quantity: Number(tradeQty), price: Number(tradePrice) }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast({ title: "Trade Executed", description: data.message });
+        setTradeSymbol("");
+        setTradeQty("");
+        setTradePrice("");
+        loadPortfolio();
+      } else {
+        toast({ title: "Trade Failed", description: data.error, variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Trade Failed", description: "Please sign in to trade", variant: "destructive" });
+    } finally {
+      setTradeLoading(false);
+    }
+  }, [tradeSymbol, tradeQty, tradePrice, tradeSide, getToken, toast, loadPortfolio]);
+
+  const resetPortfolio = useCallback(async () => {
+    try {
+      const res = await authFetch("/paper-trading/reset", getToken, { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        toast({ title: "Portfolio Reset", description: data.message });
+        loadPortfolio();
+      }
+    } catch {
+      toast({ title: "Reset Failed", description: "Please try again", variant: "destructive" });
+    }
+  }, [getToken, toast, loadPortfolio]);
+
+  const portfolioValueDisplay = portfolio.portfolioValue;
+  const pnl = portfolio.totalValue - STARTING_CASH;
+  const pnlPct = ((pnl / STARTING_CASH) * 100).toFixed(2);
+  const portfolioChartPoints = portfolio.trades.length > 0
+    ? portfolio.trades.slice().reverse().slice(0, 8).map((t, i) => ({
+        time: new Date(t.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        value: STARTING_CASH + (pnl * ((i + 1) / Math.max(portfolio.trades.length, 1))),
+      }))
+    : [{ time: "Now", value: 0 }];
 
   useEffect(() => {
     const update = () => {
@@ -312,8 +385,6 @@ export default function Dashboard() {
     }, 700);
   }, [toast]);
 
-  const currentChartData = chartDataByRange[chartRange];
-  const pctChange = ((currentChartData[currentChartData.length - 1].value - currentChartData[0].value) / currentChartData[0].value * 100).toFixed(1);
   const todayOptionsIncome = optionsIncomeData[optionsIncomeData.length - 1].income;
 
   const isMarketOpen = (() => {
@@ -420,7 +491,7 @@ export default function Dashboard() {
       <div className="px-2 py-2 bg-[#020204]">
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1.5 mb-2">
           {[
-            { label: "PORTFOLIO", value: `${Number(pctChange) >= 0 ? '+' : ''}${pctChange}%`, sub: "$15,620", color: Number(pctChange) >= 0 ? "#00ff88" : "#ff3366" },
+            { label: "PORTFOLIO", value: `${pnl >= 0 ? '+' : ''}${pnlPct}%`, sub: `$${portfolio.totalValue.toLocaleString(undefined, {maximumFractionDigits: 0})}`, color: pnl >= 0 ? "#00ff88" : "#ff3366" },
             { label: "OPTIONS P&L", value: `+$${todayOptionsIncome}`, sub: "Theta today", color: "#FFD700" },
             { label: "WIN RATE", value: "80%", sub: "Last 10 signals", color: "#9c27b0" },
             { label: "RISK LEVEL", value: "8.4%", sub: "Exposure", color: "#00ff88" },
@@ -499,35 +570,99 @@ export default function Dashboard() {
 
               <div className="col-span-12 lg:col-span-7">
                 <BloombergPanel>
-                  <PanelHeader title="PORTFOLIO VALUE" icon={<TrendingUp className="w-3 h-3" />} color="green" rightContent={
-                    <div className="flex items-center gap-1">
-                      {timeRanges.map(r => (
-                        <button key={r} onClick={() => setChartRange(r)}
-                          className={`px-1.5 py-0.5 text-[8px] font-mono font-bold rounded-sm transition-colors ${chartRange === r ? 'bg-[#00D4FF]/20 text-[#00D4FF]' : 'text-white/20 hover:text-white/40'}`}>
-                          {r}
-                        </button>
-                      ))}
-                      <span className={`ml-2 text-[10px] font-mono font-bold ${Number(pctChange) >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>
-                        {Number(pctChange) >= 0 ? '+' : ''}{pctChange}%
+                  <PanelHeader title="PAPER PORTFOLIO" icon={<TrendingUp className="w-3 h-3" />} color="green" rightContent={
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] font-mono text-white/30">$100K STARTING CASH</span>
+                      <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>
+                        {pnl >= 0 ? '+' : ''}{pnlPct}%
                       </span>
+                      <button onClick={() => setShowTradePanel(v => !v)} className="px-1.5 py-0.5 text-[8px] font-mono font-bold bg-[#00D4FF]/10 text-[#00D4FF] rounded-sm hover:bg-[#00D4FF]/20 transition-colors">
+                        {showTradePanel ? "CHART" : "TRADE"}
+                      </button>
                     </div>
                   } />
                   <div className="p-2">
-                    <ResponsiveContainer width="100%" height={180}>
-                      <AreaChart data={currentChartData}>
-                        <defs>
-                          <linearGradient id="pgBB" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#00D4FF" stopOpacity={0.2} />
-                            <stop offset="95%" stopColor="#00D4FF" stopOpacity={0} />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
-                        <XAxis dataKey="time" tick={{ fill: '#333', fontSize: 9, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fill: '#333', fontSize: 9, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(1)}k`} domain={['dataMin - 200', 'dataMax + 200']} width={45} />
-                        <Tooltip contentStyle={{ background: '#0a0a0f', border: '1px solid rgba(0,212,255,0.15)', borderRadius: 2, color: '#fff', fontSize: 10, fontFamily: 'JetBrains Mono' }} formatter={(value: number) => [`$${value.toLocaleString()}`, '']} />
-                        <Area type="monotone" dataKey="value" stroke="#00D4FF" strokeWidth={1.5} fill="url(#pgBB)" />
-                      </AreaChart>
-                    </ResponsiveContainer>
+                    {showTradePanel ? (
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-4 gap-1.5">
+                          <div className="bg-white/[0.03] rounded-sm p-2 text-center">
+                            <p className="text-[8px] font-mono text-white/30">CASH</p>
+                            <p className="text-[11px] font-mono font-bold text-[#00ff88]">${portfolio.cashBalance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                          </div>
+                          <div className="bg-white/[0.03] rounded-sm p-2 text-center">
+                            <p className="text-[8px] font-mono text-white/30">POSITIONS</p>
+                            <p className="text-[11px] font-mono font-bold text-[#00D4FF]">${portfolioValueDisplay.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                          </div>
+                          <div className="bg-white/[0.03] rounded-sm p-2 text-center">
+                            <p className="text-[8px] font-mono text-white/30">TOTAL</p>
+                            <p className="text-[11px] font-mono font-bold text-white">${portfolio.totalValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                          </div>
+                          <div className="bg-white/[0.03] rounded-sm p-2 text-center">
+                            <p className="text-[8px] font-mono text-white/30">P&L</p>
+                            <p className={`text-[11px] font-mono font-bold ${pnl >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>{pnl >= 0 ? '+' : ''}${pnl.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          <button onClick={() => setTradeSide("buy")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00ff88]/20 text-[#00ff88] border border-[#00ff88]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>BUY</button>
+                          <button onClick={() => setTradeSide("sell")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "sell" ? "bg-[#ff3366]/20 text-[#ff3366] border border-[#ff3366]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>SELL</button>
+                        </div>
+                        <div className="grid grid-cols-3 gap-1">
+                          <input value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30" />
+                          <input value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30" />
+                          <input value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30" />
+                        </div>
+                        <div className="flex gap-1">
+                          <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} className={`flex-1 h-7 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00ff88] text-black hover:bg-[#00ff88]/80" : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"} disabled:opacity-40`}>
+                            {tradeLoading ? "EXECUTING..." : `${tradeSide.toUpperCase()} ORDER`}
+                          </button>
+                          <button onClick={resetPortfolio} className="px-2 h-7 text-[9px] font-mono font-bold text-white/30 bg-white/[0.03] border border-white/[0.06] rounded-sm hover:text-white/50 transition-colors">
+                            RESET
+                          </button>
+                        </div>
+                        {portfolio.positions.length > 0 && (
+                          <div className="border-t border-white/[0.06] pt-1.5">
+                            <p className="text-[8px] font-mono text-white/25 mb-1">OPEN POSITIONS</p>
+                            {portfolio.positions.map(p => (
+                              <div key={p.id} className="flex items-center justify-between py-0.5">
+                                <span className="text-[10px] font-mono font-bold text-[#00D4FF]">{p.symbol}</span>
+                                <span className="text-[9px] font-mono text-white/40">{p.quantity} shares @ ${p.avgCost.toFixed(2)}</span>
+                                <span className="text-[9px] font-mono text-white/60">${(p.quantity * p.avgCost).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {!isSignedIn && <p className="text-[9px] font-mono text-[#FFD700] text-center">Sign in to start paper trading</p>}
+                      </div>
+                    ) : (
+                      <div>
+                        {portfolio.trades.length === 0 ? (
+                          <div className="flex flex-col items-center justify-center h-[180px] text-center">
+                            <TrendingUp className="w-8 h-8 text-white/10 mb-2" />
+                            <p className="text-[11px] font-mono text-white/30">$0.00 Portfolio Value</p>
+                            <p className="text-[9px] font-mono text-white/15 mt-1">Place your first paper trade to start tracking</p>
+                            <button onClick={() => setShowTradePanel(true)} className="mt-2 px-3 py-1 text-[9px] font-mono font-bold text-[#00D4FF] bg-[#00D4FF]/10 rounded-sm hover:bg-[#00D4FF]/20 transition-colors">
+                              START TRADING
+                            </button>
+                          </div>
+                        ) : (
+                          <ResponsiveContainer width="100%" height={180}>
+                            <AreaChart data={portfolioChartPoints}>
+                              <defs>
+                                <linearGradient id="pgBB" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor={pnl >= 0 ? "#00ff88" : "#ff3366"} stopOpacity={0.2} />
+                                  <stop offset="95%" stopColor={pnl >= 0 ? "#00ff88" : "#ff3366"} stopOpacity={0} />
+                                </linearGradient>
+                              </defs>
+                              <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
+                              <XAxis dataKey="time" tick={{ fill: '#333', fontSize: 9, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} />
+                              <YAxis tick={{ fill: '#333', fontSize: 9, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(1)}k`} domain={['dataMin - 500', 'dataMax + 500']} width={45} />
+                              <Tooltip contentStyle={{ background: '#0a0a0f', border: '1px solid rgba(0,212,255,0.15)', borderRadius: 2, color: '#fff', fontSize: 10, fontFamily: 'JetBrains Mono' }} formatter={(value: number) => [`$${value.toLocaleString()}`, '']} />
+                              <Area type="monotone" dataKey="value" stroke={pnl >= 0 ? "#00ff88" : "#ff3366"} strokeWidth={1.5} fill="url(#pgBB)" />
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </BloombergPanel>
               </div>

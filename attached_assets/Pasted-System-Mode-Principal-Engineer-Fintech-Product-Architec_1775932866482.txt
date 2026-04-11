@@ -1,0 +1,196 @@
+System Mode: Principal Engineer + Fintech Product Architect + Reliability Lead
+
+Mission:
+Upgrade this application from “working” to “elite production-grade fintech system” with strong UX, resilience, and intelligent behavior.
+
+Context:
+- Clerk auth fully integrated
+- Backend (Express) stabilized
+- User sync issues resolved
+- Errors now logged properly
+
+We are now optimizing for:
+→ Reliability under stress
+→ Elite UX quality
+→ Intelligent system behavior
+→ Long-term scalability
+
+---
+
+# PRIMARY OBJECTIVE
+
+Make the app feel:
+- Fast
+- Stable
+- Predictable
+- Trustworthy
+- High-end (like top fintech apps)
+
+---
+
+# EXECUTION PLAN
+
+## 1. RESILIENCE + FAIL-SAFE SYSTEMS
+
+Implement:
+
+- Global API error handler (frontend + backend)
+- Retry logic for failed API calls (authFetch)
+- Graceful fallback UI for:
+  • failed requests
+  • missing data
+  • slow responses
+
+MANDATORY:
+- No blank screens
+- No silent UI failures
+- Every failure must show user-safe feedback
+
+---
+
+## 2. SMART authFetch UPGRADE
+
+Enhance authFetch:
+
+- Auto-retry once on token failure
+- Detect 401 → refresh session → retry
+- Timeout protection (abort long requests)
+- Structured error return (not just throw)
+
+---
+
+## 3. LOADING + UX PERCEPTION
+
+Add:
+
+- Skeleton loaders for all data-driven pages
+- Loading states for ALL buttons
+- Disable buttons during API calls
+
+Goal:
+User should NEVER feel “nothing is happening”
+
+---
+
+## 4. STATE CONSISTENCY
+
+Ensure:
+
+- Global user state is always synced
+- No flicker between logged-out/logged-in UI
+- Cache user data intelligently
+
+---
+
+## 5. PERFORMANCE OPTIMIZATION
+
+- Identify unnecessary re-renders
+- Lazy load heavy components
+- Optimize API call frequency
+
+---
+
+## 6. EVENT TRACKING SYSTEM
+
+Implement:
+
+Track:
+- login
+- signup
+- button clicks
+- failures
+- drop-off points
+
+Store:
+- userId
+- event name
+- timestamp
+- context
+
+Goal:
+Understand how users actually behave
+
+---
+
+## 7. UX POLISH (THIS IS WHAT MAKES APPS FEEL “TOP 3”)
+
+Audit entire UI:
+
+- Fix:
+  • inconsistent spacing
+  • poor alignment
+  • weak typography
+  • unclear buttons
+
+- Improve:
+  • button labels (clear actions)
+  • error messages (human language)
+  • onboarding clarity
+
+---
+
+## 8. EDGE CASE HANDLING
+
+Test and fix:
+
+- rapid clicking
+- double submissions
+- slow network
+- expired session mid-action
+
+---
+
+## 9. TRUST SIGNALS (CRITICAL FOR FINTECH)
+
+Add:
+
+- “Secure connection” indicators
+- “Data is protected” messaging
+- Clear identity display (user avatar/email)
+- Confirmation feedback after actions
+
+---
+
+## 10. SYSTEM HEALTH CHECK
+
+Build a lightweight internal check:
+
+- API health
+- DB connectivity
+- auth status
+
+Expose simple status for debugging
+
+---
+
+# OUTPUT FORMAT
+
+Return:
+
+1. 🔴 CRITICAL UX/LOGIC GAPS
+2. 🟠 RELIABILITY RISKS
+3. 🟡 PERFORMANCE ISSUES
+4. 🟢 STRONG AREAS
+5. 🛠 EXACT IMPLEMENTATION STEPS
+
+---
+
+# CONSTRAINTS
+
+- No vague advice
+- No “nice to have” fluff
+- Everything must improve real user experience
+- Think like millions of users will use this
+
+---
+
+# SUCCESS CONDITION
+
+The app must:
+- Never feel broken
+- Never confuse the user
+- Always respond clearly
+- Feel fast and intentional
+- Build trust instantly
+
+END

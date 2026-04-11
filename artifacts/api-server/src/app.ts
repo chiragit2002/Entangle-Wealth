@@ -71,6 +71,13 @@ app.use(clerkMiddleware());
 app.use("/api/taxgpt", aiLimiter);
 app.use("/api/analyze-document", aiLimiter);
 app.use("/api/analyze", aiLimiter);
+app.use("/api/marketing/generate", rateLimit({
+  windowMs: 60 * 1000,
+  limit: 5,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { error: "Marketing AI rate limit exceeded. Max 5 requests per minute." },
+}));
 
 app.use(seoRouter);
 app.use("/api", router);

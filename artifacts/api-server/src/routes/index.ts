@@ -14,6 +14,7 @@ import alpacaRouter from "./alpaca";
 import newsRouter from "./news";
 import gamificationRouter from "./gamification";
 import tokenRouter from "./token";
+import marketingRouter from "./marketing";
 
 const router: IRouter = Router();
 
@@ -32,5 +33,6 @@ router.use(alpacaRouter);
 router.use(newsRouter);
 router.use(gamificationRouter);
 router.use(tokenRouter);
+router.use(marketingRouter);
 
 export default router;

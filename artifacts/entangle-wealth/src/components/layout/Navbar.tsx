@@ -53,6 +53,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/rewards", label: "Rewards", desc: "Monthly distributions" },
       { href: "/marketplace", label: "Travel", desc: "Book with ENTGL" },
       { href: "/token-admin", label: "Admin", desc: "Token management" },
+      { href: "/marketing", label: "Marketing AI", desc: "9-agent command center" },
     ],
   },
   {
@@ -115,6 +116,7 @@ const MOBILE_SECTIONS = [
       { href: "/rewards", label: "Rewards" },
       { href: "/marketplace", label: "Travel" },
       { href: "/token-admin", label: "Admin" },
+      { href: "/marketing", label: "Marketing AI" },
     ],
   },
   {

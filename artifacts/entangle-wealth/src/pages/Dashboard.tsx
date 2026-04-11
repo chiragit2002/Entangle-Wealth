@@ -322,7 +322,7 @@ export default function Dashboard() {
             </span>
           </div>
           <div className="h-3 w-px bg-white/10" />
-          <span className="text-[9px] font-mono text-white/30">6 AI MODELS ACTIVE</span>
+          <span className="text-[9px] font-mono text-white/30">DEMO MODE · SIMULATED DATA</span>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">

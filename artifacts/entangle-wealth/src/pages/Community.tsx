@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,8 @@ import { Users, MessageSquare, Calendar, Briefcase, CreditCard, Plus, ThumbsUp, 
 import { ReferralSection } from "@/components/viral/ReferralSection";
 import { TestimonialForm } from "@/components/viral/TestimonialForm";
 import { trackEvent } from "@/lib/trackEvent";
+import { useAuth } from "@clerk/react";
+import { authFetch } from "@/lib/authFetch";
 
 type Tab = "communities" | "feed" | "events" | "jobs" | "pricing";
 
@@ -118,7 +120,17 @@ function sanitize(str: string): string {
 
 export default function Community() {
   const { toast } = useToast();
+  const { getToken, isSignedIn } = useAuth();
+  const [referralCode, setReferralCode] = useState("");
   const [tab, setTab] = useState<Tab>("communities");
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+    authFetch("/viral/referral/code", getToken)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data?.code) setReferralCode(data.code); })
+      .catch(() => {});
+  }, [isSignedIn, getToken]);
   const [commFilter, setCommFilter] = useState("all");
   const [jobFilter, setJobFilter] = useState("all");
   const [jobSearch, setJobSearch] = useState("");
@@ -384,7 +396,15 @@ export default function Community() {
                       <MessageCircle className="w-4 h-4" /> {p.comments}
                     </button>
                     <button
-                      onClick={() => toast({ title: "Link copied", description: "Post link copied to clipboard." })}
+                      onClick={async () => {
+                        const postUrl = `${window.location.origin}/community?post=${p.id}`;
+                        try {
+                          await navigator.clipboard.writeText(postUrl);
+                          toast({ title: "Link copied", description: "Post link copied to clipboard." });
+                        } catch {
+                          toast({ title: "Could not copy link", description: "Please copy manually: " + postUrl, variant: "destructive" });
+                        }
+                      }}
                       className="flex items-center gap-1.5 text-xs text-[#555] hover:text-primary min-h-[36px] px-2 transition-colors"
                     >
                       <Share2 className="w-4 h-4" /> Share
@@ -538,8 +558,8 @@ export default function Community() {
                   <p key={i} className="text-[13px] text-[#aaa] py-2 border-b border-white/5 last:border-0">✅ {f}</p>
                 ))}
               </div>
-              <Button className="w-full mt-4 bg-gradient-to-r from-secondary to-[#cc9900] text-black font-bold min-h-[44px]" onClick={() => toast({ title: "Free trial started", description: "You now have 30 days of Pro access." })}>
-                Start Free 30-Day Trial
+              <Button className="w-full mt-4 bg-gradient-to-r from-secondary to-[#cc9900] text-black font-bold min-h-[44px]" onClick={() => { window.location.href = "/pricing"; }}>
+                Start Free 30-Day Trial →
               </Button>
             </div>
 
@@ -552,8 +572,8 @@ export default function Community() {
                   <p key={i} className="text-[13px] text-[#aaa] py-2 border-b border-white/5 last:border-0">✅ {f}</p>
                 ))}
               </div>
-              <Button className="w-full mt-4 bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold min-h-[44px]" onClick={() => toast({ title: "Free trial started", description: "You now have 30 days of Business access." })}>
-                Start Free 30-Day Trial
+              <Button className="w-full mt-4 bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold min-h-[44px]" onClick={() => { window.location.href = "/pricing"; }}>
+                Start Free 30-Day Trial →
               </Button>
             </div>
 
@@ -570,7 +590,23 @@ export default function Community() {
             <div className="glass-panel rounded-xl p-5 mb-4">
               <p className="text-sm font-bold text-secondary mb-3">Revenue Share Program</p>
               <p className="text-[13px] text-[#777] leading-relaxed mb-3">Refer friends and earn 20% of their subscription every month for life. Build your own income stream by sharing what already helps you.</p>
-              <Button className="w-full bg-gradient-to-r from-secondary to-[#cc9900] text-black font-bold min-h-[44px]" onClick={() => toast({ title: "Link copied", description: "Your referral link has been copied to clipboard." })}>
+              <Button className="w-full bg-gradient-to-r from-secondary to-[#cc9900] text-black font-bold min-h-[44px]" onClick={async () => {
+                if (!isSignedIn) {
+                  toast({ title: "Sign in required", description: "Please sign in to get your referral link." });
+                  return;
+                }
+                if (!referralCode) {
+                  toast({ title: "Loading...", description: "Your referral code is being generated. Please try again." });
+                  return;
+                }
+                const link = `${window.location.origin}?ref=${referralCode}`;
+                try {
+                  await navigator.clipboard.writeText(link);
+                  toast({ title: "Link copied", description: "Your referral link has been copied to clipboard." });
+                } catch {
+                  toast({ title: "Could not copy link", description: "Please copy manually: " + link, variant: "destructive" });
+                }
+              }}>
                 Get Your Referral Link
               </Button>
             </div>

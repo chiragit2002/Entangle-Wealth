@@ -113,6 +113,7 @@ export interface ChatMessage {
   role: "user" | "ai";
   text: string;
   timestamp: number;
+  source?: "ai" | "cached";
 }
 
 export const ENTITY_LABELS: Record<EntityType, string> = {

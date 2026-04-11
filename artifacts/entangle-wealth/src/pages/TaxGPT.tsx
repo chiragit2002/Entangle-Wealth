@@ -174,16 +174,16 @@ export default function TaxGPT() {
       if (res.ok) {
         const data = await res.json();
         const answer = data.answer + (data.answer.includes("Disclaimer") ? "" : "\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice. Consult a licensed CPA for your specific situation.");
-        setMessages(prev => [...prev, { role: "ai", text: answer, timestamp: Date.now() }]);
+        setMessages(prev => [...prev, { role: "ai", text: answer, timestamp: Date.now(), source: "ai" as const }]);
       } else if (res.status === 429) {
-        setMessages(prev => [...prev, { role: "ai", text: "You're sending questions too quickly. Please wait a moment and try again.\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice.", timestamp: Date.now() }]);
+        setMessages(prev => [...prev, { role: "ai", text: "You're sending questions too quickly. Please wait a moment and try again.\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice.", timestamp: Date.now(), source: "ai" as const }]);
       } else {
         const fallback = getLocalResponse(question);
-        setMessages(prev => [...prev, { role: "ai", text: fallback + "\n\n*Note: AI service temporarily unavailable. Showing cached response.*", timestamp: Date.now() }]);
+        setMessages(prev => [...prev, { role: "ai", text: fallback, timestamp: Date.now(), source: "cached" as const }]);
       }
     } catch {
       const fallback = getLocalResponse(question);
-      setMessages(prev => [...prev, { role: "ai", text: fallback + "\n\n*Note: Could not reach AI service. Showing cached response.*", timestamp: Date.now() }]);
+      setMessages(prev => [...prev, { role: "ai", text: fallback, timestamp: Date.now(), source: "cached" as const }]);
     }
     setLoading(false);
   };
@@ -232,8 +232,25 @@ export default function TaxGPT() {
               <div key={i} className={`rounded-xl p-3 text-[14px] leading-relaxed max-w-[90%] whitespace-pre-line ${
                 msg.role === "user"
                   ? "ml-auto bg-[rgba(0,200,248,0.1)] border border-[rgba(0,200,248,0.15)] text-right"
+                  : msg.source === "cached"
+                  ? "bg-[rgba(255,183,0,0.04)] border border-[rgba(255,183,0,0.2)]"
                   : "bg-[rgba(156,39,176,0.06)] border border-[rgba(156,39,176,0.15)]"
               }`}>
+                {msg.source === "cached" && (
+                  <div className="flex items-center gap-1.5 mb-2 pb-2 border-b border-[rgba(255,183,0,0.15)]">
+                    <AlertTriangle className="w-3.5 h-3.5 text-[#ffb800]" />
+                    <span className="text-[10px] font-bold text-[#ffb800] uppercase tracking-wider">Cached Response · AI Unavailable</span>
+                  </div>
+                )}
+                {msg.source === "ai" && msg.role === "ai" && (
+                  <div className="flex items-center gap-1.5 mb-2 pb-2 border-b border-[rgba(156,39,176,0.15)]">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00e676] opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00e676]" />
+                    </span>
+                    <span className="text-[10px] font-bold text-[#00e676] uppercase tracking-wider">AI Response</span>
+                  </div>
+                )}
                 {msg.text}
               </div>
             ))}

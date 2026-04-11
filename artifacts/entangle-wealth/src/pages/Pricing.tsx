@@ -89,6 +89,7 @@ export default function Pricing() {
   const { getToken } = useAuth();
   const [products, setProducts] = useState<StripeProduct[]>([]);
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
+  const [referralCode, setReferralCode] = useState("");
 
   useEffect(() => { trackEvent("upgrade_modal_shown"); }, []);
 
@@ -98,6 +99,14 @@ export default function Pricing() {
       .then(setProducts)
       .catch(err => { if (import.meta.env.DEV) console.error('Failed to fetch Stripe products:', err); });
   }, []);
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+    authFetch("/viral/referral/code", getToken)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data?.code) setReferralCode(data.code); })
+      .catch(() => {});
+  }, [isSignedIn, getToken]);
 
   const fetchAuth = useCallback(
     (path: string, options: RequestInit = {}) => authFetch(path, getToken, options),
@@ -230,7 +239,23 @@ export default function Pricing() {
             Earn <strong className="text-[#f5c842]">20% monthly</strong> for every person you refer. For life. Build your own income stream.
           </p>
           <Button
-            onClick={() => toast({ title: "Referral link copied!" })}
+            onClick={async () => {
+              if (!isSignedIn) {
+                toast({ title: "Sign in required", description: "Please sign in to get your referral link." });
+                return;
+              }
+              if (!referralCode) {
+                toast({ title: "Loading...", description: "Your referral code is being generated. Please try again." });
+                return;
+              }
+              const link = `${window.location.origin}?ref=${referralCode}`;
+              try {
+                await navigator.clipboard.writeText(link);
+                toast({ title: "Referral link copied!", description: link });
+              } catch {
+                toast({ title: "Could not copy link", description: "Please copy manually: " + link, variant: "destructive" });
+              }
+            }}
             className="bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black font-bold hover:opacity-90 h-12 px-8"
           >
             Get Your Referral Link

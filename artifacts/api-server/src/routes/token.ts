@@ -123,7 +123,7 @@ router.get("/token/balance", requireAuth, async (req, res) => {
 
 router.get("/token/transactions", requireAuth, async (req, res) => {
   const userId = (req as any).userId;
-  const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
+  const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
   const offset = parseInt(req.query.offset as string) || 0;
 
   try {
@@ -147,6 +147,8 @@ router.get("/token/transactions", requireAuth, async (req, res) => {
 
 router.get("/token/rewards", requireAuth, async (req, res) => {
   const userId = (req as any).userId;
+  const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
+  const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
 
   try {
     const [user] = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.clerkId, userId));
@@ -156,7 +158,9 @@ router.get("/token/rewards", requireAuth, async (req, res) => {
       .select()
       .from(rewardDistributionsTable)
       .where(eq(rewardDistributionsTable.userId, user.id))
-      .orderBy(desc(rewardDistributionsTable.createdAt));
+      .orderBy(desc(rewardDistributionsTable.createdAt))
+      .limit(limit)
+      .offset(offset);
 
     res.json(rewards);
   } catch (error) {
@@ -165,8 +169,10 @@ router.get("/token/rewards", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/token/rewards/history", async (_req, res) => {
+router.get("/token/rewards/history", async (req, res) => {
   try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
+    const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
     const distributions = await db
       .select({
         month: rewardDistributionsTable.month,
@@ -181,7 +187,8 @@ router.get("/token/rewards/history", async (_req, res) => {
       .from(rewardDistributionsTable)
       .leftJoin(usersTable, eq(rewardDistributionsTable.userId, usersTable.id))
       .orderBy(desc(rewardDistributionsTable.createdAt), rewardDistributionsTable.rank)
-      .limit(500);
+      .limit(limit)
+      .offset(offset);
 
     const grouped: Record<string, any[]> = {};
     for (const d of distributions) {
@@ -206,6 +213,8 @@ router.get("/token/rewards/history", async (_req, res) => {
 
 router.get("/token/bookings", requireAuth, async (req, res) => {
   const userId = (req as any).userId;
+  const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
+  const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
 
   try {
     const [user] = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.clerkId, userId));
@@ -215,7 +224,9 @@ router.get("/token/bookings", requireAuth, async (req, res) => {
       .select()
       .from(travelBookingsTable)
       .where(eq(travelBookingsTable.userId, user.id))
-      .orderBy(desc(travelBookingsTable.createdAt));
+      .orderBy(desc(travelBookingsTable.createdAt))
+      .limit(limit)
+      .offset(offset);
 
     res.json(bookings);
   } catch (error) {

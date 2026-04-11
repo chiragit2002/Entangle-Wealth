@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
 import { useUser, useAuth, useClerk } from "@clerk/react";
-import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target, Wallet, Coins, Users, Fingerprint, Upload, X, Image } from "lucide-react";
+import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target, Wallet, Coins, Users, Fingerprint, Upload, X, Image, Building2 } from "lucide-react";
 import { ReferralSection } from "@/components/viral/ReferralSection";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -39,6 +39,9 @@ interface ProfileData {
   isPublicProfile: boolean;
   kycStatus: string;
   subscriptionTier: string;
+  isBusinessOwner?: boolean;
+  businessDocStatus?: string;
+  businessDocRejectionReason?: string | null;
 }
 
 interface SavedJob {
@@ -142,6 +145,12 @@ export default function Profile() {
   const [uploadProgress, setUploadProgress] = useState<{ idPhoto: number; selfie: number }>({ idPhoto: 0, selfie: 0 });
   const [dragActive, setDragActive] = useState<"id" | "selfie" | null>(null);
   const [passkeyRegistering, setPasskeyRegistering] = useState(false);
+  const [showBusinessDocUpload, setShowBusinessDocUpload] = useState(false);
+  const [businessDocFiles, setBusinessDocFiles] = useState<File[]>([]);
+  const [businessDocPreviews, setBusinessDocPreviews] = useState<string[]>([]);
+  const [submittingBusinessDocs, setSubmittingBusinessDocs] = useState(false);
+  const [businessDocDragActive, setBusinessDocDragActive] = useState(false);
+  const businessDocInputRef = useRef<HTMLInputElement>(null);
   const idPhotoRef = useRef<HTMLInputElement>(null);
   const selfieRef = useRef<HTMLInputElement>(null);
   const { client: clerkClient } = useClerk();
@@ -201,6 +210,9 @@ export default function Profile() {
             isPublicProfile: data.isPublicProfile ?? true,
             kycStatus: data.kycStatus || "not_started",
             subscriptionTier: data.subscriptionTier || "free",
+            isBusinessOwner: data.isBusinessOwner ?? false,
+            businessDocStatus: data.businessDocStatus || "not_started",
+            businessDocRejectionReason: data.businessDocRejectionReason ?? null,
           });
         }
       }
@@ -381,6 +393,95 @@ export default function Profile() {
     } finally {
       setSubmittingKyc(false);
       setUploadingKycDocs(false);
+    }
+  };
+
+  const handleBusinessDocFileAdd = (files: FileList | null) => {
+    if (!files) return;
+    const allowed = ["image/jpeg", "image/png", "image/jpg", "image/webp", "application/pdf"];
+    for (const file of Array.from(files)) {
+      if (!allowed.includes(file.type)) {
+        toast({ title: "Invalid file type", description: "Please upload JPG, PNG, WebP, or PDF.", variant: "destructive" });
+        continue;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast({ title: "File too large", description: "Max 10MB per file.", variant: "destructive" });
+        continue;
+      }
+      if (businessDocFiles.length >= 3) {
+        toast({ title: "Max 3 documents", description: "You can upload up to 3 documents.", variant: "destructive" });
+        break;
+      }
+      const preview = file.type.startsWith("image/") ? URL.createObjectURL(file) : "";
+      setBusinessDocFiles(prev => [...prev, file]);
+      setBusinessDocPreviews(prev => [...prev, preview]);
+    }
+  };
+
+  const removeBusinessDoc = (idx: number) => {
+    setBusinessDocFiles(prev => { const c = [...prev]; c.splice(idx, 1); return c; });
+    setBusinessDocPreviews(prev => {
+      const c = [...prev];
+      if (c[idx]) URL.revokeObjectURL(c[idx]);
+      c.splice(idx, 1);
+      return c;
+    });
+  };
+
+  const uploadBusinessDocFile = async (file: File): Promise<string | null> => {
+    try {
+      const urlRes = await fetchAuth("/storage/uploads/request-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
+      });
+      if (!urlRes.ok) return null;
+      const { uploadURL, objectPath } = await urlRes.json();
+      const uploadRes = await fetch(uploadURL as string, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      if (!uploadRes.ok) return null;
+      return objectPath as string;
+    } catch {
+      return null;
+    }
+  };
+
+  const submitBusinessDocs = async () => {
+    if (businessDocFiles.length === 0) {
+      toast({ title: "No files selected", description: "Please select at least one business document.", variant: "destructive" });
+      return;
+    }
+    setSubmittingBusinessDocs(true);
+    try {
+      const paths: string[] = [];
+      for (const file of businessDocFiles) {
+        const path = await uploadBusinessDocFile(file);
+        if (!path) {
+          toast({ title: "Upload failed", description: `Failed to upload ${file.name}. Please try again.`, variant: "destructive" });
+          setSubmittingBusinessDocs(false);
+          return;
+        }
+        paths.push(path);
+      }
+      const res = await fetchAuth("/business-docs/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ docPaths: paths }),
+      });
+      if (!res.ok) throw new Error("Submission failed");
+      const data = await res.json();
+      setProfile(prev => ({ ...prev, businessDocStatus: data.status, businessDocRejectionReason: null }));
+      setShowBusinessDocUpload(false);
+      setBusinessDocFiles([]);
+      setBusinessDocPreviews([]);
+      toast({ title: "Documents Submitted", description: data.message });
+    } catch {
+      toast({ title: "Error", description: "Failed to submit business documents.", variant: "destructive" });
+    } finally {
+      setSubmittingBusinessDocs(false);
     }
   };
 
@@ -619,6 +720,98 @@ export default function Profile() {
                 <Button variant="ghost" className="text-muted-foreground" onClick={() => setShowKyc(false)}>Cancel</Button>
               </div>
             </div>
+          </div>
+        )}
+
+        {profile.isBusinessOwner && (
+          <div className="glass-panel p-6 mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-primary" /> Business Documents
+              </h3>
+              {(profile.businessDocStatus === "not_started" || profile.businessDocStatus === "rejected") && (
+                <Button size="sm" variant="outline" className="border-primary/30 text-primary" onClick={() => setShowBusinessDocUpload(v => !v)}>
+                  {showBusinessDocUpload ? "Cancel" : "Upload Docs"}
+                </Button>
+              )}
+            </div>
+
+            {profile.businessDocStatus === "pending_review" && (
+              <div className="flex items-center gap-2 text-yellow-400 text-sm">
+                <Shield className="w-4 h-4" /> Documents under review — you'll be notified once verified.
+              </div>
+            )}
+            {profile.businessDocStatus === "verified" && (
+              <div className="flex items-center gap-2 text-green-400 text-sm">
+                <ShieldCheck className="w-4 h-4" /> Business documents verified.
+              </div>
+            )}
+            {profile.businessDocStatus === "rejected" && (
+              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 mb-3">
+                <div className="flex items-center gap-2 text-red-400 text-sm font-medium mb-1">
+                  <ShieldAlert className="w-4 h-4" /> Documents rejected — please re-upload.
+                </div>
+                {profile.businessDocRejectionReason && (
+                  <p className="text-xs text-red-300/70">Reason: {profile.businessDocRejectionReason}</p>
+                )}
+              </div>
+            )}
+            {profile.businessDocStatus === "not_started" && (
+              <p className="text-sm text-muted-foreground">No documents uploaded yet. Please upload your business documents to complete verification.</p>
+            )}
+
+            {showBusinessDocUpload && (
+              <div className="mt-4 space-y-3">
+                <p className="text-xs text-white/50">Upload at least one: business license, EIN letter, or articles of incorporation. (JPG, PNG, WebP, or PDF · Max 10MB)</p>
+                {businessDocFiles.length > 0 && (
+                  <div className="space-y-2">
+                    {businessDocFiles.map((file, idx) => (
+                      <div key={idx} className="flex items-center gap-2 bg-white/5 rounded-lg p-2">
+                        {businessDocPreviews[idx] ? (
+                          <img src={businessDocPreviews[idx]} alt="" className="w-8 h-8 object-cover rounded border border-white/10" />
+                        ) : (
+                          <div className="w-8 h-8 rounded border border-white/10 bg-white/5 flex items-center justify-center">
+                            <FileText className="w-4 h-4 text-white/40" />
+                          </div>
+                        )}
+                        <span className="flex-1 text-xs text-white/60 truncate">{file.name}</span>
+                        <button onClick={() => removeBusinessDoc(idx)} className="text-white/30 hover:text-white/70">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {businessDocFiles.length < 3 && (
+                  <>
+                    <input
+                      ref={businessDocInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf"
+                      multiple
+                      className="hidden"
+                      onChange={e => handleBusinessDocFileAdd(e.target.files)}
+                    />
+                    <div
+                      onClick={() => businessDocInputRef.current?.click()}
+                      onDragOver={e => { e.preventDefault(); setBusinessDocDragActive(true); }}
+                      onDragLeave={() => setBusinessDocDragActive(false)}
+                      onDrop={e => { e.preventDefault(); setBusinessDocDragActive(false); handleBusinessDocFileAdd(e.dataTransfer.files); }}
+                      className={`w-full h-20 border border-dashed rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${businessDocDragActive ? "border-primary/60 bg-primary/10" : "border-white/20 hover:border-primary/40 hover:bg-primary/5"}`}
+                    >
+                      <Upload className="w-5 h-5 text-white/30" />
+                      <span className="text-[11px] text-white/30">{businessDocDragActive ? "Drop to upload" : "Click or drag files here"}</span>
+                    </div>
+                  </>
+                )}
+                <div className="flex gap-2">
+                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={submitBusinessDocs} disabled={submittingBusinessDocs || businessDocFiles.length === 0}>
+                    {submittingBusinessDocs ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Submitting...</> : "Submit Documents"}
+                  </Button>
+                  <Button variant="ghost" className="text-muted-foreground" onClick={() => { setShowBusinessDocUpload(false); setBusinessDocFiles([]); setBusinessDocPreviews([]); }}>Cancel</Button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

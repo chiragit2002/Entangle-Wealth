@@ -41,6 +41,12 @@ export const usersTable = pgTable("users", {
   kycIdType: text("kyc_id_type"),
   kycIdNumber: text("kyc_id_number"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  isBusinessOwner: boolean("is_business_owner").default(false),
+  businessDocPaths: jsonb("business_doc_paths").default([]),
+  businessDocStatus: text("business_doc_status").default("not_started"),
+  businessDocRejectionReason: text("business_doc_rejection_reason"),
+  businessDocSubmittedAt: timestamp("business_doc_submitted_at", { withTimezone: true }),
+  businessDocVerifiedAt: timestamp("business_doc_verified_at", { withTimezone: true }),
 });
 
 export type User = typeof usersTable.$inferSelect;

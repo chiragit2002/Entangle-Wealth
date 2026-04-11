@@ -19,6 +19,7 @@ const KYC_ALLOWED_MIME_TYPES = new Set([
   "image/webp",
   "image/heic",
   "image/heif",
+  "application/pdf",
 ]);
 const KYC_MAX_SIZE_BYTES = 10 * 1024 * 1024;
 const UPLOAD_ALLOC_TTL_HOURS = 1;
@@ -60,7 +61,7 @@ router.post("/storage/uploads/request-url", requireAuth, async (req: Request, re
   const { name, size, contentType } = parsed.data;
 
   if (!KYC_ALLOWED_MIME_TYPES.has(contentType)) {
-    res.status(400).json({ error: "File type not allowed. Accepted types: JPEG, PNG, WebP, HEIC." });
+    res.status(400).json({ error: "File type not allowed. Accepted types: JPEG, PNG, WebP, HEIC, PDF." });
     return;
   }
 
@@ -148,7 +149,7 @@ router.get("/storage/objects/*path", requireAuth, async (req: Request, res: Resp
 
     if (!canAccessViaAcl) {
       const [docOwner] = await db
-        .select({ clerkId: usersTable.clerkId })
+        .select({ clerkId: usersTable.clerkId, businessDocPaths: usersTable.businessDocPaths })
         .from(usersTable)
         .where(
           or(
@@ -158,7 +159,16 @@ router.get("/storage/objects/*path", requireAuth, async (req: Request, res: Resp
         )
         .limit(1);
 
-      const isOwner = docOwner?.clerkId === requestingUserId;
+      const businessDocOwner = docOwner ? docOwner : await (async () => {
+        const allUsers = await db
+          .select({ clerkId: usersTable.clerkId, businessDocPaths: usersTable.businessDocPaths })
+          .from(usersTable);
+        return allUsers.find(u =>
+          Array.isArray(u.businessDocPaths) && (u.businessDocPaths as string[]).includes(objectPath)
+        ) || null;
+      })();
+
+      const isOwner = docOwner?.clerkId === requestingUserId || businessDocOwner?.clerkId === requestingUserId;
 
       if (!isOwner) {
         const adminIds = (process.env.ADMIN_CLERK_IDS || "").split(",").map(s => s.trim()).filter(Boolean);

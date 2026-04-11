@@ -161,19 +161,23 @@ router.post("/users/sync", requireAuth, async (req, res) => {
 
 router.put("/users/me", requireAuth, async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
-  const { headline, bio, phone, location, isPublicProfile } = req.body;
+  const { headline, bio, phone, location, isPublicProfile, isBusinessOwner } = req.body;
 
   try {
+    const updateData: Record<string, unknown> = {
+      headline,
+      bio,
+      phone,
+      location,
+      isPublicProfile,
+      updatedAt: new Date(),
+    };
+    if (typeof isBusinessOwner === "boolean") {
+      updateData.isBusinessOwner = isBusinessOwner;
+    }
     const [updated] = await db
       .update(usersTable)
-      .set({
-        headline,
-        bio,
-        phone,
-        location,
-        isPublicProfile,
-        updatedAt: new Date(),
-      })
+      .set(updateData as any)
       .where(eq(usersTable.clerkId, clerkId))
       .returning();
 

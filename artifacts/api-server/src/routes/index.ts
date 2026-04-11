@@ -35,6 +35,7 @@ import timelineRouter from "./timeline";
 import habitsRouter from "./habits";
 import lifeOutcomesRouter from "./lifeOutcomes";
 import coachingRouter from "./coaching";
+import businessDocsRouter from "./businessDocs";
 
 const router: IRouter = Router();
 
@@ -74,5 +75,6 @@ router.use(timelineRouter);
 router.use(habitsRouter);
 router.use(lifeOutcomesRouter);
 router.use(coachingRouter);
+router.use(businessDocsRouter);
 
 export default router;

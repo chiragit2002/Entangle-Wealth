@@ -8,12 +8,31 @@ import {
   getStocksBySector,
 } from "../data/nasdaq-stocks";
 import { stockCache } from "../lib/cache";
+import { validateQuery, validateParams, z } from "../lib/validateRequest";
 
 const router = Router();
 
+const StocksQuerySchema = z.object({
+  q: z.string().max(100).optional().default(""),
+  sector: z.string().max(100).optional(),
+  capTier: z.string().max(50).optional(),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(50),
+  sortBy: z.enum(["symbol", "name", "price", "changePercent", "volume", "marketCap"]).optional().default("symbol"),
+  sortDir: z.enum(["asc", "desc"]).optional().default("asc"),
+});
+
+const SectorParamsSchema = z.object({
+  sector: z.string().min(1).max(100),
+});
+
+const SymbolParamsSchema = z.object({
+  symbol: z.string().min(1).max(20).regex(/^[A-Z0-9.^-]+$/i, "Invalid stock symbol"),
+});
+
 // Stock data endpoints are intentionally public — market data is non-sensitive
 // and allows unauthenticated browsing to support the public-facing experience.
-router.get("/stocks", (req, res) => {
+router.get("/stocks", validateQuery(StocksQuerySchema), (req, res) => {
   const query = (req.query.q as string) || "";
   const sector = req.query.sector as string | undefined;
   const capTier = req.query.capTier as string | undefined;
@@ -85,7 +104,7 @@ router.get("/stocks/sectors", (_req, res) => {
   res.json(result);
 });
 
-router.get("/stocks/sectors/:sector", (req, res) => {
+router.get("/stocks/sectors/:sector", validateParams(SectorParamsSchema), (req, res) => {
   const stocks = getStocksBySector(req.params.sector);
   if (stocks.length === 0) {
     res.status(404).json({ error: "Sector not found" });
@@ -94,7 +113,7 @@ router.get("/stocks/sectors/:sector", (req, res) => {
   res.json({ sector: req.params.sector, count: stocks.length, stocks: stocks.slice(0, 100) });
 });
 
-router.get("/stocks/:symbol", (req, res) => {
+router.get("/stocks/:symbol", validateParams(SymbolParamsSchema), (req, res) => {
   const stock = getStockBySymbol(req.params.symbol);
   if (!stock) {
     res.status(404).json({ error: "Stock not found" });

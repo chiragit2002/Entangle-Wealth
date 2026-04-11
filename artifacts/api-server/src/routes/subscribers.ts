@@ -5,6 +5,7 @@ import { emailSubscribersTable, usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { logger } from "../lib/logger";
+import { validateBody, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -28,23 +29,20 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 254;
 }
 
-router.post("/subscribers", subscriberLimiter, async (req, res) => {
+const SubscriberCreateSchema = z.object({
+  email: z.string().email("Please provide a valid email address.").max(254),
+  preference: z.enum(["tips", "updates"]).optional().default("tips"),
+});
+
+const UnsubscribeSchema = z.object({
+  email: z.string().email().max(254).optional(),
+  token: z.string().max(200).optional(),
+});
+
+router.post("/subscribers", subscriberLimiter, validateBody(SubscriberCreateSchema), async (req, res) => {
   const { email, preference } = req.body;
-
-  if (!email || typeof email !== "string") {
-    res.status(400).json({ error: "Email is required." });
-    return;
-  }
-
   const cleanEmail = email.trim().toLowerCase();
-
-  if (!isValidEmail(cleanEmail)) {
-    res.status(400).json({ error: "Please provide a valid email address." });
-    return;
-  }
-
-  const validPreferences = ["tips", "updates"];
-  const cleanPreference = validPreferences.includes(preference) ? preference : "tips";
+  const cleanPreference = preference ?? "tips";
 
   try {
     const existing = await db
@@ -156,13 +154,12 @@ router.get("/subscribers/unsubscribe", unsubscribeLimiter, async (req, res) => {
   }
 });
 
-router.post("/subscribers/unsubscribe", unsubscribeLimiter, async (req, res) => {
-  const { token } = req.body;
+const TokenSchema = z.object({
+  token: z.string().min(1).max(200),
+});
 
-  if (!token || typeof token !== "string") {
-    res.status(400).json({ error: "Token required." });
-    return;
-  }
+router.post("/subscribers/unsubscribe", unsubscribeLimiter, validateBody(TokenSchema), async (req, res) => {
+  const { token } = req.body;
 
   try {
     const result = await db

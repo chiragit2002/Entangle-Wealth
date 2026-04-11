@@ -3,6 +3,7 @@ import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { checkTaxGptLimit, incrementTaxGptCount } from "../lib/userDailyLimits";
+import { validateBody, z } from "../lib/validateRequest";
 
 let openai: any = null;
 try {
@@ -179,7 +180,20 @@ This analysis is for educational purposes only. Consult a licensed CPA or tax pr
 6. Keep the disclaimer prominent in every response.
 7. For quick questions, give a concise answer (no need for full review format). Use the structured format only for situation reviews.`;
 
-router.post("/taxgpt", requireAuth, async (req, res) => {
+const TaxGptRequestSchema = z.object({
+  question: z.string().min(1).max(1000),
+  profileContext: z.object({
+    entityType: z.string().max(100).optional(),
+    businessName: z.string().max(200).optional(),
+    industry: z.string().max(100).optional(),
+    grossRevenue: z.number().nonnegative().optional(),
+    state: z.string().max(50).optional(),
+    hasHomeOffice: z.boolean().optional(),
+    usesVehicle: z.boolean().optional(),
+  }).optional(),
+});
+
+router.post("/taxgpt", requireAuth, validateBody(TaxGptRequestSchema), async (req, res) => {
   if (!checkRateLimit(req)) {
     res.status(429).json({ error: "Rate limit exceeded. Please wait before sending another question." });
     return;

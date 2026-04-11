@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { validateBody, validateQuery, z } from "../lib/validateRequest";
 import { db } from "@workspace/db";
 import {
   coachingSessionsTable,
@@ -120,14 +121,13 @@ Coaching style:
 IMPORTANT: This is educational guidance, not financial advice. Keep a friendly, human tone.`;
 }
 
-router.post("/coaching/chat", requireAuth, async (req, res) => {
+const CoachingChatSchema = z.object({
+  message: z.string().min(1, "Message is required").max(1000, "Message max 1000 chars"),
+});
+
+router.post("/coaching/chat", requireAuth, validateBody(CoachingChatSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const { message } = req.body;
-
-  if (!message || typeof message !== "string" || message.length > 1000) {
-    res.status(400).json({ error: "Message required (max 1000 chars)" });
-    return;
-  }
 
   try {
     const userId = await resolveUserId(clerkId, req);
@@ -322,7 +322,7 @@ Respond in JSON format:
   }
 });
 
-router.get("/coaching/history", requireAuth, async (req, res) => {
+router.get("/coaching/history", requireAuth, validateQuery(z.object({ limit: z.coerce.number().int().min(1).max(50).optional().default(20) })), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
   try {

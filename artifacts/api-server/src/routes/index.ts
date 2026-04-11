@@ -36,6 +36,7 @@ import habitsRouter from "./habits";
 import lifeOutcomesRouter from "./lifeOutcomes";
 import coachingRouter from "./coaching";
 import businessDocsRouter from "./businessDocs";
+import securityRouter from "./security";
 
 const router: IRouter = Router();
 
@@ -76,5 +77,6 @@ router.use(habitsRouter);
 router.use(lifeOutcomesRouter);
 router.use(coachingRouter);
 router.use(businessDocsRouter);
+router.use(securityRouter);
 
 export default router;

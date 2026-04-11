@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { validateBody, validateQuery, z } from "../lib/validateRequest";
 import { db } from "@workspace/db";
 import {
   giveawayEntriesTable,
@@ -160,7 +161,7 @@ router.get("/giveaway/my-entries", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/giveaway/leaderboard", async (req, res) => {
+router.get("/giveaway/leaderboard", validateQuery(z.object({ limit: z.coerce.number().int().min(1).max(50).optional().default(20) })), async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
   try {
     const leaderboard = await db
@@ -204,7 +205,7 @@ router.get("/giveaway/leaderboard", async (req, res) => {
   }
 });
 
-router.post("/giveaway/admin/sync-all", requireAuth, requireAdmin, async (req, res) => {
+router.post("/giveaway/admin/sync-all", requireAuth, requireAdmin, validateBody(z.object({}).strict()), async (req, res) => {
   try {
     const allUsers = await db.select({ id: usersTable.id, clerkId: usersTable.clerkId }).from(usersTable);
     let synced = 0;
@@ -222,7 +223,7 @@ router.post("/giveaway/admin/sync-all", requireAuth, requireAdmin, async (req, r
   }
 });
 
-router.post("/giveaway/admin/draw-winner", requireAuth, requireAdmin, async (req, res) => {
+router.post("/giveaway/admin/draw-winner", requireAuth, requireAdmin, validateQuery(z.object({ force: z.enum(["true", "false"]).optional() })), validateBody(z.object({}).strict()), async (req, res) => {
   try {
     const countdown = getCountdown();
     if (!countdown.passed) {

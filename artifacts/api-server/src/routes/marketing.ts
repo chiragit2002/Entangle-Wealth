@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import { aiQueue } from "../lib/aiQueue";
 import { anthropicCircuit } from "../lib/circuitBreaker";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
+import { validateBody, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -188,26 +189,16 @@ const TONE_INSTRUCTIONS: Record<string, string> = {
   casual: "Use a casual, conversational tone. Write like you're texting a friend who's interested in finance. Use humor where appropriate."
 };
 
-router.post("/marketing/generate", requireAuth, requireAdmin, async (req, res) => {
+const MarketingGenerateSchema = z.object({
+  agent: z.enum(Object.keys(PLATFORM_CONFIGS) as [string, ...string[]]),
+  topic: z.string().min(1).max(500),
+  tone: z.enum(["educational", "motivational", "data-driven", "casual"]).optional(),
+  context: z.string().max(2000).optional(),
+});
+
+router.post("/marketing/generate", requireAuth, requireAdmin, validateBody(MarketingGenerateSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { agent, topic, tone, context } = req.body;
-
-  if (!agent || !topic) {
-    res.status(400).json({ error: "Agent and topic are required" });
-    return;
-  }
-
-  const platformConfig = PLATFORM_CONFIGS[agent];
-  if (!platformConfig) {
-    res.status(400).json({ error: `Invalid agent: ${agent}. Valid agents: ${Object.keys(PLATFORM_CONFIGS).join(", ")}` });
-    return;
-  }
-
-  const validTones = ["educational", "motivational", "data-driven", "casual"];
-  if (tone && !validTones.includes(tone)) {
-    res.status(400).json({ error: `Invalid tone. Valid tones: ${validTones.join(", ")}` });
-    return;
-  }
 
   try {
     const client = await getAnthropicClient();

@@ -2,6 +2,7 @@ import { Router, type IRouter, type Request, type Response } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { pool } from "@workspace/db";
+import { logger } from "../lib/logger";
 import http from "node:http";
 
 const router: IRouter = Router();
@@ -334,8 +335,8 @@ router.get("/admin/launch-checks", requireAuth, async (req: Request, res: Respon
       timestamp: new Date().toISOString(),
     });
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : "Unknown error";
-    res.status(500).json({ error: msg });
+    logger.error({ err: e }, "Launch checks failed");
+    res.status(500).json({ error: "Failed to run launch checks" });
   }
 });
 

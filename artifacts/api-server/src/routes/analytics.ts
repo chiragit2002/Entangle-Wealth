@@ -7,17 +7,19 @@ import { analyticsEventsTable, usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { getAuth } from "@clerk/express";
 import { logger } from "../lib/logger";
+import { validateBody, z } from "../lib/validateRequest";
 
 const router = Router();
 
-router.post("/analytics/track", (req: Request, res: Response) => {
+const AnalyticsTrackSchema = z.object({
+  event: z.string().min(1).max(200),
+  properties: z.record(z.unknown()).optional(),
+  sessionId: z.string().max(200).optional(),
+});
+
+router.post("/analytics/track", validateBody(AnalyticsTrackSchema), (req: Request, res: Response) => {
   const { userId } = getAuth(req);
   const { event, properties, sessionId } = req.body;
-
-  if (!event || typeof event !== "string") {
-    res.status(400).json({ error: "event is required" });
-    return;
-  }
 
   db.insert(analyticsEventsTable)
     .values({

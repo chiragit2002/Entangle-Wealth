@@ -6,10 +6,11 @@ import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { sendZapierWebhookTest } from "../lib/zapierWebhook";
+import { validateBody, z } from "../lib/validateRequest";
 
 const router = Router();
 
-router.post("/webhooks/zapier/test", requireAuth, requireAdmin, async (_req: AuthenticatedRequest, res: Response) => {
+router.post("/webhooks/zapier/test", requireAuth, requireAdmin, validateBody(z.object({}).strict()), async (_req: AuthenticatedRequest, res: Response) => {
   try {
     const result = await sendZapierWebhookTest();
     res.json(result);

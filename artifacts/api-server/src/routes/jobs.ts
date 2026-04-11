@@ -4,10 +4,19 @@ import { savedJobsTable } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
+import { validateBody, validateQuery, validateParams, IntIdParamsSchema, z } from "../lib/validateRequest";
 
 const router = Router();
 
-router.get("/jobs/search", async (req, res) => {
+const JobsSearchQuerySchema = z.object({
+  q: z.string().max(200).optional(),
+  location: z.string().max(200).optional(),
+  type: z.string().max(100).optional(),
+  remote: z.enum(["true", "false"]).optional(),
+  page: z.coerce.number().int().min(1).optional().default(1),
+});
+
+router.get("/jobs/search", validateQuery(JobsSearchQuerySchema), async (req, res) => {
   const { q, location, type, remote, page } = req.query;
   const pageNum = parseInt(page as string) || 1;
 
@@ -140,7 +149,18 @@ router.get("/jobs/saved", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/jobs/save", requireAuth, async (req, res) => {
+const SaveJobSchema = z.object({
+  jobTitle: z.string().max(300).optional(),
+  company: z.string().max(200).optional(),
+  location: z.string().max(200).optional(),
+  salary: z.string().max(100).optional(),
+  jobType: z.string().max(100).optional(),
+  sourceUrl: z.string().url().max(1000).optional().or(z.literal("")),
+  source: z.string().max(100).optional(),
+  externalId: z.string().max(200).optional(),
+});
+
+router.post("/jobs/save", requireAuth, validateBody(SaveJobSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { jobTitle, company, location, salary, jobType, sourceUrl, source, externalId } = req.body;
 
@@ -172,7 +192,7 @@ router.post("/jobs/save", requireAuth, async (req, res) => {
   }
 });
 
-router.delete("/jobs/saved/:id", requireAuth, async (req, res) => {
+router.delete("/jobs/saved/:id", requireAuth, validateParams(IntIdParamsSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const jobId = parseInt(req.params.id);
 

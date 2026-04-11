@@ -5,6 +5,7 @@ import { eq, desc, ilike, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import crypto from "crypto";
+import { validateBody, validateParams, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -63,20 +64,17 @@ router.get("/gigs", async (req, res) => {
   }
 });
 
-router.post("/gigs", requireAuth, async (req, res) => {
+const GigCreateSchema = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().min(1).max(1000),
+  price: z.string().min(1).max(50),
+  category: z.enum(["cleaning", "outdoor", "auto", "moving", "other"]),
+  contactName: z.string().max(100).optional(),
+});
+
+router.post("/gigs", requireAuth, validateBody(GigCreateSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { title, description, price, category, contactName } = req.body;
-
-  if (!title || !description || !price || !category) {
-    res.status(400).json({ error: "Title, description, price, and category are required" });
-    return;
-  }
-
-  const allowedCategories = ["cleaning", "outdoor", "auto", "moving", "other"];
-  if (!allowedCategories.includes(category)) {
-    res.status(400).json({ error: "Invalid category" });
-    return;
-  }
 
   try {
     const [gig] = await db.insert(gigsTable).values({
@@ -96,7 +94,11 @@ router.post("/gigs", requireAuth, async (req, res) => {
   }
 });
 
-router.delete("/gigs/:id", requireAuth, async (req, res) => {
+const GigIdParamsSchema = z.object({
+  id: z.string().min(1).max(100),
+});
+
+router.delete("/gigs/:id", requireAuth, validateParams(GigIdParamsSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const gigId = req.params.id;
 

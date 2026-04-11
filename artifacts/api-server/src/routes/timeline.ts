@@ -16,6 +16,20 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
 import { getAuth } from "@clerk/express";
 import { calculateLevel, calculateTier } from "@workspace/xp";
+import { validateBody, validateParams, z } from "../lib/validateRequest";
+
+const TimelineIdParamsSchema = z.object({
+  id: z.string().regex(/^\d+$/, "ID must be a number"),
+});
+
+const TimelineParamsBodySchema = z.object({
+  monthlyIncome: z.coerce.number().min(0).max(1000000).default(0),
+  savingsRate: z.coerce.number().min(0).max(1).default(0),
+  monthlyDebt: z.coerce.number().min(0).default(0),
+  investmentRate: z.coerce.number().min(0).max(0.5).default(0.07),
+  currentNetWorth: z.coerce.number().default(0),
+  emergencyFundMonths: z.coerce.number().min(0).default(0),
+});
 
 const router = Router();
 
@@ -149,7 +163,7 @@ function simulateHorizon(params: TimelineParams, months: number): HorizonResult 
   };
 }
 
-function validateParams(body: unknown): { params: TimelineParams; error?: string } {
+function parseTimelineParams(body: unknown): { params: TimelineParams; error?: string } {
   const b = body as Record<string, unknown>;
   const monthlyIncome = Number(b.monthlyIncome) || 0;
   const savingsRate = Number(b.savingsRate) || 0;
@@ -244,8 +258,8 @@ async function updateIdentityStage(userId: string, field: "simulationsRun" | "sn
   }
 }
 
-router.post("/timeline/simulate", async (req, res) => {
-  const { params, error } = validateParams(req.body);
+router.post("/timeline/simulate", validateBody(TimelineParamsBodySchema), async (req, res) => {
+  const { params, error } = parseTimelineParams(req.body);
   if (error) {
     res.status(400).json({ error });
     return;
@@ -272,14 +286,31 @@ router.post("/timeline/simulate", async (req, res) => {
   }
 });
 
-router.post("/timeline/save", requireAuth, async (req, res) => {
+const TimelineSaveSchema = z.object({
+  name: z.string().max(100).optional(),
+  annotation: z.string().max(500).optional(),
+  isBaseline: z.boolean().optional(),
+  monthlyIncome: z.number().min(0).max(1000000).optional(),
+  savingsRate: z.number().min(0).max(1).optional(),
+  monthlyDebt: z.number().min(0).optional(),
+  investmentRate: z.number().min(0).max(0.5).optional(),
+  currentNetWorth: z.number().optional(),
+  emergencyFundMonths: z.number().min(0).max(24).optional(),
+});
+
+const WhatIfModelSchema = z.object({
+  baseParams: z.record(z.unknown()),
+  decisionIds: z.array(z.string().max(100)).max(20),
+});
+
+router.post("/timeline/save", requireAuth, validateBody(TimelineSaveSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   try {
     const userId = await resolveUserId(clerkId, req);
     if (!userId) { res.status(404).json({ error: "User not found" }); return; }
 
     const { name, annotation, isBaseline, ...bodyParams } = req.body;
-    const { params, error } = validateParams(bodyParams);
+    const { params, error } = parseTimelineParams(bodyParams);
     if (error) { res.status(400).json({ error }); return; }
 
     const [timeline] = await db.insert(timelinesTable).values({
@@ -342,7 +373,7 @@ router.get("/timeline/saved", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/timeline/:id", requireAuth, async (req, res) => {
+router.get("/timeline/:id", requireAuth, validateParams(TimelineIdParamsSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const timelineId = parseInt(req.params.id);
   if (isNaN(timelineId)) { res.status(400).json({ error: "Invalid ID" }); return; }
@@ -365,7 +396,7 @@ router.get("/timeline/:id", requireAuth, async (req, res) => {
   }
 });
 
-router.delete("/timeline/:id", requireAuth, async (req, res) => {
+router.delete("/timeline/:id", requireAuth, validateParams(TimelineIdParamsSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const timelineId = parseInt(req.params.id);
   if (isNaN(timelineId)) { res.status(400).json({ error: "Invalid ID" }); return; }
@@ -387,12 +418,17 @@ router.delete("/timeline/:id", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/timeline/compare", async (req, res) => {
+const TimelineCompareSchema = z.object({
+  paramsA: z.record(z.unknown()),
+  paramsB: z.record(z.unknown()),
+});
+
+router.post("/timeline/compare", validateBody(TimelineCompareSchema), async (req, res) => {
   try {
     const { paramsA, paramsB } = req.body as { paramsA: unknown; paramsB: unknown };
 
-    const validA = validateParams(paramsA);
-    const validB = validateParams(paramsB);
+    const validA = parseTimelineParams(paramsA);
+    const validB = parseTimelineParams(paramsB);
 
     if (validA.error) { res.status(400).json({ error: `Timeline A: ${validA.error}` }); return; }
     if (validB.error) { res.status(400).json({ error: `Timeline B: ${validB.error}` }); return; }
@@ -545,10 +581,10 @@ router.get("/timeline/what-if/decisions", (_req, res) => {
   res.json(WHAT_IF_DECISIONS);
 });
 
-router.post("/timeline/what-if/model", async (req, res) => {
+router.post("/timeline/what-if/model", validateBody(WhatIfModelSchema), async (req, res) => {
   const { baseParams, decisionIds } = req.body as { baseParams: unknown; decisionIds: string[] };
 
-  const { params: base, error } = validateParams(baseParams);
+  const { params: base, error } = parseTimelineParams(baseParams);
   if (error) {
     res.status(400).json({ error });
     return;

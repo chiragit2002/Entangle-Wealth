@@ -7,6 +7,7 @@ import { resolveUserId } from "../lib/resolveUserId";
 import { logger } from "../lib/logger";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { calculateLevel, calculateTier } from "@workspace/xp";
+import { validateBody, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -130,7 +131,14 @@ router.get("/paper-trading/portfolio", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/paper-trading/trade", requireAuth, async (req, res) => {
+const TradeSchema = z.object({
+  symbol: z.string().min(1).max(10).regex(/^[A-Za-z]{1,10}$/, "Symbol must be 1-10 letters"),
+  side: z.enum(["buy", "sell"]),
+  quantity: z.number().int().positive().max(1_000_000),
+  price: z.number().positive().max(1_000_000),
+});
+
+router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), async (req, res) => {
   try {
     const clerkId = (req as AuthenticatedRequest).userId;
     const dbUserId = await resolveUserId(clerkId, req);
@@ -140,23 +148,8 @@ router.post("/paper-trading/trade", requireAuth, async (req, res) => {
     }
 
     const { symbol, side, quantity, price } = req.body;
-
-    if (!symbol || !side || !quantity || !price) {
-      res.status(400).json({ error: "Missing required fields: symbol, side, quantity, price" });
-      return;
-    }
-
-    if (!["buy", "sell"].includes(side)) {
-      res.status(400).json({ error: "Side must be 'buy' or 'sell'" });
-      return;
-    }
-
     const qty = Math.floor(Number(quantity));
     const px = Number(price);
-    if (qty <= 0 || px <= 0) {
-      res.status(400).json({ error: "Quantity and price must be positive" });
-      return;
-    }
 
     const totalCost = qty * px;
     const upperSymbol = symbol.toUpperCase();
@@ -245,7 +238,7 @@ router.post("/paper-trading/trade", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/paper-trading/reset", requireAuth, async (req, res) => {
+router.post("/paper-trading/reset", requireAuth, validateBody(z.object({}).strict()), async (req, res) => {
   try {
     const clerkId = (req as AuthenticatedRequest).userId;
     const dbUserId = await resolveUserId(clerkId, req);
@@ -301,7 +294,7 @@ router.get("/paper-trading/spin/status", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/paper-trading/spin", requireAuth, async (req, res) => {
+router.post("/paper-trading/spin", requireAuth, validateBody(z.object({}).strict()), async (req, res) => {
   try {
     const clerkId = (req as AuthenticatedRequest).userId;
     const dbUserId = await resolveUserId(clerkId, req);

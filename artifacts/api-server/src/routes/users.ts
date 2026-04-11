@@ -13,7 +13,12 @@ import { getAuth } from "@clerk/express";
 import crypto from "crypto";
 import { processReferralMilestones } from "../lib/referralRewards";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
+import { validateBody, validateParams, z } from "../lib/validateRequest";
 import { logger } from "../lib/logger";
+
+const UserIdParamsSchema = z.object({
+  userId: z.string().min(1).max(100),
+});
 
 const router = Router();
 
@@ -35,7 +40,24 @@ router.get("/users/me", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/users/sync", requireAuth, async (req, res) => {
+const UserSyncSchema = z.object({
+  email: z.string().email().max(254).optional(),
+  firstName: z.string().max(100).optional(),
+  lastName: z.string().max(100).optional(),
+  photoUrl: z.string().url().max(500).optional().or(z.literal("")),
+  referredBy: z.string().max(100).optional(),
+});
+
+const UserUpdateSchema = z.object({
+  headline: z.string().max(200).optional(),
+  bio: z.string().max(2000).optional(),
+  phone: z.string().max(50).optional(),
+  location: z.string().max(200).optional(),
+  isPublicProfile: z.boolean().optional(),
+  isBusinessOwner: z.boolean().optional(),
+});
+
+router.post("/users/sync", requireAuth, validateBody(UserSyncSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const { email, firstName, lastName, photoUrl } = req.body;
 
@@ -159,7 +181,7 @@ router.post("/users/sync", requireAuth, async (req, res) => {
   }
 });
 
-router.put("/users/me", requireAuth, async (req, res) => {
+router.put("/users/me", requireAuth, validateBody(UserUpdateSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const { headline, bio, phone, location, isPublicProfile, isBusinessOwner } = req.body;
 
@@ -192,7 +214,7 @@ router.put("/users/me", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/users/:userId/profile", async (req, res) => {
+router.get("/users/:userId/profile", validateParams(UserIdParamsSchema), async (req, res) => {
   try {
     const [user] = await db
       .select({

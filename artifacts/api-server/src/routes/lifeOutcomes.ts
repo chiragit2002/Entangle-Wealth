@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
+import { validateBody, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -116,7 +117,17 @@ function classifyLifestyle(annualPassiveIncome: number): string {
   return "Basic";
 }
 
-router.post("/life-outcomes/project", async (req, res) => {
+const LifeOutcomesSchema = z.object({
+  currentAge: z.number().int().min(18).max(70).optional(),
+  annualIncome: z.number().nonnegative().max(100_000_000).optional(),
+  monthlyInvestment: z.number().nonnegative().max(10_000_000).optional(),
+  currentSavings: z.number().nonnegative().max(1_000_000_000).optional(),
+  expectedReturnRate: z.number().min(0).max(30).optional(),
+  inflationRate: z.number().min(0).max(15).optional(),
+  monthlyExpenses: z.number().nonnegative().max(10_000_000).optional(),
+});
+
+router.post("/life-outcomes/project", validateBody(LifeOutcomesSchema), async (req, res) => {
   try {
     const {
       currentAge = 30,

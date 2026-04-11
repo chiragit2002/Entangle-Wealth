@@ -6,6 +6,7 @@ import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import crypto from "crypto";
 import { REFERRAL_MILESTONES } from "../lib/referralRewards";
+import { validateBody, validateQuery, PaginationQuerySchema, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -124,13 +125,20 @@ router.get("/viral/referral/milestones", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/viral/referral/milestones/seen", requireAuth, async (req, res) => {
+const MilestonesSeenSchema = z.object({
+  keys: z.array(z.string().max(100)).max(50),
+});
+
+const TestimonialSchema = z.object({
+  name: z.string().min(1).max(100),
+  role: z.string().max(100).optional(),
+  message: z.string().min(1).max(500),
+  rating: z.number().int().min(1).max(5),
+});
+
+router.post("/viral/referral/milestones/seen", requireAuth, validateBody(MilestonesSeenSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { keys } = req.body;
-  if (!Array.isArray(keys)) {
-    res.status(400).json({ error: "keys must be an array" });
-    return;
-  }
   try {
     const [user] = await db
       .select({ referralMilestonesSeen: usersTable.referralMilestonesSeen })
@@ -240,7 +248,7 @@ router.get("/stats/hero", async (_req, res) => {
   }
 });
 
-router.get("/stats/recent-signups", async (req, res) => {
+router.get("/stats/recent-signups", validateQuery(PaginationQuerySchema), async (req, res) => {
   try {
     const limit = Math.min(Math.max(parseInt(String(req.query.limit)) || 10, 1), 50);
     const offset = Math.max(parseInt(String(req.query.offset)) || 0, 0);
@@ -273,24 +281,9 @@ router.get("/stats/recent-signups", async (req, res) => {
   }
 });
 
-router.post("/viral/testimonials", requireAuth, async (req, res) => {
+router.post("/viral/testimonials", requireAuth, validateBody(TestimonialSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { name, role, message, rating } = req.body;
-
-  if (!name || !message || !rating) {
-    res.status(400).json({ error: "name, message, and rating are required" });
-    return;
-  }
-
-  if (typeof rating !== "number" || rating < 1 || rating > 5) {
-    res.status(400).json({ error: "rating must be between 1 and 5" });
-    return;
-  }
-
-  if (message.length > 500) {
-    res.status(400).json({ error: "message must be 500 characters or fewer" });
-    return;
-  }
 
   try {
     const [testimonial] = await db
@@ -311,7 +304,7 @@ router.post("/viral/testimonials", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/viral/testimonials", async (req, res) => {
+router.get("/viral/testimonials", validateQuery(PaginationQuerySchema), async (req, res) => {
   try {
     const limit = Math.min(Math.max(parseInt(String(req.query.limit)) || 20, 1), 50);
     const offset = Math.max(parseInt(String(req.query.offset)) || 0, 0);

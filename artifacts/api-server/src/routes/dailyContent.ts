@@ -7,6 +7,7 @@ import { aiQueue } from "../lib/aiQueue";
 import { anthropicCircuit } from "../lib/circuitBreaker";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { logger } from "../lib/logger";
+import { validateBody, validateParams, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -331,7 +332,7 @@ router.get("/daily-content/history", requireAuth, requireAdmin, async (req, res)
   }
 });
 
-router.post("/daily-content/regenerate", requireAuth, requireAdmin, async (req, res) => {
+router.post("/daily-content/regenerate", requireAuth, requireAdmin, validateBody(z.object({}).strict()), async (req, res) => {
   try {
     const today = getTodayDateString();
     const theme = getTodayTheme();
@@ -359,15 +360,20 @@ router.post("/daily-content/regenerate", requireAuth, requireAdmin, async (req, 
   }
 });
 
-router.patch("/daily-content/:id", requireAuth, requireAdmin, async (req, res) => {
+const DailyContentPatchSchema = z.object({
+  status: z.enum(["draft", "approved", "posted", "archived"]).optional(),
+  content: z.string().max(10000).optional(),
+}).refine(d => d.status !== undefined || d.content !== undefined, {
+  message: "At least one field (status or content) must be provided",
+});
+
+const DailyContentIdParamsSchema = z.object({
+  id: z.coerce.number().int().positive(),
+});
+
+router.patch("/daily-content/:id", requireAuth, requireAdmin, validateParams(DailyContentIdParamsSchema), validateBody(DailyContentPatchSchema), async (req, res) => {
   const { id } = req.params;
   const { status, content } = req.body;
-
-  const validStatuses = ["draft", "approved", "posted", "archived"];
-  if (status && !validStatuses.includes(status)) {
-    res.status(400).json({ error: `Invalid status. Valid: ${validStatuses.join(", ")}` });
-    return;
-  }
 
   try {
     const updates: string[] = ["updated_at = now()"];
@@ -407,7 +413,7 @@ router.patch("/daily-content/:id", requireAuth, requireAdmin, async (req, res) =
   }
 });
 
-router.delete("/daily-content/:id", requireAuth, requireAdmin, async (req, res) => {
+router.delete("/daily-content/:id", requireAuth, requireAdmin, validateParams(DailyContentIdParamsSchema), async (req, res) => {
   const { id } = req.params;
 
   try {

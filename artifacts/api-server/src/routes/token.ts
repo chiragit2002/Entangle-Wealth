@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { validateBody, validateQuery, PaginationQuerySchema, z } from "../lib/validateRequest";
 import { db } from "@workspace/db";
 import {
   usersTable,
@@ -12,6 +13,7 @@ import { eq, desc, sql, and, count } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -48,14 +50,29 @@ function getRewardAmount(rank: number): number {
   return 0;
 }
 
-router.put("/token/wallet", requireAuth, async (req, res) => {
+const WalletSchema = z.object({
+  walletAddress: z.string().regex(ETH_ADDRESS_REGEX, "Valid Ethereum wallet address required (0x...)"),
+});
+
+const BookingSchema = z.object({
+  listingId: z.string().min(1).max(20),
+  destination: z.string().max(200).optional(),
+  checkIn: z.string().max(50).optional(),
+  checkOut: z.string().max(50).optional(),
+  details: z.string().max(500).optional(),
+});
+
+const AdminDistributeSchema = z.object({
+  month: z.string().regex(/^\d{4}-\d{2}$/, "Month must be in format YYYY-MM"),
+});
+
+const AdminConfigSchema = z.object({
+  sharePrice: z.number().positive("Valid share price required"),
+});
+
+router.put("/token/wallet", requireAuth, validateBody(WalletSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { walletAddress } = req.body;
-
-  if (!walletAddress || !ETH_ADDRESS_REGEX.test(walletAddress)) {
-    res.status(400).json({ error: "Valid Ethereum wallet address required (0x...)" });
-    return;
-  }
 
   try {
     const [existing] = await db
@@ -81,7 +98,7 @@ router.put("/token/wallet", requireAuth, async (req, res) => {
 
     res.json({ walletAddress: updated.walletAddress, tokenBalance: updated.tokenBalance });
   } catch (error) {
-    console.error("Wallet link error:", error);
+    logger.error({ err: error }, "Wallet link error");
     res.status(500).json({ error: "Failed to link wallet" });
   }
 });
@@ -124,12 +141,12 @@ router.get("/token/balance", requireAuth, async (req, res) => {
       sharePrice,
     });
   } catch (error) {
-    console.error("Balance error:", error);
+    logger.error({ err: error }, "Balance error");
     res.status(500).json({ error: "Failed to fetch balance" });
   }
 });
 
-router.get("/token/transactions", requireAuth, async (req, res) => {
+router.get("/token/transactions", requireAuth, validateQuery(PaginationQuerySchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
   const offset = parseInt(req.query.offset as string) || 0;
@@ -149,12 +166,12 @@ router.get("/token/transactions", requireAuth, async (req, res) => {
 
     res.json({ items: transactions, total: totalResult?.c || 0, limit, offset });
   } catch (error) {
-    console.error("Transactions error:", error);
+    logger.error({ err: error }, "Transactions error");
     res.status(500).json({ error: "Failed to fetch transactions" });
   }
 });
 
-router.get("/token/rewards", requireAuth, async (req, res) => {
+router.get("/token/rewards", requireAuth, validateQuery(PaginationQuerySchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
   const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
@@ -174,12 +191,12 @@ router.get("/token/rewards", requireAuth, async (req, res) => {
 
     res.json({ items: rewards, total: totalResult?.c || 0, limit, offset });
   } catch (error) {
-    console.error("Rewards error:", error);
+    logger.error({ err: error }, "Rewards error");
     res.status(500).json({ error: "Failed to fetch rewards" });
   }
 });
 
-router.get("/token/rewards/history", async (req, res) => {
+router.get("/token/rewards/history", validateQuery(PaginationQuerySchema), async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
     const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
@@ -216,12 +233,12 @@ router.get("/token/rewards/history", async (req, res) => {
 
     res.json(grouped);
   } catch (error) {
-    console.error("Reward history error:", error);
+    logger.error({ err: error }, "Reward history error");
     res.status(500).json({ error: "Failed to fetch reward history" });
   }
 });
 
-router.get("/token/bookings", requireAuth, async (req, res) => {
+router.get("/token/bookings", requireAuth, validateQuery(PaginationQuerySchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
   const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
@@ -241,7 +258,7 @@ router.get("/token/bookings", requireAuth, async (req, res) => {
 
     res.json({ items: bookings, total: totalResult?.c || 0, limit, offset });
   } catch (error) {
-    console.error("Bookings error:", error);
+    logger.error({ err: error }, "Bookings error");
     res.status(500).json({ error: "Failed to fetch bookings" });
   }
 });
@@ -250,14 +267,9 @@ router.get("/token/catalog", (_req, res) => {
   res.json(TRAVEL_CATALOG);
 });
 
-router.post("/token/book", requireAuth, async (req, res) => {
+router.post("/token/book", requireAuth, validateBody(BookingSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { listingId, destination, checkIn, checkOut, details } = req.body;
-
-  if (!listingId) {
-    res.status(400).json({ error: "listingId is required" });
-    return;
-  }
 
   const catalogItem = TRAVEL_CATALOG[listingId];
   if (!catalogItem) {
@@ -312,9 +324,10 @@ router.post("/token/book", requireAuth, async (req, res) => {
     });
 
     res.json({ booking: result.booking, txHash, newBalance: result.newBalance });
-  } catch (error: any) {
-    console.error("Booking error:", error);
-    if (error.message?.includes("Insufficient balance")) {
+  } catch (error) {
+    logger.error({ err: error }, "Booking error");
+    const msg = error instanceof Error ? error.message : "";
+    if (msg.includes("Insufficient balance")) {
       res.status(400).json({ error: "Insufficient EntangleCoin balance" });
     } else {
       res.status(500).json({ error: "Failed to process booking" });
@@ -322,14 +335,9 @@ router.post("/token/book", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/token/admin/distribute", requireAuth, requireAdmin, async (req, res) => {
+router.post("/token/admin/distribute", requireAuth, requireAdmin, validateBody(AdminDistributeSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { month } = req.body;
-
-  if (!month) {
-    res.status(400).json({ error: "Month is required (e.g., '2026-04')" });
-    return;
-  }
 
   try {
 
@@ -396,7 +404,7 @@ router.post("/token/admin/distribute", requireAuth, requireAdmin, async (req, re
 
     res.json({ distributed: distributions.length, month, distributions });
   } catch (error) {
-    console.error("Distribution error:", error);
+    logger.error({ err: error }, "Distribution error");
     res.status(500).json({ error: "Failed to distribute rewards" });
   }
 });
@@ -441,19 +449,14 @@ router.get("/token/admin/stats", requireAuth, requireAdmin, async (req, res) => 
       tokenValue: (config ? parseFloat(config.value) : 40.0) * 0.25,
     });
   } catch (error) {
-    console.error("Admin stats error:", error);
+    logger.error({ err: error }, "Admin stats error");
     res.status(500).json({ error: "Failed to fetch admin stats" });
   }
 });
 
-router.put("/token/admin/config", requireAuth, requireAdmin, async (req, res) => {
+router.put("/token/admin/config", requireAuth, requireAdmin, validateBody(AdminConfigSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { sharePrice } = req.body;
-
-  if (!sharePrice || sharePrice <= 0) {
-    res.status(400).json({ error: "Valid share price required" });
-    return;
-  }
 
   try {
 
@@ -472,7 +475,7 @@ router.put("/token/admin/config", requireAuth, requireAdmin, async (req, res) =>
 
     res.json({ sharePrice, tokenValue: sharePrice * 0.25 });
   } catch (error) {
-    console.error("Config update error:", error);
+    logger.error({ err: error }, "Config update error");
     res.status(500).json({ error: "Failed to update configuration" });
   }
 });

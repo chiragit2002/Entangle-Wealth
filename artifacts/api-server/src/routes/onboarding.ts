@@ -5,6 +5,7 @@ import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { logger } from "../lib/logger";
+import { validateBody, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -52,7 +53,16 @@ router.get("/onboarding", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
-router.post("/onboarding/complete-welcome", requireAuth, async (req: Request, res: Response) => {
+const OnboardingWelcomeSchema = z.object({
+  interests: z.array(z.string().max(100)).max(50).optional(),
+});
+
+const OnboardingChecklistSchema = z.object({
+  item: z.string().min(1).max(100),
+  completed: z.boolean(),
+});
+
+router.post("/onboarding/complete-welcome", requireAuth, validateBody(OnboardingWelcomeSchema), async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
   const { interests } = req.body as { interests?: string[] };
 
@@ -73,14 +83,9 @@ router.post("/onboarding/complete-welcome", requireAuth, async (req: Request, re
   }
 });
 
-router.post("/onboarding/checklist", requireAuth, async (req: Request, res: Response) => {
+router.post("/onboarding/checklist", requireAuth, validateBody(OnboardingChecklistSchema), async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
   const { item, completed } = req.body as { item: string; completed: boolean };
-
-  if (!item) {
-    res.status(400).json({ error: "Missing item" });
-    return;
-  }
 
   try {
     const rows = await db

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
+import { validateBody, z } from "../lib/validateRequest";
 
 let openai: any = null;
 try {
@@ -11,13 +12,14 @@ try {
 
 const router = Router();
 
-router.post("/analyze-document", requireAuth, async (req, res) => {
-  const { fileData, fileType, fileName } = req.body;
+const DocumentAnalyzeSchema = z.object({
+  fileData: z.string().min(1),
+  fileType: z.string().min(1).max(100).regex(/^(image\/|application\/pdf)/, "Only image or PDF file types allowed"),
+  fileName: z.string().max(255).optional(),
+});
 
-  if (!fileData || !fileType) {
-    res.status(400).json({ error: "fileData and fileType are required" });
-    return;
-  }
+router.post("/analyze-document", requireAuth, validateBody(DocumentAnalyzeSchema), async (req, res) => {
+  const { fileData, fileType, fileName } = req.body;
 
   if (!openai) {
     res.status(503).json({ error: "AI service not available" });

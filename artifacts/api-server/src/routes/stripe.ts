@@ -6,6 +6,11 @@ import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { getUncachableStripeClient, getStripePublishableKey } from "../stripeClient";
 import { resolveUserId } from "../lib/resolveUserId";
+import { validateBody, z } from "../lib/validateRequest";
+
+const PriceIdSchema = z.object({
+  priceId: z.string().regex(/^price_/, "Must be a valid Stripe price ID"),
+});
 
 const router = Router();
 
@@ -51,14 +56,9 @@ router.get("/stripe/products", async (_req, res) => {
   }
 });
 
-router.post("/stripe/create-checkout", requireAuth, async (req, res) => {
+router.post("/stripe/create-checkout", requireAuth, validateBody(PriceIdSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { priceId } = req.body;
-
-  if (!priceId || typeof priceId !== "string" || !priceId.startsWith("price_")) {
-    res.status(400).json({ error: "Valid price ID required" });
-    return;
-  }
 
   try {
     const stripe = await getUncachableStripeClient();
@@ -173,14 +173,9 @@ router.get("/stripe/virtual-cash-products", async (_req, res) => {
   }
 });
 
-router.post("/stripe/create-virtual-cash-checkout", requireAuth, async (req, res) => {
+router.post("/stripe/create-virtual-cash-checkout", requireAuth, validateBody(PriceIdSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { priceId } = req.body;
-
-  if (!priceId || typeof priceId !== "string" || !priceId.startsWith("price_")) {
-    res.status(400).json({ error: "Valid price ID required" });
-    return;
-  }
 
   try {
     const stripe = await getUncachableStripeClient();
@@ -260,7 +255,7 @@ router.get("/stripe/virtual-cash-purchases", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/stripe/create-portal", requireAuth, async (req, res) => {
+router.post("/stripe/create-portal", requireAuth, validateBody(z.object({}).strict()), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
 
   try {

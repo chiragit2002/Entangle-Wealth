@@ -1,9 +1,10 @@
-import { Router, type IRouter, type Request, type Response } from "express";
+import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
 import { Readable } from "stream";
 import {
   RequestUploadUrlBody,
   RequestUploadUrlResponse,
 } from "@workspace/api-zod";
+import { validateBody } from "../lib/validateRequest";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { ObjectPermission } from "../lib/objectAcl";
 import { requireAuth } from "../middlewares/requireAuth";
@@ -11,6 +12,18 @@ import { db } from "@workspace/db";
 import { sql, eq, or } from "drizzle-orm";
 import { usersTable } from "@workspace/db/schema";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
+
+function validateWildcardPath(paramKey: string) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const raw = req.params[paramKey];
+    const filePath = Array.isArray(raw) ? raw.join("/") : (raw ?? "");
+    if (!filePath || filePath.length > 512 || /\.\.\/|\.\.\\/.test(filePath)) {
+      res.status(400).json({ error: "Invalid path" });
+      return;
+    }
+    next();
+  };
+}
 
 const KYC_ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
@@ -51,14 +64,8 @@ const objectStorageService = new ObjectStorageService();
  * The client sends JSON metadata (name, size, contentType) — NOT the file.
  * Then uploads the file directly to the returned presigned URL.
  */
-router.post("/storage/uploads/request-url", requireAuth, async (req: Request, res: Response) => {
-  const parsed = RequestUploadUrlBody.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ error: "Missing or invalid required fields" });
-    return;
-  }
-
-  const { name, size, contentType } = parsed.data;
+router.post("/storage/uploads/request-url", requireAuth, validateBody(RequestUploadUrlBody), async (req: Request, res: Response) => {
+  const { name, size, contentType } = req.body;
 
   if (!KYC_ALLOWED_MIME_TYPES.has(contentType)) {
     res.status(400).json({ error: "File type not allowed. Accepted types: JPEG, PNG, WebP, HEIC, PDF." });
@@ -98,7 +105,7 @@ router.post("/storage/uploads/request-url", requireAuth, async (req: Request, re
  * These are unconditionally public — no authentication or ACL checks.
  * IMPORTANT: Always provide this endpoint when object storage is set up.
  */
-router.get("/storage/public-objects/*filePath", async (req: Request, res: Response) => {
+router.get("/storage/public-objects/*filePath", validateWildcardPath("filePath"), async (req: Request, res: Response) => {
   try {
     const raw = req.params.filePath;
     const filePath = Array.isArray(raw) ? raw.join("/") : raw;
@@ -131,7 +138,7 @@ router.get("/storage/public-objects/*filePath", async (req: Request, res: Respon
  * Serve private object entities from PRIVATE_OBJECT_DIR.
  * Requires authentication. Access is granted to the document owner or an admin.
  */
-router.get("/storage/objects/*path", requireAuth, async (req: Request, res: Response) => {
+router.get("/storage/objects/*path", requireAuth, validateWildcardPath("path"), async (req: Request, res: Response) => {
   const requestingUserId = (req as AuthenticatedRequest).userId;
 
   try {

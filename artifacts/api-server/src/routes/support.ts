@@ -8,6 +8,7 @@ import { usersTable } from "@workspace/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { logger } from "../lib/logger";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
+import { validateBody, validateQuery, validateParams, PaginationQuerySchema, IntIdParamsSchema, z } from "../lib/validateRequest";
 
 async function ensureSupportTables() {
   try {
@@ -71,31 +72,34 @@ const MAX_SUBJECT_LENGTH = 200;
 const MAX_DESCRIPTION_LENGTH = 5000;
 const MAX_NOTES_LENGTH = 5000;
 
+const TicketCreateSchema = z.object({
+  subject: z.string().min(1).max(MAX_SUBJECT_LENGTH),
+  category: z.enum(VALID_TICKET_CATEGORIES as [string, ...string[]]),
+  description: z.string().min(1).max(MAX_DESCRIPTION_LENGTH),
+  screenshotUrl: z.string().max(7_000_000).optional(),
+});
+
+const TicketPatchSchema = z.object({
+  status: z.enum(VALID_TICKET_STATUSES as [string, ...string[]]).optional(),
+  adminNotes: z.string().max(MAX_NOTES_LENGTH).optional(),
+});
+
+const ServiceStatusSchema = z.object({
+  status: z.enum(["operational", "degraded", "outage"]),
+});
+
+const IncidentCreateSchema = z.object({
+  serviceName: z.string().min(1).max(200),
+  title: z.string().min(1).max(200),
+  description: z.string().max(2000).optional(),
+  severity: z.enum(["minor", "major", "critical"]).optional().default("minor"),
+});
+
 const router = Router();
 
-router.post("/support/tickets", requireAuth, imageCompressionMiddleware, async (req: Request, res: Response) => {
+router.post("/support/tickets", requireAuth, imageCompressionMiddleware, validateBody(TicketCreateSchema), async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
   const { subject, category, description, screenshotUrl } = req.body;
-
-  if (!subject || !category || !description) {
-    return res.status(400).json({ error: "Subject, category, and description are required" });
-  }
-
-  if (typeof subject !== "string" || subject.length > MAX_SUBJECT_LENGTH) {
-    return res.status(400).json({ error: `Subject must be ${MAX_SUBJECT_LENGTH} characters or fewer` });
-  }
-
-  if (typeof description !== "string" || description.length > MAX_DESCRIPTION_LENGTH) {
-    return res.status(400).json({ error: `Description must be ${MAX_DESCRIPTION_LENGTH} characters or fewer` });
-  }
-
-  if (!VALID_TICKET_CATEGORIES.includes(category)) {
-    return res.status(400).json({ error: "Invalid category" });
-  }
-
-  if (screenshotUrl && (typeof screenshotUrl !== "string" || screenshotUrl.length > 7_000_000)) {
-    return res.status(400).json({ error: "Screenshot too large" });
-  }
 
   try {
     const users = await db.select({ email: usersTable.email }).from(usersTable).where(eq(usersTable.clerkId, userId)).limit(1);
@@ -123,7 +127,7 @@ router.post("/support/tickets", requireAuth, imageCompressionMiddleware, async (
   }
 });
 
-router.get("/support/tickets", requireAuth, async (req: Request, res: Response) => {
+router.get("/support/tickets", requireAuth, validateQuery(PaginationQuerySchema), async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
   const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
   const offset = parseInt(req.query.offset as string) || 0;
@@ -149,7 +153,11 @@ router.get("/support/tickets", requireAuth, async (req: Request, res: Response) 
   }
 });
 
-router.get("/support/admin/tickets", requireAuth, requireAdmin, async (req: Request, res: Response) => {
+const AdminTicketsQuerySchema = PaginationQuerySchema.extend({
+  status: z.string().max(50).optional(),
+});
+
+router.get("/support/admin/tickets", requireAuth, requireAdmin, validateQuery(AdminTicketsQuerySchema), async (req: Request, res: Response) => {
   try {
     const statusFilter = (req.query.status as string) || "";
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
@@ -189,22 +197,10 @@ router.get("/support/admin/tickets", requireAuth, requireAdmin, async (req: Requ
   }
 });
 
-router.patch("/support/admin/tickets/:id", requireAuth, requireAdmin, async (req: Request, res: Response) => {
+router.patch("/support/admin/tickets/:id", requireAuth, requireAdmin, validateParams(IntIdParamsSchema), validateBody(TicketPatchSchema), async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
   const ticketId = parseInt(req.params.id, 10);
   const { status, adminNotes } = req.body;
-
-  if (isNaN(ticketId)) {
-    return res.status(400).json({ error: "Invalid ticket ID" });
-  }
-
-  if (status && !VALID_TICKET_STATUSES.includes(status)) {
-    return res.status(400).json({ error: "Invalid status. Must be: " + VALID_TICKET_STATUSES.join(", ") });
-  }
-
-  if (adminNotes && (typeof adminNotes !== "string" || adminNotes.length > MAX_NOTES_LENGTH)) {
-    return res.status(400).json({ error: `Notes must be ${MAX_NOTES_LENGTH} characters or fewer` });
-  }
 
   try {
 
@@ -241,7 +237,7 @@ router.get("/status/services", async (_req: Request, res: Response) => {
   }
 });
 
-router.get("/status/incidents", async (req: Request, res: Response) => {
+router.get("/status/incidents", validateQuery(PaginationQuerySchema), async (req: Request, res: Response) => {
   try {
     const limit = Math.min(Math.max(parseInt(String(req.query.limit)) || 50, 1), 50);
     const offset = Math.max(parseInt(String(req.query.offset)) || 0, 0);
@@ -259,14 +255,14 @@ router.get("/status/incidents", async (req: Request, res: Response) => {
   }
 });
 
-router.patch("/status/admin/services/:name", requireAuth, requireAdmin, async (req: Request, res: Response) => {
+const ServiceNameParamsSchema = z.object({
+  name: z.string().min(1).max(100),
+});
+
+router.patch("/status/admin/services/:name", requireAuth, requireAdmin, validateParams(ServiceNameParamsSchema), validateBody(ServiceStatusSchema), async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
   const serviceName = decodeURIComponent(req.params.name);
   const { status } = req.body;
-
-  if (!status || !["operational", "degraded", "outage"].includes(status)) {
-    return res.status(400).json({ error: "Invalid status. Must be operational, degraded, or outage." });
-  }
 
   try {
 
@@ -284,13 +280,9 @@ router.patch("/status/admin/services/:name", requireAuth, requireAdmin, async (r
   }
 });
 
-router.post("/status/admin/incidents", requireAuth, requireAdmin, async (req: Request, res: Response) => {
+router.post("/status/admin/incidents", requireAuth, requireAdmin, validateBody(IncidentCreateSchema), async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
   const { serviceName, title, description, severity } = req.body;
-
-  if (!serviceName || !title) {
-    return res.status(400).json({ error: "Service name and title are required" });
-  }
 
   try {
 

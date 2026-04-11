@@ -13,6 +13,7 @@ import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
 import { calculateLevel, calculateTier } from "@workspace/xp";
+import { validateBody, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -114,7 +115,31 @@ router.get("/simulation/profile", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/simulation/profile", requireAuth, async (req, res) => {
+const SimulationProfileSchema = z.object({
+  annualIncome: z.number().nonnegative().max(100_000_000).optional(),
+  monthlyExpenses: z.number().nonnegative().max(10_000_000).optional(),
+  savingsRate: z.number().min(0).max(100).optional(),
+  currentSavings: z.number().nonnegative().max(1_000_000_000).optional(),
+  monthlyInvestment: z.number().nonnegative().max(10_000_000).optional(),
+  expectedReturnRate: z.number().min(0).max(30).optional(),
+  inflationRate: z.number().min(0).max(15).optional(),
+  timeHorizonYears: z.number().int().min(1).max(50).optional(),
+  riskTolerance: z.enum(["conservative", "moderate", "aggressive"]).optional(),
+});
+
+const SimulationProjectSchema = z.object({
+  currentSavings: z.number().nonnegative().optional(),
+  monthlyInvestment: z.number().nonnegative().optional(),
+  savingsRate: z.number().min(0).max(100).optional(),
+  annualIncome: z.number().nonnegative().optional(),
+  expectedReturnRate: z.number().min(0).max(30).optional(),
+  inflationRate: z.number().min(0).max(15).optional(),
+  timeHorizonYears: z.number().int().min(1).max(50).optional(),
+  saveSnapshot: z.boolean().optional(),
+  snapshotLabel: z.string().max(200).optional(),
+});
+
+router.post("/simulation/profile", requireAuth, validateBody(SimulationProfileSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const {
     annualIncome,
@@ -165,7 +190,7 @@ router.post("/simulation/profile", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/simulation/project", requireAuth, async (req, res) => {
+router.post("/simulation/project", requireAuth, validateBody(SimulationProjectSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const {
     currentSavings = 0,

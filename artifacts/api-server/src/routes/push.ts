@@ -3,6 +3,7 @@ import webpush from "web-push";
 import { requireAuth } from "../middlewares/requireAuth";
 import { pool } from "@workspace/db";
 import { logger } from "../lib/logger";
+import { validateBody, z } from "../lib/validateRequest";
 
 interface AuthenticatedRequest extends Request {
   userId?: string;
@@ -45,15 +46,21 @@ router.get("/push/vapid-public-key", (_req: Request, res: Response) => {
   res.json({ publicKey: activePublicKey });
 });
 
-router.post("/push/subscribe", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+const PushSubscriptionSchema = z.object({
+  subscription: z.object({
+    endpoint: z.string().url().max(2000),
+    keys: z.object({
+      p256dh: z.string().max(500),
+      auth: z.string().max(200),
+    }).optional(),
+  }),
+});
+
+router.post("/push/subscribe", requireAuth, validateBody(PushSubscriptionSchema), async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
 
   const { subscription } = req.body;
-  if (!subscription || !subscription.endpoint) {
-    res.status(400).json({ error: "Invalid subscription object" });
-    return;
-  }
 
   try {
     const client = await pool.connect();

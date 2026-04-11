@@ -28,6 +28,7 @@ if (!basePath) {
 
 export default defineConfig({
   base: basePath,
+  envPrefix: "VITE_",
   plugins: [
     react(),
     tailwindcss(),

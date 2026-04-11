@@ -10,6 +10,7 @@ import { CircuitBreaker, registerCircuit } from "../lib/circuitBreaker";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
 import { sendPushNotificationToUser } from "./push";
 import { getAuth } from "@clerk/express";
+import { validateBody, validateQuery, validateParams, PaginationQuerySchema, IntIdParamsSchema, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -53,7 +54,7 @@ async function getDailyAlertCount(userId: string): Promise<number> {
   return result?.c || 0;
 }
 
-router.get("/alerts", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get("/alerts", requireAuth, validateQuery(PaginationQuerySchema), async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
   try {
@@ -90,18 +91,30 @@ router.get("/alerts", requireAuth, async (req: AuthenticatedRequest, res: Respon
   }
 });
 
-router.post("/alerts", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+const AlertCreateSchema = z.object({
+  symbol: z.string().min(1).max(10).regex(/^[A-Za-z0-9.]{1,10}$/, "Invalid symbol"),
+  alertType: z.enum(ALERT_TYPES as [string, ...string[]]),
+  threshold: z.number().optional(),
+});
+
+const AlertPatchSchema = z.object({
+  enabled: z.boolean().optional(),
+  threshold: z.number().optional(),
+  alertType: z.enum(ALERT_TYPES as [string, ...string[]]).optional(),
+});
+
+const AlertMarkReadSchema = z.object({
+  ids: z.array(z.number().int().positive()).max(500).optional(),
+});
+
+const DigestPreferenceSchema = z.object({
+  frequency: z.enum(["off", "daily", "weekly"]),
+});
+
+router.post("/alerts", requireAuth, validateBody(AlertCreateSchema), async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
   const { symbol, alertType, threshold } = req.body;
-  if (!symbol || !alertType) {
-    res.status(400).json({ error: "symbol and alertType are required" });
-    return;
-  }
-  if (!isValidAlertType(alertType)) {
-    res.status(400).json({ error: `Invalid alertType. Valid: ${ALERT_TYPES.join(", ")}` });
-    return;
-  }
   const sanitizedSymbol = String(symbol).toUpperCase().replace(/[^A-Z0-9.]/g, "").slice(0, 10);
   if (!sanitizedSymbol) {
     res.status(400).json({ error: "Invalid symbol" });
@@ -134,11 +147,10 @@ router.post("/alerts", requireAuth, async (req: AuthenticatedRequest, res: Respo
   }
 });
 
-router.patch("/alerts/:id", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.patch("/alerts/:id", requireAuth, validateParams(IntIdParamsSchema), validateBody(AlertPatchSchema), async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
   const alertId = parseInt(req.params.id);
-  if (isNaN(alertId)) { res.status(400).json({ error: "Invalid alert ID" }); return; }
   const { enabled, threshold, alertType } = req.body;
   try {
     const patch: Record<string, unknown> = { updatedAt: new Date() };
@@ -158,11 +170,10 @@ router.patch("/alerts/:id", requireAuth, async (req: AuthenticatedRequest, res: 
   }
 });
 
-router.delete("/alerts/:id", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.delete("/alerts/:id", requireAuth, validateParams(IntIdParamsSchema), async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
   const alertId = parseInt(req.params.id);
-  if (isNaN(alertId)) { res.status(400).json({ error: "Invalid alert ID" }); return; }
   try {
     const [deleted] = await db
       .delete(alertsTable)
@@ -176,7 +187,7 @@ router.delete("/alerts/:id", requireAuth, async (req: AuthenticatedRequest, res:
   }
 });
 
-router.get("/alerts/history", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get("/alerts/history", requireAuth, validateQuery(PaginationQuerySchema), async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
   try {
@@ -227,7 +238,7 @@ router.get("/alerts/unread-count", requireAuth, async (req: AuthenticatedRequest
   }
 });
 
-router.post("/alerts/mark-read", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post("/alerts/mark-read", requireAuth, validateBody(AlertMarkReadSchema), async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
   try {
@@ -589,14 +600,10 @@ router.get("/alerts/digest-preference", requireAuth, async (req: AuthenticatedRe
   }
 });
 
-router.patch("/alerts/digest-preference", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.patch("/alerts/digest-preference", requireAuth, validateBody(DigestPreferenceSchema), async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
   const { frequency } = req.body;
-  if (!frequency || !["off", "daily", "weekly"].includes(frequency)) {
-    res.status(400).json({ error: "frequency must be off, daily, or weekly" });
-    return;
-  }
   try {
     await db
       .update(usersTable)

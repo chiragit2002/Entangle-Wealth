@@ -5,6 +5,7 @@ import Parser from "rss-parser";
 import { getAllSymbols } from "../data/nasdaq-stocks";
 import { newsCache } from "../lib/cache";
 import { requireAuth } from "../middlewares/requireAuth";
+import { validateQuery, PaginationQuerySchema, z } from "../lib/validateRequest";
 
 const router = Router();
 const rssParser = new Parser({
@@ -286,8 +287,8 @@ async function parseFeed(topic: string, url: string): Promise<NewsItem[]> {
     }
 
     return items;
-  } catch (err: any) {
-    logger.warn({ url, err: err.message }, "Failed to parse RSS feed");
+  } catch (err: unknown) {
+    logger.warn({ url, err }, "Failed to parse RSS feed");
     return [];
   }
 }
@@ -372,7 +373,12 @@ function newsRateLimit(req: Request, res: Response, next: NextFunction) {
 
 router.use("/news", newsRateLimit);
 
-router.get("/news", async (req: Request, res: Response) => {
+const NewsQuerySchema = PaginationQuerySchema.extend({
+  topic: z.string().max(100).optional().default(""),
+  search: z.string().max(200).optional().default(""),
+});
+
+router.get("/news", validateQuery(NewsQuerySchema), async (req: Request, res: Response) => {
   try {
     const topic = (req.query.topic as string) || "";
     const search = (req.query.search as string) || "";
@@ -422,7 +428,7 @@ router.get("/news", async (req: Request, res: Response) => {
     };
     newsCache.set(newsCacheKey, response);
     res.json(response);
-  } catch (err: any) {
+  } catch (err: unknown) {
     logger.error({ err }, "News endpoint failed");
     res.status(500).json({ error: "Failed to fetch news" });
   }
@@ -443,7 +449,7 @@ router.get("/news/refresh", requireAuth, async (_req: Request, res: Response) =>
     cachedItems = [];
     const items = await scrapeAllFeeds();
     res.json({ refreshed: true, count: items.length });
-  } catch (err: any) {
+  } catch (err: unknown) {
     logger.error({ err }, "News refresh failed");
     res.status(500).json({ error: "Failed to refresh news" });
   }

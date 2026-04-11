@@ -1,9 +1,35 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { logger } from "../lib/logger";
 import { requireAuth } from "../middlewares/requireAuth";
+import { validateParams, validateQuery, z } from "../lib/validateRequest";
 import { TTLCache } from "../lib/cache";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { alpacaCircuit } from "../lib/circuitBreaker";
+
+const AlpacaSymbolParamsSchema = z.object({
+  symbol: z.string().min(1).max(10).regex(/^[A-Za-z]+$/),
+});
+
+const AlpacaSymbolsQuerySchema = z.object({
+  symbols: z.string().min(1).max(500),
+});
+
+const AlpacaBarsParamsSchema = z.object({
+  symbol: z.string().min(1).max(10).regex(/^[A-Za-z]+$/),
+});
+
+const AlpacaBarsQuerySchema = z.object({
+  timeframe: z.string().max(20).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).optional(),
+  start: z.string().datetime({ offset: true }).optional(),
+  end: z.string().datetime({ offset: true }).optional(),
+});
+
+const AlpacaMultiBarsQuerySchema = z.object({
+  symbols: z.string().min(1).max(500),
+  timeframe: z.string().max(20).optional(),
+  limit: z.coerce.number().int().min(1).max(200).optional(),
+});
 
 const alpacaCache = new TTLCache(60_000, 300);
 
@@ -82,7 +108,7 @@ async function alpacaFetch(url: string, cacheKey?: string) {
   );
 }
 
-router.get("/alpaca/snapshot/:symbol", async (req, res) => {
+router.get("/alpaca/snapshot/:symbol", validateParams(AlpacaSymbolParamsSchema), async (req, res) => {
   try {
     const symbol = req.params.symbol.toUpperCase();
     const cacheKey = `snapshot:${symbol}`;
@@ -103,7 +129,7 @@ router.get("/alpaca/snapshot/:symbol", async (req, res) => {
   }
 });
 
-router.get("/alpaca/snapshots", async (req, res) => {
+router.get("/alpaca/snapshots", validateQuery(AlpacaSymbolsQuerySchema), async (req, res) => {
   try {
     const symbols = (req.query.symbols as string) || "";
     if (!symbols) {
@@ -128,7 +154,7 @@ router.get("/alpaca/snapshots", async (req, res) => {
   }
 });
 
-router.get("/alpaca/bars/:symbol", async (req, res) => {
+router.get("/alpaca/bars/:symbol", validateParams(AlpacaBarsParamsSchema), validateQuery(AlpacaBarsQuerySchema), async (req, res) => {
   try {
     const symbol = req.params.symbol.toUpperCase();
     const timeframe = (req.query.timeframe as string) || "1Day";
@@ -148,7 +174,7 @@ router.get("/alpaca/bars/:symbol", async (req, res) => {
   }
 });
 
-router.get("/alpaca/quote/:symbol", async (req, res) => {
+router.get("/alpaca/quote/:symbol", validateParams(AlpacaSymbolParamsSchema), async (req, res) => {
   try {
     const symbol = req.params.symbol.toUpperCase();
     const data = await alpacaFetch(
@@ -161,7 +187,7 @@ router.get("/alpaca/quote/:symbol", async (req, res) => {
   }
 });
 
-router.get("/alpaca/trades/:symbol", async (req, res) => {
+router.get("/alpaca/trades/:symbol", validateParams(AlpacaSymbolParamsSchema), async (req, res) => {
   try {
     const symbol = req.params.symbol.toUpperCase();
     const data = await alpacaFetch(
@@ -174,7 +200,7 @@ router.get("/alpaca/trades/:symbol", async (req, res) => {
   }
 });
 
-router.get("/alpaca/multibars", async (req, res) => {
+router.get("/alpaca/multibars", validateQuery(AlpacaMultiBarsQuerySchema), async (req, res) => {
   try {
     const symbols = (req.query.symbols as string) || "";
     const timeframe = (req.query.timeframe as string) || "1Day";

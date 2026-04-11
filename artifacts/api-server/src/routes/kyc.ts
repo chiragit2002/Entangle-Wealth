@@ -6,6 +6,11 @@ import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { isUploadOwnedBy } from "./storage";
+import { validateBody, validateParams, z } from "../lib/validateRequest";
+
+const AdminUserIdParamsSchema = z.object({
+  userId: z.string().min(1).max(100),
+});
 
 const router = Router();
 
@@ -31,14 +36,19 @@ router.get("/kyc/status", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/kyc/submit", requireAuth, async (req, res) => {
+const KycSubmitSchema = z.object({
+  fullLegalName: z.string().min(1).max(200),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD"),
+  address: z.string().min(1).max(500),
+  idType: z.enum(["passport", "drivers_license", "national_id", "other"]),
+  idNumber: z.string().min(1).max(100),
+  idPhotoPath: z.string().regex(/^\/objects\//, "Must start with /objects/").optional(),
+  selfiePath: z.string().regex(/^\/objects\//, "Must start with /objects/").optional(),
+});
+
+router.post("/kyc/submit", requireAuth, validateBody(KycSubmitSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { fullLegalName, dateOfBirth, address, idType, idNumber, idPhotoPath, selfiePath } = req.body;
-
-  if (!fullLegalName || !dateOfBirth || !address || !idType || !idNumber) {
-    res.status(400).json({ error: "All required fields must be provided" });
-    return;
-  }
 
   if (idPhotoPath && typeof idPhotoPath === "string") {
     if (!idPhotoPath.startsWith("/objects/")) {
@@ -97,7 +107,7 @@ router.post("/kyc/submit", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/kyc/approve/:userId", requireAuth, requireAdmin, async (req, res) => {
+router.post("/kyc/approve/:userId", requireAuth, requireAdmin, validateParams(AdminUserIdParamsSchema), validateBody(z.object({}).strict()), async (req, res) => {
   const targetUserId = String(req.params.userId);
 
   try {
@@ -119,7 +129,7 @@ router.post("/kyc/approve/:userId", requireAuth, requireAdmin, async (req, res) 
   }
 });
 
-router.post("/kyc/reject/:userId", requireAuth, requireAdmin, async (req, res) => {
+router.post("/kyc/reject/:userId", requireAuth, requireAdmin, validateParams(AdminUserIdParamsSchema), validateBody(z.object({}).strict()), async (req, res) => {
   const targetUserId = String(req.params.userId);
 
   try {

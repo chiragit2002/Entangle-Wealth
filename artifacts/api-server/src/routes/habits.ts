@@ -13,6 +13,7 @@ import { eq, and, desc, gte, sql } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
+import { validateBody, validateParams, validateQuery, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -124,13 +125,13 @@ router.get("/habits/me", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/habits/:habitId/complete", requireAuth, async (req, res) => {
+const HabitCompleteParamsSchema = z.object({
+  habitId: z.coerce.number().int().positive(),
+});
+
+router.post("/habits/:habitId/complete", requireAuth, validateParams(HabitCompleteParamsSchema), validateBody(z.object({}).strict()), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const habitId = parseInt(req.params.habitId);
-  if (isNaN(habitId)) {
-    res.status(400).json({ error: "Invalid habit ID" });
-    return;
-  }
 
   try {
     const userId = await resolveUserId(clerkId, req);
@@ -299,7 +300,7 @@ router.get("/habits/summary", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/habits/history", requireAuth, async (req, res) => {
+router.get("/habits/history", requireAuth, validateQuery(z.object({ limit: z.coerce.number().int().min(1).max(50).optional().default(20) })), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
   try {

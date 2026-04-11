@@ -4,6 +4,7 @@ import { resumesTable, resumeExperiencesTable, resumeEducationTable } from "@wor
 import { eq, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
+import { validateBody, validateParams, IntIdParamsSchema, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -18,7 +19,39 @@ router.get("/resumes", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/resumes", requireAuth, async (req, res) => {
+const ExperienceSchema = z.object({
+  company: z.string().max(200).optional(),
+  title: z.string().max(200).optional(),
+  location: z.string().max(200).optional(),
+  startDate: z.string().max(50).optional(),
+  endDate: z.string().max(50).optional(),
+  isCurrent: z.boolean().optional(),
+  description: z.string().max(2000).optional(),
+  isGigWork: z.boolean().optional(),
+});
+
+const EducationSchema = z.object({
+  institution: z.string().max(200).optional(),
+  degree: z.string().max(200).optional(),
+  field: z.string().max(200).optional(),
+  startDate: z.string().max(50).optional(),
+  endDate: z.string().max(50).optional(),
+});
+
+const ResumeCreateSchema = z.object({
+  title: z.string().max(200).optional(),
+  template: z.string().max(100).optional(),
+  summary: z.string().max(2000).optional(),
+  skills: z.array(z.string().max(100)).max(100).optional(),
+  certifications: z.array(z.string().max(200)).max(50).optional(),
+});
+
+const ResumeUpdateSchema = ResumeCreateSchema.extend({
+  experiences: z.array(ExperienceSchema).max(50).optional(),
+  education: z.array(EducationSchema).max(20).optional(),
+});
+
+router.post("/resumes", requireAuth, validateBody(ResumeCreateSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { title, template, summary, skills, certifications } = req.body;
 
@@ -38,7 +71,7 @@ router.post("/resumes", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/resumes/:id", requireAuth, async (req, res) => {
+router.get("/resumes/:id", requireAuth, validateParams(IntIdParamsSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const resumeId = parseInt(req.params.id);
 
@@ -64,7 +97,7 @@ router.get("/resumes/:id", requireAuth, async (req, res) => {
   }
 });
 
-router.put("/resumes/:id", requireAuth, async (req, res) => {
+router.put("/resumes/:id", requireAuth, validateParams(IntIdParamsSchema), validateBody(ResumeUpdateSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const resumeId = parseInt(req.params.id);
   const { title, template, summary, skills, certifications, experiences, education } = req.body;
@@ -131,7 +164,7 @@ router.put("/resumes/:id", requireAuth, async (req, res) => {
   }
 });
 
-router.delete("/resumes/:id", requireAuth, async (req, res) => {
+router.delete("/resumes/:id", requireAuth, validateParams(IntIdParamsSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const resumeId = parseInt(req.params.id);
 
@@ -152,7 +185,11 @@ router.delete("/resumes/:id", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/resumes/public/:userId", async (req, res) => {
+const PublicUserIdParamsSchema = z.object({
+  userId: z.string().min(1).max(100),
+});
+
+router.get("/resumes/public/:userId", validateParams(PublicUserIdParamsSchema), async (req, res) => {
   try {
     const resumes = await db.select().from(resumesTable)
       .where(eq(resumesTable.userId, req.params.userId));

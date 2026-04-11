@@ -5,6 +5,7 @@ import { getStrategyHtml, getStrategyIndexHtml } from "../seo/strategies";
 import { getPatternHtml, getPatternIndexHtml } from "../seo/patterns";
 import { getSectorHtml, getSectorIndexHtml } from "../seo/sectors";
 import { getComparisonHtml, getComparisonIndexHtml } from "../seo/comparisons";
+import { validateParams, SlugParamsSchema } from "../lib/validateRequest";
 import {
   generateSitemapIndex,
   generateGlossarySitemap,
@@ -31,7 +32,7 @@ router.get("/learn", (_req, res) => {
   res.send(getGlossaryIndexHtml());
 });
 
-router.get("/learn/:slug", (req, res) => {
+router.get("/learn/:slug", validateParams(SlugParamsSchema), (req, res) => {
   const html = getTermHtml(req.params.slug);
   if (!html) {
     res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Term not found", "/learn"));
@@ -48,7 +49,7 @@ router.get("/indicators", (_req, res) => {
   res.send(getIndicatorIndexHtml());
 });
 
-router.get("/indicators/:slug", (req, res) => {
+router.get("/indicators/:slug", validateParams(SlugParamsSchema), (req, res) => {
   const html = getIndicatorHtml(req.params.slug);
   if (!html) {
     res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Indicator not found", "/indicators"));
@@ -65,7 +66,7 @@ router.get("/strategies", (_req, res) => {
   res.send(getStrategyIndexHtml());
 });
 
-router.get("/strategies/:slug", (req, res) => {
+router.get("/strategies/:slug", validateParams(SlugParamsSchema), (req, res) => {
   const html = getStrategyHtml(req.params.slug);
   if (!html) {
     res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Strategy not found", "/strategies"));
@@ -82,7 +83,7 @@ router.get("/patterns", (_req, res) => {
   res.send(getPatternIndexHtml());
 });
 
-router.get("/patterns/:slug", (req, res) => {
+router.get("/patterns/:slug", validateParams(SlugParamsSchema), (req, res) => {
   const html = getPatternHtml(req.params.slug);
   if (!html) {
     res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Pattern not found", "/patterns"));
@@ -99,7 +100,7 @@ router.get("/sectors", (_req, res) => {
   res.send(getSectorIndexHtml());
 });
 
-router.get("/sectors/:slug", (req, res) => {
+router.get("/sectors/:slug", validateParams(SlugParamsSchema), (req, res) => {
   const html = getSectorHtml(req.params.slug);
   if (!html) {
     res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Sector not found", "/sectors"));
@@ -116,7 +117,7 @@ router.get("/compare", (_req, res) => {
   res.send(getComparisonIndexHtml());
 });
 
-router.get("/compare/:slug", (req, res) => {
+router.get("/compare/:slug", validateParams(SlugParamsSchema), (req, res) => {
   const html = getComparisonHtml(req.params.slug);
   if (!html) {
     res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Comparison not found", "/compare"));

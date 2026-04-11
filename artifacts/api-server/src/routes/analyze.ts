@@ -4,6 +4,8 @@ import { getStockBySymbol } from "../data/nasdaq-stocks";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { checkSignalLimit, incrementSignalCount } from "../lib/userDailyLimits";
+import { logger } from "../lib/logger";
+import { validateParams, validateBody, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -29,7 +31,11 @@ function checkRateLimit(req: Request): boolean {
   return true;
 }
 
-router.post("/stocks/:symbol/analyze", requireAuth, async (req, res) => {
+const StockSymbolParamsSchema = z.object({
+  symbol: z.string().min(1).max(10).regex(/^[A-Za-z]{1,10}$/, "Symbol must be 1-10 letters"),
+});
+
+router.post("/stocks/:symbol/analyze", requireAuth, validateParams(StockSymbolParamsSchema), validateBody(z.object({}).strict()), async (req, res) => {
   if (!checkRateLimit(req)) {
     res.status(429).json({ error: "Rate limit exceeded. Please wait before requesting another analysis." });
     return;
@@ -139,14 +145,12 @@ Then synthesize with the Flash Council and deliver the consensus signal.`;
     incrementSignalCount(clerkId);
     res.json(analysis);
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Analysis failed";
-    console.error("Analysis error:", message);
-    console.error("Full analysis error details:", message);
+    logger.error({ err: error, symbol: req.params.symbol }, "Stock analysis error");
     res.status(500).json({ error: "Analysis failed. Please try again." });
   }
 });
 
-router.post("/stocks/:symbol/quick-analyze", requireAuth, async (req, res) => {
+router.post("/stocks/:symbol/quick-analyze", requireAuth, validateParams(StockSymbolParamsSchema), validateBody(z.object({}).strict()), async (req, res) => {
   if (!checkRateLimit(req)) {
     res.status(429).json({ error: "Rate limit exceeded. Please wait before requesting another analysis." });
     return;
@@ -182,8 +186,7 @@ router.post("/stocks/:symbol/quick-analyze", requireAuth, async (req, res) => {
 
     res.json(JSON.parse(content));
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Quick analysis failed";
-    console.error("Quick analysis error details:", message);
+    logger.error({ err: error, symbol: req.params.symbol }, "Quick stock analysis error");
     res.status(500).json({ error: "Quick analysis failed. Please try again." });
   }
 });

@@ -6,6 +6,11 @@ import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { isUploadOwnedBy } from "./storage";
+import { validateBody, validateParams, z } from "../lib/validateRequest";
+
+const BusinessDocUserIdParamsSchema = z.object({
+  userId: z.string().min(1).max(100),
+});
 
 const router = Router();
 
@@ -32,20 +37,21 @@ router.get("/business-docs/status", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/business-docs/submit", requireAuth, async (req, res) => {
+const BusinessDocSubmitSchema = z.object({
+  docPaths: z.array(
+    z.string().min(1).max(500).regex(/^\/objects\//, "Must start with /objects/")
+  ).min(1).max(10),
+});
+
+const AdminRejectionSchema = z.object({
+  reason: z.string().min(1).max(1000),
+});
+
+router.post("/business-docs/submit", requireAuth, validateBody(BusinessDocSubmitSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
   const { docPaths } = req.body;
 
-  if (!Array.isArray(docPaths) || docPaths.length === 0) {
-    res.status(400).json({ error: "At least one document path is required" });
-    return;
-  }
-
   for (const p of docPaths) {
-    if (typeof p !== "string" || !p.startsWith("/objects/")) {
-      res.status(400).json({ error: "Invalid document path" });
-      return;
-    }
     if (!(await isUploadOwnedBy(p, userId))) {
       res.status(403).json({ error: "You do not own one or more uploaded documents" });
       return;
@@ -83,7 +89,7 @@ router.post("/business-docs/submit", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/business-docs/approve/:userId", requireAuth, requireAdmin, async (req, res) => {
+router.post("/business-docs/approve/:userId", requireAuth, requireAdmin, validateParams(BusinessDocUserIdParamsSchema), validateBody(z.object({}).strict()), async (req, res) => {
   const targetUserId = String(req.params.userId);
 
   try {
@@ -105,7 +111,7 @@ router.post("/business-docs/approve/:userId", requireAuth, requireAdmin, async (
   }
 });
 
-router.post("/business-docs/reject/:userId", requireAuth, requireAdmin, async (req, res) => {
+router.post("/business-docs/reject/:userId", requireAuth, requireAdmin, validateParams(BusinessDocUserIdParamsSchema), validateBody(AdminRejectionSchema), async (req, res) => {
   const targetUserId = String(req.params.userId);
   const { reason } = req.body;
 

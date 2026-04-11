@@ -11,9 +11,18 @@ import { bruteForceGuard } from "./middlewares/bruteForce";
 import { csrfProtection } from "./middlewares/csrfProtection";
 import { authEventTracker } from "./middlewares/authEventTracker";
 import { metricsMiddleware } from "./middlewares/metricsMiddleware";
+import { globalErrorHandler } from "./middlewares/errorHandler";
+import {
+  userApiLimiter,
+  userAiLimiter,
+  userTradingLimiter,
+  userKycLimiter,
+} from "./middlewares/userRateLimit";
+import { trackSensitiveEndpointAccess, trackUserRequest } from "./lib/authEventLogger";
 import router from "./routes";
 import seoRouter from "./routes/seo";
 import { logger } from "./lib/logger";
+import { getAuth } from "@clerk/express";
 
 const app: Express = express();
 
@@ -26,8 +35,6 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: [
           "'self'",
-          "'unsafe-inline'",
-          "'unsafe-eval'",
           "https://*.clerk.accounts.dev",
           "https://js.stripe.com",
           "https://challenges.cloudflare.com",
@@ -170,6 +177,17 @@ app.use("/api/stripe", bruteForceGuard);
 app.use(clerkMiddleware());
 app.use(authEventTracker);
 
+app.use((req, _res, next) => {
+  const auth = getAuth(req);
+  const ip = req.ip || req.socket.remoteAddress || "unknown";
+  const fullPath = req.originalUrl.split("?")[0];
+  trackSensitiveEndpointAccess(auth?.userId ?? undefined, ip, fullPath);
+  if (auth?.userId) {
+    trackUserRequest(auth.userId, fullPath);
+  }
+  next();
+});
+
 app.use("/api/taxgpt", aiLimiter);
 app.use("/api/analyze-document", aiLimiter);
 app.use("/api/analyze", aiLimiter);
@@ -181,16 +199,17 @@ app.use("/api/marketing/generate", rateLimit({
   message: { error: "Marketing AI rate limit exceeded. Max 5 requests per minute." },
 }));
 
+app.use("/api/taxgpt", userAiLimiter);
+app.use("/api/analyze-document", userAiLimiter);
+app.use("/api/analyze", userAiLimiter);
+app.use("/api/paper-trading", userTradingLimiter);
+app.use("/api/kyc", userKycLimiter);
+app.use("/api", userApiLimiter);
+
 app.use(seoRouter);
 app.use("/api", seoRouter);
 app.use("/api", router);
 
-app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
-  const statusCode = (err as { status?: number; statusCode?: number })?.status
-    || (err as { status?: number; statusCode?: number })?.statusCode
-    || 500;
-  logger.error({ err, method: req.method, url: req.url }, "Unhandled error");
-  res.status(statusCode).json({ error: "An unexpected error occurred. Please try again." });
-});
+app.use(globalErrorHandler);
 
 export default app;

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { validateBody, validateQuery, validateParams, PaginationQuerySchema, z } from "../lib/validateRequest";
 import { db } from "@workspace/db";
 import {
   userXpTable,
@@ -19,6 +20,23 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
 import { evaluateStreak } from "../lib/streakUtils";
 import { calculateLevel, calculateTier, xpForLevel, xpForNextLevel, applyMultiplier, TIER_THRESHOLDS } from "@workspace/xp";
+
+const ChallengeIdParamsSchema = z.object({
+  challengeId: z.coerce.number().int().positive(),
+});
+
+const LeaderboardQuerySchema = z.object({
+  period: z.enum(["all", "monthly", "weekly"]).optional().default("monthly"),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(100),
+});
+
+const PeriodQuerySchema = z.object({
+  period: z.enum(["all", "monthly", "weekly"]).optional().default("monthly"),
+});
+
+const XpHistoryQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).optional().default(20),
+});
 
 const router = Router();
 
@@ -75,13 +93,14 @@ const XP_REWARDS: Record<string, Record<string, number>> = {
 
 const MAX_XP_PER_ACTION = 100;
 
-router.post("/gamification/xp", requireAuth, async (req, res) => {
+const XpSchema = z.object({
+  reason: z.string().min(1).max(100),
+  category: z.enum(["trading", "gig", "community", "engagement"]),
+});
+
+router.post("/gamification/xp", requireAuth, validateBody(XpSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const { reason, category } = req.body;
-  if (!reason || !category) {
-    res.status(400).json({ error: "reason and category are required" });
-    return;
-  }
 
   const categoryRewards = XP_REWARDS[category];
   if (!categoryRewards || !(reason in categoryRewards)) {
@@ -138,7 +157,7 @@ router.post("/gamification/xp", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/gamification/streak/checkin", requireAuth, async (req, res) => {
+router.post("/gamification/streak/checkin", requireAuth, validateBody(z.object({}).strict()), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const now = new Date();
 
@@ -271,7 +290,7 @@ router.get("/gamification/challenges/me", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/gamification/challenges/:challengeId/progress", requireAuth, async (req, res) => {
+router.post("/gamification/challenges/:challengeId/progress", requireAuth, validateParams(ChallengeIdParamsSchema), validateBody(z.object({ increment: z.coerce.number().int().min(1).max(100).optional().default(1) })), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const challengeId = parseInt(req.params.challengeId);
   const rawIncrement = parseInt(req.body.increment) || 1;
@@ -323,7 +342,7 @@ router.post("/gamification/challenges/:challengeId/progress", requireAuth, async
   }
 });
 
-router.get("/gamification/leaderboard", async (req, res) => {
+router.get("/gamification/leaderboard", validateQuery(LeaderboardQuerySchema), async (req, res) => {
   const period = (req.query.period as string) || "monthly";
   const limit = Math.min(parseInt(req.query.limit as string) || 100, 100);
 
@@ -362,7 +381,7 @@ router.get("/gamification/leaderboard", async (req, res) => {
   }
 });
 
-router.get("/gamification/leaderboard/rank", requireAuth, async (req, res) => {
+router.get("/gamification/leaderboard/rank", requireAuth, validateQuery(PeriodQuerySchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const period = (req.query.period as string) || "monthly";
   try {
@@ -404,7 +423,7 @@ router.get("/gamification/leaderboard/rank", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/gamification/xp/history", requireAuth, async (req, res) => {
+router.get("/gamification/xp/history", requireAuth, validateQuery(XpHistoryQuerySchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
   try {
@@ -568,7 +587,7 @@ router.get("/gamification/spin/status", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/gamification/spin", requireAuth, async (req, res) => {
+router.post("/gamification/spin", requireAuth, validateBody(z.object({}).strict()), async (req, res) => {
   if (!checkSpinRateLimit(req)) {
     res.status(429).json({ error: "Too many requests. Please slow down." });
     return;
@@ -770,7 +789,7 @@ router.get("/gamification/status", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/gamification/claim-daily", requireAuth, async (req, res) => {
+router.post("/gamification/claim-daily", requireAuth, validateBody(z.object({}).strict()), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const now = new Date();
 

@@ -4,17 +4,15 @@ import { logAuthEvent, type AuthEventType } from "../lib/authEventLogger";
 import { recordFailedAttempt, resetAttempts } from "../middlewares/bruteForce";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
 import { logger } from "../lib/logger";
+import { validateBody, z } from "../lib/validateRequest";
 import crypto from "crypto";
 
 const router = Router();
 
-const VALID_TYPES: Set<AuthEventType> = new Set([
-  "login_success",
-  "login_failed",
-  "logout",
-  "oauth_callback",
-  "signup",
-]);
+const AuthEventBodySchema = z.object({
+  type: z.enum(["login_success", "login_failed", "logout", "oauth_callback", "signup"]),
+  details: z.record(z.unknown()).optional(),
+});
 
 const REQUIRES_AUTH: Set<AuthEventType> = new Set([
   "login_success",
@@ -23,19 +21,14 @@ const REQUIRES_AUTH: Set<AuthEventType> = new Set([
   "signup",
 ]);
 
-router.post("/auth/event", (req: Request, res: Response) => {
+router.post("/auth/event", validateBody(AuthEventBodySchema), (req: Request, res: Response) => {
   const ip = req.ip || req.socket.remoteAddress || "unknown";
   const userAgent = req.headers["user-agent"];
   const { userId } = getAuth(req);
   const resolvedUserId = userId ?? undefined;
-  const { type, details } = req.body || {};
+  const { type, details } = req.body;
 
-  if (!type || !VALID_TYPES.has(type)) {
-    res.status(400).json({ error: "Invalid event type" });
-    return;
-  }
-
-  const eventType: AuthEventType = type;
+  const eventType: AuthEventType = type as AuthEventType;
 
   if (REQUIRES_AUTH.has(eventType) && !resolvedUserId) {
     res.status(401).json({ error: "Authentication required for this event type" });

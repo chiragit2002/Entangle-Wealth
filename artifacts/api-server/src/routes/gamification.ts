@@ -18,6 +18,7 @@ import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
 import { evaluateStreak } from "../lib/streakUtils";
+import { applyMultiplier } from "../lib/xpUtils";
 
 const router = Router();
 
@@ -126,7 +127,7 @@ router.post("/gamification/xp", requireAuth, async (req, res) => {
 
     let [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
     const multiplier = streak?.multiplier || 1.0;
-    const finalAmount = Math.min(Math.round(baseAmount * multiplier), MAX_XP_PER_ACTION);
+    const finalAmount = Math.min(applyMultiplier(baseAmount, multiplier), MAX_XP_PER_ACTION);
 
     await db.insert(xpTransactionsTable).values({ userId, amount: finalAmount, reason, category });
 
@@ -663,7 +664,7 @@ router.post("/gamification/spin", requireAuth, async (req, res) => {
       if (!xpRow) {
         [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
       }
-      const baseXp = Math.round(picked.rewardValue * founderMultiplier) + streakBonus;
+      const baseXp = applyMultiplier(picked.rewardValue, founderMultiplier) + streakBonus;
       const newTotalXp = xpRow.totalXp + baseXp;
       const newLevel = calculateLevel(newTotalXp);
       const newTier = calculateTier(newLevel, newTotalXp);
@@ -822,7 +823,7 @@ router.post("/gamification/claim-daily", requireAuth, async (req, res) => {
     else if (newStreak >= 3) dailyXp += 50;
 
     const [founder] = await db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
-    if (founder) dailyXp = Math.round(dailyXp * founder.xpMultiplier);
+    if (founder) dailyXp = applyMultiplier(dailyXp, founder.xpMultiplier);
 
     let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
     if (!xpRow) {

@@ -1,6 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 
-{/* ATTORNEY REVIEW: This Accessibility Statement should be reviewed by legal counsel to ensure compliance with ADA, Section 508, and applicable state laws. */}
+// ATTORNEY REVIEW: This Accessibility Statement should be reviewed by legal counsel to ensure compliance with ADA, Section 508, and applicable state laws.
 export default function Accessibility() {
   return (
     <Layout>

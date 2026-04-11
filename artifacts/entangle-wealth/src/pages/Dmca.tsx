@@ -1,6 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 
-{/* ATTORNEY REVIEW: This entire DMCA Policy page requires review by legal counsel before production use. */}
+// ATTORNEY REVIEW: This entire DMCA Policy page requires review by legal counsel before production use.
 export default function Dmca() {
   return (
     <Layout>

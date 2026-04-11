@@ -1,5 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 
+// ATTORNEY REVIEW: This entire Privacy Policy page requires review by legal counsel before production use.
 export default function Privacy() {
   return (
     <Layout>

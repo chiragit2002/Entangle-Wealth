@@ -1,5 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 
+// ATTORNEY REVIEW: This entire Terms of Use page requires review by legal counsel before production use.
 export default function Terms() {
   return (
     <Layout>

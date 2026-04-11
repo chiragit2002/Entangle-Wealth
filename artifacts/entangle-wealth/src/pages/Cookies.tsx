@@ -1,7 +1,7 @@
 import { Layout } from "@/components/layout/Layout";
 import { Link } from "wouter";
 
-{/* ATTORNEY REVIEW: This entire Cookie Policy page requires review by legal counsel before production use. */}
+// ATTORNEY REVIEW: This entire Cookie Policy page requires review by legal counsel before production use.
 export default function Cookies() {
   return (
     <Layout>

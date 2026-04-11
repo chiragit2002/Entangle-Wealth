@@ -1,7 +1,7 @@
 import { Layout } from "@/components/layout/Layout";
 import { Link } from "wouter";
 
-{/* ATTORNEY REVIEW: This entire Financial Disclaimer page requires review by legal counsel before production use. */}
+// ATTORNEY REVIEW: This entire Financial Disclaimer page requires review by legal counsel before production use.
 export default function Disclaimer() {
   return (
     <Layout>

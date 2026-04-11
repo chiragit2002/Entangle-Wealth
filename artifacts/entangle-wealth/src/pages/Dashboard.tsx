@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
+import { useAuth } from "@clerk/react";
 import { Layout } from "@/components/layout/Layout";
 import { FlashCouncil } from "@/components/FlashCouncil";
 import { MarketTicker } from "@/components/MarketTicker";
@@ -158,9 +159,15 @@ function DataRow({ label, value, change, mono = true, small = false }: { label: 
 }
 
 function GamificationBar() {
+  const { isSignedIn, isLoaded } = useAuth();
   const [gamData, setGamData] = useState<{ rank: string; streak: string; badges: string } | null>(null);
 
   useEffect(() => {
+    if (!isLoaded) return;
+    if (!isSignedIn) {
+      setGamData(null);
+      return;
+    }
     (async () => {
       try {
         const res = await fetch("/api/gamification/leaderboard/rank");
@@ -172,7 +179,27 @@ function GamificationBar() {
         setGamData({ rank: "#--", streak: "0 days", badges: "0/12" });
       }
     })();
-  }, []);
+  }, [isLoaded, isSignedIn]);
+
+  if (isLoaded && !isSignedIn) {
+    return (
+      <div className="grid grid-cols-3 gap-1.5 mb-2">
+        {[
+          { icon: <Trophy className="w-4 h-4 text-[#FFD700]" />, label: "RANK", color: "hover:border-[#FFD700]/20" },
+          { icon: <Flame className="w-4 h-4 text-orange-400" />, label: "STREAK", color: "hover:border-orange-400/20" },
+          { icon: <Award className="w-4 h-4 text-[#9c27b0]" />, label: "BADGES", color: "hover:border-[#9c27b0]/20" },
+        ].map(({ icon, label, color }) => (
+          <a key={label} href="/sign-in" className={`bg-[#0a0a0f] border border-white/[0.06] rounded-sm px-2.5 py-2 flex items-center gap-2 ${color} transition-colors cursor-pointer`}>
+            {icon}
+            <div>
+              <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest">{label}</p>
+              <p className="text-[10px] font-mono font-semibold text-white/30">Sign in to view</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    );
+  }
 
   const data = gamData || { rank: "#--", streak: "0 days", badges: "0/12" };
 

@@ -2,7 +2,8 @@ import { useState, useMemo } from "react";
 import { Link } from "wouter";
 import { Layout } from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
-import { Search, FileText, Calendar, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Search, FileText, Calendar, ArrowRight, BookOpen, TrendingUp, GraduationCap, BarChart3 } from "lucide-react";
 import { loadBlogPosts, type BlogPost } from "@/lib/seoStore";
 
 export default function BlogIndex() {
@@ -45,13 +46,50 @@ export default function BlogIndex() {
               <BlogCard key={post.id} post={post} />
             ))}
           </div>
-        ) : (
+        ) : search ? (
           <div className="text-center py-20 text-muted-foreground">
-            <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
-            <p className="text-lg font-medium mb-1">
-              {search ? "No articles match your search" : "No articles published yet"}
+            <Search className="w-10 h-10 mx-auto mb-3 opacity-30" />
+            <p className="text-lg font-medium mb-1">No articles match your search</p>
+            <p className="text-sm">Try a different keyword or browse our other resources below.</p>
+          </div>
+        ) : (
+          <div className="text-center py-16 max-w-2xl mx-auto">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
+              <BookOpen className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">Articles Coming Soon</h2>
+            <p className="text-muted-foreground mb-8 leading-relaxed">
+              While we prepare our first articles, explore the tools and resources already available on EntangleWealth.
             </p>
-            <p className="text-sm">Check back soon for financial insights and analysis.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+              <Link href="/research">
+                <div className="group rounded-xl border border-white/[0.06] p-5 hover:border-primary/20 transition-all cursor-pointer text-left" style={{ background: "rgba(8,8,20,0.6)" }}>
+                  <TrendingUp className="w-6 h-6 text-primary mb-3" />
+                  <p className="font-semibold text-white text-sm mb-1">News Intelligence</p>
+                  <p className="text-xs text-muted-foreground">Live financial news scored by relevance</p>
+                </div>
+              </Link>
+              <Link href="/technical">
+                <div className="group rounded-xl border border-white/[0.06] p-5 hover:border-primary/20 transition-all cursor-pointer text-left" style={{ background: "rgba(8,8,20,0.6)" }}>
+                  <BarChart3 className="w-6 h-6 text-primary mb-3" />
+                  <p className="font-semibold text-white text-sm mb-1">Technical Analysis</p>
+                  <p className="text-xs text-muted-foreground">55+ indicators with AI consensus signals</p>
+                </div>
+              </Link>
+              <Link href="/market-overview">
+                <div className="group rounded-xl border border-white/[0.06] p-5 hover:border-primary/20 transition-all cursor-pointer text-left" style={{ background: "rgba(8,8,20,0.6)" }}>
+                  <GraduationCap className="w-6 h-6 text-primary mb-3" />
+                  <p className="font-semibold text-white text-sm mb-1">Market Overview</p>
+                  <p className="text-xs text-muted-foreground">Live market data and sector analysis</p>
+                </div>
+              </Link>
+            </div>
+            <Link href="/dashboard">
+              <Button className="bg-primary text-black hover:bg-primary/90 font-semibold">
+                Go to Dashboard
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
           </div>
         )}
       </div>

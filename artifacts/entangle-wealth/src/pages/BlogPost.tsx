@@ -123,7 +123,7 @@ export default function BlogPostPage() {
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 text-center">
             <h3 className="text-lg font-bold text-white mb-2">Ready to level up your financial game?</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              EntangleWealth gives you Bloomberg Terminal-parity tools — free.
+              EntangleWealth gives you Bloomberg Terminal-parity tools | free.
             </p>
             <Link href="/sign-up" className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-black font-bold text-sm hover:bg-primary/90 transition-colors">
               Get Started Free

@@ -65,7 +65,7 @@ const INITIAL_COMMUNITIES: Community[] = [
 ];
 
 const INITIAL_POSTS: Post[] = [
-  { id: "1", author: "Marcus T.", avatar: "MT", avatarBg: "#00d4ff", time: "2 hours ago", body: "Just found $3,200 in missed deductions using the TaxFlow receipt scanner. If you're a gig worker, you NEED to be tracking every mile and every meal. The IRS won't remind you — but EntangleWealth will.", likes: 47, comments: 12, liked: false },
+  { id: "1", author: "Marcus T.", avatar: "MT", avatarBg: "#00d4ff", time: "2 hours ago", body: "Just found $3,200 in missed deductions using the TaxFlow receipt scanner. If you're a gig worker, you NEED to be tracking every mile and every meal. The IRS won't remind you | but EntangleWealth will.", likes: 47, comments: 12, liked: false },
   { id: "2", author: "Sarah K.", avatar: "SK", avatarBg: "#ffd700", time: "5 hours ago", body: "The options flow signals have been incredible this week. Caught that NVDA unusual activity alert before the 8% move. Who else was in on that trade?", likes: 83, comments: 24, liked: false },
   { id: "3", author: "David L.", avatar: "DL", avatarBg: "#00ff88", time: "8 hours ago", body: "Pro tip for gig workers: keep a separate business bank account. Makes tax time 10x easier and the IRS loves clear documentation. My CPA thanked me.", likes: 31, comments: 8, liked: false },
   { id: "4", author: "Jessica M.", avatar: "JM", avatarBg: "#ff3366", time: "1 day ago", body: "Used the travel planner for my CES trip and it automatically separated my business vs personal expenses. Saved me hours of manual categorization. Game changer for anyone who travels for work.", likes: 56, comments: 15, liked: false },
@@ -80,12 +80,12 @@ const INITIAL_EVENTS: Event[] = [
 ];
 
 const INITIAL_JOBS: Job[] = [
-  { id: "1", title: "Financial Analyst — Remote", company: "QuantEdge Capital", meta: "Remote · Full-time · Posted 2 days ago", salary: "$95K — $130K", category: "remote" },
-  { id: "2", title: "Tax Preparer — Seasonal", company: "H&R Block", meta: "Multiple locations · Part-time · Posted 1 week ago", salary: "$22 — $35/hr", category: "parttime" },
-  { id: "3", title: "DoorDash Driver", company: "DoorDash", meta: "Your area · Gig · Start today", salary: "$18 — $28/hr avg", category: "gig" },
-  { id: "4", title: "Freelance Bookkeeper", company: "Various Clients", meta: "Remote · Freelance · Ongoing", salary: "$40 — $65/hr", category: "freelance" },
-  { id: "5", title: "Investment Research Associate", company: "Goldman Sachs", meta: "New York, NY · Full-time · Posted 3 days ago", salary: "$120K — $180K", category: "fulltime" },
-  { id: "6", title: "Real Estate Agent", company: "Keller Williams", meta: "Your area · Full-time · Commission", salary: "$60K — $150K+", category: "fulltime" },
+  { id: "1", title: "Financial Analyst | Remote", company: "QuantEdge Capital", meta: "Remote · Full-time · Posted 2 days ago", salary: "$95K | $130K", category: "remote" },
+  { id: "2", title: "Tax Preparer | Seasonal", company: "H&R Block", meta: "Multiple locations · Part-time · Posted 1 week ago", salary: "$22 | $35/hr", category: "parttime" },
+  { id: "3", title: "DoorDash Driver", company: "DoorDash", meta: "Your area · Gig · Start today", salary: "$18 | $28/hr avg", category: "gig" },
+  { id: "4", title: "Freelance Bookkeeper", company: "Various Clients", meta: "Remote · Freelance · Ongoing", salary: "$40 | $65/hr", category: "freelance" },
+  { id: "5", title: "Investment Research Associate", company: "Goldman Sachs", meta: "New York, NY · Full-time · Posted 3 days ago", salary: "$120K | $180K", category: "fulltime" },
+  { id: "6", title: "Real Estate Agent", company: "Keller Williams", meta: "Your area · Full-time · Commission", salary: "$60K | $150K+", category: "fulltime" },
 ];
 
 const COMM_CATEGORIES = [
@@ -414,7 +414,7 @@ export default function Community() {
                         const postUrl = referralCode
                           ? `${window.location.origin}/community?post=${p.id}&ref=${referralCode}`
                           : `${window.location.origin}/community?post=${p.id}`;
-                        const shareText = `Check out this post on EntangleWealth: "${p.body.slice(0, 80)}${p.body.length > 80 ? "..." : ""}" — ${postUrl}`;
+                        const shareText = `Check out this post on EntangleWealth: "${p.body.slice(0, 80)}${p.body.length > 80 ? "..." : ""}" | ${postUrl}`;
                         if (navigator.share) {
                           try {
                             await navigator.share({ title: "EntangleWealth Community", text: shareText, url: postUrl });
@@ -548,7 +548,7 @@ export default function Community() {
               <h2 className="text-[28px] font-black mb-2 bg-gradient-to-r from-white via-primary to-secondary bg-clip-text text-transparent">Simple Pricing</h2>
               <p className="text-sm text-[#666]">Try everything free for 30 days. No card required.</p>
               <div className="mt-3">
-                <span className="px-4 py-1.5 rounded-full text-[13px] font-bold bg-[rgba(0,255,136,0.2)] text-[#00ff88]">30 DAY FREE TRIAL — NO CARD NEEDED</span>
+                <span className="px-4 py-1.5 rounded-full text-[13px] font-bold bg-[rgba(0,255,136,0.2)] text-[#00ff88]">30 DAY FREE TRIAL | NO CARD NEEDED</span>
               </div>
             </div>
 
@@ -661,8 +661,8 @@ export default function Community() {
                 className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm resize-none focus:outline-none focus:border-primary/50 placeholder:text-[#444] mb-2"
               />
               <select value={newComm.privacy} onChange={e => setNewComm(p => ({ ...p, privacy: e.target.value }))} className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-primary/50 mb-3 [&>option]:bg-[#0d0d1a] [&>option]:text-white">
-                <option value="public">Public — Anyone can join</option>
-                <option value="private">Private — Request to join</option>
+                <option value="public">Public | Anyone can join</option>
+                <option value="private">Private | Request to join</option>
               </select>
               <Button className="w-full bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold min-h-[44px]" onClick={createCommunity}>
                 Create Community

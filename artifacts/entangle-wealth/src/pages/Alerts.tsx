@@ -322,7 +322,7 @@ export default function Alerts() {
             )}
             {tier === "pro" && (
               <div className="text-xs text-[#00ff88] bg-[#00ff88]/5 rounded-lg px-3 py-2 border border-[#00ff88]/20">
-                Pro — Unlimited
+                Pro | Unlimited
               </div>
             )}
           </div>

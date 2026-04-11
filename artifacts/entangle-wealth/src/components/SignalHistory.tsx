@@ -27,7 +27,7 @@ export function SignalHistory() {
         <div className="bg-white/[0.02] rounded-lg p-2 text-center">
           <div className="text-[9px] text-muted-foreground uppercase">Total P&L</div>
           <div className={`text-lg font-mono font-bold stat-value ${parseFloat(totalPnl) >= 0 ? "text-green-400" : "text-red-400"}`}>
-            {parseFloat(totalPnl) >= 0 ? "+" : ""}{totalPnl}%
+            {parseFloat(totalPnl) >= 0 ? "+" : ""}{Math.abs(parseFloat(totalPnl)).toFixed(2)}%
           </div>
         </div>
         <div className="bg-white/[0.02] rounded-lg p-2 text-center">
@@ -36,7 +36,7 @@ export function SignalHistory() {
         </div>
         <div className="bg-white/[0.02] rounded-lg p-2 text-center">
           <div className="text-[9px] text-muted-foreground uppercase">Avg Loss</div>
-          <div className="text-lg font-mono font-bold text-red-400">{avgLoss}%</div>
+          <div className="text-lg font-mono font-bold text-red-400">{Math.abs(parseFloat(avgLoss)).toFixed(2)}%</div>
         </div>
       </div>
 
@@ -45,7 +45,7 @@ export function SignalHistory() {
           <div
             key={s.id}
             className={`flex-1 h-6 rounded-sm ${s.result === "win" ? "bg-green-400/20 border border-green-400/30" : "bg-red-400/20 border border-red-400/30"}`}
-            title={`${s.symbol} ${s.type} ${s.result === "win" ? "+" : ""}${s.pnl}%`}
+            title={`${s.symbol} ${s.type} +${Math.abs(s.pnl).toFixed(2)}%`}
           />
         ))}
       </div>
@@ -63,7 +63,7 @@ export function SignalHistory() {
               ${signal.entry.toFixed(0)} → ${signal.exit.toFixed(0)}
             </span>
             <span className={`font-mono font-bold w-14 text-right ${signal.result === "win" ? "text-green-400" : "text-red-400"}`}>
-              {signal.pnl >= 0 ? "+" : ""}{signal.pnl.toFixed(2)}%
+              +{Math.abs(signal.pnl).toFixed(2)}%
             </span>
             <span className="text-muted-foreground font-mono w-8 text-right">{signal.holdTime}</span>
           </div>

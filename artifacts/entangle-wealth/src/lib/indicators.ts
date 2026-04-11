@@ -78,7 +78,7 @@ export function calcDEMA(prices: number[], period: number): IndicatorResult {
   const ema2 = ema(ema1, period);
   const val = 2 * ema1[ema1.length - 1] - ema2;
   const price = prices[prices.length - 1];
-  return { name: `DEMA (${period})`, category: "trend", value: +val.toFixed(2), signal: trendSignal(price, val), description: `Double Exponential Moving Average — reduces lag` };
+  return { name: `DEMA (${period})`, category: "trend", value: +val.toFixed(2), signal: trendSignal(price, val), description: `Double Exponential Moving Average: reduces lag` };
 }
 
 export function calcTEMA(prices: number[], period: number): IndicatorResult {
@@ -87,7 +87,7 @@ export function calcTEMA(prices: number[], period: number): IndicatorResult {
   const ema3 = ema(ema2, period);
   const val = 3 * ema1[ema1.length - 1] - 3 * ema2[ema2.length - 1] + ema3;
   const price = prices[prices.length - 1];
-  return { name: `TEMA (${period})`, category: "trend", value: +val.toFixed(2), signal: trendSignal(price, val), description: `Triple Exponential Moving Average — minimal lag` };
+  return { name: `TEMA (${period})`, category: "trend", value: +val.toFixed(2), signal: trendSignal(price, val), description: `Triple Exponential Moving Average: minimal lag` };
 }
 
 export function calcHMA(prices: number[], period: number): IndicatorResult {
@@ -112,7 +112,7 @@ export function calcHMA(prices: number[], period: number): IndicatorResult {
   const hmaArr = wmaArr(diffSeries, sqrtPeriod);
   const val = hmaArr.length > 0 ? hmaArr[hmaArr.length - 1] : prices[prices.length - 1];
   const price = prices[prices.length - 1];
-  return { name: `HMA (${period})`, category: "trend", value: +val.toFixed(2), signal: trendSignal(price, val), description: `Hull Moving Average — fast trend following with ${sqrtPeriod}-period smoothing` };
+  return { name: `HMA (${period})`, category: "trend", value: +val.toFixed(2), signal: trendSignal(price, val), description: `Hull Moving Average: fast trend following (${sqrtPeriod} period smoothing)` };
 }
 
 export function calcKAMA(prices: number[], period: number = 10): IndicatorResult {
@@ -133,7 +133,7 @@ export function calcKAMA(prices: number[], period: number = 10): IndicatorResult
     val = val + sc * (prices[i] - val);
   }
   const price = prices[prices.length - 1];
-  return { name: `KAMA (${period})`, category: "trend", value: +val.toFixed(2), signal: trendSignal(price, val), description: `Kaufman Adaptive Moving Average — adjusts to volatility` };
+  return { name: `KAMA (${period})`, category: "trend", value: +val.toFixed(2), signal: trendSignal(price, val), description: `Kaufman Adaptive Moving Average: adjusts to volatility` };
 }
 
 export function calcVWAP(prices: number[], volumes: number[]): IndicatorResult {
@@ -159,7 +159,7 @@ export function calcIchimoku(highs: number[], lows: number[], closes: number[]):
   else if (price > kijun) sig = "BUY";
   else if (price < tenkan && tenkan < kijun) sig = "STRONG_SELL";
   else if (price < kijun) sig = "SELL";
-  return { name: "Ichimoku Cloud", category: "trend", value: `T:${tenkan.toFixed(0)} K:${kijun.toFixed(0)}`, signal: sig, description: "Ichimoku Kinko Hyo — Tenkan/Kijun crossover system" };
+  return { name: "Ichimoku Cloud", category: "trend", value: `T:${tenkan.toFixed(0)} K:${kijun.toFixed(0)}`, signal: sig, description: "Ichimoku Kinko Hyo: Tenkan/Kijun crossover system" };
 }
 
 export function calcParabolicSAR(highs: number[], lows: number[], step: number = 0.02, max: number = 0.2): IndicatorResult {
@@ -177,7 +177,7 @@ export function calcParabolicSAR(highs: number[], lows: number[], step: number =
       else { if (lows[i] < ep) { ep = lows[i]; af = Math.min(af + step, max); } }
     }
   }
-  return { name: "Parabolic SAR", category: "trend", value: +sar.toFixed(2), signal: uptrend ? "BUY" : "SELL", description: "Stop And Reverse — trend direction and trailing stop" };
+  return { name: "Parabolic SAR", category: "trend", value: +sar.toFixed(2), signal: uptrend ? "BUY" : "SELL", description: "Stop And Reverse: trend direction and trailing stop" };
 }
 
 export function calcSupertrend(highs: number[], lows: number[], closes: number[], period: number = 10, multiplier: number = 3): IndicatorResult {
@@ -187,7 +187,7 @@ export function calcSupertrend(highs: number[], lows: number[], closes: number[]
   const lowerBand = hl2 - multiplier * atrVal;
   const price = closes[closes.length - 1];
   const uptrend = price > lowerBand;
-  return { name: "Supertrend", category: "trend", value: +(uptrend ? lowerBand : upperBand).toFixed(2), signal: uptrend ? "BUY" : "SELL", description: "Supertrend — ATR-based trend following" };
+  return { name: "Supertrend", category: "trend", value: +(uptrend ? lowerBand : upperBand).toFixed(2), signal: uptrend ? "BUY" : "SELL", description: "Supertrend: ATR-based trend following" };
 }
 
 export function calcADX(highs: number[], lows: number[], closes: number[], period: number = 14): IndicatorResult {
@@ -208,7 +208,7 @@ export function calcADX(highs: number[], lows: number[], closes: number[], perio
   if (dx > 40 && diPlus > diMinus) sig = "STRONG_BUY";
   if (dx > 25 && diMinus > diPlus) sig = "SELL";
   if (dx > 40 && diMinus > diPlus) sig = "STRONG_SELL";
-  return { name: `ADX (${period})`, category: "trend", value: +dx.toFixed(1), signal: sig, description: "Average Directional Index — trend strength (not direction)" };
+  return { name: `ADX (${period})`, category: "trend", value: +dx.toFixed(1), signal: sig, description: "Average Directional Index: trend strength (not direction)" };
 }
 
 export function calcAroon(highs: number[], lows: number[], period: number = 25): IndicatorResult {
@@ -223,7 +223,7 @@ export function calcAroon(highs: number[], lows: number[], period: number = 25):
   else if (up > 50 && up > down) sig = "BUY";
   else if (down > 70 && up < 30) sig = "STRONG_SELL";
   else if (down > 50 && down > up) sig = "SELL";
-  return { name: `Aroon (${period})`, category: "trend", value: `↑${up.toFixed(0)} ↓${down.toFixed(0)}`, signal: sig, description: "Aroon Indicator — time since highest high / lowest low" };
+  return { name: `Aroon (${period})`, category: "trend", value: `↑${up.toFixed(0)} ↓${down.toFixed(0)}`, signal: sig, description: "Aroon Indicator: time since highest high / lowest low" };
 }
 
 export function calcTRIX(prices: number[], period: number = 15): IndicatorResult {
@@ -232,7 +232,7 @@ export function calcTRIX(prices: number[], period: number = 15): IndicatorResult
   const e3 = emaArray(e2, period);
   if (e3.length < 2) return { name: `TRIX (${period})`, category: "trend", value: 0, signal: "NEUTRAL", description: "Triple Smoothed EMA Rate of Change" };
   const val = ((e3[e3.length - 1] - e3[e3.length - 2]) / e3[e3.length - 2]) * 100;
-  return { name: `TRIX (${period})`, category: "trend", value: +val.toFixed(4), signal: val > 0.01 ? "BUY" : val < -0.01 ? "SELL" : "NEUTRAL", description: "TRIX — triple smoothed EMA rate of change, filters noise" };
+  return { name: `TRIX (${period})`, category: "trend", value: +val.toFixed(4), signal: val > 0.01 ? "BUY" : val < -0.01 ? "SELL" : "NEUTRAL", description: "TRIX: triple smoothed EMA rate of change, filters noise" };
 }
 
 export function calcDPO(prices: number[], period: number = 20): IndicatorResult {
@@ -241,7 +241,7 @@ export function calcDPO(prices: number[], period: number = 20): IndicatorResult 
   const price = prices[prices.length - 1 - shift] || prices[prices.length - 1];
   const avg = sma(prices.slice(0, -shift), period);
   const val = price - avg;
-  return { name: `DPO (${period})`, category: "trend", value: +val.toFixed(2), signal: val > 0 ? "BUY" : val < 0 ? "SELL" : "NEUTRAL", description: "Detrended Price Oscillator — removes trend to identify cycles" };
+  return { name: `DPO (${period})`, category: "trend", value: +val.toFixed(2), signal: val > 0 ? "BUY" : val < 0 ? "SELL" : "NEUTRAL", description: "Detrended Price Oscillator: removes trend to identify cycles" };
 }
 
 export function calcMassIndex(highs: number[], lows: number[], period: number = 25): IndicatorResult {
@@ -254,7 +254,7 @@ export function calcMassIndex(highs: number[], lows: number[], period: number = 
   for (let i = e2.length - len; i < e2.length; i++) {
     sum += e2[i] === 0 ? 1 : e1[i] / e2[i];
   }
-  return { name: `Mass Index (${period})`, category: "trend", value: +sum.toFixed(2), signal: sum > 27 ? "SELL" : sum < 26.5 && sum > 25 ? "BUY" : "NEUTRAL", description: "Mass Index — detects trend reversals via range expansion" };
+  return { name: `Mass Index (${period})`, category: "trend", value: +sum.toFixed(2), signal: sum > 27 ? "SELL" : sum < 26.5 && sum > 25 ? "BUY" : "NEUTRAL", description: "Mass Index: detects trend reversals via range expansion" };
 }
 
 export function calcVortex(highs: number[], lows: number[], closes: number[], period: number = 14): IndicatorResult {
@@ -272,7 +272,7 @@ export function calcVortex(highs: number[], lows: number[], closes: number[], pe
   if (viPlus > viMinus + 0.2) sig = "STRONG_BUY";
   if (viMinus > viPlus + 0.1) sig = "SELL";
   if (viMinus > viPlus + 0.2) sig = "STRONG_SELL";
-  return { name: `Vortex (${period})`, category: "trend", value: `+${viPlus.toFixed(2)} -${viMinus.toFixed(2)}`, signal: sig, description: "Vortex Indicator — identifies trend direction and strength" };
+  return { name: `Vortex (${period})`, category: "trend", value: `VI.up ${viPlus.toFixed(2)} VI.dn ${viMinus.toFixed(2)}`, signal: sig, description: "Vortex Indicator: identifies trend direction and strength" };
 }
 
 // ─── MOMENTUM INDICATORS ──────────────────────────────
@@ -293,7 +293,7 @@ export function calcRSI(prices: number[], period: number = 14): IndicatorResult 
   else if (val < 30) sig = "BUY";
   else if (val > 80) sig = "STRONG_SELL";
   else if (val > 70) sig = "SELL";
-  return { name: `RSI (${period})`, category: "momentum", value: +val.toFixed(1), signal: sig, description: "Relative Strength Index — overbought >70, oversold <30" };
+  return { name: `RSI (${period})`, category: "momentum", value: +val.toFixed(1), signal: sig, description: "Relative Strength Index: overbought >70, oversold <30" };
 }
 
 export function calcMACD(prices: number[]): IndicatorResult {
@@ -312,7 +312,7 @@ export function calcMACD(prices: number[]): IndicatorResult {
   if (macd > 0 && histogram > 0.5) sig = "STRONG_BUY";
   if (macd < 0 && histogram < 0) sig = "SELL";
   if (macd < 0 && histogram < -0.5) sig = "STRONG_SELL";
-  return { name: "MACD (12,26,9)", category: "momentum", value: +macd.toFixed(3), signal: sig, description: "Moving Average Convergence Divergence — trend momentum" };
+  return { name: "MACD (12,26,9)", category: "momentum", value: +macd.toFixed(3), signal: sig, description: "Moving Average Convergence Divergence: trend momentum" };
 }
 
 export function calcStochastic(highs: number[], lows: number[], closes: number[], period: number = 14): IndicatorResult {
@@ -326,7 +326,7 @@ export function calcStochastic(highs: number[], lows: number[], closes: number[]
   else if (k < 30) sig = "BUY";
   else if (k > 80) sig = "STRONG_SELL";
   else if (k > 70) sig = "SELL";
-  return { name: `Stochastic %K (${period})`, category: "momentum", value: +k.toFixed(1), signal: sig, description: "Stochastic Oscillator — %K position in range" };
+  return { name: `Stochastic %K (${period})`, category: "momentum", value: +k.toFixed(1), signal: sig, description: "Stochastic Oscillator: %K position in range" };
 }
 
 export function calcWilliamsR(highs: number[], lows: number[], closes: number[], period: number = 14): IndicatorResult {
@@ -340,7 +340,7 @@ export function calcWilliamsR(highs: number[], lows: number[], closes: number[],
   else if (wr < -60) sig = "BUY";
   else if (wr > -20) sig = "STRONG_SELL";
   else if (wr > -40) sig = "SELL";
-  return { name: `Williams %R (${period})`, category: "momentum", value: +wr.toFixed(1), signal: sig, description: "Williams %R — overbought > -20, oversold < -80" };
+  return { name: `Williams %R (${period})`, category: "momentum", value: +Math.abs(wr).toFixed(1), signal: sig, description: "Williams %R: overbought near 0, oversold near 100" };
 }
 
 export function calcCCI(highs: number[], lows: number[], closes: number[], period: number = 20): IndicatorResult {
@@ -355,7 +355,7 @@ export function calcCCI(highs: number[], lows: number[], closes: number[], perio
   else if (cci > 100) sig = "BUY";
   else if (cci < -200) sig = "STRONG_SELL";
   else if (cci < -100) sig = "SELL";
-  return { name: `CCI (${period})`, category: "momentum", value: +cci.toFixed(1), signal: sig, description: "Commodity Channel Index — measures deviation from average" };
+  return { name: `CCI (${period})`, category: "momentum", value: +cci.toFixed(1), signal: sig, description: "Commodity Channel Index: measures deviation from average" };
 }
 
 export function calcROC(prices: number[], period: number = 12): IndicatorResult {
@@ -368,7 +368,7 @@ export function calcROC(prices: number[], period: number = 12): IndicatorResult 
   else if (roc > 5) rocSig = "BUY";
   else if (roc < -10) rocSig = "STRONG_SELL";
   else if (roc < -5) rocSig = "SELL";
-  return { name: `ROC (${period})`, category: "momentum", value: +roc.toFixed(2), signal: rocSig, description: "Rate of Change — momentum as percentage price change" };
+  return { name: `ROC (${period})`, category: "momentum", value: +roc.toFixed(2), signal: rocSig, description: "Rate of Change: momentum as percentage price change" };
 }
 
 export function calcMFI(highs: number[], lows: number[], closes: number[], volumes: number[], period: number = 14): IndicatorResult {
@@ -386,7 +386,7 @@ export function calcMFI(highs: number[], lows: number[], closes: number[], volum
   else if (mfi < 30) sig = "BUY";
   else if (mfi > 80) sig = "STRONG_SELL";
   else if (mfi > 70) sig = "SELL";
-  return { name: `MFI (${period})`, category: "momentum", value: +mfi.toFixed(1), signal: sig, description: "Money Flow Index — volume-weighted RSI" };
+  return { name: `MFI (${period})`, category: "momentum", value: +mfi.toFixed(1), signal: sig, description: "Money Flow Index: volume-weighted RSI" };
 }
 
 export function calcCMO(prices: number[], period: number = 14): IndicatorResult {
@@ -397,7 +397,7 @@ export function calcCMO(prices: number[], period: number = 14): IndicatorResult 
     if (diff > 0) sumUp += diff; else sumDown += Math.abs(diff);
   }
   const cmo = sumUp + sumDown === 0 ? 0 : ((sumUp - sumDown) / (sumUp + sumDown)) * 100;
-  return { name: `CMO (${period})`, category: "momentum", value: +cmo.toFixed(1), signal: cmo > 50 ? "STRONG_BUY" : cmo > 20 ? "BUY" : cmo < -50 ? "STRONG_SELL" : cmo < -20 ? "SELL" : "NEUTRAL", description: "Chande Momentum Oscillator — unsmoothed momentum" };
+  return { name: `CMO (${period})`, category: "momentum", value: +cmo.toFixed(1), signal: cmo > 50 ? "STRONG_BUY" : cmo > 20 ? "BUY" : cmo < -50 ? "STRONG_SELL" : cmo < -20 ? "SELL" : "NEUTRAL", description: "Chande Momentum Oscillator: unsmoothed momentum" };
 }
 
 export function calcUltimateOscillator(highs: number[], lows: number[], closes: number[]): IndicatorResult {
@@ -415,7 +415,7 @@ export function calcUltimateOscillator(highs: number[], lows: number[], closes: 
   const avg14 = tr14 === 0 ? 0 : bp14 / tr14;
   const avg28 = tr28 === 0 ? 0 : bp28 / tr28;
   const uo = ((4 * avg7 + 2 * avg14 + avg28) / 7) * 100;
-  return { name: "Ultimate Oscillator", category: "momentum", value: +uo.toFixed(1), signal: uo > 70 ? "SELL" : uo < 30 ? "BUY" : "NEUTRAL", description: "Ultimate Oscillator — multi-timeframe momentum (7/14/28)" };
+  return { name: "Ultimate Oscillator", category: "momentum", value: +uo.toFixed(1), signal: uo > 70 ? "SELL" : uo < 30 ? "BUY" : "NEUTRAL", description: "Ultimate Oscillator: multi-timeframe momentum (7/14/28)" };
 }
 
 export function calcTSI(prices: number[], longPeriod: number = 25, shortPeriod: number = 13): IndicatorResult {
@@ -426,14 +426,14 @@ export function calcTSI(prices: number[], longPeriod: number = 25, shortPeriod: 
   const smoothed1 = ema(emaArray(diffs, longPeriod), shortPeriod);
   const smoothed2 = ema(emaArray(absDiffs, longPeriod), shortPeriod);
   const tsi = smoothed2 === 0 ? 0 : (smoothed1 / smoothed2) * 100;
-  return { name: "TSI (25,13)", category: "momentum", value: +tsi.toFixed(1), signal: tsi > 25 ? "BUY" : tsi < -25 ? "SELL" : "NEUTRAL", description: "True Strength Index — double-smoothed momentum" };
+  return { name: "TSI (25,13)", category: "momentum", value: +tsi.toFixed(1), signal: tsi > 25 ? "BUY" : tsi < -25 ? "SELL" : "NEUTRAL", description: "True Strength Index: double-smoothed momentum" };
 }
 
 export function calcPPO(prices: number[]): IndicatorResult {
   const e12 = ema(prices, 12);
   const e26 = ema(prices, 26);
   const ppo = e26 === 0 ? 0 : ((e12 - e26) / e26) * 100;
-  return { name: "PPO (12,26)", category: "momentum", value: +ppo.toFixed(3), signal: ppo > 1 ? "BUY" : ppo < -1 ? "SELL" : "NEUTRAL", description: "Percentage Price Oscillator — normalized MACD" };
+  return { name: "PPO (12,26)", category: "momentum", value: +ppo.toFixed(3), signal: ppo > 1 ? "BUY" : ppo < -1 ? "SELL" : "NEUTRAL", description: "Percentage Price Oscillator: normalized MACD" };
 }
 
 export function calcAwesomeOscillator(highs: number[], lows: number[]): IndicatorResult {
@@ -442,7 +442,7 @@ export function calcAwesomeOscillator(highs: number[], lows: number[]): Indicato
   const sma5 = sma(medians, 5);
   const sma34 = sma(medians, 34);
   const ao = sma5 - sma34;
-  return { name: "Awesome Oscillator", category: "momentum", value: +ao.toFixed(2), signal: ao > 0 ? "BUY" : ao < 0 ? "SELL" : "NEUTRAL", description: "Awesome Oscillator — 5/34 SMA of median price difference" };
+  return { name: "Awesome Oscillator", category: "momentum", value: +ao.toFixed(2), signal: ao > 0 ? "BUY" : ao < 0 ? "SELL" : "NEUTRAL", description: "Awesome Oscillator: 5/34 SMA of median price difference" };
 }
 
 export function calcCoppockCurve(prices: number[]): IndicatorResult {
@@ -454,7 +454,7 @@ export function calcCoppockCurve(prices: number[]): IndicatorResult {
     rocSeries.push(r14 + r11);
   }
   const val = rocSeries.length >= 10 ? wma(rocSeries, 10) : rocSeries[rocSeries.length - 1] || 0;
-  return { name: "Coppock Curve", category: "momentum", value: +val.toFixed(2), signal: val > 0 ? "BUY" : "SELL", description: "Coppock Curve — long-term momentum for buy signals" };
+  return { name: "Coppock Curve", category: "momentum", value: +val.toFixed(2), signal: val > 0 ? "BUY" : "SELL", description: "Coppock Curve: long-term momentum for buy signals" };
 }
 
 export function calcKST(prices: number[]): IndicatorResult {
@@ -464,7 +464,7 @@ export function calcKST(prices: number[]): IndicatorResult {
   const roc20 = prices.length >= 21 ? ((prices[prices.length - 1] - prices[prices.length - 21]) / prices[prices.length - 21]) * 100 : roc10;
   const roc30 = prices.length >= 31 ? ((prices[prices.length - 1] - prices[prices.length - 31]) / prices[prices.length - 31]) * 100 : roc10;
   const kst = roc10 * 1 + roc15 * 2 + roc20 * 3 + roc30 * 4;
-  return { name: "KST", category: "momentum", value: +kst.toFixed(2), signal: kst > 0 ? "BUY" : "SELL", description: "Know Sure Thing — weighted sum of 4 ROC periods" };
+  return { name: "KST", category: "momentum", value: +kst.toFixed(2), signal: kst > 0 ? "BUY" : "SELL", description: "Know Sure Thing: weighted sum of 4 ROC periods" };
 }
 
 export function calcStochRSI(prices: number[], period: number = 14): IndicatorResult {
@@ -488,7 +488,7 @@ export function calcStochRSI(prices: number[], period: number = 14): IndicatorRe
   else if (stochRSI < 30) sig = "BUY";
   else if (stochRSI > 80) sig = "STRONG_SELL";
   else if (stochRSI > 70) sig = "SELL";
-  return { name: `Stoch RSI (${period})`, category: "momentum", value: +stochRSI.toFixed(1), signal: sig, description: "Stochastic RSI — RSI of RSI, ultra-sensitive" };
+  return { name: `Stoch RSI (${period})`, category: "momentum", value: +stochRSI.toFixed(1), signal: sig, description: "Stochastic RSI: RSI of RSI, ultra-sensitive" };
 }
 
 // ─── VOLATILITY INDICATORS ────────────────────────────
@@ -514,14 +514,14 @@ export function calcBollinger(prices: number[], period: number = 20): IndicatorR
   else if (pctB < 25) sig = "BUY";
   else if (pctB > 90) sig = "STRONG_SELL";
   else if (pctB > 75) sig = "SELL";
-  return { name: `Bollinger Bands (${period})`, category: "volatility", value: `${lower.toFixed(0)}-${upper.toFixed(0)}`, signal: sig, description: `Bollinger Bands — %B: ${pctB.toFixed(0)}% within bands` };
+  return { name: `Bollinger Bands (${period})`, category: "volatility", value: `${lower.toFixed(0)} to ${upper.toFixed(0)}`, signal: sig, description: `Bollinger Bands: %B position ${Math.abs(pctB).toFixed(0)}% within bands` };
 }
 
 export function calcATR(highs: number[], lows: number[], closes: number[], period: number = 14): IndicatorResult {
   const val = calcATRRaw(highs, lows, closes, period);
   const price = closes[closes.length - 1];
   const pctATR = (val / price) * 100;
-  return { name: `ATR (${period})`, category: "volatility", value: +val.toFixed(2), signal: pctATR > 5 ? "SELL" : pctATR > 3 ? "NEUTRAL" : "BUY", description: `Average True Range — ${pctATR.toFixed(1)}% of price` };
+  return { name: `ATR (${period})`, category: "volatility", value: +val.toFixed(2), signal: pctATR > 5 ? "SELL" : pctATR > 3 ? "NEUTRAL" : "BUY", description: `Average True Range: ${pctATR.toFixed(1)}% of price` };
 }
 
 export function calcKeltner(prices: number[], highs: number[], lows: number[], closes: number[], period: number = 20): IndicatorResult {
@@ -535,7 +535,7 @@ export function calcKeltner(prices: number[], highs: number[], lows: number[], c
   else if (price < mid) sig = "BUY";
   else if (price > upper) sig = "STRONG_SELL";
   else if (price > mid + atrVal) sig = "SELL";
-  return { name: `Keltner Channel (${period})`, category: "volatility", value: `${lower.toFixed(0)}-${upper.toFixed(0)}`, signal: sig, description: "Keltner Channels — EMA ± 2×ATR" };
+  return { name: `Keltner Channel (${period})`, category: "volatility", value: `${lower.toFixed(0)} to ${upper.toFixed(0)}`, signal: sig, description: "Keltner Channels: EMA ± 2×ATR" };
 }
 
 export function calcDonchian(highs: number[], lows: number[], period: number = 20): IndicatorResult {
@@ -548,14 +548,14 @@ export function calcDonchian(highs: number[], lows: number[], period: number = 2
   else if (price > mid) sig = "BUY";
   else if (price <= ll * 1.02) sig = "STRONG_SELL";
   else if (price < mid) sig = "SELL";
-  return { name: `Donchian Channel (${period})`, category: "volatility", value: `${ll.toFixed(0)}-${hh.toFixed(0)}`, signal: sig, description: "Donchian Channels — breakout trading system" };
+  return { name: `Donchian Channel (${period})`, category: "volatility", value: `${ll.toFixed(0)} to ${hh.toFixed(0)}`, signal: sig, description: "Donchian Channels: breakout trading system" };
 }
 
 export function calcStdDev(prices: number[], period: number = 20): IndicatorResult {
   const val = stdDev(prices, period);
   const price = prices[prices.length - 1];
   const pct = (val / price) * 100;
-  return { name: `Std Dev (${period})`, category: "volatility", value: +val.toFixed(2), signal: pct > 5 ? "SELL" : "NEUTRAL", description: `Standard Deviation — ${pct.toFixed(1)}% of price` };
+  return { name: `Std Dev (${period})`, category: "volatility", value: +val.toFixed(2), signal: pct > 5 ? "SELL" : "NEUTRAL", description: `Standard Deviation: ${pct.toFixed(1)}% of price` };
 }
 
 export function calcHistoricalVolatility(prices: number[], period: number = 20): IndicatorResult {
@@ -565,7 +565,7 @@ export function calcHistoricalVolatility(prices: number[], period: number = 20):
   }
   const sd = stdDev(returns, period);
   const annualized = sd * Math.sqrt(252) * 100;
-  return { name: `HV (${period})`, category: "volatility", value: +annualized.toFixed(1), signal: annualized > 50 ? "SELL" : annualized < 20 ? "BUY" : "NEUTRAL", description: `Historical Volatility — ${annualized.toFixed(1)}% annualized` };
+  return { name: `HV (${period})`, category: "volatility", value: +annualized.toFixed(1), signal: annualized > 50 ? "SELL" : annualized < 20 ? "BUY" : "NEUTRAL", description: `Historical Volatility: ${annualized.toFixed(1)}% annualized` };
 }
 
 export function calcChaikinVolatility(highs: number[], lows: number[], period: number = 10): IndicatorResult {
@@ -576,7 +576,7 @@ export function calcChaikinVolatility(highs: number[], lows: number[], period: n
   const curr = emaRanges[emaRanges.length - 1];
   const prev = emaRanges[emaRanges.length - 1 - period];
   const val = prev === 0 ? 0 : ((curr - prev) / prev) * 100;
-  return { name: `Chaikin Vol (${period})`, category: "volatility", value: +val.toFixed(1), signal: val > 25 ? "SELL" : val < -25 ? "BUY" : "NEUTRAL", description: "Chaikin Volatility — rate of change of ATR" };
+  return { name: `Chaikin Vol (${period})`, category: "volatility", value: +val.toFixed(1), signal: val > 25 ? "SELL" : val < -25 ? "BUY" : "NEUTRAL", description: "Chaikin Volatility: rate of change of ATR" };
 }
 
 export function calcUlcerIndex(prices: number[], period: number = 14): IndicatorResult {
@@ -588,7 +588,7 @@ export function calcUlcerIndex(prices: number[], period: number = 14): Indicator
     sumSq += pctDrawdown * pctDrawdown;
   }
   const ui = Math.sqrt(sumSq / period);
-  return { name: `Ulcer Index (${period})`, category: "volatility", value: +ui.toFixed(2), signal: ui > 10 ? "SELL" : ui > 5 ? "NEUTRAL" : "BUY", description: "Ulcer Index — measures downside risk/drawdown" };
+  return { name: `Ulcer Index (${period})`, category: "volatility", value: +ui.toFixed(2), signal: ui > 10 ? "SELL" : ui > 5 ? "NEUTRAL" : "BUY", description: "Ulcer Index: measures downside risk/drawdown" };
 }
 
 // ─── VOLUME INDICATORS ────────────────────────────────
@@ -601,7 +601,7 @@ export function calcOBV(closes: number[], volumes: number[]): IndicatorResult {
   }
   const obvM = obv / 1e6;
   const recentTrend = closes.length >= 5 ? closes[closes.length - 1] > closes[closes.length - 5] : false;
-  return { name: "OBV", category: "volume", value: `${obvM > 0 ? "+" : ""}${obvM.toFixed(1)}M`, signal: obv > 0 && recentTrend ? "BUY" : obv < 0 ? "SELL" : "NEUTRAL", description: "On-Balance Volume — cumulative volume flow" };
+  return { name: "OBV", category: "volume", value: `${obvM > 0 ? "+" : ""}${Math.abs(obvM).toFixed(1)}M`, signal: obv > 0 && recentTrend ? "BUY" : obv < 0 ? "SELL" : "NEUTRAL", description: "On-Balance Volume: cumulative volume flow" };
 }
 
 export function calcADLine(highs: number[], lows: number[], closes: number[], volumes: number[]): IndicatorResult {
@@ -611,7 +611,7 @@ export function calcADLine(highs: number[], lows: number[], closes: number[], vo
     ad += mfm * volumes[i];
   }
   const adM = ad / 1e6;
-  return { name: "A/D Line", category: "volume", value: `${adM > 0 ? "+" : ""}${adM.toFixed(1)}M`, signal: ad > 0 ? "BUY" : ad < 0 ? "SELL" : "NEUTRAL", description: "Accumulation/Distribution Line — buying vs selling pressure" };
+  return { name: "A/D Line", category: "volume", value: `${adM > 0 ? "+" : ""}${Math.abs(adM).toFixed(1)}M`, signal: ad > 0 ? "BUY" : ad < 0 ? "SELL" : "NEUTRAL", description: "Accumulation/Distribution Line: buying vs selling pressure" };
 }
 
 export function calcCMF(highs: number[], lows: number[], closes: number[], volumes: number[], period: number = 20): IndicatorResult {
@@ -623,7 +623,7 @@ export function calcCMF(highs: number[], lows: number[], closes: number[], volum
     vol += volumes[i];
   }
   const cmf = vol === 0 ? 0 : mfv / vol;
-  return { name: `CMF (${period})`, category: "volume", value: +cmf.toFixed(3), signal: cmf > 0.1 ? "STRONG_BUY" : cmf > 0.05 ? "BUY" : cmf < -0.1 ? "STRONG_SELL" : cmf < -0.05 ? "SELL" : "NEUTRAL", description: "Chaikin Money Flow — volume-weighted buying/selling" };
+  return { name: `CMF (${period})`, category: "volume", value: +cmf.toFixed(3), signal: cmf > 0.1 ? "STRONG_BUY" : cmf > 0.05 ? "BUY" : cmf < -0.1 ? "STRONG_SELL" : cmf < -0.05 ? "SELL" : "NEUTRAL", description: "Chaikin Money Flow: volume-weighted buying/selling" };
 }
 
 export function calcForceIndex(closes: number[], volumes: number[], period: number = 13): IndicatorResult {
@@ -633,7 +633,7 @@ export function calcForceIndex(closes: number[], volumes: number[], period: numb
   }
   const val = ema(forces, period);
   const norm = val / 1e6;
-  return { name: `Force Index (${period})`, category: "volume", value: `${norm > 0 ? "+" : ""}${norm.toFixed(1)}M`, signal: val > 0 ? "BUY" : "SELL", description: "Force Index — price change × volume" };
+  return { name: `Force Index (${period})`, category: "volume", value: `${norm > 0 ? "+" : ""}${Math.abs(norm).toFixed(1)}M`, signal: val > 0 ? "BUY" : "SELL", description: "Force Index: price change × volume" };
 }
 
 export function calcEMV(highs: number[], lows: number[], volumes: number[], period: number = 14): IndicatorResult {
@@ -644,7 +644,7 @@ export function calcEMV(highs: number[], lows: number[], volumes: number[], peri
     emvValues.push(br === 0 ? 0 : dm / br);
   }
   const val = sma(emvValues, period);
-  return { name: `EMV (${period})`, category: "volume", value: +val.toFixed(2), signal: val > 0 ? "BUY" : val < 0 ? "SELL" : "NEUTRAL", description: "Ease of Movement — relates price change to volume" };
+  return { name: `EMV (${period})`, category: "volume", value: +val.toFixed(2), signal: val > 0 ? "BUY" : val < 0 ? "SELL" : "NEUTRAL", description: "Ease of Movement: relates price change to volume" };
 }
 
 export function calcVolumeRSI(volumes: number[], period: number = 14): IndicatorResult {
@@ -656,7 +656,7 @@ export function calcVolumeRSI(volumes: number[], period: number = 14): Indicator
   }
   const ag = gains / period, al = losses / period;
   const val = al === 0 ? 100 : 100 - 100 / (1 + ag / al);
-  return { name: `Volume RSI (${period})`, category: "volume", value: +val.toFixed(1), signal: val > 70 ? "BUY" : val < 30 ? "SELL" : "NEUTRAL", description: "Volume RSI — RSI applied to volume data" };
+  return { name: `Volume RSI (${period})`, category: "volume", value: +val.toFixed(1), signal: val > 70 ? "BUY" : val < 30 ? "SELL" : "NEUTRAL", description: "Volume RSI: RSI applied to volume data" };
 }
 
 export function calcPivotPoints(high: number, low: number, close: number): IndicatorResult {
@@ -669,7 +669,7 @@ export function calcPivotPoints(high: number, low: number, close: number): Indic
   else if (price > pp) sig = "BUY";
   else if (price < s1) sig = "STRONG_SELL";
   else if (price < pp) sig = "SELL";
-  return { name: "Pivot Points", category: "volume", value: `P:${pp.toFixed(0)} R1:${r1.toFixed(0)} S1:${s1.toFixed(0)}`, signal: sig, description: "Pivot Points — support/resistance levels" };
+  return { name: "Pivot Points", category: "volume", value: `P:${pp.toFixed(0)} R1:${r1.toFixed(0)} S1:${s1.toFixed(0)}`, signal: sig, description: "Pivot Points: support/resistance levels" };
 }
 
 export function calcFibonacci(high: number, low: number, close: number): IndicatorResult {
@@ -683,7 +683,7 @@ export function calcFibonacci(high: number, low: number, close: number): Indicat
   else if (close > fib382) sig = "BUY";
   else if (close < fib618) sig = "STRONG_SELL";
   else if (close < fib500) sig = "SELL";
-  return { name: "Fibonacci Retracement", category: "volume", value: `23.6%:${fib236.toFixed(0)} 61.8%:${fib618.toFixed(0)}`, signal: sig, description: "Fibonacci levels — key support/resistance zones" };
+  return { name: "Fibonacci Retracement", category: "volume", value: `23.6%:${fib236.toFixed(0)} 61.8%:${fib618.toFixed(0)}`, signal: sig, description: "Fibonacci levels: key support/resistance zones" };
 }
 
 // ─── MAIN ANALYSIS FUNCTION ───────────────────────────

@@ -1,11 +1,11 @@
 export const marketTickerData = [
   { symbol: "SPY", price: 512.45, change: "+1.2%", isPositive: true },
   { symbol: "QQQ", price: 438.12, change: "+1.5%", isPositive: true },
-  { symbol: "AAPL", price: 175.84, change: "-0.3%", isPositive: false },
+  { symbol: "AAPL", price: 175.84, change: "0.3%", isPositive: false },
   { symbol: "MSFT", price: 412.30, change: "+0.8%", isPositive: true },
   { symbol: "NVDA", price: 875.20, change: "+3.4%", isPositive: true },
-  { symbol: "TSLA", price: 198.45, change: "-1.2%", isPositive: false },
-  { symbol: "META", price: 185.20, change: "-0.5%", isPositive: false },
+  { symbol: "TSLA", price: 198.45, change: "1.2%", isPositive: false },
+  { symbol: "META", price: 185.20, change: "0.5%", isPositive: false },
   { symbol: "AMZN", price: 495.10, change: "+1.1%", isPositive: true },
   { symbol: "GOOGL", price: 485.90, change: "+0.9%", isPositive: true },
   { symbol: "NFLX", price: 615.30, change: "+2.1%", isPositive: true },
@@ -59,12 +59,12 @@ export const optionsIncomeData = [
 ];
 
 export const councilMessages = [
-  "AAPL showing bullish divergence on 15-min — options flow confirms with $2.1M call sweep",
-  "NVDA institutional accumulation detected at $870 support — volume 3x average",
-  "SPY approaching key resistance at $515 — dealer gamma exposure flipping",
-  "TSLA bearish RSI divergence — premium selling activity increasing on calls",
-  "AMD pre-earnings IV elevated — calendar spread opportunity for theta capture",
-  "QQQ put flow likely hedging, not directional — context: large equity portfolio protection",
+  "AAPL showing bullish divergence on 15-min | options flow confirms with $2.1M call sweep",
+  "NVDA institutional accumulation detected at $870 support | volume 3x average",
+  "SPY approaching key resistance at $515 | dealer gamma exposure flipping",
+  "TSLA bearish RSI divergence | premium selling activity increasing on calls",
+  "AMD pre-earnings IV elevated | calendar spread opportunity for theta capture",
+  "QQQ put flow likely hedging, not directional | context: large equity portfolio protection",
 ];
 
 export const incomeOpportunities = [
@@ -77,28 +77,28 @@ export const incomeOpportunities = [
 ];
 
 export const agentLogMessages = [
-  { time: "3:42 PM", message: "Price action analysis complete on NVDA — bull flag confirmed on 4H chart" },
+  { time: "3:42 PM", message: "Price action analysis complete on NVDA | bull flag confirmed on 4H chart" },
   { time: "3:41 PM", message: "Options flow scan: $4.2M call sweep on NVDA 950C detected across CBOE + ISE" },
-  { time: "3:40 PM", message: "Volume analysis: NVDA trading 2.8x average volume — institutional buying pattern" },
-  { time: "3:39 PM", message: "Risk check: NVDA position would be 1.6% of portfolio at current sizing — within limits" },
-  { time: "3:38 PM", message: "Sentiment scan: NVDA news sentiment 72% positive — no negative catalysts detected" },
-  { time: "3:37 PM", message: "Cross-check complete: 4 of 5 methods agree on NVDA bullish — signal fired at 87% confidence" },
-  { time: "3:35 PM", message: "Greeks analysis: AMD IV rank at 78th percentile — premium selling favorable" },
-  { time: "3:34 PM", message: "TSLA RSI divergence flagged — bearish signal at 74% confidence. 1 method dissenting." },
-  { time: "3:32 PM", message: "SPY approaching dealer gamma flip level at $515 — expect volatility expansion above this level" },
-  { time: "3:30 PM", message: "Portfolio risk scan: total exposure 8.4% — well within 15% max allocation guideline" },
+  { time: "3:40 PM", message: "Volume analysis: NVDA trading 2.8x average volume | institutional buying pattern" },
+  { time: "3:39 PM", message: "Risk check: NVDA position would be 1.6% of portfolio at current sizing | within limits" },
+  { time: "3:38 PM", message: "Sentiment scan: NVDA news sentiment 72% positive | no negative catalysts detected" },
+  { time: "3:37 PM", message: "Cross-check complete: 4 of 5 methods agree on NVDA bullish | signal fired at 87% confidence" },
+  { time: "3:35 PM", message: "Greeks analysis: AMD IV rank at 78th percentile | premium selling favorable" },
+  { time: "3:34 PM", message: "TSLA RSI divergence flagged | bearish signal at 74% confidence. 1 method dissenting." },
+  { time: "3:32 PM", message: "SPY approaching dealer gamma flip level at $515 | expect volatility expansion above this level" },
+  { time: "3:30 PM", message: "Portfolio risk scan: total exposure 8.4% | well within 15% max allocation guideline" },
 ];
 
 export const sectorData = [
   { sector: "Technology", ticker: "XLK", change: 2.4, weight: 32, volume: "High" },
-  { sector: "Healthcare", ticker: "XLV", change: -0.8, weight: 14, volume: "Normal" },
+  { sector: "Healthcare", ticker: "XLV", change: 0.8, weight: 14, volume: "Normal" },
   { sector: "Financials", ticker: "XLF", change: 1.2, weight: 12, volume: "High" },
-  { sector: "Energy", ticker: "XLE", change: -1.5, weight: 8, volume: "Low" },
+  { sector: "Energy", ticker: "XLE", change: 1.5, weight: 8, volume: "Low" },
   { sector: "Consumer Disc.", ticker: "XLY", change: 0.6, weight: 11, volume: "Normal" },
   { sector: "Industrials", ticker: "XLI", change: 1.8, weight: 9, volume: "High" },
-  { sector: "Real Estate", ticker: "XLRE", change: -0.3, weight: 5, volume: "Low" },
+  { sector: "Real Estate", ticker: "XLRE", change: 0.3, weight: 5, volume: "Low" },
   { sector: "Utilities", ticker: "XLU", change: 0.2, weight: 4, volume: "Low" },
-  { sector: "Materials", ticker: "XLB", change: -0.5, weight: 3, volume: "Normal" },
+  { sector: "Materials", ticker: "XLB", change: 0.5, weight: 3, volume: "Normal" },
   { sector: "Telecom", ticker: "XLC", change: 0.9, weight: 2, volume: "Normal" },
 ];
 
@@ -120,11 +120,11 @@ export const fearGreedData = {
 export const signalHistory = [
   { id: 1, date: "Apr 4", symbol: "NVDA", type: "BUY", entry: 845.00, exit: 875.20, pnl: 3.55, result: "win" as const, confidence: 87, holdTime: "2d" },
   { id: 2, date: "Apr 3", symbol: "TSLA", type: "SELL", entry: 205.00, exit: 198.45, pnl: 3.41, result: "win" as const, confidence: 74, holdTime: "1d" },
-  { id: 3, date: "Apr 3", symbol: "AAPL", type: "BUY", entry: 178.00, exit: 175.84, pnl: -1.21, result: "loss" as const, confidence: 52, holdTime: "3d" },
+  { id: 3, date: "Apr 3", symbol: "AAPL", type: "BUY", entry: 178.00, exit: 175.84, pnl: 1.21, result: "loss" as const, confidence: 52, holdTime: "3d" },
   { id: 4, date: "Apr 2", symbol: "AMD", type: "BUY", entry: 155.00, exit: 162.75, pnl: 5.00, result: "win" as const, confidence: 83, holdTime: "3d" },
   { id: 5, date: "Apr 2", symbol: "META", type: "BUY", entry: 178.00, exit: 185.20, pnl: 4.04, result: "win" as const, confidence: 79, holdTime: "2d" },
   { id: 6, date: "Apr 1", symbol: "SPY", type: "SELL", entry: 515.00, exit: 512.45, pnl: 0.50, result: "win" as const, confidence: 68, holdTime: "4h" },
-  { id: 7, date: "Apr 1", symbol: "MSFT", type: "BUY", entry: 415.00, exit: 412.30, pnl: -0.65, result: "loss" as const, confidence: 55, holdTime: "1d" },
+  { id: 7, date: "Apr 1", symbol: "MSFT", type: "BUY", entry: 415.00, exit: 412.30, pnl: 0.65, result: "loss" as const, confidence: 55, holdTime: "1d" },
   { id: 8, date: "Mar 31", symbol: "PLTR", type: "BUY", entry: 23.00, exit: 24.50, pnl: 6.52, result: "win" as const, confidence: 79, holdTime: "5d" },
   { id: 9, date: "Mar 30", symbol: "NFLX", type: "BUY", entry: 600.00, exit: 615.30, pnl: 2.55, result: "win" as const, confidence: 81, holdTime: "6d" },
   { id: 10, date: "Mar 29", symbol: "GOOGL", type: "BUY", entry: 480.00, exit: 485.90, pnl: 1.23, result: "win" as const, confidence: 72, holdTime: "7d" },
@@ -164,16 +164,16 @@ export const terminalNewsFeed = [
 ];
 
 export const terminalSystemLog = [
-  { time: "15:42:03", level: "INFO", module: "ENTANGLE-CORE", message: "Quantum consensus reached: NVDA BUY @ 87% confidence — 5/6 models agree" },
+  { time: "15:42:03", level: "INFO", module: "ENTANGLE-CORE", message: "Quantum consensus reached: NVDA BUY @ 87% confidence | 5/6 models agree" },
   { time: "15:42:01", level: "DATA", module: "FLOW-SCANNER", message: "Detected $4.2M sweep on NVDA 950C 05/17 across 3 exchanges" },
   { time: "15:41:58", level: "WARN", module: "RISK-ENGINE", message: "Portfolio beta exposure elevated: 1.35 vs target 1.0" },
-  { time: "15:41:55", level: "INFO", module: "PRICE-ACTION", message: "Bull flag breakout confirmed on NVDA 4H — volume 2.8x avg" },
-  { time: "15:41:52", level: "INFO", module: "SENTIMENT", message: "Market sentiment index: 72/100 (Greed) — up from 65 yesterday" },
-  { time: "15:41:48", level: "DATA", module: "GREEKS-ENGINE", message: "AMD IV rank: 78th percentile — theta premium elevated" },
-  { time: "15:41:45", level: "WARN", module: "ENTANGLE-CORE", message: "TSLA signal conflict: 3 bearish, 2 bullish, 1 neutral — no consensus" },
-  { time: "15:41:40", level: "INFO", module: "VOLUME-ANALYSIS", message: "SPY dark pool activity: 42% of volume — above average institutional flow" },
-  { time: "15:41:35", level: "INFO", module: "RISK-ENGINE", message: "Max drawdown today: -0.8% — within tolerance (max -3%)" },
-  { time: "15:41:30", level: "DATA", module: "FLOW-SCANNER", message: "QQQ put sweep $1.8M — flagged as hedge (correlated with equity position)" },
+  { time: "15:41:55", level: "INFO", module: "PRICE-ACTION", message: "Bull flag breakout confirmed on NVDA 4H | volume 2.8x avg" },
+  { time: "15:41:52", level: "INFO", module: "SENTIMENT", message: "Market sentiment index: 72/100 (Greed) | up from 65 yesterday" },
+  { time: "15:41:48", level: "DATA", module: "GREEKS-ENGINE", message: "AMD IV rank: 78th percentile | theta premium elevated" },
+  { time: "15:41:45", level: "WARN", module: "ENTANGLE-CORE", message: "TSLA signal conflict: 3 bearish, 2 bullish, 1 neutral | no consensus" },
+  { time: "15:41:40", level: "INFO", module: "VOLUME-ANALYSIS", message: "SPY dark pool activity: 42% of volume | above average institutional flow" },
+  { time: "15:41:35", level: "INFO", module: "RISK-ENGINE", message: "Max drawdown today: 0.8% | within tolerance (max 3%)" },
+  { time: "15:41:30", level: "DATA", module: "FLOW-SCANNER", message: "QQQ put sweep $1.8M | flagged as hedge (correlated with equity position)" },
 ];
 
 export const quantumNodes = [

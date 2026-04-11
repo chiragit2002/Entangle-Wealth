@@ -58,7 +58,7 @@ export default function Accessibility() {
             <h2 className="text-xl font-bold text-white mb-3">Feedback & Assistance</h2>
             <p>We welcome your feedback on the accessibility of EntangleWealth. If you encounter accessibility barriers or have suggestions for improvement, please contact us:</p>
             <div className="mt-3 bg-white/[0.02] border border-white/[0.06] rounded-xl p-5">
-              <p className="font-bold text-white">EntangleWealth — Accessibility</p>
+              <p className="font-bold text-white">EntangleWealth | Accessibility</p>
               <p className="mt-1">Email: accessibility@entanglewealth.com</p>
             </div>
             <p className="mt-3">We try to respond to accessibility feedback within 5 business days. If you need immediate assistance or encounter a barrier that prevents you from accessing critical functionality, please include details about the issue and we will work to provide alternative access.</p>

@@ -374,7 +374,7 @@ export default function DailyContent() {
       if (!res.ok) throw new Error("Failed to start regeneration");
       setToday((prev) => prev ? { ...prev, posts: [], batchExists: false } : null);
       setGenerating(true);
-      toast({ title: "Regenerating...", description: "Fresh batch is being generated — usually takes 30-60 seconds" });
+      toast({ title: "Regenerating...", description: "Fresh batch is being generated | usually takes 30-60 seconds" });
     } catch (err: any) {
       toast({ title: "Regeneration failed", description: err.message, variant: "destructive" });
     } finally {
@@ -387,7 +387,7 @@ export default function DailyContent() {
     try {
       const res = await authFetch("/daily-content/regenerate", getToken, { method: "POST" });
       if (!res.ok) throw new Error("Failed to start generation");
-      toast({ title: "Generating...", description: "Today's batch is being generated — usually takes 30-60 seconds" });
+      toast({ title: "Generating...", description: "Today's batch is being generated | usually takes 30-60 seconds" });
     } catch (err: any) {
       setGenerating(false);
       toast({ title: "Generation failed", description: err.message, variant: "destructive" });
@@ -482,7 +482,7 @@ export default function DailyContent() {
               Daily Content Engine
             </h1>
             <p className="text-muted-foreground mt-1 text-sm">
-              Auto-generated daily batch — Twitter/X, LinkedIn, Engagement
+              Auto-generated daily batch | Twitter/X, LinkedIn, Engagement
             </p>
           </div>
 
@@ -554,7 +554,7 @@ export default function DailyContent() {
                 <Loader2 className="w-5 h-5 animate-spin text-primary shrink-0" />
                 <div>
                   <p className="text-sm font-semibold text-white">Generating today's batch...</p>
-                  <p className="text-xs text-muted-foreground">AI is crafting your posts — typically takes 30-60 seconds</p>
+                  <p className="text-xs text-muted-foreground">AI is crafting your posts | typically takes 30-60 seconds</p>
                 </div>
               </div>
             )}

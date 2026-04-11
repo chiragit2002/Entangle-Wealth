@@ -90,7 +90,7 @@ export default function TaxStrategy() {
 
         <div className="glass-panel rounded-xl p-4 mb-6 border border-[rgba(255,215,0,0.2)] bg-[rgba(255,215,0,0.03)]">
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            These strategies are based on IRS publications and tax code. This is educational information only — not professional tax advice. Consult a licensed CPA for your specific situation.
+            These strategies are based on IRS publications and tax code. This is educational information only | not professional tax advice. Consult a licensed CPA for your specific situation.
           </p>
         </div>
 

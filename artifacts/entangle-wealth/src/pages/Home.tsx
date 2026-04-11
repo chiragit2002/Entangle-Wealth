@@ -293,7 +293,7 @@ function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
         }}
         className="h-12 px-8 bg-gradient-to-r from-[#00c8f8] to-[#0088cc] text-black font-bold hover:opacity-90 text-base rounded-full shadow-[0_0_24px_rgba(0,200,248,0.25)]"
       >
-        Get clarity — it's free
+        Get clarity | it's free
       </Button>
     );
   }
@@ -309,7 +309,7 @@ function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
   return (
     <div className="flex items-center gap-2 text-[#00e676] text-sm font-medium animate-in fade-in duration-300">
       <CheckCircle className="w-5 h-5" />
-      <span>Great — taking you there now...</span>
+      <span>Great | taking you there now...</span>
     </div>
   );
 }
@@ -360,7 +360,7 @@ export default function Home() {
             </h1>
 
             <p className="max-w-xl text-base md:text-xl text-white/60 leading-relaxed">
-              Entangled Wealth gives you clear, plain-language guidance on your finances — no charts
+              Entangled Wealth gives you clear, plain-language guidance on your finances | no charts
               to decipher, no jargon to decode. Just answers you can act on.
             </p>
 
@@ -402,7 +402,7 @@ export default function Home() {
               Sound familiar?
             </p>
             <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
-              Most people feel lost with money — and it's not their fault.
+              Most people feel lost with money | and it's not their fault.
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
               {[
@@ -413,7 +413,7 @@ export default function Home() {
                   text: "You've tried apps and articles, but the advice is confusing, conflicting, or just not for you.",
                 },
                 {
-                  text: "Every time you think about it, you feel overwhelmed — so you put it off again.",
+                  text: "Every time you think about it, you feel overwhelmed | so you put it off again.",
                 },
               ].map((item, i) => (
                 <div
@@ -438,7 +438,7 @@ export default function Home() {
             </h2>
             <p className="text-base text-white/50 max-w-lg mx-auto leading-relaxed">
               We take your financial picture, apply smart analysis behind the scenes, and give you
-              clear, actionable guidance — in plain English. No expertise required.
+              clear, actionable guidance | in plain English. No expertise required.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
               {[
@@ -489,21 +489,21 @@ export default function Home() {
                 {
                   num: "1",
                   title: "Understand your situation",
-                  desc: "Tell us a bit about where you are financially. No forms, no complexity — just the basics.",
+                  desc: "Tell us a bit about where you are financially. No forms, no complexity | just the basics.",
                   color: "text-[#00c8f8]",
                   bg: "bg-[#00c8f8]/10",
                 },
                 {
                   num: "2",
                   title: "Get clear guidance",
-                  desc: "We analyze your picture and give you simple, specific next steps — no financial degree needed.",
+                  desc: "We analyze your picture and give you simple, specific next steps | no financial degree needed.",
                   color: "text-[#00e676]",
                   bg: "bg-[#00e676]/10",
                 },
                 {
                   num: "3",
                   title: "Make better decisions",
-                  desc: "Act with confidence. Whether you're saving, investing, or just getting organized — you'll know what to do.",
+                  desc: "Act with confidence. Whether you're saving, investing, or just getting organized | you'll know what to do.",
                   color: "text-[#f5c842]",
                   bg: "bg-[#f5c842]/10",
                 },
@@ -534,7 +534,7 @@ export default function Home() {
               Why people trust us
             </p>
             <h2 className="text-2xl md:text-4xl font-bold text-white">
-              Built to simplify — not overwhelm.
+              Built to simplify | not overwhelm.
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 text-left">
               {[
@@ -603,7 +603,7 @@ export default function Home() {
             )}
 
             {!testimonialsState.error && !testimonialsState.loading && testimonialsState.data === null && (
-              <p className="text-center text-sm text-white/30">No reviews yet — be the first!</p>
+              <p className="text-center text-sm text-white/30">No reviews yet | be the first!</p>
             )}
 
             {testimonialsState.data && testimonialsState.data.length > 0 && (
@@ -646,14 +646,14 @@ export default function Home() {
               Ready to feel good about your money?
             </h2>
             <p className="text-base text-white/50 max-w-md leading-relaxed">
-              It starts with a single step. No commitment, no credit card, no overwhelm — just
+              It starts with a single step. No commitment, no credit card, no overwhelm | just
               clarity.
             </p>
 
             <MicroConversionFlow referralCode={referralCode || undefined} />
 
             <p className="text-[11px] text-white/25 max-w-xs leading-relaxed">
-              This is a financial guidance tool. It won't guarantee outcomes — nothing can. But it
+              This is a financial guidance tool. It won't guarantee outcomes | nothing can. But it
               will help you feel more informed and in control.
             </p>
 

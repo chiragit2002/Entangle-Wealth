@@ -218,13 +218,13 @@ function generateAgentReviews(results: IndicatorResult[], symbol: string): Agent
   return [
     { name: "Trend Analyst", role: "Moving Averages & Direction", color: "#00d4ff",
       signal: trendBuy > trend.length * 0.6 ? "BUY" : trendBuy < trend.length * 0.3 ? "SELL" : "NEUTRAL",
-      verdict: trendBuy > trend.length * 0.6 ? `${symbol} bullish trend alignment across ${trendBuy}/${trend.length} indicators` : `${symbol} trend mixed — ${trendBuy}/${trend.length} bullish`,
+      verdict: trendBuy > trend.length * 0.6 ? `${symbol} bullish trend alignment across ${trendBuy}/${trend.length} indicators` : `${symbol} trend mixed | ${trendBuy}/${trend.length} bullish`,
       reasoning: `${supertrend ? `Supertrend: ${supertrend.signal} at ${supertrend.value}.` : ""} ${adx ? `ADX: ${adx.value} (${Number(adx.value) > 25 ? "trending" : "ranging"}).` : ""} ${trendBuy}/${trend.length} trend indicators bullish.`,
       keyMetrics: [`MA Consensus: ${trendBuy}/${trend.length}`, supertrend ? `Supertrend: ${supertrend.signal}` : "", adx ? `ADX: ${adx.value}` : ""].filter(Boolean),
     },
     { name: "Momentum Surgeon", role: "RSI, MACD & Oscillators", color: "#ffd700",
       signal: momBuy > momentum.length * 0.5 ? "BUY" : momBuy < momentum.length * 0.3 ? "SELL" : "NEUTRAL",
-      verdict: rsi ? `RSI ${rsi.value} — ${Number(rsi.value) > 70 ? "overbought" : Number(rsi.value) < 30 ? "oversold" : "neutral"}` : `Momentum ${momBuy > momentum.length * 0.5 ? "bullish" : "bearish"}`,
+      verdict: rsi ? `RSI ${rsi.value} | ${Number(rsi.value) > 70 ? "overbought" : Number(rsi.value) < 30 ? "oversold" : "neutral"}` : `Momentum ${momBuy > momentum.length * 0.5 ? "bullish" : "bearish"}`,
       reasoning: `${rsi ? `RSI(14): ${rsi.value}.` : ""} ${macd ? `MACD: ${macd.value} (${macd.signal}).` : ""} ${momBuy}/${momentum.length} momentum bullish.`,
       keyMetrics: [rsi ? `RSI: ${rsi.value}` : "", macd ? `MACD: ${macd.value}` : "", `Consensus: ${momBuy}/${momentum.length}`].filter(Boolean),
     },
@@ -248,7 +248,7 @@ function generateAgentReviews(results: IndicatorResult[], symbol: string): Agent
     },
     { name: "Consensus Engine", role: "Final Synthesis", color: "#a855f7",
       signal: overall.signal,
-      verdict: `${overall.signal.replace("_", " ")} — ${overall.confidence}% confidence across ${results.length} indicators`,
+      verdict: `${overall.signal.replace("_", " ")} | ${overall.confidence}% confidence across ${results.length} indicators`,
       reasoning: `${overall.buyCount} BUY, ${overall.sellCount} SELL, ${overall.neutralCount} NEUTRAL. ${overall.confidence >= 70 ? "High conviction." : "Mixed signals."}`,
       keyMetrics: [`Buy: ${overall.buyCount}`, `Sell: ${overall.sellCount}`, `Confidence: ${overall.confidence}%`],
     },
@@ -353,7 +353,7 @@ export default function TechnicalAnalysis() {
       lastAnalyzed: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
     };
     setWatchlist(prev => [item, ...prev]);
-    toast({ title: "Added to watchlist", description: `${sym} — ${sig.signal.replace("_", " ")} (${sig.confidence}%)` });
+    toast({ title: "Added to watchlist", description: `${sym} | ${sig.signal.replace("_", " ")} (${sig.confidence}%)` });
   }, [watchlist, toast]);
 
   const removeFromWatchlist = useCallback((sym: string) => {
@@ -379,7 +379,7 @@ export default function TechnicalAnalysis() {
       return `"${v.replace(/"/g, '""')}"`;
     };
     const lines = [
-      `EntangleWealth Technical Analysis — ${activeSymbol}`,
+      `EntangleWealth Technical Analysis | ${activeSymbol}`,
       `Generated,${new Date().toLocaleDateString("en-US")}`, "",
       "Indicator,Category,Value,Signal",
       ...indicators.map(r => `${escape(r.name)},${r.category},${escape(String(r.value))},${r.signal}`),
@@ -496,7 +496,7 @@ export default function TechnicalAnalysis() {
                             </div>
                             <div className="flex items-center gap-2 mt-0.5">
                               <span className="text-[11px] text-white/40 font-mono">${w.price.toFixed(2)}</span>
-                              <span className={`text-[10px] font-mono font-bold ${w.change >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>{w.change >= 0 ? "+" : ""}{w.change}%</span>
+                              <span className={`text-[10px] font-mono font-bold ${w.change >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>{w.change >= 0 ? "+" : ""}{Math.abs(w.change).toFixed(2)}%</span>
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-0.5">
@@ -685,7 +685,7 @@ export default function TechnicalAnalysis() {
                               <p className="text-[9px] text-white/15 truncate hidden md:block">{ind.description}</p>
                             </div>
                           </div>
-                          <span className="text-[12px] font-mono font-bold text-white/50 text-right truncate">{ind.value}</span>
+                          <span className="text-[12px] font-mono font-bold text-white/50 text-right truncate">{typeof ind.value === "number" ? Math.abs(ind.value) : ind.value}</span>
                           <div className="flex justify-end">
                             <span className={`text-[9px] font-black px-2 py-0.5 rounded border ${sigBg(ind.signal)}`}>{ind.signal.replace("_", " ")}</span>
                           </div>

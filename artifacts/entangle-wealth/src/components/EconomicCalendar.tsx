@@ -13,9 +13,9 @@ interface EconEvent {
 }
 
 const EVENTS: EconEvent[] = [
-  { date: "Apr 7", time: "8:30 AM", name: "Trade Balance", impact: "medium", previous: "-$68.3B", forecast: "-$67.5B", category: "gdp" },
+  { date: "Apr 7", time: "8:30 AM", name: "Trade Balance", impact: "medium", previous: "$68.3B", forecast: "$67.5B", category: "gdp" },
   { date: "Apr 8", time: "6:00 AM", name: "NFIB Small Business Optimism", impact: "low", previous: "100.7", forecast: "101.2", category: "gdp" },
-  { date: "Apr 9", time: "2:00 PM", name: "FOMC Meeting Minutes", impact: "high", previous: "—", forecast: "—", category: "fed" },
+  { date: "Apr 9", time: "2:00 PM", name: "FOMC Meeting Minutes", impact: "high", previous: "N/A", forecast: "N/A", category: "fed" },
   { date: "Apr 10", time: "8:30 AM", name: "CPI (MoM)", impact: "high", previous: "0.4%", forecast: "0.3%", category: "inflation" },
   { date: "Apr 10", time: "8:30 AM", name: "Core CPI (YoY)", impact: "high", previous: "3.8%", forecast: "3.7%", category: "inflation" },
   { date: "Apr 10", time: "8:30 AM", name: "Initial Jobless Claims", impact: "medium", previous: "221K", forecast: "215K", category: "employment" },

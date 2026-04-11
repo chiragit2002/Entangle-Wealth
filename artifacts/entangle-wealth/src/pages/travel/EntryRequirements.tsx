@@ -43,7 +43,7 @@ function getRequirements(destinations: string[]): Requirement[] {
     description: "Ensure your passport is valid for at least 6 months beyond your return date. Many countries enforce this rule strictly.",
     severity: "warning",
     link: "https://travel.state.gov/content/travel/en/passports.html",
-    linkLabel: "U.S. State Dept — Passports",
+    linkLabel: "U.S. State Dept | Passports",
   });
 
   const needsVisa = lowerDests.some(d =>
@@ -54,10 +54,10 @@ function getRequirements(destinations: string[]): Requirement[] {
       id: "visa",
       icon: CreditCard,
       title: "Visa May Be Required",
-      description: "One or more of your destinations may require a visa for U.S. passport holders. Check requirements well in advance — processing can take weeks.",
+      description: "One or more of your destinations may require a visa for U.S. passport holders. Check requirements well in advance | processing can take weeks.",
       severity: "warning",
       link: "https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages.html",
-      linkLabel: "U.S. State Dept — Country Info",
+      linkLabel: "U.S. State Dept | Country Info",
     });
   }
 
@@ -67,7 +67,7 @@ function getRequirements(destinations: string[]): Requirement[] {
       id: "etias",
       icon: Globe,
       title: "ETIAS Authorization (Europe)",
-      description: "Starting 2025, U.S. citizens traveling to EU/Schengen countries need ETIAS travel authorization. Apply online before departure — valid for 3 years.",
+      description: "Starting 2025, U.S. citizens traveling to EU/Schengen countries need ETIAS travel authorization. Apply online before departure | valid for 3 years.",
       severity: "info",
       link: "https://travel-europe.europa.eu/etias_en",
       linkLabel: "Official ETIAS Portal",
@@ -83,7 +83,7 @@ function getRequirements(destinations: string[]): Requirement[] {
       description: "Your destination(s) may require or recommend specific vaccinations (Yellow Fever, Hepatitis A/B, Typhoid, etc.). Consult your doctor 4–6 weeks before travel.",
       severity: "warning",
       link: "https://wwwnc.cdc.gov/travel/destinations/list",
-      linkLabel: "CDC — Traveler's Health",
+      linkLabel: "CDC | Traveler's Health",
     });
   }
 
@@ -94,7 +94,7 @@ function getRequirements(destinations: string[]): Requirement[] {
     description: "Consider comprehensive travel insurance covering medical emergencies, trip cancellation, and lost luggage. Some countries require proof of insurance.",
     severity: "info",
     link: "https://travel.state.gov/content/travel/en/international-travel/before-you-go/your-health-abroad/insurance-providers-overseas.html",
-    linkLabel: "State Dept — Insurance Info",
+    linkLabel: "State Dept | Insurance Info",
   });
 
   return reqs;

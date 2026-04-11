@@ -163,7 +163,7 @@ export default function Status() {
                     {inc.description && <p className="text-xs text-white/40">{inc.description}</p>}
                     <p className="text-[10px] text-white/15 mt-2 font-mono">
                       {new Date(inc.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                      {inc.resolved_at && <> — Resolved {new Date(inc.resolved_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</>}
+                      {inc.resolved_at && <> | Resolved {new Date(inc.resolved_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</>}
                     </p>
                   </div>
                 );

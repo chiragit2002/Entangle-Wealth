@@ -475,7 +475,7 @@ export default function Profile() {
             <div className="space-y-3 border-t border-white/10 pt-4">
               <Input placeholder="Headline (e.g., Full-Stack Developer)" value={profile.headline} onChange={(e) => setProfile(prev => ({ ...prev, headline: e.target.value }))} className="bg-white/5 border-white/10" />
               <textarea
-                placeholder="Bio — tell employers about yourself..."
+                placeholder="Bio | tell employers about yourself..."
                 value={profile.bio}
                 onChange={(e) => setProfile(prev => ({ ...prev, bio: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white placeholder:text-muted-foreground/50 min-h-[80px] resize-none focus:outline-none focus:border-primary/50"
@@ -833,7 +833,7 @@ export default function Profile() {
 
         <div className="glass-panel p-6 mb-6">
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2"><Fingerprint className="w-5 h-5 text-primary" /> Passkey / Biometric Sign-In</h3>
-          <p className="text-sm text-muted-foreground mb-4">Sign in with Face ID, fingerprint, or security key — no password needed.</p>
+          <p className="text-sm text-muted-foreground mb-4">Sign in with Face ID, fingerprint, or security key | no password needed.</p>
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium">Register a Passkey</p>

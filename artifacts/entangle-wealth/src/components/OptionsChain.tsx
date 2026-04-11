@@ -96,7 +96,7 @@ export function OptionsChain() {
   const chain = useMemo(() => generateChain(selectedSymbol.price), [selectedSymbol]);
   const totalCallVol = chain.reduce((s, c) => s + c.callVol, 0);
   const totalPutVol = chain.reduce((s, c) => s + c.putVol, 0);
-  const pcRatio = totalCallVol ? (totalPutVol / totalCallVol).toFixed(2) : "—";
+  const pcRatio = totalCallVol ? (totalPutVol / totalCallVol).toFixed(2) : "N/A";
 
   return (
     <div data-tour="options-chain" className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden mb-6">
@@ -173,9 +173,9 @@ export function OptionsChain() {
                   <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} ${row.callVol > 2000 ? "text-primary/50 font-bold" : "text-white/15"}`}>{row.callVol.toLocaleString()}</td>
                   <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/12`}>{row.callOI.toLocaleString()}</td>
                   {showGreeks && <>
-                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/20`}>{row.callDelta}</td>
-                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/12`}>{row.callGamma}</td>
-                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-[#ff3366]/30`}>{row.callTheta}</td>
+                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/20`}>{Math.abs(row.callDelta)}</td>
+                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/12`}>{Math.abs(row.callGamma)}</td>
+                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-[#ff3366]/30`}>{Math.abs(row.callTheta).toFixed(3)}</td>
                     <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/15`}>{row.callIV}</td>
                   </>}
                   <td className={`px-3 py-1.5 text-center font-bold text-[11px] ${isATM ? "text-[#ffd700] bg-[#ffd700]/[0.05]" : "text-white/40 bg-white/[0.015]"}`}>
@@ -188,9 +188,9 @@ export function OptionsChain() {
                   <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} ${row.putVol > 2000 ? "text-[#ff3366]/50 font-bold" : "text-white/15"}`}>{row.putVol.toLocaleString()}</td>
                   <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/12`}>{row.putOI.toLocaleString()}</td>
                   {showGreeks && <>
-                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/20`}>{row.putDelta}</td>
-                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/12`}>{row.putGamma}</td>
-                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-[#ff3366]/30`}>{row.putTheta}</td>
+                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/20`}>{Math.abs(row.putDelta)}</td>
+                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/12`}>{Math.abs(row.putGamma)}</td>
+                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-[#ff3366]/30`}>{Math.abs(row.putTheta).toFixed(3)}</td>
                     <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/15`}>{row.putIV}</td>
                   </>}
                 </tr>

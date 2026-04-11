@@ -38,7 +38,7 @@ function getEntityChips(profile: UserProfile | null): { emoji: string; text: str
         { emoji: "📊", text: "Do I qualify for the QBI deduction?" },
         { emoji: "🏠", text: "Home office deduction rules?" },
         { emoji: "🚗", text: "How to document vehicle mileage?" },
-        { emoji: "💼", text: "SEP-IRA vs Solo 401(k) — which is better?" },
+        { emoji: "💼", text: "SEP-IRA vs Solo 401(k) | which is better?" },
         { emoji: "🏦", text: "Best order to fund retirement accounts?" },
       ];
     case "llc":
@@ -111,7 +111,7 @@ export default function TaxGPT() {
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     const saved = getChatHistory(profileId);
     if (saved.length > 0) return saved;
-    return [{ role: "ai" as const, text: `Hello! I'm TaxGPT, your tax intelligence assistant.${profile ? ` I see you're a ${ENTITY_SHORT_LABELS[profile.entityType]} with ${profile.businessName ? `${profile.businessName} in ` : ""}${profile.industry || "your business"}.` : ""} Ask me about deductions, strategies, audit risks, or IRS rules.\n\n**⚠️ Disclaimer:** This is educational information only — not professional tax advice. Consult a licensed CPA for your specific situation.`, timestamp: Date.now() }];
+    return [{ role: "ai" as const, text: `Hello! I'm TaxGPT, your tax intelligence assistant.${profile ? ` I see you're a ${ENTITY_SHORT_LABELS[profile.entityType]} with ${profile.businessName ? `${profile.businessName} in ` : ""}${profile.industry || "your business"}.` : ""} Ask me about deductions, strategies, audit risks, or IRS rules.\n\n**⚠️ Disclaimer:** This is educational information only | not professional tax advice. Consult a licensed CPA for your specific situation.`, timestamp: Date.now() }];
   });
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -235,7 +235,7 @@ export default function TaxGPT() {
 
         <div className="glass-panel rounded-xl p-4 mb-6 border border-[rgba(156,39,176,0.2)] bg-[rgba(156,39,176,0.03)]">
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            TaxGPT answers based on IRS publications and tax code. This is educational information only — not professional tax advice. Consult a licensed CPA for your specific situation.
+            TaxGPT answers based on IRS publications and tax code. This is educational information only | not professional tax advice. Consult a licensed CPA for your specific situation.
           </p>
         </div>
 

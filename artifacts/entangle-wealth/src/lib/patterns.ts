@@ -60,47 +60,47 @@ export function detectCandlestickPatterns(
     if (range === 0) continue;
 
     if (isDoji(c)) {
-      results.push({ name: "Doji", type: "neutral", index: i, reliability: "medium", description: "Indecision candle — body < 10% of range" });
+      results.push({ name: "Doji", type: "neutral", index: i, reliability: "medium", description: "Indecision candle: body < 10% of range" });
     }
 
     if (i > 0) {
       const prev: Candle = { open: opens[i - 1], high: highs[i - 1], low: lows[i - 1], close: closes[i - 1], volume: volumes[i - 1] };
 
       if (isBullish(c) && body > range * 0.6 && lowerWick(c) > body * 1.5 && upperWick(c) < body * 0.3 && isBearish(prev)) {
-        results.push({ name: "Hammer", type: "bullish", index: i, reliability: "high", description: "Bullish reversal — long lower wick after downtrend" });
+        results.push({ name: "Hammer", type: "bullish", index: i, reliability: "high", description: "Bullish reversal: long lower wick after downtrend" });
       }
 
       if (isBearish(c) && upperWick(c) > body * 2 && lowerWick(c) < body * 0.3 && isBullish(prev)) {
-        results.push({ name: "Shooting Star", type: "bearish", index: i, reliability: "high", description: "Bearish reversal — long upper wick after uptrend" });
+        results.push({ name: "Shooting Star", type: "bearish", index: i, reliability: "high", description: "Bearish reversal: long upper wick after uptrend" });
       }
 
       if (body > range * 0.8 && isBullish(c)) {
-        results.push({ name: "Marubozu", type: "bullish", index: i, reliability: "medium", description: "Strong bullish — body > 80% of range, minimal wicks" });
+        results.push({ name: "Marubozu", type: "bullish", index: i, reliability: "medium", description: "Strong bullish: body > 80% of range, minimal wicks" });
       }
       if (body > range * 0.8 && isBearish(c)) {
-        results.push({ name: "Marubozu", type: "bearish", index: i, reliability: "medium", description: "Strong bearish — body > 80% of range, minimal wicks" });
+        results.push({ name: "Marubozu", type: "bearish", index: i, reliability: "medium", description: "Strong bearish: body > 80% of range, minimal wicks" });
       }
 
       if (isBullish(c) && isBearish(prev) && c.close > prev.open && c.open < prev.close && bodySize(c) > bodySize(prev)) {
-        results.push({ name: "Bullish Engulfing", type: "bullish", index: i, reliability: "high", description: "Bullish reversal — current candle engulfs previous bearish candle" });
+        results.push({ name: "Bullish Engulfing", type: "bullish", index: i, reliability: "high", description: "Bullish reversal: current candle engulfs previous bearish candle" });
       }
       if (isBearish(c) && isBullish(prev) && c.open > prev.close && c.close < prev.open && bodySize(c) > bodySize(prev)) {
-        results.push({ name: "Bearish Engulfing", type: "bearish", index: i, reliability: "high", description: "Bearish reversal — current candle engulfs previous bullish candle" });
+        results.push({ name: "Bearish Engulfing", type: "bearish", index: i, reliability: "high", description: "Bearish reversal: current candle engulfs previous bullish candle" });
       }
 
       if (isBullish(c) && isBearish(prev) && bodySize(c) < bodySize(prev) * 0.5 && c.open > prev.close && c.close < prev.open) {
-        results.push({ name: "Bullish Harami", type: "bullish", index: i, reliability: "medium", description: "Potential bullish reversal — small body inside previous large body" });
+        results.push({ name: "Bullish Harami", type: "bullish", index: i, reliability: "medium", description: "Potential bullish reversal: small body inside previous large body" });
       }
       if (isBearish(c) && isBullish(prev) && bodySize(c) < bodySize(prev) * 0.5 && c.close > prev.open && c.open < prev.close) {
-        results.push({ name: "Bearish Harami", type: "bearish", index: i, reliability: "medium", description: "Potential bearish reversal — small body inside previous large body" });
+        results.push({ name: "Bearish Harami", type: "bearish", index: i, reliability: "medium", description: "Potential bearish reversal: small body inside previous large body" });
       }
 
       if (isBullish(c) && isBearish(prev) && c.open < prev.close && c.close > (prev.open + prev.close) / 2 && c.close < prev.open) {
-        results.push({ name: "Piercing Line", type: "bullish", index: i, reliability: "medium", description: "Bullish reversal — closes above midpoint of previous bearish candle" });
+        results.push({ name: "Piercing Line", type: "bullish", index: i, reliability: "medium", description: "Bullish reversal: closes above midpoint of previous bearish candle" });
       }
 
       if (isBearish(c) && isBullish(prev) && c.open > prev.close && c.close < (prev.open + prev.close) / 2 && c.close > prev.open) {
-        results.push({ name: "Dark Cloud Cover", type: "bearish", index: i, reliability: "medium", description: "Bearish reversal — closes below midpoint of previous bullish candle" });
+        results.push({ name: "Dark Cloud Cover", type: "bearish", index: i, reliability: "medium", description: "Bearish reversal: closes below midpoint of previous bullish candle" });
       }
     }
 
@@ -109,19 +109,19 @@ export function detectCandlestickPatterns(
       const c2: Candle = { open: opens[i - 1], high: highs[i - 1], low: lows[i - 1], close: closes[i - 1], volume: volumes[i - 1] };
 
       if (isBearish(c1) && isDoji(c2) && c2.low < c1.close && isBullish(c) && c.close > (c1.open + c1.close) / 2) {
-        results.push({ name: "Morning Star", type: "bullish", index: i, reliability: "high", description: "Strong bullish reversal — 3-candle pattern with doji star" });
+        results.push({ name: "Morning Star", type: "bullish", index: i, reliability: "high", description: "Strong bullish reversal: 3-candle pattern with doji star" });
       }
 
       if (isBullish(c1) && isDoji(c2) && c2.high > c1.close && isBearish(c) && c.close < (c1.open + c1.close) / 2) {
-        results.push({ name: "Evening Star", type: "bearish", index: i, reliability: "high", description: "Strong bearish reversal — 3-candle pattern with doji star" });
+        results.push({ name: "Evening Star", type: "bearish", index: i, reliability: "high", description: "Strong bearish reversal: 3-candle pattern with doji star" });
       }
 
       if (isBullish(c1) && isBullish(c2) && isBullish(c) && c2.close > c1.close && c.close > c2.close && c2.open > c1.open && c.open > c2.open) {
-        results.push({ name: "Three White Soldiers", type: "bullish", index: i, reliability: "high", description: "Strong bullish continuation — three consecutive higher closing bullish candles" });
+        results.push({ name: "Three White Soldiers", type: "bullish", index: i, reliability: "high", description: "Strong bullish continuation: three consecutive higher closing bullish candles" });
       }
 
       if (isBearish(c1) && isBearish(c2) && isBearish(c) && c2.close < c1.close && c.close < c2.close && c2.open < c1.open && c.open < c2.open) {
-        results.push({ name: "Three Black Crows", type: "bearish", index: i, reliability: "high", description: "Strong bearish continuation — three consecutive lower closing bearish candles" });
+        results.push({ name: "Three Black Crows", type: "bearish", index: i, reliability: "high", description: "Strong bearish continuation: three consecutive lower closing bearish candles" });
       }
     }
   }
@@ -171,7 +171,7 @@ export function detectChartPatterns(
           startIndex: p1,
           endIndex: p2,
           reliability: "high",
-          description: `Double top at $${highs[p1].toFixed(2)} — bearish reversal pattern`,
+          description: `Double top at $${highs[p1].toFixed(2)}: bearish reversal pattern`,
         });
       }
     }
@@ -189,7 +189,7 @@ export function detectChartPatterns(
           startIndex: t1,
           endIndex: t2,
           reliability: "high",
-          description: `Double bottom at $${lows[t1].toFixed(2)} — bullish reversal pattern`,
+          description: `Double bottom at $${lows[t1].toFixed(2)}: bullish reversal pattern`,
         });
       }
     }
@@ -206,7 +206,7 @@ export function detectChartPatterns(
           startIndex: p1,
           endIndex: p3,
           reliability: "high",
-          description: "Head and Shoulders top — strong bearish reversal pattern",
+          description: "Head and Shoulders top: strong bearish reversal pattern",
         });
       }
     }
@@ -223,7 +223,7 @@ export function detectChartPatterns(
           startIndex: t1,
           endIndex: t3,
           reliability: "high",
-          description: "Inverse Head and Shoulders — strong bullish reversal pattern",
+          description: "Inverse Head and Shoulders: strong bullish reversal pattern",
         });
       }
     }
@@ -242,7 +242,7 @@ export function detectChartPatterns(
         startIndex: len - 30,
         endIndex: len - 1,
         reliability: "medium",
-        description: "Converging trendlines — breakout imminent in either direction",
+        description: "Converging trendlines: breakout imminent in either direction",
       });
     }
 
@@ -253,7 +253,7 @@ export function detectChartPatterns(
         startIndex: len - 30,
         endIndex: len - 1,
         reliability: "high",
-        description: "Flat resistance with rising support — bullish breakout likely",
+        description: "Flat resistance with rising support: bullish breakout likely",
       });
     }
 
@@ -264,7 +264,7 @@ export function detectChartPatterns(
         startIndex: len - 30,
         endIndex: len - 1,
         reliability: "high",
-        description: "Declining resistance with flat support — bearish breakdown likely",
+        description: "Declining resistance with flat support: bearish breakdown likely",
       });
     }
 
@@ -279,7 +279,7 @@ export function detectChartPatterns(
         startIndex: len - 15,
         endIndex: len - 1,
         reliability: "medium",
-        description: "Narrow consolidation after strong move up — bullish continuation",
+        description: "Narrow consolidation after strong move up: bullish continuation",
       });
     }
     if (rangeAvg < prevRangeAvg * 0.6 && highSlope < 0 && lowSlope < 0) {
@@ -289,7 +289,7 @@ export function detectChartPatterns(
         startIndex: len - 15,
         endIndex: len - 1,
         reliability: "medium",
-        description: "Narrow consolidation after strong move down — bearish continuation",
+        description: "Narrow consolidation after strong move down: bearish continuation",
       });
     }
   }

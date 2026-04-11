@@ -68,39 +68,39 @@ const MULTI_ASSET_DATA = {
     { symbol: "BTC", name: "Bitcoin", price: 97450.20, change: 2.34 },
     { symbol: "ETH", name: "Ethereum", price: 3842.15, change: 1.87 },
     { symbol: "SOL", name: "Solana", price: 248.90, change: 4.12 },
-    { symbol: "XRP", name: "Ripple", price: 2.48, change: -0.95 },
+    { symbol: "XRP", name: "Ripple", price: 2.48, change: 0.95 },
     { symbol: "ADA", name: "Cardano", price: 0.82, change: 1.23 },
-    { symbol: "DOGE", name: "Dogecoin", price: 0.187, change: -2.15 },
+    { symbol: "DOGE", name: "Dogecoin", price: 0.187, change: 2.15 },
   ],
   forex: [
-    { symbol: "EUR/USD", price: 1.0842, change: -0.12 },
+    { symbol: "EUR/USD", price: 1.0842, change: 0.12 },
     { symbol: "GBP/USD", price: 1.2715, change: 0.08 },
     { symbol: "USD/JPY", price: 151.42, change: 0.34 },
-    { symbol: "USD/CHF", price: 0.8845, change: -0.05 },
+    { symbol: "USD/CHF", price: 0.8845, change: 0.05 },
     { symbol: "AUD/USD", price: 0.6612, change: 0.22 },
-    { symbol: "USD/CAD", price: 1.3648, change: -0.18 },
+    { symbol: "USD/CAD", price: 1.3648, change: 0.18 },
   ],
   commodities: [
     { symbol: "GOLD", name: "Gold", price: 2385.40, change: 0.42, unit: "/oz" },
     { symbol: "SILVER", name: "Silver", price: 28.92, change: 1.15, unit: "/oz" },
-    { symbol: "WTI", name: "Crude Oil", price: 78.45, change: -1.23, unit: "/bbl" },
-    { symbol: "BRENT", name: "Brent", price: 82.30, change: -0.98, unit: "/bbl" },
+    { symbol: "WTI", name: "Crude Oil", price: 78.45, change: 1.23, unit: "/bbl" },
+    { symbol: "BRENT", name: "Brent", price: 82.30, change: 0.98, unit: "/bbl" },
     { symbol: "NATGAS", name: "Nat Gas", price: 2.84, change: 3.45, unit: "/MMBtu" },
     { symbol: "COPPER", name: "Copper", price: 4.52, change: 0.67, unit: "/lb" },
   ],
   bonds: [
-    { symbol: "US2Y", name: "2Y Treasury", yield: 4.72, change: -0.03 },
-    { symbol: "US5Y", name: "5Y Treasury", yield: 4.35, change: -0.02 },
+    { symbol: "US2Y", name: "2Y Treasury", yield: 4.72, change: 0.03 },
+    { symbol: "US5Y", name: "5Y Treasury", yield: 4.35, change: 0.02 },
     { symbol: "US10Y", name: "10Y Treasury", yield: 4.28, change: 0.02 },
     { symbol: "US30Y", name: "30Y Treasury", yield: 4.45, change: 0.01 },
     { symbol: "TIPS10", name: "10Y TIPS", yield: 2.15, change: 0.01 },
-    { symbol: "HYG", name: "HY Spread", yield: 3.42, change: -0.05 },
+    { symbol: "HYG", name: "HY Spread", yield: 3.42, change: 0.05 },
   ],
 };
 
 const MARKET_INTERNALS = {
   advDecl: { advancing: 1842, declining: 1156, unchanged: 247, ratio: 1.59 },
-  tick: { current: 245, high: 892, low: -654 },
+  tick: { current: 245, high: 892, low: 654 },
   trin: { value: 0.85, signal: "Bullish" },
   putCall: { ratio: 0.72, equity: 0.65, index: 1.12 },
   vix: { current: 14.32, change: -5.6, percentile: 22 },
@@ -155,7 +155,7 @@ function DataRow({ label, value, change, mono = true, small = false }: { label: 
         <span className={`${small ? 'text-[9px]' : 'text-[10px]'} font-mono font-medium text-white/80`}>{value}</span>
         {change !== undefined && (
           <span className={`${small ? 'text-[8px]' : 'text-[9px]'} font-mono font-bold ${change >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>
-            {change >= 0 ? '+' : ''}{change.toFixed(2)}%
+            {change >= 0 ? '+' : ''}{Math.abs(change).toFixed(2)}%
           </span>
         )}
       </div>
@@ -177,11 +177,11 @@ function GamificationBar() {
       try {
         const res = await fetch("/api/gamification/leaderboard/rank");
         const rankData = res.ok ? await res.json() : null;
-        const rankStr = rankData?.rank ? `#${rankData.rank}` : "#--";
+        const rankStr = rankData?.rank ? `#${rankData.rank}` : "#00";
 
         setGamData({ rank: rankStr, streak: "0 days", badges: "0/12" });
       } catch {
-        setGamData({ rank: "#--", streak: "0 days", badges: "0/12" });
+        setGamData({ rank: "#00", streak: "0 days", badges: "0/12" });
       }
     })();
   }, [isLoaded, isSignedIn]);
@@ -206,7 +206,7 @@ function GamificationBar() {
     );
   }
 
-  const data = gamData || { rank: "#--", streak: "0 days", badges: "0/12" };
+  const data = gamData || { rank: "#00", streak: "0 days", badges: "0/12" };
 
   return (
     <div className="grid grid-cols-3 gap-1.5 mb-2">
@@ -385,7 +385,7 @@ export default function Dashboard() {
       const sig = getOverallSignal(results);
       setQuickAnalysis({ symbol: sym, name: info?.name || sym, signal: sig.signal, confidence: sig.confidence, buyCount: sig.buyCount, sellCount: sig.sellCount });
       setAnalyzingSymbol("");
-      toast({ title: `${sym} Analysis Complete`, description: `${sig.signal.replace("_", " ")} — ${sig.confidence}% confidence` });
+      toast({ title: `${sym} Analysis Complete`, description: `${sig.signal.replace("_", " ")} | ${sig.confidence}% confidence` });
     }, 700);
   }, [toast]);
 
@@ -495,12 +495,12 @@ export default function Dashboard() {
       <div className="px-2 py-2 bg-[#020204]">
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1.5 mb-2">
           {[
-            { label: "PORTFOLIO", value: `${pnl >= 0 ? '+' : ''}${pnlPct}%`, sub: `$${portfolio.totalValue.toLocaleString(undefined, {maximumFractionDigits: 0})}`, color: pnl >= 0 ? "#00ff88" : "#ff3366" },
+            { label: "PORTFOLIO", value: `${pnl >= 0 ? '+' : ''}${Math.abs(parseFloat(pnlPct)).toFixed(2)}%`, sub: `$${portfolio.totalValue.toLocaleString(undefined, {maximumFractionDigits: 0})}`, color: pnl >= 0 ? "#00ff88" : "#ff3366" },
             { label: "OPTIONS P&L", value: `+$${todayOptionsIncome}`, sub: "Theta today", color: "#FFD700" },
             { label: "WIN RATE", value: "80%", sub: "Last 10 signals", color: "#9c27b0" },
             { label: "RISK LEVEL", value: "8.4%", sub: "Exposure", color: "#00ff88" },
-            { label: "VIX", value: MARKET_INTERNALS.vix.current.toFixed(2), sub: `${MARKET_INTERNALS.vix.change > 0 ? '+' : ''}${MARKET_INTERNALS.vix.change}%`, color: MARKET_INTERNALS.vix.change > 0 ? "#ff3366" : "#00ff88" },
-            { label: "TICK", value: `${MARKET_INTERNALS.tick.current > 0 ? '+' : ''}${MARKET_INTERNALS.tick.current}`, sub: `H:${MARKET_INTERNALS.tick.high} L:${MARKET_INTERNALS.tick.low}`, color: MARKET_INTERNALS.tick.current > 0 ? "#00ff88" : "#ff3366" },
+            { label: "VIX", value: MARKET_INTERNALS.vix.current.toFixed(2), sub: `${MARKET_INTERNALS.vix.change > 0 ? '+' : ''}${Math.abs(MARKET_INTERNALS.vix.change)}%`, color: MARKET_INTERNALS.vix.change > 0 ? "#ff3366" : "#00ff88" },
+            { label: "TICK", value: `${MARKET_INTERNALS.tick.current > 0 ? '+' : ''}${Math.abs(MARKET_INTERNALS.tick.current)}`, sub: `H:${MARKET_INTERNALS.tick.high} L:${Math.abs(MARKET_INTERNALS.tick.low)}`, color: MARKET_INTERNALS.tick.current > 0 ? "#00ff88" : "#ff3366" },
             { label: "A/D RATIO", value: MARKET_INTERNALS.advDecl.ratio.toFixed(2), sub: `${MARKET_INTERNALS.advDecl.advancing}/${MARKET_INTERNALS.advDecl.declining}`, color: MARKET_INTERNALS.advDecl.ratio > 1 ? "#00ff88" : "#ff3366" },
             { label: "P/C RATIO", value: MARKET_INTERNALS.putCall.ratio.toFixed(2), sub: `Eq:${MARKET_INTERNALS.putCall.equity} Ix:${MARKET_INTERNALS.putCall.index}`, color: MARKET_INTERNALS.putCall.ratio < 0.8 ? "#00ff88" : MARKET_INTERNALS.putCall.ratio > 1.0 ? "#ff3366" : "#FFD700" },
           ].map((stat) => (
@@ -584,7 +584,7 @@ export default function Dashboard() {
                     <div className="flex items-center gap-2">
                       <span className="text-[9px] font-mono text-white/30">$100K STARTING CASH</span>
                       <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>
-                        {pnl >= 0 ? '+' : ''}{pnlPct}%
+                        {pnl >= 0 ? '+' : ''}{Math.abs(parseFloat(pnlPct)).toFixed(2)}%
                       </span>
                       <button onClick={() => setShowTradePanel(v => !v)} className="px-1.5 py-0.5 text-[8px] font-mono font-bold bg-[#00D4FF]/10 text-[#00D4FF] rounded-sm hover:bg-[#00D4FF]/20 transition-colors">
                         {showTradePanel ? "CHART" : "TRADE"}
@@ -609,7 +609,7 @@ export default function Dashboard() {
                           </div>
                           <div className="bg-white/[0.03] rounded-sm p-2 text-center">
                             <p className="text-[8px] font-mono text-white/30">P&L</p>
-                            <p className={`text-[11px] font-mono font-bold ${pnl >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>{pnl >= 0 ? '+' : ''}${pnl.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                            <p className={`text-[11px] font-mono font-bold ${pnl >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>{pnl >= 0 ? '+' : ''}${Math.abs(pnl).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
                           </div>
                         </div>
                         <div className="flex gap-1">
@@ -807,9 +807,9 @@ export default function Dashboard() {
                               <span className={`px-1 py-0.5 text-[8px] font-mono font-bold rounded-sm ${e.type === 'CALL' ? 'bg-[#00ff88]/10 text-[#00ff88]' : 'bg-[#ff3366]/10 text-[#ff3366]'}`}>{e.type}</span>
                             </td>
                             <td className="px-2 py-1.5 text-[10px] font-mono text-white/60">${e.strike}</td>
-                            <td className={`px-2 py-1.5 text-[10px] font-mono font-bold ${e.delta > 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>{e.delta > 0 ? '+' : ''}{e.delta}</td>
-                            <td className="px-2 py-1.5 text-[10px] font-mono text-[#00D4FF]">{e.gamma}</td>
-                            <td className="px-2 py-1.5 text-[10px] font-mono text-[#ff3366]">{e.theta}</td>
+                            <td className={`px-2 py-1.5 text-[10px] font-mono font-bold ${e.delta > 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>{e.delta > 0 ? '+' : ''}{Math.abs(e.delta)}</td>
+                            <td className="px-2 py-1.5 text-[10px] font-mono text-[#00D4FF]">{Math.abs(e.gamma)}</td>
+                            <td className="px-2 py-1.5 text-[10px] font-mono text-[#ff3366]">{Math.abs(e.theta)}</td>
                             <td className={`px-2 py-1.5 text-[10px] font-mono font-bold ${e.ivRank >= 70 ? 'text-[#FFD700]' : 'text-white/40'}`}>{e.ivRank}%</td>
                             <td className="px-2 py-1.5">
                               <div className="flex items-center gap-1">
@@ -837,8 +837,8 @@ export default function Dashboard() {
                 <div className="divide-y divide-white/[0.03]">
                   <DataRow label="ADV/DECL" value={`${MARKET_INTERNALS.advDecl.advancing} / ${MARKET_INTERNALS.advDecl.declining}`} change={((MARKET_INTERNALS.advDecl.advancing / MARKET_INTERNALS.advDecl.declining) - 1) * 100} />
                   <DataRow label="UNCHANGED" value={`${MARKET_INTERNALS.advDecl.unchanged}`} />
-                  <DataRow label="TICK" value={`${MARKET_INTERNALS.tick.current > 0 ? '+' : ''}${MARKET_INTERNALS.tick.current}`} />
-                  <DataRow label="TICK HIGH/LOW" value={`${MARKET_INTERNALS.tick.high} / ${MARKET_INTERNALS.tick.low}`} />
+                  <DataRow label="TICK" value={`${MARKET_INTERNALS.tick.current > 0 ? '+' : ''}${Math.abs(MARKET_INTERNALS.tick.current)}`} />
+                  <DataRow label="TICK HIGH/LOW" value={`${Math.abs(MARKET_INTERNALS.tick.high)} / ${Math.abs(MARKET_INTERNALS.tick.low)}`} />
                   <DataRow label="TRIN (ARMS)" value={MARKET_INTERNALS.trin.value.toFixed(2)} />
                   <DataRow label="P/C RATIO" value={MARKET_INTERNALS.putCall.ratio.toFixed(2)} />
                   <DataRow label="P/C EQUITY" value={MARKET_INTERNALS.putCall.equity.toFixed(2)} />

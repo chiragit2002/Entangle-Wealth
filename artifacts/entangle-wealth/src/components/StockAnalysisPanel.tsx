@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { analyzeStock, type FullAnalysis } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Brain, AlertTriangle, TrendingUp, TrendingDown, Minus, Loader2, Shield, Zap, Target } from "lucide-react";
+import { Brain, AlertTriangle, TrendingUp, TrendingDown, Activity, Loader2, Shield, Zap, Target } from "lucide-react";
 import { useUpgradePrompt, UpgradePrompt } from "@/components/UpgradePrompt";
 
 interface StockAnalysisPanelProps {
@@ -14,7 +14,7 @@ function SignalBadge({ signal }: { signal: string }) {
     STRONG_BUY: { color: "bg-green-500/20 text-green-400 border-green-500/50", icon: <TrendingUp className="w-3 h-3" /> },
     BUY: { color: "bg-green-500/10 text-green-300 border-green-500/30", icon: <TrendingUp className="w-3 h-3" /> },
     BULLISH: { color: "bg-green-500/10 text-green-300 border-green-500/30", icon: <TrendingUp className="w-3 h-3" /> },
-    NEUTRAL: { color: "bg-yellow-500/10 text-yellow-300 border-yellow-500/30", icon: <Minus className="w-3 h-3" /> },
+    NEUTRAL: { color: "bg-yellow-500/10 text-yellow-300 border-yellow-500/30", icon: <Activity className="w-3 h-3" /> },
     SELL: { color: "bg-red-500/10 text-red-300 border-red-500/30", icon: <TrendingDown className="w-3 h-3" /> },
     BEARISH: { color: "bg-red-500/10 text-red-300 border-red-500/30", icon: <TrendingDown className="w-3 h-3" /> },
     STRONG_SELL: { color: "bg-red-500/20 text-red-400 border-red-500/50", icon: <TrendingDown className="w-3 h-3" /> },

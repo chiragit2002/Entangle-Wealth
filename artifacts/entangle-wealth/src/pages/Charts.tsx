@@ -463,7 +463,7 @@ export default function Charts() {
     setClaudeAnalysis(analysis);
     setClaudeLoading(false);
     if (analysis) setShowClaudeModal(true);
-    else toast({ title: "Analysis Failed", description: "Claude API error — check your API key", variant: "destructive" });
+    else toast({ title: "Analysis Failed", description: "Claude API error | check your API key", variant: "destructive" });
   }, [claudeKey, toast]);
 
   const buySignals = useMemo(() => scanResults.filter(r => r.signal === "BUY" || r.signal === "STRONG_BUY").sort((a, b) => b.score - a.score), [scanResults]);
@@ -506,7 +506,7 @@ export default function Charts() {
         alert.triggered = true;
         setAlerts([...alerts]);
         if (Notification.permission === "granted") {
-          new Notification(`Price Alert: ${symbol}`, { body: `Price ${alert.condition} $${alert.price.toFixed(2)} — now $${price.toFixed(2)}` });
+          new Notification(`Price Alert: ${symbol}`, { body: `Price ${alert.condition} $${alert.price.toFixed(2)} | now $${price.toFixed(2)}` });
         }
         toast({ title: `Alert Triggered: ${symbol}`, description: `Price ${alert.condition} $${alert.price.toFixed(2)}` });
       }
@@ -522,7 +522,7 @@ export default function Charts() {
             <BarChart3 className="w-4 h-4 text-[#2962FF]" />
             <span className="text-xs font-bold tracking-wider" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{symbol}</span>
             <span className={`text-[10px] font-mono ${isUp ? "text-[#26A69A]" : "text-[#EF5350]"}`}>
-              ${currentPrice.toFixed(2)} {isUp ? "+" : ""}{priceChange.toFixed(2)}%
+              ${currentPrice.toFixed(2)} {isUp ? "+" : ""}{Math.abs(priceChange).toFixed(2)}%
             </span>
           </div>
 

@@ -181,7 +181,7 @@ export default function AdminKyc() {
                           <CreditCard className="w-3.5 h-3.5 text-white/30 mt-0.5 shrink-0" />
                           <div>
                             <p className="text-[10px] text-white/30 uppercase tracking-wide">ID Type / Number</p>
-                            <p className="text-sm text-white font-medium">{s.kycIdType}{s.kycIdNumber ? ` — ${s.kycIdNumber}` : ""}</p>
+                            <p className="text-sm text-white font-medium">{s.kycIdType}{s.kycIdNumber ? ` | ${s.kycIdNumber}` : ""}</p>
                           </div>
                         </div>
                       )}

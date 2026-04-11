@@ -50,7 +50,7 @@ export function MirofishTerminal() {
         setLiveNews(mapped);
       } catch {
         setLiveNews([
-          { time: "--:--", source: "System", headline: "News feeds loading...", sentiment: "neutral" },
+          { time: "00:00", source: "System", headline: "News feeds loading...", sentiment: "neutral" },
         ]);
       }
     }
@@ -72,7 +72,7 @@ export function MirofishTerminal() {
     if (!cmd) return;
 
     if (cmd === "HELP") {
-      addOutput(rawInput, "Commands: QUOTE <SYM> | ANALYZE <SYM> | SEARCH <QUERY> | NEWS [TOPIC] | RISK | STATUS | SIGNALS | PORTFOLIO | CLEAR\n\nAI-Powered:\n  ANALYZE <SYM> — Run quantum AI analysis on any of 5,000 NASDAQ stocks\n  SEARCH <QUERY> — Search stocks by symbol or name\n  NEWS [TOPIC] — Fetch live intelligence (Microelectronics, Geopolitics, Supply Chain, Tech Policy)");
+      addOutput(rawInput, "Commands: QUOTE <SYM> | ANALYZE <SYM> | SEARCH <QUERY> | NEWS [TOPIC] | RISK | STATUS | SIGNALS | PORTFOLIO | CLEAR\n\nAI-Powered:\n  ANALYZE <SYM>: Run quantum AI analysis on any of 5,000 NASDAQ stocks\n  SEARCH <QUERY>: Search stocks by symbol or name\n  NEWS [TOPIC]: Fetch live intelligence (Microelectronics, Geopolitics, Supply Chain, Tech Policy)");
       return;
     }
 
@@ -92,7 +92,7 @@ export function MirofishTerminal() {
           setCommandHistory(prev => [...prev, { input: "", output: "[NEWS] No articles found. Try: NEWS Microelectronics" }]);
         } else {
           const lines = data.items.map((item: NewsItem, i: number) => {
-            const sent = item.sentiment === "positive" ? "+" : item.sentiment === "negative" ? "-" : "~";
+            const sent = item.sentiment === "positive" ? "+" : item.sentiment === "negative" ? "▼" : "~";
             const tickers = item.tickers.length > 0 ? ` [${item.tickers.join(",")}]` : "";
             return `  ${i + 1}. [${sent}] ${item.title.slice(0, 70)}${tickers}\n     Score: ${item.score} | ${item.source} | ${item.topic}`;
           });
@@ -131,7 +131,7 @@ export function MirofishTerminal() {
           addOutput(rawInput, `No stocks found for "${q}". Try a different query.`);
         } else {
           const lines = data.stocks.map(s =>
-            `  ${s.symbol.padEnd(6)} $${s.price.toFixed(2).padStart(8)} ${(s.changePercent >= 0 ? "+" : "") + s.changePercent.toFixed(2) + "%"} ${s.name.slice(0, 25)}`
+            `  ${s.symbol.padEnd(6)} $${s.price.toFixed(2).padStart(8)} ${(s.changePercent >= 0 ? "+" : "") + Math.abs(s.changePercent).toFixed(2) + "%"} ${s.name.slice(0, 25)}`
           );
           addOutput(rawInput, `[SEARCH] Found ${data.pagination.total} results for "${q}" (showing ${data.stocks.length}):\n${lines.join("\n")}`);
         }
@@ -151,7 +151,7 @@ export function MirofishTerminal() {
           const data = await fetchStocks({ q: sym, limit: 1 });
           if (data.stocks.length > 0) {
             const s = data.stocks[0];
-            addOutput(rawInput, `${s.symbol} | $${s.price.toFixed(2)} | ${s.changePercent >= 0 ? "+" : ""}${s.changePercent.toFixed(2)}% | Vol: ${(s.volume / 1e6).toFixed(1)}M | ${s.sector}`);
+            addOutput(rawInput, `${s.symbol} | $${s.price.toFixed(2)} | ${s.changePercent >= 0 ? "+" : ""}${Math.abs(s.changePercent).toFixed(2)}% | Vol: ${(s.volume / 1e6).toFixed(1)}M | ${s.sector}`);
           } else {
             addOutput(rawInput, `Symbol ${sym} not found in 5,000 NASDAQ stocks.`);
           }
@@ -163,7 +163,7 @@ export function MirofishTerminal() {
     }
 
     if (cmd === "RISK") {
-      addOutput(rawInput, "Portfolio Risk: 8.4% | Max Drawdown: -0.8% | Beta: 1.35 | Sharpe: 2.1 | Kelly: 14.2%");
+      addOutput(rawInput, "Portfolio Risk: 8.4% | Max Drawdown: 0.8% | Beta: 1.35 | Sharpe: 2.1 | Kelly: 14.2%");
     } else if (cmd === "STATUS") {
       addOutput(rawInput, "ENTANGLE-CORE: ONLINE | 7 AI Models Active | 5,000 NASDAQ Stocks | Consensus: 87% | Uptime: 99.97%");
     } else if (cmd === "SIGNALS") {
@@ -195,7 +195,7 @@ export function MirofishTerminal() {
   };
 
   const newsItems = liveNews.length > 0 ? liveNews : [
-    { time: "--:--", source: "Loading", headline: "Fetching live news feeds...", sentiment: "neutral" as const },
+    { time: "00:00", source: "Loading", headline: "Fetching live news feeds...", sentiment: "neutral" as const },
   ];
 
   return (
@@ -238,7 +238,7 @@ export function MirofishTerminal() {
         <div className="border-r border-primary/10 p-3">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-            <span className="text-[9px] font-mono text-blue-400/70 uppercase tracking-wider">News Feed — Live</span>
+            <span className="text-[9px] font-mono text-blue-400/70 uppercase tracking-wider">News Feed | Live</span>
           </div>
           <div className="space-y-1 max-h-64 overflow-y-auto">
             {newsItems.map((item, i) => (
@@ -247,7 +247,7 @@ export function MirofishTerminal() {
                   <span className="text-[9px] font-mono text-white/30">{item.time}</span>
                   <span className="text-[9px] font-mono text-primary/50">{item.source}</span>
                   <span className={`text-[8px] font-mono ml-auto ${getSentimentColor(item.sentiment)}`}>
-                    {item.sentiment === "positive" ? "+" : item.sentiment === "negative" ? "-" : "~"}
+                    {item.sentiment === "positive" ? "+" : item.sentiment === "negative" ? "▼" : "~"}
                   </span>
                 </div>
                 <p className="text-[10px] font-mono text-white/70 leading-tight">{item.headline}</p>

@@ -15,7 +15,7 @@ export default function ErrorFallback({ error, resetErrorBoundary }: ErrorFallba
         <div>
           <h2 className="text-xl font-bold mb-2">Something went wrong</h2>
           <p className="text-muted-foreground text-sm">
-            We ran into an unexpected issue loading this page. Please try again — if the problem persists, contact support.
+            We ran into an unexpected issue loading this page. Please try again. If the problem persists, contact support.
           </p>
         </div>
         <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-left">

@@ -145,7 +145,7 @@ export default function Stocks() {
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                Demo data shown — prices are simulated
+                Demo data shown | prices are simulated
               </div>
             </div>
 
@@ -188,7 +188,7 @@ export default function Stocks() {
                           <span className="font-mono font-bold text-white">{s.symbol}</span>
                           <span className="text-muted-foreground ml-2 hidden sm:inline">{s.name.slice(0, 20)}</span>
                         </div>
-                        <span className="text-red-400 font-mono">{s.changePercent.toFixed(2)}%</span>
+                        <span className="text-red-400 font-mono">{Math.abs(s.changePercent).toFixed(2)}%</span>
                       </button>
                     ))}
                   </div>
@@ -209,7 +209,7 @@ export default function Stocks() {
                         <div className="flex items-center gap-2">
                           <span className="text-muted-foreground font-mono">{s.count}</span>
                           <span className={`font-mono ${s.avgChange >= 0 ? "text-green-400" : "text-red-400"}`}>
-                            {s.avgChange >= 0 ? "+" : ""}{s.avgChange.toFixed(2)}%
+                            {s.avgChange >= 0 ? "+" : ""}{Math.abs(s.avgChange).toFixed(2)}%
                           </span>
                         </div>
                       </button>
@@ -241,7 +241,7 @@ export default function Stocks() {
                       <div className="text-right">
                         <div className="text-3xl font-mono font-bold stat-value">${selectedStock.price.toFixed(2)}</div>
                         <div className={`text-sm font-mono ${selectedStock.changePercent >= 0 ? "text-green-400" : "text-red-400"}`}>
-                          {selectedStock.change >= 0 ? "+" : ""}{selectedStock.change.toFixed(2)} ({selectedStock.changePercent >= 0 ? "+" : ""}{selectedStock.changePercent.toFixed(2)}%)
+                          {selectedStock.change >= 0 ? "+" : ""}{Math.abs(selectedStock.change).toFixed(2)} ({selectedStock.changePercent >= 0 ? "+" : ""}{Math.abs(selectedStock.changePercent).toFixed(2)}%)
                         </div>
                       </div>
                     </div>
@@ -427,7 +427,7 @@ export default function Stocks() {
                               </td>
                               <td className="p-3 text-right font-mono">${stock.price.toFixed(2)}</td>
                               <td className={`p-3 text-right font-mono ${stock.changePercent >= 0 ? "text-green-400" : "text-red-400"}`}>
-                                {stock.changePercent >= 0 ? "+" : ""}{stock.changePercent.toFixed(2)}%
+                                {stock.changePercent >= 0 ? "+" : ""}{Math.abs(stock.changePercent).toFixed(2)}%
                               </td>
                               <td className="p-3 text-right font-mono text-muted-foreground hidden lg:table-cell">
                                 {formatVolume(stock.volume)}

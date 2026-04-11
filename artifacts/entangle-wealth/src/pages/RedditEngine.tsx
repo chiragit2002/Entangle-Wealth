@@ -232,7 +232,7 @@ export default function RedditEngine() {
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
               <p className="text-xs text-red-300">
-                Some subreddits are tagged <strong>"Avoid"</strong> — these have strict anti-promotion rules or hostile communities.
+                Some subreddits are tagged <strong>"Avoid"</strong> | these have strict anti-promotion rules or hostile communities.
               </p>
             </div>
             <button onClick={() => setAvoidDismissed(true)} className="text-red-400 hover:text-red-300 shrink-0">

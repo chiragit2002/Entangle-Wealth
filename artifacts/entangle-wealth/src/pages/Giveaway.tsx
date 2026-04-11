@@ -222,7 +222,7 @@ export default function Giveaway() {
             <span className="bg-gradient-to-r from-[#f5c842] to-[#cc9900] bg-clip-text text-transparent">Anniversary Giveaway</span>
           </h1>
           <p className="text-white/60 text-sm md:text-base max-w-xl mx-auto leading-relaxed">
-            Our biggest milestone is your reward. Every action on the platform — trading, streaks, referrals — earns you
+            Our biggest milestone is your reward. Every action on the platform | trading, streaks, referrals | earns you
             entries. One winner takes $50,000 on our 1-year anniversary.
           </p>
         </div>
@@ -316,7 +316,7 @@ export default function Giveaway() {
             {referralLink && (
               <div className="bg-white/[0.03] rounded-xl p-4 border border-[#c084fc]/15">
                 <p className="text-xs font-bold text-[#c084fc] mb-2 flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5" /> Earn More Entries — Share Your Referral Link
+                  <Users className="w-3.5 h-3.5" /> Earn More Entries | Share Your Referral Link
                 </p>
                 <div className="flex gap-2">
                   <div className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white/60 truncate">
@@ -344,7 +344,7 @@ export default function Giveaway() {
             </p>
             <Link href="/sign-up">
               <Button className="bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black font-bold hover:opacity-90 h-12 px-8">
-                Start Free — Enter Now →
+                Start Free | Enter Now →
               </Button>
             </Link>
           </div>
@@ -377,7 +377,7 @@ export default function Giveaway() {
 
           {leaderboard.length === 0 ? (
             <div className="glass-panel rounded-xl p-8 text-center text-white/30 text-sm">
-              No entries yet — be the first to participate!
+              No entries yet | be the first to participate!
             </div>
           ) : (
             <div className="glass-panel rounded-xl overflow-hidden">
@@ -461,11 +461,11 @@ export default function Giveaway() {
           <ul className="space-y-2 text-sm text-white/60">
             {[
               "Open to all registered EntangleWealth members in good standing.",
-              "Entries are calculated automatically based on platform activity — no manual submission needed.",
+              "Entries are calculated automatically based on platform activity | no manual submission needed.",
               "The grand prize drawing uses a weighted random selection (more entries = better odds).",
               "Winner is selected by EntangleWealth administrators on the anniversary date (April 11, 2026).",
               "The $36,000 referral bonus pool is distributed proportionally to all users with converted referrals.",
-              "Disbursement is handled manually by the EntangleWealth team — winner is contacted via registered email.",
+              "Disbursement is handled manually by the EntangleWealth team | winner is contacted via registered email.",
               "Giveaway is promotional and not a registered lottery. See Terms of Service for full details.",
             ].map((rule) => (
               <li key={rule} className="flex items-start gap-2">
@@ -482,7 +482,7 @@ export default function Giveaway() {
         <div className="text-center pb-4">
           <Link href="/sign-up">
             <Button className="bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black font-bold hover:opacity-90 h-12 px-10 text-base">
-              Enter Now — It's Free →
+              Enter Now | It's Free →
             </Button>
           </Link>
           <p className="text-[10px] text-white/30 mt-2">No purchase necessary. Free tier users are fully eligible.</p>

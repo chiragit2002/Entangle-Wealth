@@ -105,7 +105,7 @@ export default function Terms() {
 
           <section>
             <h2 className="text-xl font-bold text-white mb-3">9. Intellectual Property</h2>
-            <p>All content, features, and functionality of the Service — including but not limited to software, algorithms, analysis methodologies, text, graphics, logos, and user interface design — are owned by EntangleWealth and are protected by copyright, trademark, and other intellectual property laws.</p>
+            <p>All content, features, and functionality of the Service | including but not limited to software, algorithms, analysis methodologies, text, graphics, logos, and user interface design | are owned by EntangleWealth and are protected by copyright, trademark, and other intellectual property laws.</p>
             <p className="mt-3">You are granted a limited, non-exclusive, non-transferable, revocable license to access and use the Service for your personal, non-commercial use, subject to these Terms.</p>
           </section>
 

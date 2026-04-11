@@ -126,17 +126,17 @@ export function ShareSignalCard({ data, referralLink }: Props) {
     const blob = await (await fetch(dataUrl)).blob();
     const file = new File([blob], `signal-${data.symbol}.png`, { type: "image/png" });
 
-    const caption = `${data.signal.toUpperCase()} signal on ${data.symbol} — ${data.confidence}% confidence. Check out EntangleWealth for institutional-grade AI signals!`;
+    const caption = `${data.signal.toUpperCase()} signal on ${data.symbol} | ${data.confidence}% confidence. Check out EntangleWealth for institutional-grade AI signals!`;
     const url = referralLink || window.location.origin;
     const shareText = `${caption} ${url}`;
 
     if (navigator.share) {
       try {
         if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: `${data.symbol} Signal — EntangleWealth`, text: shareText });
+          await navigator.share({ files: [file], title: `${data.symbol} Signal | EntangleWealth`, text: shareText });
           return;
         }
-        await navigator.share({ title: `${data.symbol} Signal — EntangleWealth`, text: shareText, url });
+        await navigator.share({ title: `${data.symbol} Signal | EntangleWealth`, text: shareText, url });
         return;
       } catch {}
     }

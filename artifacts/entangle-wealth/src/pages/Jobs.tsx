@@ -127,7 +127,7 @@ export default function Jobs() {
             <Briefcase className="w-9 h-9 text-primary" />
             Job Search
           </h1>
-          <p className="text-muted-foreground text-lg">Find your next opportunity — full-time, freelance, or gig work</p>
+          <p className="text-muted-foreground text-lg">Find your next opportunity | full-time, freelance, or gig work</p>
         </div>
 
         <div className="glass-panel p-6 mb-6">

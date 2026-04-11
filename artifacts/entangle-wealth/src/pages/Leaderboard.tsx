@@ -144,7 +144,7 @@ export default function Leaderboard() {
                 <div className="mt-2 flex items-center justify-center gap-1">
                   <TrendingUp className={`w-3 h-3 ${entry.gainPercent >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`} />
                   <span className={`text-sm font-mono font-bold ${entry.gainPercent >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
-                    {entry.gainPercent >= 0 ? "+" : ""}{entry.gainPercent}%
+                    {entry.gainPercent >= 0 ? "+" : ""}{Math.abs(entry.gainPercent)}%
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">{entry.totalXp.toLocaleString()} XP</p>
@@ -199,7 +199,7 @@ export default function Leaderboard() {
                   </div>
                   <div className="col-span-2 text-right">
                     <span className={`text-sm font-mono font-bold ${entry.gainPercent >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
-                      {entry.gainPercent >= 0 ? "+" : ""}{entry.gainPercent}%
+                      {entry.gainPercent >= 0 ? "+" : ""}{Math.abs(entry.gainPercent)}%
                     </span>
                   </div>
                   <div className="col-span-3 text-right">

@@ -243,7 +243,7 @@ export default function TokenWallet() {
                   </div>
                   <div className="text-right">
                     <p className={`font-mono font-bold ${tx.amount > 0 ? "text-emerald-400" : "text-red-400"}`}>
-                      {tx.amount > 0 ? "+" : ""}{tx.amount.toLocaleString()} ENTGL
+                      {tx.amount > 0 ? "+" : ""}{Math.abs(tx.amount).toLocaleString()} ENTGL
                     </p>
                     {tx.txHash && (
                       <span className="text-[10px] text-muted-foreground font-mono">

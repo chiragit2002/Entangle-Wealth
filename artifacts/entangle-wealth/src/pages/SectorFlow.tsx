@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { fetchAlpacaSnapshots } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, TrendingUp, TrendingDown, Activity, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
+import { RefreshCw, TrendingUp, TrendingDown, Activity, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
 
 const SECTOR_STOCKS: Record<string, string[]> = {
@@ -75,7 +75,7 @@ function RadarChart({ sectors }: { sectors: SectorData[] }) {
               {sector.name.length > 12 ? sector.name.slice(0, 12) + "…" : sector.name}
             </text>
             <text x={labelX} y={labelY + 12} textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="9" fontFamily="JetBrains Mono">
-              {sector.avgChange >= 0 ? "+" : ""}{sector.avgChange.toFixed(2)}%
+              {sector.avgChange >= 0 ? "+" : ""}{Math.abs(sector.avgChange).toFixed(2)}%
             </text>
           </g>
         );
@@ -101,9 +101,9 @@ function FlowBar({ sector }: { sector: SectorData }) {
         <div className="flex items-center gap-1.5">
           {sector.momentum === "bullish" ? <ArrowUpRight className="w-4 h-4 text-[#00e676]" />
             : sector.momentum === "bearish" ? <ArrowDownRight className="w-4 h-4 text-[#ff4466]" />
-            : <Minus className="w-4 h-4 text-[#5a5a7a]" />}
+            : <Activity className="w-4 h-4 text-[#5a5a7a]" />}
           <span className={`font-mono text-sm font-bold ${sector.avgChange >= 0 ? "text-[#00e676]" : "text-[#ff4466]"}`}>
-            {sector.avgChange >= 0 ? "+" : ""}{sector.avgChange.toFixed(2)}%
+            {sector.avgChange >= 0 ? "+" : ""}{Math.abs(sector.avgChange).toFixed(2)}%
           </span>
         </div>
       </div>
@@ -120,11 +120,11 @@ function FlowBar({ sector }: { sector: SectorData }) {
       <div className="flex justify-between mt-2 pt-2 border-t border-white/[0.04]">
         <div className="text-[10px]">
           <span className="text-[#00e676] font-mono font-bold">{sector.topMover.symbol}</span>
-          <span className="text-[#00e676] ml-1">{sector.topMover.change >= 0 ? "+" : ""}{sector.topMover.change.toFixed(1)}%</span>
+          <span className="text-[#00e676] ml-1">{sector.topMover.change >= 0 ? "+" : ""}{Math.abs(sector.topMover.change).toFixed(1)}%</span>
         </div>
         <div className="text-[10px]">
           <span className="text-[#ff4466] font-mono font-bold">{sector.worstMover.symbol}</span>
-          <span className="text-[#ff4466] ml-1">{sector.worstMover.change.toFixed(1)}%</span>
+          <span className="text-[#ff4466] ml-1">{Math.abs(sector.worstMover.change).toFixed(1)}%</span>
         </div>
       </div>
     </div>

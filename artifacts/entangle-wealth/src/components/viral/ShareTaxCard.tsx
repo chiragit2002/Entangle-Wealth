@@ -96,7 +96,7 @@ export function ShareTaxCard({ data, referralLink }: Props) {
     ctx.textAlign = "left";
     ctx.fillStyle = "rgba(255,255,255,0.5)";
     ctx.font = "12px sans-serif";
-    ctx.fillText("Scan your taxes at EntangleWealth — find deductions you're missing.", 30, 340);
+    ctx.fillText("Scan your taxes at EntangleWealth | find deductions you're missing.", 30, 340);
 
     ctx.fillStyle = "rgba(255,255,255,0.15)";
     ctx.font = "10px sans-serif";
@@ -130,10 +130,10 @@ export function ShareTaxCard({ data, referralLink }: Props) {
     if (navigator.share) {
       try {
         if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: "My Tax Savings — EntangleWealth", text: shareText });
+          await navigator.share({ files: [file], title: "My Tax Savings | EntangleWealth", text: shareText });
           return;
         }
-        await navigator.share({ title: "My Tax Savings — EntangleWealth", text: shareText, url });
+        await navigator.share({ title: "My Tax Savings | EntangleWealth", text: shareText, url });
         return;
       } catch {}
     }

@@ -64,7 +64,8 @@ export function CandlestickChart({ data, symbol, height = 380 }: CandlestickChar
   const firstBar = bars[0];
   const lastPrice = lastBar?.close ?? 0;
   const firstPrice = firstBar?.close ?? 0;
-  const pctChange = firstPrice ? ((lastPrice - firstPrice) / firstPrice * 100).toFixed(2) : "0";
+  const pctChangeNum = firstPrice ? Math.abs((lastPrice - firstPrice) / firstPrice * 100) : 0;
+  const pctChange = pctChangeNum.toFixed(2);
   const isUp = lastPrice >= firstPrice;
 
   useEffect(() => {

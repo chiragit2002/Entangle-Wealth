@@ -83,7 +83,7 @@ export default function NotFound() {
 
         <div className="mt-12 flex items-center gap-2 text-xs text-white/20">
           <Shield className="w-3.5 h-3.5" />
-          <span>EntangleWealth — Bloomberg-Parity Financial Intelligence</span>
+          <span>EntangleWealth | Bloomberg-Parity Financial Intelligence</span>
         </div>
       </div>
     </Layout>

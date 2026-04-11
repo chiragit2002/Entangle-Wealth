@@ -30,8 +30,8 @@ function buildDigestHtml(alerts: Array<{ symbol: string; alertType: string; mess
     <tr style="border-bottom: 1px solid #1a1a2e;">
       <td style="padding: 12px; color: #00D4FF; font-family: 'JetBrains Mono', monospace; font-weight: bold;">${a.symbol}</td>
       <td style="padding: 12px; color: #999;">${getAlertTypeLabel(a.alertType)}</td>
-      <td style="padding: 12px; color: #ccc;">${a.message || "—"}</td>
-      <td style="padding: 12px; color: #666; font-size: 12px;">${a.triggeredAt ? new Date(a.triggeredAt).toLocaleString("en-US", { timeZone: "America/New_York" }) : "—"}</td>
+      <td style="padding: 12px; color: #ccc;">${a.message || "N/A"}</td>
+      <td style="padding: 12px; color: #666; font-size: 12px;">${a.triggeredAt ? new Date(a.triggeredAt).toLocaleString("en-US", { timeZone: "America/New_York" }) : "N/A"}</td>
     </tr>
   `).join("");
 

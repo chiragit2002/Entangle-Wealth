@@ -138,7 +138,7 @@ export default function Privacy() {
             <h2 className="text-xl font-bold text-white mb-3">13. Contact Us</h2>
             <p>If you have any questions or concerns about this Privacy Policy, please contact us at:</p>
             <div className="mt-3 bg-white/[0.02] border border-white/[0.06] rounded-xl p-5">
-              <p className="font-bold text-white">EntangleWealth — Privacy</p>
+              <p className="font-bold text-white">EntangleWealth | Privacy</p>
               <p className="mt-1">Email: privacy@entanglewealth.com</p>
               <p>Website: entanglewealth.com</p>
             </div>

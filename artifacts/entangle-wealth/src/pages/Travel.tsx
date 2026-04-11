@@ -70,7 +70,7 @@ const IRS_DEDUCTIONS: IRSDeduction[] = [
   {
     id: "lodging", category: "Lodging", title: "Hotel & Accommodation",
     irsRef: "IRC §162(a)(2)", publication: "IRS Publication 463, Chapter 1",
-    description: "Hotel rooms, Airbnb, and other lodging while on business travel. Only deductible for business days — personal days excluded.",
+    description: "Hotel rooms, Airbnb, and other lodging while on business travel. Only deductible for business days | personal days excluded.",
     pct: 100, conditions: ["Only for nights with business activity the next day", "Cannot be lavish or extravagant", "Tips to hotel staff are also deductible"],
     icon: Building2, selected: false,
   },
@@ -311,7 +311,7 @@ export default function Travel() {
 
   const exportAll = () => {
     const lines: string[] = [];
-    lines.push("ENTANGLEWEALTH — BUSINESS TRAVEL TAX REPORT");
+    lines.push("ENTANGLEWEALTH | BUSINESS TRAVEL TAX REPORT");
     lines.push(`Generated,${new Date().toLocaleDateString("en-US")}`);
     lines.push("");
     lines.push("TRIP DETAILS");

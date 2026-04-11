@@ -214,16 +214,16 @@ function defaultKeywords(): SeoKeyword[] {
 
 function defaultMetaTags(): SeoMetaTag[] {
   const pages: Array<[string, string, string, string]> = [
-    ["/", "Home", "EntangleWealth — Bloomberg Terminal-Parity for Everyone", "Free professional-grade financial analysis with 55+ indicators, 5,000 NASDAQ stocks, AI analysis, and tax tools."],
+    ["/", "Home", "EntangleWealth | Bloomberg Terminal-Parity for Everyone", "Free professional-grade financial analysis with 55+ indicators, 5,000 NASDAQ stocks, AI analysis, and tax tools."],
     ["/dashboard", "Dashboard", "Dashboard | EntangleWealth", "Your command center for markets, portfolio, and financial insights."],
-    ["/technical", "Technical Analysis", "Technical Analysis — 55+ Indicators | EntangleWealth", "Professional technical analysis with RSI, MACD, Bollinger Bands, and 50+ more indicators."],
+    ["/technical", "Technical Analysis", "Technical Analysis | 55+ Indicators | EntangleWealth", "Professional technical analysis with RSI, MACD, Bollinger Bands, and 50+ more indicators."],
     ["/stocks", "Stocks", "5,000 NASDAQ Stocks | EntangleWealth", "Browse, search, and analyze 5,000 NASDAQ-listed stocks with real-time data."],
     ["/screener", "Screener", "Stock Screener | EntangleWealth", "Filter and screen stocks by market cap, volume, sector, and technical signals."],
     ["/options", "Options", "Options Chain & Greeks | EntangleWealth", "Live options chain with Greeks, IV, and strategy analysis tools."],
-    ["/tax", "TaxFlow", "Tax Dashboard — Deductions & Tracking | EntangleWealth", "Track tax deductions, mileage, expenses, and maximize your refund."],
+    ["/tax", "TaxFlow", "Tax Dashboard | Deductions & Tracking | EntangleWealth", "Track tax deductions, mileage, expenses, and maximize your refund."],
     ["/pricing", "Pricing", "Plans & Pricing | EntangleWealth", "Choose the right plan for your financial journey. Free tier available."],
-    ["/about", "About", "About EntangleWealth — Our Mission", "Bloomberg Terminal-parity financial tools for everyday families."],
-    ["/blog", "Blog", "EntangleWealth Blog — Financial Insights & Education", "Expert financial analysis, market insights, tax tips, and investing education."],
+    ["/about", "About", "About EntangleWealth | Our Mission", "Bloomberg Terminal-parity financial tools for everyday families."],
+    ["/blog", "Blog", "EntangleWealth Blog | Financial Insights & Education", "Expert financial analysis, market insights, tax tips, and investing education."],
   ];
   return pages.map(([pagePath, pageLabel, title, description]) => ({
     id: uid(),

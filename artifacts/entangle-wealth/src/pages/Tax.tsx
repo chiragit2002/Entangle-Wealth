@@ -169,7 +169,7 @@ export default function Tax() {
 
   const exportCPAReport = () => {
     const lines: string[] = [];
-    lines.push("ENTANGLEWEALTH — TAXFLOW CPA REPORT");
+    lines.push("ENTANGLEWEALTH | TAXFLOW CPA REPORT");
     lines.push(`Generated: ${new Date().toLocaleDateString("en-US")}`);
     lines.push(`Tax Year: ${taxYear}`);
     if (profile) {

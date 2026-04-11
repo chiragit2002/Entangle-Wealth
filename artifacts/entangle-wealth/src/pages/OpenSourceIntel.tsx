@@ -32,7 +32,7 @@ const LIBRARY_DATA: Library[] = [
     stars: "9.5k+",
     license: "Apache-2.0",
     language: "TypeScript",
-    description: "Performant financial charts — candlestick, area, line, histogram — rendered via HTML5 Canvas. The official TradingView charting library for web.",
+    description: "Performant financial charts | candlestick, area, line, histogram | rendered via HTML5 Canvas. The official TradingView charting library for web.",
     howItHelps: "Replace current Recharts-based stock charts with professional-grade financial charts. Candlestick rendering, crosshair, price scales, time scales, and real-time streaming updates via .update() API.",
     install: "pnpm add lightweight-charts",
     features: ["Candlestick / OHLC charts", "Real-time streaming .update()", "Custom indicators overlay", "Crosshair + tooltips", "Price / time scales", "Canvas-based (60fps)"],
@@ -48,7 +48,7 @@ const LIBRARY_DATA: Library[] = [
     license: "MIT",
     language: "TypeScript",
     description: "React component-based wrapper for TradingView Lightweight Charts with JSX API, supporting custom series, price lines, and reactive updates.",
-    howItHelps: "Declarative React wrapper so we can use Lightweight Charts as JSX components — <Chart>, <CandlestickSeries>, <VolumeSeries> — with reactive props.",
+    howItHelps: "Declarative React wrapper so we can use Lightweight Charts as JSX components | <Chart>, <CandlestickSeries>, <VolumeSeries> | with reactive props.",
     install: "pnpm add lightweight-charts-react-wrapper",
     features: ["JSX component API", "Reactive prop updates", "Custom series support", "Price line components", "TypeScript-first"],
     priority: "critical",
@@ -77,13 +77,13 @@ const LIBRARY_DATA: Library[] = [
     license: "MIT",
     language: "TypeScript",
     description: "A comprehensive JavaScript/TypeScript technical indicators library with pattern recognition. Supports RSI, MACD, SMA, Bollinger Bands, Ichimoku, and 50+ more.",
-    howItHelps: "Powers our 55+ technical indicators calculation. Both static calculate() and streaming nextValue() APIs — ideal for both historical analysis and live tick data from Alpaca WebSocket.",
+    howItHelps: "Powers our 55+ technical indicators calculation. Both static calculate() and streaming nextValue() APIs | ideal for both historical analysis and live tick data from Alpaca WebSocket.",
     install: "pnpm add technicalindicators",
     features: ["50+ indicators (RSI, MACD, SMA, EMA, BB)", "Streaming nextValue() for live data", "Pattern recognition (head & shoulders, etc.)", "TypeScript support", "Browser + Node compatible"],
     priority: "high",
     category: "Technical Analysis",
     lastActive: "2025",
-    currentlyUsing: "Already integrated — validate version is current",
+    currentlyUsing: "Already integrated | validate version is current",
   },
   {
     name: "TanStack Table v8",
@@ -128,7 +128,7 @@ const LIBRARY_DATA: Library[] = [
     priority: "high",
     category: "Export",
     lastActive: "2026",
-    currentlyUsing: "jsPDF (imperative API — harder to maintain)",
+    currentlyUsing: "jsPDF (imperative API | harder to maintain)",
   },
   {
     name: "Sonner",
@@ -151,7 +151,7 @@ const LIBRARY_DATA: Library[] = [
     stars: "8k+",
     license: "MIT",
     language: "TypeScript",
-    description: "Highly customizable particle animations — confetti, fireworks, mesh effects, and more. Includes React, Vue, and Angular integrations.",
+    description: "Highly customizable particle animations | confetti, fireworks, mesh effects, and more. Includes React, Vue, and Angular integrations.",
     howItHelps: "Enhance our animated mesh background with GPU-accelerated particle effects. Add celebration confetti on trade signals, portfolio milestones, or achievement unlocks.",
     install: "pnpm add @tsparticles/react @tsparticles/slim",
     features: ["Confetti / fireworks presets", "Custom shapes and paths", "GPU-accelerated rendering", "React component wrapper", "Interactive (mouse/touch)"],
@@ -166,7 +166,7 @@ const LIBRARY_DATA: Library[] = [
     license: "MIT",
     language: "TypeScript",
     description: "A free, self-hostable, privacy-first resume builder. Next.js + React + TypeScript with beautiful templates and PDF export via headless Chrome.",
-    howItHelps: "Study their architecture for our Résumé Builder — template system, PDF rendering pipeline, and drag-and-drop section reordering. Could extract their template designs as inspiration.",
+    howItHelps: "Study their architecture for our Résumé Builder | template system, PDF rendering pipeline, and drag-and-drop section reordering. Could extract their template designs as inspiration.",
     install: "Reference architecture (not direct dependency)",
     features: ["15+ professional templates", "Drag-and-drop sections", "Real-time preview", "Self-hostable", "No tracking / privacy-first"],
     priority: "medium",
@@ -194,7 +194,7 @@ const LIBRARY_DATA: Library[] = [
     license: "MIT",
     language: "TypeScript",
     description: "A fast, Canvas-based React data grid that handles millions of rows with smooth scrolling. Used in production at Glide.",
-    howItHelps: "Alternative to TanStack Table for scenarios where we need extreme performance — like rendering all 5,000 NASDAQ stocks with 20+ columns of live-updating data.",
+    howItHelps: "Alternative to TanStack Table for scenarios where we need extreme performance | like rendering all 5,000 NASDAQ stocks with 20+ columns of live-updating data.",
     install: "pnpm add @glideapps/glide-data-grid",
     features: ["Canvas-based rendering", "Millions of rows", "Cell editing", "Custom cell renderers", "Smooth 60fps scrolling"],
     priority: "nice-to-have",
@@ -299,21 +299,21 @@ export default function OpenSourceIntel() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-3 rounded-xl bg-red-500/5 border border-red-500/20">
-                <p className="text-sm font-semibold text-red-400 mb-1">Phase 1 — Immediate</p>
+                <p className="text-sm font-semibold text-red-400 mb-1">Phase 1 | Immediate</p>
                 <p className="text-xs text-muted-foreground">
                   TradingView Lightweight Charts + React wrapper for professional candlestick charts.
                   Alpaca TypeScript SDK for typed, WebSocket-streaming market data.
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/20">
-                <p className="text-sm font-semibold text-gold mb-1">Phase 2 — Next Sprint</p>
+                <p className="text-sm font-semibold text-gold mb-1">Phase 2 | Next Sprint</p>
                 <p className="text-xs text-muted-foreground">
                   TanStack Table + Virtual for pro stock screener. @react-pdf/renderer for
                   React-native PDF export. Resizable panels for terminal layout.
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-cyan-500/5 border border-cyan-500/20">
-                <p className="text-sm font-semibold text-primary mb-1">Phase 3 — Enhancement</p>
+                <p className="text-sm font-semibold text-primary mb-1">Phase 3 | Enhancement</p>
                 <p className="text-xs text-muted-foreground">
                   Sonner for toast notifications. tsParticles for visual effects. Zustand
                   for lightweight global state. FinGPT for AI sentiment models.

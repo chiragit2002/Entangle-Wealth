@@ -650,7 +650,7 @@ export default function Gamification() {
                       ))
                     ) : (
                       <div className="px-3 py-6 text-center">
-                        <p className="text-[10px] font-mono text-white/20">No rewards yet — start earning XP!</p>
+                        <p className="text-[10px] font-mono text-white/20">No rewards yet | start earning XP!</p>
                       </div>
                     )}
                   </div>
@@ -670,7 +670,7 @@ export default function Gamification() {
                     <Crown className="w-8 h-8 text-[#f5c842]" />
                   </div>
                   <div className="flex-1 text-center sm:text-left">
-                    <h3 className="text-[13px] font-bold font-mono text-[#f5c842] mb-1">Early Adopter — Founders Badge</h3>
+                    <h3 className="text-[13px] font-bold font-mono text-[#f5c842] mb-1">Early Adopter | Founders Badge</h3>
                     <p className="text-[10px] font-mono text-white/40">
                       You joined EntangleWealth as one of our earliest members. This badge grants you a permanent XP multiplier
                       and exclusive recognition across the platform.
@@ -697,7 +697,7 @@ export default function Gamification() {
                     <Crown className="w-6 h-6 text-white/15" />
                   </div>
                   <div>
-                    <p className="text-[11px] font-mono font-bold text-white/30">Founders Badge — Locked</p>
+                    <p className="text-[11px] font-mono font-bold text-white/30">Founders Badge | Locked</p>
                     <p className="text-[9px] font-mono text-white/20">Reserved for early EntangleWealth members. Stay active to unlock exclusive perks.</p>
                   </div>
                 </div>

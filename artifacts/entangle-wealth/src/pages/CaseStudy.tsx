@@ -62,9 +62,9 @@ export default function CaseStudy() {
     const addFooter = () => {
       doc.setFontSize(7);
       doc.setTextColor(120);
-      doc.text(`EntangleWealth Competitive Case Study — ${REPORT_DATE}`, M, H - 20);
+      doc.text(`EntangleWealth Competitive Case Study | ${REPORT_DATE}`, M, H - 20);
       doc.text(`Page ${pageNum}`, W - M, H - 20, { align: "right" });
-      doc.text("CONFIDENTIAL — For Internal & Investor Use Only", W / 2, H - 20, { align: "center" });
+      doc.text("CONFIDENTIAL | For Internal & Investor Use Only", W / 2, H - 20, { align: "center" });
     };
 
     const ensureSpace = (need: number) => {
@@ -117,28 +117,28 @@ export default function CaseStudy() {
     doc.text("COMPETITIVE CASE STUDY", W / 2, 235, { align: "center" });
     doc.setFontSize(11);
     doc.setTextColor(180);
-    doc.text(`${REPORT_DATE} — CEO Strategic Briefing`, W / 2, 270, { align: "center" });
+    doc.text(`${REPORT_DATE} | CEO Strategic Briefing`, W / 2, 270, { align: "center" });
     doc.setFontSize(9);
     doc.setTextColor(120);
     doc.text("How EntangleWealth Delivers Bloomberg Terminal-Grade Intelligence", W / 2, 310, { align: "center" });
-    doc.text("at 99.6% Lower Cost — Backed by Market Data and Feature Analysis", W / 2, 325, { align: "center" });
+    doc.text("at 99.6% Lower Cost | Backed by Market Data and Feature Analysis", W / 2, 325, { align: "center" });
     doc.setFontSize(8);
     doc.setTextColor(100);
-    doc.text("CONFIDENTIAL — For Internal & Investor Use Only", W / 2, H - 60, { align: "center" });
+    doc.text("CONFIDENTIAL | For Internal & Investor Use Only", W / 2, H - 60, { align: "center" });
     doc.addPage();
     pageNum++;
     y = M;
 
     addHeading("1. EXECUTIVE SUMMARY", 18);
-    addParagraph("EntangleWealth is the first financial analysis platform to combine Bloomberg Terminal-grade market intelligence with AI multi-agent consensus verification — at a price point accessible to the 400 million global retail investors currently priced out of professional-grade tools.");
+    addParagraph("EntangleWealth is the first financial analysis platform to combine Bloomberg Terminal-grade market intelligence with AI multi-agent consensus verification | at a price point accessible to the 400 million global retail investors currently priced out of professional-grade tools.");
     addParagraph("POSITIONING STATEMENT (April Dunford Framework):");
-    addParagraph("For retail investors and independent traders who need institutional-quality market intelligence, EntangleWealth is a full-spectrum financial command center that delivers AI-verified consensus signals across 5,000+ NASDAQ stocks with 55+ technical indicators, live market data, options flow analysis, and integrated tax optimization. Unlike Bloomberg Terminal ($32,000/yr), TradingView (charting only), or Trade Ideas (scanner only), EntangleWealth provides the only multi-model AI consensus engine that requires 6 independent analysis methods to agree before issuing a signal — eliminating single-model bias while including career tools, tax intelligence, and community features in a single platform starting at $0/month.");
+    addParagraph("For retail investors and independent traders who need institutional-quality market intelligence, EntangleWealth is a full-spectrum financial command center that delivers AI-verified consensus signals across 5,000+ NASDAQ stocks with 55+ technical indicators, live market data, options flow analysis, and integrated tax optimization. Unlike Bloomberg Terminal ($32,000/yr), TradingView (charting only), or Trade Ideas (scanner only), EntangleWealth provides the only multi-model AI consensus engine that requires 6 independent analysis methods to agree before issuing a signal | eliminating single-model bias while including career tools, tax intelligence, and community features in a single platform starting at $0/month.");
     y += 10;
     addHeading("Key Metrics", 12);
     addBullet("Total Addressable Market: $9.6B stock trading app market (2025), growing to $34.5B by 2035 at 13.62% CAGR");
     addBullet("Predictive AI in stock market: $840M (2025) → $1.82B (2030) at 17% CAGR");
     addBullet("Global retail active investment app users: 400M+, with 60%+ executing trades via mobile");
-    addBullet("Competitor pricing gap: Bloomberg $32,000/yr, Trade Ideas $2,136/yr, TrendSpider $648–$2,388/yr — EntangleWealth Pro: $348/yr");
+    addBullet("Competitor pricing gap: Bloomberg $32,000/yr, Trade Ideas $2,136/yr, TrendSpider $648–$2,388/yr | EntangleWealth Pro: $348/yr");
 
     addFooter();
     doc.addPage();
@@ -149,7 +149,7 @@ export default function CaseStudy() {
     addParagraph("The global fintech market reached $394.9 billion in 2025 and is projected to grow at 18.2% CAGR to $1.76 trillion by 2034 (Fortune Business Insights). Within this, the stock trading app market specifically hit $9.6 billion in 2025 with projection to $34.5 billion by 2035.");
     addParagraph("Three converging forces create an unprecedented window:");
     addBullet("DEMOCRATIZATION: 400M+ retail investors globally now trade via mobile apps. Retail investors account for 21-35% of US equity trading volume. Yet zero platforms offer multi-model AI consensus at accessible pricing.");
-    addBullet("AI MATURITY: The predictive AI in finance segment reached $840M in 2025, growing 17% annually. 92% of financial institutions now consider AI critical to competitiveness. The tools exist — but remain siloed behind institutional paywalls.");
+    addBullet("AI MATURITY: The predictive AI in finance segment reached $840M in 2025, growing 17% annually. 92% of financial institutions now consider AI critical to competitiveness. The tools exist | but remain siloed behind institutional paywalls.");
     addBullet("FRAGMENTATION: Retail investors currently need 3-5 separate tools (charting, scanning, news, tax, options) at $200-$500/month combined. EntangleWealth consolidates all into one platform at $29/month.");
 
     addFooter();
@@ -197,13 +197,13 @@ export default function CaseStudy() {
 
     addHeading("4. THE ENTANGLEWEALTH DIFFERENCE", 18);
     addParagraph("DIFFERENTIATOR #1: 6-Model AI Consensus Engine");
-    addParagraph("Every competitor uses either zero AI or a single-model approach. Bloomberg relies on human analysts. TradingView has no AI analysis. Trade Ideas uses Holly — a single AI model. Danelfin uses a single scoring algorithm. EntangleWealth is the ONLY platform requiring 6 independent AI models (Price Action, Volume Analysis, Options Flow, Technical Indicators, Sentiment Analysis, Risk Management) to achieve consensus before issuing a signal. This cross-verification methodology mirrors how institutional quant desks operate — but no retail platform has implemented it until now.");
+    addParagraph("Every competitor uses either zero AI or a single-model approach. Bloomberg relies on human analysts. TradingView has no AI analysis. Trade Ideas uses Holly | a single AI model. Danelfin uses a single scoring algorithm. EntangleWealth is the ONLY platform requiring 6 independent AI models (Price Action, Volume Analysis, Options Flow, Technical Indicators, Sentiment Analysis, Risk Management) to achieve consensus before issuing a signal. This cross-verification methodology mirrors how institutional quant desks operate | but no retail platform has implemented it until now.");
     y += 5;
     addParagraph("DIFFERENTIATOR #2: Full-Spectrum Financial Platform");
     addParagraph("Competitors are narrowly focused. Bloomberg does terminal. TradingView does charts. Trade Ideas does scanning. Robinhood does execution. None offer integrated tax intelligence (TaxGPT with IRS publication training), career tools (resume builder, job search), income opportunities (gig marketplace, options income strategies), AND community features in a single platform. EntangleWealth consolidates what would require 5+ separate subscriptions.");
     y += 5;
     addParagraph("DIFFERENTIATOR #3: Bloomberg-Grade Data at 99.6% Lower Cost");
-    addParagraph("Bloomberg Terminal costs $31,980/year minimum with 2-year contract lock-in and 50% early termination penalty. EntangleWealth Pro delivers live market data, 55+ technical indicators, options flow, market internals (TICK, TRIN, A/D, VIX), multi-asset coverage (crypto, forex, commodities, bonds), and AI consensus analysis for $348/year — a 99.6% cost reduction. Even against mid-market competitors: Trade Ideas Premium ($2,136/yr), TrendSpider ($648-2,388/yr), Koyfin Pro ($948/yr) — EntangleWealth undercuts every professional-grade alternative.");
+    addParagraph("Bloomberg Terminal costs $31,980/year minimum with 2-year contract lock-in and 50% early termination penalty. EntangleWealth Pro delivers live market data, 55+ technical indicators, options flow, market internals (TICK, TRIN, A/D, VIX), multi-asset coverage (crypto, forex, commodities, bonds), and AI consensus analysis for $348/year | a 99.6% cost reduction. Even against mid-market competitors: Trade Ideas Premium ($2,136/yr), TrendSpider ($648-2,388/yr), Koyfin Pro ($948/yr) | EntangleWealth undercuts every professional-grade alternative.");
     y += 5;
     addParagraph("DIFFERENTIATOR #4: 166-Page SEO Content Engine");
     addParagraph("EntangleWealth has deployed a programmatic SEO system generating 166 optimized pages across 7 content verticals (Glossary: 67 terms, Technical Indicators: 16, Trading Strategies: 24, Chart Patterns: 21, Sector Analysis: 12, Stock Comparisons: 11, Educational Pages: 15). No competitor has built comparable educational content infrastructure. This creates an organic acquisition moat that compounds over time.");
@@ -313,7 +313,7 @@ export default function CaseStudy() {
       y += Math.max(noteLines.length, 1) * 13 + 2;
     });
     y += 10;
-    addParagraph("Cost Efficiency Ratio: EntangleWealth delivers 24 core capabilities at $14.50/capability/year. Bloomberg delivers comparable depth at $1,332/capability/year — a 92x efficiency advantage.");
+    addParagraph("Cost Efficiency Ratio: EntangleWealth delivers 24 core capabilities at $14.50/capability/year. Bloomberg delivers comparable depth at $1,332/capability/year | a 92x efficiency advantage.");
 
     addFooter();
     doc.addPage();
@@ -323,19 +323,19 @@ export default function CaseStudy() {
     addHeading("7. WHITE SPACE & STRATEGIC MOAT", 18);
     addParagraph("Analysis reveals four unserved market gaps where EntangleWealth operates without direct competition:");
     y += 5;
-    addBullet("GAP 1 — AI CONSENSUS VERIFICATION: No competitor offers multi-model signal cross-verification. Single-model approaches (Holly, Danelfin Score) are vulnerable to model bias and cannot achieve the signal confidence levels that institutional desks require. EntangleWealth's 6-model consensus is architecturally unique in the retail space.");
-    addBullet("GAP 2 — FINANCIAL WELLNESS INTEGRATION: Zero competitors combine trading analysis with tax optimization, career tools, and income generation. The 400M+ retail investors include freelancers, gig workers, and families for whom financial wellness extends beyond stock picks. EntangleWealth is the only platform addressing the full financial lifecycle.");
-    addBullet("GAP 3 — CONTENT-LED ACQUISITION: No competitor has deployed programmatic SEO at this scale for financial education. 166 pages across 7 verticals create a compounding organic traffic moat. TradingView has community-generated content but no structured educational SEO engine.");
-    addBullet("GAP 4 — PRICE-TO-FEATURE RATIO: The market splits into two extremes: expensive-and-complete (Bloomberg, Trade Ideas) or cheap-and-limited (Robinhood, free TradingView). No platform occupies the Bloomberg-features-at-retail-pricing position that EntangleWealth holds.");
+    addBullet("GAP 1 | AI CONSENSUS VERIFICATION: No competitor offers multi-model signal cross-verification. Single-model approaches (Holly, Danelfin Score) are vulnerable to model bias and cannot achieve the signal confidence levels that institutional desks require. EntangleWealth's 6-model consensus is architecturally unique in the retail space.");
+    addBullet("GAP 2 | FINANCIAL WELLNESS INTEGRATION: Zero competitors combine trading analysis with tax optimization, career tools, and income generation. The 400M+ retail investors include freelancers, gig workers, and families for whom financial wellness extends beyond stock picks. EntangleWealth is the only platform addressing the full financial lifecycle.");
+    addBullet("GAP 3 | CONTENT-LED ACQUISITION: No competitor has deployed programmatic SEO at this scale for financial education. 166 pages across 7 verticals create a compounding organic traffic moat. TradingView has community-generated content but no structured educational SEO engine.");
+    addBullet("GAP 4 | PRICE-TO-FEATURE RATIO: The market splits into two extremes: expensive-and-complete (Bloomberg, Trade Ideas) or cheap-and-limited (Robinhood, free TradingView). No platform occupies the Bloomberg-features-at-retail-pricing position that EntangleWealth holds.");
     y += 10;
     addHeading("8. RISK FACTORS & HONEST ASSESSMENT", 14);
     addParagraph("Where competitors currently lead:");
     addBullet("DATA DEPTH: Bloomberg's 325,000+ terminal users generate proprietary network effects. Their chat function (IB) creates institutional switching costs that EntangleWealth cannot replicate at the retail level.");
     addBullet("USER BASE: TradingView's 100M+ users create massive community-driven content and indicator libraries. EntangleWealth's community features are newer and smaller.");
-    addBullet("EXECUTION: Robinhood's 24M funded accounts include built-in order execution. EntangleWealth currently provides analysis — execution requires a brokerage integration.");
+    addBullet("EXECUTION: Robinhood's 24M funded accounts include built-in order execution. EntangleWealth currently provides analysis | execution requires a brokerage integration.");
     addBullet("INDICATOR LIBRARY: TradingView offers 400+ indicators vs. EntangleWealth's 55+. However, research shows most active traders use 3-8 indicators consistently.");
     y += 5;
-    addParagraph("Mitigation: EntangleWealth's moat is not in competing on Bloomberg's data depth or TradingView's indicator count — it's in the AI consensus layer and full-lifecycle financial platform that neither can replicate without fundamental architectural changes.");
+    addParagraph("Mitigation: EntangleWealth's moat is not in competing on Bloomberg's data depth or TradingView's indicator count | it's in the AI consensus layer and full-lifecycle financial platform that neither can replicate without fundamental architectural changes.");
 
     addFooter();
     doc.addPage();
@@ -343,11 +343,11 @@ export default function CaseStudy() {
     y = M;
 
     addHeading("9. STRATEGIC RECOMMENDATIONS", 18);
-    addBullet("ACTION 1 — LEAD WITH COST DISRUPTION: In all investor and user-facing materials, anchor on the $31,980 vs. $348 comparison (99.6% cost reduction). This is the most compelling narrative for both fundraising and user acquisition. Source: Bloomberg LP's January 2025 price increase letter confirming $2,665/month base pricing.");
-    addBullet("ACTION 2 — OWN THE 'AI CONSENSUS' CATEGORY: No competitor has claimed multi-model verification as a positioning category. File for trademark on 'Quantum Entanglement Analysis' methodology. Build case studies showing signal accuracy improvements from consensus vs. single-model approaches.");
-    addBullet("ACTION 3 — EXPAND SEO MOAT: Current 166 pages should grow to 500+ within 6 months. Target: 'best [indicator] strategy', '[stock] vs [stock]', '[sector] analysis 2026' long-tail keywords. Estimated organic traffic value at 500 pages: $15K-40K/month equivalent paid traffic.");
-    addBullet("ACTION 4 — BROKERAGE INTEGRATION ROADMAP: Partner with Alpaca for embedded execution to close the analysis-to-execution gap. This eliminates Robinhood's primary structural advantage while maintaining EntangleWealth's analytical superiority.");
-    addBullet("ACTION 5 — BATTLECARD DEPLOYMENT: For every prospect evaluating Bloomberg or TradingView, lead with: 'What would you do with the $31,000 you save per seat per year?' and 'When was the last time your charting tool helped you file taxes or find a job?'");
+    addBullet("ACTION 1 | LEAD WITH COST DISRUPTION: In all investor and user-facing materials, anchor on the $31,980 vs. $348 comparison (99.6% cost reduction). This is the most compelling narrative for both fundraising and user acquisition. Source: Bloomberg LP's January 2025 price increase letter confirming $2,665/month base pricing.");
+    addBullet("ACTION 2 | OWN THE 'AI CONSENSUS' CATEGORY: No competitor has claimed multi-model verification as a positioning category. File for trademark on 'Quantum Entanglement Analysis' methodology. Build case studies showing signal accuracy improvements from consensus vs. single-model approaches.");
+    addBullet("ACTION 3 | EXPAND SEO MOAT: Current 166 pages should grow to 500+ within 6 months. Target: 'best [indicator] strategy', '[stock] vs [stock]', '[sector] analysis 2026' long-tail keywords. Estimated organic traffic value at 500 pages: $15K-40K/month equivalent paid traffic.");
+    addBullet("ACTION 4 | BROKERAGE INTEGRATION ROADMAP: Partner with Alpaca for embedded execution to close the analysis-to-execution gap. This eliminates Robinhood's primary structural advantage while maintaining EntangleWealth's analytical superiority.");
+    addBullet("ACTION 5 | BATTLECARD DEPLOYMENT: For every prospect evaluating Bloomberg or TradingView, lead with: 'What would you do with the $31,000 you save per seat per year?' and 'When was the last time your charting tool helped you file taxes or find a job?'");
 
     addFooter();
     doc.addPage();
@@ -356,22 +356,22 @@ export default function CaseStudy() {
 
     addHeading("10. CONCLUSION", 18);
     addParagraph("EntangleWealth occupies a unique and defensible position in a $9.6B market growing to $34.5B by 2035. No existing platform combines multi-model AI consensus verification, Bloomberg-grade market intelligence, tax optimization, career tools, and programmatic content infrastructure at accessible pricing.");
-    addParagraph("The competitive landscape reveals a clear pattern: incumbents are either too expensive (Bloomberg), too narrow (TradingView, Trade Ideas), or too shallow (Robinhood, Danelfin). EntangleWealth is architected to serve the intersection — delivering institutional-quality intelligence at retail pricing while addressing the full financial lifecycle of modern investors.");
-    addParagraph("The 6-model AI consensus engine is not a feature — it is a category. No competitor can replicate it without rebuilding their analysis infrastructure from the ground up. Combined with 166-page SEO content moat, integrated financial wellness tools, and a pricing model that undercuts every professional alternative by 73-99%, EntangleWealth is positioned to capture significant share of the retail financial intelligence market.");
+    addParagraph("The competitive landscape reveals a clear pattern: incumbents are either too expensive (Bloomberg), too narrow (TradingView, Trade Ideas), or too shallow (Robinhood, Danelfin). EntangleWealth is architected to serve the intersection | delivering institutional-quality intelligence at retail pricing while addressing the full financial lifecycle of modern investors.");
+    addParagraph("The 6-model AI consensus engine is not a feature | it is a category. No competitor can replicate it without rebuilding their analysis infrastructure from the ground up. Combined with 166-page SEO content moat, integrated financial wellness tools, and a pricing model that undercuts every professional alternative by 73-99%, EntangleWealth is positioned to capture significant share of the retail financial intelligence market.");
     y += 20;
     addHeading("SOURCES", 12);
     const sources = [
-      "Bloomberg LP — January 2025 pricing letter: 6.5% increase to $2,665/mo ($31,980/yr), 2-year contracts",
-      "TradingView — 100M+ users, 150+ exchanges, 2M+ instruments (tradingview.com)",
-      "Trade Ideas — Holly AI: overnight backtesting, 60% win-rate threshold, Premium at $254/mo (trade-ideas.com)",
-      "Koyfin — 500K+ investors, Capital IQ powered, Pro at $79/mo annual (koyfin.com)",
-      "TrendSpider — Automated trendline detection, 4 tiers from $54-$199/mo (trendspider.com)",
-      "Danelfin — AI Score 1-10 methodology, 10K+ features per stock, Pro at $59/mo (danelfin.com)",
-      "Robinhood — Q4 2024: 24M funded accounts, Gold at $5/mo, 3.35% APY (robinhood.com)",
-      "Fortune Business Insights — Global fintech market $394.9B (2025), 18.2% CAGR to $1.76T by 2034",
-      "Stock Trading App Market — $9.6B (2025) → $34.5B (2035), 13.62% CAGR (multiple sources)",
-      "Predictive AI in Stock Market — $840M (2025) → $1.82B (2030), 17% CAGR",
-      "Retail Trading — 400M+ global active investment app users, 60%+ mobile-first (2024-2025 surveys)",
+      "Bloomberg LP | January 2025 pricing letter: 6.5% increase to $2,665/mo ($31,980/yr), 2-year contracts",
+      "TradingView | 100M+ users, 150+ exchanges, 2M+ instruments (tradingview.com)",
+      "Trade Ideas | Holly AI: overnight backtesting, 60% win-rate threshold, Premium at $254/mo (trade-ideas.com)",
+      "Koyfin | 500K+ investors, Capital IQ powered, Pro at $79/mo annual (koyfin.com)",
+      "TrendSpider | Automated trendline detection, 4 tiers from $54-$199/mo (trendspider.com)",
+      "Danelfin | AI Score 1-10 methodology, 10K+ features per stock, Pro at $59/mo (danelfin.com)",
+      "Robinhood | Q4 2024: 24M funded accounts, Gold at $5/mo, 3.35% APY (robinhood.com)",
+      "Fortune Business Insights | Global fintech market $394.9B (2025), 18.2% CAGR to $1.76T by 2034",
+      "Stock Trading App Market | $9.6B (2025) → $34.5B (2035), 13.62% CAGR (multiple sources)",
+      "Predictive AI in Stock Market | $840M (2025) → $1.82B (2030), 17% CAGR",
+      "Retail Trading | 400M+ global active investment app users, 60%+ mobile-first (2024-2025 surveys)",
     ];
     doc.setFontSize(8);
     sources.forEach((s, i) => {
@@ -397,7 +397,7 @@ export default function CaseStudy() {
             <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(circle at 30% 50%, #00D4FF 0%, transparent 50%), radial-gradient(circle at 70% 50%, #FFD700 0%, transparent 50%)" }} />
             <div className="relative text-center">
               <div className="inline-block px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 mb-6">
-                <span className="text-cyan-400 text-xs tracking-widest uppercase" style={{ fontFamily: "JetBrains Mono, monospace" }}>Competitive Intelligence Report — {REPORT_DATE}</span>
+                <span className="text-cyan-400 text-xs tracking-widest uppercase" style={{ fontFamily: "JetBrains Mono, monospace" }}>Competitive Intelligence Report | {REPORT_DATE}</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight">
                 <span className="text-white">Entangle</span><span className="text-cyan-400">Wealth</span>
@@ -406,7 +406,7 @@ export default function CaseStudy() {
                 CEO Strategic Case Study
               </p>
               <p className="text-gray-400 max-w-2xl mx-auto mb-8">
-                How EntangleWealth Delivers Bloomberg Terminal-Grade Intelligence at 99.6% Lower Cost — Backed by Market Data and Competitive Feature Analysis
+                How EntangleWealth Delivers Bloomberg Terminal-Grade Intelligence at 99.6% Lower Cost | Backed by Market Data and Competitive Feature Analysis
               </p>
               <div className="flex flex-wrap gap-3 justify-center">
                 <Button onClick={handleDownloadPDF} className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-6 py-3 text-base gap-2">
@@ -445,7 +445,7 @@ export default function CaseStudy() {
                     <strong className="text-white">For</strong> retail investors and independent traders <strong className="text-white">who</strong> need institutional-quality market intelligence,{" "}
                     <strong className="text-cyan-400">EntangleWealth</strong> is a full-spectrum financial command center that delivers AI-verified consensus signals across 5,000+ NASDAQ stocks with 55+ technical indicators, live market data, options flow analysis, and integrated tax optimization.{" "}
                     <strong className="text-white">Unlike</strong> Bloomberg Terminal ($32,000/yr), TradingView (charting only), or Trade Ideas (scanner only),{" "}
-                    <strong className="text-white">EntangleWealth</strong> provides the only multi-model AI consensus engine that requires 6 independent analysis methods to agree before issuing a signal — eliminating single-model bias while including career tools, tax intelligence, and community features starting at <strong className="text-emerald-400">$0/month</strong>.
+                    <strong className="text-white">EntangleWealth</strong> provides the only multi-model AI consensus engine that requires 6 independent analysis methods to agree before issuing a signal | eliminating single-model bias while including career tools, tax intelligence, and community features starting at <strong className="text-emerald-400">$0/month</strong>.
                   </p>
                 </div>
               </div>
@@ -461,7 +461,7 @@ export default function CaseStudy() {
                   <li>• Bloomberg Terminal ($32,000/yr)</li>
                   <li>• TradingView + Trade Ideas ($3,500/yr combined)</li>
                   <li>• Spreadsheets + manual research</li>
-                  <li>• "Do nothing" — gut-feel trading</li>
+                  <li>• "Do nothing" | gut-feel trading</li>
                 </ul>
               </div>
               <div className="bg-[#0a0a0f] border border-gray-800/60 rounded-lg p-5">
@@ -488,7 +488,7 @@ export default function CaseStudy() {
             <div className="space-y-4">
               {[
                 { icon: Users, color: "#00D4FF", title: "Democratization", text: "400M+ retail investors globally trade via mobile apps. Retail accounts for 21-35% of US equity trading volume. Yet zero platforms offer multi-model AI consensus at accessible pricing." },
-                { icon: Brain, color: "#FFD700", title: "AI Maturity", text: "Predictive AI in finance reached $840M in 2025, growing 17% annually. 92% of financial institutions consider AI critical to competitiveness. The tools exist — but remain behind institutional paywalls." },
+                { icon: Brain, color: "#FFD700", title: "AI Maturity", text: "Predictive AI in finance reached $840M in 2025, growing 17% annually. 92% of financial institutions consider AI critical to competitiveness. The tools exist | but remain behind institutional paywalls." },
                 { icon: Layers, color: "#9c27b0", title: "Fragmentation", text: "Retail investors need 3-5 separate tools (charting, scanning, news, tax, options) at $200-$500/month combined. EntangleWealth consolidates all into one platform at $29/month." },
               ].map(({ icon: Icon, color, title, text }) => (
                 <div key={title} className="flex gap-4 bg-[#0a0a0f] border border-gray-800/60 rounded-lg p-5">
@@ -542,9 +542,9 @@ export default function CaseStudy() {
           <Section id="section-4" title="4. The EntangleWealth Difference" subtitle="Four structural differentiators no competitor can replicate without fundamental rebuilds">
             <div className="space-y-6">
               {[
-                { num: "01", icon: Brain, color: "#00D4FF", title: "6-Model AI Consensus Engine", desc: "Every competitor uses either zero AI or a single-model approach. Bloomberg relies on human analysts. TradingView has no AI analysis. Trade Ideas uses Holly — a single AI. Danelfin uses a single scoring algorithm. EntangleWealth is the ONLY platform requiring 6 independent AI models (Price Action, Volume Analysis, Options Flow, Technical Indicators, Sentiment Analysis, Risk Management) to achieve consensus before issuing a signal. This cross-verification methodology mirrors institutional quant desks — but no retail platform has implemented it." },
+                { num: "01", icon: Brain, color: "#00D4FF", title: "6-Model AI Consensus Engine", desc: "Every competitor uses either zero AI or a single-model approach. Bloomberg relies on human analysts. TradingView has no AI analysis. Trade Ideas uses Holly | a single AI. Danelfin uses a single scoring algorithm. EntangleWealth is the ONLY platform requiring 6 independent AI models (Price Action, Volume Analysis, Options Flow, Technical Indicators, Sentiment Analysis, Risk Management) to achieve consensus before issuing a signal. This cross-verification methodology mirrors institutional quant desks | but no retail platform has implemented it." },
                 { num: "02", icon: Layers, color: "#FFD700", title: "Full-Spectrum Financial Platform", desc: "Competitors are narrowly focused. Bloomberg does terminal. TradingView does charts. Trade Ideas does scanning. Robinhood does execution. None offer integrated tax intelligence (TaxGPT trained on IRS publications), career tools (resume builder, job search), income opportunities (gig marketplace, options income strategies), AND community features in a single platform. EntangleWealth consolidates what would require 5+ separate subscriptions." },
-                { num: "03", icon: DollarSign, color: "#00ff88", title: "Bloomberg-Grade Data at 99.6% Lower Cost", desc: "Bloomberg Terminal costs $31,980/year minimum with 2-year contract lock-in and 50% early termination penalty. EntangleWealth Pro delivers live market data, 55+ technical indicators, options flow, market internals (TICK, TRIN, A/D, VIX), multi-asset coverage (crypto, forex, commodities, bonds), and AI consensus analysis for $348/year — a 99.6% cost reduction. Even mid-market competitors: Trade Ideas $2,136/yr, TrendSpider $648–$2,388/yr, Koyfin Pro $948/yr — EntangleWealth undercuts every professional alternative." },
+                { num: "03", icon: DollarSign, color: "#00ff88", title: "Bloomberg-Grade Data at 99.6% Lower Cost", desc: "Bloomberg Terminal costs $31,980/year minimum with 2-year contract lock-in and 50% early termination penalty. EntangleWealth Pro delivers live market data, 55+ technical indicators, options flow, market internals (TICK, TRIN, A/D, VIX), multi-asset coverage (crypto, forex, commodities, bonds), and AI consensus analysis for $348/year | a 99.6% cost reduction. Even mid-market competitors: Trade Ideas $2,136/yr, TrendSpider $648–$2,388/yr, Koyfin Pro $948/yr | EntangleWealth undercuts every professional alternative." },
                 { num: "04", icon: TrendingUp, color: "#9c27b0", title: "166-Page SEO Content Engine", desc: "EntangleWealth has deployed a programmatic SEO system generating 166 optimized pages across 7 content verticals (Glossary: 67, Indicators: 16, Strategies: 24, Patterns: 21, Sectors: 12, Comparisons: 11, Educational: 15). No competitor has comparable educational content infrastructure. This creates an organic acquisition moat that compounds over time, reducing CAC as the content library grows." },
               ].map(({ num, icon: Icon, color, title, desc }) => (
                 <div key={num} className="flex gap-5 bg-[#0a0a0f] border border-gray-800/60 rounded-xl p-6 hover:border-gray-700/60 transition-colors">
@@ -563,7 +563,7 @@ export default function CaseStudy() {
             </div>
           </Section>
 
-          <Section id="section-5" title="5. Feature Matrix" subtitle="24 capabilities across 8 platforms — green wins, red gaps, yellow partial">
+          <Section id="section-5" title="5. Feature Matrix" subtitle="24 capabilities across 8 platforms | green wins, red gaps, yellow partial">
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
                 <thead>
@@ -663,7 +663,7 @@ export default function CaseStudy() {
               <h4 className="font-bold text-yellow-400 mb-2">Cost Efficiency Analysis</h4>
               <p className="text-sm text-gray-400">
                 EntangleWealth delivers <strong className="text-white">24 core capabilities</strong> at <strong className="text-emerald-400">$14.50/capability/year</strong>.
-                Bloomberg delivers comparable depth at <strong className="text-red-400">$1,332/capability/year</strong> — a{" "}
+                Bloomberg delivers comparable depth at <strong className="text-red-400">$1,332/capability/year</strong> | a{" "}
                 <strong className="text-cyan-400">92x efficiency advantage</strong>.
                 For a 10-person trading desk, switching from Bloomberg to EntangleWealth saves <strong className="text-emerald-400">$316,320/year</strong>.
               </p>
@@ -687,7 +687,7 @@ export default function CaseStudy() {
             </div>
           </Section>
 
-          <Section id="section-8" title="8. Risk Factors & Honest Assessment" subtitle="Where competitors currently lead — and our mitigation strategy">
+          <Section id="section-8" title="8. Risk Factors & Honest Assessment" subtitle="Where competitors currently lead | and our mitigation strategy">
             <div className="bg-[#0a0a0f] border border-red-500/20 rounded-lg p-6 mb-6">
               <h4 className="font-bold text-red-400 mb-4 flex items-center gap-2">
                 <Shield className="w-5 h-5" /> Competitive Advantages Held by Others
@@ -712,7 +712,7 @@ export default function CaseStudy() {
             <div className="bg-[#0a0a0f] border border-emerald-500/20 rounded-lg p-6">
               <h4 className="font-bold text-emerald-400 mb-2">Mitigation</h4>
               <p className="text-sm text-gray-400 leading-relaxed">
-                EntangleWealth's moat is not in competing on Bloomberg's data depth or TradingView's indicator count — it's in the <strong className="text-white">AI consensus layer</strong> and <strong className="text-white">full-lifecycle financial platform</strong> that neither can replicate without fundamental architectural changes.  
+                EntangleWealth's moat is not in competing on Bloomberg's data depth or TradingView's indicator count | it's in the <strong className="text-white">AI consensus layer</strong> and <strong className="text-white">full-lifecycle financial platform</strong> that neither can replicate without fundamental architectural changes.  
                 The brokerage execution gap can be closed through Alpaca embedded trading integration, which is on the product roadmap.
               </p>
             </div>
@@ -751,10 +751,10 @@ export default function CaseStudy() {
                 The competitive landscape reveals a clear pattern: incumbents are either <strong className="text-red-400">too expensive</strong> (Bloomberg),{" "}
                 <strong className="text-yellow-400">too narrow</strong> (TradingView, Trade Ideas), or{" "}
                 <strong className="text-yellow-400">too shallow</strong> (Robinhood, Danelfin).
-                EntangleWealth is architected to serve the intersection — delivering institutional-quality intelligence at retail pricing while addressing the full financial lifecycle.
+                EntangleWealth is architected to serve the intersection | delivering institutional-quality intelligence at retail pricing while addressing the full financial lifecycle.
               </p>
               <p className="text-gray-300 leading-relaxed">
-                The 6-model AI consensus engine is not a feature — <strong className="text-cyan-400">it is a category</strong>. No competitor can replicate it without rebuilding their analysis infrastructure from the ground up. Combined with the 166-page SEO content moat, integrated financial wellness tools, and pricing that undercuts every professional alternative by 73-99%,{" "}
+                The 6-model AI consensus engine is not a feature | <strong className="text-cyan-400">it is a category</strong>. No competitor can replicate it without rebuilding their analysis infrastructure from the ground up. Combined with the 166-page SEO content moat, integrated financial wellness tools, and pricing that undercuts every professional alternative by 73-99%,{" "}
                 <strong className="text-white">EntangleWealth is positioned to capture significant share of the retail financial intelligence market</strong>.
               </p>
             </div>
@@ -764,17 +764,17 @@ export default function CaseStudy() {
             <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Sources & Citations</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-600">
               {[
-                "[1] Bloomberg LP — Jan 2025 pricing letter: 6.5% increase to $2,665/mo ($31,980/yr)",
-                "[2] TradingView — 100M+ users, 150+ exchanges (tradingview.com)",
-                "[3] Trade Ideas — Holly AI overnight backtesting, Premium $254/mo (trade-ideas.com)",
-                "[4] Koyfin — 500K+ investors, Capital IQ powered (koyfin.com)",
-                "[5] TrendSpider — Automated analysis, 4 tiers $54-$199/mo (trendspider.com)",
-                "[6] Danelfin — AI Score 1-10, 10K+ features/stock (danelfin.com)",
-                "[7] Robinhood — Q4 2024: 24M funded accounts, Gold $5/mo (robinhood.com)",
-                "[8] Fortune Business Insights — Fintech $394.9B (2025), 18.2% CAGR",
-                "[9] Stock Trading App Market — $9.6B → $34.5B (2035), 13.62% CAGR",
-                "[10] Predictive AI in Stock Market — $840M → $1.82B (2030), 17% CAGR",
-                "[11] Retail Trading — 400M+ global users, 60%+ mobile (2024-2025)",
+                "[1] Bloomberg LP | Jan 2025 pricing letter: 6.5% increase to $2,665/mo ($31,980/yr)",
+                "[2] TradingView | 100M+ users, 150+ exchanges (tradingview.com)",
+                "[3] Trade Ideas | Holly AI overnight backtesting, Premium $254/mo (trade-ideas.com)",
+                "[4] Koyfin | 500K+ investors, Capital IQ powered (koyfin.com)",
+                "[5] TrendSpider | Automated analysis, 4 tiers $54-$199/mo (trendspider.com)",
+                "[6] Danelfin | AI Score 1-10, 10K+ features/stock (danelfin.com)",
+                "[7] Robinhood | Q4 2024: 24M funded accounts, Gold $5/mo (robinhood.com)",
+                "[8] Fortune Business Insights | Fintech $394.9B (2025), 18.2% CAGR",
+                "[9] Stock Trading App Market | $9.6B → $34.5B (2035), 13.62% CAGR",
+                "[10] Predictive AI in Stock Market | $840M → $1.82B (2030), 17% CAGR",
+                "[11] Retail Trading | 400M+ global users, 60%+ mobile (2024-2025)",
               ].map((s) => (
                 <p key={s}>{s}</p>
               ))}
@@ -785,7 +785,7 @@ export default function CaseStudy() {
             <Button onClick={handleDownloadPDF} className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-8 py-4 text-lg gap-2">
               <Download className="w-5 h-5" /> Download Full PDF Report
             </Button>
-            <p className="text-xs text-gray-600 mt-3">CONFIDENTIAL — For Internal & Investor Use Only</p>
+            <p className="text-xs text-gray-600 mt-3">CONFIDENTIAL | For Internal & Investor Use Only</p>
           </div>
         </div>
       </div>

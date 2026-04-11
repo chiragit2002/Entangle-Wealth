@@ -173,7 +173,7 @@ export default function Pricing() {
           </h1>
           <p className="text-muted-foreground text-base md:text-lg">30 days free. No card. Cancel anytime.</p>
           <div className="inline-block mt-4 bg-[rgba(0,230,118,0.1)] border border-[rgba(0,230,118,0.3)] rounded-full px-4 py-1.5 text-xs font-bold text-[#00e676]">
-            FREE TRIAL — NO CREDIT CARD NEEDED
+            FREE TRIAL | NO CREDIT CARD NEEDED
           </div>
         </div>
 
@@ -236,7 +236,7 @@ export default function Pricing() {
         <div className="mobile-card-glow text-center p-6 md:p-8">
           <div className="text-2xl font-black tracking-tight mb-2">Referral Program</div>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f5c842]/10 border border-[#f5c842]/25 text-[#f5c842] text-xs font-bold mb-3">
-            🏆 $36,000 Anniversary Bonus Pool — Invite friends, earn your share
+            🏆 $36,000 Anniversary Bonus Pool | Invite friends, earn your share
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed mb-1">
             Earn <strong className="text-[#f5c842]">20% monthly</strong> for every person you refer. For life. Build your own income stream.

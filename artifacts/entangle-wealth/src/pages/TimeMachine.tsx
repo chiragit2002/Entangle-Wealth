@@ -198,7 +198,7 @@ export default function TimeMachine() {
             <span className="electric-text">What If</span> Time Machine
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            See what your investment would be worth today — powered by real market data
+            See what your investment would be worth today | powered by real market data
           </p>
         </div>
 
@@ -260,8 +260,8 @@ export default function TimeMachine() {
                     ${result.currentValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </div>
                   <div className={`text-xs font-bold ${result.totalReturn >= 0 ? "text-[#00e676]" : "text-[#ff4466]"}`}>
-                    {result.totalReturn >= 0 ? "+" : ""}${result.totalReturn.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                    {" "}({result.totalReturnPct >= 0 ? "+" : ""}{result.totalReturnPct.toFixed(1)}%)
+                    {result.totalReturn >= 0 ? "+" : ""}${Math.abs(result.totalReturn).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    {" "}({result.totalReturnPct >= 0 ? "+" : ""}{Math.abs(result.totalReturnPct).toFixed(1)}%)
                   </div>
                 </div>
               </div>
@@ -275,9 +275,9 @@ export default function TimeMachine() {
                 value={`$${result.currentValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
                 sub={`@ $${result.endPrice.toFixed(2)} per share`}
                 color={result.totalReturn >= 0 ? "text-[#00e676]" : "text-[#ff4466]"} />
-              <StatCard icon={Zap} label="Annualized" value={`${result.annualizedReturn >= 0 ? "+" : ""}${result.annualizedReturn.toFixed(1)}%`}
+              <StatCard icon={Zap} label="Annualized" value={`${result.annualizedReturn >= 0 ? "+" : ""}${Math.abs(result.annualizedReturn).toFixed(1)}%`}
                 sub="Compound annual growth" color={result.annualizedReturn >= 0 ? "text-[#00e676]" : "text-[#ff4466]"} />
-              <StatCard icon={AlertTriangle} label="Max Drawdown" value={`${result.maxDrawdown.toFixed(1)}%`}
+              <StatCard icon={AlertTriangle} label="Max Drawdown" value={`${Math.abs(result.maxDrawdown).toFixed(1)}%`}
                 sub={result.maxDrawdownDate || "N/A"} color="text-[#ff4466]" />
             </div>
 
@@ -301,7 +301,7 @@ export default function TimeMachine() {
             <Clock className="w-16 h-16 text-primary/20 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-muted-foreground mb-2">Travel Back in Time</h3>
             <p className="text-sm text-muted-foreground/60 max-w-md mx-auto">
-              Pick a stock, choose a date, enter an amount, and see exactly what your investment would be worth today — powered by real historical market data.
+              Pick a stock, choose a date, enter an amount, and see exactly what your investment would be worth today | powered by real historical market data.
             </p>
           </div>
         )}

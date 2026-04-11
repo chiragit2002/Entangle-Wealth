@@ -220,7 +220,7 @@ export default function Receipts() {
     };
     setDocuments(prev => [entry, ...prev]);
     setForm({ vendor: "", amount: "", category: "", purpose: "", date: "" });
-    toast({ title: "Receipt logged", description: `${entry.vendor} — $${entry.amount.toFixed(2)}` });
+    toast({ title: "Receipt logged", description: `${entry.vendor} | $${entry.amount.toFixed(2)}` });
   };
 
   const removeDocument = (id: string) => {
@@ -249,7 +249,7 @@ export default function Receipts() {
     };
     setMileage(prev => [entry, ...prev]);
     setMileageForm({ date: "", start: "", end: "", miles: "", purpose: "" });
-    toast({ title: "Mileage logged", description: `${entry.miles} mi — $${entry.deductible.toFixed(2)}` });
+    toast({ title: "Mileage logged", description: `${entry.miles} mi | $${entry.deductible.toFixed(2)}` });
   };
 
   const exportReceiptCSV = () => {
@@ -353,7 +353,7 @@ export default function Receipts() {
                 <>
                   <Upload className="w-10 h-10 mb-2 text-primary/50" />
                   <p className="font-bold mb-1">Drop Files Here or Click to Upload</p>
-                  <p className="text-[13px] text-muted-foreground">PDF, JPG, PNG — Max 10MB per file</p>
+                  <p className="text-[13px] text-muted-foreground">PDF, JPG, PNG | Max 10MB per file</p>
                 </>
               )}
               <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/jpg,application/pdf" multiple className="hidden"

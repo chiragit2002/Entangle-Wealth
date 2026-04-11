@@ -85,7 +85,7 @@ const competitors: Competitor[] = [
     category: "AI Day Trading",
     pricing: "$127–$254/mo",
     users: "100K+",
-    strengths: ["Holly AI — 8-year track record", "300+ pre-built strategies", "Auto-execution capable"],
+    strengths: ["Holly AI | 8-year track record", "300+ pre-built strategies", "Auto-execution capable"],
     weaknesses: ["Expensive ($3K/yr premium)", "Day-trading only", "No fundamental or macro analysis"],
     aiCapability: "advanced",
     technicalIndicators: 50,
@@ -104,7 +104,7 @@ const competitors: Competitor[] = [
     pricing: "$49–$107/mo",
     users: "55K+",
     strengths: ["Auto trendlines & patterns", "Sidekick AI chat analyst", "ML Strategy Lab"],
-    weaknesses: ["Technical-only — no fundamentals", "Learning curve for bots", "No income/tax features"],
+    weaknesses: ["Technical-only | no fundamentals", "Learning curve for bots", "No income/tax features"],
     aiCapability: "advanced",
     technicalIndicators: 150,
     liveData: true,
@@ -186,7 +186,7 @@ const featureMatrix = [
 ];
 
 const kanoAnalysis = [
-  { feature: "Real-time quotes", category: "Basic", note: "Table stakes — every competitor has this. Not a differentiator." },
+  { feature: "Real-time quotes", category: "Basic", note: "Table stakes | every competitor has this. Not a differentiator." },
   { feature: "Technical charting", category: "Basic", note: "TradingView dominates. Compete on AI overlay, not chart quality." },
   { feature: "AI stock signals", category: "Performance", note: "More AI models = better. EntangleWealth's 6-model consensus is unique." },
   { feature: "Options flow analysis", category: "Performance", note: "Growing demand. Few competitors combine with AI signals." },
@@ -208,12 +208,12 @@ const strategicActions = [
   },
   {
     title: "Own the 'Financial Wellness' Category",
-    desc: "No one combines stock analysis + tax tools + gig income + resume builder. This isn't a feature — it's a category. You're not a trading platform. You're a financial empowerment platform. Robinhood gamifies trading. You dignify financial planning.",
+    desc: "No one combines stock analysis + tax tools + gig income + resume builder. This isn't a feature | it's a category. You're not a trading platform. You're a financial empowerment platform. Robinhood gamifies trading. You dignify financial planning.",
     urgency: "medium" as const,
   },
   {
     title: "Price to Disrupt: Free Tier Must Stay Generous",
-    desc: "Trade Ideas charges $3K/yr. TrendSpider charges $1.3K/yr. Your free tier with 55+ indicators and live data is a quantum tunneling opportunity — you phase through price barriers that keep retail investors locked out of institutional-grade tools.",
+    desc: "Trade Ideas charges $3K/yr. TrendSpider charges $1.3K/yr. Your free tier with 55+ indicators and live data is a quantum tunneling opportunity | you phase through price barriers that keep retail investors locked out of institutional-grade tools.",
     urgency: "high" as const,
   },
   {
@@ -367,7 +367,7 @@ export default function CompetitiveAnalysis() {
       y += 50;
       doc.setFontSize(14);
       doc.setTextColor(60);
-      doc.text(`${PRODUCT} — ${REPORT_DATE}`, M, y);
+      doc.text(`${PRODUCT} | ${REPORT_DATE}`, M, y);
       y += 30;
       doc.setFontSize(11);
       doc.setTextColor(80);
@@ -585,7 +585,7 @@ export default function CompetitiveAnalysis() {
           </div>
         </Section>
 
-        <Section title="Feature Matrix — Quantum Superiority Map" icon={Zap} color="bg-[#00e676]/10 text-[#00e676]">
+        <Section title="Feature Matrix | Quantum Superiority Map" icon={Zap} color="bg-[#00e676]/10 text-[#00e676]">
           <div className="glass-panel rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -638,7 +638,7 @@ export default function CompetitiveAnalysis() {
           </div>
         </Section>
 
-        <Section title="Positioning Map — Quantum Quadrant" icon={TrendingUp} color="bg-secondary/10 text-secondary">
+        <Section title="Positioning Map | Quantum Quadrant" icon={TrendingUp} color="bg-secondary/10 text-secondary">
           <div className="glass-panel rounded-2xl p-6 md:p-8">
             <div className="relative w-full aspect-square max-w-lg mx-auto">
               <div className="absolute inset-0 border border-white/[0.06] rounded-lg">
@@ -683,7 +683,7 @@ export default function CompetitiveAnalysis() {
               </div>
             </div>
             <p className="text-center text-xs text-muted-foreground/60 mt-8">
-              EntangleWealth occupies the upper-right quadrant alone — high AI sophistication + broad platform scope. No competitor is entangled at this position.
+              EntangleWealth occupies the upper-right quadrant alone | high AI sophistication + broad platform scope. No competitor is entangled at this position.
             </p>
           </div>
         </Section>
@@ -747,7 +747,7 @@ export default function CompetitiveAnalysis() {
             ))}
           </div>
           <p className="text-sm text-muted-foreground max-w-xl mx-auto">
-            No other platform in the market combines AI consensus signals, financial planning tools, and institutional-grade analytics — at any price point. This is not a feature advantage. This is a category advantage.
+            No other platform in the market combines AI consensus signals, financial planning tools, and institutional-grade analytics | at any price point. This is not a feature advantage. This is a category advantage.
           </p>
         </div>
 

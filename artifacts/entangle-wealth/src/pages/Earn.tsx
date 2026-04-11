@@ -55,7 +55,7 @@ export default function Earn() {
     setClaimedOpps(prev => [...prev, id]);
     toast({
       title: "Opportunity claimed!",
-      description: `${title} — check the platform for next steps.`,
+      description: `${title} | check the platform for next steps.`,
     });
   };
 

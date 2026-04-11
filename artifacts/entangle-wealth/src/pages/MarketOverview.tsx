@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { Layout } from "@/components/layout/Layout";
 import {
   TrendingUp, TrendingDown, Activity, Globe, BarChart3,
-  ArrowUpRight, ArrowDownRight, Minus, RefreshCw, Zap,
+  ArrowUpRight, ArrowDownRight, RefreshCw, Zap,
   DollarSign, Landmark, Fuel, Bitcoin, Wheat, Loader2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -44,53 +44,53 @@ interface EconIndicator {
 const INDICES: MarketIndex[] = [
   { name: "S&P 500", ticker: "SPX", value: 5248.49, change: 38.25, changePercent: 0.73 },
   { name: "NASDAQ Comp", ticker: "IXIC", value: 16399.52, change: 145.12, changePercent: 0.89 },
-  { name: "Dow Jones", ticker: "DJI", value: 39127.14, change: -42.77, changePercent: -0.11 },
+  { name: "Dow Jones", ticker: "DJI", value: 39127.14, change: 42.77, changePercent: 0.11 },
   { name: "Russell 2000", ticker: "RUT", value: 2070.13, change: 18.45, changePercent: 0.90 },
-  { name: "VIX", ticker: "VIX", value: 14.32, change: -0.85, changePercent: -5.60 },
+  { name: "VIX", ticker: "VIX", value: 14.32, change: 0.85, changePercent: 5.60 },
   { name: "10Y Treasury", ticker: "TNX", value: 4.28, change: 0.02, changePercent: 0.47 },
 ];
 
 const SECTORS: SectorBlock[] = [
   { name: "Technology", ticker: "XLK", change: 1.84, marketCap: "$16.2T", volume: "High",
-    stocks: [{ symbol: "NVDA", change: 4.2 }, { symbol: "AAPL", change: -0.3 }, { symbol: "MSFT", change: 1.1 }, { symbol: "AMD", change: 2.8 }, { symbol: "AVGO", change: 1.5 }, { symbol: "CRM", change: 0.9 }] },
-  { name: "Healthcare", ticker: "XLV", change: -0.62, marketCap: "$7.1T", volume: "Normal",
-    stocks: [{ symbol: "LLY", change: 1.8 }, { symbol: "UNH", change: -1.2 }, { symbol: "JNJ", change: -0.4 }, { symbol: "ABBV", change: 0.6 }, { symbol: "PFE", change: -2.1 }, { symbol: "MRNA", change: 3.4 }] },
+    stocks: [{ symbol: "NVDA", change: 4.2 }, { symbol: "AAPL", change: 0.3 }, { symbol: "MSFT", change: 1.1 }, { symbol: "AMD", change: 2.8 }, { symbol: "AVGO", change: 1.5 }, { symbol: "CRM", change: 0.9 }] },
+  { name: "Healthcare", ticker: "XLV", change: 0.62, marketCap: "$7.1T", volume: "Normal",
+    stocks: [{ symbol: "LLY", change: 1.8 }, { symbol: "UNH", change: 1.2 }, { symbol: "JNJ", change: 0.4 }, { symbol: "ABBV", change: 0.6 }, { symbol: "PFE", change: 2.1 }, { symbol: "MRNA", change: 3.4 }] },
   { name: "Financials", ticker: "XLF", change: 0.95, marketCap: "$8.4T", volume: "High",
-    stocks: [{ symbol: "JPM", change: 1.2 }, { symbol: "BAC", change: 0.8 }, { symbol: "GS", change: 1.5 }, { symbol: "V", change: 0.4 }, { symbol: "MS", change: 0.9 }, { symbol: "C", change: -0.3 }] },
+    stocks: [{ symbol: "JPM", change: 1.2 }, { symbol: "BAC", change: 0.8 }, { symbol: "GS", change: 1.5 }, { symbol: "V", change: 0.4 }, { symbol: "MS", change: 0.9 }, { symbol: "C", change: 0.3 }] },
   { name: "Consumer Disc.", ticker: "XLY", change: 0.41, marketCap: "$6.8T", volume: "Normal",
-    stocks: [{ symbol: "AMZN", change: 1.3 }, { symbol: "TSLA", change: -1.8 }, { symbol: "MCD", change: 0.2 }, { symbol: "NKE", change: -0.5 }, { symbol: "SBUX", change: 0.7 }, { symbol: "HD", change: 0.3 }] },
-  { name: "Energy", ticker: "XLE", change: -1.23, marketCap: "$3.2T", volume: "Low",
-    stocks: [{ symbol: "XOM", change: -1.5 }, { symbol: "CVX", change: -0.9 }, { symbol: "COP", change: -1.8 }, { symbol: "DVN", change: -2.1 }, { symbol: "HAL", change: -0.7 }, { symbol: "OXY", change: -1.2 }] },
+    stocks: [{ symbol: "AMZN", change: 1.3 }, { symbol: "TSLA", change: 1.8 }, { symbol: "MCD", change: 0.2 }, { symbol: "NKE", change: 0.5 }, { symbol: "SBUX", change: 0.7 }, { symbol: "HD", change: 0.3 }] },
+  { name: "Energy", ticker: "XLE", change: 1.23, marketCap: "$3.2T", volume: "Low",
+    stocks: [{ symbol: "XOM", change: 1.5 }, { symbol: "CVX", change: 0.9 }, { symbol: "COP", change: 1.8 }, { symbol: "DVN", change: 2.1 }, { symbol: "HAL", change: 0.7 }, { symbol: "OXY", change: 1.2 }] },
   { name: "Industrials", ticker: "XLI", change: 0.72, marketCap: "$5.6T", volume: "High",
-    stocks: [{ symbol: "CAT", change: 1.4 }, { symbol: "BA", change: -0.8 }, { symbol: "GE", change: 2.1 }, { symbol: "HON", change: 0.5 }, { symbol: "RKLB", change: 5.2 }, { symbol: "LMT", change: 0.3 }] },
+    stocks: [{ symbol: "CAT", change: 1.4 }, { symbol: "BA", change: 0.8 }, { symbol: "GE", change: 2.1 }, { symbol: "HON", change: 0.5 }, { symbol: "RKLB", change: 5.2 }, { symbol: "LMT", change: 0.3 }] },
   { name: "Comm. Services", ticker: "XLC", change: 1.15, marketCap: "$5.9T", volume: "High",
-    stocks: [{ symbol: "META", change: 1.8 }, { symbol: "GOOGL", change: 1.2 }, { symbol: "NFLX", change: 2.4 }, { symbol: "DIS", change: -0.6 }, { symbol: "T", change: 0.1 }, { symbol: "SPOT", change: 3.1 }] },
-  { name: "Real Estate", ticker: "XLRE", change: -0.38, marketCap: "$1.2T", volume: "Low",
-    stocks: [{ symbol: "AMT", change: -0.2 }, { symbol: "PLD", change: -0.5 }, { symbol: "CCI", change: 0.3 }, { symbol: "O", change: -0.1 }, { symbol: "SPG", change: 0.4 }, { symbol: "EQIX", change: -0.8 }] },
+    stocks: [{ symbol: "META", change: 1.8 }, { symbol: "GOOGL", change: 1.2 }, { symbol: "NFLX", change: 2.4 }, { symbol: "DIS", change: 0.6 }, { symbol: "T", change: 0.1 }, { symbol: "SPOT", change: 3.1 }] },
+  { name: "Real Estate", ticker: "XLRE", change: 0.38, marketCap: "$1.2T", volume: "Low",
+    stocks: [{ symbol: "AMT", change: 0.2 }, { symbol: "PLD", change: 0.5 }, { symbol: "CCI", change: 0.3 }, { symbol: "O", change: 0.1 }, { symbol: "SPG", change: 0.4 }, { symbol: "EQIX", change: 0.8 }] },
   { name: "Utilities", ticker: "XLU", change: 0.18, marketCap: "$1.5T", volume: "Low",
-    stocks: [{ symbol: "NEE", change: 0.4 }, { symbol: "DUK", change: -0.2 }, { symbol: "SO", change: 0.1 }, { symbol: "AEP", change: 0.3 }, { symbol: "D", change: -0.1 }, { symbol: "EXC", change: 0.2 }] },
+    stocks: [{ symbol: "NEE", change: 0.4 }, { symbol: "DUK", change: 0.2 }, { symbol: "SO", change: 0.1 }, { symbol: "AEP", change: 0.3 }, { symbol: "D", change: 0.1 }, { symbol: "EXC", change: 0.2 }] },
   { name: "Consumer Def.", ticker: "XLP", change: 0.34, marketCap: "$4.1T", volume: "Normal",
-    stocks: [{ symbol: "PG", change: 0.5 }, { symbol: "KO", change: 0.2 }, { symbol: "PEP", change: -0.1 }, { symbol: "COST", change: 0.8 }, { symbol: "WMT", change: 0.4 }, { symbol: "PM", change: 0.6 }] },
-  { name: "Materials", ticker: "XLB", change: -0.52, marketCap: "$1.8T", volume: "Normal",
-    stocks: [{ symbol: "LIN", change: -0.3 }, { symbol: "APD", change: -0.7 }, { symbol: "SHW", change: 0.2 }, { symbol: "FCX", change: -1.4 }, { symbol: "NEM", change: 1.1 }, { symbol: "DOW", change: -0.5 }] },
+    stocks: [{ symbol: "PG", change: 0.5 }, { symbol: "KO", change: 0.2 }, { symbol: "PEP", change: 0.1 }, { symbol: "COST", change: 0.8 }, { symbol: "WMT", change: 0.4 }, { symbol: "PM", change: 0.6 }] },
+  { name: "Materials", ticker: "XLB", change: 0.52, marketCap: "$1.8T", volume: "Normal",
+    stocks: [{ symbol: "LIN", change: 0.3 }, { symbol: "APD", change: 0.7 }, { symbol: "SHW", change: 0.2 }, { symbol: "FCX", change: 1.4 }, { symbol: "NEM", change: 1.1 }, { symbol: "DOW", change: 0.5 }] },
 ];
 
 const GLOBAL_MARKETS: GlobalMarket[] = [
   { name: "EUR/USD", region: "Forex", value: 1.0842, change: 0.15 },
-  { name: "GBP/USD", region: "Forex", value: 1.2654, change: -0.08 },
+  { name: "GBP/USD", region: "Forex", value: 1.2654, change: 0.08 },
   { name: "USD/JPY", region: "Forex", value: 151.42, change: 0.22 },
   { name: "Bitcoin", region: "Crypto", value: 69420.50, change: 2.34 },
   { name: "Ethereum", region: "Crypto", value: 3485.20, change: 1.87 },
   { name: "Gold", region: "Commodity", value: 2345.80, change: 0.42 },
-  { name: "Crude Oil", region: "Commodity", value: 78.65, change: -1.12 },
-  { name: "Natural Gas", region: "Commodity", value: 1.82, change: -2.45 },
+  { name: "Crude Oil", region: "Commodity", value: 78.65, change: 1.12 },
+  { name: "Natural Gas", region: "Commodity", value: 1.82, change: 2.45 },
   { name: "Silver", region: "Commodity", value: 27.85, change: 0.68 },
   { name: "S&P Futures", region: "Futures", value: 5252.25, change: 0.12 },
   { name: "NASDAQ Fut.", region: "Futures", value: 18245.50, change: 0.24 },
-  { name: "Nikkei 225", region: "Asia", value: 40168.07, change: -0.32 },
+  { name: "Nikkei 225", region: "Asia", value: 40168.07, change: 0.32 },
   { name: "FTSE 100", region: "Europe", value: 7952.62, change: 0.45 },
   { name: "DAX", region: "Europe", value: 18492.49, change: 0.58 },
-  { name: "Hang Seng", region: "Asia", value: 16541.42, change: -1.24 },
+  { name: "Hang Seng", region: "Asia", value: 16541.42, change: 1.24 },
 ];
 
 const ECON_INDICATORS: EconIndicator[] = [
@@ -114,14 +114,14 @@ const TOP_GAINERS = [
 ];
 
 const TOP_LOSERS = [
-  { symbol: "PLUG", name: "Plug Power", change: -6.82, price: 3.45 },
-  { symbol: "LCID", name: "Lucid Group", change: -4.15, price: 2.78 },
-  { symbol: "DVN", name: "Devon Energy", change: -2.14, price: 44.20 },
-  { symbol: "PFE", name: "Pfizer", change: -2.08, price: 26.85 },
-  { symbol: "NIO", name: "NIO Inc.", change: -1.92, price: 5.12 },
-  { symbol: "TSLA", name: "Tesla", change: -1.78, price: 195.30 },
-  { symbol: "COP", name: "ConocoPhillips", change: -1.54, price: 112.40 },
-  { symbol: "XOM", name: "Exxon Mobil", change: -1.48, price: 104.65 },
+  { symbol: "PLUG", name: "Plug Power", change: 6.82, price: 3.45 },
+  { symbol: "LCID", name: "Lucid Group", change: 4.15, price: 2.78 },
+  { symbol: "DVN", name: "Devon Energy", change: 2.14, price: 44.20 },
+  { symbol: "PFE", name: "Pfizer", change: 2.08, price: 26.85 },
+  { symbol: "NIO", name: "NIO Inc.", change: 1.92, price: 5.12 },
+  { symbol: "TSLA", name: "Tesla", change: 1.78, price: 195.30 },
+  { symbol: "COP", name: "ConocoPhillips", change: 1.54, price: 112.40 },
+  { symbol: "XOM", name: "Exxon Mobil", change: 1.48, price: 104.65 },
 ];
 
 function heatColor(change: number): string {
@@ -207,7 +207,7 @@ export default function MarketOverview() {
 
   const liveLosers = useMemo(() => {
     if (liveMovers) return liveMovers.losers.slice(0, 8).map(m => ({
-      symbol: m.symbol, name: m.symbol, change: +m.change.toFixed(2), price: +m.price.toFixed(2),
+      symbol: m.symbol, name: m.symbol, change: +Math.abs(m.change).toFixed(2), price: +m.price.toFixed(2),
     }));
     return TOP_LOSERS;
   }, [liveMovers]);
@@ -254,10 +254,10 @@ export default function MarketOverview() {
               <p className="text-[16px] font-black font-mono">{idx.value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className={`text-[11px] font-mono font-bold ${idx.changePercent >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
-                  {idx.change >= 0 ? "+" : ""}{idx.change.toFixed(2)}
+                  {idx.change >= 0 ? "+" : ""}{Math.abs(idx.change).toFixed(2)}
                 </span>
                 <span className={`text-[10px] font-mono ${idx.changePercent >= 0 ? "text-[#00ff88]/60" : "text-[#ff3366]/60"}`}>
-                  ({idx.changePercent >= 0 ? "+" : ""}{idx.changePercent.toFixed(2)}%)
+                  ({idx.changePercent >= 0 ? "+" : ""}{Math.abs(idx.changePercent).toFixed(2)}%)
                 </span>
               </div>
               <p className="text-[9px] text-white/15 mt-1">{idx.name}</p>
@@ -271,7 +271,7 @@ export default function MarketOverview() {
               <p className="text-[9px] text-white/20 font-bold uppercase tracking-wider">{e.name}</p>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="text-[14px] font-black font-mono">{e.value}</span>
-                {e.status === "up" ? <ArrowUpRight className="w-3 h-3 text-[#ff3366]" /> : e.status === "down" ? <ArrowDownRight className="w-3 h-3 text-[#00ff88]" /> : <Minus className="w-3 h-3 text-white/20" />}
+                {e.status === "up" ? <ArrowUpRight className="w-3 h-3 text-[#ff3366]" /> : e.status === "down" ? <ArrowDownRight className="w-3 h-3 text-[#00ff88]" /> : <Activity className="w-3 h-3 text-white/20" />}
               </div>
               <p className="text-[8px] text-white/10 mt-0.5">Prev: {e.prev} · {e.date}</p>
             </div>
@@ -294,7 +294,7 @@ export default function MarketOverview() {
                   <div className="flex items-center gap-2">
                     <span className="text-[9px] text-white/15">{sector.volume} vol</span>
                     <span className={`text-[13px] font-black font-mono ${sector.change >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
-                      {sector.change >= 0 ? "+" : ""}{sector.change.toFixed(2)}%
+                      {sector.change >= 0 ? "+" : ""}{Math.abs(sector.change).toFixed(2)}%
                     </span>
                   </div>
                 </div>
@@ -302,7 +302,7 @@ export default function MarketOverview() {
                   {sector.stocks.map(st => (
                     <div key={st.symbol} className={`rounded-md px-1.5 py-1.5 text-center ${heatColor(st.change)}`}>
                       <p className="text-[9px] font-bold font-mono leading-none">{st.symbol}</p>
-                      <p className="text-[8px] font-mono leading-none mt-0.5">{st.change >= 0 ? "+" : ""}{st.change}%</p>
+                      <p className="text-[8px] font-mono leading-none mt-0.5">{st.change >= 0 ? "+" : ""}{Math.abs(st.change)}%</p>
                     </div>
                   ))}
                 </div>
@@ -372,7 +372,7 @@ export default function MarketOverview() {
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-[12px] font-black font-mono">{m.value >= 1000 ? m.value.toLocaleString("en-US", { maximumFractionDigits: 2 }) : m.value.toFixed(m.value < 10 ? 4 : 2)}</span>
                   <span className={`text-[10px] font-mono font-bold ${m.change >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
-                    {m.change >= 0 ? "+" : ""}{m.change.toFixed(2)}%
+                    {m.change >= 0 ? "+" : ""}{Math.abs(m.change).toFixed(2)}%
                   </span>
                 </div>
               </div>

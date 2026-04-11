@@ -15,7 +15,7 @@ export default function Disclaimer() {
           {/* ATTORNEY REVIEW: Verify this disclaimer is sufficient for your regulatory jurisdiction(s) */}
           <section>
             <div className="bg-[#ff3366]/5 border border-[#ff3366]/20 rounded-xl p-6">
-              <h2 className="text-xl font-bold text-[#ff3366] mb-3">IMPORTANT — PLEASE READ CAREFULLY</h2>
+              <h2 className="text-xl font-bold text-[#ff3366] mb-3">IMPORTANT | PLEASE READ CAREFULLY</h2>
               <p className="text-white/80">The information provided by EntangleWealth is for <strong className="text-white">educational and informational purposes only</strong>. Nothing on this platform constitutes financial advice, investment advice, trading advice, or any other form of professional advice. You should not make any financial decisions based solely on the information provided here.</p>
             </div>
           </section>
@@ -100,7 +100,7 @@ export default function Disclaimer() {
             <h2 className="text-xl font-bold text-white mb-3">9. Contact</h2>
             <p>For questions about this disclaimer, contact:</p>
             <div className="mt-3 bg-white/[0.02] border border-white/[0.06] rounded-xl p-5">
-              <p className="font-bold text-white">EntangleWealth — Legal</p>
+              <p className="font-bold text-white">EntangleWealth | Legal</p>
               <p className="mt-1">Email: legal@entanglewealth.com</p>
             </div>
           </section>

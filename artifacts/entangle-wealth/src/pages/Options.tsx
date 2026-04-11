@@ -292,9 +292,9 @@ export default function Options() {
                               <span className="text-xs text-muted-foreground">{new Date(item.exp).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric'})}</span>
                             </div>
                           )}
-                          {visibleCols.delta && <div className="w-20 text-right font-mono text-sm">{item.delta.toFixed(2)}</div>}
-                          {visibleCols.gamma && <div className="w-20 text-right font-mono text-sm">{item.gamma.toFixed(2)}</div>}
-                          {visibleCols.theta && <div className="w-20 text-right font-mono text-sm text-destructive">{item.theta.toFixed(2)}</div>}
+                          {visibleCols.delta && <div className="w-20 text-right font-mono text-sm">{Math.abs(item.delta).toFixed(2)}</div>}
+                          {visibleCols.gamma && <div className="w-20 text-right font-mono text-sm">{Math.abs(item.gamma).toFixed(2)}</div>}
+                          {visibleCols.theta && <div className="w-20 text-right font-mono text-sm text-destructive">{Math.abs(item.theta).toFixed(2)}</div>}
                           {visibleCols.ivRank && (
                             <div className="w-28 flex items-center justify-center gap-2">
                               <span className="font-mono text-sm w-8 text-right">{item.ivRank}%</span>
@@ -350,15 +350,15 @@ export default function Options() {
                             <div className="grid grid-cols-2 gap-3">
                               <div className="glass-panel rounded-lg p-3 text-center">
                                 <p className="text-[10px] text-muted-foreground uppercase">Delta</p>
-                                <p className="text-lg font-mono font-bold">{item.delta.toFixed(2)}</p>
+                                <p className="text-lg font-mono font-bold">{Math.abs(item.delta).toFixed(2)}</p>
                               </div>
                               <div className="glass-panel rounded-lg p-3 text-center">
                                 <p className="text-[10px] text-muted-foreground uppercase">Gamma</p>
-                                <p className="text-lg font-mono font-bold">{item.gamma.toFixed(2)}</p>
+                                <p className="text-lg font-mono font-bold">{Math.abs(item.gamma).toFixed(2)}</p>
                               </div>
                               <div className="glass-panel rounded-lg p-3 text-center">
                                 <p className="text-[10px] text-muted-foreground uppercase">Theta</p>
-                                <p className="text-lg font-mono font-bold text-destructive">{item.theta.toFixed(2)}</p>
+                                <p className="text-lg font-mono font-bold text-destructive">{Math.abs(item.theta).toFixed(2)}</p>
                               </div>
                               <div className="glass-panel rounded-lg p-3 text-center">
                                 <p className="text-[10px] text-muted-foreground uppercase">IV Rank</p>
@@ -385,7 +385,7 @@ export default function Options() {
                                   ? "Multiple analysis methods confirm this signal. Strong institutional activity detected."
                                   : item.strength >= 70
                                   ? "Moderate agreement across analysis methods. Worth monitoring."
-                                  : "Limited agreement. Exercise caution — fewer methods confirm this signal."}
+                                  : "Limited agreement. Exercise caution | fewer methods confirm this signal."}
                               </p>
                             </div>
                           </div>
@@ -400,7 +400,7 @@ export default function Options() {
         )}
 
         <div className="mt-8 p-4 rounded-lg border border-white/5 bg-white/[0.01]">
-          <p className="text-xs text-muted-foreground/60 text-center">Options trading carries substantial risk. The data shown above is for demonstration purposes. Signal strength is a composite score based on volume, premium size, and IV rank — it is not a recommendation to trade.</p>
+          <p className="text-xs text-muted-foreground/60 text-center">Options trading carries substantial risk. The data shown above is for demonstration purposes. Signal strength is a composite score based on volume, premium size, and IV rank | it is not a recommendation to trade.</p>
         </div>
       </div>
       <PaperTradingWidget variant="floating" />

@@ -291,7 +291,7 @@ export default function Achievements() {
                     {badge.isSecret && !badge.earned ? "???" : badge.name}
                   </h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    {badge.isSecret && !badge.earned ? "Secret badge — keep exploring!" : badge.description}
+                    {badge.isSecret && !badge.earned ? "Secret badge | keep exploring!" : badge.description}
                   </p>
                   <div className="flex items-center justify-center gap-1">
                     <Zap className="w-3 h-3 text-yellow-400" />

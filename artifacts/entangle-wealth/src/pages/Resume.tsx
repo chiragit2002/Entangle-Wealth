@@ -368,7 +368,7 @@ export default function Resume() {
                 <span className="text-primary">Entangled</span> Résumé Builder
               </h1>
               <p className="text-muted-foreground mt-1 max-w-xl">
-                Your career particles — experience, skills, financial data — entangled into one coherent professional wavefunction.
+                Your career particles | experience, skills, financial data | entangled into one coherent professional wavefunction.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -407,9 +407,9 @@ export default function Resume() {
                 <div>
                   <p className="text-sm font-medium">Quantum Coherence Score</p>
                   <p className="text-xs text-muted-foreground">
-                    {completionScore < 40 ? "Low coherence — add more data to strengthen your wavefunction" :
-                     completionScore < 70 ? "Moderate coherence — connect LinkedIn or accounting for full entanglement" :
-                     completionScore < 90 ? "Strong coherence — nearly fully entangled" :
+                    {completionScore < 40 ? "Low coherence | add more data to strengthen your wavefunction" :
+                     completionScore < 70 ? "Moderate coherence | connect LinkedIn or accounting for full entanglement" :
+                     completionScore < 90 ? "Strong coherence | nearly fully entangled" :
                      "Maximum entanglement achieved"}
                   </p>
                 </div>
@@ -545,7 +545,7 @@ export default function Resume() {
                   { step: "1", title: "Paste Your Profile URL", desc: "We observe your public LinkedIn profile to collapse the quantum state of your career data." },
                   { step: "2", title: "AI Parses & Enhances", desc: "Quantum AI models analyze your experience and rewrite weak bullets into achievement-focused statements." },
                   { step: "3", title: "Auto-Populate Your Résumé", desc: "Experience, education, skills, and certifications flow into your résumé builder instantly." },
-                  { step: "4", title: "Fine-Tune & Export", desc: "Review the entangled data, make adjustments, then export as PDF — ready for any opportunity." },
+                  { step: "4", title: "Fine-Tune & Export", desc: "Review the entangled data, make adjustments, then export as PDF | ready for any opportunity." },
                 ].map((step, i) => (
                   <div key={i} className="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors">
                     <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center text-primary font-bold text-xs shrink-0">
@@ -671,7 +671,7 @@ export default function Resume() {
                   <p className="text-sm font-medium text-gold">Privacy & Security</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     All financial data is encrypted end-to-end and only used to generate résumé bullet points.
-                    We never store raw financial records — only the quantum-distilled metrics that strengthen your professional profile.
+                    We never store raw financial records | only the quantum-distilled metrics that strengthen your professional profile.
                     You can disconnect any platform at any time to fully disentangle your data.
                   </p>
                 </div>
@@ -734,7 +734,7 @@ export default function Resume() {
               {expandedSections.summary && (
                 <div className="glass-panel p-4">
                   <textarea
-                    placeholder="Write a brief professional summary — 2-3 sentences describing who you are, what you do, and your biggest professional strengths..."
+                    placeholder="Write a brief professional summary | 2-3 sentences describing who you are, what you do, and your biggest professional strengths..."
                     value={resume.summary}
                     onChange={(e) => setResume(prev => ({ ...prev, summary: e.target.value }))}
                     className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white placeholder:text-muted-foreground/50 min-h-[100px] resize-none focus:outline-none focus:border-primary/50"
@@ -877,7 +877,7 @@ export default function Resume() {
                 <div className="text-sm text-muted-foreground mb-3 flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    Live Preview — {templateConfig.name}
+                    Live Preview | {templateConfig.name}
                   </span>
                   <span className="text-xs font-mono text-primary/60">QUANTUM STATE: SUPERPOSITION</span>
                 </div>
@@ -917,11 +917,11 @@ export default function Resume() {
                           <div className="flex justify-between items-baseline">
                             <div>
                               <span className="font-semibold text-sm">{exp.title || "Position"}</span>
-                              <span className="text-gray-500 text-sm"> — {exp.company || "Company"}</span>
+                              <span className="text-gray-500 text-sm"> | {exp.company || "Company"}</span>
                               {exp.isGigWork && <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded ml-2">Gig</span>}
                             </div>
                             <span className="text-[10px] text-gray-400 whitespace-nowrap ml-2">
-                              {exp.startDate || "Start"} — {exp.isCurrent ? "Present" : exp.endDate || "End"}
+                              {exp.startDate || "Start"} | {exp.isCurrent ? "Present" : exp.endDate || "End"}
                             </span>
                           </div>
                           {exp.location && <p className="text-[10px] text-gray-400">{exp.location}</p>}
@@ -941,9 +941,9 @@ export default function Resume() {
                           <div className="flex justify-between items-baseline">
                             <div>
                               <span className="font-semibold text-sm">{edu.school}</span>
-                              {edu.degree && <span className="text-gray-500 text-sm"> — {edu.degree}{edu.field ? `, ${edu.field}` : ""}</span>}
+                              {edu.degree && <span className="text-gray-500 text-sm"> | {edu.degree}{edu.field ? `, ${edu.field}` : ""}</span>}
                             </div>
-                            <span className="text-[10px] text-gray-400">{edu.startDate} — {edu.endDate}</span>
+                            <span className="text-[10px] text-gray-400">{edu.startDate} | {edu.endDate}</span>
                           </div>
                         </div>
                       ))}

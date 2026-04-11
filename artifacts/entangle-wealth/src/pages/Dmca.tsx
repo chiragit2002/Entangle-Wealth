@@ -35,7 +35,7 @@ export default function Dmca() {
             <h2 className="text-xl font-bold text-white mb-3">3. Designated DMCA Agent</h2>
             <p>All DMCA takedown notices should be sent to our designated agent:</p>
             <div className="mt-3 bg-white/[0.02] border border-white/[0.06] rounded-xl p-5">
-              <p className="font-bold text-white">DMCA Agent — EntangleWealth</p>
+              <p className="font-bold text-white">DMCA Agent | EntangleWealth</p>
               <p className="mt-1">Email: dmca@entanglewealth.com</p>
               <p>Subject line: DMCA Takedown Notice</p>
             </div>

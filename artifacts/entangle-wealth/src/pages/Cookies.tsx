@@ -12,7 +12,7 @@ export default function Cookies() {
         <p className="text-sm text-white/20 mb-10 font-mono">Last Updated: April 11, 2026</p>
 
         <div className="space-y-10 text-white/60 leading-relaxed">
-          {/* ATTORNEY REVIEW: Section 1 — verify scope and legal definitions for your jurisdiction */}
+          {/* ATTORNEY REVIEW: Section 1 | verify scope and legal definitions for your jurisdiction */}
           <section>
             <h2 className="text-xl font-bold text-white mb-3">1. What Are Cookies</h2>
             <p>Cookies are small text files that are placed on your computer or mobile device when you visit a website. They are widely used to make websites work more efficiently, provide a better user experience, and give website owners usage information.</p>
@@ -84,7 +84,7 @@ export default function Cookies() {
             <h2 className="text-xl font-bold text-white mb-3">6. Contact Us</h2>
             <p>If you have questions about our use of cookies, please contact us at:</p>
             <div className="mt-3 bg-white/[0.02] border border-white/[0.06] rounded-xl p-5">
-              <p className="font-bold text-white">EntangleWealth — Privacy</p>
+              <p className="font-bold text-white">EntangleWealth | Privacy</p>
               <p className="mt-1">Email: privacy@entanglewealth.com</p>
             </div>
           </section>

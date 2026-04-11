@@ -112,7 +112,7 @@ export function ReferralSection() {
         <Trophy className="w-5 h-5 text-[#f5c842] shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="text-xs font-bold text-[#f5c842]">$36,000 Referral Bonus Pool</p>
-          <p className="text-[10px] text-white/50 leading-tight mt-0.5">Invite friends — earn your share of the $36K pool + 5 entries into the $50K giveaway per referral.</p>
+          <p className="text-[10px] text-white/50 leading-tight mt-0.5">Invite friends | earn your share of the $36K pool + 5 entries into the $50K giveaway per referral.</p>
         </div>
         <Link href="/giveaway">
           <button className="shrink-0 text-[#f5c842]/60 hover:text-[#f5c842] transition-colors">
@@ -181,7 +181,7 @@ export function ReferralSection() {
         </div>
         {nextMilestone && (
           <p className="text-[10px] text-muted-foreground">
-            {referralCount} / {progressMilestone.threshold} referrals — {nextMilestone.remaining} more to unlock {progressMilestone.label}
+            {referralCount} / {progressMilestone.threshold} referrals | {nextMilestone.remaining} more to unlock {progressMilestone.label}
           </p>
         )}
 

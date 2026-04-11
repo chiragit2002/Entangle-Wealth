@@ -410,7 +410,7 @@ export default function WealthSim() {
             <TrendingUp className="w-4 h-4 text-[#00D4FF]" />
             <span className="text-[11px] font-mono font-bold text-[#00D4FF] tracking-wider">WEALTH SIMULATION ENGINE</span>
             <div className="h-3 w-px bg-white/10" />
-            <span className="text-[9px] font-mono text-white/25">All projections are simulations only — not financial advice</span>
+            <span className="text-[9px] font-mono text-white/25">All projections are simulations only | not financial advice</span>
           </div>
           {xpEarned > 0 && (
             <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-[#f5c842]">
@@ -425,7 +425,7 @@ export default function WealthSim() {
             <div className="bg-gradient-to-r from-[#0a0a14] via-[#0d0d1f] to-[#0a0a14] border border-white/[0.08] rounded-sm p-6 text-center">
               <div className="text-5xl mb-3">📈</div>
               <h1 className="text-2xl font-black text-white font-mono mb-2">Wealth Simulation Engine</h1>
-              <p className="text-white/40 text-sm max-w-lg mx-auto mb-6">See how your money grows over time. Adjust your savings rate, investment allocation, and time horizon — watch your future net worth update in real time.</p>
+              <p className="text-white/40 text-sm max-w-lg mx-auto mb-6">See how your money grows over time. Adjust your savings rate, investment allocation, and time horizon | watch your future net worth update in real time.</p>
               <div className="grid grid-cols-3 gap-3 max-w-lg mx-auto mb-6">
                 {[
                   { icon: <DollarSign className="w-4 h-4" />, label: "Compound Growth", desc: "See contributions vs. returns" },

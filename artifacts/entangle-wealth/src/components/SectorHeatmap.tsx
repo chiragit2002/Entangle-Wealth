@@ -52,14 +52,14 @@ export function SectorHeatmap() {
               onBlur={() => setHoveredSector(null)}
               tabIndex={0}
               role="button"
-              aria-label={`${sector.sector}: ${sector.change >= 0 ? "+" : ""}${sector.change.toFixed(1)}% change, ${sector.weight}% weight`}
+              aria-label={`${sector.sector}: ${sector.change >= 0 ? "+" : ""}${Math.abs(sector.change).toFixed(1)}% change, ${sector.weight}% weight`}
             >
               <div className="flex flex-col h-full justify-between">
                 <span className="text-[9px] text-white/60 leading-tight">{sector.sector}</span>
                 <div>
                   <span className="text-[10px] font-mono text-white/40">{sector.ticker}</span>
                   <div className={`text-sm font-mono font-bold ${sector.change >= 0 ? "text-primary" : "text-red-400"}`}>
-                    {sector.change >= 0 ? "+" : ""}{sector.change.toFixed(1)}%
+                    {sector.change >= 0 ? "+" : ""}{Math.abs(sector.change).toFixed(1)}%
                   </div>
                 </div>
               </div>

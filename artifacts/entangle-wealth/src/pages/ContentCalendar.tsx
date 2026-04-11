@@ -473,7 +473,7 @@ function ExportModal({
         </div>
 
         <p className="text-[9px] text-muted-foreground">
-          CSV format: Date, Time, Platform, Content, Status — compatible with Buffer, Hootsuite, and Later.
+          CSV format: Date, Time, Platform, Content, Status | compatible with Buffer, Hootsuite, and Later.
         </p>
       </div>
     </div>

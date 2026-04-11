@@ -321,7 +321,7 @@ export default function Screener() {
                   </div>
                   <span className="text-[13px] font-mono font-bold text-right">${stock.price.toFixed(2)}</span>
                   <span className={`text-[12px] font-mono font-bold text-right ${stock.change >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
-                    {stock.change >= 0 ? "+" : ""}{stock.change.toFixed(2)}%
+                    {stock.change >= 0 ? "+" : ""}{Math.abs(stock.change).toFixed(2)}%
                   </span>
                   <span className="text-[10px] font-mono text-white/25 text-right">{stock.volume}</span>
                   <span className="text-[10px] font-mono text-white/25 text-right">{stock.marketCap}</span>

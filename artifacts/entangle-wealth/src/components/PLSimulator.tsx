@@ -98,10 +98,10 @@ export function PLSimulator() {
               </linearGradient>
             </defs>
             <XAxis dataKey="price" tick={{ fill: "#555", fontSize: 9, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} />
-            <YAxis tick={{ fill: "#555", fontSize: 9, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} />
+            <YAxis tick={{ fill: "#555", fontSize: 9, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${Math.abs(v).toLocaleString()}`} />
             <Tooltip
               contentStyle={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontFamily: "JetBrains Mono", fontSize: 11 }}
-              formatter={(value: number) => [`$${value.toLocaleString()}`, "P&L"]}
+              formatter={(value: number) => [`$${Math.abs(value).toLocaleString()}`, "P&L"]}
               labelFormatter={(label) => `Price: $${label}`}
             />
             <ReferenceLine y={0} stroke="rgba(255,255,255,0.15)" strokeDasharray="3 3" />
@@ -114,7 +114,7 @@ export function PLSimulator() {
       <div className="grid grid-cols-3 gap-3">
         <div className="text-center">
           <div className="text-[9px] font-mono text-muted-foreground uppercase">Max Loss</div>
-          <div className="text-sm font-mono font-bold text-red-400">-${maxLoss.toLocaleString()}</div>
+          <div className="text-sm font-mono font-bold text-red-400">${maxLoss.toLocaleString()}</div>
         </div>
         <div className="text-center">
           <div className="text-[9px] font-mono text-muted-foreground uppercase">Breakeven</div>

@@ -70,7 +70,7 @@ export function StreakNudge() {
           </div>
           <div>
             <p className="text-[11px] font-bold text-orange-300">Keep your {streak}-day streak alive!</p>
-            <p className="text-[9px] font-mono text-white/30">You haven't checked in today — your streak is at risk</p>
+            <p className="text-[9px] font-mono text-white/30">You haven't checked in today | your streak is at risk</p>
           </div>
         </div>
         <div className="flex items-center gap-2">

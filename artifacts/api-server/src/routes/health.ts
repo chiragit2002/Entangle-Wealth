@@ -8,6 +8,10 @@ const router: IRouter = Router();
 const startTime = Date.now();
 let activeConnections = 0;
 
+export function getActiveConnectionCount(): number {
+  return activeConnections;
+}
+
 export function trackConnections(server: Server): void {
   server.on("connection", (socket: Socket) => {
     activeConnections++;

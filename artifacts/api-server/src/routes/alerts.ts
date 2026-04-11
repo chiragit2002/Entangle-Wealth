@@ -4,6 +4,8 @@ import { db } from "@workspace/db";
 import { alertsTable, alertHistoryTable, usersTable } from "@workspace/db/schema";
 import { eq, and, desc, gte, sql, count } from "drizzle-orm";
 import { logger } from "../lib/logger";
+import { retryWithBackoff } from "../lib/retryWithBackoff";
+import { CircuitBreaker } from "../lib/circuitBreaker";
 
 const router = Router();
 
@@ -55,15 +57,29 @@ router.get("/alerts", requireAuth, async (req: AuthenticatedRequest, res: Respon
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
   try {
+    const limit = Math.min(Math.max(parseInt(String(req.query.limit)) || 50, 1), 50);
+    const offset = Math.max(parseInt(String(req.query.offset)) || 0, 0);
+
+    const [totalResult] = await db
+      .select({ c: count() })
+      .from(alertsTable)
+      .where(eq(alertsTable.userId, userId));
+
     const rows = await db
       .select()
       .from(alertsTable)
       .where(eq(alertsTable.userId, userId))
-      .orderBy(desc(alertsTable.createdAt));
+      .orderBy(desc(alertsTable.createdAt))
+      .limit(limit)
+      .offset(offset);
+
     const tier = await getUserTier(userId);
     const dailyCount = await getDailyAlertCount(userId);
     res.json({
       alerts: rows,
+      total: totalResult?.c || 0,
+      limit,
+      offset,
       tier,
       dailyLimit: tier === "free" ? FREE_DAILY_LIMIT : null,
       dailyUsed: dailyCount,
@@ -284,6 +300,11 @@ export function pushAlertToUser(userId: string, data: Record<string, unknown>) {
 
 const ALPACA_DATA_URL = "https://data.alpaca.markets";
 
+const alertsAlpacaCircuit = new CircuitBreaker("alerts-alpaca", {
+  failureThreshold: 5,
+  resetTimeoutMs: 60_000,
+});
+
 function alpacaHeaders() {
   const keyId = process.env.ALPACA_KEY_ID || process.env.ALPACA_API_KEY || "";
   const secret = process.env.ALPACA_API_SECRET || "";
@@ -297,10 +318,15 @@ function alpacaHeaders() {
 async function fetchSnapshots(symbols: string[]): Promise<Record<string, SnapshotData>> {
   if (symbols.length === 0) return {};
   try {
-    const url = `${ALPACA_DATA_URL}/v2/stocks/snapshots?symbols=${encodeURIComponent(symbols.join(","))}`;
-    const res = await fetch(url, { headers: alpacaHeaders() });
-    if (!res.ok) return {};
-    return (await res.json()) as Record<string, SnapshotData>;
+    return await alertsAlpacaCircuit.execute(
+      () =>
+        retryWithBackoff(async () => {
+          const url = `${ALPACA_DATA_URL}/v2/stocks/snapshots?symbols=${encodeURIComponent(symbols.join(","))}`;
+          const res = await fetch(url, { headers: alpacaHeaders() });
+          if (!res.ok) throw new Error(`Alpaca snapshots ${res.status}`);
+          return (await res.json()) as Record<string, SnapshotData>;
+        }, { label: "alpaca-alerts-snapshots", maxRetries: 4 })
+    );
   } catch {
     return {};
   }
@@ -360,11 +386,16 @@ function computeBollinger(closes: number[]): { upper: number; lower: number; pri
 
 async function fetchBars(symbol: string): Promise<number[]> {
   try {
-    const url = `${ALPACA_DATA_URL}/v2/stocks/${symbol}/bars?timeframe=1Day&limit=30&adjustment=split&feed=iex&sort=asc`;
-    const res = await fetch(url, { headers: alpacaHeaders() });
-    if (!res.ok) return [];
-    const data = (await res.json()) as { bars?: Array<{ c: number }> };
-    return (data.bars || []).map((b) => b.c);
+    return await alertsAlpacaCircuit.execute(
+      () =>
+        retryWithBackoff(async () => {
+          const url = `${ALPACA_DATA_URL}/v2/stocks/${symbol}/bars?timeframe=1Day&limit=30&adjustment=split&feed=iex&sort=asc`;
+          const res = await fetch(url, { headers: alpacaHeaders() });
+          if (!res.ok) throw new Error(`Alpaca bars ${res.status}`);
+          const data = (await res.json()) as { bars?: Array<{ c: number }> };
+          return (data.bars || []).map((b) => b.c);
+        }, { label: "alpaca-alerts-bars", maxRetries: 4 })
+    );
   } catch {
     return [];
   }

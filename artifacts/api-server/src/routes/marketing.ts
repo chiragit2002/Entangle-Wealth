@@ -238,7 +238,7 @@ router.post("/marketing/generate", requireAuth, async (req, res) => {
                 },
               ],
             }),
-          { label: "anthropic-marketing", maxRetries: 2 }
+          { label: "anthropic-marketing", maxRetries: 4 }
         )
       )
     );

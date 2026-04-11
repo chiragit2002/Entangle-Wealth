@@ -96,7 +96,7 @@ async function sendDigestForUser(userId: string, email: string, since: Date, res
           subject: `${period} Alert Digest — ${alerts.length} alert${alerts.length > 1 ? "s" : ""} triggered`,
           html,
         }),
-      { label: "resend-digest", maxRetries: 3 }
+      { label: "resend-digest", maxRetries: 4 }
     );
     logger.info({ userId, alertCount: alerts.length, period }, "Sent alert digest email");
   } catch (err) {

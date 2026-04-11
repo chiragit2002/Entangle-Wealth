@@ -71,7 +71,7 @@ async function alpacaFetchRaw(url: string) {
 
 async function alpacaFetch(url: string, cacheKey?: string) {
   return alpacaCircuit.execute(
-    () => retryWithBackoff(() => alpacaFetchRaw(url), { label: "alpaca", maxRetries: 3 }),
+    () => retryWithBackoff(() => alpacaFetchRaw(url), { label: "alpaca", maxRetries: 4 }),
     cacheKey
       ? () => {
           const cached = alpacaCache.get(cacheKey);

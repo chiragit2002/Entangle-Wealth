@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { logger } from "../lib/logger";
+import { getActiveConnectionCount } from "../routes/health";
 
 let totalRequests = 0;
 let totalResponseTimeMs = 0;
@@ -67,6 +68,7 @@ export function getMetricsSnapshot() {
         ? Math.round(totalResponseTimeMs / totalRequests)
         : 0,
     },
+    activeConnections: getActiveConnectionCount(),
     eventLoopLagMs: Math.round(lastEventLoopLagMs * 100) / 100,
     node: process.version,
     timestamp: new Date().toISOString(),

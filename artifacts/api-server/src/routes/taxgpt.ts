@@ -1,4 +1,5 @@
 import { Router, type Request } from "express";
+import { retryWithBackoff } from "../lib/retryWithBackoff";
 
 let openai: any = null;
 try {
@@ -212,15 +213,19 @@ router.post("/taxgpt", async (req, res) => {
       systemPrompt += `\nPersonalize your answers to this user's entity type and situation. Reference strategies specific to their entity type.`;
     }
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: sanitized },
-      ],
-      max_tokens: 1500,
-      temperature: 0.3,
-    });
+    const completion = await retryWithBackoff(
+      () =>
+        openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: sanitized },
+          ],
+          max_tokens: 1500,
+          temperature: 0.3,
+        }),
+      { label: "openai-taxgpt", maxRetries: 4 }
+    );
 
     const answer = completion.choices?.[0]?.message?.content || "I couldn't generate a response. Please try rephrasing your question.";
     res.json({ answer });

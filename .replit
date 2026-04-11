@@ -37,3 +37,6 @@ ZAPIER_WEBHOOK_URL = "https://hooks.zapier.com/hooks/catch/27178640/u7gn3ct/"
 NODE_ENV = "production"
 VAPID_PUBLIC_KEY = "BH56scrGzFRcM4MxhDMZTmXj6KCg4jp9IOOAuIWH7SkH5gKVs8lyIMEDc2JJcyGfMOptYm1cMKq0kw2gIVODujs"
 VAPID_SUBJECT = "mailto:support@entanglewealth.com"
+
+[userenv.production]
+VITE_CLERK_PROXY_URL = "https://entanglewealth.com/api/__clerk"

@@ -26,6 +26,10 @@ export function trackEvent(event: string, properties?: Record<string, unknown>):
         keepalive: true,
       }).catch(() => {});
     }
+
+    window.dispatchEvent(
+      new CustomEvent("onboarding-event", { detail: { event } })
+    );
   } catch {
     // non-blocking
   }

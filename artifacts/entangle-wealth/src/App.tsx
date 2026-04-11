@@ -12,6 +12,7 @@ import { NotificationPrompt } from "@/components/pwa/NotificationPrompt";
 import { PageSkeleton, ChartSkeleton, TableSkeleton } from "@/components/pwa/PageSkeleton";
 import { captureReferralCode } from "@/lib/referral";
 import { trackEvent } from "@/lib/trackEvent";
+import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
 
 import Home from "@/pages/Home";
 
@@ -230,6 +231,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/blog/:slug">{() => <LazyPage component={BlogPostPage} />}</Route>
             <Route component={NotFound} />
           </Switch>
+          <OnboardingProvider />
           <InstallPrompt />
           <NotificationPrompt />
           <Toaster />

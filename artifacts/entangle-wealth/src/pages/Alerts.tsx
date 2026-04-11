@@ -346,8 +346,11 @@ export default function Alerts() {
             {rules.length === 0 ? (
               <div className="text-center py-20 rounded-xl bg-white/[0.02] border border-white/[0.06]">
                 <Bell className="w-12 h-12 mx-auto mb-3 text-white/10" />
-                <p className="text-white/30 text-sm">No alert rules configured</p>
-                <p className="text-white/15 text-xs mt-1">Create your first alert to get started</p>
+                <p className="text-white/30 text-sm font-semibold">No alert rules yet</p>
+                <p className="text-white/15 text-xs mt-1 max-w-xs mx-auto">Set up your first price alert to get notified when stocks hit your target levels.</p>
+                <button onClick={() => setShowForm(true)} className="mt-4 px-4 py-2 rounded-lg bg-gradient-to-r from-[#00D4FF] to-[#0099cc] text-black text-xs font-bold hover:opacity-90 transition-opacity">
+                  Create Your First Alert
+                </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -451,8 +454,8 @@ export default function Alerts() {
             {history.length === 0 ? (
               <div className="text-center py-20 rounded-xl bg-white/[0.02] border border-white/[0.06]">
                 <History className="w-12 h-12 mx-auto mb-3 text-white/10" />
-                <p className="text-white/30 text-sm">No triggered alerts yet</p>
-                <p className="text-white/15 text-xs mt-1">Alerts will appear here when triggered</p>
+                <p className="text-white/30 text-sm font-semibold">No triggered alerts yet</p>
+                <p className="text-white/15 text-xs mt-1 max-w-xs mx-auto">When your alert conditions are met, triggered notifications will appear here.</p>
               </div>
             ) : (
               <div className="space-y-2">

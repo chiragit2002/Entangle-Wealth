@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, real } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, real, jsonb } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
   id: text("id").primaryKey(),
@@ -25,6 +25,9 @@ export const usersTable = pgTable("users", {
   referredBy: text("referred_by"),
   referralCouponApplied: boolean("referral_coupon_applied").default(false),
   alertEmailDigest: text("alert_email_digest").default("off"),
+  onboardingCompleted: boolean("onboarding_completed").default(false),
+  onboardingInterests: jsonb("onboarding_interests"),
+  onboardingChecklist: jsonb("onboarding_checklist"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 

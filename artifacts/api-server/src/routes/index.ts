@@ -19,6 +19,7 @@ import authEventsRouter from "./auth-events";
 import viralRouter from "./viral";
 import alertsRouter from "./alerts";
 import analyticsRouter from "./analytics";
+import onboardingRouter from "./onboarding";
 
 const router: IRouter = Router();
 
@@ -42,5 +43,6 @@ router.use(marketingRouter);
 router.use(viralRouter);
 router.use(alertsRouter);
 router.use(analyticsRouter);
+router.use(onboardingRouter);
 
 export default router;

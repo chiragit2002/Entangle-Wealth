@@ -1,10 +1,11 @@
 import { Link, useLocation } from "wouter";
 import { Menu, X, Activity, LogOut, User, ChevronDown } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useUser, useClerk, Show } from "@clerk/react";
 import { Button } from "@/components/ui/button";
 import NotificationCenter from "@/components/NotificationCenter";
 import { TaxYearSelector } from "@/components/tax/TaxYearSelector";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 interface NavGroup {
   label: string;
@@ -52,8 +53,6 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/wallet", label: "Wallet", desc: "ENTGL balance & txns" },
       { href: "/rewards", label: "Rewards", desc: "Monthly distributions" },
       { href: "/marketplace", label: "Travel", desc: "Book with ENTGL" },
-      { href: "/token-admin", label: "Admin", desc: "Token management" },
-      { href: "/marketing", label: "Marketing AI", desc: "9-agent command center" },
     ],
   },
   {
@@ -115,8 +114,6 @@ const MOBILE_SECTIONS = [
       { href: "/wallet", label: "Wallet" },
       { href: "/rewards", label: "Rewards" },
       { href: "/marketplace", label: "Travel" },
-      { href: "/token-admin", label: "Admin" },
-      { href: "/marketing", label: "Marketing AI" },
     ],
   },
   {
@@ -194,12 +191,37 @@ function DropdownMenu({ group, isOpen, onToggle }: { group: NavGroup; isOpen: bo
   );
 }
 
+const ADMIN_NAV_GROUP: NavGroup = {
+  label: "Admin",
+  items: [
+    { href: "/token-admin", label: "Token Admin", desc: "Token management" },
+    { href: "/marketing", label: "Marketing AI", desc: "9-agent command center" },
+  ],
+};
+
+const ADMIN_MOBILE_SECTION = {
+  title: "Admin",
+  links: [
+    { href: "/token-admin", label: "Token Admin" },
+    { href: "/marketing", label: "Marketing AI" },
+  ],
+};
+
 export function Navbar() {
   const [location, setLocation] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const { user } = useUser();
   const { signOut } = useClerk();
+  const isAdmin = useIsAdmin();
+
+  const navGroups = useMemo(() => {
+    return isAdmin ? [...NAV_GROUPS, ADMIN_NAV_GROUP] : NAV_GROUPS;
+  }, [isAdmin]);
+
+  const mobileSections = useMemo(() => {
+    return isAdmin ? [...MOBILE_SECTIONS, ADMIN_MOBILE_SECTION] : MOBILE_SECTIONS;
+  }, [isAdmin]);
 
   return (
     <nav className="sticky top-0 z-50 w-full" style={{
@@ -236,7 +258,7 @@ export function Navbar() {
             Home
           </Link>
 
-          {NAV_GROUPS.map((group) => (
+          {navGroups.map((group) => (
             <DropdownMenu
               key={group.label}
               group={group}
@@ -304,7 +326,7 @@ export function Navbar() {
           }}
         >
           <div className="p-4 space-y-5">
-            {MOBILE_SECTIONS.map((section) => (
+            {mobileSections.map((section) => (
               <div key={section.title}>
                 <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary/60 mb-2 px-2">{section.title}</div>
                 <div className="grid grid-cols-2 gap-1.5">

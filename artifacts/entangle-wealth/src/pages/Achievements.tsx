@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
-import { Award, Lock, CheckCircle, Target, Flame, Zap, Star, Trophy, TrendingUp, Users, Calendar } from "lucide-react";
+import { Award, Lock, CheckCircle, Target, Flame, Zap, Star, Trophy, TrendingUp, Users, Calendar, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DailySpinWheel } from "@/components/DailySpinWheel";
+import { useToast } from "@/hooks/use-toast";
 
 interface BadgeData {
   id: number;
@@ -96,11 +98,13 @@ const categories = ["All", "trading", "streak", "community", "milestone", "gig"]
 
 export default function Achievements() {
   const { getToken } = useAuth();
+  const { toast } = useToast();
   const [badges, setBadges] = useState<BadgeData[]>(DEFAULT_BADGES);
   const [challenges, setChallenges] = useState<ChallengeData[]>(DEFAULT_CHALLENGES);
   const [gamification, setGamification] = useState<GamificationData | null>(null);
   const [activeTab, setActiveTab] = useState<"badges" | "challenges">("badges");
   const [badgeFilter, setBadgeFilter] = useState<string>("All");
+  const [showSpinWheel, setShowSpinWheel] = useState(false);
 
   const fetchAuth = useCallback((path: string, options: RequestInit = {}) => {
     return authFetch(path, getToken, options);
@@ -148,7 +152,15 @@ export default function Achievements() {
             </h1>
             <p className="text-muted-foreground mt-1">Earn badges and complete challenges for XP rewards</p>
           </div>
+          <Button
+            onClick={() => setShowSpinWheel(true)}
+            className="bg-gradient-to-r from-[#FFD700] to-[#f59e0b] text-black font-bold hover:opacity-90 gap-2"
+          >
+            <Gift className="w-4 h-4" />
+            Daily Spin
+          </Button>
         </div>
+        <DailySpinWheel isOpen={showSpinWheel} onClose={() => setShowSpinWheel(false)} onReward={(r) => toast({ title: "Reward!", description: r })} />
 
         {gamification && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">

@@ -1,0 +1,231 @@
+System Mode: Senior Full-Stack Engineer + Fintech UX Architect + Gamification Designer
+
+Mission:
+Build a complete gamification dashboard system including UI, backend logic, and data models for Entangled Wealth.
+
+---
+
+# 🎯 CORE OBJECTIVE
+
+Create a system where users:
+- log in daily
+- see progress instantly
+- feel rewarded
+- come back consistently
+
+---
+
+# 🧩 FRONTEND UI (REACT)
+
+Create a Dashboard page with:
+
+## 1. HEADER
+- User avatar
+- Name
+- "Level X"
+- XP progress bar
+
+---
+
+## 2. MAIN GRID
+
+### A. DAILY SPIN WHEEL CARD
+- Button: "Spin"
+- Disabled after use (24h cooldown)
+- Show result animation
+- Display reward
+
+---
+
+### B. PROGRESS CARD
+Show:
+- XP total
+- Level
+- Progress bar to next level
+
+---
+
+### C. STREAK CARD
+- Current streak (days)
+- Bonus indicator
+
+---
+
+### D. REWARDS CARD
+- Recent rewards
+- XP boosts
+- Unlocks
+
+---
+
+### E. FOUNDERS BADGE (if applicable)
+- Display if early user
+- Show multiplier bonus
+
+---
+
+# 🎨 UI RULES
+
+- Clean fintech design
+- Dark/light mode compatible
+- Smooth animations (subtle)
+- No clutter
+
+---
+
+# 🧠 LEVEL SYSTEM
+
+Define:
+
+XP → Level
+
+Example:
+
+Level 1: 0 XP  
+Level 2: 1000 XP  
+Level 3: 2500 XP  
+Level 4: 5000 XP  
+
+---
+
+# 🎰 DAILY SPIN SYSTEM (SAFE)
+
+Rewards:
+
+- 50 XP (common)
+- 100 XP
+- 250 XP
+- 2x XP boost (rare)
+- streak boost (rare)
+
+---
+
+## PROBABILITIES
+
+- 50 XP → 50%
+- 100 XP → 30%
+- 250 XP → 15%
+- 2x boost → 4%
+- streak boost → 1%
+
+---
+
+# 🗄️ BACKEND (EXPRESS + DB)
+
+Create new tables:
+
+## users (extend existing)
+- xp
+- level
+- streak
+- lastSpinAt
+- isFounder
+- xpMultiplier
+
+---
+
+## rewards_log
+- id
+- userId
+- rewardType
+- value
+- createdAt
+
+---
+
+# 🔐 API ROUTES
+
+## GET /gamification/status
+Returns:
+- xp
+- level
+- streak
+- lastSpinAt
+- rewards
+
+---
+
+## POST /gamification/spin
+Logic:
+1. Check lastSpinAt
+2. If <24h → reject
+3. Generate reward
+4. Apply XP / bonus
+5. Update streak
+6. Save log
+7. Return result
+
+---
+
+## POST /gamification/claim-daily
+(Optional daily reward)
+
+---
+
+# 🧠 STREAK LOGIC
+
+If user returns within 24–48h:
+→ streak++
+
+Else:
+→ reset streak
+
+Bonus:
+- 3 days → +50 XP
+- 7 days → +200 XP
+
+---
+
+# ⚙️ BACKEND LOGIC EXAMPLE
+
+Pseudo:
+
+- pick random number
+- map to reward tier
+- apply multiplier
+- update DB
+
+---
+
+# 🛡️ ANTI-ABUSE
+
+- server-side cooldown check
+- no client trust
+- rate limiting
+
+---
+
+# 🔄 FRONTEND FLOW
+
+1. Load dashboard
+2. Call /gamification/status
+3. Render data
+4. User clicks spin
+5. Call /gamification/spin
+6. Animate result
+7. Update UI
+
+---
+
+# 📦 OUTPUT
+
+Return:
+
+1. React component structure
+2. API route implementations
+3. DB schema updates
+4. Spin logic function
+5. UX improvements
+
+---
+
+# 🏁 SUCCESS CONDITION
+
+User logs in →
+sees progress →
+spins →
+gets reward →
+feels progress →
+comes back tomorrow
+
+END

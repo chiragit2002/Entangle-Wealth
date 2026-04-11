@@ -96,6 +96,36 @@ async function ensureAlertTables() {
   }
 }
 
+async function ensureGamificationTables() {
+  try {
+    const client = await pool.connect();
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS daily_spins (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          reward TEXT NOT NULL,
+          reward_type TEXT NOT NULL,
+          reward_value INTEGER NOT NULL DEFAULT 0,
+          spun_at TIMESTAMPTZ DEFAULT now()
+        );
+        CREATE TABLE IF NOT EXISTS founder_status (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+          xp_multiplier REAL NOT NULL DEFAULT 1.5,
+          granted_at TIMESTAMPTZ DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS idx_daily_spins_user ON daily_spins (user_id);
+      `);
+      logger.info("Gamification tables ensured");
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    logger.warn({ error: err }, "Failed to ensure gamification tables (non-fatal)");
+  }
+}
+
 async function ensurePaperTradingTables() {
   try {
     const client = await pool.connect();
@@ -296,6 +326,7 @@ const httpServer = server.listen(port, async () => {
   await ensureDailyContentTable();
   await ensureAlertTables();
   await ensurePaperTradingTables();
+  await ensureGamificationTables();
   ensurePerformanceIndexes().catch((err) =>
     logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
   );

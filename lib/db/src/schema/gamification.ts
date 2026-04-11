@@ -92,6 +92,24 @@ export const leaderboardSnapshotsTable = pgTable("leaderboard_snapshots", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
+export const dailySpinsTable = pgTable("daily_spins", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+  reward: text("reward").notNull(),
+  rewardType: text("reward_type").notNull(),
+  rewardValue: integer("reward_value").notNull().default(0),
+  spunAt: timestamp("spun_at", { withTimezone: true }).defaultNow(),
+});
+
+export const founderStatusTable = pgTable("founder_status", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }).unique(),
+  xpMultiplier: real("xp_multiplier").notNull().default(1.5),
+  grantedAt: timestamp("granted_at", { withTimezone: true }).defaultNow(),
+});
+
+export type DailySpin = typeof dailySpinsTable.$inferSelect;
+export type FounderStatus = typeof founderStatusTable.$inferSelect;
 export type UserXp = typeof userXpTable.$inferSelect;
 export type InsertUserXp = typeof userXpTable.$inferInsert;
 export type XpTransaction = typeof xpTransactionsTable.$inferSelect;

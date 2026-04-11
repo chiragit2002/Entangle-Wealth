@@ -1,0 +1,87 @@
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+
+const rewards = ["50 XP", "100 XP", "250 XP", "2x Boost", "Streak"];
+
+export default function SpinWheel({ onSpin }: any) {
+  const [spinning, setSpinning] = useState(false);
+  const [rotation, setRotation] = useState(0);
+  const [result, setResult] = useState<string | null>(null);
+
+  const spin = async () => {
+    if (spinning) return;
+
+    setSpinning(true);
+
+    const res = await fetch("/api/gamification/spin", {
+      method: "POST",
+    });
+
+    const data = await res.json();
+
+    const index = rewards.indexOf(data.rewardLabel);
+    const segment = 360 / rewards.length;
+
+    const spinTo =
+      360 * 6 + (360 - index * segment - segment / 2);
+
+    setRotation(spinTo);
+
+    setTimeout(() => {
+      setResult(data.rewardLabel);
+      setSpinning(false);
+      onSpin?.(data);
+    }, 4000);
+  };
+
+  return (
+    <div className="flex flex-col items-center">
+      {/* Wheel */}
+      <motion.div
+        animate={{ rotate: rotation }}
+        transition={{
+          duration: 4,
+          ease: [0.2, 0.8, 0.2, 1], // smooth deceleration
+        }}
+        className="w-72 h-72 rounded-full border-4 border-white relative shadow-xl"
+      >
+        {rewards.map((r, i) => (
+          <div
+            key={i}
+            className="absolute w-full h-full flex items-start justify-center text-sm font-semibold"
+            style={{
+              transform: `rotate(${i * (360 / rewards.length)}deg)`,
+            }}
+          >
+            <span className="mt-4">{r}</span>
+          </div>
+        ))}
+      </motion.div>
+
+      {/* Pointer */}
+      <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-b-[20px] border-l-transparent border-r-transparent border-b-red-500 -mt-2" />
+
+      {/* Button */}
+      <motion.button
+        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.05 }}
+        onClick={spin}
+        disabled={spinning}
+        className="mt-6 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl shadow-lg"
+      >
+        {spinning ? "Spinning..." : "Spin"}
+      </motion.button>
+
+      {/* Result */}
+      {result && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="mt-4 text-xl font-bold text-green-400"
+        >
+          🎉 You won: {result}
+        </motion.div>
+      )}
+    </div>
+  );
+}

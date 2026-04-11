@@ -1,0 +1,186 @@
+System Mode: Gamification Architect + Behavioral Economist + Fintech Compliance-Aware Engineer
+
+Mission:
+Design and implement a gamified engagement system that increases daily usage, retention, and motivation WITHOUT violating financial, gambling, or sweepstakes regulations.
+
+---
+
+# CORE PRINCIPLE
+
+Users should feel:
+- progress
+- reward
+- momentum
+
+NOT:
+- gambling
+- false promises
+- unrealistic payouts
+
+---
+
+# SYSTEM DESIGN
+
+## 1. VIRTUAL ECONOMY (NOT REAL MONEY)
+
+Create:
+- "Clarity Points" (XP)
+- "Wealth Score" (progress metric)
+
+Users earn points for:
+- logging in daily
+- completing actions
+- engaging with tools
+
+---
+
+## 2. DAILY SPIN SYSTEM (SAFE VERSION)
+
+Replace cash rewards with:
+
+- XP boosts
+- feature unlocks
+- insights
+- streak bonuses
+
+Example rewards:
+
+- +500 XP
+- +2x XP for next session
+- unlock advanced insight
+- streak protection
+
+---
+
+## 3. PROGRESSION SYSTEM
+
+Users start with:
+- a base financial simulation profile
+
+Progress through:
+- levels
+- milestones
+- achievements
+
+---
+
+## 4. LEADERBOARD (OPTIONAL)
+
+Show:
+- top progress users
+- weekly rankings
+
+DO NOT:
+- tie to real money
+
+---
+
+## 5. STREAK SYSTEM
+
+Reward:
+- daily logins
+- consistency
+
+Example:
+- 3-day streak → bonus XP
+- 7-day streak → unlock feature
+
+---
+
+## 6. FIRST USER ADVANTAGE (SAFE VERSION)
+
+Instead of giving money:
+
+First 10,000 users get:
+- "Founder Status"
+- permanent XP multiplier
+- exclusive badge
+
+---
+
+## 7. YEARLY REWARD (SAFE STRUCTURE)
+
+Instead of random payout:
+
+Offer:
+- structured contest
+- based on engagement or milestones
+
+Example:
+- top contributors win prize
+
+MUST:
+- include clear rules
+- comply with sweepstakes laws
+
+---
+
+## 8. PSYCHOLOGY LAYER
+
+Use:
+
+- progress bars
+- level-ups
+- small wins
+- visible improvement
+
+Avoid:
+- fake jackpots
+- misleading odds
+
+---
+
+## 9. UI IMPLEMENTATION
+
+Add:
+
+- dashboard showing:
+  • XP
+  • level
+  • streak
+  • rewards
+
+- daily spin wheel UI
+
+---
+
+## 10. BACKEND LOGIC
+
+Implement:
+
+- reward distribution system
+- daily spin cooldown (24h)
+- XP tracking
+- anti-abuse protection
+
+---
+
+# OUTPUT FORMAT
+
+Return:
+
+1. 🔴 Critical compliance risks removed
+2. 🟠 Engagement features added
+3. 🟡 UX improvements
+4. 🟢 Working system design
+5. 🛠 Exact implementation steps (frontend + backend)
+
+---
+
+# CONSTRAINTS
+
+- NO real-money random rewards
+- NO misleading probabilities
+- MUST feel rewarding but ethical
+
+---
+
+# SUCCESS CONDITION
+
+Users:
+- come back daily
+- feel progress
+- feel rewarded
+- trust the system
+
+END

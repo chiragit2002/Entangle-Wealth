@@ -1,0 +1,78 @@
+import React, { useState } from "react";
+
+const rewards = [
+  { label: "50 XP", value: 50 },
+  { label: "100 XP", value: 100 },
+  { label: "250 XP", value: 250 },
+  { label: "2x Boost", value: "boost" },
+  { label: "Streak Boost", value: "streak" },
+];
+
+export default function SpinWheel({ onSpin }: any) {
+  const [spinning, setSpinning] = useState(false);
+  const [rotation, setRotation] = useState(0);
+  const [result, setResult] = useState<any>(null);
+
+  const spin = async () => {
+    if (spinning) return;
+
+    setSpinning(true);
+
+    // call backend
+    const res = await fetch("/api/gamification/spin", {
+      method: "POST",
+    });
+    const data = await res.json();
+
+    const index = rewards.findIndex(
+      (r) => r.label === data.rewardLabel
+    );
+
+    const segmentAngle = 360 / rewards.length;
+    const spinTo =
+      360 * 5 + (360 - index * segmentAngle - segmentAngle / 2);
+
+    setRotation(spinTo);
+
+    setTimeout(() => {
+      setResult(data);
+      setSpinning(false);
+      onSpin && onSpin(data);
+    }, 4000);
+  };
+
+  return (
+    <div className="flex flex-col items-center">
+      <div
+        className="w-64 h-64 rounded-full border-4 border-white relative transition-transform duration-[4000ms] ease-out"
+        style={{ transform: `rotate(${rotation}deg)` }}
+      >
+        {rewards.map((r, i) => (
+          <div
+            key={i}
+            className="absolute w-full h-full flex items-start justify-center text-sm"
+            style={{
+              transform: `rotate(${i * (360 / rewards.length)}deg)`,
+            }}
+          >
+            <span className="mt-2">{r.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={spin}
+        disabled={spinning}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+      >
+        {spinning ? "Spinning..." : "Spin"}
+      </button>
+
+      {result && (
+        <div className="mt-4 text-lg">
+          You won: {result.rewardLabel}
+        </div>
+      )}
+    </div>
+  );
+}

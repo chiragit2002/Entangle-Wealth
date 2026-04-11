@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/trackEvent";
 import { Area, AreaChart, Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from "recharts";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
+import { GamificationWidget } from "@/components/GamificationWidget";
 import { WeeklyProgressCard } from "@/components/WeeklyProgressCard";
 import { StreakNudge } from "@/components/StreakNudge";
 import { FinishSetupNudge } from "@/components/FinishSetupNudge";
@@ -693,6 +694,10 @@ export default function Dashboard() {
                     </ResponsiveContainer>
                   </div>
                 </BloombergPanel>
+              </div>
+
+              <div className="col-span-12 lg:col-span-5">
+                <GamificationWidget />
               </div>
 
               <div className="col-span-12">

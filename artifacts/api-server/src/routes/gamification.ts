@@ -9,6 +9,8 @@ import {
   userChallengesTable,
   streaksTable,
   leaderboardSnapshotsTable,
+  dailySpinsTable,
+  founderStatusTable,
   usersTable,
 } from "@workspace/db/schema";
 import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
@@ -519,6 +521,148 @@ router.get("/gamification/weekly-summary", requireAuth, async (req, res) => {
   } catch (error) {
     console.error("Error fetching weekly summary:", error);
     res.status(500).json({ error: "Failed to fetch weekly summary" });
+  }
+});
+
+const SPIN_REWARDS = [
+  { reward: "+500 XP", rewardType: "xp", rewardValue: 500, weight: 25 },
+  { reward: "+250 XP", rewardType: "xp", rewardValue: 250, weight: 30 },
+  { reward: "+1,000 XP", rewardType: "xp", rewardValue: 1000, weight: 10 },
+  { reward: "2x XP (Next Session)", rewardType: "multiplier", rewardValue: 2, weight: 8 },
+  { reward: "Streak Shield", rewardType: "streak_protection", rewardValue: 1, weight: 10 },
+  { reward: "+100 XP", rewardType: "xp", rewardValue: 100, weight: 12 },
+  { reward: "+750 XP", rewardType: "xp", rewardValue: 750, weight: 5 },
+];
+
+function pickWeightedReward() {
+  const totalWeight = SPIN_REWARDS.reduce((s, r) => s + r.weight, 0);
+  let roll = Math.random() * totalWeight;
+  for (const r of SPIN_REWARDS) {
+    roll -= r.weight;
+    if (roll <= 0) return r;
+  }
+  return SPIN_REWARDS[0];
+}
+
+router.get("/gamification/spin/status", requireAuth, async (req, res) => {
+  const clerkId = (req as AuthenticatedRequest).userId;
+  try {
+    const userId = await resolveUserId(clerkId, req);
+    if (!userId) { res.status(404).json({ error: "User not found" }); return; }
+
+    const [lastSpin] = await db
+      .select()
+      .from(dailySpinsTable)
+      .where(eq(dailySpinsTable.userId, userId))
+      .orderBy(desc(dailySpinsTable.spunAt))
+      .limit(1);
+
+    const now = new Date();
+    const canSpin = !lastSpin || (now.getTime() - new Date(lastSpin.spunAt!).getTime()) >= 24 * 60 * 60 * 1000;
+    const nextSpinAt = lastSpin ? new Date(new Date(lastSpin.spunAt!).getTime() + 24 * 60 * 60 * 1000).toISOString() : null;
+
+    const history = await db
+      .select()
+      .from(dailySpinsTable)
+      .where(eq(dailySpinsTable.userId, userId))
+      .orderBy(desc(dailySpinsTable.spunAt))
+      .limit(7);
+
+    const [founder] = await db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
+
+    res.json({ canSpin, nextSpinAt, lastReward: lastSpin?.reward || null, history, isFounder: !!founder, rewards: SPIN_REWARDS.map(r => ({ reward: r.reward, rewardType: r.rewardType })) });
+  } catch (error) {
+    console.error("Error checking spin status:", error);
+    res.status(500).json({ error: "Failed to check spin status" });
+  }
+});
+
+router.post("/gamification/spin", requireAuth, async (req, res) => {
+  const clerkId = (req as AuthenticatedRequest).userId;
+  try {
+    const userId = await resolveUserId(clerkId, req);
+    if (!userId) { res.status(404).json({ error: "User not found" }); return; }
+
+    const result = await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_daily_spin'))`);
+
+      const [lastSpin] = await tx
+        .select()
+        .from(dailySpinsTable)
+        .where(eq(dailySpinsTable.userId, userId))
+        .orderBy(desc(dailySpinsTable.spunAt))
+        .limit(1);
+
+      const now = new Date();
+      if (lastSpin && (now.getTime() - new Date(lastSpin.spunAt!).getTime()) < 24 * 60 * 60 * 1000) {
+        const nextSpinAt = new Date(new Date(lastSpin.spunAt!).getTime() + 24 * 60 * 60 * 1000).toISOString();
+        return { alreadySpun: true, nextSpinAt };
+      }
+
+      const picked = pickWeightedReward();
+
+      await tx.insert(dailySpinsTable).values({
+        userId,
+        reward: picked.reward,
+        rewardType: picked.rewardType,
+        rewardValue: picked.rewardValue,
+      });
+
+      return { alreadySpun: false, picked };
+    });
+
+    if (result.alreadySpun) {
+      res.status(429).json({ error: "Already spun today", nextSpinAt: result.nextSpinAt });
+      return;
+    }
+
+    const picked = result.picked!;
+
+    if (picked.rewardType === "xp") {
+      let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+      if (!xpRow) {
+        [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
+      }
+      const newTotalXp = xpRow.totalXp + picked.rewardValue;
+      const newLevel = calculateLevel(newTotalXp);
+      const newTier = calculateTier(newLevel, newTotalXp);
+      await db.update(userXpTable).set({
+        totalXp: newTotalXp, level: newLevel, tier: newTier,
+        monthlyXp: xpRow.monthlyXp + picked.rewardValue,
+        weeklyXp: xpRow.weeklyXp + picked.rewardValue,
+        updatedAt: new Date(),
+      }).where(eq(userXpTable.userId, userId));
+      await db.insert(xpTransactionsTable).values({ userId, amount: picked.rewardValue, reason: "daily_spin", category: "engagement" });
+    } else if (picked.rewardType === "multiplier") {
+      await db.update(streaksTable).set({ multiplier: Math.min(3.0, picked.rewardValue), updatedAt: new Date() }).where(eq(streaksTable.userId, userId));
+    } else if (picked.rewardType === "streak_protection") {
+      const [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
+      if (streak) {
+        await db.update(streaksTable).set({ longestStreak: Math.max(streak.longestStreak, streak.currentStreak + 1), updatedAt: new Date() }).where(eq(streaksTable.userId, userId));
+      }
+    }
+
+    const nextSpinAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    res.json({ reward: picked.reward, rewardType: picked.rewardType, rewardValue: picked.rewardValue, nextSpinAt });
+  } catch (error) {
+    console.error("Error spinning wheel:", error);
+    res.status(500).json({ error: "Failed to spin wheel" });
+  }
+});
+
+router.get("/gamification/founder/status", requireAuth, async (req, res) => {
+  const clerkId = (req as AuthenticatedRequest).userId;
+  try {
+    const userId = await resolveUserId(clerkId, req);
+    if (!userId) { res.status(404).json({ error: "User not found" }); return; }
+
+    const [founder] = await db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
+    const [{ count }] = await db.select({ count: sql<number>`count(*)::int` }).from(founderStatusTable);
+
+    res.json({ isFounder: !!founder, founderCount: count, xpMultiplier: founder?.xpMultiplier || 1.0, grantedAt: founder?.grantedAt || null });
+  } catch (error) {
+    console.error("Error checking founder status:", error);
+    res.status(500).json({ error: "Failed to check founder status" });
   }
 });
 

@@ -1,0 +1,173 @@
+System Mode: Conversion Architect + UX Optimizer + Behavioral Designer
+
+Mission:
+Build a high-converting landing experience that turns visitors into users of Entangled Wealth with minimal friction.
+
+---
+
+# PRIMARY OBJECTIVE
+
+When someone lands:
+
+Within 5 seconds they must:
+1. Understand what this is
+2. Feel it's relevant to them
+3. Want to try it
+
+---
+
+# PAGE STRUCTURE (MANDATORY)
+
+## 1. HERO SECTION (MOST IMPORTANT)
+
+Headline:
+- Must hit pain directly
+
+Internal prompt:
+"Write a headline that speaks to confusion around financial decisions and promises clarity"
+
+Example:
+"Stop guessing what to do with your money."
+
+Subheadline:
+"Entangled Wealth helps you make clear financial decisions without the overwhelm."
+
+CTA:
+- "Try it"
+- "Get clarity"
+
+---
+
+## 2. PROBLEM SECTION
+
+Explain:
+- why users feel stuck
+- what’s broken
+
+Keep simple:
+- no jargon
+- no long paragraphs
+
+---
+
+## 3. SOLUTION SECTION
+
+Show:
+
+- how Entangled Wealth helps
+- what changes for the user
+
+Focus:
+- clarity
+- simplicity
+- confidence
+
+---
+
+## 4. HOW IT WORKS (3 STEPS)
+
+1. Understand your situation  
+2. Get clear guidance  
+3. Make better decisions  
+
+---
+
+## 5. TRUST SECTION
+
+Add:
+- simple reassurance
+- transparency
+
+Examples:
+- “Built to simplify—not overwhelm”
+- “No confusing financial jargon”
+
+---
+
+## 6. CTA (REPEATED)
+
+- clear
+- simple
+- low pressure
+
+Examples:
+- “Try it now”
+- “See if it helps you”
+
+---
+
+# UX RULES
+
+- No clutter
+- Large readable text
+- Clear spacing
+- Mobile-first
+
+---
+
+# PSYCHOLOGY LAYER
+
+Use:
+
+- clarity over complexity
+- relief over urgency
+- guidance over selling
+
+Avoid:
+- hype
+- pressure tactics
+
+---
+
+# MICRO-CONVERSION STRATEGY
+
+DO NOT push signup immediately.
+
+Instead:
+
+Step 1:
+→ “Try it”
+
+Step 2:
+→ small interaction
+
+Step 3:
+→ THEN signup
+
+---
+
+# ERROR HANDLING
+
+If anything fails:
+- show clear message
+- never leave blank screen
+
+---
+
+# SPEED REQUIREMENT
+
+Page must:
+- load fast
+- feel responsive
+
+---
+
+# OUTPUT
+
+Return:
+
+1. Full landing page copy
+2. Section breakdown
+3. CTA strategy
+4. UX improvements
+
+---
+
+# SUCCESS CONDITION
+
+Visitor:
+- understands instantly
+- feels relief
+- takes action
+
+END

@@ -32,6 +32,9 @@ import subscribersRouter from "./subscribers";
 import giveawayRouter from "./giveaway";
 import simulationRouter from "./simulation";
 import timelineRouter from "./timeline";
+import habitsRouter from "./habits";
+import lifeOutcomesRouter from "./lifeOutcomes";
+import coachingRouter from "./coaching";
 
 const router: IRouter = Router();
 
@@ -68,5 +71,8 @@ router.use(subscribersRouter);
 router.use(giveawayRouter);
 router.use(simulationRouter);
 router.use(timelineRouter);
+router.use(habitsRouter);
+router.use(lifeOutcomesRouter);
+router.use(coachingRouter);
 
 export default router;

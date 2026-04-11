@@ -474,4 +474,153 @@ router.get("/timeline/identity/me", requireAuth, async (req, res) => {
   }
 });
 
+interface WhatIfDecision {
+  id: string;
+  label: string;
+  description: string;
+  monthlyIncomeChange: number;
+  savingsRateChange: number;
+  monthlyDebtChange: number;
+  investmentRateChange: number;
+}
+
+const WHAT_IF_DECISIONS: WhatIfDecision[] = [
+  {
+    id: "max_401k",
+    label: "Max Out 401(k)",
+    description: "Contribute the maximum allowed to your 401(k) ($23,000/yr)",
+    monthlyIncomeChange: 0,
+    savingsRateChange: 0.12,
+    monthlyDebtChange: 0,
+    investmentRateChange: 0,
+  },
+  {
+    id: "pay_off_debt",
+    label: "Aggressively Pay Off Debt",
+    description: "Double your debt payments to eliminate debt faster",
+    monthlyIncomeChange: 0,
+    savingsRateChange: 0,
+    monthlyDebtChange: 500,
+    investmentRateChange: 0,
+  },
+  {
+    id: "career_change",
+    label: "Career Change / Promotion",
+    description: "Land a job paying 25% more annually",
+    monthlyIncomeChange: 0.25,
+    savingsRateChange: 0.05,
+    monthlyDebtChange: 0,
+    investmentRateChange: 0,
+  },
+  {
+    id: "side_income",
+    label: "Start Side Income",
+    description: "Add $1,000/month in side income and invest 70% of it",
+    monthlyIncomeChange: 1000,
+    savingsRateChange: 0.04,
+    monthlyDebtChange: 0,
+    investmentRateChange: 0.005,
+  },
+  {
+    id: "cut_expenses",
+    label: "Cut Monthly Expenses 20%",
+    description: "Reduce spending by 20% and redirect savings to investments",
+    monthlyIncomeChange: 0,
+    savingsRateChange: 0.08,
+    monthlyDebtChange: 0,
+    investmentRateChange: 0,
+  },
+  {
+    id: "invest_aggressively",
+    label: "Invest Aggressively",
+    description: "Shift to a 100% equity portfolio (higher risk/reward)",
+    monthlyIncomeChange: 0,
+    savingsRateChange: 0,
+    monthlyDebtChange: 0,
+    investmentRateChange: 0.03,
+  },
+];
+
+router.get("/timeline/what-if/decisions", (_req, res) => {
+  res.json(WHAT_IF_DECISIONS);
+});
+
+router.post("/timeline/what-if/model", async (req, res) => {
+  const { baseParams, decisionIds } = req.body as { baseParams: unknown; decisionIds: string[] };
+
+  const { params: base, error } = validateParams(baseParams);
+  if (error) {
+    res.status(400).json({ error });
+    return;
+  }
+
+  const selectedDecisions = WHAT_IF_DECISIONS.filter(d => Array.isArray(decisionIds) && decisionIds.includes(d.id));
+
+  const modifiedParams: TimelineParams = { ...base };
+  for (const decision of selectedDecisions) {
+    if (decision.monthlyIncomeChange > 0 && decision.monthlyIncomeChange < 10) {
+      modifiedParams.monthlyIncome = base.monthlyIncome * (1 + decision.monthlyIncomeChange);
+    } else if (decision.monthlyIncomeChange >= 10) {
+      modifiedParams.monthlyIncome = base.monthlyIncome + decision.monthlyIncomeChange;
+    }
+
+    if (decision.savingsRateChange !== 0) {
+      modifiedParams.savingsRate = clamp(base.savingsRate + decision.savingsRateChange, 0, 0.9);
+    }
+
+    if (decision.monthlyDebtChange !== 0) {
+      modifiedParams.monthlyDebt = Math.max(0, base.monthlyDebt - decision.monthlyDebtChange);
+    }
+
+    if (decision.investmentRateChange !== 0) {
+      modifiedParams.investmentRate = clamp(base.investmentRate + decision.investmentRateChange, 0, 0.5);
+    }
+  }
+
+  try {
+    const baseResults = HORIZONS.map(h => simulateHorizon(base, h.months));
+    const modifiedResults = HORIZONS.map(h => simulateHorizon(modifiedParams, h.months));
+
+    const deltas = baseResults.map((b, i) => {
+      const m = modifiedResults[i];
+      return {
+        horizon: b.horizon,
+        deltaNetWorth: Math.round((m.projectedNetWorth - b.projectedNetWorth) * 100) / 100,
+        deltaStress: Math.round((b.stressIndex - m.stressIndex) * 10) / 10,
+        deltaOpportunity: Math.round((m.opportunityScore - b.opportunityScore) * 10) / 10,
+        deltaStability: Math.round((m.stabilityScore - b.stabilityScore) * 10) / 10,
+      };
+    });
+
+    const yr20Base = baseResults.find(r => r.horizon === "20yr");
+    const yr20Modified = modifiedResults.find(r => r.horizon === "20yr");
+
+    const { userId: clerkId } = getAuth(req);
+    if (clerkId) {
+      const userId = await resolveUserId(clerkId, req);
+      if (userId) {
+        await awardXp(userId, 20, "what_if_modeled", "timeline");
+      }
+    }
+
+    res.json({
+      baseParams: base,
+      modifiedParams,
+      appliedDecisions: selectedDecisions,
+      baseResults,
+      modifiedResults,
+      deltas,
+      summary: {
+        netWorthGain20yr: (yr20Modified?.projectedNetWorth || 0) - (yr20Base?.projectedNetWorth || 0),
+        stressReduction: (yr20Base?.stressIndex || 0) - (yr20Modified?.stressIndex || 0),
+        opportunityGain: (yr20Modified?.opportunityScore || 0) - (yr20Base?.opportunityScore || 0),
+      },
+      modeledAt: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error("What-if model error:", err);
+    res.status(500).json({ error: "What-if modeling failed" });
+  }
+});
+
 export default router;

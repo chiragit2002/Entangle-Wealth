@@ -8,7 +8,7 @@ import {
 import {
   GitBranch, Save, Trash2, RefreshCw, BookmarkCheck,
   TrendingUp, AlertTriangle, Star, Zap, Shield, Target,
-  ChevronDown, ChevronUp, Info, CheckCircle2,
+  ChevronDown, ChevronUp, Info, CheckCircle2, CircleDot, Sparkles,
   ArrowRight, Flame, Compass, Clock, Layers, BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -81,6 +81,24 @@ interface CompareResult {
     deltaNetWorth20yr: number;
     deltaStress: number;
     deltaOpportunity: number;
+  };
+}
+
+interface WhatIfDecision {
+  id: string;
+  label: string;
+  description: string;
+}
+
+interface WhatIfModelResult {
+  appliedDecisions: WhatIfDecision[];
+  baseResults: HorizonResult[];
+  modifiedResults: HorizonResult[];
+  deltas: { horizon: string; deltaNetWorth: number; deltaStress: number; deltaOpportunity: number }[];
+  summary: {
+    netWorthGain20yr: number;
+    stressReduction: number;
+    opportunityGain: number;
   };
 }
 
@@ -1014,6 +1032,11 @@ export default function AlternateTimeline() {
   const [isExplorationMode, setIsExplorationMode] = useState(false);
   const [savedTimelines, setSavedTimelines] = useState<SavedTimeline[]>([]);
   const [showSaved, setShowSaved] = useState(false);
+  const [whatIfDecisions, setWhatIfDecisions] = useState<WhatIfDecision[]>([]);
+  const [selectedDecisionIds, setSelectedDecisionIds] = useState<string[]>([]);
+  const [whatIfResult, setWhatIfResult] = useState<WhatIfModelResult | null>(null);
+  const [showWhatIf, setShowWhatIf] = useState(false);
+  const [modelingWhatIf, setModelingWhatIf] = useState(false);
   const [saveNameA, setSaveNameA] = useState("Current Path");
   const [saveNameB, setSaveNameB] = useState("Better Path");
   const [saveAnnotationA, setSaveAnnotationA] = useState("");
@@ -1054,10 +1077,47 @@ export default function AlternateTimeline() {
     } catch {}
   }, [isSignedIn, getToken]);
 
+  const fetchWhatIfDecisions = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/timeline/what-if/decisions`);
+      if (res.ok) setWhatIfDecisions(await res.json());
+    } catch {}
+  }, []);
+
+  const runWhatIfModel = useCallback(async () => {
+    if (selectedDecisionIds.length === 0) return;
+    setModelingWhatIf(true);
+    try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (isSignedIn) {
+        const token = await getToken();
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+      }
+      const res = await fetch(`${API_BASE}/timeline/what-if/model`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ baseParams: paramsA, decisionIds: selectedDecisionIds }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setWhatIfResult(data);
+        const bParams = data.modifiedParams;
+        if (bParams) {
+          setParamsB(bParams);
+        }
+      }
+    } catch (err) {
+      console.error("What-if model error", err);
+    } finally {
+      setModelingWhatIf(false);
+    }
+  }, [selectedDecisionIds, paramsA, isSignedIn, getToken]);
+
   useEffect(() => {
     fetchStage();
     fetchSaved();
-  }, [fetchStage, fetchSaved]);
+    fetchWhatIfDecisions();
+  }, [fetchStage, fetchSaved, fetchWhatIfDecisions]);
 
   const simulate = useCallback(async (a: TimelineParams, b: TimelineParams) => {
     setLoading(true);
@@ -1341,6 +1401,100 @@ export default function AlternateTimeline() {
             )}
           </div>
         </div>
+
+        {whatIfDecisions.length > 0 && (
+          <div className="mb-6 rounded-2xl overflow-hidden"
+            style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(156,39,176,0.25)" }}>
+            <button
+              onClick={() => setShowWhatIf(v => !v)}
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/[0.02] transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-400" />
+                <span className="font-bold text-sm text-purple-300">What-If Decision Modeler</span>
+                <span className="text-[9px] px-2 py-0.5 rounded-full bg-purple-400/10 border border-purple-400/20 text-purple-400 font-bold">NEW</span>
+              </div>
+              {showWhatIf ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+            </button>
+
+            {showWhatIf && (
+              <div className="px-4 pb-4 space-y-4">
+                <p className="text-xs text-white/40">
+                  Toggle key life decisions to see the ripple effect across your entire financial timeline. Selected decisions auto-populate the "Better Path" pane.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {whatIfDecisions.map(decision => {
+                    const isSelected = selectedDecisionIds.includes(decision.id);
+                    return (
+                      <button
+                        key={decision.id}
+                        onClick={() => setSelectedDecisionIds(prev =>
+                          isSelected ? prev.filter(id => id !== decision.id) : [...prev, decision.id]
+                        )}
+                        className={`text-left p-3 rounded-xl border transition-all ${
+                          isSelected
+                            ? "border-purple-400/40 bg-purple-400/10 text-purple-200"
+                            : "border-white/[0.08] bg-white/[0.02] text-white/60 hover:border-white/20 hover:text-white"
+                        }`}
+                      >
+                        <div className="flex items-start gap-2">
+                          <div className={`w-4 h-4 rounded border mt-0.5 flex-shrink-0 flex items-center justify-center ${
+                            isSelected ? "border-purple-400 bg-purple-400" : "border-white/20"
+                          }`}>
+                            {isSelected && <CheckCircle2 className="w-3 h-3 text-black" />}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-xs">{decision.label}</div>
+                            <div className="text-[11px] opacity-70 mt-0.5">{decision.description}</div>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={runWhatIfModel}
+                  disabled={selectedDecisionIds.length === 0 || modelingWhatIf}
+                  className="w-full py-2.5 rounded-xl bg-purple-500 text-white font-bold text-sm hover:bg-purple-500/90 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {modelingWhatIf ? (
+                    <><RefreshCw className="w-4 h-4 animate-spin" />Modeling...</>
+                  ) : (
+                    <><Zap className="w-4 h-4" />Model Selected Decisions ({selectedDecisionIds.length})</>
+                  )}
+                </button>
+
+                {whatIfResult && (
+                  <div className="mt-2 pt-3 border-t border-white/[0.06] space-y-3">
+                    <div className="text-[10px] text-purple-400 font-semibold uppercase tracking-wider">Decision Impact at 20 Years</div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="text-center rounded-xl p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <div className="text-[10px] text-white/40 font-mono uppercase">Net Worth Gain</div>
+                        <div className={`text-lg font-black font-mono mt-1 ${whatIfResult.summary.netWorthGain20yr >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                          {whatIfResult.summary.netWorthGain20yr >= 0 ? "+" : ""}{fmt(whatIfResult.summary.netWorthGain20yr)}
+                        </div>
+                      </div>
+                      <div className="text-center rounded-xl p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <div className="text-[10px] text-white/40 font-mono uppercase">Stress Reduction</div>
+                        <div className={`text-lg font-black font-mono mt-1 ${whatIfResult.summary.stressReduction >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                          {whatIfResult.summary.stressReduction >= 0 ? "+" : ""}{whatIfResult.summary.stressReduction.toFixed(1)}pts
+                        </div>
+                      </div>
+                      <div className="text-center rounded-xl p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <div className="text-[10px] text-white/40 font-mono uppercase">Opportunity Gain</div>
+                        <div className={`text-lg font-black font-mono mt-1 ${whatIfResult.summary.opportunityGain >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                          {whatIfResult.summary.opportunityGain >= 0 ? "+" : ""}{whatIfResult.summary.opportunityGain.toFixed(1)}pts
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {compareResult && (
           <div className="mb-4">

@@ -5,6 +5,7 @@ import { authFetch } from "@/lib/authFetch";
 import { Award, Lock, CheckCircle, Target, Flame, Zap, Star, Trophy, TrendingUp, Users, Calendar, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DailySpinWheel } from "@/components/DailySpinWheel";
+import { XPBar } from "@/components/XPBar";
 import { useToast } from "@/hooks/use-toast";
 import { fireConfetti } from "@/lib/confetti";
 
@@ -180,34 +181,42 @@ export default function Achievements() {
         <DailySpinWheel isOpen={showSpinWheel} onClose={() => setShowSpinWheel(false)} onReward={(r) => toast({ title: "Reward!", description: r })} />
 
         {gamification && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <div className="glass-panel p-4 text-center">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Level</p>
-              <p className="text-2xl font-bold font-mono">{gamification.xp.level}</p>
-              <div className="w-full bg-white/5 rounded-full h-1.5 mt-2">
-                <div
-                  className={`h-1.5 rounded-full bg-gradient-to-r ${TIER_COLORS[gamification.xp.tier] || TIER_COLORS.Bronze}`}
-                  style={{ width: `${gamification.levelProgress}%` }}
-                />
+          <div className="space-y-4 mb-6">
+            <div className="glass-panel p-5">
+              <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                <div className="flex items-center gap-4">
+                  <div className="text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Level</p>
+                    <p className="text-3xl font-bold font-mono text-primary">{gamification.xp.level}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Tier</p>
+                    <p className={`text-xl font-bold ${TIER_COLORS[gamification.xp.tier] ? "bg-gradient-to-r bg-clip-text text-transparent " + TIER_COLORS[gamification.xp.tier] : "text-white"}`}>
+                      {gamification.xp.tier}
+                    </p>
+                  </div>
+                </div>
+                <div className="md:ml-auto flex gap-4">
+                  <div className="text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total XP</p>
+                    <p className="text-2xl font-bold font-mono text-primary">{gamification.xp.totalXp.toLocaleString()}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Streak</p>
+                    <p className="text-2xl font-bold font-mono text-orange-400 flex items-center gap-1">
+                      <Flame className="w-5 h-5" /> {gamification.streak.currentStreak}
+                    </p>
+                    <p className="text-[9px] text-muted-foreground">{gamification.streak.multiplier.toFixed(1)}x multiplier</p>
+                  </div>
+                </div>
               </div>
-              <p className="text-[9px] text-muted-foreground mt-1">{gamification.xpToNextLevel} XP to next</p>
-            </div>
-            <div className="glass-panel p-4 text-center">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Tier</p>
-              <p className={`text-2xl font-bold ${TIER_COLORS[gamification.xp.tier] ? "bg-gradient-to-r bg-clip-text text-transparent " + TIER_COLORS[gamification.xp.tier] : "text-white"}`}>
-                {gamification.xp.tier}
-              </p>
-            </div>
-            <div className="glass-panel p-4 text-center">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Streak</p>
-              <p className="text-2xl font-bold font-mono text-orange-400 flex items-center justify-center gap-1">
-                <Flame className="w-5 h-5" /> {gamification.streak.currentStreak}
-              </p>
-              <p className="text-[9px] text-muted-foreground">{gamification.streak.multiplier.toFixed(1)}x multiplier</p>
-            </div>
-            <div className="glass-panel p-4 text-center">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total XP</p>
-              <p className="text-2xl font-bold font-mono text-primary">{gamification.xp.totalXp.toLocaleString()}</p>
+              <XPBar
+                level={gamification.xp.level}
+                levelProgress={gamification.levelProgress}
+                xpToNextLevel={gamification.xpToNextLevel}
+                tier={gamification.xp.tier}
+                variant="full"
+              />
             </div>
           </div>
         )}

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { DailySpinWheel } from "@/components/DailySpinWheel";
+import { XPBar } from "@/components/XPBar";
 import { Zap, Flame, Trophy, Star, Gift, TrendingUp, ChevronRight, Award } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -138,21 +139,13 @@ export function GamificationWidget() {
             </div>
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-0.5">
-              <span className="text-[8px] font-mono text-white/25">Level {data.xp.level} → {data.xp.level + 1}</span>
-              <span className="text-[8px] font-mono text-[#00D4FF]">{data.xpToNextLevel.toLocaleString()} XP to go</span>
-            </div>
-            <div className="w-full h-1.5 bg-white/[0.04] rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-1000 ease-out"
-                style={{
-                  width: `${Math.min(data.levelProgress, 100)}%`,
-                  background: `linear-gradient(90deg, ${tierColor}, #00D4FF)`,
-                }}
-              />
-            </div>
-          </div>
+          <XPBar
+            level={data.xp.level}
+            levelProgress={data.levelProgress}
+            xpToNextLevel={data.xpToNextLevel}
+            tier={data.xp.tier}
+            variant="compact"
+          />
 
           <div className="flex gap-1">
             <button

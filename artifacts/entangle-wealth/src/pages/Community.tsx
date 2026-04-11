@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -117,7 +117,6 @@ function sanitize(str: string): string {
 }
 
 export default function Community() {
-  useEffect(() => { trackEvent("community_post"); }, []);
   const { toast } = useToast();
   const [tab, setTab] = useState<Tab>("communities");
   const [commFilter, setCommFilter] = useState("all");
@@ -168,6 +167,7 @@ export default function Community() {
     };
     setPosts(prev => [newPost, ...prev]);
     setPostText("");
+    trackEvent("community_post");
     toast({ title: "Posted", description: "Your post is live in the community feed." });
   };
 

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { usersTable, referralsTable } from "@workspace/db/schema";
+import { usersTable, referralsTable, analyticsEventsTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { getAuth } from "@clerk/express";
@@ -62,6 +62,11 @@ router.post("/users/sync", requireAuth, async (req, res) => {
       }).returning();
 
       if (req.body.referredBy) {
+        db.insert(analyticsEventsTable).values({
+          userId: clerkId,
+          event: "referral_signup",
+          properties: { referralCode: req.body.referredBy },
+        }).catch(() => {});
         const [referrer] = await db
           .select()
           .from(usersTable)

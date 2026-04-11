@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { X, Share2, Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { fireConfetti } from "@/lib/confetti";
+import { BigWinOverlay } from "@/components/BigWinOverlay";
 
 interface Milestone {
   threshold: number;
@@ -23,6 +24,7 @@ export function MilestoneCelebrationModal() {
   const [queue, setQueue] = useState<Milestone[]>([]);
   const [referralLink, setReferralLink] = useState("");
   const [copied, setCopied] = useState(false);
+  const [showBigWin, setShowBigWin] = useState(false);
 
   const fetchAuth = useCallback((path: string, opts: RequestInit = {}) => {
     return authFetch(path, getToken, opts);
@@ -40,7 +42,8 @@ export function MilestoneCelebrationModal() {
           const data = await milestoneRes.json();
           if (data.newMilestones?.length > 0) {
             setQueue(data.newMilestones);
-            fireConfetti();
+            fireConfetti("big");
+            setShowBigWin(true);
           }
         }
         if (codeRes.ok) {
@@ -100,6 +103,8 @@ export function MilestoneCelebrationModal() {
   if (!current) return null;
 
   return (
+    <>
+    <BigWinOverlay show={showBigWin} label="MILESTONE!" onDone={() => setShowBigWin(false)} />
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 px-4"
       onClick={(e) => { if (e.target === e.currentTarget) dismiss(); }}
@@ -156,5 +161,6 @@ export function MilestoneCelebrationModal() {
         </Button>
       </div>
     </div>
+    </>
   );
 }

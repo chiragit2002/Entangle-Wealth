@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { DailySpinWheel } from "@/components/DailySpinWheel";
 import { XPBar } from "@/components/XPBar";
 import { useToast } from "@/hooks/use-toast";
-import { fireConfetti } from "@/lib/confetti";
+import { fireConfetti, getCelebrationTier } from "@/lib/confetti";
+import { BigWinOverlay } from "@/components/BigWinOverlay";
 
 interface BadgeData {
   id: number;
@@ -107,6 +108,7 @@ export default function Achievements() {
   const [activeTab, setActiveTab] = useState<"badges" | "challenges">("badges");
   const [badgeFilter, setBadgeFilter] = useState<string>("All");
   const [showSpinWheel, setShowSpinWheel] = useState(false);
+  const [showBigWin, setShowBigWin] = useState(false);
 
   const fetchAuth = useCallback((path: string, options: RequestInit = {}) => {
     return authFetch(path, getToken, options);
@@ -135,7 +137,10 @@ export default function Achievements() {
           const seenSet = new Set(seenSlugs);
           const newlyEarned = data.filter(b => b.earned && !seenSet.has(b.slug));
           if (newlyEarned.length > 0) {
-            fireConfetti();
+            const maxXp = Math.max(...newlyEarned.map(b => b.xpReward));
+            const tier = getCelebrationTier("xp", maxXp);
+            fireConfetti(tier);
+            if (tier === "big") setShowBigWin(true);
             newlyEarned.forEach(b => seenSet.add(b.slug));
             try {
               localStorage.setItem(seenKey, JSON.stringify(Array.from(seenSet)));
@@ -161,6 +166,7 @@ export default function Achievements() {
 
   return (
     <Layout>
+      <BigWinOverlay show={showBigWin} label="ACHIEVEMENT!" onDone={() => setShowBigWin(false)} />
       <div className="container mx-auto px-4 py-6 max-w-5xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>

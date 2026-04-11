@@ -3,7 +3,8 @@ import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
 import { X, Gift, Clock, Zap, Shield, Star } from "lucide-react";
-import { fireConfetti } from "@/lib/confetti";
+import { fireConfetti, getCelebrationTier } from "@/lib/confetti";
+import { BigWinOverlay } from "@/components/BigWinOverlay";
 
 const WHEEL_SEGMENTS = [
   { label: "+500 XP", color: "#00D4FF", icon: "⚡" },
@@ -30,6 +31,8 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
   const [result, setResult] = useState<{ reward: string; rewardType: string; rewardValue: number } | null>(null);
   const [rotation, setRotation] = useState(0);
   const [countdown, setCountdown] = useState("");
+  const [showBigWin, setShowBigWin] = useState(false);
+  const [celebrationTier, setCelebrationTier] = useState<"small" | "medium" | "big">("small");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const checkStatus = useCallback(async () => {
@@ -194,7 +197,10 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
           setCanSpin(false);
           setNextSpinAt(data.nextSpinAt);
           setSpinning(false);
-          fireConfetti();
+          const tier = getCelebrationTier(data.rewardType, data.rewardValue ?? 0);
+          setCelebrationTier(tier);
+          fireConfetti(tier);
+          if (tier === "big") setShowBigWin(true);
           onReward?.(data.reward);
         }
       };
@@ -209,6 +215,8 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
   if (!isOpen) return null;
 
   return (
+    <>
+    <BigWinOverlay show={showBigWin} label="BIG WIN" onDone={() => setShowBigWin(false)} />
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm">
       <div className="relative w-[360px] bg-[#0a0a0f] border border-white/[0.1] rounded-xl shadow-2xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#00D4FF]/5 via-transparent to-[#FFD700]/5 pointer-events-none" />
@@ -235,7 +243,13 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
           </div>
 
           {result && (
-            <div className="mt-4 w-full p-3 rounded-lg bg-[#FFD700]/10 border border-[#FFD700]/20 text-center animate-in fade-in duration-500">
+            <div className={`mt-4 w-full p-3 rounded-lg text-center animate-in fade-in duration-500 transition-all ${
+              celebrationTier === "big"
+                ? "bg-[#FFD700]/15 border border-[#FFD700]/40 animate-pulse-glow-gold"
+                : celebrationTier === "medium"
+                ? "bg-[#00D4FF]/10 border border-[#00D4FF]/30 animate-pulse-glow"
+                : "bg-[#FFD700]/10 border border-[#FFD700]/20"
+            }`}>
               <p className="text-[10px] font-mono text-[#FFD700]/60 uppercase tracking-widest">YOU WON</p>
               <p className="text-lg font-bold font-mono text-[#FFD700] mt-1">{result.reward}</p>
               {result.rewardType === "xp" && (
@@ -285,5 +299,6 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
         </div>
       </div>
     </div>
+    </>
   );
 }

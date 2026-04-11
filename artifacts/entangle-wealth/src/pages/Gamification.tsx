@@ -9,6 +9,8 @@ import {
   Zap, Flame, Trophy, Star, Gift, Sparkles, RefreshCw,
   ChevronRight, Crown, Lock, CheckCircle, Clock, TrendingUp, User,
 } from "lucide-react";
+import { fireConfetti, getCelebrationTier, getXpCelebrationTier } from "@/lib/confetti";
+import { BigWinOverlay } from "@/components/BigWinOverlay";
 
 interface ActivityItem {
   id: string | number;
@@ -192,6 +194,8 @@ export default function Gamification() {
   const [spinResult, setSpinResult] = useState<{ reward: string; rewardType: string } | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [claimingDaily, setClaimingDaily] = useState(false);
+  const [showBigWin, setShowBigWin] = useState(false);
+  const [bigWinLabel, setBigWinLabel] = useState("BIG WIN");
   const spinRotationRef = useRef(0);
 
   const fetchStatus = useCallback(async () => {
@@ -239,6 +243,12 @@ export default function Gamification() {
         setShowResult(true);
         setSpinning(false);
         fetchStatus();
+        const tier = getCelebrationTier(data.rewardType, data.rewardValue ?? 0);
+        fireConfetti(tier);
+        if (tier === "big") {
+          setBigWinLabel("BIG WIN");
+          setShowBigWin(true);
+        }
         toast({ title: "You spun the wheel!", description: `You won: ${data.reward}` });
       }, 4200);
     } catch {
@@ -254,6 +264,13 @@ export default function Gamification() {
       const res = await authFetch("/gamification/claim-daily", getToken, { method: "POST" });
       const data = await res.json();
       if (res.ok) {
+        const totalXp = (data.xpEarned ?? 0) + (data.streakBonus ?? 0);
+        const tier = getXpCelebrationTier(totalXp);
+        fireConfetti(tier);
+        if (tier === "big") {
+          setBigWinLabel("JACKPOT!");
+          setShowBigWin(true);
+        }
         toast({ title: "Daily Reward Claimed!", description: `+${data.xpEarned} XP earned${data.streakBonus > 0 ? ` (+${data.streakBonus} streak bonus)` : ""}` });
         fetchStatus();
       } else {
@@ -284,6 +301,7 @@ export default function Gamification() {
 
   return (
     <Layout>
+      <BigWinOverlay show={showBigWin} label={bigWinLabel} onDone={() => setShowBigWin(false)} />
       <div className="min-h-screen bg-[#040408]">
         <div className="bg-[#040408] border-b border-white/[0.06] px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="flex items-center gap-3 flex-1">

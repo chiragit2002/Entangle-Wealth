@@ -3,6 +3,7 @@ import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { CheckCircle2, Circle, ChevronDown, ChevronUp, X, Rocket } from "lucide-react";
 import { fireConfetti } from "@/lib/confetti";
+import { BigWinOverlay } from "@/components/BigWinOverlay";
 import { trackEvent } from "@/lib/trackEvent";
 
 interface ChecklistItem {
@@ -39,6 +40,7 @@ export function GettingStartedChecklist() {
   const [dismissed, setDismissed] = useState(false);
   const [daysSinceSignup, setDaysSinceSignup] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  const [showBigWin, setShowBigWin] = useState(false);
 
   const fetchState = useCallback(async () => {
     if (!isSignedIn) return;
@@ -63,7 +65,8 @@ export function GettingStartedChecklist() {
       const updated = { ...prev, [itemId]: true };
       const allDone = ITEMS.every((item) => updated[item.id]);
       if (allDone) {
-        fireConfetti();
+        fireConfetti("big");
+        setShowBigWin(true);
         trackEvent("onboarding_checklist_completed");
       }
       return updated;
@@ -104,6 +107,7 @@ export function GettingStartedChecklist() {
 
   return (
     <>
+      <BigWinOverlay show={showBigWin} label="ALL DONE!" onDone={() => setShowBigWin(false)} />
       <div className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-50 w-72">
         <div className="bg-[#0a0a14] border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden">
           <div

@@ -310,14 +310,14 @@ export default function DailyContent() {
   const [generating, setGenerating] = useState(false);
   const pollRef = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchToday = useCallback(async () => {
+  const fetchToday = useCallback(async (): Promise<TodayResponse | undefined> => {
     try {
       const res = await authFetch("/daily-content/today", getToken);
       if (!res.ok) {
         if (res.status === 403) {
           setAuthorized(false);
           setLoading(false);
-          return;
+          return undefined;
         }
         throw new Error("Failed to fetch");
       }
@@ -328,6 +328,7 @@ export default function DailyContent() {
       return data;
     } catch (err) {
       setLoading(false);
+      return undefined;
     }
   }, [getToken]);
 

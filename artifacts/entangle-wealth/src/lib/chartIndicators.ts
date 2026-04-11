@@ -358,7 +358,7 @@ export function calcParabolicSARSeries(highs: number[], lows: number[], step: nu
 
   for (let i = 1; i < highs.length; i++) {
     sar = sar + af * (ep - sar);
-    let prevUp = uptrend;
+    let prevUp: boolean = uptrend;
     if (uptrend) {
       if (lows[i] < sar) { uptrend = false; sar = ep; ep = lows[i]; af = step; }
       else { if (highs[i] > ep) { ep = highs[i]; af = Math.min(af + step, max); } }

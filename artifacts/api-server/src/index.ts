@@ -179,14 +179,6 @@ async function ensurePaperTradingTables() {
           avg_cost REAL NOT NULL DEFAULT 0,
           updated_at TIMESTAMPTZ DEFAULT now()
         );
-        CREATE TABLE IF NOT EXISTS daily_spins (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT NOT NULL,
-          prize_amount REAL NOT NULL,
-          spin_date TEXT NOT NULL,
-          created_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE UNIQUE INDEX IF NOT EXISTS daily_spins_user_date_unique ON daily_spins (user_id, spin_date);
         CREATE INDEX IF NOT EXISTS idx_paper_trades_user ON paper_trades (user_id);
         CREATE INDEX IF NOT EXISTS idx_paper_positions_user ON paper_positions (user_id);
       `);

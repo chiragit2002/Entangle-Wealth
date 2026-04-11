@@ -250,7 +250,7 @@ export default function Gamification() {
         fetchStatus();
         const tier = getCelebrationTier(data.rewardType, data.rewardValue ?? 0);
         fireConfetti(tier);
-        if (tier === "big") {
+        if (tier === "jackpot") {
           setBigWinLabel("BIG WIN");
           setShowBigWin(true);
         }
@@ -272,7 +272,7 @@ export default function Gamification() {
         const totalXp = (data.xpEarned ?? 0) + (data.streakBonus ?? 0);
         const tier = getXpCelebrationTier(totalXp);
         fireConfetti(tier);
-        if (tier === "big") {
+        if (tier === "jackpot") {
           setBigWinLabel("JACKPOT!");
           setShowBigWin(true);
         }

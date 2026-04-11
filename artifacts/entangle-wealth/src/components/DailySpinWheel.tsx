@@ -252,7 +252,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
                 className={`mt-4 w-full p-3 rounded-lg text-center ${
                   resultTier === "jackpot"
                     ? "bg-[#FFD700]/15 border border-[#FFD700]/40"
-                    : resultTier === "big"
+                    : resultTier === "large"
                     ? "bg-[#00D4FF]/10 border border-[#00D4FF]/30"
                     : "bg-[#FFD700]/10 border border-[#FFD700]/20"
                 }`}

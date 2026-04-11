@@ -370,6 +370,6 @@ export function getXpCelebrationTier(xp: number): CelebrationTier {
   return "small";
 }
 
-export function fireConfetti(): void {
-  fireCelebration(0, "xp", "medium");
+export function fireConfetti(tier: CelebrationTier = "medium"): void {
+  fireCelebration(0, "xp", tier);
 }

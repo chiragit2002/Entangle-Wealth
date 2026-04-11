@@ -117,7 +117,7 @@ export default function AdminTickets() {
               <p className="text-xs text-white/30">{tickets.length} tickets</p>
             </div>
           </div>
-          <button onClick={fetchTickets} disabled={loading} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white/[0.05] border border-white/10 rounded-lg hover:bg-white/10 transition-colors text-white/60">
+          <button onClick={() => fetchTickets()} disabled={loading} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white/[0.05] border border-white/10 rounded-lg hover:bg-white/10 transition-colors text-white/60">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
           </button>
         </div>

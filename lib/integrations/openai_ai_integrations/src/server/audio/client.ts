@@ -78,8 +78,8 @@ export async function convertToWav(audioBuffer: Buffer): Promise<Buffer> {
 
     return await readFile(outputPath);
   } finally {
-    await unlink(inputPath).catch(() => {});
-    await unlink(outputPath).catch(() => {});
+    await unlink(inputPath).catch((err) => console.debug("Failed to clean up temp input file", inputPath, err));
+    await unlink(outputPath).catch((err) => console.debug("Failed to clean up temp output file", outputPath, err));
   }
 }
 

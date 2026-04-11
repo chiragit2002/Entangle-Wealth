@@ -155,7 +155,7 @@ function useUserCount() {
     fetch(`${API_BASE}/stats/user-count`)
       .then((r) => r.ok ? r.json() : null)
       .then((d) => { if (d && d.count > 0) setCount(d.count); })
-      .catch(() => {});
+      .catch((err) => console.warn("Failed to fetch user count", err));
   }, []);
   return count;
 }
@@ -166,7 +166,7 @@ function useRecentSignups() {
     fetch(`${API_BASE}/stats/recent-signups`)
       .then((r) => r.ok ? r.json() : null)
       .then((d) => { if (d && d.length > 0) setSignups(d); })
-      .catch(() => {});
+      .catch((err) => console.warn("Failed to fetch recent signups", err));
   }, []);
   return signups;
 }
@@ -177,7 +177,7 @@ function useTestimonials() {
     fetch(`${API_BASE}/viral/testimonials`)
       .then((r) => r.ok ? r.json() : null)
       .then((d) => { if (d) setTestimonials(d); })
-      .catch(() => {});
+      .catch((err) => console.warn("Failed to fetch testimonials", err));
   }, []);
   return testimonials;
 }

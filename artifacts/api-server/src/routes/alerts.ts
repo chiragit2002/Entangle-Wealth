@@ -542,7 +542,7 @@ async function evaluateAlerts() {
           symbol: alert.symbol,
           condition: message,
           triggeredValue,
-        }).catch(() => {});
+        }).catch((err) => logger.warn({ err }, "Failed to send Zapier webhook for alert triggered"));
       }
     }
   } catch (err) {

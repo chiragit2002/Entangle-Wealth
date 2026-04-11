@@ -96,7 +96,7 @@ export default function Pricing() {
     fetch("/api/stripe/products")
       .then(res => res.ok ? res.json() : [])
       .then(setProducts)
-      .catch(() => {});
+      .catch((err) => console.warn("Failed to fetch Stripe products", err));
   }, []);
 
   const fetchAuth = useCallback(

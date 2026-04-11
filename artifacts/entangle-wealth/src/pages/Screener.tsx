@@ -124,7 +124,7 @@ export default function Screener() {
         }));
         setIsLive(true);
       })
-      .catch(() => {});
+      .catch((err) => console.warn("Failed to fetch live stock snapshots", err));
   }, []);
 
   const handleSort = useCallback((field: SortField) => {

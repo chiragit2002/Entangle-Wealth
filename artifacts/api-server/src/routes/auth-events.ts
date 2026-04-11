@@ -3,6 +3,7 @@ import { getAuth } from "@clerk/express";
 import { logAuthEvent, type AuthEventType } from "../lib/authEventLogger";
 import { recordFailedAttempt, resetAttempts } from "../middlewares/bruteForce";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
+import { logger } from "../lib/logger";
 import crypto from "crypto";
 
 const router = Router();
@@ -65,7 +66,7 @@ router.post("/auth/event", (req: Request, res: Response) => {
       userId,
       timestamp: new Date().toISOString(),
       ipHash: hashedIp,
-    }).catch(() => {});
+    }).catch((err) => logger.warn({ err }, "Failed to send Zapier webhook for login event"));
   }
 
   res.json({ logged: true });

@@ -11,6 +11,7 @@ import { getAuth } from "@clerk/express";
 import crypto from "crypto";
 import { processReferralMilestones } from "../lib/referralRewards";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -91,7 +92,7 @@ router.post("/users/sync", requireAuth, async (req, res) => {
         referralCode: created.referralCode,
         signupTimestamp:
           created.createdAt?.toISOString() || new Date().toISOString(),
-      }).catch(() => {});
+      }).catch((err) => logger.warn({ err }, "Failed to send Zapier webhook for user signup"));
 
       if (req.body.referredBy) {
         db.insert(analyticsEventsTable)
@@ -100,7 +101,7 @@ router.post("/users/sync", requireAuth, async (req, res) => {
             event: "referral_signup",
             properties: { referralCode: req.body.referredBy },
           })
-          .catch(() => {});
+          .catch((err) => logger.warn({ err }, "Failed to insert referral_signup analytics event"));
         const [referrer] = await db
           .select()
           .from(usersTable)
@@ -118,7 +119,7 @@ router.post("/users/sync", requireAuth, async (req, res) => {
               referrerId: referrer.clerkId,
               referredUserEmail: created.email,
               referralCode: req.body.referredBy,
-            }).catch(() => {});
+            }).catch((err) => logger.warn({ err }, "Failed to send Zapier webhook for referral conversion"));
 
             processReferralMilestones(referrer.clerkId).catch((err) =>
               console.error("[referral] milestone processing failed:", err),

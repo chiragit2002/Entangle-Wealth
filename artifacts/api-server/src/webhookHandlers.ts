@@ -108,7 +108,7 @@ export class WebhookHandlers {
             planTier,
             amount: session.amount_total,
             subscriptionStatus: 'active',
-          }).catch(() => {});
+          }).catch((err) => logger.warn({ err }, "Failed to send Zapier webhook for subscription created"));
           break;
         }
         case 'customer.subscription.updated': {
@@ -126,7 +126,7 @@ export class WebhookHandlers {
             planTier,
             amount: sub.items?.data?.[0]?.price?.unit_amount || null,
             subscriptionStatus: sub.status || null,
-          }).catch(() => {});
+          }).catch((err) => logger.warn({ err }, "Failed to send Zapier webhook for subscription updated"));
           break;
         }
         case 'invoice.payment_succeeded': {
@@ -139,7 +139,7 @@ export class WebhookHandlers {
             userId,
             amount: invoice.amount_paid,
             invoiceId: invoice.id,
-          }).catch(() => {});
+          }).catch((err) => logger.warn({ err }, "Failed to send Zapier webhook for payment received"));
           break;
         }
       }

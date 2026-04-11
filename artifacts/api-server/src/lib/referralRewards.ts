@@ -9,6 +9,7 @@ import {
 } from "@workspace/db/schema";
 import { eq, count, and } from "drizzle-orm";
 import { getUncachableStripeClient } from "../stripeClient";
+import { resolveUserId } from "./resolveUserId";
 
 const REFERRAL_BADGES = [
   { slug: "referral-bronze", name: "Referral Bronze", icon: "bronze", description: "Referred 3 users who signed up", category: "referral", xpReward: 100, threshold: 3 },
@@ -41,6 +42,12 @@ export async function ensureReferralBadgesExist(): Promise<void> {
 }
 
 export async function processReferralMilestones(referrerId: string): Promise<void> {
+  const userId = await resolveUserId(referrerId);
+  if (!userId) {
+    console.warn(`[referral] Could not resolve DB user ID for Clerk ID ${referrerId}`);
+    return;
+  }
+
   const [stats] = await db
     .select({ converted: count() })
     .from(referralsTable)
@@ -61,20 +68,20 @@ export async function processReferralMilestones(referrerId: string): Promise<voi
         .from(userBadgesTable)
         .where(
           and(
-            eq(userBadgesTable.userId, referrerId),
+            eq(userBadgesTable.userId, userId),
             eq(userBadgesTable.badgeId, badge.id)
           )
         );
 
       if (!existing) {
         await db.insert(userBadgesTable).values({
-          userId: referrerId,
+          userId,
           badgeId: badge.id,
         });
 
         if (badge.xpReward > 0) {
           await db.insert(xpTransactionsTable).values({
-            userId: referrerId,
+            userId,
             amount: badge.xpReward,
             reason: `Earned ${badge.name} badge`,
             category: "referral",
@@ -83,7 +90,7 @@ export async function processReferralMilestones(referrerId: string): Promise<voi
           const [xp] = await db
             .select()
             .from(userXpTable)
-            .where(eq(userXpTable.userId, referrerId));
+            .where(eq(userXpTable.userId, userId));
 
           if (xp) {
             await db
@@ -94,10 +101,10 @@ export async function processReferralMilestones(referrerId: string): Promise<voi
                 weeklyXp: xp.weeklyXp + badge.xpReward,
                 updatedAt: new Date(),
               })
-              .where(eq(userXpTable.userId, referrerId));
+              .where(eq(userXpTable.userId, userId));
           } else {
             await db.insert(userXpTable).values({
-              userId: referrerId,
+              userId,
               totalXp: badge.xpReward,
               monthlyXp: badge.xpReward,
               weeklyXp: badge.xpReward,

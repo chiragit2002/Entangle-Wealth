@@ -8,8 +8,8 @@ import { logger } from "../lib/logger";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { CircuitBreaker, registerCircuit } from "../lib/circuitBreaker";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
-import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { sendPushNotificationToUser } from "./push";
+import { getAuth } from "@clerk/express";
 
 const router = Router();
 
@@ -254,9 +254,24 @@ router.post("/alerts/mark-read", requireAuth, async (req: AuthenticatedRequest, 
 
 const sseClients = new Map<string, Set<Response>>();
 
-router.get("/alerts/stream", requireAuth, (req: AuthenticatedRequest, res: Response) => {
-  const userId = req.userId;
-  if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
+router.get("/alerts/stream", (req: Request, res: Response) => {
+  const { userId } = getAuth(req);
+
+  if (!userId) {
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+      "X-Accel-Buffering": "no",
+    });
+    res.flushHeaders();
+    res.write(`event: auth_error\ndata: ${JSON.stringify({ type: "auth_error", message: "Token expired or missing. Please refresh and reconnect." })}\n\n`);
+    if (typeof (res as Record<string, unknown>).flush === "function") {
+      (res as Record<string, (() => void)>).flush();
+    }
+    res.end();
+    return;
+  }
 
   res.writeHead(200, {
     "Content-Type": "text/event-stream",

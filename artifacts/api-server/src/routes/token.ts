@@ -98,17 +98,23 @@ router.get("/token/balance", requireAuth, async (req, res) => {
       .from(usersTable)
       .where(eq(usersTable.clerkId, userId));
 
-    if (!user) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-
     const [config] = await db
       .select()
       .from(tokenConfigTable)
       .where(eq(tokenConfigTable.key, "share_price"));
     const sharePrice = config ? parseFloat(config.value) : 40.0;
     const tokenValue = sharePrice * 0.25;
+
+    if (!user) {
+      res.json({
+        balance: 0,
+        walletAddress: null,
+        tokenValue,
+        totalValue: 0,
+        sharePrice,
+      });
+      return;
+    }
 
     res.json({
       balance: user.tokenBalance || 0,

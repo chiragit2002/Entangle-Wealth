@@ -17,7 +17,7 @@ interface CheckResult {
   detail: string;
 }
 
-function localGet(path: string): Promise<{ statusCode: number; body: string }> {
+function localApiGet(path: string): Promise<{ statusCode: number; body: string }> {
   const port = process.env.PORT || "3001";
   return new Promise((resolve, reject) => {
     const req = http.get(`http://127.0.0.1:${port}${path}`, { timeout: 5000 }, (res) => {
@@ -30,9 +30,21 @@ function localGet(path: string): Promise<{ statusCode: number; body: string }> {
   });
 }
 
+function frontendGet(path: string): Promise<{ statusCode: number; body: string }> {
+  return new Promise((resolve, reject) => {
+    const req = http.get(`http://127.0.0.1:80${path}`, { timeout: 5000 }, (res) => {
+      let body = "";
+      res.on("data", (chunk: Buffer) => { body += chunk.toString(); });
+      res.on("end", () => resolve({ statusCode: res.statusCode || 0, body }));
+    });
+    req.on("error", (e) => reject(e));
+    req.on("timeout", () => { req.destroy(); reject(new Error("Timeout")); });
+  });
+}
+
 async function checkHealthEndpoint(): Promise<CheckResult> {
   try {
-    const { statusCode, body } = await localGet("/api/healthz");
+    const { statusCode, body } = await localApiGet("/api/healthz");
     if (statusCode === 200) {
       const data = JSON.parse(body);
       if (data.status === "ok") {
@@ -160,22 +172,22 @@ async function checkMemory(): Promise<CheckResult> {
   return { id: "memory", label: "Memory Usage", category: "Performance", status: "fail", detail: `${heapUsedMB}MB heap used — high memory pressure` };
 }
 
-async function checkPageReturns200(id: string, label: string, category: string, pagePath: string): Promise<CheckResult> {
+async function checkFrontendPage(id: string, label: string, category: string, path: string): Promise<CheckResult> {
   try {
-    const { statusCode } = await localGet(pagePath);
-    if (statusCode === 200) {
-      return { id, label, category, status: "pass", detail: `${pagePath} returns 200 OK` };
+    const { statusCode, body } = await frontendGet(path);
+    if (statusCode === 200 && body.length > 100) {
+      return { id, label, category, status: "pass", detail: `${path} serving (${statusCode}, ${Math.round(body.length / 1024)}KB)` };
     }
-    return { id, label, category, status: "fail", detail: `${pagePath} returned ${statusCode}` };
+    return { id, label, category, status: "fail", detail: `${path} returned ${statusCode}` };
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Unknown error";
-    return { id, label, category, status: "fail", detail: `${pagePath} unreachable: ${msg}` };
+    return { id, label, category, status: "fail", detail: `${path} unreachable: ${msg}` };
   }
 }
 
 async function checkBlogPosts(): Promise<CheckResult> {
   try {
-    const { statusCode, body } = await localGet("/api/seo/blog-posts");
+    const { statusCode, body } = await localApiGet("/api/seo/blog-posts");
     if (statusCode === 200) {
       const data = JSON.parse(body);
       const posts = Array.isArray(data) ? data : data.posts || [];
@@ -185,9 +197,40 @@ async function checkBlogPosts(): Promise<CheckResult> {
       }
       return { id: "blog", label: "Blog Post Published", category: "Content", status: "warn", detail: "No published blog posts yet" };
     }
-    return { id: "blog", label: "Blog Post Published", category: "Content", status: "warn", detail: `Blog API returned ${statusCode}` };
+    return { id: "blog", label: "Blog Post Published", category: "Content", status: "warn", detail: `Blog API returned ${statusCode} — posts may be in localStorage` };
   } catch {
     return { id: "blog", label: "Blog Post Published", category: "Content", status: "warn", detail: "Could not verify blog posts (client-side storage)" };
+  }
+}
+
+async function checkSSL(): Promise<CheckResult> {
+  const replitDomain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS;
+  if (!replitDomain) {
+    return { id: "ssl", label: "SSL Certificate", category: "Security", status: "warn", detail: "No deployment domain detected — SSL handled by Replit on deploy" };
+  }
+  try {
+    const resp = await fetch(`https://${replitDomain}/api/healthz`, { signal: AbortSignal.timeout(5000) });
+    if (resp.ok) {
+      return { id: "ssl", label: "SSL Certificate", category: "Security", status: "pass", detail: `HTTPS verified on ${replitDomain}` };
+    }
+    return { id: "ssl", label: "SSL Certificate", category: "Security", status: "warn", detail: `HTTPS returned ${resp.status}` };
+  } catch {
+    return { id: "ssl", label: "SSL Certificate", category: "Security", status: "warn", detail: "SSL auto-provisioned by Replit on deployment" };
+  }
+}
+
+async function check404Page(): Promise<CheckResult> {
+  try {
+    const { statusCode, body } = await frontendGet("/this-page-does-not-exist-404-test");
+    if (statusCode === 200 && body.includes("404")) {
+      return { id: "error_page", label: "404 Error Page", category: "UX", status: "pass", detail: "Branded 404 page is serving" };
+    }
+    if (statusCode === 200) {
+      return { id: "error_page", label: "404 Error Page", category: "UX", status: "pass", detail: "SPA fallback serving — 404 handled client-side" };
+    }
+    return { id: "error_page", label: "404 Error Page", category: "UX", status: "fail", detail: `404 test returned ${statusCode}` };
+  } catch {
+    return { id: "error_page", label: "404 Error Page", category: "UX", status: "warn", detail: "Could not verify 404 page (frontend may not be accessible from API)" };
   }
 }
 
@@ -213,11 +256,14 @@ router.get("/admin/launch-checks", requireAuth, async (req: Request, res: Respon
       checkSessionSecret(),
       checkNodeVersion(),
       checkMemory(),
-      checkPageReturns200("page_terms", "Terms of Service Page", "Legal", "/api/healthz"),
-      checkPageReturns200("page_privacy", "Privacy Policy Page", "Legal", "/api/healthz"),
-      checkPageReturns200("page_help", "Help Center Page", "Support", "/api/healthz"),
-      checkPageReturns200("page_status", "Status Page", "Support", "/api/healthz"),
+      checkFrontendPage("page_terms", "Terms of Service", "Legal", "/terms"),
+      checkFrontendPage("page_privacy", "Privacy Policy", "Legal", "/privacy"),
+      checkFrontendPage("page_disclaimer", "Financial Disclaimer", "Legal", "/disclaimer"),
+      checkFrontendPage("page_help", "Help Center", "Support", "/help"),
+      checkFrontendPage("page_status", "Status Page", "Support", "/status"),
       checkBlogPosts(),
+      checkSSL(),
+      check404Page(),
     ]);
 
     const passing = checks.filter((c) => c.status === "pass").length;

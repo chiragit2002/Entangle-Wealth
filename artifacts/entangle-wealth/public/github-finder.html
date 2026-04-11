@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Solution Finder — EntangleWealth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0D1117;--bg2:#161B22;--bg3:#21262D;--bg4:#30363D;
+--border:#30363D;--border2:#21262D;
+--green:#3FB950;--purple:#BC8CFF;--blue:#58A6FF;--orange:#F78166;
+--red:#FF7B72;--yellow:#D29922;--teal:#39C5CF;--gold:#F5C842;
+--text:#E6EDF3;--muted:#8B949E;--subtle:#484F58;
+--font-ui:'Inter',sans-serif;--font-code:'JetBrains Mono',monospace;
+}
+html{font-size:14px}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);min-height:100vh;overflow-x:hidden}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
+button{cursor:pointer;font-family:var(--font-ui);border:none;background:none;color:var(--text)}
+input,textarea,select{font-family:var(--font-ui);background:var(--bg4);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 12px;outline:none;transition:border .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--blue)}
+code,pre{font-family:var(--font-code)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--subtle)}
+
+.nav{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.nav-logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:1.1rem;color:var(--gold);white-space:nowrap}
+.nav-logo span{color:var(--text)}
+.search-wrap{flex:1;position:relative;max-width:700px}
+.search-wrap input{width:100%;padding:10px 16px 10px 40px;border-radius:8px;font-size:1rem;background:var(--bg);border:1px solid var(--border)}
+.search-wrap input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(88,166,255,.15)}
+.search-wrap .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.nav-actions{display:flex;align-items:center;gap:12px;white-space:nowrap}
+#rate-limit-display{font-size:.75rem;color:var(--muted);font-family:var(--font-code)}
+.btn-settings{padding:6px 14px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;color:var(--muted);transition:all .2s}
+.btn-settings:hover{border-color:var(--blue);color:var(--blue)}
+
+.tabs{display:flex;gap:2px;padding:0 20px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab-btn{padding:10px 16px;font-size:.85rem;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;font-weight:500}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border);align-items:center}
+.filter-group{display:flex;gap:4px;flex-wrap:wrap}
+.chip{padding:4px 12px;border-radius:20px;font-size:.75rem;border:1px solid var(--border);color:var(--muted);transition:all .2s;font-weight:500}
+.chip:hover{border-color:var(--blue);color:var(--text)}
+.chip.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.mode-chips{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px}
+.mode-chip{padding:4px 10px;border-radius:14px;font-size:.72rem;border:1px solid var(--border);color:var(--muted);transition:all .2s}
+.mode-chip:hover,.mode-chip.active{border-color:var(--purple);color:var(--purple);background:rgba(188,140,255,.1)}
+
+.main{padding:20px;max-width:1200px;margin:0 auto}
+.tab-content{display:none}.tab-content.active{display:block}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;transition:border .2s}
+.card:hover{border-color:var(--subtle)}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:12px}
+.card-title{font-weight:600;font-size:1rem}
+.card-title a{color:var(--text)}.card-title a:hover{color:var(--blue)}
+.card-desc{color:var(--muted);font-size:.9rem;margin-bottom:10px;line-height:1.5}
+.card-meta{display:flex;flex-wrap:wrap;gap:12px;font-size:.8rem;color:var(--muted);align-items:center}
+.card-meta .star{color:var(--gold)}
+.card-meta .lang-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:3px;vertical-align:middle}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.tag{padding:2px 8px;border-radius:12px;font-size:.7rem;background:rgba(88,166,255,.1);color:var(--blue);border:1px solid rgba(88,166,255,.2)}
+.card-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.btn{padding:6px 14px;border-radius:6px;font-size:.8rem;font-weight:500;transition:all .2s;border:1px solid var(--border)}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-primary:hover{background:#4393e6;color:#fff}
+.btn-sm{padding:4px 10px;font-size:.75rem}
+
+.ai-card{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--purple);border-radius:10px;padding:20px;margin-bottom:16px}
+.ai-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.ai-card-header h3{color:var(--purple);font-size:1rem;display:flex;align-items:center;gap:8px}
+.confidence-badge{padding:4px 10px;border-radius:12px;font-size:.75rem;font-weight:600;font-family:var(--font-code)}
+.confidence-high{background:rgba(63,185,80,.15);color:var(--green)}
+.confidence-med{background:rgba(210,153,34,.15);color:var(--yellow)}
+.confidence-low{background:rgba(255,123,114,.15);color:var(--red)}
+.ai-section{margin-bottom:14px}
+.ai-section h4{font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.ai-section p,.ai-section li{font-size:.9rem;line-height:1.6;color:var(--text)}
+.ai-section ul{padding-left:16px}
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin:8px 0;overflow-x:auto;font-size:.85rem;line-height:1.5}
+.code-block code{font-family:var(--font-code)}
+
+.health-bar{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-top:4px}
+.health-bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
+.health-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:12px 0}
+.health-item{background:var(--bg3);border-radius:8px;padding:12px}
+.health-item label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.health-item .score{font-size:1.5rem;font-weight:700;font-family:var(--font-code);margin:4px 0}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0}
+.stat-box{background:var(--bg3);padding:10px;border-radius:8px;text-align:center}
+.stat-box .val{font-size:1.2rem;font-weight:700;font-family:var(--font-code);color:var(--text)}
+.stat-box .lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;margin-top:2px}
+
+.error-input{width:100%;min-height:120px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:var(--font-code);font-size:.85rem;color:var(--orange);resize:vertical}
+.error-input::placeholder{color:var(--subtle)}
+
+.section-title{font-size:1.1rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+.settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;justify-content:center;align-items:flex-start;padding-top:60px}
+.settings-overlay.show{display:flex}
+.settings-panel{background:var(--bg2);border:1px solid var(--border);border-radius:12px;width:90%;max-width:560px;max-height:80vh;overflow-y:auto;padding:24px}
+.settings-panel h2{margin-bottom:16px;font-size:1.2rem}
+.setting-group{margin-bottom:20px}
+.setting-group label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px;font-weight:500}
+.setting-group input,.setting-group select{width:100%}
+.setting-group .hint{font-size:.75rem;color:var(--subtle);margin-top:4px}
+.setting-row{display:flex;gap:8px;align-items:center}
+.setting-row input{flex:1}
+
+.loading{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay{display:flex;flex-direction:column;align-items:center;gap:12px;padding:40px;color:var(--muted)}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state .icon{font-size:3rem;margin-bottom:12px}
+.empty-state p{font-size:1rem;max-width:400px;margin:0 auto;line-height:1.6}
+
+.issue-card{border-left:3px solid var(--green)}
+.issue-card.closed{border-left-color:var(--purple)}
+.issue-card.closed-red{border-left-color:var(--red)}
+.issue-status{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:600}
+.issue-status.open{background:rgba(63,185,80,.15);color:var(--green)}
+.issue-status.closed{background:rgba(188,140,255,.15);color:var(--purple)}
+.issue-status.closed-red{background:rgba(255,123,114,.15);color:var(--red)}
+
+.dev-profile{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.dev-avatar{width:100px;height:100px;border-radius:50%;border:3px solid var(--border)}
+.dev-info{flex:1;min-width:250px}
+.dev-name{font-size:1.3rem;font-weight:700}
+.dev-login{color:var(--muted);font-size:.95rem}
+
+.trending-rank{font-size:1.5rem;font-weight:800;color:var(--orange);font-family:var(--font-code);min-width:40px;text-align:center}
+.trending-bar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-top:6px}
+.trending-bar-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--gold));border-radius:2px}
+
+.bookmark-collection{margin-bottom:20px}
+.bookmark-collection h3{font-size:.95rem;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+
+.ai-lab-modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:20px}
+.ai-lab-mode{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all .2s}
+.ai-lab-mode:hover,.ai-lab-mode.active{border-color:var(--purple);background:rgba(188,140,255,.05)}
+.ai-lab-mode h4{font-size:.95rem;margin-bottom:4px}
+.ai-lab-mode p{font-size:.8rem;color:var(--muted)}
+
+.readme-content{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:20px;line-height:1.7;font-size:.9rem}
+.readme-content h1,.readme-content h2,.readme-content h3{margin:16px 0 8px;color:var(--text);border-bottom:1px solid var(--border);padding-bottom:6px}
+.readme-content pre{background:var(--bg);border-radius:6px;padding:12px;overflow-x:auto;margin:8px 0}
+.readme-content code{font-family:var(--font-code);font-size:.85rem}
+.readme-content p{margin:8px 0}
+.readme-content img{max-width:100%;border-radius:6px}
+.readme-content a{color:var(--blue)}
+.readme-content ul,.readme-content ol{padding-left:20px;margin:8px 0}
+.readme-content blockquote{border-left:3px solid var(--border);padding-left:12px;color:var(--muted);margin:8px 0}
+.readme-content table{border-collapse:collapse;width:100%;margin:8px 0}
+.readme-content th,.readme-content td{border:1px solid var(--border);padding:6px 10px;text-align:left;font-size:.85rem}
+.readme-content th{background:var(--bg4)}
+
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 20px;color:var(--text);font-size:.9rem;z-index:300;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:768px){
+  .nav{flex-wrap:wrap;gap:8px;padding:10px 12px}
+  .search-wrap{order:3;max-width:100%;flex-basis:100%}
+  .nav-actions{order:2;margin-left:auto}
+  .tabs{padding:0 12px}
+  .tab-btn{padding:8px 10px;font-size:.78rem}
+  .main{padding:12px}
+  .grid-2{grid-template-columns:1fr}
+  .dev-profile{flex-direction:column;align-items:center;text-align:center}
+  .ai-lab-modes{grid-template-columns:1fr}
+  .filters{padding:8px 12px}
+  .health-grid{grid-template-columns:1fr 1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  #rate-limit-display{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">⚛ <span>GitHub Finder</span></div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="main-search" placeholder='Search GitHub — try "react table virtualization" or paste an error message' autocomplete="off">
+  </div>
+  <div class="nav-actions">
+    <span id="rate-limit-display">GitHub API: — / —</span>
+    <button class="btn-settings" onclick="toggleSettings()">⚙ Settings</button>
+  </div>
+</nav>
+
+<div class="tabs" id="tab-bar">
+  <button class="tab-btn active" data-tab="search">🔍 Search</button>
+  <button class="tab-btn" data-tab="errors">🐛 Error Solver</button>
+  <button class="tab-btn" data-tab="repos">📦 Repos</button>
+  <button class="tab-btn" data-tab="code">💻 Code</button>
+  <button class="tab-btn" data-tab="issues">📋 Issues</button>
+  <button class="tab-btn" data-tab="people">👤 People</button>
+  <button class="tab-btn" data-tab="ailab">🤖 AI Lab</button>
+  <button class="tab-btn" data-tab="trending">🔥 Trending</button>
+  <button class="tab-btn" data-tab="bookmarks">⭐ Bookmarks</button>
+</div>
+
+<div class="filters" id="filter-bar">
+  <div class="mode-chips" id="mode-chips">
+    <button class="mode-chip active" data-mode="universal">🔍 Universal</button>
+    <button class="mode-chip" data-mode="error_solver">🐛 Error Solver</button>
+    <button class="mode-chip" data-mode="library_finder">📦 Library Finder</button>
+    <button class="mode-chip" data-mode="code_search">💻 Code Search</button>
+    <button class="mode-chip" data-mode="developer">👤 Developer</button>
+    <button class="mode-chip" data-mode="how_to">📖 How-To</button>
+  </div>
+  <div class="filter-group" id="lang-filters">
+    <button class="chip active" data-lang="">All</button>
+    <button class="chip" data-lang="JavaScript">JavaScript</button>
+    <button class="chip" data-lang="TypeScript">TypeScript</button>
+    <button class="chip" data-lang="Python">Python</button>
+    <button class="chip" data-lang="Rust">Rust</button>
+    <button class="chip" data-lang="Go">Go</button>
+    <button class="chip" data-lang="Java">Java</button>
+    <button class="chip" data-lang="C++">C++</button>
+    <button class="chip" data-lang="C#">C#</button>
+    <button class="chip" data-lang="PHP">PHP</button>
+    <button class="chip" data-lang="Ruby">Ruby</button>
+    <button class="chip" data-lang="Swift">Swift</button>
+    <button class="chip" data-lang="Kotlin">Kotlin</button>
+    <button class="chip" data-lang="Shell">Shell</button>
+  </div>
+  <div class="filter-group" id="time-filters">
+    <button class="chip active" data-time="">Any time</button>
+    <button class="chip" data-time="day">Today</button>
+    <button class="chip" data-time="week">This week</button>
+    <button class="chip" data-time="month">This month</button>
+    <button class="chip" data-time="year">This year</button>
+  </div>
+</div>
+
+<div class="main">
+  <div id="tab-search" class="tab-content active">
+    <div id="search-results">
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <p>Search GitHub for solutions, libraries, code examples, and more. Try pasting an error message or searching for a library.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-errors" class="tab-content">
+    <div class="section-title">🐛 Error Solver</div>
+    <textarea class="error-input" id="error-input" placeholder="Paste your error message or stack trace here...&#10;&#10;Example:&#10;TypeError: Cannot read properties of undefined (reading 'map')&#10;  at ProductList (ProductList.jsx:23:18)"></textarea>
+    <div style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap;align-items:center">
+      <select id="error-lang" style="width:150px"><option value="">Language</option><option>JavaScript</option><option>TypeScript</option><option>Python</option><option>Java</option><option>Rust</option><option>Go</option><option>C++</option><option>Ruby</option><option>PHP</option><option>Swift</option></select>
+      <select id="error-framework" style="width:150px"><option value="">Framework</option><option>React</option><option>Next.js</option><option>Vue</option><option>Angular</option><option>Express</option><option>Django</option><option>FastAPI</option><option>Rails</option><option>Spring</option><option>Flask</option></select>
+      <button class="btn btn-primary" onclick="handleSolveError()">🔍 Solve It</button>
+    </div>
+    <div id="error-results"></div>
+  </div>
+
+  <div id="tab-repos" class="tab-content">
+    <div class="section-title">📦 Repository Analyzer</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <input type="text" id="repo-input" placeholder="Enter owner/repo or paste a GitHub URL" style="flex:1">
+      <button class="btn btn-primary" onclick="handleAnalyzeRepo()">Analyze</button>
+    </div>
+    <div id="repo-results"></div>
+  </div>
+
+  <div id="tab-code" class="tab-content">
+    <div class="section-title">💻 Code Search</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <input type="text" id="code-search-input" placeholder="Find code that does... e.g. validates email with regex" style="flex:1;min-width:200px">
+      <select id="code-lang" style="width:140px"><option value="">Language</option><option>JavaScript</option><option>TypeScript</option><option>Python</option><option>Java</option><option>Rust</option><option>Go</option><option>C++</option><option>Ruby</option><option>PHP</option></select>
+      <button class="btn btn-primary" onclick="handleCodeSearch()">Search Code</button>
+    </div>
+    <div id="code-results"></div>
+  </div>
+
+  <div id="tab-issues" class="tab-content">
+    <div class="section-title">📋 Issues & Discussions</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <input type="text" id="issue-search-input" placeholder="Search issues and discussions..." style="flex:1;min-width:200px">
+      <select id="issue-state" style="width:110px"><option value="all">All States</option><option value="open">Open</option><option value="closed">Closed</option></select>
+      <select id="issue-type" style="width:110px"><option value="issue">Issues</option><option value="pr">Pull Requests</option></select>
+      <button class="btn btn-primary" onclick="handleIssueSearch()">Search</button>
+    </div>
+    <div id="issue-results"></div>
+  </div>
+
+  <div id="tab-people" class="tab-content">
+    <div class="section-title">👤 Developer Profiles</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <input type="text" id="people-input" placeholder="Enter a GitHub username" style="flex:1">
+      <button class="btn btn-primary" onclick="handleAnalyzeDev()">Analyze Profile</button>
+    </div>
+    <div id="people-results"></div>
+  </div>
+
+  <div id="tab-ailab" class="tab-content">
+    <div class="section-title">🤖 AI Lab</div>
+    <div class="ai-lab-modes" id="ai-lab-modes">
+      <div class="ai-lab-mode active" data-mode="codebase-qa" onclick="setAILabMode('codebase-qa')">
+        <h4>📖 Codebase Q&A</h4>
+        <p>Paste a GitHub URL and ask questions about the codebase</p>
+      </div>
+      <div class="ai-lab-mode" data-mode="compare" onclick="setAILabMode('compare')">
+        <h4>⚖️ Library Comparison</h4>
+        <p>Compare 2-5 libraries across multiple dimensions</p>
+      </div>
+      <div class="ai-lab-mode" data-mode="pr-review" onclick="setAILabMode('pr-review')">
+        <h4>🔀 PR Analyzer</h4>
+        <p>Analyze any Pull Request for risks and quality</p>
+      </div>
+      <div class="ai-lab-mode" data-mode="stack" onclick="setAILabMode('stack')">
+        <h4>🏗️ Tech Stack Advisor</h4>
+        <p>Describe your project and get stack recommendations</p>
+      </div>
+    </div>
+    <div id="ailab-workspace">
+      <div id="ailab-codebase-qa" class="ailab-panel">
+        <input type="text" id="qa-repo" placeholder="GitHub repo URL or owner/repo" style="width:100%;margin-bottom:8px">
+        <input type="text" id="qa-question" placeholder="Ask a question about this codebase..." style="width:100%;margin-bottom:8px">
+        <button class="btn btn-primary" onclick="handleCodebaseQA()">Ask AI</button>
+      </div>
+      <div id="ailab-compare" class="ailab-panel" style="display:none">
+        <input type="text" id="compare-libs" placeholder="Enter library names separated by commas (e.g. react, vue, svelte)" style="width:100%;margin-bottom:8px">
+        <button class="btn btn-primary" onclick="handleLibCompare()">Compare Libraries</button>
+      </div>
+      <div id="ailab-pr-review" class="ailab-panel" style="display:none">
+        <input type="text" id="pr-url" placeholder="Paste PR URL (e.g. https://github.com/owner/repo/pull/123)" style="width:100%;margin-bottom:8px">
+        <button class="btn btn-primary" onclick="handlePRAnalysis()">Analyze PR</button>
+      </div>
+      <div id="ailab-stack" class="ailab-panel" style="display:none">
+        <textarea id="stack-desc" placeholder="Describe your project (e.g. Real-time chat app for 10k concurrent users, needs auth, file sharing, and mobile support)" style="width:100%;min-height:80px;margin-bottom:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-family:var(--font-ui);resize:vertical"></textarea>
+        <button class="btn btn-primary" onclick="handleStackRecommend()">Get Recommendations</button>
+      </div>
+    </div>
+    <div id="ailab-results" style="margin-top:16px"></div>
+  </div>
+
+  <div id="tab-trending" class="tab-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div class="section-title" style="margin-bottom:0">🔥 Trending Repositories</div>
+      <div style="display:flex;gap:8px">
+        <select id="trending-lang" onchange="loadTrending()"><option value="">All Languages</option><option>javascript</option><option>typescript</option><option>python</option><option>rust</option><option>go</option><option>java</option><option>c++</option><option>swift</option></select>
+        <select id="trending-since" onchange="loadTrending()"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select>
+      </div>
+    </div>
+    <div id="trending-results">
+      <div class="loading-overlay"><div class="loading"></div><span>Loading trending repos...</span></div>
+    </div>
+  </div>
+
+  <div id="tab-bookmarks" class="tab-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div class="section-title" style="margin-bottom:0">⭐ Bookmarks & History</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-sm" onclick="showBookmarkTab('bookmarks')">Bookmarks</button>
+        <button class="btn btn-sm" onclick="showBookmarkTab('history')">History</button>
+        <button class="btn btn-sm" onclick="exportBookmarks()">Export JSON</button>
+        <button class="btn btn-sm" style="color:var(--red)" onclick="clearAllData()">Clear All</button>
+      </div>
+    </div>
+    <div id="bookmarks-content"></div>
+    <div id="history-content" style="display:none"></div>
+  </div>
+</div>
+
+<div class="settings-overlay" id="settings-overlay" onclick="if(event.target===this)toggleSettings()">
+  <div class="settings-panel">
+    <h2>⚙ Settings</h2>
+    <div class="setting-group">
+      <label>GitHub Personal Access Token</label>
+      <div class="hint" style="margin-bottom:6px">For 5,000 requests/hr (vs 60 without). Create at: github.com/settings/tokens</div>
+      <div class="setting-row">
+        <input type="password" id="setting-github-pat" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+        <button class="btn btn-sm btn-primary" onclick="saveGithubPAT()">Save</button>
+        <button class="btn btn-sm" onclick="testGithubPAT()">Test</button>
+      </div>
+      <div class="hint" id="pat-status"></div>
+    </div>
+    <div class="setting-group">
+      <label>Anthropic API Key</label>
+      <div class="hint" style="margin-bottom:6px">For AI analysis, error solving, and smart ranking</div>
+      <div class="setting-row">
+        <input type="password" id="setting-anthropic-key" placeholder="sk-ant-xxxxxxxxxxxxxxxxxxxx">
+        <button class="btn btn-sm btn-primary" onclick="saveAnthropicKey()">Save</button>
+        <button class="btn btn-sm" onclick="testAnthropicKey()">Test</button>
+      </div>
+      <div class="hint" id="anthropic-status"></div>
+    </div>
+    <div class="setting-group">
+      <label>AI Settings</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+        <div>
+          <div class="hint">Model</div>
+          <select id="setting-ai-model" style="width:100%;margin-top:4px">
+            <option value="claude-sonnet-4-20250514">claude-sonnet-4-20250514</option>
+          </select>
+        </div>
+        <div>
+          <div class="hint">Show AI analysis</div>
+          <select id="setting-ai-show" style="width:100%;margin-top:4px">
+            <option value="always">Always</option>
+            <option value="request">On request</option>
+            <option value="never">Never</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="setting-group">
+      <label>Default Search Settings</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px">
+        <div>
+          <div class="hint">Min Stars</div>
+          <input type="number" id="setting-min-stars" value="0" min="0" style="width:100%;margin-top:4px">
+        </div>
+        <div>
+          <div class="hint">Sort by</div>
+          <select id="setting-sort" style="width:100%;margin-top:4px"><option value="stars">Stars</option><option value="updated">Updated</option><option value="forks">Forks</option></select>
+        </div>
+        <div>
+          <div class="hint">Results per page</div>
+          <select id="setting-per-page" style="width:100%;margin-top:4px"><option value="10">10</option><option value="20">20</option><option value="30">30</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="setting-group">
+      <label>Data</label>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button class="btn btn-sm" onclick="exportBookmarks()">Export Bookmarks</button>
+        <button class="btn btn-sm" onclick="exportHistory()">Export History</button>
+        <button class="btn btn-sm" style="color:var(--red)" onclick="clearAllData()">Clear All Data</button>
+      </div>
+    </div>
+    <button class="btn" style="width:100%;margin-top:8px;border-color:var(--border)" onclick="toggleSettings()">Close</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const LANG_COLORS = {
+  JavaScript:'#F1E05A',TypeScript:'#3178C6',Python:'#3572A5',Java:'#B07219',
+  'C++':'#F34B7D','C#':'#178600',C:'#555555',Go:'#00ADD8',Rust:'#DEA584',
+  PHP:'#4F5D95',Ruby:'#701516',Swift:'#FA7343',Kotlin:'#A97BFF',Dart:'#00B4AB',
+  Scala:'#DC322F',Shell:'#89E051',HTML:'#E34C26',CSS:'#563D7C',Vue:'#41B883',
+  Svelte:'#FF3E00',Elixir:'#6E4A7E',Haskell:'#5E5086',Lua:'#000080',R:'#198CE7',
+  MATLAB:'#E16737',Jupyter:'#DA5B0B',Zig:'#EC915C',Nim:'#FFE953',
+};
+
+let currentTab = 'search';
+let currentLang = '';
+let currentTime = '';
+let currentMode = 'universal';
+let bookmarks = JSON.parse(localStorage.getItem('ghf_bookmarks') || '[]');
+let searchHistory = JSON.parse(localStorage.getItem('ghf_history') || '[]');
+
+const GitHubAPI = {
+  BASE: 'https://api.github.com',
+  GRAPHQL: 'https://api.github.com/graphql',
+  getToken() { return localStorage.getItem('ghf_github_pat') || null; },
+  getHeaders() {
+    const h = { 'Accept': 'application/vnd.github.v3+json', 'X-GitHub-Api-Version': '2022-11-28' };
+    const t = this.getToken();
+    if (t) h['Authorization'] = `Bearer ${t}`;
+    return h;
+  },
+  async get(endpoint) {
+    const r = await fetch(`${this.BASE}${endpoint}`, { headers: this.getHeaders() });
+    const rem = r.headers.get('X-RateLimit-Remaining');
+    const rst = r.headers.get('X-RateLimit-Reset');
+    this.updateRateLimit(rem, rst);
+    if (r.status === 403) throw new Error('Rate limit exceeded. Add a PAT in Settings for 5,000 req/hr.');
+    if (r.status === 404) throw new Error(`Not found: ${endpoint}`);
+    if (!r.ok) throw new Error(`GitHub API error: ${r.status}`);
+    return r.json();
+  },
+  async graphql(query) {
+    const t = this.getToken();
+    if (!t) throw new Error('GraphQL requires a GitHub PAT');
+    const r = await fetch(this.GRAPHQL, {
+      method: 'POST',
+      headers: { ...this.getHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query }),
+    });
+    const d = await r.json();
+    if (d.errors) throw new Error(d.errors[0].message);
+    return d.data;
+  },
+  updateRateLimit(rem, rst) {
+    const el = document.getElementById('rate-limit-display');
+    if (el && rem) {
+      const t = new Date(rst * 1000).toLocaleTimeString();
+      el.textContent = `API: ${rem} remaining · resets ${t}`;
+      el.style.color = rem < 100 ? 'var(--orange)' : 'var(--muted)';
+    }
+  }
+};
+
+function getAnthropicKey() { return localStorage.getItem('ghf_anthropic_key') || null; }
+function getAIShow() { return localStorage.getItem('ghf_ai_show') || 'always'; }
+
+async function callClaudeAPI(prompt, systemPrompt) {
+  const key = getAnthropicKey();
+  if (!key) throw new Error('Anthropic API key required. Add it in Settings.');
+  const model = localStorage.getItem('ghf_ai_model') || 'claude-sonnet-4-20250514';
+  const msgs = [{ role: 'user', content: prompt }];
+  const body = { model, max_tokens: 2000, messages: msgs };
+  if (systemPrompt) body.system = systemPrompt;
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    throw new Error(e.error?.message || `Anthropic API error: ${r.status}`);
+  }
+  const d = await r.json();
+  return d.content[0].text;
+}
+
+function timeAgo(dateStr) {
+  const s = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return `${Math.floor(s/60)}m ago`;
+  if (s < 86400) return `${Math.floor(s/3600)}h ago`;
+  if (s < 2592000) return `${Math.floor(s/86400)}d ago`;
+  if (s < 31536000) return `${Math.floor(s/2592000)}mo ago`;
+  return `${Math.floor(s/31536000)}y ago`;
+}
+
+function fmtNum(n) {
+  if (!n) return '0';
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'k';
+  return n.toString();
+}
+
+function langDot(lang) {
+  const c = LANG_COLORS[lang] || '#8B949E';
+  return `<span class="lang-dot" style="background:${c}"></span>${lang || 'Unknown'}`;
+}
+
+function showToast(msg, dur = 3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+function toggleSettings() {
+  const o = document.getElementById('settings-overlay');
+  o.classList.toggle('show');
+  if (o.classList.contains('show')) {
+    const pat = localStorage.getItem('ghf_github_pat');
+    if (pat) document.getElementById('setting-github-pat').value = pat;
+    const ak = getAnthropicKey();
+    if (ak) document.getElementById('setting-anthropic-key').value = ak;
+    document.getElementById('setting-ai-show').value = getAIShow();
+  }
+}
+
+function saveGithubPAT() {
+  const v = document.getElementById('setting-github-pat').value.trim();
+  if (v) { localStorage.setItem('ghf_github_pat', v); showToast('GitHub PAT saved'); }
+  else { localStorage.removeItem('ghf_github_pat'); showToast('GitHub PAT removed'); }
+}
+
+async function testGithubPAT() {
+  const s = document.getElementById('pat-status');
+  try {
+    s.textContent = 'Testing...'; s.style.color = 'var(--muted)';
+    const d = await GitHubAPI.get('/rate_limit');
+    const r = d.resources.core;
+    s.textContent = `✓ Authenticated. ${r.remaining}/${r.limit} requests remaining`;
+    s.style.color = 'var(--green)';
+  } catch (e) { s.textContent = `✗ ${e.message}`; s.style.color = 'var(--red)'; }
+}
+
+function saveAnthropicKey() {
+  const v = document.getElementById('setting-anthropic-key').value.trim();
+  if (v) { localStorage.setItem('ghf_anthropic_key', v); showToast('Anthropic key saved'); }
+  else { localStorage.removeItem('ghf_anthropic_key'); showToast('Anthropic key removed'); }
+}
+
+async function testAnthropicKey() {
+  const s = document.getElementById('anthropic-status');
+  try {
+    s.textContent = 'Testing...'; s.style.color = 'var(--muted)';
+    await callClaudeAPI('Reply with just the word "connected".');
+    s.textContent = '✓ Connected to Anthropic API'; s.style.color = 'var(--green)';
+  } catch (e) { s.textContent = `✗ ${e.message}`; s.style.color = 'var(--red)'; }
+}
+
+function addToHistory(query, type, count) {
+  searchHistory.unshift({ query, type, count, time: new Date().toISOString() });
+  if (searchHistory.length > 100) searchHistory = searchHistory.slice(0, 100);
+  localStorage.setItem('ghf_history', JSON.stringify(searchHistory));
+}
+
+function addBookmark(item) {
+  if (bookmarks.find(b => b.id === item.id)) { showToast('Already bookmarked'); return; }
+  bookmarks.unshift({ ...item, bookmarkedAt: new Date().toISOString(), notes: '' });
+  localStorage.setItem('ghf_bookmarks', JSON.stringify(bookmarks));
+  showToast('Bookmarked ⭐');
+}
+
+function removeBookmark(id) {
+  bookmarks = bookmarks.filter(b => b.id !== id);
+  localStorage.setItem('ghf_bookmarks', JSON.stringify(bookmarks));
+  renderBookmarks();
+  showToast('Bookmark removed');
+}
+
+function exportBookmarks() {
+  const blob = new Blob([JSON.stringify(bookmarks, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'github-finder-bookmarks.json'; a.click();
+}
+
+function exportHistory() {
+  const blob = new Blob([JSON.stringify(searchHistory, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'github-finder-history.json'; a.click();
+}
+
+function clearAllData() {
+  if (!confirm('Clear all bookmarks, history, and settings?')) return;
+  localStorage.removeItem('ghf_bookmarks'); localStorage.removeItem('ghf_history');
+  bookmarks = []; searchHistory = [];
+  showToast('All data cleared');
+  renderBookmarks();
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTab = btn.dataset.tab;
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(`tab-${currentTab}`).classList.add('active');
+    const fbar = document.getElementById('filter-bar');
+    fbar.style.display = (currentTab === 'search') ? 'flex' : 'none';
+    if (currentTab === 'trending') loadTrending();
+    if (currentTab === 'bookmarks') { renderBookmarks(); renderHistory(); }
+  });
+});
+
+document.querySelectorAll('#lang-filters .chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#lang-filters .chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentLang = btn.dataset.lang;
+  });
+});
+
+document.querySelectorAll('#time-filters .chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#time-filters .chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTime = btn.dataset.time;
+  });
+});
+
+document.querySelectorAll('#mode-chips .mode-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#mode-chips .mode-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = btn.dataset.mode;
+  });
+});
+
+document.getElementById('main-search').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleMainSearch();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
+    e.preventDefault();
+    document.getElementById('main-search').focus();
+  }
+});
+
+function parseSmartQuery(query) {
+  if (query.match(/error|exception|TypeError|SyntaxError|cannot read|undefined is not|ReferenceError|RangeError|ENOENT|ECONNREFUSED|segfault|panic|traceback/i))
+    return { mode: 'error_solver', query };
+  if (query.match(/github\.com\/[\w.-]+\/[\w.-]+/))
+    return { mode: 'repo_analyzer', url: query };
+  if (query.match(/^how (to|do|can|should)/i))
+    return { mode: 'how_to', query };
+  if (query.match(/best (library|package|tool|framework|module) for/i))
+    return { mode: 'library_finder', query };
+  if (query.match(/^[\w.-]+\/[\w.-]+$/))
+    return { mode: 'direct_repo', query };
+  return { mode: currentMode || 'universal', query };
+}
+
+function getTimeFilter() {
+  const now = new Date();
+  switch (currentTime) {
+    case 'day': { const d = new Date(now - 86400000); return `pushed:>${d.toISOString().slice(0,10)}`; }
+    case 'week': { const d = new Date(now - 604800000); return `pushed:>${d.toISOString().slice(0,10)}`; }
+    case 'month': { const d = new Date(now - 2592000000); return `pushed:>${d.toISOString().slice(0,10)}`; }
+    case 'year': { const d = new Date(now - 31536000000); return `pushed:>${d.toISOString().slice(0,10)}`; }
+    default: return '';
+  }
+}
+
+function getSearchSettings() {
+  return {
+    minStars: parseInt(localStorage.getItem('ghf_min_stars') || '0') || 0,
+    sort: localStorage.getItem('ghf_sort') || 'stars',
+    perPage: parseInt(localStorage.getItem('ghf_per_page') || '10') || 10,
+  };
+}
+
+async function searchRepositories(query, opts = {}) {
+  const settings = getSearchSettings();
+  const { language, sort = settings.sort, order = 'desc', perPage = settings.perPage } = opts;
+  const parts = [query];
+  if (language) parts.push(`language:${language}`);
+  if (settings.minStars > 0) parts.push(`stars:>=${settings.minStars}`);
+  const tf = getTimeFilter();
+  if (tf) parts.push(tf);
+  const q = parts.filter(Boolean).join(' ');
+  return GitHubAPI.get(`/search/repositories?q=${encodeURIComponent(q)}&sort=${sort}&order=${order}&per_page=${perPage}`);
+}
+
+async function searchCode(query, opts = {}) {
+  const { language } = opts;
+  const parts = [query];
+  if (language) parts.push(`language:${language}`);
+  const q = parts.filter(Boolean).join(' ');
+  return GitHubAPI.get(`/search/code?q=${encodeURIComponent(q)}&per_page=10`);
+}
+
+async function searchIssues(query, opts = {}) {
+  const { state = 'open', type = 'issue' } = opts;
+  const q = `${query} type:${type} state:${state}`;
+  return GitHubAPI.get(`/search/issues?q=${encodeURIComponent(q)}&sort=reactions&order=desc&per_page=10`);
+}
+
+async function searchUsers(query) {
+  return GitHubAPI.get(`/search/users?q=${encodeURIComponent(query)}&per_page=5`);
+}
+
+async function handleMainSearch() {
+  const q = document.getElementById('main-search').value.trim();
+  if (!q) return;
+  const parsed = parseSmartQuery(q);
+
+  if (parsed.mode === 'repo_analyzer' || parsed.mode === 'direct_repo') {
+    const repo = parsed.url ? parsed.url.replace(/https?:\/\/github\.com\//, '').replace(/\/+$/, '') : parsed.query;
+    document.getElementById('repo-input').value = repo;
+    document.querySelector('[data-tab="repos"]').click();
+    handleAnalyzeRepo();
+    return;
+  }
+
+  if (parsed.mode === 'error_solver') {
+    document.getElementById('error-input').value = q;
+    document.querySelector('[data-tab="errors"]').click();
+    handleSolveError();
+    return;
+  }
+
+  const container = document.getElementById('search-results');
+  container.innerHTML = '<div class="loading-overlay"><div class="loading"></div><span>Searching GitHub...</span></div>';
+
+  try {
+    const opts = { language: currentLang || undefined };
+    const [repos, code, issuesOpen, issuesClosed, users] = await Promise.allSettled([
+      searchRepositories(q, opts),
+      searchCode(q, opts).catch(() => ({ items: [] })),
+      searchIssues(q, { state: 'open' }),
+      searchIssues(q, { state: 'closed' }),
+      searchUsers(q),
+    ]);
+
+    const repoItems = repos.value?.items || [];
+    const codeItems = code.value?.items || [];
+    const issueItems = [...(issuesOpen.value?.items || []), ...(issuesClosed.value?.items || [])];
+    const userItems = users.value?.items || [];
+    const totalCount = repoItems.length + codeItems.length + issueItems.length + userItems.length;
+
+    addToHistory(q, 'universal', totalCount);
+
+    let html = '';
+
+    if (getAnthropicKey() && getAIShow() === 'always' && repoItems.length > 0) {
+      html += '<div class="ai-card" id="ai-solution-card"><div class="ai-card-header"><h3>🤖 AI Solution Analysis</h3><span style="color:var(--muted);font-size:.8rem">Analyzing...</span></div><div class="loading-overlay" style="padding:20px"><div class="loading"></div></div></div>';
+      rankWithAI(q, { repos: repoItems, codeResults: codeItems, issues: issueItems }).then(ai => {
+        const card = document.getElementById('ai-solution-card');
+        if (card) card.outerHTML = renderAISolution(q, ai);
+      }).catch(() => {
+        const card = document.getElementById('ai-solution-card');
+        if (card) card.remove();
+      });
+    }
+
+    if (repoItems.length > 0) {
+      html += `<div class="section-title">📦 Repositories (${repos.value?.total_count || repoItems.length})</div>`;
+      html += repoItems.map(renderRepoCard).join('');
+    }
+    if (codeItems.length > 0) {
+      html += `<div class="section-title" style="margin-top:20px">💻 Code Results (${code.value?.total_count || codeItems.length})</div>`;
+      html += codeItems.slice(0, 5).map(renderCodeCard).join('');
+    }
+    if (issueItems.length > 0) {
+      html += `<div class="section-title" style="margin-top:20px">📋 Issues & PRs (${issueItems.length})</div>`;
+      html += issueItems.slice(0, 5).map(renderIssueCard).join('');
+    }
+    if (userItems.length > 0) {
+      html += `<div class="section-title" style="margin-top:20px">👤 Users (${users.value?.total_count || userItems.length})</div>`;
+      html += userItems.map(renderUserBrief).join('');
+    }
+    if (!html) html = '<div class="empty-state"><div class="icon">🔍</div><p>No results found. Try a different query.</p></div>';
+    container.innerHTML = html;
+    hljs.highlightAll();
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${e.message}</p></div>`;
+  }
+}
+
+async function rankWithAI(query, results) {
+  const prompt = `You are a senior software engineer helping another developer find the best solution.
+
+DEVELOPER'S QUESTION: "${query}"
+
+TOP REPOSITORIES:
+${results.repos.slice(0,5).map(r => `- ${r.full_name} ★${r.stargazers_count}\n  ${r.description}\n  Language: ${r.language} | Forks: ${r.forks_count} | Updated: ${r.updated_at}\n  Topics: ${(r.topics||[]).join(', ')}`).join('\n')}
+
+TOP CODE EXAMPLES:
+${results.codeResults.slice(0,3).map(c => `- ${c.repository.full_name}: ${c.path}`).join('\n')}
+
+TOP ISSUES:
+${results.issues.slice(0,3).map(i => `- [${(i.state||'').toUpperCase()}] ${i.title} (${i.comments} comments)`).join('\n')}
+
+Respond in JSON only:
+{
+  "best_solution": {
+    "type": "library|code_pattern|architecture|workaround",
+    "headline": "one sentence direct answer",
+    "explanation": "2-3 paragraphs explaining the best approach",
+    "recommended_repo": "owner/name or null",
+    "recommended_repo_reason": "why this one specifically",
+    "code_example": "short code snippet or null",
+    "language": "javascript|python|etc",
+    "caveats": ["gotchas"],
+    "alternatives": [{"name":"Alt","when_to_use":"...","tradeoff":"..."}]
+  },
+  "ranked_repos": [{"repo":"owner/name","rank":1,"score":95,"why":"reason","best_for":"use case"}],
+  "related_searches": ["5 related queries"],
+  "confidence": 85
+}`;
+  const raw = await callClaudeAPI(prompt);
+  const match = raw.match(/\{[\s\S]*\}/);
+  return match ? JSON.parse(match[0]) : JSON.parse(raw);
+}
+
+function renderAISolution(query, ai) {
+  const c = ai.confidence || 0;
+  const cls = c >= 80 ? 'confidence-high' : c >= 50 ? 'confidence-med' : 'confidence-low';
+  const sol = ai.best_solution || {};
+  let html = `<div class="ai-card"><div class="ai-card-header"><h3>🤖 AI Solution Analysis</h3><span class="confidence-badge ${cls}">Confidence: ${c}%</span></div>`;
+  html += `<div class="ai-section"><h4>Best Approach for "${query}"</h4><p>${sol.headline || ''}</p></div>`;
+  if (sol.explanation) html += `<div class="ai-section"><p>${sol.explanation.replace(/\n/g, '<br>')}</p></div>`;
+  if (sol.recommended_repo) html += `<div class="ai-section"><h4>⭐ Recommended</h4><p><a href="https://github.com/${sol.recommended_repo}" target="_blank">${sol.recommended_repo}</a> — ${sol.recommended_repo_reason || ''}</p></div>`;
+  if (sol.code_example) html += `<div class="ai-section"><h4>Quick Start</h4><div class="code-block"><code class="language-${sol.language || 'text'}">${escHtml(sol.code_example)}</code></div></div>`;
+  if (sol.caveats?.length) html += `<div class="ai-section"><h4>⚠ Caveats</h4><ul>${sol.caveats.map(c => `<li>${c}</li>`).join('')}</ul></div>`;
+  if (sol.alternatives?.length) html += `<div class="ai-section"><h4>Alternatives</h4><ul>${sol.alternatives.map(a => `<li><strong>${a.name}</strong> → ${a.when_to_use}${a.tradeoff ? ` (${a.tradeoff})` : ''}</li>`).join('')}</ul></div>`;
+  if (ai.related_searches?.length) html += `<div class="ai-section"><h4>Related Searches</h4><div class="card-tags">${ai.related_searches.map(s => `<button class="tag" onclick="document.getElementById('main-search').value='${escHtml(s)}';handleMainSearch()">${s}</button>`).join('')}</div></div>`;
+  html += '</div>';
+  return html;
+}
+
+const _repoCache = new Map();
+function renderRepoCard(repo) {
+  const bId = `repo_${repo.full_name}`;
+  _repoCache.set(bId, { id: bId, type: 'repo', name: repo.full_name, url: repo.html_url, stars: repo.stargazers_count, language: repo.language, description: repo.description || '' });
+  return `<div class="card">
+    <div class="card-header">
+      <div class="card-title"><a href="${escHtml(repo.html_url)}" target="_blank">📦 ${escHtml(repo.full_name)}</a></div>
+      <span class="card-meta"><span class="star">★ ${fmtNum(repo.stargazers_count)}</span></span>
+    </div>
+    <div class="card-desc">${escHtml(repo.description || 'No description')}</div>
+    <div class="card-meta">
+      <span>${langDot(repo.language)}</span>
+      <span>🍴 ${fmtNum(repo.forks_count)}</span>
+      <span>◉ ${repo.open_issues_count} issues</span>
+      <span>${escHtml(repo.license?.spdx_id || 'No license')}</span>
+      <span>Updated ${timeAgo(repo.updated_at)}</span>
+    </div>
+    ${repo.topics?.length ? `<div class="card-tags">${repo.topics.slice(0,8).map(t => `<span class="tag">${escHtml(t)}</span>`).join('')}</div>` : ''}
+    <div class="card-actions">
+      <a href="${escHtml(repo.html_url)}" target="_blank" class="btn btn-sm">Open Repo</a>
+      <button class="btn btn-sm" data-analyze="${escHtml(repo.full_name)}">Analyze</button>
+      <button class="btn btn-sm" data-bookmark="${escHtml(bId)}">⭐ Bookmark</button>
+    </div>
+  </div>`;
+}
+
+document.addEventListener('click', (e) => {
+  const analyzeBtn = e.target.closest('[data-analyze]');
+  if (analyzeBtn) {
+    document.getElementById('repo-input').value = analyzeBtn.dataset.analyze;
+    document.querySelector('[data-tab="repos"]').click();
+    handleAnalyzeRepo();
+    return;
+  }
+  const bookmarkBtn = e.target.closest('[data-bookmark]');
+  if (bookmarkBtn) {
+    const data = _repoCache.get(bookmarkBtn.dataset.bookmark);
+    if (data) addBookmark(data);
+    return;
+  }
+});
+
+function renderCodeCard(item) {
+  const frag = item.text_matches?.[0]?.fragment || '';
+  return `<div class="card">
+    <div class="card-header">
+      <div class="card-title"><a href="${item.html_url}" target="_blank">📄 ${item.path}</a></div>
+      <span class="card-meta"><span>📦 ${item.repository.full_name}</span></span>
+    </div>
+    ${frag ? `<div class="code-block"><code>${escHtml(frag)}</code></div>` : ''}
+    <div class="card-actions">
+      <a href="${item.html_url}" target="_blank" class="btn btn-sm">View on GitHub</a>
+      <button class="btn btn-sm" onclick="copyText('${escHtml(frag)}')">Copy</button>
+    </div>
+  </div>`;
+}
+
+function renderIssueCard(issue) {
+  const st = issue.state === 'open' ? 'open' : (issue.pull_request ? 'closed' : 'closed-red');
+  const stLabel = issue.state === 'open' ? 'OPEN' : 'CLOSED';
+  const repoName = issue.repository_url?.split('/').slice(-2).join('/') || '';
+  return `<div class="card issue-card ${st}">
+    <div class="card-header">
+      <div>
+        <span class="issue-status ${st}">${issue.pull_request ? '🔀' : '●'} ${stLabel}</span>
+        <span style="font-size:.75rem;color:var(--muted);margin-left:8px">${repoName}</span>
+      </div>
+      <span style="font-size:.8rem;color:var(--muted)">${timeAgo(issue.created_at)}</span>
+    </div>
+    <div class="card-title" style="margin-bottom:6px"><a href="${issue.html_url}" target="_blank">${escHtml(issue.title)}</a></div>
+    <div class="card-meta">
+      <span>👍 ${issue.reactions?.['+1'] || 0}</span>
+      <span>💬 ${issue.comments} comments</span>
+      <span>by ${issue.user?.login || 'unknown'}</span>
+    </div>
+    <div class="card-actions">
+      <a href="${issue.html_url}" target="_blank" class="btn btn-sm">View Thread</a>
+    </div>
+  </div>`;
+}
+
+function renderUserBrief(u) {
+  return `<div class="card" style="display:flex;gap:12px;align-items:center">
+    <img src="${u.avatar_url}" style="width:40px;height:40px;border-radius:50%">
+    <div>
+      <div class="card-title"><a href="${u.html_url}" target="_blank">@${u.login}</a></div>
+      <span style="font-size:.8rem;color:var(--muted)">${u.type}</span>
+    </div>
+    <button class="btn btn-sm" style="margin-left:auto" onclick="document.getElementById('people-input').value='${u.login}';document.querySelector('[data-tab=\\'people\\']').click();handleAnalyzeDev()">Analyze</button>
+  </div>`;
+}
+
+function extractErrorSignature(text) {
+  return text.split('\n')[0]
+    .replace(/\(.*?\)/g, '').replace(/at .*/g, '')
+    .replace(/['"]/g, '').replace(/\s+/g, ' ').trim().slice(0, 150);
+}
+
+async function handleSolveError() {
+  const errorText = document.getElementById('error-input').value.trim();
+  if (!errorText) return;
+  const language = document.getElementById('error-lang').value;
+  const framework = document.getElementById('error-framework').value;
+  const container = document.getElementById('error-results');
+  container.innerHTML = '<div class="loading-overlay"><div class="loading"></div><span>Searching for solutions...</span></div>';
+
+  try {
+    const sig = extractErrorSignature(errorText);
+    const [closedIssues, openIssues, codeResults] = await Promise.allSettled([
+      searchIssues(`"${sig}" ${framework}`, { state: 'closed' }),
+      searchIssues(`"${sig}" ${framework}`, { state: 'open' }),
+      searchCode(sig, { language: language || undefined }).catch(() => ({ items: [] })),
+    ]);
+
+    const allIssues = [...(closedIssues.value?.items || []), ...(openIssues.value?.items || [])];
+    addToHistory(sig, 'error', allIssues.length);
+
+    let html = '';
+
+    if (getAnthropicKey()) {
+      try {
+        const prompt = `You are an expert ${language || ''} ${framework || ''} developer debugging an error.
+
+ERROR:
+\`\`\`
+${errorText}
+\`\`\`
+
+RELATED GITHUB ISSUES FOUND:
+${allIssues.slice(0,8).map(i => `- [${i.state}] ${i.title} (${i.comments} comments)`).join('\n')}
+
+Respond in JSON only:
+{
+  "root_cause": "exact explanation of WHY this error occurs",
+  "fix": {
+    "description": "what to do to fix it",
+    "code_before": "code that causes the error (if identifiable)",
+    "code_after": "corrected code",
+    "language": "${language || 'text'}"
+  },
+  "common_causes": [{"cause":"...","how_to_check":"...","how_to_fix":"..."}],
+  "prevention": "how to prevent this error in the future",
+  "confidence": 85
+}`;
+        const raw = await callClaudeAPI(prompt);
+        const match = raw.match(/\{[\s\S]*\}/);
+        const ai = match ? JSON.parse(match[0]) : JSON.parse(raw);
+        const conf = ai.confidence || 0;
+        const cls = conf >= 80 ? 'confidence-high' : conf >= 50 ? 'confidence-med' : 'confidence-low';
+        html += `<div class="ai-card">
+          <div class="ai-card-header"><h3>🐛 Error Analysis</h3><span class="confidence-badge ${cls}">Confidence: ${conf}%</span></div>
+          <div class="ai-section"><h4>Root Cause</h4><p>${ai.root_cause || ''}</p></div>`;
+        if (ai.fix) {
+          html += `<div class="ai-section"><h4>The Fix</h4><p>${ai.fix.description || ''}</p>`;
+          if (ai.fix.code_before) html += `<div class="code-block" style="border-left:3px solid var(--red)"><code class="language-${ai.fix.language||'text'}">${escHtml(ai.fix.code_before)}</code></div><p style="color:var(--muted);font-size:.8rem">BEFORE (broken) ↑</p>`;
+          if (ai.fix.code_after) html += `<div class="code-block" style="border-left:3px solid var(--green)"><code class="language-${ai.fix.language||'text'}">${escHtml(ai.fix.code_after)}</code></div><p style="color:var(--muted);font-size:.8rem">AFTER (fixed) ↑</p>`;
+          html += '</div>';
+        }
+        if (ai.common_causes?.length) {
+          html += `<div class="ai-section"><h4>Also Check</h4><ol>${ai.common_causes.map(c => `<li><strong>${c.cause}</strong> — ${c.how_to_fix}</li>`).join('')}</ol></div>`;
+        }
+        if (ai.prevention) html += `<div class="ai-section"><h4>Prevention</h4><p>${ai.prevention}</p></div>`;
+        html += '</div>';
+      } catch (e) { /* AI failed, just show issues */ }
+    }
+
+    if (allIssues.length > 0) {
+      html += `<div class="section-title" style="margin-top:16px">📋 Related GitHub Issues (${allIssues.length})</div>`;
+      html += allIssues.slice(0, 10).map(renderIssueCard).join('');
+    } else {
+      html += '<div class="empty-state"><p>No matching issues found. Try adjusting the error text or language/framework filters.</p></div>';
+    }
+    container.innerHTML = html;
+    hljs.highlightAll();
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${e.message}</p></div>`;
+  }
+}
+
+async function handleAnalyzeRepo() {
+  let input = document.getElementById('repo-input').value.trim();
+  if (!input) return;
+  input = input.replace(/https?:\/\/github\.com\//, '').replace(/\/+$/, '').replace(/^\//, '');
+  const [owner, repo] = input.split('/');
+  if (!owner || !repo) { showToast('Enter owner/repo format'); return; }
+  const container = document.getElementById('repo-results');
+  container.innerHTML = '<div class="loading-overlay"><div class="loading"></div><span>Analyzing repository...</span></div>';
+
+  try {
+    const [repoData, readme, languages, contributors, releases, issues, commits] = await Promise.allSettled([
+      GitHubAPI.get(`/repos/${owner}/${repo}`),
+      GitHubAPI.get(`/repos/${owner}/${repo}/readme`),
+      GitHubAPI.get(`/repos/${owner}/${repo}/languages`),
+      GitHubAPI.get(`/repos/${owner}/${repo}/contributors?per_page=10`),
+      GitHubAPI.get(`/repos/${owner}/${repo}/releases?per_page=5`),
+      GitHubAPI.get(`/repos/${owner}/${repo}/issues?state=open&per_page=20`),
+      GitHubAPI.get(`/repos/${owner}/${repo}/commits?per_page=20`),
+    ]);
+
+    const rd = repoData.value;
+    if (!rd) throw new Error('Repository not found');
+
+    let readmeContent = '';
+    if (readme.value?.content) {
+      try { readmeContent = atob(readme.value.content.replace(/\n/g, '')); } catch {}
+    }
+
+    const langs = languages.value || {};
+    const contribs = contributors.value || [];
+    const rels = releases.value || [];
+    const iss = issues.value || [];
+    const comms = commits.value || [];
+
+    addToHistory(`${owner}/${repo}`, 'repo_analysis', 1);
+
+    let html = `<div class="card" style="border-left:3px solid var(--blue)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+        <div>
+          <h2 style="font-size:1.4rem;font-weight:800">${escHtml(rd.full_name)}</h2>
+          <p style="color:var(--muted);margin-top:4px">${escHtml(rd.description || '')}</p>
+        </div>
+        <span style="font-size:1.3rem;color:var(--gold);font-weight:700;font-family:var(--font-code)">★ ${fmtNum(rd.stargazers_count)}</span>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="val">${fmtNum(rd.stargazers_count)}</div><div class="lbl">Stars</div></div>
+        <div class="stat-box"><div class="val">${fmtNum(rd.forks_count)}</div><div class="lbl">Forks</div></div>
+        <div class="stat-box"><div class="val">${rd.open_issues_count}</div><div class="lbl">Open Issues</div></div>
+        <div class="stat-box"><div class="val">${contribs.length}+</div><div class="lbl">Contributors</div></div>
+        <div class="stat-box"><div class="val">${rels.length}</div><div class="lbl">Releases</div></div>
+        <div class="stat-box"><div class="val">${rd.license?.spdx_id || 'None'}</div><div class="lbl">License</div></div>
+        <div class="stat-box"><div class="val">${timeAgo(rd.created_at)}</div><div class="lbl">Created</div></div>
+        <div class="stat-box"><div class="val">${timeAgo(rd.pushed_at)}</div><div class="lbl">Last Push</div></div>
+      </div>
+    </div>`;
+
+    const totalBytes = Object.values(langs).reduce((a, b) => a + b, 0);
+    if (totalBytes > 0) {
+      html += `<div class="card"><div class="section-title">Languages</div><div style="display:flex;gap:2px;height:10px;border-radius:5px;overflow:hidden;margin-bottom:8px">`;
+      for (const [lang, bytes] of Object.entries(langs).sort(([,a],[,b]) => b - a)) {
+        const pct = (bytes / totalBytes * 100);
+        const color = LANG_COLORS[lang] || '#8B949E';
+        html += `<div style="width:${pct}%;background:${color}" title="${lang}: ${pct.toFixed(1)}%"></div>`;
+      }
+      html += `</div><div style="display:flex;flex-wrap:wrap;gap:12px;font-size:.8rem">`;
+      for (const [lang, bytes] of Object.entries(langs).sort(([,a],[,b]) => b - a).slice(0, 8)) {
+        html += `<span>${langDot(lang)} ${(bytes / totalBytes * 100).toFixed(1)}%</span>`;
+      }
+      html += '</div></div>';
+    }
+
+    if (contribs.length > 0) {
+      html += `<div class="card"><div class="section-title">Top Contributors</div><div style="display:flex;flex-wrap:wrap;gap:8px">`;
+      for (const c of contribs.slice(0, 8)) {
+        html += `<div style="display:flex;align-items:center;gap:6px;background:var(--bg3);padding:6px 10px;border-radius:20px">
+          <img src="${c.avatar_url}" style="width:24px;height:24px;border-radius:50%">
+          <a href="${c.html_url}" target="_blank" style="font-size:.8rem">${c.login}</a>
+          <span style="font-size:.7rem;color:var(--muted)">${c.contributions}</span>
+        </div>`;
+      }
+      html += '</div></div>';
+    }
+
+    if (rels.length > 0) {
+      html += `<div class="card"><div class="section-title">Recent Releases</div>`;
+      for (const r of rels.slice(0, 3)) {
+        html += `<div style="margin-bottom:8px"><a href="${r.html_url}" target="_blank" style="font-weight:600">${escHtml(r.tag_name)}</a> <span style="color:var(--muted);font-size:.8rem">— ${timeAgo(r.published_at)}</span></div>`;
+      }
+      html += '</div>';
+    }
+
+    if (getAnthropicKey()) {
+      html += '<div class="ai-card" id="repo-ai-card"><div class="ai-card-header"><h3>🤖 AI Repository Analysis</h3></div><div class="loading-overlay" style="padding:16px"><div class="loading"></div><span>Analyzing...</span></div></div>';
+      setTimeout(async () => {
+        try {
+          const prompt = `You are a senior engineer evaluating a GitHub repository.
+REPOSITORY: ${rd.full_name}
+Stars: ${rd.stargazers_count} | Forks: ${rd.forks_count} | Created: ${rd.created_at} | Last push: ${rd.pushed_at}
+Description: ${rd.description}
+License: ${rd.license?.name}
+LANGUAGE BREAKDOWN: ${Object.entries(langs).map(([l,b]) => `${l}: ${b}`).join(', ')}
+TOP CONTRIBUTORS: ${contribs.slice(0,5).map(c => `${c.login}: ${c.contributions}`).join(', ')}
+RECENT COMMITS: ${comms.slice(0,5).map(c => `${c.commit.author.date.slice(0,10)}: ${c.commit.message.slice(0,80)}`).join('\n')}
+OPEN ISSUES (${rd.open_issues_count}): ${iss.slice(0,5).map(i => i.title).join('; ')}
+README (first 2000 chars): ${readmeContent.slice(0,2000)}
+
+Respond in JSON only:
+{
+  "health_score": 85,
+  "health_breakdown": {
+    "activity": {"score":90,"notes":"..."},
+    "community": {"score":80,"notes":"..."},
+    "documentation": {"score":85,"notes":"..."},
+    "maintenance": {"score":88,"notes":"..."},
+    "adoption": {"score":75,"notes":"..."}
+  },
+  "summary": "2-3 sentence summary",
+  "what_it_does": "plain English explanation",
+  "use_cases": ["use case 1","use case 2"],
+  "strengths": ["strength 1"],
+  "concerns": ["concern 1"],
+  "production_readiness": "PRODUCTION_READY|STABLE|EXPERIMENTAL|ABANDONED",
+  "ideal_for": "who should use this",
+  "avoid_if": "who should not",
+  "verdict": "HIGHLY_RECOMMENDED|RECOMMENDED|SITUATIONAL|AVOID"
+}`;
+          const raw = await callClaudeAPI(prompt);
+          const match = raw.match(/\{[\s\S]*\}/);
+          const ai = match ? JSON.parse(match[0]) : JSON.parse(raw);
+          const card = document.getElementById('repo-ai-card');
+          if (card) card.outerHTML = renderRepoAI(ai);
+        } catch (e) {
+          const card = document.getElementById('repo-ai-card');
+          if (card) card.outerHTML = '';
+        }
+      }, 100);
+    }
+
+    if (readmeContent) {
+      html += `<div class="card"><div class="section-title">📖 README</div><div class="readme-content">${DOMPurify.sanitize(marked.parse(readmeContent))}</div></div>`;
+    }
+
+    html += `<div class="card-actions" style="margin-top:12px">
+      <a href="${rd.html_url}" target="_blank" class="btn btn-sm btn-primary">Open on GitHub</a>
+      <button class="btn btn-sm" onclick='addBookmark(${JSON.stringify({id:`repo_${rd.full_name}`,type:"repo",name:rd.full_name,url:rd.html_url,stars:rd.stargazers_count,language:rd.language,description:rd.description}).replace(/'/g,"\\'")})'>⭐ Bookmark</button>
+    </div>`;
+
+    container.innerHTML = html;
+    hljs.highlightAll();
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${e.message}</p></div>`;
+  }
+}
+
+function renderRepoAI(ai) {
+  const hs = ai.health_score || 0;
+  const hColor = hs >= 80 ? 'var(--green)' : hs >= 50 ? 'var(--yellow)' : 'var(--red)';
+  const vColors = { HIGHLY_RECOMMENDED: 'var(--green)', RECOMMENDED: 'var(--blue)', SITUATIONAL: 'var(--yellow)', AVOID: 'var(--red)' };
+  const vColor = vColors[ai.verdict] || 'var(--muted)';
+  const prColors = { PRODUCTION_READY: 'var(--green)', STABLE: 'var(--blue)', EXPERIMENTAL: 'var(--yellow)', ABANDONED: 'var(--red)' };
+  const prColor = prColors[ai.production_readiness] || 'var(--muted)';
+
+  let html = `<div class="ai-card">
+    <div class="ai-card-header"><h3>🤖 AI Repository Analysis</h3><span style="color:${hColor};font-size:1.2rem;font-weight:800;font-family:var(--font-code)">${hs}/100</span></div>
+    <div class="health-grid">`;
+  if (ai.health_breakdown) {
+    for (const [k, v] of Object.entries(ai.health_breakdown)) {
+      const sc = v.score || 0;
+      const c = sc >= 80 ? 'var(--green)' : sc >= 50 ? 'var(--yellow)' : 'var(--red)';
+      html += `<div class="health-item"><label>${k}</label><div class="score" style="color:${c}">${sc}</div><div class="health-bar"><div class="health-bar-fill" style="width:${sc}%;background:${c}"></div></div><p style="font-size:.75rem;color:var(--muted);margin-top:4px">${v.notes || ''}</p></div>`;
+    }
+  }
+  html += '</div>';
+  if (ai.summary) html += `<div class="ai-section"><h4>Summary</h4><p>${ai.summary}</p></div>`;
+  html += `<div style="display:flex;gap:16px;margin:12px 0;flex-wrap:wrap">
+    <span style="font-size:.85rem">Production: <strong style="color:${prColor}">${ai.production_readiness || '?'}</strong></span>
+    <span style="font-size:.85rem">Verdict: <strong style="color:${vColor}">${(ai.verdict || '?').replace(/_/g, ' ')}</strong></span>
+  </div>`;
+  if (ai.use_cases?.length) html += `<div class="ai-section"><h4>Use Cases</h4><ul>${ai.use_cases.map(u => `<li>${u}</li>`).join('')}</ul></div>`;
+  if (ai.strengths?.length) html += `<div class="ai-section"><h4>Strengths</h4><ul>${ai.strengths.map(s => `<li style="color:var(--green)">${s}</li>`).join('')}</ul></div>`;
+  if (ai.concerns?.length) html += `<div class="ai-section"><h4>Concerns</h4><ul>${ai.concerns.map(c => `<li style="color:var(--orange)">${c}</li>`).join('')}</ul></div>`;
+  if (ai.ideal_for) html += `<div class="ai-section"><h4>Ideal For</h4><p>${ai.ideal_for}</p></div>`;
+  if (ai.avoid_if) html += `<div class="ai-section"><h4>Avoid If</h4><p style="color:var(--orange)">${ai.avoid_if}</p></div>`;
+  html += '</div>';
+  return html;
+}
+
+async function handleCodeSearch() {
+  const q = document.getElementById('code-search-input').value.trim();
+  if (!q) return;
+  const lang = document.getElementById('code-lang').value;
+  const container = document.getElementById('code-results');
+  container.innerHTML = '<div class="loading-overlay"><div class="loading"></div><span>Searching code...</span></div>';
+
+  try {
+    const results = await searchCode(q, { language: lang || undefined });
+    const items = results.items || [];
+    addToHistory(q, 'code', items.length);
+
+    if (items.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>No code found. Try different search terms.</p></div>';
+      return;
+    }
+
+    let html = `<div class="section-title">💻 Code Results (${results.total_count})</div>`;
+    for (const item of items) {
+      const frag = item.text_matches?.[0]?.fragment || '';
+      const ext = item.path.split('.').pop() || '';
+      html += `<div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><a href="${item.html_url}" target="_blank">📄 ${item.path}</a></div>
+            <span style="font-size:.8rem;color:var(--muted)">📦 <a href="https://github.com/${item.repository.full_name}" target="_blank">${item.repository.full_name}</a> ★ ${fmtNum(item.repository.stargazers_count || 0)}</span>
+          </div>
+        </div>
+        ${frag ? `<div class="code-block"><code class="language-${ext}">${escHtml(frag)}</code></div>` : ''}
+        <div class="card-actions">
+          <a href="${item.html_url}" target="_blank" class="btn btn-sm">View on GitHub</a>
+          ${frag ? `<button class="btn btn-sm" onclick="copyText(\`${escHtml(frag).replace(/`/g,'\\`')}\`)">Copy</button>` : ''}
+          ${getAnthropicKey() && frag ? `<button class="btn btn-sm" onclick="explainCodeInline(this, \`${btoa(unescape(encodeURIComponent(frag))).replace(/`/g,'')}\`, '${ext}')">🤖 Explain</button>` : ''}
+        </div>
+      </div>`;
+    }
+    container.innerHTML = html;
+    hljs.highlightAll();
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${e.message}</p></div>`;
+  }
+}
+
+async function explainCodeInline(btn, codeB64, lang) {
+  btn.textContent = 'Analyzing...';
+  btn.disabled = true;
+  try {
+    const code = decodeURIComponent(escape(atob(codeB64)));
+    const prompt = `Explain this ${lang} code clearly for a developer:
+\`\`\`${lang}
+${code}
+\`\`\`
+Provide:
+1. What this code does (1 sentence)
+2. How it works (step by step, plain English)
+3. Notable patterns or techniques
+4. Potential improvements
+Be concise.`;
+    const result = await callClaudeAPI(prompt);
+    const card = btn.closest('.card');
+    const existing = card.querySelector('.ai-explanation');
+    if (existing) existing.remove();
+    const div = document.createElement('div');
+    div.className = 'ai-explanation ai-card';
+    div.style.marginTop = '8px';
+    div.innerHTML = `<div class="ai-card-header"><h3>🤖 Code Explanation</h3></div><div style="white-space:pre-wrap;font-size:.85rem;line-height:1.6">${escHtml(result)}</div>`;
+    card.appendChild(div);
+  } catch (e) {
+    showToast('AI error: ' + e.message);
+  }
+  btn.textContent = '🤖 Explain';
+  btn.disabled = false;
+}
+
+async function handleIssueSearch() {
+  const q = document.getElementById('issue-search-input').value.trim();
+  if (!q) return;
+  const state = document.getElementById('issue-state').value;
+  const type = document.getElementById('issue-type').value;
+  const container = document.getElementById('issue-results');
+  container.innerHTML = '<div class="loading-overlay"><div class="loading"></div><span>Searching issues...</span></div>';
+
+  try {
+    const stateOpts = state === 'all' ? ['open', 'closed'] : [state];
+    const results = await Promise.all(stateOpts.map(s => searchIssues(q, { state: s, type })));
+    const items = results.flatMap(r => r.items || []);
+    addToHistory(q, 'issues', items.length);
+
+    if (items.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>No issues found. Try different search terms.</p></div>';
+      return;
+    }
+
+    let html = `<div class="section-title">📋 ${type === 'pr' ? 'Pull Requests' : 'Issues'} (${items.length})</div>`;
+    html += items.slice(0, 20).map(renderIssueCard).join('');
+
+    if (GitHubAPI.getToken() && type === 'issue') {
+      const topRepos = [...new Set(items.slice(0, 5).map(i => i.repository_url?.split('/').slice(-2).join('/')).filter(Boolean))];
+      if (topRepos.length > 0) {
+        const discussions = await searchDiscussionsGraphQL(q, topRepos);
+        if (discussions.length > 0) {
+          html += `<div class="section-title" style="margin-top:20px">💬 Related Discussions (${discussions.length})</div>`;
+          discussions.forEach(d => {
+            html += `<div class="card" style="border-left:3px solid var(--teal)">
+              <div class="card-title"><a href="${escHtml(d.url)}" target="_blank">${escHtml(d.title)}</a></div>
+              <div class="card-meta" style="margin-top:6px">
+                <span>👍 ${d.upvoteCount || 0} upvotes</span>
+                <span>💬 ${d.comments?.totalCount || 0} comments</span>
+                <span>${timeAgo(d.createdAt)}</span>
+                ${d.answer ? `<span style="color:var(--green)">✓ Answered by ${escHtml(d.answer.author?.login || '?')}</span>` : ''}
+              </div>
+              ${d.body ? `<p style="font-size:.85rem;color:var(--muted);margin-top:6px">${escHtml((d.body || '').slice(0, 200))}${d.body?.length > 200 ? '...' : ''}</p>` : ''}
+              <div class="card-actions"><a href="${escHtml(d.url)}" target="_blank" class="btn btn-sm">View Discussion</a></div>
+            </div>`;
+          });
+        }
+      }
+    }
+
+    container.innerHTML = html;
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${e.message}</p></div>`;
+  }
+}
+
+async function handleAnalyzeDev() {
+  const username = document.getElementById('people-input').value.trim().replace('@', '');
+  if (!username) return;
+  const container = document.getElementById('people-results');
+  container.innerHTML = '<div class="loading-overlay"><div class="loading"></div><span>Analyzing developer profile...</span></div>';
+
+  try {
+    const [user, repos, events] = await Promise.allSettled([
+      GitHubAPI.get(`/users/${username}`),
+      GitHubAPI.get(`/users/${username}/repos?sort=stars&per_page=30`),
+      GitHubAPI.get(`/users/${username}/events/public?per_page=50`),
+    ]);
+
+    const u = user.value;
+    if (!u) throw new Error('User not found');
+    const userRepos = repos.value || [];
+    const userEvents = events.value || [];
+
+    const langUsage = userRepos.reduce((acc, r) => {
+      if (r.language) acc[r.language] = (acc[r.language] || 0) + (r.stargazers_count || 0);
+      return acc;
+    }, {});
+
+    const actByType = {};
+    userEvents.forEach(e => { actByType[e.type] = (actByType[e.type] || 0) + 1; });
+
+    addToHistory(username, 'developer', 1);
+
+    const totalStars = userRepos.reduce((a, r) => a + (r.stargazers_count || 0), 0);
+
+    let html = `<div class="card">
+      <div class="dev-profile">
+        <img src="${u.avatar_url}" class="dev-avatar">
+        <div class="dev-info">
+          <div class="dev-name">${escHtml(u.name || u.login)}</div>
+          <div class="dev-login">@${u.login}</div>
+          ${u.bio ? `<p style="margin-top:6px;color:var(--muted)">${escHtml(u.bio)}</p>` : ''}
+          <div class="card-meta" style="margin-top:8px">
+            ${u.company ? `<span>🏢 ${escHtml(u.company)}</span>` : ''}
+            ${u.location ? `<span>📍 ${escHtml(u.location)}</span>` : ''}
+            ${u.blog ? `<span>🔗 <a href="${u.blog.startsWith('http') ? u.blog : 'https://'+u.blog}" target="_blank">${u.blog}</a></span>` : ''}
+            <span>📅 Joined ${u.created_at?.slice(0, 4)}</span>
+          </div>
+        </div>
+      </div>
+      <div class="stats-grid" style="margin-top:12px">
+        <div class="stat-box"><div class="val">${u.public_repos}</div><div class="lbl">Repos</div></div>
+        <div class="stat-box"><div class="val">${fmtNum(u.followers)}</div><div class="lbl">Followers</div></div>
+        <div class="stat-box"><div class="val">${fmtNum(totalStars)}</div><div class="lbl">Total Stars</div></div>
+        <div class="stat-box"><div class="val">${u.following}</div><div class="lbl">Following</div></div>
+      </div>
+    </div>`;
+
+    if (Object.keys(langUsage).length > 0) {
+      html += `<div class="card"><div class="section-title">Languages (by stars)</div><div style="display:flex;flex-wrap:wrap;gap:8px">`;
+      for (const [lang, stars] of Object.entries(langUsage).sort(([,a],[,b]) => b - a).slice(0, 10)) {
+        html += `<span style="display:flex;align-items:center;gap:4px;padding:4px 10px;background:var(--bg3);border-radius:16px;font-size:.8rem">${langDot(lang)} <span style="color:var(--gold)">★${fmtNum(stars)}</span></span>`;
+      }
+      html += '</div></div>';
+    }
+
+    if (userRepos.length > 0) {
+      html += `<div class="card"><div class="section-title">Top Repositories</div>`;
+      for (const r of userRepos.slice(0, 8)) {
+        html += `<div style="padding:8px 0;border-bottom:1px solid var(--border2)">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <a href="${r.html_url}" target="_blank" style="font-weight:600">${r.name}</a>
+            <span style="color:var(--gold);font-size:.85rem;font-family:var(--font-code)">★ ${fmtNum(r.stargazers_count)}</span>
+          </div>
+          <p style="font-size:.8rem;color:var(--muted)">${escHtml(r.description || '')}</p>
+        </div>`;
+      }
+      html += '</div>';
+    }
+
+    if (getAnthropicKey()) {
+      html += '<div class="ai-card" id="dev-ai-card"><div class="ai-card-header"><h3>🤖 AI Profile Analysis</h3></div><div class="loading-overlay" style="padding:16px"><div class="loading"></div></div></div>';
+      setTimeout(async () => {
+        try {
+          const prompt = `Analyze this GitHub developer profile:
+USERNAME: ${u.login}
+BIO: ${u.bio || 'none'}
+LOCATION: ${u.location || 'unknown'}
+COMPANY: ${u.company || 'none'}
+PUBLIC REPOS: ${u.public_repos}
+FOLLOWERS: ${u.followers}
+JOINED: ${u.created_at?.slice(0,4)}
+TOP REPOS:
+${userRepos.slice(0,10).map(r => `${r.name} ★${r.stargazers_count}: ${r.description || ''}`).join('\n')}
+LANGUAGE USAGE (by stars): ${Object.entries(langUsage).sort(([,a],[,b]) => b - a).slice(0,8).map(([l,s]) => `${l}: ${s}`).join(', ')}
+RECENT ACTIVITY: ${Object.entries(actByType).map(([t,c]) => `${t}: ${c}`).join(', ')}
+
+Respond in JSON only:
+{
+  "expertise_level": "JUNIOR|MID|SENIOR|PRINCIPAL|LEGENDARY",
+  "primary_stack": ["top 3-4 technologies"],
+  "specialization": "what they primarily build",
+  "activity_pattern": "how they contribute",
+  "influence_score": 85,
+  "notable_contributions": ["achievements"],
+  "summary": "2 sentence professional profile"
+}`;
+          const raw = await callClaudeAPI(prompt);
+          const match = raw.match(/\{[\s\S]*\}/);
+          const ai = match ? JSON.parse(match[0]) : JSON.parse(raw);
+          const card = document.getElementById('dev-ai-card');
+          if (card) {
+            const lvlColors = { LEGENDARY: 'var(--gold)', PRINCIPAL: 'var(--purple)', SENIOR: 'var(--blue)', MID: 'var(--green)', JUNIOR: 'var(--teal)' };
+            const lvlColor = lvlColors[ai.expertise_level] || 'var(--muted)';
+            card.innerHTML = `<div class="ai-card-header"><h3>🤖 AI Profile Analysis</h3><span style="color:${lvlColor};font-weight:700;font-family:var(--font-code)">${ai.expertise_level || '?'}</span></div>
+              <div class="ai-section"><h4>Summary</h4><p>${ai.summary || ''}</p></div>
+              ${ai.primary_stack?.length ? `<div class="ai-section"><h4>Primary Stack</h4><div class="card-tags">${ai.primary_stack.map(s => `<span class="tag">${s}</span>`).join('')}</div></div>` : ''}
+              ${ai.specialization ? `<div class="ai-section"><h4>Specialization</h4><p>${ai.specialization}</p></div>` : ''}
+              ${ai.notable_contributions?.length ? `<div class="ai-section"><h4>Notable</h4><ul>${ai.notable_contributions.map(n => `<li>${n}</li>`).join('')}</ul></div>` : ''}
+              <div style="font-size:.85rem;color:var(--muted)">Influence Score: <strong style="color:var(--blue)">${ai.influence_score || '?'}/100</strong></div>`;
+          }
+        } catch { document.getElementById('dev-ai-card')?.remove(); }
+      }, 100);
+    }
+
+    container.innerHTML = html;
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${e.message}</p></div>`;
+  }
+}
+
+function setAILabMode(mode) {
+  document.querySelectorAll('.ai-lab-mode').forEach(m => m.classList.toggle('active', m.dataset.mode === mode));
+  document.querySelectorAll('.ailab-panel').forEach(p => p.style.display = 'none');
+  const panel = document.getElementById(`ailab-${mode}`);
+  if (panel) panel.style.display = 'block';
+}
+
+async function handleCodebaseQA() {
+  const repoInput = document.getElementById('qa-repo').value.trim();
+  const question = document.getElementById('qa-question').value.trim();
+  if (!repoInput || !question) { showToast('Enter both a repo and a question'); return; }
+  const ownerRepo = repoInput.replace(/https?:\/\/github\.com\//, '').replace(/\/+$/, '');
+  const [owner, repo] = ownerRepo.split('/');
+  if (!owner || !repo) { showToast('Enter owner/repo format'); return; }
+  const container = document.getElementById('ailab-results');
+  container.innerHTML = '<div class="loading-overlay"><div class="loading"></div><span>Reading codebase and analyzing...</span></div>';
+
+  try {
+    const [readme, pkgJson, structure] = await Promise.allSettled([
+      GitHubAPI.get(`/repos/${owner}/${repo}/readme`).then(r => r.content ? atob(r.content.replace(/\n/g, '')) : ''),
+      GitHubAPI.get(`/repos/${owner}/${repo}/contents/package.json`).then(r => r.content ? atob(r.content.replace(/\n/g, '')) : '').catch(() => ''),
+      GitHubAPI.get(`/repos/${owner}/${repo}/git/trees/HEAD?recursive=1`).catch(() => ({ tree: [] })),
+    ]);
+
+    const fileTree = (structure.value?.tree || []).slice(0, 50).map(f => f.path).join('\n');
+    const prompt = `REPOSITORY: ${owner}/${repo}
+FILE TREE:\n${fileTree}
+README: ${(readme.value || '').slice(0, 3000)}
+PACKAGE.JSON: ${(pkgJson.value || '').slice(0, 1000)}
+
+DEVELOPER QUESTION: ${question}
+
+Answer specifically and practically. Cite exact file paths or code when relevant.`;
+
+    const result = await callClaudeAPI(prompt);
+    container.innerHTML = `<div class="ai-card"><div class="ai-card-header"><h3>📖 Codebase Q&A — ${owner}/${repo}</h3></div><div style="white-space:pre-wrap;line-height:1.7;font-size:.9rem">${escHtml(result)}</div></div>`;
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${e.message}</p></div>`;
+  }
+}
+
+async function handleLibCompare() {
+  const input = document.getElementById('compare-libs').value.trim();
+  if (!input) return;
+  const libs = input.split(',').map(s => s.trim()).filter(Boolean);
+  if (libs.length < 2) { showToast('Enter at least 2 libraries'); return; }
+  const container = document.getElementById('ailab-results');
+  container.innerHTML = '<div class="loading-overlay"><div class="loading"></div><span>Comparing libraries...</span></div>';
+
+  try {
+    const repoData = await Promise.all(libs.map(async name => {
+      try {
+        const search = await searchRepositories(name, { sort: 'stars', perPage: 1 });
+        const top = search.items?.[0];
+        if (!top) return { name, repo: null };
+        return { name, repo: top };
+      } catch { return { name, repo: null }; }
+    }));
+
+    const prompt = `Compare these ${libs.length} libraries for a developer choosing between them:
+${repoData.filter(d => d.repo).map(d => `
+LIBRARY: ${d.name} (${d.repo.full_name})
+Stars: ${d.repo.stargazers_count} | Forks: ${d.repo.forks_count} | Issues: ${d.repo.open_issues_count}
+Description: ${d.repo.description}
+License: ${d.repo.license?.name} | Language: ${d.repo.language}
+Updated: ${d.repo.updated_at}
+`).join('\n')}
+
+Provide JSON comparison only:
+{
+  "winner": "name",
+  "winner_reason": "specific reason",
+  "comparison_table": [{"dimension":"Performance","scores":{},"notes":"..."}],
+  "use_case_matrix": [{"scenario":"...","best_choice":"...","reason":"..."}],
+  "verdict": "nuanced recommendation"
+}`;
+
+    const raw = await callClaudeAPI(prompt);
+    const match = raw.match(/\{[\s\S]*\}/);
+    const ai = match ? JSON.parse(match[0]) : JSON.parse(raw);
+
+    let html = `<div class="ai-card"><div class="ai-card-header"><h3>⚖️ Library Comparison</h3></div>`;
+    html += `<div class="ai-section"><h4>Winner</h4><p><strong style="color:var(--green)">${ai.winner}</strong> — ${ai.winner_reason}</p></div>`;
+    if (ai.comparison_table?.length) {
+      html += `<div class="ai-section"><h4>Comparison</h4><table style="width:100%;border-collapse:collapse;font-size:.85rem"><thead><tr><th style="text-align:left;padding:6px;border-bottom:1px solid var(--border)">Dimension</th>`;
+      const libNames = Object.keys(ai.comparison_table[0]?.scores || {});
+      libNames.forEach(n => { html += `<th style="padding:6px;border-bottom:1px solid var(--border)">${n}</th>`; });
+      html += `<th style="padding:6px;border-bottom:1px solid var(--border)">Notes</th></tr></thead><tbody>`;
+      ai.comparison_table.forEach(row => {
+        html += `<tr><td style="padding:6px;border-bottom:1px solid var(--border2);font-weight:600">${row.dimension}</td>`;
+        libNames.forEach(n => {
+          const v = row.scores?.[n] || '?';
+          const c = v === 'EXCELLENT' ? 'var(--green)' : v === 'GOOD' ? 'var(--blue)' : v === 'FAIR' ? 'var(--yellow)' : 'var(--red)';
+          html += `<td style="padding:6px;border-bottom:1px solid var(--border2);text-align:center;color:${c}">${v}</td>`;
+        });
+        html += `<td style="padding:6px;border-bottom:1px solid var(--border2);color:var(--muted);font-size:.8rem">${row.notes || ''}</td></tr>`;
+      });
+      html += '</tbody></table></div>';
+    }
+    if (ai.use_case_matrix?.length) {
+      html += `<div class="ai-section"><h4>Use Case Matrix</h4><ul>${ai.use_case_matrix.map(u => `<li><strong>${u.scenario}</strong> → <span style="color:var(--green)">${u.best_choice}</span> (${u.reason})</li>`).join('')}</ul></div>`;
+    }
+    if (ai.verdict) html += `<div class="ai-section"><h4>Verdict</h4><p>${ai.verdict}</p></div>`;
+    html += '</div>';
+
+    html += repoData.filter(d => d.repo).map(d => renderRepoCard(d.repo)).join('');
+    container.innerHTML = html;
+    hljs.highlightAll();
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${e.message}</p></div>`;
+  }
+}
+
+async function handlePRAnalysis() {
+  const prUrl = document.getElementById('pr-url').value.trim();
+  if (!prUrl) return;
+  const match = prUrl.match(/github\.com\/([\w.-]+)\/([\w.-]+)\/pull\/(\d+)/);
+  if (!match) { showToast('Enter a valid PR URL'); return; }
+  const [, owner, repo, prNum] = match;
+  const container = document.getElementById('ailab-results');
+  container.innerHTML = '<div class="loading-overlay"><div class="loading"></div><span>Analyzing Pull Request...</span></div>';
+
+  try {
+    const [pr, files, reviews] = await Promise.allSettled([
+      GitHubAPI.get(`/repos/${owner}/${repo}/pulls/${prNum}`),
+      GitHubAPI.get(`/repos/${owner}/${repo}/pulls/${prNum}/files`),
+      GitHubAPI.get(`/repos/${owner}/${repo}/pulls/${prNum}/reviews`),
+    ]);
+
+    const prData = pr.value;
+    const prFiles = files.value || [];
+    const prReviews = reviews.value || [];
+
+    const prompt = `Analyze this GitHub Pull Request:
+PR TITLE: ${prData.title}
+PR BODY: ${(prData.body || '').slice(0, 800)}
+AUTHOR: ${prData.user.login}
+STATE: ${prData.state} | Draft: ${prData.draft}
+Files changed: ${prFiles.length} | Additions: ${prData.additions} | Deletions: ${prData.deletions}
+
+FILES CHANGED:
+${prFiles.slice(0, 15).map(f => `${f.status.toUpperCase()} ${f.filename} (+${f.additions}/-${f.deletions})`).join('\n')}
+
+DIFFS (first 500 chars each):
+${prFiles.slice(0, 5).map(f => `--- ${f.filename} ---\n${(f.patch || 'binary').slice(0, 500)}`).join('\n')}
+
+REVIEWS: ${prReviews.length} — ${prReviews.filter(r => r.state === 'APPROVED').length} approved
+
+Respond in JSON only:
+{
+  "summary": "2-3 sentence summary",
+  "impact": "BREAKING|MAJOR|MINOR|PATCH|CHORE",
+  "risk_level": "HIGH|MEDIUM|LOW",
+  "code_quality_assessment": "observations",
+  "potential_issues": ["concern 1"],
+  "good_patterns": ["good thing 1"],
+  "suggested_questions": ["question a reviewer should ask"]
+}`;
+
+    const raw = await callClaudeAPI(prompt);
+    const jMatch = raw.match(/\{[\s\S]*\}/);
+    const ai = jMatch ? JSON.parse(jMatch[0]) : JSON.parse(raw);
+
+    const riskColors = { HIGH: 'var(--red)', MEDIUM: 'var(--yellow)', LOW: 'var(--green)' };
+    const impactColors = { BREAKING: 'var(--red)', MAJOR: 'var(--orange)', MINOR: 'var(--blue)', PATCH: 'var(--green)', CHORE: 'var(--muted)' };
+
+    let html = `<div class="ai-card">
+      <div class="ai-card-header"><h3>🔀 PR Analysis — ${owner}/${repo}#${prNum}</h3></div>
+      <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+        <span>Impact: <strong style="color:${impactColors[ai.impact] || 'var(--muted)'}">${ai.impact}</strong></span>
+        <span>Risk: <strong style="color:${riskColors[ai.risk_level] || 'var(--muted)'}">${ai.risk_level}</strong></span>
+        <span>Files: <strong>${prFiles.length}</strong></span>
+        <span style="color:var(--green)">+${prData.additions}</span>
+        <span style="color:var(--red)">-${prData.deletions}</span>
+      </div>
+      <div class="ai-section"><h4>Summary</h4><p>${ai.summary}</p></div>
+      <div class="ai-section"><h4>Code Quality</h4><p>${ai.code_quality_assessment}</p></div>`;
+    if (ai.potential_issues?.length) html += `<div class="ai-section"><h4>⚠ Potential Issues</h4><ul>${ai.potential_issues.map(i => `<li style="color:var(--orange)">${i}</li>`).join('')}</ul></div>`;
+    if (ai.good_patterns?.length) html += `<div class="ai-section"><h4>✓ Good Patterns</h4><ul>${ai.good_patterns.map(g => `<li style="color:var(--green)">${g}</li>`).join('')}</ul></div>`;
+    if (ai.suggested_questions?.length) html += `<div class="ai-section"><h4>💬 Reviewer Questions</h4><ul>${ai.suggested_questions.map(q => `<li>${q}</li>`).join('')}</ul></div>`;
+    html += '</div>';
+
+    html += `<div class="card"><div class="section-title">Changed Files (${prFiles.length})</div>`;
+    prFiles.forEach(f => {
+      const stColor = f.status === 'added' ? 'var(--green)' : f.status === 'removed' ? 'var(--red)' : 'var(--blue)';
+      html += `<div style="padding:6px 0;border-bottom:1px solid var(--border2);font-size:.85rem">
+        <span style="color:${stColor};font-weight:600;text-transform:uppercase;font-size:.7rem">${f.status}</span>
+        <span style="font-family:var(--font-code);margin-left:8px">${f.filename}</span>
+        <span style="float:right;color:var(--muted)"><span style="color:var(--green)">+${f.additions}</span> <span style="color:var(--red)">-${f.deletions}</span></span>
+      </div>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${e.message}</p></div>`;
+  }
+}
+
+async function handleStackRecommend() {
+  const desc = document.getElementById('stack-desc').value.trim();
+  if (!desc) return;
+  const container = document.getElementById('ailab-results');
+  container.innerHTML = '<div class="loading-overlay"><div class="loading"></div><span>Recommending tech stack...</span></div>';
+
+  try {
+    const prompt = `A developer needs a tech stack recommendation.
+PROJECT: ${desc}
+
+Recommend a complete, opinionated tech stack. For each choice, name a specific GitHub repository.
+
+Respond in JSON only:
+{
+  "stack_name": "descriptive name",
+  "suitable_for": "project type",
+  "components": [
+    {"category":"Frontend|Backend|Database|Auth|etc","choice":"name","github_repo":"owner/repo","reason":"why","alternative":"next best"}
+  ],
+  "total_complexity": "LOW|MEDIUM|HIGH",
+  "time_to_productive": "estimate",
+  "tradeoffs": ["tradeoff 1"],
+  "getting_started_order": ["step 1","step 2"]
+}`;
+
+    const raw = await callClaudeAPI(prompt);
+    const jMatch = raw.match(/\{[\s\S]*\}/);
+    const ai = jMatch ? JSON.parse(jMatch[0]) : JSON.parse(raw);
+
+    const cxColors = { LOW: 'var(--green)', MEDIUM: 'var(--yellow)', HIGH: 'var(--red)' };
+
+    let html = `<div class="ai-card">
+      <div class="ai-card-header"><h3>🏗️ ${ai.stack_name || 'Tech Stack'}</h3><span style="color:${cxColors[ai.total_complexity] || 'var(--muted)'};font-weight:600">${ai.total_complexity} complexity</span></div>
+      <div class="ai-section"><p><strong>Best for:</strong> ${ai.suitable_for || ''}</p>
+      <p><strong>Time to productive:</strong> ${ai.time_to_productive || '?'}</p></div>`;
+
+    if (ai.components?.length) {
+      html += `<div class="ai-section"><h4>Stack Components</h4>`;
+      ai.components.forEach(c => {
+        html += `<div style="background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:.75rem;color:var(--muted);text-transform:uppercase">${c.category}</span>
+          </div>
+          <div style="font-weight:700;margin:4px 0">${c.choice}</div>
+          ${c.github_repo ? `<a href="https://github.com/${c.github_repo}" target="_blank" style="font-size:.8rem">${c.github_repo}</a>` : ''}
+          <p style="font-size:.85rem;color:var(--muted);margin-top:4px">${c.reason || ''}</p>
+          ${c.alternative ? `<p style="font-size:.8rem;color:var(--subtle)">Alt: ${c.alternative}</p>` : ''}
+        </div>`;
+      });
+      html += '</div>';
+    }
+
+    if (ai.getting_started_order?.length) {
+      html += `<div class="ai-section"><h4>Getting Started Order</h4><ol>${ai.getting_started_order.map(s => `<li>${s}</li>`).join('')}</ol></div>`;
+    }
+    if (ai.tradeoffs?.length) {
+      html += `<div class="ai-section"><h4>Tradeoffs</h4><ul>${ai.tradeoffs.map(t => `<li style="color:var(--orange)">${t}</li>`).join('')}</ul></div>`;
+    }
+    html += '</div>';
+    container.innerHTML = html;
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${e.message}</p></div>`;
+  }
+}
+
+async function loadTrending() {
+  const lang = document.getElementById('trending-lang').value;
+  const since = document.getElementById('trending-since').value;
+  const container = document.getElementById('trending-results');
+  container.innerHTML = '<div class="loading-overlay"><div class="loading"></div><span>Loading trending repos...</span></div>';
+
+  try {
+    const url = `https://github.com/trending/${lang}?since=${since}`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const r = await fetch(proxyUrl);
+    const data = await r.json();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(data.contents, 'text/html');
+    const articles = doc.querySelectorAll('article.Box-row');
+
+    const repos = Array.from(articles).map(article => {
+      const nameEl = article.querySelector('h2 a');
+      const descEl = article.querySelector('p');
+      const langEl = article.querySelector('[itemprop="programmingLanguage"]');
+      const starsEls = article.querySelectorAll('a.Link--muted');
+      const gainEl = article.querySelector('.float-sm-right, .d-inline-block.float-sm-right');
+
+      return {
+        full_name: nameEl?.getAttribute('href')?.slice(1)?.trim(),
+        description: descEl?.textContent?.trim() || '',
+        language: langEl?.textContent?.trim() || '',
+        stars: starsEls[0]?.textContent?.trim()?.replace(/,/g, '') || '0',
+        forks: starsEls[1]?.textContent?.trim()?.replace(/,/g, '') || '0',
+        stars_today: gainEl?.textContent?.trim() || '',
+      };
+    }).filter(r => r.full_name);
+
+    if (repos.length === 0) {
+      const now = new Date();
+      const sinceDate = since === 'daily' ? new Date(now - 86400000) : since === 'weekly' ? new Date(now - 604800000) : new Date(now - 2592000000);
+      const q = lang ? `language:${lang}` : 'stars:>100';
+      const timeQ = `created:>${sinceDate.toISOString().slice(0,10)}`;
+      const fallback = await searchRepositories(`${q} ${timeQ}`, { sort: 'stars', perPage: 15 });
+      const items = fallback.items || [];
+      if (items.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>Could not load trending repos. Try again later.</p></div>';
+        return;
+      }
+      let html = `<div class="section-title">🔥 Hot Repositories (via GitHub Search)</div>`;
+      items.forEach((repo, i) => {
+        html += renderTrendingCard(repo, i + 1, items[0].stargazers_count);
+      });
+      container.innerHTML = html;
+      return;
+    }
+
+    const maxStars = Math.max(...repos.map(r => parseInt(r.stars) || 0), 1);
+
+    let html = '';
+
+    if (getAnthropicKey() && repos.length >= 3) {
+      html += '<div class="ai-card" id="trending-ai"><div class="ai-card-header"><h3>🔥 AI Trend Insight</h3></div><div class="loading-overlay" style="padding:12px"><div class="loading"></div></div></div>';
+      setTimeout(async () => {
+        try {
+          const prompt = `Today's trending GitHub repos (${new Date().toDateString()}):\n${repos.slice(0,10).map(r => `- ${r.full_name}: ${r.description} (+${r.stars_today})`).join('\n')}\n\nIdentify patterns and explain in 3 short paragraphs:\n1. What trend or theme is driving today's trending?\n2. What does this tell about where tech is moving?\n3. Which single trending repo is most worth exploring and why?`;
+          const result = await callClaudeAPI(prompt, 'You are a senior developer with excellent pattern recognition for technology trends. Be direct and opinionated.');
+          const card = document.getElementById('trending-ai');
+          if (card) card.innerHTML = `<div class="ai-card-header"><h3>🔥 AI Trend Insight</h3></div><div style="white-space:pre-wrap;line-height:1.6;font-size:.9rem">${escHtml(result)}</div>`;
+        } catch { document.getElementById('trending-ai')?.remove(); }
+      }, 100);
+    }
+
+    repos.forEach((repo, i) => {
+      const stars = parseInt(repo.stars) || 0;
+      const barWidth = (stars / maxStars * 100);
+      html += `<div class="card" style="display:flex;gap:12px;align-items:flex-start">
+        <div class="trending-rank">#${i + 1}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:4px">
+            <div class="card-title"><a href="https://github.com/${repo.full_name}" target="_blank">${repo.full_name}</a></div>
+            <span style="color:var(--gold);font-family:var(--font-code);font-weight:600">★ ${fmtNum(stars)}</span>
+          </div>
+          <p style="font-size:.85rem;color:var(--muted);margin:4px 0">${escHtml(repo.description)}</p>
+          <div class="trending-bar"><div class="trending-bar-fill" style="width:${barWidth}%"></div></div>
+          <div class="card-meta" style="margin-top:6px">
+            ${repo.language ? `<span>${langDot(repo.language)}</span>` : ''}
+            <span>🍴 ${repo.forks}</span>
+            ${repo.stars_today ? `<span style="color:var(--orange)">🔥 ${repo.stars_today}</span>` : ''}
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-sm" onclick="document.getElementById('repo-input').value='${repo.full_name}';document.querySelector('[data-tab=\\'repos\\']').click();handleAnalyzeRepo()">Analyze</button>
+            <button class="btn btn-sm" onclick='addBookmark(${JSON.stringify({id:`repo_${repo.full_name}`,type:"repo",name:repo.full_name,url:`https://github.com/${repo.full_name}`,stars,language:repo.language,description:repo.description}).replace(/'/g,"\\'")})'> ⭐</button>
+          </div>
+        </div>
+      </div>`;
+    });
+
+    container.innerHTML = html;
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>Trending failed: ${e.message}. Try again.</p></div>`;
+  }
+}
+
+function renderTrendingCard(repo, rank, maxStars) {
+  const barWidth = (repo.stargazers_count / maxStars * 100);
+  return `<div class="card" style="display:flex;gap:12px;align-items:flex-start">
+    <div class="trending-rank">#${rank}</div>
+    <div style="flex:1;min-width:0">
+      <div class="card-title"><a href="${repo.html_url}" target="_blank">${repo.full_name}</a></div>
+      <p style="font-size:.85rem;color:var(--muted)">${escHtml(repo.description || '')}</p>
+      <div class="trending-bar"><div class="trending-bar-fill" style="width:${barWidth}%"></div></div>
+      <div class="card-meta" style="margin-top:6px">
+        ${repo.language ? `<span>${langDot(repo.language)}</span>` : ''}
+        <span class="star">★ ${fmtNum(repo.stargazers_count)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderBookmarks() {
+  const container = document.getElementById('bookmarks-content');
+  if (bookmarks.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">⭐</div><p>No bookmarks yet. Star repos, issues, or developers to save them here.</p></div>';
+    return;
+  }
+  let html = `<p style="color:var(--muted);margin-bottom:12px">${bookmarks.length} bookmarks</p>`;
+  bookmarks.forEach(b => {
+    html += `<div class="card">
+      <div class="card-header">
+        <div class="card-title"><a href="${b.url}" target="_blank">${escHtml(b.name)}</a></div>
+        <button class="btn btn-sm" style="color:var(--red)" onclick="removeBookmark('${b.id}')">✕</button>
+      </div>
+      ${b.description ? `<div class="card-desc">${escHtml(b.description)}</div>` : ''}
+      <div class="card-meta">
+        <span>${b.type}</span>
+        ${b.stars ? `<span class="star">★ ${fmtNum(b.stars)}</span>` : ''}
+        ${b.language ? `<span>${langDot(b.language)}</span>` : ''}
+        <span>Saved ${timeAgo(b.bookmarkedAt)}</span>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderHistory() {
+  const container = document.getElementById('history-content');
+  if (searchHistory.length === 0) {
+    container.innerHTML = '<div class="empty-state"><p>No search history yet.</p></div>';
+    return;
+  }
+  let html = `<p style="color:var(--muted);margin-bottom:12px">${searchHistory.length} searches</p>`;
+  searchHistory.slice(0, 50).forEach(h => {
+    html += `<div class="card" style="padding:10px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="document.getElementById('main-search').value='${escHtml(h.query)}';document.querySelector('[data-tab=\\'search\\']').click();handleMainSearch()">
+      <div>
+        <span style="font-weight:500">${escHtml(h.query)}</span>
+        <span class="tag" style="margin-left:8px">${h.type}</span>
+      </div>
+      <div style="color:var(--muted);font-size:.8rem">${h.count} results · ${timeAgo(h.time)}</div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function showBookmarkTab(tab) {
+  document.getElementById('bookmarks-content').style.display = tab === 'bookmarks' ? 'block' : 'none';
+  document.getElementById('history-content').style.display = tab === 'history' ? 'block' : 'none';
+  if (tab === 'bookmarks') renderBookmarks();
+  else renderHistory();
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => showToast('Copied!')).catch(() => showToast('Copy failed'));
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/`/g, '&#96;');
+}
+
+document.getElementById('main-search').addEventListener('input', (e) => {
+  const q = e.target.value;
+  const parsed = parseSmartQuery(q);
+  if (parsed.mode !== currentMode) {
+    document.querySelectorAll('#mode-chips .mode-chip').forEach(b => b.classList.remove('active'));
+    const modeMap = { error_solver: 'error_solver', repo_analyzer: 'universal', how_to: 'how_to', library_finder: 'library_finder', direct_repo: 'universal', universal: 'universal' };
+    const chip = document.querySelector(`[data-mode="${modeMap[parsed.mode] || 'universal'}"]`);
+    if (chip) chip.classList.add('active');
+  }
+});
+
+loadSettings();
+function loadSettings() {
+  const show = localStorage.getItem('ghf_ai_show');
+  if (show) document.getElementById('setting-ai-show').value = show;
+  document.getElementById('setting-ai-show').addEventListener('change', (e) => {
+    localStorage.setItem('ghf_ai_show', e.target.value);
+  });
+  const model = localStorage.getItem('ghf_ai_model');
+  if (model) document.getElementById('setting-ai-model').value = model;
+  document.getElementById('setting-ai-model').addEventListener('change', (e) => {
+    localStorage.setItem('ghf_ai_model', e.target.value);
+  });
+  const minStars = localStorage.getItem('ghf_min_stars');
+  if (minStars) document.getElementById('setting-min-stars').value = minStars;
+  document.getElementById('setting-min-stars').addEventListener('change', (e) => {
+    localStorage.setItem('ghf_min_stars', e.target.value);
+  });
+  const sort = localStorage.getItem('ghf_sort');
+  if (sort) document.getElementById('setting-sort').value = sort;
+  document.getElementById('setting-sort').addEventListener('change', (e) => {
+    localStorage.setItem('ghf_sort', e.target.value);
+  });
+  const perPage = localStorage.getItem('ghf_per_page');
+  if (perPage) document.getElementById('setting-per-page').value = perPage;
+  document.getElementById('setting-per-page').addEventListener('change', (e) => {
+    localStorage.setItem('ghf_per_page', e.target.value);
+  });
+}
+
+async function searchDiscussionsGraphQL(query, repos) {
+  if (!GitHubAPI.getToken()) return [];
+  try {
+    const repoQueries = repos.slice(0, 3).map((repo, i) => {
+      const [owner, name] = repo.split('/');
+      return `r${i}: repository(owner: "${owner}", name: "${name}") {
+        discussions(first: 5, orderBy: {field: CREATED_AT, direction: DESC}) {
+          nodes { title url body createdAt upvoteCount
+            comments { totalCount }
+            answer { body author { login } }
+          }
+        }
+      }`;
+    });
+    const gql = `query { ${repoQueries.join('\n')} }`;
+    const data = await GitHubAPI.graphql(gql);
+    const results = [];
+    for (const key of Object.keys(data || {})) {
+      const discussions = data[key]?.discussions?.nodes || [];
+      results.push(...discussions);
+    }
+    return results;
+  } catch { return []; }
+}
+</script>
+</body>
+</html>

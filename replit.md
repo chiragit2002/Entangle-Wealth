@@ -77,6 +77,7 @@ The project uses a pnpm workspace monorepo, with each package managing its own d
     - **Token Admin** (`/token-admin`): Supply overview, reward distribution trigger, share price/token valuation controls, marketplace stats. Admin-tier restricted.
     - **Smart Contract**: EntangleCoin.sol ERC-20 (100M total supply, 75/25 founder/rewards split), batch distribution, travel booking burn, Hardhat + Sepolia deploy config.
     - **DB Schema**: token_transactions, reward_distributions, travel_bookings, token_config tables; users extended with walletAddress + tokenBalance.
+- **GitHub Solution Finder** (`/github-finder.html`): Standalone 9-tab GitHub intelligence platform (Search, Error Solver, Repos, Code, Issues, People, AI Lab, Trending, Bookmarks). Features GitHub REST + GraphQL API, Claude AI analysis, smart query parsing, syntax highlighting (Highlight.js), markdown rendering (Marked.js + DOMPurify), localStorage for bookmarks/history/settings, rate limit tracking, language color map, and mobile responsive design. User provides their own GitHub PAT and Anthropic API key via Settings.
 - **Mobile Design**: Fully responsive, mobile-first design with bottom navigation and optimized components.
 
 ### API Server (`artifacts/api-server`)

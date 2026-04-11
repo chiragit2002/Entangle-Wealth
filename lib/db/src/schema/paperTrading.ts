@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, real, integer, serial, unique } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, real, integer, serial, unique, boolean } from "drizzle-orm/pg-core";
 
 export const virtualCashPurchasesTable = pgTable("virtual_cash_purchases", {
   id: serial("id").primaryKey(),
@@ -42,6 +42,8 @@ export const dailySpinTable = pgTable("daily_spins", {
   userId: text("user_id").notNull(),
   prizeAmount: real("prize_amount").notNull(),
   spinDate: text("spin_date").notNull(),
+  rewardType: text("reward_type").notNull().default("cash"),
+  rewardLabel: text("reward_label").notNull().default(""),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 }, (table) => [
   unique("daily_spins_user_date_unique").on(table.userId, table.spinDate),

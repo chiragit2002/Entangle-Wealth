@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, dailySpinTable } from "@workspace/db/schema";
+import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, dailySpinTable, userXpTable, xpTransactionsTable, streaksTable } from "@workspace/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { resolveUserId } from "../lib/resolveUserId";
@@ -11,29 +11,56 @@ const router = Router();
 
 const STARTING_CASH = 100_000;
 
-const SPIN_PRIZES = [
-  { amount: 100_000, weight: 1 },
-  { amount: 50_000, weight: 2 },
-  { amount: 25_000, weight: 5 },
-  { amount: 10_000, weight: 10 },
-  { amount: 7_500, weight: 20 },
-  { amount: 5_000, weight: 50 },
-  { amount: 4_000, weight: 66.7 },
-  { amount: 3_000, weight: 100 },
-  { amount: 2_000, weight: 142.9 },
-  { amount: 1_000, weight: 603.4 },
+type SpinRewardType = "cash" | "xp" | "multiplier" | "streak_protection";
+
+interface SpinReward {
+  rewardType: SpinRewardType;
+  label: string;
+  cashAmount: number;
+  xpAmount: number;
+  weight: number;
+}
+
+const SPIN_PRIZES: SpinReward[] = [
+  { rewardType: "cash", label: "$1K", cashAmount: 1_000, xpAmount: 0, weight: 603.4 },
+  { rewardType: "cash", label: "$2K", cashAmount: 2_000, xpAmount: 0, weight: 142.9 },
+  { rewardType: "cash", label: "$3K", cashAmount: 3_000, xpAmount: 0, weight: 100 },
+  { rewardType: "cash", label: "$4K", cashAmount: 4_000, xpAmount: 0, weight: 66.7 },
+  { rewardType: "cash", label: "$5K", cashAmount: 5_000, xpAmount: 0, weight: 50 },
+  { rewardType: "cash", label: "$7.5K", cashAmount: 7_500, xpAmount: 0, weight: 20 },
+  { rewardType: "cash", label: "$10K", cashAmount: 10_000, xpAmount: 0, weight: 10 },
+  { rewardType: "cash", label: "$25K", cashAmount: 25_000, xpAmount: 0, weight: 5 },
+  { rewardType: "cash", label: "$50K", cashAmount: 50_000, xpAmount: 0, weight: 2 },
+  { rewardType: "cash", label: "$100K", cashAmount: 100_000, xpAmount: 0, weight: 1 },
+  { rewardType: "xp", label: "+50 XP", cashAmount: 0, xpAmount: 50, weight: 50 },
+  { rewardType: "xp", label: "+100 XP", cashAmount: 0, xpAmount: 100, weight: 30 },
+  { rewardType: "xp", label: "+250 XP", cashAmount: 0, xpAmount: 250, weight: 15 },
+  { rewardType: "multiplier", label: "2x Boost", cashAmount: 0, xpAmount: 0, weight: 4 },
+  { rewardType: "streak_protection", label: "Streak Boost", cashAmount: 0, xpAmount: 0, weight: 1 },
 ];
 
 const TOTAL_WEIGHT = SPIN_PRIZES.reduce((sum, p) => sum + p.weight, 0);
 
-function pickPrize(): number {
+function pickPrize(): SpinReward {
   const rand = Math.random() * TOTAL_WEIGHT;
   let cumulative = 0;
   for (const prize of SPIN_PRIZES) {
     cumulative += prize.weight;
-    if (rand < cumulative) return prize.amount;
+    if (rand < cumulative) return prize;
   }
-  return SPIN_PRIZES[SPIN_PRIZES.length - 1].amount;
+  return SPIN_PRIZES[0];
+}
+
+function calculateLevel(totalXp: number): number {
+  return Math.floor(Math.sqrt(totalXp / 100)) + 1;
+}
+
+function calculateTier(level: number, totalXp: number): string {
+  if (level >= 40 || totalXp >= 50000) return "Diamond";
+  if (level >= 30 || totalXp >= 25000) return "Platinum";
+  if (level >= 20 || totalXp >= 10000) return "Gold";
+  if (level >= 10 || totalXp >= 3000) return "Silver";
+  return "Bronze";
 }
 
 function getTodayUTC(): string {
@@ -277,39 +304,84 @@ router.post("/paper-trading/spin", requireAuth, async (req, res) => {
     tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
     tomorrow.setUTCHours(0, 0, 0, 0);
 
-    const prize = pickPrize();
+    const picked = pickPrize();
 
-    const result = await db.transaction(async (tx) => {
+    const txResult = await db.transaction(async (tx) => {
       const inserted = await tx
         .insert(dailySpinTable)
-        .values({ userId: dbUserId, prizeAmount: prize, spinDate: today })
+        .values({ userId: dbUserId, prizeAmount: picked.cashAmount, spinDate: today, rewardType: picked.rewardType, rewardLabel: picked.label })
         .onConflictDoNothing({ target: [dailySpinTable.userId, dailySpinTable.spinDate] })
         .returning({ id: dailySpinTable.id });
 
       if (inserted.length === 0) {
-        return { alreadySpun: true, nextSpinAt: tomorrow.toISOString() };
+        return { alreadySpun: true };
       }
 
-      const [portfolio] = await tx
-        .select()
-        .from(paperPortfoliosTable)
-        .where(eq(paperPortfoliosTable.userId, dbUserId));
-
-      if (portfolio) {
-        await tx
-          .update(paperPortfoliosTable)
-          .set({ cashBalance: portfolio.cashBalance + prize, updatedAt: new Date() })
+      if (picked.rewardType === "cash" && picked.cashAmount > 0) {
+        const [portfolio] = await tx
+          .select()
+          .from(paperPortfoliosTable)
           .where(eq(paperPortfoliosTable.userId, dbUserId));
-      } else {
-        await tx
-          .insert(paperPortfoliosTable)
-          .values({ userId: dbUserId, cashBalance: STARTING_CASH + prize });
+
+        if (portfolio) {
+          await tx
+            .update(paperPortfoliosTable)
+            .set({ cashBalance: portfolio.cashBalance + picked.cashAmount, updatedAt: new Date() })
+            .where(eq(paperPortfoliosTable.userId, dbUserId));
+        } else {
+          await tx
+            .insert(paperPortfoliosTable)
+            .values({ userId: dbUserId, cashBalance: STARTING_CASH + picked.cashAmount });
+        }
+      } else if (picked.rewardType === "xp" && picked.xpAmount > 0) {
+        let [xpRow] = await tx.select().from(userXpTable).where(eq(userXpTable.userId, dbUserId));
+        if (!xpRow) {
+          [xpRow] = await tx.insert(userXpTable).values({ userId: dbUserId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
+        }
+        const newTotalXp = xpRow.totalXp + picked.xpAmount;
+        const newLevel = calculateLevel(newTotalXp);
+        const newTier = calculateTier(newLevel, newTotalXp);
+        await tx.update(userXpTable).set({
+          totalXp: newTotalXp, level: newLevel, tier: newTier,
+          monthlyXp: xpRow.monthlyXp + picked.xpAmount,
+          weeklyXp: xpRow.weeklyXp + picked.xpAmount,
+          updatedAt: new Date(),
+        }).where(eq(userXpTable.userId, dbUserId));
+        await tx.insert(xpTransactionsTable).values({ userId: dbUserId, amount: picked.xpAmount, reason: "paper_trading_spin", category: "engagement" });
+      } else if (picked.rewardType === "multiplier") {
+        let [streak] = await tx.select().from(streaksTable).where(eq(streaksTable.userId, dbUserId));
+        if (!streak) {
+          [streak] = await tx.insert(streaksTable).values({ userId: dbUserId, currentStreak: 0, longestStreak: 0, multiplier: 1.0 }).returning();
+        }
+        await tx.update(streaksTable).set({
+          multiplier: Math.min(3.0, Math.max(streak.multiplier, 2.0)),
+          updatedAt: new Date(),
+        }).where(eq(streaksTable.userId, dbUserId));
+      } else if (picked.rewardType === "streak_protection") {
+        const [streakRow] = await tx.select().from(streaksTable).where(eq(streaksTable.userId, dbUserId));
+        if (!streakRow) {
+          await tx.insert(streaksTable).values({ userId: dbUserId, currentStreak: 0, longestStreak: 0, multiplier: 1.0, streakProtectionActive: true });
+        } else {
+          await tx.update(streaksTable).set({ streakProtectionActive: true, updatedAt: new Date() }).where(eq(streaksTable.userId, dbUserId));
+        }
       }
 
-      return { success: true, prize, nextSpinAt: tomorrow.toISOString() };
+      return { alreadySpun: false };
     });
 
-    res.json(result);
+    if (txResult.alreadySpun) {
+      res.json({ alreadySpun: true, nextSpinAt: tomorrow.toISOString() });
+      return;
+    }
+
+    res.json({
+      success: true,
+      rewardType: picked.rewardType,
+      label: picked.label,
+      prize: picked.cashAmount,
+      xpAmount: picked.xpAmount,
+      nextSpinAt: tomorrow.toISOString(),
+    });
   } catch (err) {
     logger.error("Spin error:", err);
     res.status(500).json({ error: "Spin failed" });

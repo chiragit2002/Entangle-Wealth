@@ -77,6 +77,7 @@ export const streaksTable = pgTable("streaks", {
   longestStreak: integer("longest_streak").notNull().default(0),
   lastActivityDate: timestamp("last_activity_date", { withTimezone: true }),
   multiplier: real("multiplier").notNull().default(1.0),
+  streakProtectionActive: boolean("streak_protection_active").notNull().default(false),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 

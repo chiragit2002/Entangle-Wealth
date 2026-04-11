@@ -183,11 +183,18 @@ router.post("/gamification/streak/checkin", requireAuth, async (req, res) => {
       return;
     }
 
-    const { newStreak, alreadyActive } = evaluateStreak(streak.lastActivityDate, streak.currentStreak, now);
+    const { newStreak: evalNewStreak, alreadyActive } = evaluateStreak(streak.lastActivityDate, streak.currentStreak, now);
 
     if (alreadyActive) {
       res.json({ ...streak, alreadyCheckedIn: true });
       return;
+    }
+
+    let consumedProtection = false;
+    let newStreak = evalNewStreak;
+    if (newStreak < streak.currentStreak && streak.streakProtectionActive) {
+      newStreak = streak.currentStreak;
+      consumedProtection = true;
     }
 
     const newMultiplier = Math.min(1.0 + (newStreak - 1) * 0.1, 3.0);
@@ -199,12 +206,13 @@ router.post("/gamification/streak/checkin", requireAuth, async (req, res) => {
         longestStreak: newLongest,
         lastActivityDate: now,
         multiplier: newMultiplier,
+        streakProtectionActive: consumedProtection ? false : streak.streakProtectionActive,
         updatedAt: now,
       })
       .where(eq(streaksTable.userId, userId))
       .returning();
 
-    res.json(updated);
+    res.json({ ...updated, protectionUsed: consumedProtection });
   } catch (error) {
     console.error("Error checking in streak:", error);
     res.status(500).json({ error: "Failed to check in" });
@@ -809,12 +817,25 @@ router.post("/gamification/claim-daily", requireAuth, async (req, res) => {
       return;
     }
 
-    const newStreak = dailyNewStreak;
+    let consumedDailyProtection = false;
+    let newStreak = dailyNewStreak;
+    if (newStreak < streak.currentStreak && streak.streakProtectionActive) {
+      newStreak = streak.currentStreak;
+      consumedDailyProtection = true;
+    }
+
     const newMultiplier = Math.min(1.0 + (newStreak - 1) * 0.1, 3.0);
     const newLongest = Math.max(streak.longestStreak, newStreak);
 
     const [updatedStreak] = await db.update(streaksTable)
-      .set({ currentStreak: newStreak, longestStreak: newLongest, lastActivityDate: now, multiplier: newMultiplier, updatedAt: now })
+      .set({
+        currentStreak: newStreak,
+        longestStreak: newLongest,
+        lastActivityDate: now,
+        multiplier: newMultiplier,
+        streakProtectionActive: consumedDailyProtection ? false : streak.streakProtectionActive,
+        updatedAt: now,
+      })
       .where(eq(streaksTable.userId, userId))
       .returning();
 

@@ -117,6 +117,9 @@ async function ensureGamificationTables() {
           granted_at TIMESTAMPTZ DEFAULT now()
         );
         CREATE INDEX IF NOT EXISTS idx_daily_spins_user ON daily_spins (user_id);
+        ALTER TABLE streaks ADD COLUMN IF NOT EXISTS streak_protection_active BOOLEAN NOT NULL DEFAULT false;
+        ALTER TABLE daily_spins ADD COLUMN IF NOT EXISTS reward_type TEXT NOT NULL DEFAULT 'cash';
+        ALTER TABLE daily_spins ADD COLUMN IF NOT EXISTS reward_label TEXT NOT NULL DEFAULT '';
       `);
 
       const colTypeResult = await client.query(`

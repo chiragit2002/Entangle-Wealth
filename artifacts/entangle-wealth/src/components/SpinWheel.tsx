@@ -2,20 +2,34 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
-import { Gift, Clock, Trophy, ChevronDown, ChevronUp } from "lucide-react";
+import { Gift, Clock, Trophy, ChevronDown, ChevronUp, Zap, Shield, Star } from "lucide-react";
 import { motion, useMotionValue, animate, AnimatePresence } from "framer-motion";
 
-const PRIZES = [
-  { amount: 1_000, label: "$1K", color: "#1a3a2a", textColor: "#00ff88" },
-  { amount: 2_000, label: "$2K", color: "#1a2a3a", textColor: "#00D4FF" },
-  { amount: 3_000, label: "$3K", color: "#2a1a3a", textColor: "#a855f7" },
-  { amount: 4_000, label: "$4K", color: "#3a2a1a", textColor: "#f59e0b" },
-  { amount: 5_000, label: "$5K", color: "#1a3a2a", textColor: "#00ff88" },
-  { amount: 7_500, label: "$7.5K", color: "#1a2a3a", textColor: "#00D4FF" },
-  { amount: 10_000, label: "$10K", color: "#3a1a1a", textColor: "#ff3366" },
-  { amount: 25_000, label: "$25K", color: "#2a1a1a", textColor: "#ff6b35" },
-  { amount: 50_000, label: "$50K", color: "#1a1a3a", textColor: "#a855f7" },
-  { amount: 100_000, label: "$100K", color: "#2a1a00", textColor: "#FFD700" },
+type RewardType = "cash" | "xp" | "multiplier" | "streak_protection";
+
+interface Prize {
+  rewardType: RewardType;
+  label: string;
+  color: string;
+  textColor: string;
+}
+
+const PRIZES: Prize[] = [
+  { rewardType: "cash", label: "$1K", color: "#1a3a2a", textColor: "#00ff88" },
+  { rewardType: "xp", label: "+50 XP", color: "#1a1a3a", textColor: "#00D4FF" },
+  { rewardType: "cash", label: "$2K", color: "#1a2a3a", textColor: "#00D4FF" },
+  { rewardType: "xp", label: "+100 XP", color: "#2a1a3a", textColor: "#a855f7" },
+  { rewardType: "cash", label: "$3K", color: "#2a1a3a", textColor: "#a855f7" },
+  { rewardType: "cash", label: "$4K", color: "#3a2a1a", textColor: "#f59e0b" },
+  { rewardType: "xp", label: "+250 XP", color: "#1a1a2a", textColor: "#6366f1" },
+  { rewardType: "cash", label: "$5K", color: "#1a3a2a", textColor: "#00ff88" },
+  { rewardType: "cash", label: "$7.5K", color: "#1a2a3a", textColor: "#00D4FF" },
+  { rewardType: "cash", label: "$10K", color: "#3a1a1a", textColor: "#ff3366" },
+  { rewardType: "multiplier", label: "2x Boost", color: "#2a1a00", textColor: "#FFD700" },
+  { rewardType: "cash", label: "$25K", color: "#2a1a1a", textColor: "#ff6b35" },
+  { rewardType: "cash", label: "$50K", color: "#1a1a3a", textColor: "#a855f7" },
+  { rewardType: "streak_protection", label: "Streak+", color: "#2a0a1a", textColor: "#ff3366" },
+  { rewardType: "cash", label: "$100K", color: "#2a1a00", textColor: "#FFD700" },
 ];
 
 const SEG_ANGLE = (2 * Math.PI) / PRIZES.length;
@@ -30,7 +44,16 @@ interface SpinHistory {
   id: number;
   prizeAmount: number;
   spinDate: string;
+  rewardType: string;
+  rewardLabel: string;
   createdAt: string;
+}
+
+interface SpinResult {
+  rewardType: RewardType;
+  label: string;
+  prize: number;
+  xpAmount: number;
 }
 
 function useCountdown(targetIso: string | null, onExpire?: () => void) {
@@ -68,7 +91,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
 
   const [status, setStatus] = useState<SpinStatus | null>(null);
   const [spinning, setSpinning] = useState(false);
-  const [winPrize, setWinPrize] = useState<number | null>(null);
+  const [winResult, setWinResult] = useState<SpinResult | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<SpinHistory[]>([]);
   const [historyLoaded, setHistoryLoaded] = useState(false);
@@ -136,7 +159,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
       ctx.rotate(start + SEG_ANGLE / 2);
       ctx.textAlign = "right";
       ctx.fillStyle = prize.textColor;
-      ctx.font = `bold 11px monospace`;
+      ctx.font = `bold 10px monospace`;
       ctx.shadowColor = prize.textColor;
       ctx.shadowBlur = 4;
       ctx.fillText(prize.label, r - 8, 4);
@@ -173,7 +196,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
     if (spinning || !status?.canSpin) return;
 
     setSpinning(true);
-    setWinPrize(null);
+    setWinResult(null);
 
     try {
       const res = await authFetch("/paper-trading/spin", getToken, { method: "POST" });
@@ -186,8 +209,21 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
         return;
       }
 
-      const prize = data.prize as number;
-      const prizeIndex = PRIZES.findIndex(p => p.amount === prize);
+      const { rewardType, label, prize, xpAmount } = data as { rewardType: RewardType; label: string; prize: number; xpAmount: number };
+
+      let prizeIndex = -1;
+      if (rewardType === "cash") {
+        prizeIndex = PRIZES.findIndex(p => p.rewardType === "cash" && p.label === label);
+        if (prizeIndex < 0) prizeIndex = PRIZES.findIndex(p => p.rewardType === "cash");
+      } else if (rewardType === "xp") {
+        prizeIndex = PRIZES.findIndex(p => p.rewardType === "xp" && p.label === label);
+        if (prizeIndex < 0) prizeIndex = PRIZES.findIndex(p => p.rewardType === "xp");
+      } else if (rewardType === "multiplier") {
+        prizeIndex = PRIZES.findIndex(p => p.rewardType === "multiplier");
+      } else if (rewardType === "streak_protection") {
+        prizeIndex = PRIZES.findIndex(p => p.rewardType === "streak_protection");
+      }
+      const targetIndex = prizeIndex >= 0 ? prizeIndex : 0;
 
       const currentDeg = rotationDeg.get();
       const segDeg = 360 / PRIZES.length;
@@ -203,9 +239,9 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
         ease: [0.2, 0.85, 0.4, 1],
         onComplete: () => {
           setSpinning(false);
-          setWinPrize(prize);
+          setWinResult({ rewardType, label, prize, xpAmount });
           loadStatus();
-          onBalanceChange?.();
+          if (rewardType === "cash") onBalanceChange?.();
           setHistoryLoaded(prev => { if (prev) loadHistory(); return prev; });
         },
       });
@@ -215,13 +251,17 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
     }
   }, [isSignedIn, spinning, status, getToken, toast, rotationDeg, loadStatus, onBalanceChange, loadHistory]);
 
+  const cashPrizes = PRIZES.filter(p => p.rewardType === "cash");
+  const xpPrizes = PRIZES.filter(p => p.rewardType === "xp");
+  const specialPrizes = PRIZES.filter(p => p.rewardType === "multiplier" || p.rewardType === "streak_protection");
+
   return (
     <div className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm overflow-hidden">
       <div className="flex items-center justify-between px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FFD700]">
         <div className="flex items-center gap-1.5">
           <Gift className="w-3.5 h-3.5 text-[#FFD700]" />
           <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FFD700]">DAILY SPIN</span>
-          <span className="text-[8px] font-mono text-white/30 ml-1">FREE CASH</span>
+          <span className="text-[8px] font-mono text-white/30 ml-1">CASH · XP · BOOSTS</span>
         </div>
         <div className="flex items-center gap-2">
           {status?.canSpin === false && countdown && (
@@ -268,24 +308,34 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
 
           <div className="flex-1 flex flex-col justify-between min-w-0">
             <div>
-              <p className="text-[9px] font-mono text-white/30 mb-1.5">PRIZE TIERS</p>
-              <div className="space-y-0.5">
-                {PRIZES.slice().reverse().map(p => (
-                  <div key={p.amount} className="flex items-center justify-between">
+              <p className="text-[9px] font-mono text-white/30 mb-1">CASH PRIZES</p>
+              <div className="space-y-0.5 mb-2">
+                {cashPrizes.slice().reverse().map(p => (
+                  <div key={p.label} className="flex items-center justify-between">
                     <span className="text-[9px] font-mono font-bold" style={{ color: p.textColor }}>{p.label}</span>
-                    <span className="text-[8px] font-mono text-white/20">
-                      {p.amount === 100_000 ? "0.1%" :
-                       p.amount === 50_000 ? "0.2%" :
-                       p.amount === 25_000 ? "0.5%" :
-                       p.amount === 10_000 ? "1%" :
-                       p.amount === 7_500 ? "2%" :
-                       p.amount === 5_000 ? "5%" :
-                       p.amount === 4_000 ? "6.7%" :
-                       p.amount === 3_000 ? "10%" :
-                       p.amount === 2_000 ? "14.3%" : "~60%"}
-                    </span>
                   </div>
                 ))}
+              </div>
+              <div className="border-t border-white/[0.04] pt-1.5">
+                <p className="text-[9px] font-mono text-white/30 mb-1">XP & BOOSTS</p>
+                <div className="space-y-0.5">
+                  {xpPrizes.map(p => (
+                    <div key={p.label} className="flex items-center gap-1">
+                      <Zap className="w-2.5 h-2.5" style={{ color: p.textColor }} />
+                      <span className="text-[8px] font-mono" style={{ color: p.textColor }}>{p.label}</span>
+                    </div>
+                  ))}
+                  {specialPrizes.map(p => (
+                    <div key={p.label} className="flex items-center gap-1">
+                      {p.rewardType === "multiplier" ? (
+                        <Star className="w-2.5 h-2.5" style={{ color: p.textColor }} />
+                      ) : (
+                        <Shield className="w-2.5 h-2.5" style={{ color: p.textColor }} />
+                      )}
+                      <span className="text-[8px] font-mono" style={{ color: p.textColor }}>{p.label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -306,21 +356,55 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
         </div>
 
         <AnimatePresence>
-          {winPrize !== null && (
+          {winResult !== null && (
             <motion.div
-              key={winPrize}
+              key={winResult.label}
               initial={{ opacity: 0, scale: 0.8, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.45, ease: "easeOut" }}
-              className="mt-3 p-3 bg-[#FFD700]/10 border border-[#FFD700]/30 rounded-sm text-center"
+              className="mt-3 p-3 border rounded-sm text-center"
+              style={{
+                backgroundColor: winResult.rewardType === "cash" ? "rgba(255,215,0,0.1)" :
+                  winResult.rewardType === "xp" ? "rgba(0,212,255,0.1)" :
+                  winResult.rewardType === "multiplier" ? "rgba(255,215,0,0.1)" :
+                  "rgba(255,51,102,0.1)",
+                borderColor: winResult.rewardType === "cash" ? "rgba(255,215,0,0.3)" :
+                  winResult.rewardType === "xp" ? "rgba(0,212,255,0.3)" :
+                  winResult.rewardType === "multiplier" ? "rgba(255,215,0,0.3)" :
+                  "rgba(255,51,102,0.3)",
+              }}
             >
-              <Trophy className="w-5 h-5 text-[#FFD700] mx-auto mb-1" />
+              <Trophy className="w-5 h-5 mx-auto mb-1" style={{
+                color: winResult.rewardType === "cash" ? "#FFD700" :
+                  winResult.rewardType === "xp" ? "#00D4FF" :
+                  winResult.rewardType === "multiplier" ? "#FFD700" : "#ff3366"
+              }} />
               <p className="text-[9px] font-mono text-white/50 mb-0.5">YOU WON</p>
-              <p className="text-xl font-mono font-bold text-[#FFD700]">
-                +${winPrize.toLocaleString()}
-              </p>
-              <p className="text-[8px] font-mono text-white/30 mt-0.5">Added to paper trading balance</p>
+              {winResult.rewardType === "cash" && (
+                <>
+                  <p className="text-xl font-mono font-bold text-[#FFD700]">+${winResult.prize.toLocaleString()}</p>
+                  <p className="text-[8px] font-mono text-white/30 mt-0.5">Added to paper trading balance</p>
+                </>
+              )}
+              {winResult.rewardType === "xp" && (
+                <>
+                  <p className="text-xl font-mono font-bold text-[#00D4FF]">+{winResult.xpAmount} XP</p>
+                  <p className="text-[8px] font-mono text-white/30 mt-0.5">Added to your gamification profile</p>
+                </>
+              )}
+              {winResult.rewardType === "multiplier" && (
+                <>
+                  <p className="text-xl font-mono font-bold text-[#FFD700]">2x XP Boost</p>
+                  <p className="text-[8px] font-mono text-white/30 mt-0.5">XP multiplier activated on your streak</p>
+                </>
+              )}
+              {winResult.rewardType === "streak_protection" && (
+                <>
+                  <p className="text-xl font-mono font-bold text-[#ff3366]">Streak Shield</p>
+                  <p className="text-[8px] font-mono text-white/30 mt-0.5">Your streak is protected for 1 missed day</p>
+                </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -345,7 +429,14 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
               history.map(h => (
                 <div key={h.id} className="flex items-center justify-between py-0.5">
                   <span className="text-[8px] font-mono text-white/30">{h.spinDate}</span>
-                  <span className="text-[9px] font-mono font-bold text-[#FFD700]">+${h.prizeAmount.toLocaleString()}</span>
+                  <span className="text-[9px] font-mono font-bold"
+                    style={{
+                      color: h.rewardType === "xp" ? "#00D4FF" :
+                        h.rewardType === "multiplier" ? "#FFD700" :
+                        h.rewardType === "streak_protection" ? "#ff3366" : "#FFD700"
+                    }}>
+                    {h.rewardType === "cash" ? `+$${h.prizeAmount.toLocaleString()}` : h.rewardLabel || "Reward"}
+                  </span>
                 </div>
               ))
             )}

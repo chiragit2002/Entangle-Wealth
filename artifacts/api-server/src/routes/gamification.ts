@@ -592,23 +592,6 @@ router.get("/gamification/spin/status", requireAuth, async (req, res) => {
   }
 });
 
-const spinRateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const SPIN_RATE_LIMIT_WINDOW = 60_000;
-const SPIN_RATE_LIMIT_MAX = 5;
-
-function checkSpinRateLimit(req: import("express").Request): boolean {
-  const ip = req.ip || req.socket.remoteAddress || "unknown";
-  const now = Date.now();
-  const entry = spinRateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    spinRateLimitMap.set(ip, { count: 1, resetAt: now + SPIN_RATE_LIMIT_WINDOW });
-    return true;
-  }
-  if (entry.count >= SPIN_RATE_LIMIT_MAX) return false;
-  entry.count++;
-  return true;
-}
-
 router.post("/gamification/spin", requireAuth, async (req, res) => {
   if (!checkSpinRateLimit(req)) {
     res.status(429).json({ error: "Too many requests. Please slow down." });

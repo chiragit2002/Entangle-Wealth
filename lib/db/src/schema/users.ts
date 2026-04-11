@@ -33,6 +33,13 @@ export const usersTable = pgTable("users", {
   onboardingInterests: jsonb("onboarding_interests"),
   onboardingChecklist: jsonb("onboarding_checklist"),
   checklistCompletedAt: timestamp("checklist_completed_at", { withTimezone: true }),
+  kycIdPhotoPath: text("kyc_id_photo_path"),
+  kycSelfiePath: text("kyc_selfie_path"),
+  kycFullLegalName: text("kyc_full_legal_name"),
+  kycDateOfBirth: text("kyc_date_of_birth"),
+  kycAddress: text("kyc_address"),
+  kycIdType: text("kyc_id_type"),
+  kycIdNumber: text("kyc_id_number"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 

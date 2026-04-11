@@ -18,6 +18,7 @@ import { Info } from "lucide-react";
 import { AuthErrorHandler } from "@/components/AuthErrorHandler";
 import { AuthTokenError } from "@/lib/authFetch";
 import { MilestoneCelebrationModal } from "@/components/viral/MilestoneCelebrationModal";
+import { ProfileCompletionGate } from "@/components/ProfileCompletionGate";
 
 const Home = lazy(() => import("@/pages/Home"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -78,6 +79,7 @@ const LaunchReadinessPage = lazy(() => import("@/pages/LaunchReadiness"));
 const GamificationPage = lazy(() => import("@/pages/Gamification"));
 const GiveawayPage = lazy(() => import("@/pages/Giveaway"));
 const DailyContentPage = lazy(() => import("@/pages/DailyContent"));
+const AdminKycPage = lazy(() => import("@/pages/AdminKyc"));
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -136,10 +138,23 @@ const clerkAppearance = {
   },
 };
 
+function useFacebookOAuth() {
+  const clerk = useClerk();
+  const signInWithFacebook = async () => {
+    await clerk.client?.signIn.authenticateWithRedirect({
+      strategy: "oauth_facebook",
+      redirectUrl: `${window.location.origin}${basePath}/sso-callback`,
+      redirectUrlComplete: `${window.location.origin}${basePath}/dashboard`,
+    });
+  };
+  return { signInWithFacebook };
+}
+
 function SignInPage() {
   const searchString = useSearch();
   const params = new URLSearchParams(searchString);
   const redirectReason = params.get("reason");
+  const { signInWithFacebook } = useFacebookOAuth();
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
@@ -156,11 +171,21 @@ function SignInPage() {
         fallbackRedirectUrl={`${basePath}/dashboard`}
         appearance={clerkAppearance}
       />
+      <button
+        type="button"
+        onClick={signInWithFacebook}
+        className="sr-only"
+        aria-label="Sign in with Facebook"
+      >
+        Continue with Facebook
+      </button>
     </div>
   );
 }
 
 function SignUpPage() {
+  const { signInWithFacebook } = useFacebookOAuth();
+
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <SignUp
@@ -170,6 +195,14 @@ function SignUpPage() {
         fallbackRedirectUrl={`${basePath}/dashboard`}
         appearance={clerkAppearance}
       />
+      <button
+        type="button"
+        onClick={signInWithFacebook}
+        className="sr-only"
+        aria-label="Sign up with Facebook"
+      >
+        Continue with Facebook
+      </button>
     </div>
   );
 }
@@ -187,13 +220,21 @@ function ClerkQueryClientCacheInvalidator() {
       }
       if (userId && prevUserIdRef.current === null) {
         const accounts = user?.externalAccounts || [];
-        const provider = accounts.length > 0 ? accounts[0].provider : "email";
-        if (provider === "google" || provider === "oauth_google") {
+        const provider = accounts.length > 0 ? accounts[0].provider : null;
+
+        const hasPasskeys = (user?.passkeys?.length ?? 0) > 0;
+        const isOAuthLogin = accounts.length > 0;
+
+        if (hasPasskeys && !isOAuthLogin) {
+          trackEvent("login_passkey");
+        } else if (provider === "google") {
           trackEvent("login_oauth_google");
-        } else if (provider === "github" || provider === "oauth_github") {
+        } else if (provider === "github") {
           trackEvent("login_oauth_github");
-        } else if (provider === "apple" || provider === "oauth_apple") {
+        } else if (provider === "apple") {
           trackEvent("login_oauth_apple");
+        } else if (provider === "facebook") {
+          trackEvent("login_oauth_facebook");
         } else {
           trackEvent("login_email");
         }
@@ -268,6 +309,7 @@ function ClerkProviderWithRoutes() {
         <ClerkQueryClientCacheInvalidator />
         <AuthErrorHandler />
         <TooltipProvider>
+          <ProfileCompletionGate>
           <Switch>
             <Route path="/">{() => <LazyPage component={Home} />}</Route>
             <Route path="/dashboard">{() => <LazyPage component={Dashboard} />}</Route>
@@ -330,8 +372,10 @@ function ClerkProviderWithRoutes() {
             <Route path="/daily-content">{() => <LazyProtected component={DailyContentPage} />}</Route>
             <Route path="/gamification">{() => <LazyProtected component={GamificationPage} />}</Route>
             <Route path="/giveaway">{() => <LazyPage component={GiveawayPage} />}</Route>
+            <Route path="/admin/kyc">{() => <LazyProtected component={AdminKycPage} />}</Route>
             <Route component={NotFound} />
           </Switch>
+          </ProfileCompletionGate>
           <OnboardingProvider />
           <MilestoneCelebrationModal />
           <CookieConsentBanner />

@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   AlertTriangle, Receipt, MessageCircle, TrendingUp, Shield, Download,
   ChevronDown, ChevronUp, Calculator, FileText, Lightbulb, Share2,
+  ShieldCheck, ShieldAlert, ChevronRight,
 } from "lucide-react";
 import { ShareTaxCard } from "@/components/viral/ShareTaxCard";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ export default function Tax() {
   const [expandEstimator, setExpandEstimator] = useState(false);
   const [taxYear, setTaxYr] = useState(getTaxYear());
   const [referralLink, setReferralLink] = useState("");
+  const [kycStatus, setKycStatus] = useState<string | null>(null);
   const { getToken, isSignedIn } = useAuth();
 
   useEffect(() => {
@@ -47,6 +49,10 @@ export default function Tax() {
     authFetch("/viral/referral/code", getToken)
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data?.code) setReferralLink(`${window.location.origin}?ref=${data.code}`); })
+      .catch(() => {});
+    authFetch("/kyc/status", getToken)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data?.kycStatus) setKycStatus(data.kycStatus); })
       .catch(() => {});
   }, [isSignedIn, getToken]);
 
@@ -213,6 +219,55 @@ export default function Tax() {
         />
       )}
       <div className="container mx-auto px-4 py-6 max-w-3xl">
+        {isSignedIn && kycStatus && (
+          <div className={`rounded-xl p-4 mb-4 border flex items-start gap-3 ${
+            kycStatus === "verified"
+              ? "border-green-500/20 bg-green-500/5"
+              : kycStatus === "rejected"
+              ? "border-red-500/20 bg-red-500/5"
+              : kycStatus === "pending_review"
+              ? "border-yellow-500/20 bg-yellow-500/5"
+              : "border-primary/20 bg-primary/5"
+          }`}>
+            {kycStatus === "verified" ? (
+              <ShieldCheck className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
+            ) : kycStatus === "rejected" ? (
+              <ShieldAlert className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+            ) : kycStatus === "pending_review" ? (
+              <Shield className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
+            ) : (
+              <Shield className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-white">
+                {kycStatus === "verified"
+                  ? "Identity Verified"
+                  : kycStatus === "rejected"
+                  ? "KYC Verification Rejected"
+                  : kycStatus === "pending_review"
+                  ? "KYC Under Review"
+                  : "Verify Your Identity for Enhanced Features"}
+              </p>
+              <p className="text-xs text-white/50 mt-0.5">
+                {kycStatus === "verified"
+                  ? "Your identity has been verified. All advanced tax tools are unlocked."
+                  : kycStatus === "rejected"
+                  ? "Your submission was rejected. Please re-submit with correct information."
+                  : kycStatus === "pending_review"
+                  ? "Your identity is being reviewed. We'll notify you when it's complete."
+                  : "KYC verification unlocks advanced tax tools and secure payment features."}
+              </p>
+            </div>
+            {(kycStatus === "not_started" || kycStatus === "rejected") && (
+              <Link href="/profile">
+                <Button size="sm" variant="outline" className="shrink-0 border-primary/30 text-primary gap-1 text-xs">
+                  Verify <ChevronRight className="w-3 h-3" />
+                </Button>
+              </Link>
+            )}
+          </div>
+        )}
+
         <div className="glass-panel rounded-xl p-4 mb-6 border border-[rgba(255,215,0,0.2)] bg-[rgba(255,215,0,0.03)]">
           <p className="text-[12px] text-muted-foreground leading-relaxed">
             <span className="text-secondary font-bold">Disclaimer:</span> TaxFlow provides educational information based on IRS publications and is not a substitute for professional tax advice. Always consult a licensed CPA or tax attorney for your specific situation.

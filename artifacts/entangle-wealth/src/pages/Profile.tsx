@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
-import { useUser, useAuth } from "@clerk/react";
-import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target, Wallet, Coins, Users } from "lucide-react";
+import { useUser, useAuth, useClerk } from "@clerk/react";
+import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target, Wallet, Coins, Users, Fingerprint, Upload, X, Image } from "lucide-react";
 import { ReferralSection } from "@/components/viral/ReferralSection";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -11,6 +11,17 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { authFetch } from "@/lib/authFetch";
 import { getStoredReferralCode, clearStoredReferralCode } from "@/lib/referral";
+
+interface PasskeyResource {
+  id: string;
+  name?: string | null;
+  createdAt: Date;
+}
+
+type ClerkUserWithPasskeys = ReturnType<typeof useUser>["user"] & {
+  passkeys: PasskeyResource[];
+  createPasskey: () => Promise<PasskeyResource>;
+};
 
 interface GamificationData {
   xp: { totalXp: number; level: number; tier: string; monthlyXp: number; weeklyXp: number };
@@ -123,6 +134,17 @@ export default function Profile() {
   const [showKyc, setShowKyc] = useState(false);
   const [submittingKyc, setSubmittingKyc] = useState(false);
   const [isAmbassador, setIsAmbassador] = useState(false);
+  const [kycIdPhoto, setKycIdPhoto] = useState<File | null>(null);
+  const [kycSelfie, setKycSelfie] = useState<File | null>(null);
+  const [kycIdPhotoPreview, setKycIdPhotoPreview] = useState<string | null>(null);
+  const [kycSelfiePreview, setKycSelfiePreview] = useState<string | null>(null);
+  const [uploadingKycDocs, setUploadingKycDocs] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ idPhoto: number; selfie: number }>({ idPhoto: 0, selfie: 0 });
+  const [dragActive, setDragActive] = useState<"id" | "selfie" | null>(null);
+  const [passkeyRegistering, setPasskeyRegistering] = useState(false);
+  const idPhotoRef = useRef<HTMLInputElement>(null);
+  const selfieRef = useRef<HTMLInputElement>(null);
+  const { client: clerkClient } = useClerk();
 
   const fetchAuth = useCallback((path: string, options: RequestInit = {}) => {
     return authFetch(path, getToken, options);
@@ -247,17 +269,107 @@ export default function Profile() {
     }
   };
 
+  const handleKycFileChange = (type: "id" | "selfie", file: File | null) => {
+    if (!file) return;
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      toast({ title: "Invalid file type", description: "Please upload a JPG, PNG or WebP image.", variant: "destructive" });
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Max 10MB per file.", variant: "destructive" });
+      return;
+    }
+    const preview = URL.createObjectURL(file);
+    if (type === "id") {
+      setKycIdPhoto(file);
+      setKycIdPhotoPreview(preview);
+    } else {
+      setKycSelfie(file);
+      setKycSelfiePreview(preview);
+    }
+  };
+
+  const uploadKycFile = async (file: File, kind: "idPhoto" | "selfie"): Promise<string | null> => {
+    try {
+      const urlRes = await fetchAuth("/storage/uploads/request-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
+      });
+      if (!urlRes.ok) {
+        const errData = await urlRes.json().catch(() => ({}));
+        toast({ title: "Upload rejected", description: (errData as { error?: string }).error || "Failed to get upload URL.", variant: "destructive" });
+        return null;
+      }
+      const { uploadURL, objectPath } = await urlRes.json();
+
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", uploadURL as string);
+        xhr.setRequestHeader("Content-Type", file.type);
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100);
+            setUploadProgress(prev => ({ ...prev, [kind]: pct }));
+          }
+        };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) resolve();
+          else reject(new Error(`Upload failed: ${xhr.status}`));
+        };
+        xhr.onerror = () => reject(new Error("Upload network error"));
+        xhr.send(file);
+      });
+
+      setUploadProgress(prev => ({ ...prev, [kind]: 100 }));
+      return objectPath as string;
+    } catch {
+      return null;
+    }
+  };
+
   const submitKyc = async () => {
     if (!kycForm.fullLegalName || !kycForm.dateOfBirth || !kycForm.address || !kycForm.idNumber) {
-      toast({ title: "Missing fields", description: "All fields are required.", variant: "destructive" });
+      toast({ title: "Missing fields", description: "All required text fields are needed.", variant: "destructive" });
       return;
     }
     setSubmittingKyc(true);
+    setUploadingKycDocs(true);
     try {
+      let idPhotoPath: string | null = null;
+      let selfiePath: string | null = null;
+
+      if (kycIdPhoto) {
+        idPhotoPath = await uploadKycFile(kycIdPhoto, "idPhoto");
+        if (!idPhotoPath) {
+          toast({ title: "Upload failed", description: "Failed to upload ID photo. Please try again.", variant: "destructive" });
+          setSubmittingKyc(false);
+          setUploadingKycDocs(false);
+          return;
+        }
+      }
+
+      if (kycSelfie) {
+        selfiePath = await uploadKycFile(kycSelfie, "selfie");
+        if (!selfiePath) {
+          toast({ title: "Upload failed", description: "Failed to upload selfie. Please try again.", variant: "destructive" });
+          setSubmittingKyc(false);
+          setUploadingKycDocs(false);
+          return;
+        }
+      }
+
+      setUploadingKycDocs(false);
+
       const res = await fetchAuth("/kyc/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(kycForm),
+        body: JSON.stringify({
+          ...kycForm,
+          ...(idPhotoPath ? { idPhotoPath } : {}),
+          ...(selfiePath ? { selfiePath } : {}),
+        }),
       });
       if (!res.ok) throw new Error("Submission failed");
       const data = await res.json();
@@ -268,6 +380,24 @@ export default function Profile() {
       toast({ title: "Error", description: "Failed to submit KYC.", variant: "destructive" });
     } finally {
       setSubmittingKyc(false);
+      setUploadingKycDocs(false);
+    }
+  };
+
+  const registerPasskey = async () => {
+    setPasskeyRegistering(true);
+    try {
+      const clerkUser = user as ClerkUserWithPasskeys;
+      await clerkUser.createPasskey();
+      toast({ title: "Passkey registered", description: "You can now sign in with Face ID or fingerprint." });
+    } catch (err: any) {
+      if (err?.message?.includes("cancel") || err?.message?.includes("abort")) {
+        toast({ title: "Cancelled", description: "Passkey registration was cancelled." });
+      } else {
+        toast({ title: "Error", description: "Failed to register passkey. Your browser may not support this feature.", variant: "destructive" });
+      }
+    } finally {
+      setPasskeyRegistering(false);
     }
   };
 
@@ -398,25 +528,93 @@ export default function Profile() {
         {showKyc && (
           <div className="glass-panel p-6 mb-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2"><Shield className="w-5 h-5 text-primary" /> Identity Verification (KYC)</h3>
-            <p className="text-sm text-muted-foreground mb-4">Required before accessing payment features. Your information is handled securely.</p>
+            <p className="text-sm text-muted-foreground mb-4">Your information is handled securely and used only for identity verification.</p>
             <div className="space-y-3">
-              <Input placeholder="Full Legal Name" value={kycForm.fullLegalName} onChange={(e) => setKycForm(prev => ({ ...prev, fullLegalName: e.target.value }))} className="bg-white/5 border-white/10" />
-              <Input type="date" placeholder="Date of Birth" value={kycForm.dateOfBirth} onChange={(e) => setKycForm(prev => ({ ...prev, dateOfBirth: e.target.value }))} className="bg-white/5 border-white/10" />
-              <Input placeholder="Full Address" value={kycForm.address} onChange={(e) => setKycForm(prev => ({ ...prev, address: e.target.value }))} className="bg-white/5 border-white/10" />
+              <Input placeholder="Full Legal Name *" value={kycForm.fullLegalName} onChange={(e) => setKycForm(prev => ({ ...prev, fullLegalName: e.target.value }))} className="bg-white/5 border-white/10" />
+              <div>
+                <label className="text-[11px] text-white/50 mb-1 block">Date of Birth *</label>
+                <Input type="date" value={kycForm.dateOfBirth} onChange={(e) => setKycForm(prev => ({ ...prev, dateOfBirth: e.target.value }))} className="bg-white/5 border-white/10" />
+              </div>
+              <Input placeholder="Full Address *" value={kycForm.address} onChange={(e) => setKycForm(prev => ({ ...prev, address: e.target.value }))} className="bg-white/5 border-white/10" />
               <select
                 value={kycForm.idType}
                 onChange={(e) => setKycForm(prev => ({ ...prev, idType: e.target.value }))}
-                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary/50"
+                className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary/50"
               >
                 <option value="drivers_license">Driver's License</option>
                 <option value="passport">Passport</option>
                 <option value="national_id">National ID</option>
               </select>
-              <Input placeholder="ID Number" value={kycForm.idNumber} onChange={(e) => setKycForm(prev => ({ ...prev, idNumber: e.target.value }))} className="bg-white/5 border-white/10" />
+              <Input placeholder="ID Number *" value={kycForm.idNumber} onChange={(e) => setKycForm(prev => ({ ...prev, idNumber: e.target.value }))} className="bg-white/5 border-white/10" />
+
+              <div className="border-t border-white/10 pt-3">
+                <p className="text-sm font-medium text-white/70 mb-3 flex items-center gap-2"><Image className="w-4 h-4 text-primary" /> Document Upload (Optional but recommended)</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs text-white/50 mb-2">Government ID Photo</p>
+                    <input ref={idPhotoRef} type="file" accept="image/jpeg,image/png,image/jpg,image/webp" className="hidden" onChange={e => handleKycFileChange("id", e.target.files?.[0] || null)} />
+                    {kycIdPhotoPreview ? (
+                      <div className="relative">
+                        <img src={kycIdPhotoPreview} alt="ID preview" className="w-full h-24 object-cover rounded-lg border border-white/10" />
+                        <button onClick={() => { setKycIdPhoto(null); setKycIdPhotoPreview(null); setUploadProgress(p => ({ ...p, idPhoto: 0 })); }} className="absolute top-1 right-1 bg-black/60 rounded-full p-0.5 text-white/70 hover:text-white">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                        {uploadProgress.idPhoto > 0 && uploadProgress.idPhoto < 100 && (
+                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40 rounded-b-lg overflow-hidden">
+                            <div className="h-full bg-primary transition-all" style={{ width: `${uploadProgress.idPhoto}%` }} />
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => idPhotoRef.current?.click()}
+                        onDragOver={e => { e.preventDefault(); setDragActive("id"); }}
+                        onDragLeave={() => setDragActive(null)}
+                        onDrop={e => { e.preventDefault(); setDragActive(null); handleKycFileChange("id", e.dataTransfer.files?.[0] || null); }}
+                        className={`w-full h-24 border border-dashed rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${dragActive === "id" ? "border-primary/60 bg-primary/10" : "border-white/20 hover:border-primary/40 hover:bg-primary/5"}`}
+                      >
+                        <Upload className="w-5 h-5 text-white/30" />
+                        <span className="text-[11px] text-white/30">{dragActive === "id" ? "Drop to upload" : "Upload or drag photo"}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-xs text-white/50 mb-2">Selfie with ID</p>
+                    <input ref={selfieRef} type="file" accept="image/jpeg,image/png,image/jpg,image/webp" className="hidden" onChange={e => handleKycFileChange("selfie", e.target.files?.[0] || null)} />
+                    {kycSelfiePreview ? (
+                      <div className="relative">
+                        <img src={kycSelfiePreview} alt="Selfie preview" className="w-full h-24 object-cover rounded-lg border border-white/10" />
+                        <button onClick={() => { setKycSelfie(null); setKycSelfiePreview(null); setUploadProgress(p => ({ ...p, selfie: 0 })); }} className="absolute top-1 right-1 bg-black/60 rounded-full p-0.5 text-white/70 hover:text-white">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                        {uploadProgress.selfie > 0 && uploadProgress.selfie < 100 && (
+                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40 rounded-b-lg overflow-hidden">
+                            <div className="h-full bg-primary transition-all" style={{ width: `${uploadProgress.selfie}%` }} />
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => selfieRef.current?.click()}
+                        onDragOver={e => { e.preventDefault(); setDragActive("selfie"); }}
+                        onDragLeave={() => setDragActive(null)}
+                        onDrop={e => { e.preventDefault(); setDragActive(null); handleKycFileChange("selfie", e.dataTransfer.files?.[0] || null); }}
+                        className={`w-full h-24 border border-dashed rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${dragActive === "selfie" ? "border-primary/60 bg-primary/10" : "border-white/20 hover:border-primary/40 hover:bg-primary/5"}`}
+                      >
+                        <Upload className="w-5 h-5 text-white/30" />
+                        <span className="text-[11px] text-white/30">{dragActive === "selfie" ? "Drop to upload" : "Upload or drag selfie"}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <p className="text-[10px] text-white/30 mt-2">JPG, PNG or WebP · Max 10MB each</p>
+              </div>
+
               <div className="flex gap-2">
                 <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={submitKyc} disabled={submittingKyc}>
-                  {submittingKyc ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  Submit for Verification
+                  {submittingKyc ? (
+                    <><Loader2 className="w-4 h-4 animate-spin mr-2" />{uploadingKycDocs ? "Uploading..." : "Submitting..."}</>
+                  ) : "Submit for Verification"}
                 </Button>
                 <Button variant="ghost" className="text-muted-foreground" onClick={() => setShowKyc(false)}>Cancel</Button>
               </div>
@@ -631,6 +829,40 @@ export default function Profile() {
 
         <div className="mb-6">
           <ReferralSection />
+        </div>
+
+        <div className="glass-panel p-6 mb-6">
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2"><Fingerprint className="w-5 h-5 text-primary" /> Passkey / Biometric Sign-In</h3>
+          <p className="text-sm text-muted-foreground mb-4">Sign in with Face ID, fingerprint, or security key — no password needed.</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium">Register a Passkey</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Works with Face ID, Touch ID, Windows Hello, and security keys</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-primary/30 text-primary gap-2 ml-4"
+              onClick={registerPasskey}
+              disabled={passkeyRegistering}
+            >
+              {passkeyRegistering ? <Loader2 className="w-4 h-4 animate-spin" /> : <Fingerprint className="w-4 h-4" />}
+              {passkeyRegistering ? "Registering..." : "Add Passkey"}
+            </Button>
+          </div>
+          {((user as ClerkUserWithPasskeys)?.passkeys?.length > 0) && (
+            <div className="mt-4 pt-3 border-t border-white/10">
+              <p className="text-xs text-white/50 mb-2">Registered passkeys ({(user as ClerkUserWithPasskeys).passkeys.length})</p>
+              <div className="space-y-1">
+                {(user as ClerkUserWithPasskeys).passkeys.map((pk: PasskeyResource) => (
+                  <div key={pk.id} className="flex items-center justify-between text-sm py-1.5">
+                    <span className="text-white/70">{pk.name || "Passkey"}</span>
+                    <span className="text-xs text-white/30">{new Date(pk.createdAt).toLocaleDateString()}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="glass-panel p-6 mb-6">

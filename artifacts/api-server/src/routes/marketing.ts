@@ -3,9 +3,21 @@ import { requireAuth } from "../middlewares/requireAuth";
 import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
-import { anthropic } from "@workspace/integrations-anthropic-ai";
 
 const router = Router();
+
+let _anthropic: Awaited<typeof import("@workspace/integrations-anthropic-ai")>["anthropic"] | null = null;
+
+async function getAnthropicClient() {
+  if (_anthropic) return _anthropic;
+  try {
+    const mod = await import("@workspace/integrations-anthropic-ai");
+    _anthropic = mod.anthropic;
+    return _anthropic;
+  } catch {
+    return null;
+  }
+}
 
 const PLATFORM_CONFIGS: Record<string, { name: string; maxChars: number; systemPrompt: string }> = {
   reddit: {
@@ -199,10 +211,16 @@ router.post("/marketing/generate", requireAuth, async (req, res) => {
       return;
     }
 
+    const client = await getAnthropicClient();
+    if (!client) {
+      res.status(503).json({ error: "AI content generation is temporarily unavailable. Anthropic integration is not configured." });
+      return;
+    }
+
     const toneInstruction = tone ? TONE_INSTRUCTIONS[tone] : TONE_INSTRUCTIONS.educational;
     const contextBlock = context ? `\n\nAdditional context from the user:\n${context}` : "";
 
-    const message = await anthropic.messages.create({
+    const message = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 8192,
       system: `${platformConfig.systemPrompt}\n\n${toneInstruction}\n\nPlatform character limit: ${platformConfig.maxChars} characters. Stay well within this limit.`,

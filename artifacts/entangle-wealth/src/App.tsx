@@ -52,6 +52,7 @@ const TokenAdmin = lazy(() => import("@/pages/TokenAdmin"));
 const TaxStrategy = lazy(() => import("@/pages/TaxStrategy"));
 const MarketingCenter = lazy(() => import("@/pages/MarketingCenter"));
 const ContentCalendar = lazy(() => import("@/pages/ContentCalendar"));
+const RedditEngine = lazy(() => import("@/pages/RedditEngine"));
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -204,6 +205,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/token-admin">{() => <LazyProtected component={TokenAdmin} />}</Route>
             <Route path="/marketing">{() => <LazyProtected component={MarketingCenter} />}</Route>
             <Route path="/content-calendar">{() => <LazyProtected component={ContentCalendar} />}</Route>
+            <Route path="/reddit-engine">{() => <LazyProtected component={RedditEngine} />}</Route>
             <Route component={NotFound} />
           </Switch>
           <InstallPrompt />

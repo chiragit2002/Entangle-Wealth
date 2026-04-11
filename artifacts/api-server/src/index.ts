@@ -8,6 +8,44 @@ import { trackConnections } from "./routes/health";
 import { ensureReferralBadgesExist } from "./lib/referralRewards";
 import { startAlertEvaluator } from "./routes/alerts";
 import { startDigestScheduler } from "./lib/emailDigest";
+import { pool } from "@workspace/db";
+
+async function ensureAlertTables() {
+  try {
+    const client = await pool.connect();
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS alerts (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          symbol TEXT NOT NULL,
+          alert_type TEXT NOT NULL,
+          threshold REAL,
+          enabled BOOLEAN DEFAULT true,
+          created_at TIMESTAMPTZ DEFAULT now(),
+          updated_at TIMESTAMPTZ DEFAULT now()
+        );
+        CREATE TABLE IF NOT EXISTS alert_history (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          alert_id INTEGER,
+          symbol TEXT NOT NULL,
+          alert_type TEXT NOT NULL,
+          triggered_value REAL,
+          message TEXT,
+          read BOOLEAN DEFAULT false,
+          triggered_at TIMESTAMPTZ DEFAULT now()
+        );
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS alert_email_digest TEXT DEFAULT 'off';
+      `);
+      logger.info("Alert tables ensured");
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    logger.warn({ error: err }, "Failed to ensure alert tables (non-fatal)");
+  }
+}
 
 const rawPort = process.env["PORT"];
 
@@ -99,6 +137,7 @@ const httpServer = server.listen(port, async (err) => {
   ensureReferralBadgesExist().catch((err) =>
     logger.warn({ error: err }, "Failed to seed referral badges (non-fatal)")
   );
+  await ensureAlertTables();
   startAlertEvaluator();
   startDigestScheduler();
   await initStripe();

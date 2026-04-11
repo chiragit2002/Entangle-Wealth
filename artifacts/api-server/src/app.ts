@@ -78,7 +78,12 @@ app.use(
   })
 );
 
-app.use(compression());
+app.use(compression({
+  filter: (req) => {
+    if (req.path === "/api/alerts/stream") return false;
+    return true;
+  },
+}));
 
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,

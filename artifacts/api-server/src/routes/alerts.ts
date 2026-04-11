@@ -236,7 +236,11 @@ router.get("/alerts/stream", requireAuth, (req: AuthenticatedRequest, res: Respo
     Connection: "keep-alive",
     "X-Accel-Buffering": "no",
   });
+  res.flushHeaders();
   res.write("data: {\"type\":\"connected\"}\n\n");
+  if (typeof (res as Record<string, unknown>).flush === "function") {
+    (res as Record<string, (() => void)>).flush();
+  }
 
   if (!sseClients.has(userId)) {
     sseClients.set(userId, new Set());

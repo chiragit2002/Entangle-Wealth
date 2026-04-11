@@ -150,8 +150,21 @@ export function startDigestScheduler() {
   }, msUntil8am);
 
   const dayOfWeek = now.getUTCDay();
-  const daysUntilMonday = dayOfWeek === 0 ? 1 : dayOfWeek === 1 ? 0 : 8 - dayOfWeek;
-  const msUntilMonday8am = daysUntilMonday * 86_400_000 + msUntil8am;
+  let daysUntilMonday: number;
+  if (dayOfWeek === 1 && now.getUTCHours() < 8) {
+    daysUntilMonday = 0;
+  } else if (dayOfWeek === 0) {
+    daysUntilMonday = 1;
+  } else if (dayOfWeek === 1) {
+    daysUntilMonday = 7;
+  } else {
+    daysUntilMonday = (8 - dayOfWeek) % 7;
+  }
+  const nextMonday8am = new Date(now);
+  nextMonday8am.setUTCDate(nextMonday8am.getUTCDate() + daysUntilMonday);
+  nextMonday8am.setUTCHours(8, 0, 0, 0);
+  if (nextMonday8am <= now) nextMonday8am.setUTCDate(nextMonday8am.getUTCDate() + 7);
+  const msUntilMonday8am = nextMonday8am.getTime() - now.getTime();
 
   setTimeout(() => {
     runWeeklyDigest().catch(err => logger.error({ err }, "Weekly digest error"));

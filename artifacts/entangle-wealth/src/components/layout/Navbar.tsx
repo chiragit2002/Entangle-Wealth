@@ -71,6 +71,8 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/about", label: "About", desc: "Our mission" },
       { href: "/competitive-intel", label: "Intel Report", desc: "Competitive analysis" },
       { href: "/open-source-intel", label: "Open Source Intel", desc: "GitHub solutions" },
+      { href: "/help", label: "Help Center", desc: "FAQ & support" },
+      { href: "/status", label: "System Status", desc: "Service health" },
     ],
   },
 ];
@@ -134,6 +136,8 @@ const MOBILE_SECTIONS = [
       { href: "/about", label: "About" },
       { href: "/competitive-intel", label: "Intel Report" },
       { href: "/open-source-intel", label: "Open Source Intel" },
+      { href: "/help", label: "Help Center" },
+      { href: "/status", label: "System Status" },
     ],
   },
 ];
@@ -204,6 +208,7 @@ const ADMIN_NAV_GROUP: NavGroup = {
     { href: "/reddit-engine", label: "Reddit Engine", desc: "Subreddit targeting" },
     { href: "/seo", label: "SEO Engine", desc: "Keywords & blog" },
     { href: "/analytics", label: "Analytics", desc: "Platform metrics" },
+    { href: "/admin/tickets", label: "Support Tickets", desc: "Manage tickets" },
   ],
 };
 
@@ -216,6 +221,7 @@ const ADMIN_MOBILE_SECTION = {
     { href: "/reddit-engine", label: "Reddit Engine" },
     { href: "/seo", label: "SEO Engine" },
     { href: "/analytics", label: "Analytics" },
+    { href: "/admin/tickets", label: "Support Tickets" },
   ],
 };
 

@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { BottomNav } from "./BottomNav";
+import { HelpWidget } from "@/components/HelpWidget";
 
 interface LayoutProps {
   children: ReactNode;
@@ -57,6 +58,7 @@ export function Layout({ children }: LayoutProps) {
       </main>
       <Footer />
       <BottomNav />
+      <HelpWidget />
     </div>
   );
 }

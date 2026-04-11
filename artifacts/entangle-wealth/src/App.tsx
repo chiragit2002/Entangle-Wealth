@@ -65,6 +65,10 @@ const CookiesPage = lazy(() => import("@/pages/Cookies"));
 const DisclaimerPage = lazy(() => import("@/pages/Disclaimer"));
 const DmcaPage = lazy(() => import("@/pages/Dmca"));
 const AccessibilityPage = lazy(() => import("@/pages/Accessibility"));
+const HelpPage = lazy(() => import("@/pages/Help"));
+const SubmitTicketPage = lazy(() => import("@/pages/SubmitTicket"));
+const StatusPage = lazy(() => import("@/pages/Status"));
+const AdminTicketsPage = lazy(() => import("@/pages/AdminTickets"));
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -238,6 +242,10 @@ function ClerkProviderWithRoutes() {
             <Route path="/disclaimer">{() => <LazyPage component={DisclaimerPage} />}</Route>
             <Route path="/dmca">{() => <LazyPage component={DmcaPage} />}</Route>
             <Route path="/accessibility">{() => <LazyPage component={AccessibilityPage} />}</Route>
+            <Route path="/help">{() => <LazyPage component={HelpPage} />}</Route>
+            <Route path="/submit-ticket">{() => <LazyProtected component={SubmitTicketPage} />}</Route>
+            <Route path="/status">{() => <LazyPage component={StatusPage} />}</Route>
+            <Route path="/admin/tickets">{() => <LazyProtected component={AdminTicketsPage} />}</Route>
             <Route component={NotFound} />
           </Switch>
           <OnboardingProvider />

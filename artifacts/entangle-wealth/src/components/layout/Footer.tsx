@@ -23,6 +23,8 @@ export function Footer() {
             <Link href="/options" className="text-muted-foreground hover:text-primary transition-colors">Options Flow</Link>
             <Link href="/earn" className="text-muted-foreground hover:text-primary transition-colors">Earn</Link>
             <Link href="/terminal" className="text-muted-foreground hover:text-primary transition-colors">Terminal</Link>
+            <Link href="/help" className="text-muted-foreground hover:text-primary transition-colors">Help Center</Link>
+            <Link href="/status" className="text-muted-foreground hover:text-primary transition-colors">System Status</Link>
           </div>
           <div className="flex flex-col gap-3">
             <span className="font-semibold text-white">Learn</span>

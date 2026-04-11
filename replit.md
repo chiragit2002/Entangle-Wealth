@@ -70,7 +70,8 @@ The project uses a pnpm workspace monorepo.
 - **"What If" Time Machine**: Historical investment simulator using real Alpaca market data.
 - **Sector Flow Radar**: Real-time sector rotation visualization tracking 80 stocks across 8 sectors. Features animated radar chart, market regime indicator, sector breakdown cards, volume data, and top/worst movers.
 - **Volatility Lab**: Multi-timeframe realized volatility analysis with institutional-grade risk metrics. Computes annualized vol at 5 timeframes, vol term structure chart, daily return distribution histogram, vol regime detection, and risk ratios.
-- **Legal**: Terms of Use and Privacy Policy.
+- **Legal**: Terms of Use, Privacy Policy, Cookie Policy, Financial Disclaimer, DMCA Policy, Accessibility Statement. CookieConsentBanner (localStorage `ew_cookie_consent`), FinancialDisclaimerBanner (dismissible per page on Dashboard/Analysis/Options/Market pages). All pages have attorney-review flags.
+- **Support System**: Help Center (`/help`) with searchable FAQ (35 questions, 6 categories), ticket submission (`/submit-ticket`) with auth-protected form, System Status page (`/status`) with 5 service monitors and 30-day incident history, Admin Tickets page (`/admin/tickets`) for managing support tickets with status workflow. Floating HelpWidget on all pages with quick FAQ search. DB tables: `support_tickets`, `service_status`, `status_incidents`.
 - **EntangleCoin Token System**:
     - **Token Wallet**: ENTGL balance, Ethereum wallet linking (Sepolia testnet), transaction history, token valuation, supply info.
     - **Travel Marketplace**: Luxury hotel/flight listings bookable with ENTGL tokens.

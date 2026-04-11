@@ -2,11 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 
-export function useIsAdmin() {
-  const { getToken, isSignedIn } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
+export function useIsAdmin(): boolean | null {
+  const { getToken, isSignedIn, isLoaded } = useAuth();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   const checkAdmin = useCallback(async () => {
+    if (!isLoaded) return;
     if (!isSignedIn) {
       setIsAdmin(false);
       return;
@@ -17,7 +18,7 @@ export function useIsAdmin() {
     } catch {
       setIsAdmin(false);
     }
-  }, [getToken, isSignedIn]);
+  }, [getToken, isSignedIn, isLoaded]);
 
   useEffect(() => {
     checkAdmin();

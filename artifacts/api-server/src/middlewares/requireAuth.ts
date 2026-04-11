@@ -22,6 +22,6 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
   }
 
   resetAttempts(ip);
-  (req as AuthenticatedRequest).userId = userId;
+  (req as AuthenticatedRequest).userId = userId as string;
   next();
 };

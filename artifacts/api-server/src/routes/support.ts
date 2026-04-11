@@ -1,13 +1,13 @@
 import { Router, type Request, type Response } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { imageCompressionMiddleware } from "../middlewares/imageCompression";
 import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { logger } from "../lib/logger";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
-import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 async function ensureSupportTables() {
   try {

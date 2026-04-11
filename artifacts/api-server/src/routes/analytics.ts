@@ -1,13 +1,12 @@
 import { Router, type Request, type Response } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { db, pool } from "@workspace/db";
 import { analyticsEventsTable, usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { getAuth } from "@clerk/express";
 import { logger } from "../lib/logger";
-
-import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 const router = Router();
 

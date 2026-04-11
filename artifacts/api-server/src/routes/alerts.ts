@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { db } from "@workspace/db";
 import { alertsTable, alertHistoryTable, usersTable } from "@workspace/db/schema";
 import { eq, and, desc, gte, sql, count } from "drizzle-orm";

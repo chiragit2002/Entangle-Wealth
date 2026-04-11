@@ -34,3 +34,4 @@ channel = "stable-25_05"
 [userenv.shared]
 ALPACA_KEY_ID = "PKK4VHJT6MINSFW3S4ZD4YB6VO"
 ZAPIER_WEBHOOK_URL = "https://hooks.zapier.com/hooks/catch/27178640/u7gn3ct/"
+NODE_ENV = "production"

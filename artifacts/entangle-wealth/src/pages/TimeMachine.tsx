@@ -7,6 +7,7 @@ import {
   Clock, TrendingUp, TrendingDown, DollarSign, Calendar,
   ArrowRight, Zap, AlertTriangle, Trophy, Skull,
 } from "lucide-react";
+import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
 
 interface TimeMachineResult {
   symbol: string;
@@ -305,6 +306,7 @@ export default function TimeMachine() {
           </div>
         )}
       </div>
+      <FinancialDisclaimerBanner pageKey="time-machine" />
     </Layout>
   );
 }

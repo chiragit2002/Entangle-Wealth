@@ -7,6 +7,7 @@ import {
   Activity, TrendingUp, TrendingDown, Zap, BarChart3,
   AlertTriangle, Shield, Target,
 } from "lucide-react";
+import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
 
 interface VolResult {
   symbol: string;
@@ -364,6 +365,7 @@ export default function VolatilityLab() {
           </div>
         )}
       </div>
+      <FinancialDisclaimerBanner pageKey="volatility" />
     </Layout>
   );
 }

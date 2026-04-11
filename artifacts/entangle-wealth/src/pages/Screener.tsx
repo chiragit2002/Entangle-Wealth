@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { generateMockOHLCV, runAllIndicators, getOverallSignal } from "@/lib/indicators";
 import { fetchSnapshots, fetchBars, barsToStockData, type AlpacaSnapshot } from "@/lib/alpaca";
 import { trackEvent } from "@/lib/trackEvent";
+import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
 
 interface ScreenerStock {
   symbol: string;
@@ -358,6 +359,7 @@ export default function Screener() {
           </p>
         </div>
       </div>
+      <FinancialDisclaimerBanner pageKey="screener" />
     </Layout>
   );
 }

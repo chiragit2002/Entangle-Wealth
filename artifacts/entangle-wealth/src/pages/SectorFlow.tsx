@@ -3,6 +3,7 @@ import { Layout } from "@/components/layout/Layout";
 import { fetchAlpacaSnapshots } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, TrendingUp, TrendingDown, Activity, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
+import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
 
 const SECTOR_STOCKS: Record<string, string[]> = {
   Technology: ["AAPL", "MSFT", "NVDA", "GOOGL", "META", "AVGO", "AMD", "CRM", "ADBE", "INTC"],
@@ -243,6 +244,7 @@ export default function SectorFlow() {
           </div>
         )}
       </div>
+      <FinancialDisclaimerBanner pageKey="sector-flow" />
     </Layout>
   );
 }

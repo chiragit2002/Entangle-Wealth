@@ -22,6 +22,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/charts", label: "Charts", desc: "TradingView Pro" },
       { href: "/screener", label: "Screener", desc: "Stock filter" },
       { href: "/options", label: "Options", desc: "Chain & Greeks" },
+      { href: "/alerts", label: "Alerts", desc: "Real-time alerts" },
     ],
   },
   {
@@ -84,6 +85,7 @@ const MOBILE_SECTIONS = [
       { href: "/charts", label: "Charts" },
       { href: "/screener", label: "Screener" },
       { href: "/options", label: "Options" },
+      { href: "/alerts", label: "Alerts" },
     ],
   },
   {

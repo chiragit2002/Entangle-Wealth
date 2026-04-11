@@ -86,7 +86,7 @@ const apiLimiter = rateLimit({
   standardHeaders: "draft-7",
   legacyHeaders: false,
   message: { error: "Too many requests, please try again later." },
-  skip: (req) => req.path.startsWith(CLERK_PROXY_PATH) || req.path === "/api/stripe/webhook",
+  skip: (req) => req.path.startsWith(CLERK_PROXY_PATH) || req.path === "/api/stripe/webhook" || req.path === "/api/alerts/stream",
 });
 app.use(apiLimiter);
 

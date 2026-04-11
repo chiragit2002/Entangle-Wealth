@@ -1,82 +1,199 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Bell, X, Trash2, Settings, TrendingUp, TrendingDown, AlertTriangle, Zap, Check } from "lucide-react";
+import { useAuth } from "@clerk/react";
+import { Bell, X, Trash2, Settings, TrendingUp, TrendingDown, AlertTriangle, Zap, Activity, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { authFetch } from "@/lib/authFetch";
+import { Link } from "wouter";
 
 export interface AppNotification {
-  id: string;
-  type: "buy_alert" | "sell_alert" | "price_alert" | "system" | "indicator";
-  title: string;
-  body: string;
-  symbol?: string;
+  id: number;
+  type: "price_above" | "price_below" | "rsi_oversold" | "rsi_overbought" | "macd_crossover" | "bollinger_breakout" | "system";
+  symbol: string;
+  message: string;
   time: string;
   read: boolean;
 }
 
 interface AlertConfig {
-  id: string;
+  id: number;
   symbol: string;
-  type: "price_above" | "price_below" | "rsi_oversold" | "rsi_overbought" | "macd_cross" | "volume_spike";
-  value: string;
+  alertType: string;
+  threshold: number | null;
   enabled: boolean;
 }
-
-const MOCK_NOTIFICATIONS: AppNotification[] = [
-  { id: "1", type: "buy_alert", title: "BUY Signal — NVDA", body: "7-agent consensus reached: RSI oversold, MACD bullish crossover. Confidence: 87%", symbol: "NVDA", time: "2 min ago", read: false },
-  { id: "2", type: "sell_alert", title: "SELL Signal — TSLA", body: "RSI overbought at 78, Bollinger Band squeeze detected. Consider taking profits.", symbol: "TSLA", time: "15 min ago", read: false },
-  { id: "3", type: "price_alert", title: "AAPL hit $198", body: "Your price alert for AAPL above $198 has been triggered.", symbol: "AAPL", time: "1 hr ago", read: false },
-  { id: "4", type: "indicator", title: "Volume Spike — AMD", body: "AMD volume 3.2x above 20-day average. Unusual activity detected.", symbol: "AMD", time: "2 hrs ago", read: true },
-  { id: "5", type: "system", title: "Market Opening", body: "Pre-market scan complete. 3 new signals generated for your watchlist.", time: "4 hrs ago", read: true },
-  { id: "6", type: "buy_alert", title: "BUY Signal — MSFT", body: "Supertrend flipped bullish. ADX at 32 confirming strong trend.", symbol: "MSFT", time: "Yesterday", read: true },
-];
 
 const ALERT_TYPE_OPTIONS = [
   { value: "price_above", label: "Price Above" },
   { value: "price_below", label: "Price Below" },
   { value: "rsi_oversold", label: "RSI Oversold (<30)" },
   { value: "rsi_overbought", label: "RSI Overbought (>70)" },
-  { value: "macd_cross", label: "MACD Crossover" },
-  { value: "volume_spike", label: "Volume Spike (>2x)" },
+  { value: "macd_crossover", label: "MACD Crossover" },
+  { value: "bollinger_breakout", label: "Bollinger Breakout" },
 ];
-
-const STORAGE_KEY = "entangle-alerts";
 
 function getNotifIcon(type: AppNotification["type"]) {
   switch (type) {
-    case "buy_alert": return <TrendingUp className="w-4 h-4 text-[#00ff88]" />;
-    case "sell_alert": return <TrendingDown className="w-4 h-4 text-[#ff3366]" />;
-    case "price_alert": return <Zap className="w-4 h-4 text-[#ffd700]" />;
-    case "indicator": return <AlertTriangle className="w-4 h-4 text-primary" />;
+    case "price_above": return <TrendingUp className="w-4 h-4 text-[#00ff88]" />;
+    case "price_below": return <TrendingDown className="w-4 h-4 text-[#ff3366]" />;
+    case "rsi_oversold": return <Activity className="w-4 h-4 text-[#00D4FF]" />;
+    case "rsi_overbought": return <Activity className="w-4 h-4 text-[#ffd700]" />;
+    case "macd_crossover": return <Zap className="w-4 h-4 text-[#9c27b0]" />;
+    case "bollinger_breakout": return <AlertTriangle className="w-4 h-4 text-[#ff6b35]" />;
     case "system": return <Bell className="w-4 h-4 text-white/50" />;
   }
 }
 
 function getNotifBorder(type: AppNotification["type"]) {
   switch (type) {
-    case "buy_alert": return "border-l-[#00ff88]";
-    case "sell_alert": return "border-l-[#ff3366]";
-    case "price_alert": return "border-l-[#ffd700]";
-    case "indicator": return "border-l-primary";
+    case "price_above": return "border-l-[#00ff88]";
+    case "price_below": return "border-l-[#ff3366]";
+    case "rsi_oversold": return "border-l-[#00D4FF]";
+    case "rsi_overbought": return "border-l-[#ffd700]";
+    case "macd_crossover": return "border-l-[#9c27b0]";
+    case "bollinger_breakout": return "border-l-[#ff6b35]";
     case "system": return "border-l-white/20";
   }
 }
 
+function formatTime(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = now.getTime() - d.getTime();
+  if (diff < 60_000) return "Just now";
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function needsThreshold(type: string): boolean {
+  return type === "price_above" || type === "price_below";
+}
+
 export default function NotificationCenter() {
+  const { getToken, isSignedIn } = useAuth();
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<"notifications" | "alerts">("notifications");
-  const [notifications, setNotifications] = useState<AppNotification[]>(MOCK_NOTIFICATIONS);
-  const [alerts, setAlerts] = useState<AlertConfig[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
-    } catch { return []; }
-  });
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [alerts, setAlerts] = useState<AlertConfig[]>([]);
   const [newAlert, setNewAlert] = useState({ symbol: "", type: "price_above", value: "" });
+  const [loadingAlerts, setLoadingAlerts] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const fetchUnreadCount = useCallback(async () => {
+    if (!isSignedIn) return;
+    try {
+      const res = await authFetch("/alerts/unread-count", getToken);
+      if (res.ok) {
+        const data = await res.json();
+        setUnreadCount(data.count);
+      }
+    } catch { /* ignore */ }
+  }, [getToken, isSignedIn]);
+
+  const fetchHistory = useCallback(async () => {
+    if (!isSignedIn) return;
+    try {
+      const res = await authFetch("/alerts/history", getToken);
+      if (res.ok) {
+        const data = await res.json();
+        const items: AppNotification[] = (data.history || []).slice(0, 20).map((h: Record<string, unknown>) => ({
+          id: h.id as number,
+          type: (h.alertType as string) || "system",
+          symbol: (h.symbol as string) || "",
+          message: (h.message as string) || "",
+          time: (h.triggeredAt as string) || new Date().toISOString(),
+          read: Boolean(h.read),
+        }));
+        setNotifications(items);
+        setUnreadCount(items.filter(n => !n.read).length);
+      }
+    } catch { /* ignore */ }
+  }, [getToken, isSignedIn]);
+
+  const fetchAlertRules = useCallback(async () => {
+    if (!isSignedIn) return;
+    setLoadingAlerts(true);
+    try {
+      const res = await authFetch("/alerts", getToken);
+      if (res.ok) {
+        const data = await res.json();
+        setAlerts(data.alerts);
+      }
+    } catch { /* ignore */ } finally {
+      setLoadingAlerts(false);
+    }
+  }, [getToken, isSignedIn]);
+
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(alerts));
-  }, [alerts]);
+    if (!isSignedIn) return;
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 30_000);
+    return () => clearInterval(interval);
+  }, [isSignedIn, fetchUnreadCount]);
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+    let aborted = false;
+
+    async function connectSSE() {
+      while (!aborted) {
+        try {
+          const token = await getToken();
+          if (!token || aborted) return;
+          const res = await fetch("/api/alerts/stream", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!res.ok || !res.body) {
+            await new Promise(r => setTimeout(r, 10_000));
+            continue;
+          }
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = "";
+
+          while (!aborted) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
+            for (const line of lines) {
+              if (!line.startsWith("data: ")) continue;
+              try {
+                const data = JSON.parse(line.slice(6));
+                if (data.type === "alert") {
+                  const notif: AppNotification = {
+                    id: data.id,
+                    type: data.alertType || "system",
+                    symbol: data.symbol || "",
+                    message: data.message || "",
+                    time: data.triggeredAt || new Date().toISOString(),
+                    read: false,
+                  };
+                  setNotifications(prev => [notif, ...prev.slice(0, 49)]);
+                  setUnreadCount(prev => prev + 1);
+                }
+              } catch { /* ignore parse errors */ }
+            }
+          }
+        } catch { /* connection error */ }
+        if (!aborted) await new Promise(r => setTimeout(r, 5_000));
+      }
+    }
+
+    connectSSE();
+
+    return () => { aborted = true; };
+  }, [isSignedIn, getToken]);
+
+  useEffect(() => {
+    if (open) {
+      fetchHistory();
+      if (tab === "alerts") fetchAlertRules();
+    }
+  }, [open, tab, fetchHistory, fetchAlertRules]);
 
   useEffect(() => {
     if (!open) return;
@@ -93,35 +210,60 @@ export default function NotificationCenter() {
     }
   }, [open]);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
-
-  const markAllRead = useCallback(() => {
+  const markAllRead = useCallback(async () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  }, []);
+    setUnreadCount(0);
+    try {
+      await authFetch("/alerts/mark-read", getToken, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+    } catch { /* ignore */ }
+  }, [getToken]);
 
   const clearAll = useCallback(() => {
     setNotifications([]);
+    setUnreadCount(0);
   }, []);
 
-  const addAlert = () => {
+  const addAlert = async () => {
     if (!newAlert.symbol.trim()) return;
-    const config: AlertConfig = {
-      id: crypto.randomUUID(),
-      symbol: newAlert.symbol.toUpperCase().trim().slice(0, 10),
-      type: newAlert.type as AlertConfig["type"],
-      value: newAlert.value.trim().slice(0, 20) || "Auto",
-      enabled: true,
-    };
-    setAlerts(prev => [config, ...prev]);
-    setNewAlert({ symbol: "", type: "price_above", value: "" });
+    try {
+      const res = await authFetch("/alerts", getToken, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          symbol: newAlert.symbol.toUpperCase().trim(),
+          alertType: newAlert.type,
+          threshold: needsThreshold(newAlert.type) ? parseFloat(newAlert.value) || null : null,
+        }),
+      });
+      if (res.ok) {
+        setNewAlert({ symbol: "", type: "price_above", value: "" });
+        fetchAlertRules();
+      }
+    } catch { /* ignore */ }
   };
 
-  const toggleAlert = (id: string) => {
+  const toggleAlert = async (id: number) => {
+    const alert = alerts.find(a => a.id === id);
+    if (!alert) return;
     setAlerts(prev => prev.map(a => a.id === id ? { ...a, enabled: !a.enabled } : a));
+    try {
+      await authFetch(`/alerts/${id}`, getToken, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: !alert.enabled }),
+      });
+    } catch { /* ignore */ }
   };
 
-  const removeAlert = (id: string) => {
+  const removeAlert = async (id: number) => {
     setAlerts(prev => prev.filter(a => a.id !== id));
+    try {
+      await authFetch(`/alerts/${id}`, getToken, { method: "DELETE" });
+    } catch { /* ignore */ }
   };
 
   return (
@@ -134,7 +276,7 @@ export default function NotificationCenter() {
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-[#ff3366] text-[10px] font-bold text-white flex items-center justify-center">
-            {unreadCount}
+            {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
@@ -165,7 +307,8 @@ export default function NotificationCenter() {
                   {notifications.length === 0 ? (
                     <div className="text-center py-10 text-white/20">
                       <Bell className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                      <p className="text-[13px]">No notifications</p>
+                      <p className="text-[13px]">No notifications yet</p>
+                      <p className="text-[11px] text-white/15 mt-1">Configure alerts to get started</p>
                     </div>
                   ) : (
                     <div className="divide-y divide-white/[0.04]">
@@ -174,11 +317,13 @@ export default function NotificationCenter() {
                           <div className="mt-0.5 flex-shrink-0">{getNotifIcon(n.type)}</div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <p className={`text-[13px] font-bold truncate ${!n.read ? "text-white" : "text-white/60"}`}>{n.title}</p>
+                              <p className={`text-[13px] font-bold truncate ${!n.read ? "text-white" : "text-white/60"}`}>
+                                {n.symbol}
+                              </p>
                               {!n.read && <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />}
                             </div>
-                            <p className="text-[11px] text-white/40 mt-0.5 line-clamp-2">{n.body}</p>
-                            <p className="text-[10px] text-white/20 mt-1">{n.time}</p>
+                            <p className="text-[11px] text-white/40 mt-0.5 line-clamp-2">{n.message}</p>
+                            <p className="text-[10px] text-white/20 mt-1">{formatTime(n.time)}</p>
                           </div>
                         </div>
                       ))}
@@ -190,16 +335,18 @@ export default function NotificationCenter() {
               {tab === "alerts" && (
                 <div className="p-3 space-y-3">
                   <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
-                    <p className="text-[12px] font-bold text-primary mb-2">New Alert</p>
+                    <p className="text-[12px] font-bold text-primary mb-2">Quick Add Alert</p>
                     <div className="flex gap-2 mb-2">
                       <input placeholder="Symbol" value={newAlert.symbol}
-                        onChange={e => setNewAlert(p => ({ ...p, symbol: e.target.value.toUpperCase().slice(0, 10) }))}
+                        onChange={e => setNewAlert(p => ({ ...p, symbol: e.target.value.toUpperCase().replace(/[^A-Z0-9.]/g, "").slice(0, 10) }))}
                         maxLength={10}
                         className="flex-1 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white focus:outline-none focus:border-primary/30 placeholder:text-white/20 min-w-0" />
-                      <input placeholder="Value" value={newAlert.value}
-                        onChange={e => setNewAlert(p => ({ ...p, value: e.target.value.slice(0, 20) }))}
-                        maxLength={20}
-                        className="w-[80px] bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white focus:outline-none focus:border-primary/30 placeholder:text-white/20" />
+                      {needsThreshold(newAlert.type) && (
+                        <input placeholder="Price" value={newAlert.value}
+                          onChange={e => setNewAlert(p => ({ ...p, value: e.target.value.replace(/[^0-9.]/g, "").slice(0, 20) }))}
+                          maxLength={20}
+                          className="w-[80px] bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white focus:outline-none focus:border-primary/30 placeholder:text-white/20" />
+                      )}
                     </div>
                     <div className="flex gap-2">
                       <select value={newAlert.type} onChange={e => setNewAlert(p => ({ ...p, type: e.target.value }))}
@@ -210,7 +357,11 @@ export default function NotificationCenter() {
                     </div>
                   </div>
 
-                  {alerts.length === 0 ? (
+                  {loadingAlerts ? (
+                    <div className="space-y-2">
+                      {[1, 2].map(i => <div key={i} className="h-14 rounded-lg bg-white/[0.02] animate-pulse" />)}
+                    </div>
+                  ) : alerts.length === 0 ? (
                     <p className="text-[12px] text-white/20 text-center py-4">No alerts configured</p>
                   ) : (
                     <div className="space-y-2">
@@ -218,7 +369,10 @@ export default function NotificationCenter() {
                         <div key={a.id} className={`rounded-lg border p-3 flex items-center gap-2 ${a.enabled ? "border-primary/20 bg-primary/[0.03]" : "border-white/[0.06] bg-white/[0.01] opacity-50"}`}>
                           <div className="flex-1 min-w-0">
                             <p className="text-[13px] font-bold">{a.symbol}</p>
-                            <p className="text-[10px] text-white/30">{ALERT_TYPE_OPTIONS.find(o => o.value === a.type)?.label} {a.value !== "Auto" ? `@ ${a.value}` : ""}</p>
+                            <p className="text-[10px] text-white/30">
+                              {ALERT_TYPE_OPTIONS.find(o => o.value === a.alertType)?.label}
+                              {a.threshold != null ? ` @ $${a.threshold.toFixed(2)}` : ""}
+                            </p>
                           </div>
                           <button onClick={() => toggleAlert(a.id)} className={`p-1.5 rounded ${a.enabled ? "text-[#00ff88]" : "text-white/20"}`}>
                             <Check className="w-3.5 h-3.5" />
@@ -230,6 +384,11 @@ export default function NotificationCenter() {
                       ))}
                     </div>
                   )}
+
+                  <Link href="/alerts" onClick={() => setOpen(false)}
+                    className="block text-center text-[11px] text-primary font-semibold py-2 hover:bg-primary/5 rounded-lg transition-colors">
+                    Manage All Alerts →
+                  </Link>
                 </div>
               )}
             </div>

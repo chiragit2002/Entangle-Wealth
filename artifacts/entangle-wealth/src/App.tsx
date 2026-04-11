@@ -56,6 +56,7 @@ const RedditEngine = lazy(() => import("@/pages/RedditEngine"));
 const SeoEngine = lazy(() => import("@/pages/SeoEngine"));
 const BlogIndex = lazy(() => import("@/pages/BlogIndex"));
 const BlogPostPage = lazy(() => import("@/pages/BlogPost"));
+const AlertsPage = lazy(() => import("@/pages/Alerts"));
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -210,6 +211,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/content-calendar">{() => <LazyProtected component={ContentCalendar} />}</Route>
             <Route path="/reddit-engine">{() => <LazyProtected component={RedditEngine} />}</Route>
             <Route path="/seo">{() => <LazyProtected component={SeoEngine} />}</Route>
+            <Route path="/alerts">{() => <LazyProtected component={AlertsPage} />}</Route>
             <Route path="/blog">{() => <LazyPage component={BlogIndex} />}</Route>
             <Route path="/blog/:slug">{() => <LazyPage component={BlogPostPage} />}</Route>
             <Route component={NotFound} />

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, lazy, Suspense } from "react";
 import { Switch, Route, useLocation, Router as WouterRouter, Redirect } from "wouter";
 import { ClerkProvider, SignIn, SignUp, Show, useClerk } from "@clerk/react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
@@ -7,46 +7,49 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ErrorFallback from "@/components/ErrorFallback";
 import NotFound from "@/pages/not-found";
+import { InstallPrompt } from "@/components/pwa/InstallPrompt";
+import { PageSkeleton, ChartSkeleton, TableSkeleton } from "@/components/pwa/PageSkeleton";
 
 import Home from "@/pages/Home";
-import Dashboard from "@/pages/Dashboard";
-import Earn from "@/pages/Earn";
-import Options from "@/pages/Options";
-import About from "@/pages/About";
-import Terminal from "@/pages/Terminal";
-import Stocks from "@/pages/Stocks";
-import Jobs from "@/pages/Jobs";
-import Gigs from "@/pages/Gigs";
-import Community from "@/pages/Community";
-import Tax from "@/pages/Tax";
-import Receipts from "@/pages/Receipts";
-import Travel from "@/pages/Travel";
-import TaxGPT from "@/pages/TaxGPT";
-import Resume from "@/pages/Resume";
-import Profile from "@/pages/Profile";
-import TechnicalAnalysis from "@/pages/TechnicalAnalysis";
-import MarketOverview from "@/pages/MarketOverview";
-import Screener from "@/pages/Screener";
-import Terms from "@/pages/Terms";
-import Privacy from "@/pages/Privacy";
-import Pricing from "@/pages/Pricing";
-import Research from "@/pages/Research";
-import TimeMachine from "@/pages/TimeMachine";
-import SectorFlow from "@/pages/SectorFlow";
-import VolatilityLab from "@/pages/VolatilityLab";
-import CompetitiveAnalysis from "@/pages/CompetitiveAnalysis";
-import OpenSourceIntel from "@/pages/OpenSourceIntel";
-import CaseStudy from "@/pages/CaseStudy";
-import Charts from "@/pages/Charts";
-import Leaderboard from "@/pages/Leaderboard";
-import Achievements from "@/pages/Achievements";
-import TokenWallet from "@/pages/TokenWallet";
-import TravelMarketplace from "@/pages/TravelMarketplace";
-import RewardHistory from "@/pages/RewardHistory";
-import TokenAdmin from "@/pages/TokenAdmin";
-import TaxStrategy from "@/pages/TaxStrategy";
-import MarketingCenter from "@/pages/MarketingCenter";
-import ContentCalendar from "@/pages/ContentCalendar";
+
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const Earn = lazy(() => import("@/pages/Earn"));
+const Options = lazy(() => import("@/pages/Options"));
+const About = lazy(() => import("@/pages/About"));
+const Terminal = lazy(() => import("@/pages/Terminal"));
+const Stocks = lazy(() => import("@/pages/Stocks"));
+const Jobs = lazy(() => import("@/pages/Jobs"));
+const Gigs = lazy(() => import("@/pages/Gigs"));
+const Community = lazy(() => import("@/pages/Community"));
+const Tax = lazy(() => import("@/pages/Tax"));
+const Receipts = lazy(() => import("@/pages/Receipts"));
+const Travel = lazy(() => import("@/pages/Travel"));
+const TaxGPT = lazy(() => import("@/pages/TaxGPT"));
+const Resume = lazy(() => import("@/pages/Resume"));
+const Profile = lazy(() => import("@/pages/Profile"));
+const TechnicalAnalysis = lazy(() => import("@/pages/TechnicalAnalysis"));
+const MarketOverview = lazy(() => import("@/pages/MarketOverview"));
+const Screener = lazy(() => import("@/pages/Screener"));
+const Terms = lazy(() => import("@/pages/Terms"));
+const Privacy = lazy(() => import("@/pages/Privacy"));
+const Pricing = lazy(() => import("@/pages/Pricing"));
+const Research = lazy(() => import("@/pages/Research"));
+const TimeMachine = lazy(() => import("@/pages/TimeMachine"));
+const SectorFlow = lazy(() => import("@/pages/SectorFlow"));
+const VolatilityLab = lazy(() => import("@/pages/VolatilityLab"));
+const CompetitiveAnalysis = lazy(() => import("@/pages/CompetitiveAnalysis"));
+const OpenSourceIntel = lazy(() => import("@/pages/OpenSourceIntel"));
+const CaseStudy = lazy(() => import("@/pages/CaseStudy"));
+const Charts = lazy(() => import("@/pages/Charts"));
+const Leaderboard = lazy(() => import("@/pages/Leaderboard"));
+const Achievements = lazy(() => import("@/pages/Achievements"));
+const TokenWallet = lazy(() => import("@/pages/TokenWallet"));
+const TravelMarketplace = lazy(() => import("@/pages/TravelMarketplace"));
+const RewardHistory = lazy(() => import("@/pages/RewardHistory"));
+const TokenAdmin = lazy(() => import("@/pages/TokenAdmin"));
+const TaxStrategy = lazy(() => import("@/pages/TaxStrategy"));
+const MarketingCenter = lazy(() => import("@/pages/MarketingCenter"));
+const ContentCalendar = lazy(() => import("@/pages/ContentCalendar"));
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -112,6 +115,38 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
   );
 }
 
+function LazyPage({ component: Component }: { component: React.ComponentType }) {
+  return (
+    <Suspense fallback={<PageSkeleton />}>
+      <Component />
+    </Suspense>
+  );
+}
+
+function LazyChart({ component: Component }: { component: React.ComponentType }) {
+  return (
+    <Suspense fallback={<ChartSkeleton />}>
+      <Component />
+    </Suspense>
+  );
+}
+
+function LazyTable({ component: Component }: { component: React.ComponentType }) {
+  return (
+    <Suspense fallback={<TableSkeleton />}>
+      <Component />
+    </Suspense>
+  );
+}
+
+function LazyProtected({ component: Component }: { component: React.ComponentType }) {
+  return (
+    <Suspense fallback={<PageSkeleton />}>
+      <ProtectedRoute component={Component} />
+    </Suspense>
+  );
+}
+
 function ClerkProviderWithRoutes() {
   const [, setLocation] = useLocation();
 
@@ -127,48 +162,49 @@ function ClerkProviderWithRoutes() {
         <TooltipProvider>
           <Switch>
             <Route path="/" component={Home} />
-            <Route path="/dashboard" component={Dashboard} />
-            <Route path="/earn" component={Earn} />
-            <Route path="/options" component={Options} />
-            <Route path="/stocks" component={Stocks} />
-            <Route path="/jobs" component={Jobs} />
-            <Route path="/gigs" component={Gigs} />
-            <Route path="/community" component={Community} />
-            <Route path="/tax" component={Tax} />
-            <Route path="/receipts" component={Receipts} />
-            <Route path="/travel" component={Travel} />
-            <Route path="/tax-strategy" component={TaxStrategy} />
-            <Route path="/taxgpt" component={TaxGPT} />
-            <Route path="/technical" component={TechnicalAnalysis} />
-            <Route path="/charts" component={Charts} />
-            <Route path="/market-overview" component={MarketOverview} />
-            <Route path="/screener" component={Screener} />
-            <Route path="/terminal" component={Terminal} />
-            <Route path="/about" component={About} />
-            <Route path="/terms" component={Terms} />
-            <Route path="/privacy" component={Privacy} />
-            <Route path="/pricing" component={Pricing} />
-            <Route path="/research" component={Research} />
-            <Route path="/time-machine" component={TimeMachine} />
-            <Route path="/sector-flow" component={SectorFlow} />
-            <Route path="/volatility" component={VolatilityLab} />
-            <Route path="/competitive-intel" component={CompetitiveAnalysis} />
-            <Route path="/open-source-intel" component={OpenSourceIntel} />
-            <Route path="/case-study" component={CaseStudy} />
-            <Route path="/leaderboard" component={Leaderboard} />
-            <Route path="/achievements" component={Achievements} />
+            <Route path="/dashboard">{() => <LazyPage component={Dashboard} />}</Route>
+            <Route path="/earn">{() => <LazyPage component={Earn} />}</Route>
+            <Route path="/options">{() => <LazyPage component={Options} />}</Route>
+            <Route path="/stocks">{() => <LazyTable component={Stocks} />}</Route>
+            <Route path="/jobs">{() => <LazyTable component={Jobs} />}</Route>
+            <Route path="/gigs">{() => <LazyTable component={Gigs} />}</Route>
+            <Route path="/community">{() => <LazyPage component={Community} />}</Route>
+            <Route path="/tax">{() => <LazyPage component={Tax} />}</Route>
+            <Route path="/receipts">{() => <LazyPage component={Receipts} />}</Route>
+            <Route path="/travel">{() => <LazyPage component={Travel} />}</Route>
+            <Route path="/tax-strategy">{() => <LazyPage component={TaxStrategy} />}</Route>
+            <Route path="/taxgpt">{() => <LazyPage component={TaxGPT} />}</Route>
+            <Route path="/technical">{() => <LazyChart component={TechnicalAnalysis} />}</Route>
+            <Route path="/charts">{() => <LazyChart component={Charts} />}</Route>
+            <Route path="/market-overview">{() => <LazyChart component={MarketOverview} />}</Route>
+            <Route path="/screener">{() => <LazyTable component={Screener} />}</Route>
+            <Route path="/terminal">{() => <LazyPage component={Terminal} />}</Route>
+            <Route path="/about">{() => <LazyPage component={About} />}</Route>
+            <Route path="/terms">{() => <LazyPage component={Terms} />}</Route>
+            <Route path="/privacy">{() => <LazyPage component={Privacy} />}</Route>
+            <Route path="/pricing">{() => <LazyPage component={Pricing} />}</Route>
+            <Route path="/research">{() => <LazyPage component={Research} />}</Route>
+            <Route path="/time-machine">{() => <LazyChart component={TimeMachine} />}</Route>
+            <Route path="/sector-flow">{() => <LazyChart component={SectorFlow} />}</Route>
+            <Route path="/volatility">{() => <LazyChart component={VolatilityLab} />}</Route>
+            <Route path="/competitive-intel">{() => <LazyPage component={CompetitiveAnalysis} />}</Route>
+            <Route path="/open-source-intel">{() => <LazyPage component={OpenSourceIntel} />}</Route>
+            <Route path="/case-study">{() => <LazyPage component={CaseStudy} />}</Route>
+            <Route path="/leaderboard">{() => <LazyPage component={Leaderboard} />}</Route>
+            <Route path="/achievements">{() => <LazyPage component={Achievements} />}</Route>
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?" component={SignUpPage} />
-            <Route path="/resume">{() => <ProtectedRoute component={Resume} />}</Route>
-            <Route path="/profile">{() => <ProtectedRoute component={Profile} />}</Route>
-            <Route path="/wallet">{() => <ProtectedRoute component={TokenWallet} />}</Route>
-            <Route path="/marketplace">{() => <ProtectedRoute component={TravelMarketplace} />}</Route>
-            <Route path="/rewards">{() => <ProtectedRoute component={RewardHistory} />}</Route>
-            <Route path="/token-admin">{() => <ProtectedRoute component={TokenAdmin} />}</Route>
-            <Route path="/marketing">{() => <ProtectedRoute component={MarketingCenter} />}</Route>
-            <Route path="/content-calendar">{() => <ProtectedRoute component={ContentCalendar} />}</Route>
+            <Route path="/resume">{() => <LazyProtected component={Resume} />}</Route>
+            <Route path="/profile">{() => <LazyProtected component={Profile} />}</Route>
+            <Route path="/wallet">{() => <LazyProtected component={TokenWallet} />}</Route>
+            <Route path="/marketplace">{() => <LazyProtected component={TravelMarketplace} />}</Route>
+            <Route path="/rewards">{() => <LazyProtected component={RewardHistory} />}</Route>
+            <Route path="/token-admin">{() => <LazyProtected component={TokenAdmin} />}</Route>
+            <Route path="/marketing">{() => <LazyProtected component={MarketingCenter} />}</Route>
+            <Route path="/content-calendar">{() => <LazyProtected component={ContentCalendar} />}</Route>
             <Route component={NotFound} />
           </Switch>
+          <InstallPrompt />
           <Toaster />
         </TooltipProvider>
       </QueryClientProvider>

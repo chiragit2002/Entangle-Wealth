@@ -210,6 +210,8 @@ const ADMIN_NAV_GROUP: NavGroup = {
     { href: "/analytics", label: "Analytics", desc: "Platform metrics" },
     { href: "/admin/tickets", label: "Support Tickets", desc: "Manage tickets" },
     { href: "/admin/status", label: "Status Manager", desc: "Service health control" },
+    { href: "/admin/scalability", label: "Scalability", desc: "Performance metrics" },
+    { href: "/launch", label: "Launch Readiness", desc: "Go/No-Go checklist" },
   ],
 };
 
@@ -224,6 +226,8 @@ const ADMIN_MOBILE_SECTION = {
     { href: "/analytics", label: "Analytics" },
     { href: "/admin/tickets", label: "Support Tickets" },
     { href: "/admin/status", label: "Status Manager" },
+    { href: "/admin/scalability", label: "Scalability" },
+    { href: "/launch", label: "Launch Readiness" },
   ],
 };
 

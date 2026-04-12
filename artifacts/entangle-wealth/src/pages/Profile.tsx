@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
 import { useUser, useAuth, useClerk } from "@clerk/react";
 import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target, Wallet, Coins, Users, Fingerprint, Upload, X, Image, Building2 } from "lucide-react";
+import { OccupationDropdown } from "@/components/OccupationDropdown";
+import { getOccupationById } from "@workspace/occupations";
 import { ReferralSection } from "@/components/viral/ReferralSection";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -33,6 +35,7 @@ interface GamificationData {
 
 interface ProfileData {
   headline: string;
+  occupationId: string;
   bio: string;
   phone: string;
   location: string;
@@ -122,7 +125,7 @@ export default function Profile() {
   const { getToken } = useAuth();
   const { toast } = useToast();
   const [profile, setProfile] = useState<ProfileData>({
-    headline: "", bio: "", phone: "", location: "",
+    headline: "", occupationId: "", bio: "", phone: "", location: "",
     isPublicProfile: true, kycStatus: "not_started", subscriptionTier: "free",
   });
   const [savedJobs, setSavedJobs] = useState<SavedJob[]>([]);
@@ -204,6 +207,7 @@ export default function Profile() {
         if (!data.needsSync) {
           setProfile({
             headline: data.headline || "",
+            occupationId: data.occupationId || "",
             bio: data.bio || "",
             phone: data.phone || "",
             location: data.location || "",
@@ -586,7 +590,9 @@ export default function Profile() {
                     </span>
                   )}
                 </div>
-                {profile.headline && <p className="text-primary">{profile.headline}</p>}
+                {(profile.occupationId ? getOccupationById(profile.occupationId)?.name : profile.headline) && (
+                  <p className="text-primary">{profile.occupationId ? getOccupationById(profile.occupationId)?.name : profile.headline}</p>
+                )}
                 <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                   {user?.primaryEmailAddress && <span className="flex items-center gap-1"><Mail className="w-3.5 h-3.5" />{user.primaryEmailAddress.emailAddress}</span>}
                   {profile.location && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{profile.location}</span>}
@@ -601,7 +607,16 @@ export default function Profile() {
 
           {editing && (
             <div className="space-y-3 border-t border-white/10 pt-4">
-              <Input placeholder="Headline (e.g., Full-Stack Developer)" value={profile.headline} onChange={(e) => setProfile(prev => ({ ...prev, headline: e.target.value }))} className="bg-white/5 border-white/10" />
+              <div>
+                <label className="text-[11px] text-white/50 mb-1 flex items-center gap-1">
+                  <Briefcase className="w-3 h-3" /> Occupation
+                </label>
+                <OccupationDropdown
+                  value={profile.occupationId}
+                  onChange={(id) => setProfile(prev => ({ ...prev, occupationId: id }))}
+                  placeholder="Select your occupation..."
+                />
+              </div>
               <textarea
                 placeholder="Bio | tell employers about yourself..."
                 value={profile.bio}
@@ -621,6 +636,26 @@ export default function Profile() {
 
           {!editing && profile.bio && (
             <p className="text-muted-foreground text-sm border-t border-white/10 pt-4">{profile.bio}</p>
+          )}
+
+          {!editing && !profile.occupationId && profile.headline && (
+            <div className="border-t border-white/10 pt-4">
+              <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-amber-300 font-medium">Update your occupation</p>
+                  <p className="text-[11px] text-amber-300/60 mt-0.5">You have an old-style headline (&ldquo;{profile.headline}&rdquo;). Select a structured occupation to improve tax recommendations and AI coaching.</p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="mt-2 h-7 text-xs border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                    onClick={() => setEditing(true)}
+                  >
+                    Update Occupation
+                  </Button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
 

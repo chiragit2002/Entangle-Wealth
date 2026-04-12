@@ -4,6 +4,10 @@ import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { checkTaxGptLimit, incrementTaxGptCount } from "../lib/userDailyLimits";
 import { validateBody, z } from "../lib/validateRequest";
+import { db } from "@workspace/db";
+import { usersTable } from "@workspace/db/schema";
+import { eq } from "drizzle-orm";
+import { getOccupationById } from "@workspace/occupations";
 
 let openai: any = null;
 try {
@@ -231,7 +235,36 @@ router.post("/taxgpt", requireAuth, validateBody(TaxGptRequestSchema), async (re
   }
 
   try {
+    const [userRecord] = await db
+      .select({ occupationId: usersTable.occupationId, headline: usersTable.headline })
+      .from(usersTable)
+      .where(eq(usersTable.clerkId, clerkId));
+
+    const occupationData = userRecord?.occupationId
+      ? getOccupationById(userRecord.occupationId)
+      : undefined;
+
     let systemPrompt = TAX_SYSTEM_PROMPT;
+
+    if (occupationData) {
+      systemPrompt += `\n\n═══════════════════════════════════════\n  USER OCCUPATION CONTEXT\n═══════════════════════════════════════\n`;
+      systemPrompt += `Occupation: ${occupationData.name}\n`;
+      systemPrompt += `Sector: ${occupationData.category}\n`;
+      systemPrompt += `Tax Classification: ${occupationData.taxCategory}\n`;
+      if (occupationData.taxCategory === "1099") {
+        systemPrompt += `\nThis user is a 1099 independent contractor or self-employed professional. Prioritize: SE tax deduction, self-employed health insurance deduction, QBI deduction (§199A), home office, vehicle, and Solo 401(k)/SEP-IRA strategies.`;
+      } else if (occupationData.taxCategory === "Business Owner") {
+        systemPrompt += `\nThis user is a business owner. Prioritize: entity structure optimization (S-Corp election, LLC), QBI deduction (§199A), Section 179 expensing, bonus depreciation, solo 401(k)/SEP-IRA, and payroll/salary-vs-distribution optimization.`;
+      } else if (occupationData.taxCategory === "W-2") {
+        systemPrompt += `\nThis user is a W-2 employee. Prioritize: 401(k)/IRA maximization, HSA, employer stock options (ISO/NSO/ESPP), educator deductions if applicable, and itemized vs. standard deduction analysis.`;
+      } else if (occupationData.taxCategory === "Mixed") {
+        systemPrompt += `\nThis user has mixed W-2 and self-employment income. Prioritize: SE tax deduction, dual retirement contribution strategies, QBI eligibility, and coordination between W-2 withholding and quarterly estimated payments.`;
+      }
+    } else if (userRecord?.headline) {
+      systemPrompt += `\n\n═══════════════════════════════════════\n  USER CONTEXT\n═══════════════════════════════════════\n`;
+      systemPrompt += `Profession/Role: ${userRecord.headline}\n`;
+    }
+
     if (profileContext && typeof profileContext === "object") {
       systemPrompt += `\n\n═══════════════════════════════════════\n  USER PROFILE CONTEXT\n═══════════════════════════════════════\n`;
       if (profileContext.entityType) systemPrompt += `Entity Type: ${profileContext.entityType}\n`;

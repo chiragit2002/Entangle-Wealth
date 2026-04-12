@@ -15,6 +15,7 @@ import { processReferralMilestones } from "../lib/referralRewards";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
 import { validateBody, validateParams, z } from "../lib/validateRequest";
 import { logger } from "../lib/logger";
+import { getOccupationById } from "@workspace/occupations";
 
 const UserIdParamsSchema = z.object({
   userId: z.string().min(1).max(100),
@@ -33,7 +34,8 @@ router.get("/users/me", requireAuth, async (req, res) => {
       res.status(200).json({ needsSync: true });
       return;
     }
-    res.json(user);
+    const occupation = user.occupationId ? getOccupationById(user.occupationId) : null;
+    res.json({ ...user, occupation: occupation ?? null });
   } catch (error) {
     console.error("Error fetching user:", error);
     res.status(500).json({ error: "Failed to fetch user" });
@@ -50,6 +52,7 @@ const UserSyncSchema = z.object({
 
 const UserUpdateSchema = z.object({
   headline: z.string().max(200).optional(),
+  occupationId: z.string().max(100).optional(),
   bio: z.string().max(2000).optional(),
   phone: z.string().max(50).optional(),
   location: z.string().max(200).optional(),
@@ -183,17 +186,33 @@ router.post("/users/sync", requireAuth, validateBody(UserSyncSchema), async (req
 
 router.put("/users/me", requireAuth, validateBody(UserUpdateSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
-  const { headline, bio, phone, location, isPublicProfile, isBusinessOwner } = req.body;
+  const { headline, occupationId, bio, phone, location, isPublicProfile, isBusinessOwner } = req.body;
 
   try {
     const updateData: Record<string, unknown> = {
-      headline,
       bio,
       phone,
       location,
       isPublicProfile,
       updatedAt: new Date(),
     };
+
+    if (occupationId !== undefined) {
+      if (occupationId) {
+        const occ = getOccupationById(occupationId);
+        if (!occ) {
+          res.status(400).json({ error: "Invalid occupation ID. Please select a valid occupation from the list." });
+          return;
+        }
+        updateData.occupationId = occupationId;
+        updateData.headline = occ.name;
+      } else {
+        updateData.occupationId = null;
+      }
+    } else if (headline !== undefined) {
+      updateData.headline = headline;
+    }
+
     if (typeof isBusinessOwner === "boolean") {
       updateData.isBusinessOwner = isBusinessOwner;
     }

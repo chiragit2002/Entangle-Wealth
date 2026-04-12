@@ -8,6 +8,7 @@ export const usersTable = pgTable("users", {
   lastName: text("last_name"),
   photoUrl: text("photo_url"),
   headline: text("headline"),
+  occupationId: text("occupation_id"),
   bio: text("bio"),
   phone: text("phone"),
   location: text("location"),

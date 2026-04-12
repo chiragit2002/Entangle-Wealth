@@ -4,6 +4,8 @@ import { useLocation } from "wouter";
 import { User, MapPin, Loader2, ChevronRight, Briefcase, Building2, Upload, X, FileText, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { OccupationDropdown } from "@/components/OccupationDropdown";
+import { getOccupationById } from "@workspace/occupations";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,19 +14,19 @@ const BYPASS_PATHS = ["/sign-in", "/sign-up", "/terms", "/privacy", "/about", "/
 interface ProfileGateData {
   firstName: string;
   lastName: string;
-  headline: string;
+  occupationId: string;
   location: string;
 }
 
 interface FieldErrors {
   firstName?: string;
   lastName?: string;
-  headline?: string;
+  occupationId?: string;
   location?: string;
 }
 
 function getCompletionPct(data: ProfileGateData, isBusinessOwner: boolean, docPaths: string[]): number {
-  const profileFields = [data.firstName, data.lastName, data.headline, data.location];
+  const profileFields = [data.firstName, data.lastName, data.occupationId, data.location];
   const filledProfile = profileFields.filter(f => f.trim().length > 0).length;
   if (!isBusinessOwner) {
     return Math.round((filledProfile / profileFields.length) * 100);
@@ -37,7 +39,7 @@ function isProfileComplete(data: ProfileGateData): boolean {
   return (
     data.firstName.trim().length > 0 &&
     data.lastName.trim().length > 0 &&
-    data.headline.trim().length > 0 &&
+    data.occupationId.trim().length > 0 &&
     data.location.trim().length > 0
   );
 }
@@ -56,7 +58,7 @@ function validateField(name: keyof ProfileGateData, value: string): string | und
     const labels: Record<keyof ProfileGateData, string> = {
       firstName: "First name",
       lastName: "Last name",
-      headline: "Headline",
+      occupationId: "Occupation",
       location: "Location",
     };
     return `${labels[name]} is required`;
@@ -64,7 +66,6 @@ function validateField(name: keyof ProfileGateData, value: string): string | und
   if (name === "firstName" || name === "lastName") {
     if (value.trim().length < 2) return "Must be at least 2 characters";
   }
-  if (name === "headline" && value.trim().length < 5) return "Please enter a more descriptive headline";
   return undefined;
 }
 
@@ -101,7 +102,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
   const [saving, setSaving] = useState(false);
   const [touched, setTouched] = useState<Partial<Record<keyof ProfileGateData, boolean>>>({});
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [form, setForm] = useState<ProfileGateData>({ firstName: "", lastName: "", headline: "", location: "" });
+  const [form, setForm] = useState<ProfileGateData>({ firstName: "", lastName: "", occupationId: "", location: "" });
 
   const [isBusinessOwner, setIsBusinessOwner] = useState<boolean | null>(null);
   const [businessOwnerAnswered, setBusinessOwnerAnswered] = useState(false);
@@ -138,7 +139,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
         profileData = {
           firstName: data.firstName || user?.firstName || "",
           lastName: data.lastName || user?.lastName || "",
-          headline: data.headline || "",
+          occupationId: data.occupationId || "",
           location: data.location || "",
         };
 
@@ -158,7 +159,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
         profileData = {
           firstName: user?.firstName || "",
           lastName: user?.lastName || "",
-          headline: "",
+          occupationId: "",
           location: "",
         };
       }
@@ -171,7 +172,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
       const profileData: ProfileGateData = {
         firstName: user?.firstName || "",
         lastName: user?.lastName || "",
-        headline: "",
+        occupationId: "",
         location: "",
       };
       if (!isProfileComplete(profileData)) {
@@ -252,7 +253,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
   };
 
   const handleSave = async () => {
-    const allFields: (keyof ProfileGateData)[] = ["firstName", "lastName", "headline", "location"];
+    const allFields: (keyof ProfileGateData)[] = ["firstName", "lastName", "occupationId", "location"];
     const newTouched: Partial<Record<keyof ProfileGateData, boolean>> = {};
     const newErrors: FieldErrors = {};
     allFields.forEach(f => {
@@ -288,7 +289,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          headline: form.headline.trim(),
+          occupationId: form.occupationId.trim(),
           location: form.location.trim(),
         }),
       });
@@ -441,30 +442,29 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
             </div>
           </div>
           <div>
-            <label htmlFor="gate-headline" className="text-[11px] text-white/50 mb-1 flex items-center gap-1">
+            <label htmlFor="gate-occupation" className="text-[11px] text-white/50 mb-1 flex items-center gap-1">
               <Briefcase className="w-3 h-3" aria-hidden="true" />
-              Headline <span className="text-primary" aria-hidden="true">*</span>
+              Occupation <span className="text-primary" aria-hidden="true">*</span>
             </label>
-            <Input
-              id="gate-headline"
-              placeholder="e.g., Freelance Developer & Investor"
-              value={form.headline}
-              onChange={e => handleFieldChange("headline", e.target.value)}
-              onBlur={() => handleBlur("headline")}
-              className={`bg-white/5 border-white/10 transition-colors ${errors.headline ? "border-red-500/50 focus:border-red-500" : "focus:border-primary/50"}`}
-              aria-invalid={!!errors.headline}
-              aria-describedby={errors.headline ? "gate-headline-error" : undefined}
+            <OccupationDropdown
+              inputId="gate-occupation"
+              value={form.occupationId}
+              onChange={(id) => {
+                handleFieldChange("occupationId", id);
+              }}
+              error={errors.occupationId}
+              placeholder="Select your occupation..."
             />
-            {errors.headline && (
-              <p id="gate-headline-error" className="text-[10px] text-red-400 mt-1 flex items-center gap-1">
+            {errors.occupationId && (
+              <p id="gate-occupation-error" className="text-[10px] text-red-400 mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3 shrink-0" />
-                {errors.headline}
+                {errors.occupationId}
               </p>
             )}
-            {form.headline.trim().length > 0 && !errors.headline && (
+            {form.occupationId && !errors.occupationId && (
               <p className="text-[10px] text-primary/60 mt-1 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3 shrink-0" />
-                Looks good!
+                {getOccupationById(form.occupationId)?.name}
               </p>
             )}
           </div>

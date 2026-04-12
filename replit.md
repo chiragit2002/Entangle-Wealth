@@ -28,6 +28,7 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **Frontend**: React with Vite and Tailwind CSS.
 - **Payments**: Stripe for subscriptions and KYC verification.
 - **Data Management**: LocalStorage for client-side persistence.
+- **Occupation System**: `@workspace/occupations` package — 536 structured occupations across 26 categories with tax category mappings (W-2, 1099, Business Owner). Used in Profile, ProfileCompletionGate, coaching AI context.
 - **Security**: Helmet for HTTP security headers, global and AI-specific rate limiting.
 - **Performance**: Paginated endpoints, database indexing, AI request queuing, exponential backoff with jitter, circuit breaker patterns, image compression, and real-time metrics.
 

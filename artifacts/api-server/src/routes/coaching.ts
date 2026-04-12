@@ -12,6 +12,7 @@ import {
   wealthProfilesTable,
   simulationRunsTable,
   xpTransactionsTable,
+  usersTable,
 } from "@workspace/db/schema";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
@@ -19,6 +20,7 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
 import { aiQueue } from "../lib/aiQueue";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { getOccupationById } from "@workspace/occupations";
 
 const router = Router();
 
@@ -26,6 +28,10 @@ async function getUserContext(userId: string) {
   const [xp] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
   const [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
   const [profile] = await db.select().from(wealthProfilesTable).where(eq(wealthProfilesTable.userId, userId));
+  const [userRecord] = await db
+    .select({ occupationId: usersTable.occupationId, headline: usersTable.headline })
+    .from(usersTable)
+    .where(eq(usersTable.id, userId));
 
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
@@ -72,6 +78,10 @@ async function getUserContext(userId: string) {
       completions: h.userHabit.totalCompletions,
     }));
 
+  const occupationData = userRecord?.occupationId
+    ? getOccupationById(userRecord.occupationId)
+    : undefined;
+
   return {
     level: xp?.level || 1,
     totalXp: xp?.totalXp || 0,
@@ -92,6 +102,15 @@ async function getUserContext(userId: string) {
     topHabits,
     simulationRunsCount: simRuns.length,
     recentActivityCategories: [...new Set(recentXpTxns.map(t => t.category))],
+    occupation: occupationData
+      ? {
+          name: occupationData.name,
+          category: occupationData.category,
+          taxCategory: occupationData.taxCategory,
+        }
+      : userRecord?.headline
+        ? { name: userRecord.headline, category: "Unknown", taxCategory: "Unknown" }
+        : null,
   };
 }
 
@@ -108,6 +127,7 @@ Your user context:
 - Top habits: ${context.topHabits.map(h => `${h.title} (${h.streak}-day streak)`).join(", ") || "None yet"}
 - Simulation runs: ${context.simulationRunsCount}
 - Recent activity categories: ${context.recentActivityCategories.join(", ") || "None"}
+${context.occupation ? `- Occupation: ${context.occupation.name} (${context.occupation.category}) — Tax type: ${context.occupation.taxCategory}` : "- Occupation: not set"}
 ${context.profile ? `- Financial profile: $${context.profile.annualIncome.toLocaleString()}/yr income, ${context.profile.savingsRate}% savings rate, $${context.profile.monthlyInvestment}/mo investment, ${context.profile.riskTolerance} risk tolerance` : "- Financial profile: not set up yet"}
 
 Coaching style:

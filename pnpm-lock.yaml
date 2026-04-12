@@ -246,6 +246,9 @@ importers:
       '@workspace/integrations-openai-ai-server':
         specifier: workspace:*
         version: link:../../lib/integrations-openai-ai-server
+      '@workspace/occupations':
+        specifier: workspace:*
+        version: link:../../lib/occupations
       '@workspace/xp':
         specifier: workspace:*
         version: link:../../lib/xp
@@ -482,6 +485,9 @@ importers:
       '@workspace/api-client-react':
         specifier: workspace:*
         version: link:../../lib/api-client-react
+      '@workspace/occupations':
+        specifier: workspace:*
+        version: link:../../lib/occupations
       '@workspace/xp':
         specifier: workspace:*
         version: link:../../lib/xp
@@ -809,6 +815,8 @@ importers:
       p-retry:
         specifier: ^7.1.1
         version: 7.1.1
+
+  lib/occupations: {}
 
   lib/xp: {}
 

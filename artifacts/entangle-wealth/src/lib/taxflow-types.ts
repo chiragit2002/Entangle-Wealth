@@ -16,6 +16,15 @@ export interface KycData {
   submitted: boolean;
 }
 
+export type TaxCategory = "W-2" | "1099" | "Business Owner" | "Mixed";
+
+export interface OccupationData {
+  id: string;
+  name: string;
+  category: string;
+  taxCategory: TaxCategory;
+}
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -41,6 +50,8 @@ export interface UserProfile {
   taxYear: number;
   createdAt: string;
   kyc: KycData;
+  occupationId?: string;
+  occupation?: OccupationData;
 }
 
 export interface TaxStrategy {

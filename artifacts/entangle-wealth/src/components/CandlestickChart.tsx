@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo, memo } from "react";
 import { createChart, CandlestickSeries, HistogramSeries, LineSeries, type IChartApi, type ISeriesApi, type CandlestickData, type HistogramData, ColorType, CrosshairMode, type Time } from "lightweight-charts";
 import type { StockData } from "@/lib/indicators";
 
@@ -19,7 +19,7 @@ function smaArray(prices: number[], period: number): (number | null)[] {
   return result;
 }
 
-export function CandlestickChart({ data, symbol, height = 380 }: CandlestickChartProps) {
+function CandlestickChartBase({ data, symbol, height = 380 }: CandlestickChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
 
@@ -193,6 +193,8 @@ export function CandlestickChart({ data, symbol, height = 380 }: CandlestickChar
     </div>
   );
 }
+
+export const CandlestickChart = memo(CandlestickChartBase);
 
 function deduplicateByTime<T extends { time: string }>(items: T[]): T[] {
   const seen = new Set<string>();

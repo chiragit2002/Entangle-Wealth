@@ -1,7 +1,7 @@
 import { sectorData } from "@/lib/mock-data";
-import { useState } from "react";
+import { useState, memo } from "react";
 
-export function SectorHeatmap() {
+function SectorHeatmapBase() {
   const [hoveredSector, setHoveredSector] = useState<string | null>(null);
   const maxWeight = Math.max(...sectorData.map(s => s.weight));
 
@@ -77,3 +77,5 @@ export function SectorHeatmap() {
     </div>
   );
 }
+
+export const SectorHeatmap = memo(SectorHeatmapBase);

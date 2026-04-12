@@ -1,5 +1,8 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useAuth } from "@clerk/react";
+import { authFetch } from "@/lib/authFetch";
 import { Layout } from "@/components/layout/Layout";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { Link } from "wouter";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -120,21 +123,41 @@ function SliderRow({ label, value, min, max, step = 1, format, field, onChange }
   );
 }
 
+const DEFAULT_PARAMS = {
+  currentAge: 30,
+  annualIncome: 60000,
+  monthlyInvestment: 500,
+  currentSavings: 5000,
+  expectedReturnRate: 7,
+  inflationRate: 3,
+  monthlyExpenses: 3000,
+};
+
 export default function LifeOutcomes() {
-  const [params, setParams] = useState({
-    currentAge: 30,
-    annualIncome: 60000,
-    monthlyInvestment: 500,
-    currentSavings: 5000,
-    expectedReturnRate: 7,
-    inflationRate: 3,
-    monthlyExpenses: 3000,
-  });
+  const { isSignedIn, getToken } = useAuth();
+  const [params, setParams] = useState(DEFAULT_PARAMS);
 
   const [result, setResult] = useState<ProjectionResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [projectionError, setProjectionError] = useState(false);
   const [showParams, setShowParams] = useState(true);
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+    authFetch("/life-outcomes/from-profile", getToken)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.hasProfile && data.profile) {
+          setParams(prev => ({
+            ...prev,
+            ...Object.fromEntries(
+              Object.entries(data.profile).filter(([k, v]) => k in prev && typeof v === "number")
+            ),
+          }));
+        }
+      })
+      .catch(() => {});
+  }, [isSignedIn, getToken]);
 
   const handleParamChange = useCallback((field: ParamKey, v: number) => {
     setParams(p => ({ ...p, [field]: v }));
@@ -162,6 +185,7 @@ export default function LifeOutcomes() {
 
   return (
     <Layout>
+      <PageErrorBoundary fallbackTitle="Life Outcomes encountered an error">
       <div className="min-h-screen bg-[#0a0a14] text-white">
         <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -424,6 +448,7 @@ export default function LifeOutcomes() {
           )}
         </div>
       </div>
+      </PageErrorBoundary>
     </Layout>
   );
 }

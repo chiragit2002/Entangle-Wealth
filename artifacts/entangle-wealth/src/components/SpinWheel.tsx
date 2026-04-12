@@ -99,7 +99,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
   const loadStatus = useCallback(async () => {
     if (!isSignedIn) return;
     try {
-      const res = await authFetch("/paper-trading/spin/status", getToken);
+      const res = await authFetch("/gamification/spin/status", getToken);
       if (res.ok) setStatus(await res.json());
     } catch {}
   }, [isSignedIn, getToken]);
@@ -109,7 +109,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
   const loadHistory = useCallback(async () => {
     if (!isSignedIn) return;
     try {
-      const res = await authFetch("/paper-trading/spin/history", getToken);
+      const res = await authFetch("/gamification/spin/history", getToken);
       if (res.ok) setHistory(await res.json());
       setHistoryLoaded(true);
     } catch {}
@@ -199,7 +199,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
     setWinResult(null);
 
     try {
-      const res = await authFetch("/paper-trading/spin", getToken, { method: "POST" });
+      const res = await authFetch("/gamification/spin", getToken, { method: "POST" });
       const data = await res.json();
 
       if (!res.ok || data.alreadySpun) {

@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { quantumNodes } from "@/lib/mock-data";
 
-export function QuantumViz() {
+function QuantumVizBase() {
   const [activeConnections, setActiveConnections] = useState<number[]>([0, 2, 4]);
   const [consensusValue, setConsensusValue] = useState(87);
   const [pulsingNode, setPulsingNode] = useState(0);
@@ -136,3 +136,5 @@ export function QuantumViz() {
     </div>
   );
 }
+
+export const QuantumViz = memo(QuantumVizBase);

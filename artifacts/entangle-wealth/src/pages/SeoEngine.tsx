@@ -215,8 +215,8 @@ function KeywordsTab() {
                     </td>
                     <td className="px-4 py-2">
                       <div className="flex items-center gap-1">
-                        <button onClick={handleEdit} className="text-emerald-400 hover:text-emerald-300 transition-colors"><Save className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => setEditingId(null)} className="text-white/40 hover:text-white transition-colors"><X className="w-3.5 h-3.5" /></button>
+                        <button onClick={handleEdit} className="text-emerald-400 hover:text-emerald-300 transition-colors" aria-label="Save edit"><Save className="w-3.5 h-3.5" aria-hidden="true" /></button>
+                        <button onClick={() => setEditingId(null)} className="text-white/40 hover:text-white transition-colors" aria-label="Cancel edit"><X className="w-3.5 h-3.5" aria-hidden="true" /></button>
                       </div>
                     </td>
                   </tr>
@@ -231,8 +231,8 @@ function KeywordsTab() {
                     <td className="px-4 py-3 text-center"><TrendIcon trend={kw.trend} /></td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
-                        <button onClick={() => startEdit(kw)} className="text-blue-400/60 hover:text-blue-400 transition-colors"><Edit3 className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => handleDelete(kw.id)} className="text-red-400/60 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => startEdit(kw)} className="text-blue-400/60 hover:text-blue-400 transition-colors" aria-label={`Edit keyword ${kw.keyword}`}><Edit3 className="w-3.5 h-3.5" aria-hidden="true" /></button>
+                        <button onClick={() => handleDelete(kw.id)} className="text-red-400/60 hover:text-red-400 transition-colors" aria-label={`Delete keyword ${kw.keyword}`}><Trash2 className="w-3.5 h-3.5" aria-hidden="true" /></button>
                       </div>
                     </td>
                   </tr>
@@ -455,11 +455,11 @@ function BlogTab() {
                 <button onClick={() => exportPost(post, "md")} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-primary hover:bg-white/[0.05] transition-colors" title="Export Markdown">
                   <Copy className="w-4 h-4" />
                 </button>
-                <button onClick={() => openEdit(post)} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-blue-400 hover:bg-white/[0.05] transition-colors">
-                  <Edit3 className="w-4 h-4" />
+                <button onClick={() => openEdit(post)} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-blue-400 hover:bg-white/[0.05] transition-colors" aria-label="Edit post">
+                  <Edit3 className="w-4 h-4" aria-hidden="true" />
                 </button>
-                <button onClick={() => handleDelete(post.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-red-400 hover:bg-white/[0.05] transition-colors">
-                  <Trash2 className="w-4 h-4" />
+                <button onClick={() => handleDelete(post.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-red-400 hover:bg-white/[0.05] transition-colors" aria-label="Delete post">
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -507,8 +507,8 @@ function MetaTagsTab() {
                 <span className="text-sm font-semibold text-white">{tag.pageLabel}</span>
                 <span className="text-xs text-muted-foreground font-mono">{tag.pagePath}</span>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setEditingId(isEditing ? null : tag.id)} className="text-xs text-muted-foreground hover:text-white h-7 px-2">
-                {isEditing ? <X className="w-3.5 h-3.5" /> : <Edit3 className="w-3.5 h-3.5" />}
+              <Button variant="ghost" size="sm" onClick={() => setEditingId(isEditing ? null : tag.id)} className="text-xs text-muted-foreground hover:text-white h-7 px-2" aria-label={isEditing ? "Cancel editing" : `Edit ${tag.pageLabel}`}>
+                {isEditing ? <X className="w-3.5 h-3.5" aria-hidden="true" /> : <Edit3 className="w-3.5 h-3.5" aria-hidden="true" />}
               </Button>
             </div>
 
@@ -634,8 +634,8 @@ function BacklinksTab() {
                     <td className="px-4 py-2 hidden lg:table-cell text-xs text-white/40">{new Date(link.addedAt).toLocaleDateString()}</td>
                     <td className="px-4 py-2">
                       <div className="flex items-center gap-1">
-                        <button onClick={handleEdit} className="text-emerald-400 hover:text-emerald-300 transition-colors"><Save className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => setEditingId(null)} className="text-white/40 hover:text-white transition-colors"><X className="w-3.5 h-3.5" /></button>
+                        <button onClick={handleEdit} className="text-emerald-400 hover:text-emerald-300 transition-colors" aria-label="Save edit"><Save className="w-3.5 h-3.5" aria-hidden="true" /></button>
+                        <button onClick={() => setEditingId(null)} className="text-white/40 hover:text-white transition-colors" aria-label="Cancel edit"><X className="w-3.5 h-3.5" aria-hidden="true" /></button>
                       </div>
                     </td>
                   </tr>
@@ -657,8 +657,8 @@ function BacklinksTab() {
                     <td className="px-4 py-3 text-xs text-white/40 hidden lg:table-cell">{new Date(link.addedAt).toLocaleDateString()}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
-                        <button onClick={() => startEdit(link)} className="text-blue-400/60 hover:text-blue-400 transition-colors"><Edit3 className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => handleDelete(link.id)} className="text-red-400/60 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => startEdit(link)} className="text-blue-400/60 hover:text-blue-400 transition-colors" aria-label={`Edit backlink ${link.url}`}><Edit3 className="w-3.5 h-3.5" aria-hidden="true" /></button>
+                        <button onClick={() => handleDelete(link.id)} className="text-red-400/60 hover:text-red-400 transition-colors" aria-label={`Delete backlink ${link.url}`}><Trash2 className="w-3.5 h-3.5" aria-hidden="true" /></button>
                       </div>
                     </td>
                   </tr>

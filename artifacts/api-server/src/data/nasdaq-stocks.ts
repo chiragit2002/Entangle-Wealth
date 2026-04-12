@@ -612,26 +612,73 @@ export function generateAllStocks(): NasdaqStock[] {
 }
 
 let _cachedStocks: NasdaqStock[] | null = null;
+let _symbolIndex: Map<string, NasdaqStock> | null = null;
+let _prefixIndex: Map<string, NasdaqStock[]> | null = null;
 
 export function getAllStocks(): NasdaqStock[] {
   if (!_cachedStocks) {
     _cachedStocks = generateAllStocks();
+    _buildSearchIndex(_cachedStocks);
   }
   return _cachedStocks;
 }
 
-export function searchStocks(query: string, limit = 50): NasdaqStock[] {
-  const q = query.toUpperCase();
-  const all = getAllStocks();
-  const results: NasdaqStock[] = [];
+function _buildSearchIndex(stocks: NasdaqStock[]): void {
+  _symbolIndex = new Map();
+  _prefixIndex = new Map();
 
+  for (const stock of stocks) {
+    _symbolIndex.set(stock.symbol, stock);
+
+    const symUpper = stock.symbol.toUpperCase();
+    const nameUpper = stock.name.toUpperCase();
+
+    for (let len = 1; len <= symUpper.length; len++) {
+      const prefix = symUpper.slice(0, len);
+      if (!_prefixIndex.has(prefix)) _prefixIndex.set(prefix, []);
+      _prefixIndex.get(prefix)!.push(stock);
+    }
+
+    const nameWords = nameUpper.split(/\s+/);
+    for (const word of nameWords) {
+      for (let len = 1; len <= Math.min(word.length, 8); len++) {
+        const prefix = word.slice(0, len);
+        if (!_prefixIndex.has(prefix)) _prefixIndex.set(prefix, []);
+        const arr = _prefixIndex.get(prefix)!;
+        if (!arr.includes(stock)) arr.push(stock);
+      }
+    }
+  }
+}
+
+export function searchStocks(query: string, limit = 50): NasdaqStock[] {
+  const q = query.toUpperCase().trim();
+  if (!q) return [];
+
+  const all = getAllStocks();
+
+  if (_prefixIndex) {
+    const candidates = _prefixIndex.get(q);
+    if (candidates) {
+      return candidates.slice(0, limit);
+    }
+    const results: NasdaqStock[] = [];
+    for (const stock of all) {
+      if (stock.symbol.toUpperCase().includes(q) || stock.name.toUpperCase().includes(q)) {
+        results.push(stock);
+        if (results.length >= limit) break;
+      }
+    }
+    return results;
+  }
+
+  const results: NasdaqStock[] = [];
   for (const stock of all) {
     if (stock.symbol.includes(q) || stock.name.toUpperCase().includes(q)) {
       results.push(stock);
       if (results.length >= limit) break;
     }
   }
-
   return results;
 }
 

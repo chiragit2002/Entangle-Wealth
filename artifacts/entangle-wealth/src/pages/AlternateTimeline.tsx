@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
@@ -792,6 +793,7 @@ export default function AlternateTimeline() {
 
   return (
     <Layout>
+      <PageErrorBoundary fallbackTitle="Alternate Timeline encountered an error">
       <div className="container mx-auto px-4 py-6 max-w-7xl pb-24">
         <div className="mb-6 flex flex-col md:flex-row md:items-end gap-4">
           <div className="flex-1">
@@ -1231,6 +1233,7 @@ export default function AlternateTimeline() {
         </div>
       </div>
       <FinancialDisclaimerBanner pageKey="alternate-timeline" />
+      </PageErrorBoundary>
     </Layout>
   );
 }

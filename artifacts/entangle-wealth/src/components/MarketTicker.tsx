@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { marketTickerData } from "@/lib/mock-data";
 
-function MarketTickerComponent() {
+function MarketTickerBase() {
   return (
     <div data-tour="market-ticker" className="w-full bg-black/90 border-b border-white/10 overflow-hidden py-2 flex items-center relative z-20">
       <div className="w-full flex space-x-8 overflow-hidden">
@@ -21,4 +21,4 @@ function MarketTickerComponent() {
   );
 }
 
-export const MarketTicker = memo(MarketTickerComponent);
+export const MarketTicker = memo(MarketTickerBase);

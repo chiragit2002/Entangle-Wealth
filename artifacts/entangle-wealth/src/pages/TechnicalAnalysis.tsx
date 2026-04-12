@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { Layout } from "@/components/layout/Layout";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { useToast } from "@/hooks/use-toast";
 import {
   BarChart3, Search, TrendingUp, TrendingDown, Activity, Volume2,
@@ -406,6 +407,7 @@ export default function TechnicalAnalysis() {
 
   return (
     <Layout>
+      <PageErrorBoundary fallbackTitle="Technical Analysis encountered an error">
       <FinancialDisclaimerBanner pageKey="technical-analysis" />
       <div className="w-full border-b border-white/[0.06] bg-[#060610]">
         <div className="container mx-auto px-4 max-w-[1400px]">
@@ -707,6 +709,7 @@ export default function TechnicalAnalysis() {
         </div>
       </div>
       <PaperTradingWidget variant="floating" initialSymbol={activeSymbol} />
+      </PageErrorBoundary>
     </Layout>
   );
 }

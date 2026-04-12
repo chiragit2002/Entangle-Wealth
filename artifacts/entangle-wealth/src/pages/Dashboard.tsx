@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useLocation, Link } from "wouter";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { useAuth } from "@clerk/react";
 import { Layout } from "@/components/layout/Layout";
 import { FlashCouncil } from "@/components/FlashCouncil";
@@ -327,6 +328,7 @@ export default function Dashboard() {
 
   return (
     <Layout>
+      <PageErrorBoundary fallbackTitle="Dashboard encountered an error">
       <FlashCouncil />
       <MarketTicker />
       <FinancialDisclaimerBanner pageKey="dashboard" />
@@ -789,6 +791,7 @@ export default function Dashboard() {
         </Panel>
 
       </div>
+      </PageErrorBoundary>
     </Layout>
   );
 }

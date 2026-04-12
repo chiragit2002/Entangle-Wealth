@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Layout } from "@/components/layout/Layout";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { useToast } from "@/hooks/use-toast";
 import {
   Search, TrendingUp, TrendingDown, Activity, Settings, Plus, X, Star,
@@ -519,6 +520,7 @@ export default function Charts() {
 
   return (
     <Layout>
+      <PageErrorBoundary fallbackTitle="Charts encountered an error">
       <div className="flex flex-col h-[calc(100vh-64px)] bg-[#131722] text-[#D1D4DC] overflow-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
         {/* Header */}
         <div className="flex items-center h-10 bg-[#1E222D] border-b border-[#363A45] px-2 gap-1 shrink-0">
@@ -1067,6 +1069,7 @@ export default function Charts() {
       </div>
       <FinancialDisclaimerBanner pageKey="charts" />
       <PaperTradingWidget variant="floating" initialSymbol={symbol} />
+      </PageErrorBoundary>
     </Layout>
   );
 }

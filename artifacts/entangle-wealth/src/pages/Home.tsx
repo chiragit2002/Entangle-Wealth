@@ -199,9 +199,11 @@ class HomeErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundary
 function RecentSignupTicker({
   signups,
   error,
+  loading,
 }: {
   signups: { name: string; timeLabel: string }[] | null;
   error: boolean;
+  loading?: boolean;
 }) {
   const [idx, setIdx] = useState(0);
   useEffect(() => {
@@ -210,20 +212,33 @@ function RecentSignupTicker({
     return () => clearInterval(t);
   }, [signups?.length]);
 
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/[0.06] bg-white/[0.03]" aria-hidden="true">
+        <div className="w-3 h-3 rounded-full bg-white/10 animate-pulse flex-shrink-0" />
+        <div className="w-36 h-2.5 rounded-full bg-white/10 animate-pulse" />
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] text-white/25">
-        <AlertCircle className="w-3 h-3" />
+        <AlertCircle className="w-3 h-3" aria-hidden="true" />
         <span>Live activity unavailable</span>
       </div>
     );
   }
 
-  if (!signups || signups.length === 0) return null;
+  if (!signups || signups.length === 0) {
+    return (
+      <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-transparent bg-transparent" style={{ minHeight: "2rem" }} aria-hidden="true" />
+    );
+  }
   const s = signups[idx];
   return (
     <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#00ff88]/15 bg-[#00ff88]/5 text-[11px] font-medium text-[#00ff88]">
-      <UserPlus className="w-3 h-3 flex-shrink-0" />
+      <UserPlus className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
       <span>
         {s.name} just joined {s.timeLabel}
       </span>
@@ -421,7 +436,7 @@ export default function Home() {
         <section className="relative flex flex-col items-center justify-center pt-20 pb-24 px-4 overflow-hidden">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808006_1px,transparent_1px),linear-gradient(to_bottom,#80808006_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
           <div className="container relative z-10 max-w-3xl mx-auto flex flex-col items-center text-center space-y-6">
-            <RecentSignupTicker signups={signupsState.data} error={signupsState.error} />
+            <RecentSignupTicker signups={signupsState.data} error={signupsState.error} loading={signupsState.loading} />
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
               Stop guessing what to do

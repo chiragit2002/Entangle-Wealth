@@ -408,8 +408,9 @@ export default function Receipts() {
               <div className="space-y-3 mb-6">
                 {filteredDocs.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
-                    <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                    <p>No documents yet. Upload or add your first one above.</p>
+                    <FileText className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                    <p className="font-semibold text-white/40 mb-1">No documents yet</p>
+                    <p className="text-sm text-white/20">Upload a receipt or expense document using the form above.</p>
                   </div>
                 ) : filteredDocs.map(d => (
                   <div key={d.id} className="glass-panel rounded-xl p-4">
@@ -553,8 +554,9 @@ export default function Receipts() {
 
             {mileage.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
-                <Car className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                <p>No mileage entries yet. Log your first business trip above.</p>
+                <Car className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                <p className="font-semibold text-white/40 mb-1">No mileage entries yet</p>
+                <p className="text-sm text-white/20">Log your first business trip using the form above.</p>
               </div>
             ) : (
               <div className="glass-panel rounded-xl overflow-x-auto mb-6">

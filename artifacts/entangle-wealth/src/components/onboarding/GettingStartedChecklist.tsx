@@ -199,7 +199,7 @@ export function GettingStartedChecklist() {
                 );
               })}
               <div className="pt-1 pb-2">
-                <p className="text-[9px] text-white/20 text-center">Complete all tasks to earn a bonus reward!</p>
+                <p className="text-[9px] text-white/20 text-center">Complete all 5 to earn a bonus reward!</p>
               </div>
             </div>
           )}

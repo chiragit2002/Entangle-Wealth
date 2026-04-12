@@ -246,7 +246,7 @@ export default function Research() {
             <Newspaper className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
             <h3 className="text-lg font-bold text-muted-foreground mb-1">No articles found</h3>
             <p className="text-sm text-muted-foreground/60">
-              {search ? "Try a different search term" : "Feeds are being scraped | check back shortly"}
+              {search ? "Try a different search term or clear the filter" : "Feeds are being scraped — check back shortly"}
             </p>
           </div>
         ) : (

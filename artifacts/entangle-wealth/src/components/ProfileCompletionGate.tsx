@@ -68,6 +68,29 @@ function validateField(name: keyof ProfileGateData, value: string): string | und
   return undefined;
 }
 
+const SKIP_STORAGE_PREFIX = "ew_profile_gate_skip_until_";
+const SKIP_DURATION_MS = 3 * 24 * 60 * 60 * 1000;
+
+function getSkipKey(userId: string): string {
+  return `${SKIP_STORAGE_PREFIX}${userId}`;
+}
+
+function isSkipped(userId: string): boolean {
+  try {
+    const val = localStorage.getItem(getSkipKey(userId));
+    if (!val) return false;
+    return Date.now() < parseInt(val, 10);
+  } catch {
+    return false;
+  }
+}
+
+function setSkipped(userId: string) {
+  try {
+    localStorage.setItem(getSkipKey(userId), String(Date.now() + SKIP_DURATION_MS));
+  } catch {}
+}
+
 export function ProfileCompletionGate({ children }: { children: React.ReactNode }) {
   const { user, isLoaded, isSignedIn } = useUser();
   const { getToken } = useAuth();
@@ -90,8 +113,18 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
 
   const shouldBypass = BYPASS_PATHS.some(p => location.startsWith(p));
 
+  const handleRemindLater = () => {
+    if (user?.id) setSkipped(user.id);
+    setShowGate(false);
+  };
+
   const checkProfile = useCallback(async () => {
     if (!isLoaded || !isSignedIn || shouldBypass) {
+      setChecking(false);
+      return;
+    }
+
+    if (user?.id && isSkipped(user.id)) {
       setChecking(false);
       return;
     }
@@ -327,14 +360,24 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
   return (
     <div className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="profile-gate-title">
       <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0d0f18] p-8 my-4 shadow-2xl shadow-black/50 animate-in fade-in zoom-in-95 duration-300">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[#0099cc] flex items-center justify-center shrink-0">
-            <User className="w-5 h-5 text-black" aria-hidden="true" />
+        <div className="flex items-start justify-between gap-3 mb-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[#0099cc] flex items-center justify-center shrink-0">
+              <User className="w-5 h-5 text-black" aria-hidden="true" />
+            </div>
+            <div>
+              <h2 id="profile-gate-title" className="text-xl font-bold text-white">Complete Your Profile</h2>
+              <p className="text-xs text-white/50">Personalize your experience on EntangleWealth</p>
+            </div>
           </div>
-          <div>
-            <h2 id="profile-gate-title" className="text-xl font-bold text-white">Complete Your Profile</h2>
-            <p className="text-xs text-white/50">Required before accessing EntangleWealth</p>
-          </div>
+          <button
+            onClick={handleRemindLater}
+            className="text-white/20 hover:text-white/50 transition-colors p-1 rounded-md hover:bg-white/[0.04] shrink-0 min-w-[32px] min-h-[32px] flex items-center justify-center"
+            aria-label="Remind me later"
+            title="Remind me later"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         <div className="mb-6" aria-label={`Profile ${pct}% complete`}>
@@ -563,6 +606,13 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
             {!businessOwnerAnswered ? "Please answer all required questions to continue" : "All fields are required to continue"}
           </p>
         )}
+
+        <button
+          onClick={handleRemindLater}
+          className="w-full mt-3 text-center text-xs text-white/20 hover:text-white/40 transition-colors py-1"
+        >
+          Remind me later
+        </button>
       </div>
     </div>
   );

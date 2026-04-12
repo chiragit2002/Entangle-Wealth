@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { marketTickerData } from "@/lib/mock-data";
-import { X, Bell, BellOff } from "lucide-react";
+import { X, Bell, BellOff, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export type WatchlistItem = { symbol: string; signal: string; confidence: number };
@@ -52,7 +52,11 @@ export function WatchlistPanel({ externalItems, onRemove }: WatchlistPanelProps 
       </div>
 
       {items.length === 0 ? (
-        <p className="text-xs text-muted-foreground text-center py-6">No items in watchlist. Bookmark signals to add them.</p>
+        <div className="flex flex-col items-center justify-center py-8 text-center gap-1.5">
+          <Eye className="w-8 h-8 text-white/10 mb-1" />
+          <p className="text-xs font-medium text-white/30">Your watchlist is empty</p>
+          <p className="text-[10px] text-white/15 max-w-[140px] leading-relaxed">Bookmark a signal from the Signals page to track it here</p>
+        </div>
       ) : (
         <div className="space-y-1">
           {items.map((item) => {

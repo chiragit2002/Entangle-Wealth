@@ -1,4 +1,5 @@
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+import { Link } from "wouter";
 
 interface ErrorFallbackProps {
   error: Error;
@@ -14,22 +15,31 @@ export default function ErrorFallback({ error, resetErrorBoundary }: ErrorFallba
         </div>
         <div>
           <h2 className="text-xl font-bold mb-2">Something went wrong</h2>
-          <p className="text-muted-foreground text-sm">
-            We ran into an unexpected issue loading this page. Please try again. If the problem persists, contact support.
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            We ran into an unexpected issue. This has been noted. Please try again — if it keeps happening, refreshing the page usually fixes it.
           </p>
         </div>
-        <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-left">
-          <p className="text-xs font-mono text-red-400 break-all">
-            {import.meta.env.DEV ? error.message : "An unexpected error occurred. Please try again."}
-          </p>
+        {import.meta.env.DEV && (
+          <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-left">
+            <p className="text-xs font-mono text-red-400 break-all">{error.message}</p>
+          </div>
+        )}
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={resetErrorBoundary}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-black font-semibold hover:bg-primary/90 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Try Again
+          </button>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-white/10 text-white/60 font-semibold hover:bg-white/5 transition-colors"
+          >
+            <Home className="w-4 h-4" />
+            Go Home
+          </Link>
         </div>
-        <button
-          onClick={resetErrorBoundary}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-black font-semibold hover:bg-primary/90 transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Try Again
-        </button>
       </div>
     </div>
   );

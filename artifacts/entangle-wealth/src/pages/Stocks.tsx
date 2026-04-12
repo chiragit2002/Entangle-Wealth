@@ -145,7 +145,7 @@ export default function Stocks() {
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                Demo data shown | prices are simulated
+                Demo data — prices are simulated
               </div>
             </div>
 
@@ -408,8 +408,24 @@ export default function Stocks() {
                           ))
                         ) : stocks.length === 0 ? (
                           <tr>
-                            <td className="p-8 text-center text-muted-foreground" colSpan={8}>
-                              No stocks found matching your search.
+                            <td className="p-10 text-center" colSpan={8}>
+                              <div className="flex flex-col items-center gap-3">
+                                <Search className="w-8 h-8 text-white/10" />
+                                <p className="text-sm font-medium text-white/50">No stocks found</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {query || sectorFilter || capFilter
+                                    ? "Try adjusting your search or filters."
+                                    : "No stocks available right now."}
+                                </p>
+                                {(query || sectorFilter || capFilter) && (
+                                  <button
+                                    onClick={() => { setQuery(""); setSectorFilter(""); setCapFilter(""); }}
+                                    className="text-xs text-primary hover:text-primary/80 transition-colors underline"
+                                  >
+                                    Clear all filters
+                                  </button>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         ) : (

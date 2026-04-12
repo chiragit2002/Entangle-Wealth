@@ -98,15 +98,16 @@ export default function Help() {
         {filtered.length === 0 ? (
           <div className="text-center py-16">
             <HelpCircle className="w-12 h-12 text-white/10 mx-auto mb-4" />
-            <p className="text-white/40 mb-2">No results found</p>
-            <p className="text-white/20 text-sm">
-              Try a different search term or{" "}
+            <p className="text-white/50 font-semibold mb-1">No results found</p>
+            <p className="text-white/25 text-sm max-w-xs mx-auto leading-relaxed">
+              Try a different search term or category, or scroll down to{" "}
               <Link
                 href="/help#submit-ticket"
                 className="text-[#00D4FF] hover:underline"
               >
-                submit a ticket
-              </Link>
+                submit a support ticket
+              </Link>{" "}
+              and we'll get back to you.
             </p>
           </div>
         ) : (

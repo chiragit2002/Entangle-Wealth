@@ -176,7 +176,7 @@ export default function Terminal() {
         <div className="mb-1.5">
           <BloombergPanel>
             <PanelHeader title="MIROFISH TERMINAL" icon={<TerminalIcon className="w-3 h-3" />} color="cyan" rightContent={
-              <span className="text-[8px] font-mono text-white/20">ORDER FLOW · NEWS · SYSTEM LOG · COMMANDS</span>
+              <span className="text-[8px] font-mono text-white/20">Type <span className="text-[#00D4FF]/50">help</span> to see all commands</span>
             } />
             <div className="p-0">
               <MirofishTerminal />

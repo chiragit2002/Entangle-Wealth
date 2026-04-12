@@ -305,7 +305,7 @@ export default function Dashboard() {
       const sig = getOverallSignal(results);
       setQuickAnalysis({ symbol: sym, name: info?.name || sym, signal: sig.signal, confidence: sig.confidence, buyCount: sig.buyCount, sellCount: sig.sellCount });
       setAnalyzingSymbol("");
-      toast({ title: `${sym} Analysis Complete`, description: `${sig.signal.replace("_", " ")} | ${sig.confidence}% confidence` });
+      toast({ title: `${sym} Analysis Complete`, description: `${sig.signal.replace("_", " ")} — ${sig.confidence}% confidence` });
     }, 700);
   }, [toast]);
 
@@ -346,7 +346,7 @@ export default function Dashboard() {
               {isMarketOpen ? "MARKET OPEN" : "MARKET CLOSED"}
             </span>
           </div>
-          <span className="text-[9px] font-mono text-white/25 hidden sm:inline">DEMO MODE · SIMULATED DATA</span>
+          <span className="text-[9px] font-mono text-white/25 hidden sm:inline">DEMO MODE — SIMULATED DATA</span>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">

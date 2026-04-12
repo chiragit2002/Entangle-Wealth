@@ -82,9 +82,14 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
         </div>
 
         <div className="flex items-center justify-between px-5 pt-4 pb-2">
-          <span className="text-[10px] font-mono text-white/30 uppercase tracking-widest">
-            Step {step + 1} of {TOTAL_STEPS}
-          </span>
+          <div className="flex items-center gap-1.5" aria-hidden="true">
+            {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+              <div
+                key={i}
+                className={`rounded-full transition-all duration-300 ${i === step ? "w-4 h-2 bg-[#00D4FF]" : i < step ? "w-2 h-2 bg-[#00D4FF]/50" : "w-2 h-2 bg-white/15"}`}
+              />
+            ))}
+          </div>
           <button
             onClick={handleSkip}
             className="text-white/20 hover:text-white/50 transition-colors p-1 rounded-md hover:bg-white/[0.04] min-w-[32px] min-h-[32px] flex items-center justify-center"

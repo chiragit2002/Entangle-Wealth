@@ -524,8 +524,9 @@ export default function Community() {
             <div className="space-y-2.5">
               {filteredJobs.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                  <p>No jobs match your filters.</p>
+                  <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                  <p className="font-semibold text-white/40 mb-1">No jobs match your filters</p>
+                  <p className="text-sm text-white/20">Try a broader category or check back later for new listings.</p>
                 </div>
               ) : (
                 filteredJobs.map(j => (

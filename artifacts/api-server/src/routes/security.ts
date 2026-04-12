@@ -1,4 +1,5 @@
 import { Router } from "express";
+import type { Express } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import { validateQuery, z } from "../lib/validateRequest";
@@ -8,28 +9,51 @@ import {
   getSecurityAlerts,
   getSecuritySummary,
 } from "../lib/authEventLogger";
+import { runSecuritySelfTest } from "../lib/securitySelfTest";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
-const router = Router();
+export function createSecurityRouter(app: Express) {
+  const router = Router();
 
-router.get("/security/dashboard", requireAuth, requireAdmin, (_req, res) => {
-  const summary = getSecuritySummary();
-  const stats = getAuthEventStats();
-  const recentEvents = getRecentAuthEvents(50);
-  const alerts = getSecurityAlerts(50);
+  router.get("/security/dashboard", requireAuth, requireAdmin, (_req, res) => {
+    const summary = getSecuritySummary();
+    const stats = getAuthEventStats();
+    const recentEvents = getRecentAuthEvents(50);
+    const alerts = getSecurityAlerts(50);
 
-  res.json({
-    summary,
-    authStats: stats,
-    recentEvents,
-    alerts,
-    generatedAt: new Date().toISOString(),
+    res.json({
+      summary,
+      authStats: stats,
+      recentEvents,
+      alerts,
+      generatedAt: new Date().toISOString(),
+    });
   });
-});
 
-router.get("/security/alerts", requireAuth, requireAdmin, validateQuery(z.object({ limit: z.coerce.number().int().min(1).max(200).optional().default(50) })), (req, res) => {
-  const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
-  const alerts = getSecurityAlerts(limit);
-  res.json({ alerts, total: alerts.length });
-});
+  router.get(
+    "/security/alerts",
+    requireAuth,
+    requireAdmin,
+    validateQuery(z.object({ limit: z.coerce.number().int().min(1).max(200).optional().default(50) })),
+    (req, res) => {
+      const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
+      const alerts = getSecurityAlerts(limit);
+      res.json({ alerts, total: alerts.length });
+    }
+  );
 
-export default router;
+  router.post("/security/self-test", requireAuth, requireAdmin, async (req, res, next) => {
+    try {
+      const userId = (req as AuthenticatedRequest).userId;
+      const ip = req.ip || req.socket.remoteAddress || "unknown";
+
+      const report = await runSecuritySelfTest(app, userId, ip);
+
+      res.json(report);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  return router;
+}

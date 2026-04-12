@@ -7,7 +7,8 @@ export type AuthEventType =
   | "oauth_callback"
   | "token_refresh"
   | "signup"
-  | "auth_check_failed";
+  | "auth_check_failed"
+  | "security_self_test";
 
 const SENSITIVE_ENDPOINTS = [
   "/api/kyc/submit",

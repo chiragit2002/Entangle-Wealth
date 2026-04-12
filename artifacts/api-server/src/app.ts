@@ -19,7 +19,7 @@ import {
   userKycLimiter,
 } from "./middlewares/userRateLimit";
 import { trackSensitiveEndpointAccess, trackUserRequest } from "./lib/authEventLogger";
-import router from "./routes";
+import { createRouter } from "./routes";
 import seoRouter from "./routes/seo";
 import { logger } from "./lib/logger";
 import { getAuth } from "@clerk/express";
@@ -208,7 +208,7 @@ app.use("/api", userApiLimiter);
 
 app.use(seoRouter);
 app.use("/api", seoRouter);
-app.use("/api", router);
+app.use("/api", createRouter(app));
 
 app.use(globalErrorHandler);
 

@@ -1,4 +1,4 @@
-import { Router, type IRouter } from "express";
+import { Router, type IRouter, type Express } from "express";
 import healthRouter from "./health";
 import storageRouter from "./storage";
 import stocksRouter from "./stocks";
@@ -36,8 +36,9 @@ import habitsRouter from "./habits";
 import lifeOutcomesRouter from "./lifeOutcomes";
 import coachingRouter from "./coaching";
 import businessDocsRouter from "./businessDocs";
-import securityRouter from "./security";
+import { createSecurityRouter } from "./security";
 
+export function createRouter(app: Express): IRouter {
 const router: IRouter = Router();
 
 router.use(healthRouter);
@@ -77,6 +78,7 @@ router.use(habitsRouter);
 router.use(lifeOutcomesRouter);
 router.use(coachingRouter);
 router.use(businessDocsRouter);
-router.use(securityRouter);
+router.use(createSecurityRouter(app));
 
-export default router;
+return router;
+}

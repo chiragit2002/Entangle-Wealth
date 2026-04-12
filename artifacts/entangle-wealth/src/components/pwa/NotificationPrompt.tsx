@@ -69,7 +69,7 @@ export function NotificationPrompt() {
     if (localStorage.getItem(DISMISS_KEY)) return;
     if (localStorage.getItem(ALERTS_ENABLED_KEY)) return;
 
-    const timer = setTimeout(() => setShow(true), 10000);
+    const timer = setTimeout(() => setShow(true), 60000);
     return () => clearTimeout(timer);
   }, []);
 

@@ -589,6 +589,13 @@ export default function Home() {
 
         <EmailCapture />
 
+        {/* Anniversary Giveaway */}
+        <section className="py-8 px-4 border-t border-white/5">
+          <div className="container mx-auto max-w-3xl">
+            <AnniversaryGiveawayBanner />
+          </div>
+        </section>
+
         {/* Trust */}
         <section className="py-16 lg:py-24 px-4 border-t border-white/5">
           <div className="container mx-auto max-w-2xl text-center space-y-6">

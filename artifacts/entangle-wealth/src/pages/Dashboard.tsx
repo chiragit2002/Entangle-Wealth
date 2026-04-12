@@ -134,8 +134,8 @@ function PanelHeader({ title, icon, rightContent }: { title: string; icon?: Reac
   return (
     <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
       <div className="flex items-center gap-2">
-        {icon && <span className="text-white/40">{icon}</span>}
-        <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">{title}</span>
+        {icon && <span className="text-white/35">{icon}</span>}
+        <span className="text-sm font-semibold text-white/60">{title}</span>
       </div>
       {rightContent}
     </div>
@@ -409,7 +409,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="px-4 py-5 space-y-5 max-w-[1600px] mx-auto w-full">
+      <div className="px-4 py-4 space-y-4 max-w-[1600px] mx-auto w-full">
 
         {/* Section 1: Hero — Portfolio + Key Metrics */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -444,9 +444,9 @@ export default function Dashboard() {
             },
           ].map((stat) => (
             <div key={stat.label} className="bg-[#0a0a0f] border border-white/[0.06] rounded-xl px-4 py-4">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40 mb-1.5">{stat.label}</p>
+              <p className="text-xs font-medium text-white/50 mb-1.5">{stat.label}</p>
               <p className="text-2xl font-bold tabular-nums" style={{ color: stat.color }}>{stat.value}</p>
-              <p className="text-[11px] text-white/30 mt-1">{stat.sub}</p>
+              <p className="text-xs text-white/35 mt-1">{stat.sub}</p>
             </div>
           ))}
         </div>
@@ -468,7 +468,7 @@ export default function Dashboard() {
                   <div className="flex items-center gap-6">
                     <div className="text-center">
                       <p className={`text-3xl font-bold ${quickAnalysis.signal.includes("BUY") ? "text-[#00D4FF]" : quickAnalysis.signal.includes("SELL") ? "text-red-400" : "text-[#FFD700]"}`}>{quickAnalysis.confidence}%</p>
-                      <p className="text-[10px] text-white/30 uppercase tracking-wider mt-0.5">Confidence</p>
+                      <p className="text-xs text-white/35 mt-0.5">Confidence</p>
                     </div>
                     <div className="h-10 w-px bg-white/10" />
                     <div>
@@ -504,7 +504,7 @@ export default function Dashboard() {
           <div className="lg:col-span-2 space-y-4">
             <Panel>
               <PanelHeader title="Signal Matrix" icon={<Activity className="w-3.5 h-3.5" />} rightContent={
-                <span className="text-[10px] text-white/25">6 models · consensus view</span>
+                <span className="text-xs text-white/30">6 models · consensus view</span>
               } />
               <div className="p-4">
                 <QuantumViz />
@@ -533,7 +533,7 @@ export default function Dashboard() {
                         { label: "P&L", value: `${pnl >= 0 ? '+' : ''}$${Math.abs(pnl).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: pnl >= 0 ? "text-primary" : "text-red-400" },
                       ].map(s => (
                         <div key={s.label} className="bg-white/[0.03] rounded-xl p-3 text-center">
-                          <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">{s.label}</p>
+                          <p className="text-xs text-white/35 mb-1">{s.label}</p>
                           <p className={`text-sm font-semibold font-mono ${s.color}`}>{s.value}</p>
                         </div>
                       ))}
@@ -557,7 +557,7 @@ export default function Dashboard() {
                     </div>
                     {portfolio.positions.length > 0 && (
                       <div className="border-t border-white/[0.06] pt-3">
-                        <p className="text-[10px] text-white/30 uppercase tracking-wider mb-2">Open Positions</p>
+                        <p className="text-xs text-white/35 mb-2">Open Positions</p>
                         {portfolio.positions.map(p => (
                           <div key={p.id} className="flex items-center justify-between py-1.5 border-b border-white/[0.03] last:border-0">
                             <span className="text-sm font-semibold text-primary">{p.symbol}</span>
@@ -621,7 +621,7 @@ export default function Dashboard() {
                 <div className="flex gap-1">
                   {(["crypto", "forex", "commodities", "bonds"] as const).map(tab => (
                     <button key={tab} onClick={() => setActiveAssetTab(tab)}
-                      className={`px-2 py-0.5 text-[10px] font-semibold rounded-lg transition-colors ${activeAssetTab === tab ? 'bg-[#FFD700]/15 text-[#FFD700]' : 'text-white/25 hover:text-white/50'}`}>
+                      className={`px-2 py-0.5 text-xs font-semibold rounded-lg transition-colors ${activeAssetTab === tab ? 'bg-[#FFD700]/15 text-[#FFD700]' : 'text-white/30 hover:text-white/60'}`}>
                       {tab === "commodities" ? "Cmdty" : tab.charAt(0).toUpperCase() + tab.slice(1)}
                     </button>
                   ))}
@@ -677,8 +677,8 @@ export default function Dashboard() {
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="w-20 hidden sm:block">
-                        <div className="flex justify-between text-[10px] mb-1">
-                          <span className="text-white/25">Conf</span>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-white/30">Conf.</span>
                           <span className="text-white/50">{alert.confidence}%</span>
                         </div>
                         <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
@@ -727,7 +727,7 @@ export default function Dashboard() {
                 ))}
               </div>
               <div className="border-t border-white/[0.06] p-4">
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-3 font-semibold">Options Income (Weekly)</p>
+                <p className="text-xs text-white/40 font-semibold mb-3">Options Income (Weekly)</p>
                 <ResponsiveContainer width="100%" height={160}>
                   <BarChart data={optionsIncomeData}>
                     <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
@@ -745,7 +745,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
               <div className="divide-y divide-white/[0.03]">
                 <div className="px-4 py-2.5">
-                  <p className="text-[10px] text-white/30 uppercase tracking-wider font-semibold">Market Internals</p>
+                  <p className="text-xs text-white/40 font-semibold">Market Internals</p>
                 </div>
                 <DataRow label="Advancing / Declining" value={`${MARKET_INTERNALS.advDecl.advancing} / ${MARKET_INTERNALS.advDecl.declining}`} change={((MARKET_INTERNALS.advDecl.advancing / MARKET_INTERNALS.advDecl.declining) - 1) * 100} />
                 <DataRow label="TICK" value={`${MARKET_INTERNALS.tick.current > 0 ? '+' : ''}${Math.abs(MARKET_INTERNALS.tick.current)}`} />
@@ -759,7 +759,7 @@ export default function Dashboard() {
               </div>
               <div className="divide-y divide-white/[0.03]">
                 <div className="px-4 py-2.5">
-                  <p className="text-[10px] text-white/30 uppercase tracking-wider font-semibold">Options Greeks (Unusual Activity)</p>
+                  <p className="text-xs text-white/40 font-semibold">Unusual Options Activity</p>
                 </div>
                 {unusualOptionsActivity.slice(0, 8).map(e => (
                   <div key={e.id} className="flex items-center gap-3 px-4 py-2 hover:bg-white/[0.01] transition-colors">
@@ -777,11 +777,11 @@ export default function Dashboard() {
           {secondaryTab === "calendar" && (
             <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
               <div className="p-4">
-                <p className="text-[10px] text-white/30 uppercase tracking-wider font-semibold mb-3">Signal History</p>
+                <p className="text-xs text-white/40 font-semibold mb-3">Signal History</p>
                 <SignalHistory />
               </div>
               <div className="p-4">
-                <p className="text-[10px] text-white/30 uppercase tracking-wider font-semibold mb-3">Economic Calendar</p>
+                <p className="text-xs text-white/40 font-semibold mb-3">Economic Calendar</p>
                 <EconomicCalendar />
               </div>
             </div>

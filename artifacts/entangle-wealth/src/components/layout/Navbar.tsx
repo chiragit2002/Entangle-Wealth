@@ -1,13 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { Menu, X, LogOut, User, ChevronDown, Volume2, VolumeX } from "lucide-react";
+import { Menu, X, LogOut, User, ChevronDown } from "lucide-react";
 import logoImg from "@assets/Gemini_Generated_Image_nso2qnso2qnso2qn_1775900950533.png";
 import { useState, useRef, useEffect, useMemo, memo } from "react";
 import { useUser, useClerk, Show } from "@clerk/react";
 import { Button } from "@/components/ui/button";
 import NotificationCenter from "@/components/NotificationCenter";
-import { TaxYearSelector } from "@/components/tax/TaxYearSelector";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { isMuted, toggleMute } from "@/lib/confetti";
 
 interface NavGroup {
   label: string;
@@ -29,8 +27,8 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Analyze",
     items: [
       { href: "/technical", label: "Analysis", desc: "55+ indicators" },
-      { href: "/sector-flow", label: "Sector Flow", desc: "Rotation radar" },
-      { href: "/volatility", label: "Vol Lab", desc: "Risk analytics" },
+      { href: "/sector-flow", label: "Sector Analysis", desc: "Rotation radar" },
+      { href: "/volatility", label: "Volatility Analysis", desc: "Risk analytics" },
       { href: "/stocks", label: "Stocks", desc: "5,000 NASDAQ" },
       { href: "/research", label: "News", desc: "Market intel feeds" },
     ],
@@ -41,8 +39,8 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/time-machine", label: "Time Machine", desc: "What-if simulator" },
       { href: "/wealth-sim", label: "Wealth Sim", desc: "Compound growth" },
       { href: "/ai-coach", label: "AI Coach", desc: "Behavioral finance" },
-      { href: "/tax", label: "TaxFlow", desc: "Tax dashboard" },
       { href: "/alerts", label: "Alerts", desc: "Real-time alerts" },
+      { href: "/tax", label: "TaxFlow", desc: "Tax dashboard" },
     ],
   },
   {
@@ -51,18 +49,8 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/leaderboard", label: "Leaderboard", desc: "Top 100 traders" },
       { href: "/achievements", label: "Achievements", desc: "Badges & challenges" },
       { href: "/community", label: "Community", desc: "Groups & events" },
+      { href: "/wallet", label: "Rewards Balance", desc: "Tokens & rewards" },
       { href: "/blog", label: "Blog", desc: "Insights & education" },
-      { href: "/earn", label: "Earn", desc: "Gig marketplace" },
-    ],
-  },
-  {
-    label: "More",
-    items: [
-      { href: "/wallet", label: "Wallet", desc: "ENTGL balance" },
-      { href: "/pricing", label: "Pricing", desc: "Plans & features" },
-      { href: "/help", label: "Help Center", desc: "FAQ & support" },
-      { href: "/about", label: "About", desc: "Our mission" },
-      { href: "/status", label: "Status", desc: "Service health" },
     ],
   },
 ];
@@ -82,8 +70,8 @@ const MOBILE_SECTIONS = [
     title: "Analyze",
     links: [
       { href: "/technical", label: "Analysis" },
-      { href: "/sector-flow", label: "Sector Flow" },
-      { href: "/volatility", label: "Vol Lab" },
+      { href: "/sector-flow", label: "Sector Analysis" },
+      { href: "/volatility", label: "Volatility Analysis" },
       { href: "/stocks", label: "Stocks" },
       { href: "/research", label: "News" },
     ],
@@ -94,8 +82,8 @@ const MOBILE_SECTIONS = [
       { href: "/time-machine", label: "Time Machine" },
       { href: "/wealth-sim", label: "Wealth Sim" },
       { href: "/ai-coach", label: "AI Coach" },
-      { href: "/tax", label: "TaxFlow" },
       { href: "/alerts", label: "Alerts" },
+      { href: "/tax", label: "TaxFlow" },
     ],
   },
   {
@@ -104,16 +92,15 @@ const MOBILE_SECTIONS = [
       { href: "/leaderboard", label: "Leaderboard" },
       { href: "/achievements", label: "Achievements" },
       { href: "/community", label: "Community" },
+      { href: "/wallet", label: "Rewards Balance" },
       { href: "/blog", label: "Blog" },
-      { href: "/earn", label: "Earn" },
     ],
   },
   {
-    title: "More",
+    title: "Support",
     links: [
-      { href: "/wallet", label: "Wallet" },
       { href: "/pricing", label: "Pricing" },
-      { href: "/help", label: "Help" },
+      { href: "/help", label: "Help Center" },
       { href: "/about", label: "About" },
       { href: "/status", label: "Status" },
     ],
@@ -162,7 +149,7 @@ function DropdownMenu({ group, isOpen, onToggle }: { group: NavGroup; isOpen: bo
         <div
           id={dropdownId}
           role="menu"
-          className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
+          className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 rounded-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
           style={{
             background: "hsl(220 18% 8%)",
             border: "1px solid hsl(220 15% 14%)",
@@ -219,15 +206,9 @@ function NavbarComponent() {
   const [location, setLocation] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [soundMuted, setSoundMuted] = useState(() => isMuted());
   const { user } = useUser();
   const { signOut } = useClerk();
   const isAdmin = useIsAdmin();
-
-  const handleToggleMute = () => {
-    const next = toggleMute();
-    setSoundMuted(next);
-  };
 
   useEffect(() => {
     function handleEscape(e: KeyboardEvent) {
@@ -278,15 +259,6 @@ function NavbarComponent() {
         </div>
 
         <div className="hidden lg:flex items-center gap-1.5">
-          <TaxYearSelector />
-          <button
-            onClick={handleToggleMute}
-            title={soundMuted ? "Unmute sounds" : "Mute sounds"}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/[0.04] transition-colors duration-150"
-            aria-label={soundMuted ? "Unmute sounds" : "Mute sounds"}
-          >
-            {soundMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          </button>
           <NotificationCenter />
 
           <Show when="signed-in">
@@ -370,13 +342,6 @@ function NavbarComponent() {
             ))}
 
             <div className="pt-4 border-t border-border/60 space-y-1">
-              <button
-                onClick={handleToggleMute}
-                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-white/[0.04] hover:text-foreground transition-colors duration-150"
-              >
-                {soundMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                {soundMuted ? "Unmute sounds" : "Mute sounds"}
-              </button>
               <Show when="signed-in">
                 <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
                   <span className="flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg text-foreground/60 hover:bg-white/[0.04] hover:text-foreground transition-colors duration-150">

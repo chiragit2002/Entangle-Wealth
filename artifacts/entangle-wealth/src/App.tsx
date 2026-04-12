@@ -22,6 +22,7 @@ const MilestoneCelebrationModal = lazy(() =>
   import("@/components/viral/MilestoneCelebrationModal").then((m) => ({ default: m.MilestoneCelebrationModal }))
 );
 import { ProfileCompletionGate } from "@/components/ProfileCompletionGate";
+import { PopupQueueProvider } from "@/components/PopupQueue";
 
 const Home = lazy(() => import("@/pages/Home"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -317,6 +318,7 @@ function ClerkProviderWithRoutes() {
         <ClerkQueryClientCacheInvalidator />
         <AuthErrorHandler />
         <TooltipProvider>
+          <PopupQueueProvider>
           <ProfileCompletionGate>
           <Switch>
             <Route path="/">{() => <LazyPage component={Home} />}</Route>
@@ -397,6 +399,7 @@ function ClerkProviderWithRoutes() {
           <InstallPrompt />
           <NotificationPrompt />
           <Toaster />
+          </PopupQueueProvider>
         </TooltipProvider>
       </QueryClientProvider>
     </ClerkProvider>

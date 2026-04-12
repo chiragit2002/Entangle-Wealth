@@ -1077,7 +1077,7 @@ export default function Profile() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
               <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
                 <Coins className="w-5 h-5 text-yellow-400 mx-auto mb-1" />
-                <p className="text-[10px] text-muted-foreground uppercase">ENTGL Balance</p>
+                <p className="text-[10px] text-muted-foreground uppercase">Rewards Balance</p>
                 <p className="text-xl font-bold font-mono text-yellow-400">{(tokenData.balance || 0).toLocaleString()}</p>
               </div>
               <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">

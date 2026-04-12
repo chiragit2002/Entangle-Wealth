@@ -12,8 +12,8 @@ const primaryItems = [
 
 const moreItems = [
   { href: "/time-machine", label: "Time Machine", icon: Clock },
-  { href: "/sector-flow", label: "Sector Flow", icon: Radar },
-  { href: "/volatility", label: "Vol Lab", icon: Activity },
+  { href: "/sector-flow", label: "Sector Analysis", icon: Radar },
+  { href: "/volatility", label: "Volatility", icon: Activity },
 ];
 
 function BottomNavComponent() {

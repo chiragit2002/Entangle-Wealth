@@ -21,16 +21,21 @@ export function InstallPrompt() {
     const count = parseInt(localStorage.getItem(VISIT_KEY) || "0", 10) + 1;
     localStorage.setItem(VISIT_KEY, String(count));
 
+    let delayTimer: ReturnType<typeof setTimeout> | null = null;
+
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       if (count >= MIN_VISITS) {
-        setShow(true);
+        delayTimer = setTimeout(() => setShow(true), 60000);
       }
     };
 
     window.addEventListener("beforeinstallprompt", handler);
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handler);
+      if (delayTimer) clearTimeout(delayTimer);
+    };
   }, []);
 
   const handleInstall = useCallback(async () => {

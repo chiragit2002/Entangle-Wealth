@@ -88,7 +88,7 @@ export function StockAnalysisPanel({ symbol, name }: StockAnalysisPanelProps) {
           <Brain className="w-16 h-16 text-primary animate-pulse-glow" />
           <Loader2 className="w-6 h-6 text-gold absolute -top-1 -right-1 animate-spin" />
         </div>
-        <h3 className="text-lg font-bold mb-2 animate-pulse">Flash Council Convening...</h3>
+        <h3 className="text-lg font-bold mb-2 animate-pulse">AI Insights Processing...</h3>
         <p className="text-sm text-muted-foreground">7 agents analyzing {symbol} simultaneously</p>
         <div className="mt-4 space-y-2">
           {["Price Action Surgeon", "Volume Profile Architect", "Sentiment Engine", "Risk Manager", "Options Flow", "Sector Rotation", "Devil's Advocate"].map((agent, i) => (
@@ -130,7 +130,7 @@ export function StockAnalysisPanel({ symbol, name }: StockAnalysisPanelProps) {
             <div>
               <h3 className="text-lg font-bold flex items-center gap-2">
                 <Brain className="w-5 h-5 text-primary" />
-                Quantum Council Verdict
+                AI Insights Summary
               </h3>
               <p className="text-sm text-muted-foreground">{name}</p>
             </div>

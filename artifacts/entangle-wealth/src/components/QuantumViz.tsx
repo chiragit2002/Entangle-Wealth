@@ -44,7 +44,7 @@ export function QuantumViz() {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Quantum Entanglement Matrix</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Signal Consensus</h3>
           </div>
           <p className="text-xs text-muted-foreground/60 mb-4">
             6 independent analysis models cross-checking in real time. Signal fires only on consensus.

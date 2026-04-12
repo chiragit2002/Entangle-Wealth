@@ -114,7 +114,7 @@ export default function TokenWallet() {
           <div className="glass-panel p-6 col-span-1 md:col-span-2">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">ENTGL Balance</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Rewards Balance</p>
                 <p className="text-4xl font-bold font-mono text-yellow-400">
                   {(balance?.balance || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}
                 </p>

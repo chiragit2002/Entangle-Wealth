@@ -424,17 +424,15 @@ export default function Home() {
           <div className="container relative z-10 max-w-3xl mx-auto flex flex-col items-center text-center space-y-6">
             <RecentSignupTicker signups={signupsState.data} error={signupsState.error} />
 
-            <LanguageSelector />
-
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
               Stop guessing what to do
               <br />
               <span className="text-[#00c8f8]">with your money.</span>
             </h1>
 
-            <p className="max-w-xl text-base md:text-xl text-white/60 leading-relaxed">
-              Entangled Wealth gives you clear, plain-language guidance on your finances — no charts
-              to decipher, no jargon to decode. Just answers you can act on.
+            <p className="max-w-lg text-base md:text-lg text-white/60 leading-relaxed">
+              Plain-language guidance on your finances — no jargon, no charts to decode. Just clear
+              answers you can act on.
             </p>
 
             <MicroConversionFlow referralCode={referralCode || undefined} />
@@ -443,23 +441,21 @@ export default function Home() {
               <InlineError message="Couldn't load your referral link right now." />
             )}
 
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-1">
+            <div className="flex flex-wrap items-center justify-center gap-5 pt-1">
               <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#00e676]" />
-                No credit card needed
+                No credit card
               </span>
               <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
                 <Lock className="w-3.5 h-3.5 text-[#00c8f8]" />
-                Your data stays private
+                Private by default
               </span>
-              <span className="text-[11px] text-white/40 font-medium">Free to start</span>
+              {!heroStatsState.error && stats.members > 0 && (
+                <span className="text-[11px] text-white/30 font-medium">
+                  {animatedMembers.toLocaleString()}+ members
+                </span>
+              )}
             </div>
-
-            {!heroStatsState.error && stats.members > 0 && (
-              <p className="text-[11px] text-white/30 font-medium">
-                {animatedMembers.toLocaleString()}+ people already use Entangled Wealth
-              </p>
-            )}
           </div>
         </section>
 

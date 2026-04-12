@@ -110,13 +110,10 @@ export default function Options() {
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Unusual Options Activity</h1>
-            <p className="text-muted-foreground mt-1">
-              Unusual options activity with full Greeks breakdown.
-              <span className="text-white/40"> • </span>
-              <span className="text-white/50">{filtered.length} of {unusualOptionsActivity.length} signals</span>
-              <span className="text-white/40"> • </span>
-              <span className="text-white/40">Demo data</span>
+            <h1 className="text-3xl font-bold tracking-tight">Options Flow</h1>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Unusual activity with full Greeks · {filtered.length} of {unusualOptionsActivity.length} signals
+              <span className="text-white/30"> · simulated</span>
             </p>
           </div>
           

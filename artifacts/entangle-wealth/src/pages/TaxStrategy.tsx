@@ -83,14 +83,14 @@ export default function TaxStrategy() {
             <Lightbulb className="w-5 h-5 text-black" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Tax Strategy Browser</h1>
-            <p className="text-[12px] text-muted-foreground">{filtered.length} strategies · {planIds.length} in your plan</p>
+            <h1 className="text-2xl md:text-3xl font-bold">Tax Strategies</h1>
+            <p className="text-[12px] text-muted-foreground">{filtered.length} legal strategies · {planIds.length} added to your plan</p>
           </div>
         </div>
 
-        <div className="glass-panel rounded-xl p-4 mb-6 border border-[rgba(255,215,0,0.2)] bg-[rgba(255,215,0,0.03)]">
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            These strategies are based on IRS publications and tax code. This is educational information only | not professional tax advice. Consult a licensed CPA for your specific situation.
+        <div className="glass-panel rounded-xl p-3 mb-6 border border-white/[0.06]">
+          <p className="text-[11px] text-white/30 leading-relaxed">
+            Based on IRS publications and tax code. Educational only — not professional tax advice. Consult a CPA.
           </p>
         </div>
 
@@ -243,17 +243,12 @@ export default function TaxStrategy() {
         </div>
 
         {filtered.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <Lightbulb className="w-12 h-12 mx-auto mb-4 opacity-30" />
-            <p>No strategies match your filters.</p>
+          <div className="text-center py-16">
+            <Lightbulb className="w-10 h-10 mx-auto mb-3 text-white/10" />
+            <p className="text-sm font-medium text-white/40 mb-1">No strategies match those filters.</p>
+            <p className="text-xs text-white/25">Try removing a filter, or search by keyword instead.</p>
           </div>
         )}
-
-        <div className="p-4 rounded-lg border border-white/5 bg-white/[0.01] mt-6">
-          <p className="text-[11px] text-muted-foreground/50 text-center">
-            <strong>Important:</strong> The tax strategies described are for informational and educational purposes only. This is NOT tax advice. Tax laws are complex and change frequently. Always consult a licensed CPA, Enrolled Agent, or tax attorney before implementing any tax strategy or filing your return.
-          </p>
-        </div>
       </div>
     </Layout>
   );

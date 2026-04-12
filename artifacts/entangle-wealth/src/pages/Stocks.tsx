@@ -135,17 +135,14 @@ export default function Stocks() {
           <div className="container mx-auto px-4 md:px-6">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
               <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <Globe className="w-6 h-6 text-primary" />
-                  <h1 className="text-3xl md:text-4xl font-bold">Stock Explorer</h1>
-                </div>
-                <p className="text-muted-foreground">
-                  Search {totalCount > 0 ? totalCount.toLocaleString() : "5,000"} NASDAQ-listed stocks with AI-powered quantum analysis
+                <h1 className="text-3xl md:text-4xl font-bold mb-1">Stock Explorer</h1>
+                <p className="text-muted-foreground text-sm">
+                  Search {totalCount > 0 ? totalCount.toLocaleString() : "5,000"} stocks — click any to run an analysis.
                 </p>
               </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2 text-xs text-white/25">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                Demo data — prices are simulated
+                Simulated prices
               </div>
             </div>
 

@@ -306,14 +306,14 @@ export default function Receipts() {
             <FileText className="w-5 h-5 text-black" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Document Vault</h1>
-            <p className="text-[12px] text-muted-foreground">AI-powered document analysis · IRS-compliant records</p>
+            <h1 className="text-2xl md:text-3xl font-bold">Receipts & Docs</h1>
+            <p className="text-[12px] text-white/40">Upload receipts, log mileage, track deductions — all in one place.</p>
           </div>
         </div>
 
-        <div className="glass-panel rounded-xl p-4 mb-6 border border-[rgba(255,215,0,0.2)] bg-[rgba(255,215,0,0.03)]">
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Upload or photograph receipts and documents. AI categorizes them based on IRS expense categories. Keep all original receipts for 7 years per IRS guidelines.
+        <div className="glass-panel rounded-xl p-3 mb-6 border border-white/[0.06]">
+          <p className="text-[11px] text-white/30 leading-relaxed">
+            AI auto-categorizes by IRS expense type. Keep originals for 7 years.
           </p>
         </div>
 
@@ -352,8 +352,8 @@ export default function Receipts() {
               ) : (
                 <>
                   <Upload className="w-10 h-10 mb-2 text-primary/50" />
-                  <p className="font-bold mb-1">Drop Files Here or Click to Upload</p>
-                  <p className="text-[13px] text-muted-foreground">PDF, JPG, PNG | Max 10MB per file</p>
+                  <p className="font-bold mb-1">Drop a receipt here, or click to upload</p>
+                  <p className="text-[13px] text-white/30">PDF, JPG, PNG · max 10 MB</p>
                 </>
               )}
               <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/jpg,application/pdf" multiple className="hidden"
@@ -407,10 +407,14 @@ export default function Receipts() {
             {viewMode === "cards" ? (
               <div className="space-y-3 mb-6">
                 {filteredDocs.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <FileText className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                    <p className="font-semibold text-white/40 mb-1">No documents yet</p>
-                    <p className="text-sm text-white/20">Upload a receipt or expense document using the form above.</p>
+                  <div className="text-center py-12">
+                    <Receipt className="w-10 h-10 mx-auto mb-3 text-white/10" />
+                    <p className="font-semibold text-white/40 mb-1">
+                      {documents.length === 0 ? "No receipts yet" : "No receipts match that filter"}
+                    </p>
+                    <p className="text-sm text-white/20">
+                      {documents.length === 0 ? "Drop a file above or type in the form to add your first expense." : "Try a different category or clear the filter."}
+                    </p>
                   </div>
                 ) : filteredDocs.map(d => (
                   <div key={d.id} className="glass-panel rounded-xl p-4">
@@ -553,10 +557,10 @@ export default function Receipts() {
             </div>
 
             {mileage.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <Car className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                <p className="font-semibold text-white/40 mb-1">No mileage entries yet</p>
-                <p className="text-sm text-white/20">Log your first business trip using the form above.</p>
+              <div className="text-center py-12">
+                <Car className="w-10 h-10 mx-auto mb-3 text-white/10" />
+                <p className="font-semibold text-white/40 mb-1">No trips logged yet</p>
+                <p className="text-sm text-white/20">Fill in the form above to add your first business trip.</p>
               </div>
             ) : (
               <div className="glass-panel rounded-xl overflow-x-auto mb-6">

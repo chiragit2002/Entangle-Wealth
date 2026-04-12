@@ -599,16 +599,28 @@ export default function Profile() {
                 </div>
               </div>
             </div>
-            <Button variant="outline" className="border-white/20 gap-2" onClick={() => editing ? saveProfile() : setEditing(true)} disabled={saving}>
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : editing ? <Save className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
-              {editing ? "Save" : "Edit"}
-            </Button>
+            <div className="flex gap-2">
+              {editing && (
+                <Button variant="ghost" size="sm" className="text-white/40 hover:text-white/60" onClick={() => setEditing(false)}>
+                  Cancel
+                </Button>
+              )}
+              <Button
+                className={editing ? "bg-[#00c8f8] text-black font-bold hover:bg-[#00c8f8]/90 gap-2" : "border-white/20 gap-2"}
+                variant={editing ? "default" : "outline"}
+                onClick={() => editing ? saveProfile() : setEditing(true)}
+                disabled={saving}
+              >
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : editing ? <Save className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
+                {editing ? "Save changes" : "Edit"}
+              </Button>
+            </div>
           </div>
 
           {editing && (
-            <div className="space-y-3 border-t border-white/10 pt-4">
-              <div>
-                <label className="text-[11px] text-white/50 mb-1 flex items-center gap-1">
+            <div className="space-y-4 border-t border-white/10 pt-5">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-white/50 flex items-center gap-1">
                   <Briefcase className="w-3 h-3" /> Occupation
                 </label>
                 <OccupationDropdown
@@ -617,19 +629,28 @@ export default function Profile() {
                   placeholder="Select your occupation..."
                 />
               </div>
-              <textarea
-                placeholder="Bio | tell employers about yourself..."
-                value={profile.bio}
-                onChange={(e) => setProfile(prev => ({ ...prev, bio: e.target.value }))}
-                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white placeholder:text-muted-foreground/50 min-h-[80px] resize-none focus:outline-none focus:border-primary/50"
-              />
-              <div className="grid grid-cols-2 gap-3">
-                <Input placeholder="Phone" value={profile.phone} onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))} className="bg-white/5 border-white/10" />
-                <Input placeholder="Location" value={profile.location} onChange={(e) => setProfile(prev => ({ ...prev, location: e.target.value }))} className="bg-white/5 border-white/10" />
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-white/50">Bio</label>
+                <textarea
+                  placeholder="A short intro about yourself..."
+                  value={profile.bio}
+                  onChange={(e) => setProfile(prev => ({ ...prev, bio: e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white placeholder:text-muted-foreground/50 min-h-[80px] resize-none focus:outline-none focus:border-primary/50"
+                />
               </div>
-              <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-white/50">Phone</label>
+                  <Input placeholder="+1 (555) 000-0000" value={profile.phone} onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))} className="bg-white/5 border-white/10" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-white/50">Location</label>
+                  <Input placeholder="City, State" value={profile.location} onChange={(e) => setProfile(prev => ({ ...prev, location: e.target.value }))} className="bg-white/5 border-white/10" />
+                </div>
+              </div>
+              <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
                 <input type="checkbox" checked={profile.isPublicProfile} onChange={(e) => setProfile(prev => ({ ...prev, isPublicProfile: e.target.checked }))} className="accent-primary" />
-                Public profile (visible to employers)
+                Make profile visible to employers
               </label>
             </div>
           )}

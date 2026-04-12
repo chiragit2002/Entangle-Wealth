@@ -226,16 +226,16 @@ export default function TaxGPT() {
           </div>
           <div className="flex-1">
             <h1 className="text-2xl md:text-3xl font-bold">TaxGPT</h1>
-            <p className="text-[12px] text-muted-foreground">IRS Knowledge Engine{profile ? ` · ${ENTITY_SHORT_LABELS[profile.entityType]}` : ""}</p>
+            <p className="text-[12px] text-muted-foreground">Ask anything about deductions, strategies, and IRS rules{profile ? ` · ${ENTITY_SHORT_LABELS[profile.entityType]}` : ""}</p>
           </div>
           <Button variant="outline" size="sm" onClick={clearChat} className="border-white/10 text-white/40 gap-1 text-[11px]">
             <Trash2 className="w-3 h-3" /> Clear
           </Button>
         </div>
 
-        <div className="glass-panel rounded-xl p-4 mb-6 border border-[rgba(156,39,176,0.2)] bg-[rgba(156,39,176,0.03)]">
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            TaxGPT answers based on IRS publications and tax code. This is educational information only — not professional tax advice. Consult a licensed CPA for your specific situation.
+        <div className="glass-panel rounded-xl p-3 mb-6 border border-white/[0.06]">
+          <p className="text-[11px] text-white/30 leading-relaxed">
+            Educational info only — not tax advice. Consult a CPA for your specific situation.
           </p>
         </div>
 

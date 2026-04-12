@@ -221,7 +221,7 @@ export default function Tax() {
       <div className="container mx-auto px-4 py-10 max-w-3xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight text-white mb-1">TaxFlow</h1>
-          <p className="text-white/40 text-sm">Track deductions, plan strategies, and estimate savings</p>
+          <p className="text-white/50 text-sm">Track your deductions, find savings, and plan smarter — before tax season.</p>
         </div>
         {isSignedIn && kycStatus && (
           <div className={`rounded-xl p-4 mb-4 border flex items-start gap-3 ${
@@ -272,9 +272,9 @@ export default function Tax() {
           </div>
         )}
 
-        <div className="glass-panel rounded-xl p-4 mb-6 border border-[rgba(255,215,0,0.2)] bg-[rgba(255,215,0,0.03)]">
-          <p className="text-[12px] text-muted-foreground leading-relaxed">
-            <span className="text-secondary font-bold">Disclaimer:</span> TaxFlow provides educational information based on IRS publications and is not a substitute for professional tax advice. Always consult a licensed CPA or tax attorney for your specific situation.
+        <div className="glass-panel rounded-xl p-4 mb-6 border border-[rgba(255,215,0,0.15)] bg-[rgba(255,215,0,0.02)]">
+          <p className="text-[12px] text-white/40 leading-relaxed">
+            For education only. Not tax advice — consult a licensed CPA for your specific situation.
           </p>
         </div>
 
@@ -336,19 +336,19 @@ export default function Tax() {
         </div>
 
         <div className="flex gap-3 mb-8 overflow-x-auto pb-2">
+          <Link href="/taxgpt">
+            <Button className="bg-[#00c8f8] text-black font-bold gap-2 whitespace-nowrap min-h-[44px] hover:bg-[#00c8f8]/90">
+              <MessageCircle className="w-4 h-4" /> Ask TaxGPT
+            </Button>
+          </Link>
           <Link href="/receipts">
             <Button variant="outline" className="border-primary/30 text-primary gap-2 whitespace-nowrap min-h-[44px]">
-              <Receipt className="w-4 h-4" /> Document Vault
+              <Receipt className="w-4 h-4" /> Upload Receipts
             </Button>
           </Link>
           <Link href="/tax-strategy">
             <Button variant="outline" className="border-secondary/30 text-secondary gap-2 whitespace-nowrap min-h-[44px]">
               <Lightbulb className="w-4 h-4" /> Strategies
-            </Button>
-          </Link>
-          <Link href="/taxgpt">
-            <Button variant="outline" className="border-[#00e676]/30 text-[#00e676] gap-2 whitespace-nowrap min-h-[44px]">
-              <MessageCircle className="w-4 h-4" /> TaxGPT
             </Button>
           </Link>
         </div>

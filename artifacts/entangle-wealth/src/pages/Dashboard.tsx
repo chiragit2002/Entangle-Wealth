@@ -137,8 +137,8 @@ function PanelHeader({ title, icon, rightContent }: { title: string; icon?: Reac
   return (
     <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
       <div className="flex items-center gap-2">
-        {icon && <span className="text-primary">{icon}</span>}
-        <span className="text-xs font-semibold text-white/70 uppercase tracking-wider">{title}</span>
+        {icon && <span className="text-white/40">{icon}</span>}
+        <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">{title}</span>
       </div>
       {rightContent}
     </div>
@@ -343,10 +343,10 @@ export default function Dashboard() {
               <span className={`relative inline-flex rounded-full h-2 w-2 ${isMarketOpen ? 'bg-[#00D4FF]' : 'bg-[#FFD700]'}`} />
             </span>
             <span className={`text-[10px] font-mono font-semibold tracking-wider ${isMarketOpen ? 'text-[#00D4FF]' : 'text-[#FFD700]'}`}>
-              {isMarketOpen ? "MARKET OPEN" : "MARKET CLOSED"}
+              {isMarketOpen ? "Market Open" : "Market Closed"}
             </span>
           </div>
-          <span className="text-[9px] font-mono text-white/25 hidden sm:inline">DEMO MODE — SIMULATED DATA</span>
+          <span className="text-[9px] font-mono text-white/20 hidden sm:inline">Simulated data · for practice only</span>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
@@ -508,8 +508,8 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 space-y-4">
             <Panel>
-              <PanelHeader title="Quantum Entanglement Matrix" icon={<Activity className="w-3.5 h-3.5" />} rightContent={
-                <span className="text-[10px] text-white/30">6 models · consensus signal</span>
+              <PanelHeader title="Signal Matrix" icon={<Activity className="w-3.5 h-3.5" />} rightContent={
+                <span className="text-[10px] text-white/25">6 models · consensus view</span>
               } />
               <div className="p-4">
                 <QuantumViz />

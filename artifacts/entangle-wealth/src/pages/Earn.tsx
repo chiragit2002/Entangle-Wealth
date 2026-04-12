@@ -64,11 +64,9 @@ export default function Earn() {
       <FlashCouncil />
 
       <div className="container mx-auto px-4 py-6 max-w-5xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Income Opportunities</h1>
-            <p className="text-muted-foreground mt-1">Gig work, freelance, and options income strategies. Demo data shown.</p>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">Earn More</h1>
+          <p className="text-muted-foreground mt-1">Gig work, freelance, and options income — explore what fits your schedule.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -117,9 +115,9 @@ export default function Earn() {
 
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Target className="w-12 h-12 text-muted-foreground mb-4" />
-            <p className="text-lg font-semibold">No opportunities in this category</p>
-            <p className="text-sm text-muted-foreground mt-1">Try selecting a different category.</p>
+            <Target className="w-10 h-10 text-white/10 mb-3" />
+            <p className="text-base font-semibold text-white/40">Nothing here yet</p>
+            <p className="text-sm text-white/25 mt-1">Try a different category to see what's available.</p>
           </div>
         ) : (
           <div className="space-y-4 mb-8">
@@ -219,20 +217,18 @@ export default function Earn() {
 
         <Card className="bg-primary/5 border-primary/20 mb-8">
           <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-4">
-            <DollarSign className="w-10 h-10 text-primary shrink-0" />
+            <TrendingUp className="w-8 h-8 text-primary shrink-0" />
             <div className="flex-1 text-center sm:text-left">
-              <h3 className="font-bold mb-1">Want trading signals too?</h3>
-              <p className="text-sm text-muted-foreground">See live stock and options signals from our multi-model analysis system.</p>
+              <h3 className="font-bold mb-1">See trading signals too</h3>
+              <p className="text-sm text-muted-foreground">Stock and options signals from our multi-model analysis — all in the dashboard.</p>
             </div>
             <Link href="/dashboard">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">View Dashboard</Button>
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Go to Dashboard</Button>
             </Link>
           </CardContent>
         </Card>
 
-        <div className="p-4 rounded-lg border border-white/5 bg-white/[0.01]">
-          <p className="text-xs text-muted-foreground/60 text-center">Income opportunities shown are examples and not guaranteed. Actual earnings depend on availability, location, effort, and market conditions. Options strategies involve risk of loss. This is demo data.</p>
-        </div>
+        <p className="text-xs text-white/20 text-center pb-4">Demo data — opportunities and earnings shown are examples, not guarantees.</p>
 
         <AnniversaryGiveawayBanner />
         <ReferralSection />

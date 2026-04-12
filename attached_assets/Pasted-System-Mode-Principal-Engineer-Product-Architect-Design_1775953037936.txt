@@ -1,0 +1,198 @@
+System Mode: Principal Engineer + Product Architect + Design Perfectionist
+
+Codename: PRODUCTION ASCENSION
+
+Mission:
+Transform this application from a development/demo state into a fully production-ready, polished, stable, secure, and user-ready platform.
+
+This is NOT feature building.
+
+This is:
+→ refinement
+→ stabilization
+→ completion
+
+---
+
+# CORE PRINCIPLE
+
+Everything must be:
+
+- real
+- working
+- intentional
+- production-safe
+
+NO placeholders.
+NO demo logic.
+NO fake data unless explicitly marked.
+
+---
+
+# PHASE 1 — REMOVE DEMO MODE
+
+- Identify ALL demo logic
+- Remove mock data
+- Remove fake responses
+- Replace with real data flows
+
+If data is missing:
+→ implement real backend connection
+→ OR disable feature cleanly
+
+---
+
+# PHASE 2 — FULL SYSTEM INTEGRATION
+
+Ensure ALL systems are connected:
+
+- Auth (Clerk) → backend validation
+- Dashboard → real user data
+- Gamification → persistent state
+- Simulation → real inputs
+- AI coach → real context
+- Financial tracking → real or safely optional
+
+NO broken connections allowed.
+
+---
+
+# PHASE 3 — UI POLISH (ELITE LEVEL)
+
+Audit every screen:
+
+- Fix spacing inconsistencies
+- Remove clutter
+- Ensure visual hierarchy
+
+Rules:
+- 1 clear action per screen
+- readable typography
+- consistent spacing
+- smooth interactions
+
+Everything must feel:
+→ calm
+→ premium
+→ intentional
+
+---
+
+# PHASE 4 — ERROR HANDLING
+
+- No crashes
+- No blank screens
+
+Implement:
+- fallback states
+- loading states
+- empty states
+
+User must NEVER feel lost.
+
+---
+
+# PHASE 5 — PERFORMANCE OPTIMIZATION
+
+- Remove unnecessary re-renders
+- Optimize API calls
+- Lazy load where possible
+
+Ensure:
+- fast load times
+- responsive UI
+
+---
+
+# PHASE 6 — SECURITY CHECK
+
+- Validate all inputs
+- Secure all endpoints
+- hide all secrets
+
+Ensure:
+- no exposed keys
+- no unsafe routes
+
+---
+
+# PHASE 7 — REAL USER FLOW TEST
+
+Simulate:
+
+1. New user signs up
+2. Lands on dashboard
+3. Understands value instantly
+4. Takes first action
+5. Sees progress
+
+If ANY step is confusing:
+→ fix it
+
+---
+
+# PHASE 8 — CLEANUP
+
+Remove:
+
+- console logs
+- debug code
+- unused files
+- commented-out junk
+
+Codebase must be:
+→ clean
+→ readable
+→ maintainable
+
+---
+
+# PHASE 9 — DEPLOYMENT READINESS
+
+Ensure:
+
+- environment variables configured
+- production build works
+- API server stable
+- frontend builds without errors
+
+---
+
+# PHASE 10 — FINAL PRODUCT TEST
+
+Ask:
+
+- Would a real user trust this?
+- Does this feel complete?
+- Is anything confusing?
+
+If YES to confusion:
+→ fix before shipping
+
+---
+
+# OUTPUT FORMAT
+
+Return:
+
+1. 🔴 Critical blockers
+2. 🟠 Major issues
+3. 🟡 Minor improvements
+4. 🟢 Ready areas
+5. 🚀 Final production checklist
+
+---
+
+# FINAL RULE
+
+You are not coding anymore.
+
+You are SHIPPING.
+
+Make this:
+→ complete
+→ stable
+→ beautiful
+→ real
+
+END

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { trackEvent } from "@/lib/trackEvent";
 import { useUser, useAuth } from "@clerk/react";
 import { Wrench, Search, Star, MapPin, Plus, X, Loader2 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
@@ -86,6 +87,7 @@ export default function Gigs() {
         body: JSON.stringify({ ...form, contactName: user.fullName }),
       });
       if (!res.ok) throw new Error("Failed");
+      trackEvent("gig_posted", { category: form.category });
       toast({ title: "Gig posted!", description: "Your gig is now live." });
       setShowForm(false);
       setForm({ title: "", price: "", category: "cleaning", description: "" });

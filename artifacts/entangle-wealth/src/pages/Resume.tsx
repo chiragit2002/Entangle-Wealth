@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { trackEvent } from "@/lib/trackEvent";
 import { useUser, useAuth } from "@clerk/react";
 import {
   FileText, Plus, Trash2, Briefcase, GraduationCap, Award, Save, Download,
@@ -239,6 +240,7 @@ export default function Resume() {
       if (!res.ok) throw new Error("Save failed");
       const saved = await res.json();
       setResume(prev => ({ ...prev, id: saved.id }));
+      trackEvent("resume_saved");
       toast({ title: "Résumé saved", description: "Your quantum résumé has been entangled with the cloud." });
     } catch {
       toast({ title: "Save failed", description: "Please try again.", variant: "destructive" });

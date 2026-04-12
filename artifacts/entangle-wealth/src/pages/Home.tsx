@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { EmailCapture } from "@/components/EmailCapture";
 import { trackEvent } from "@/lib/trackEvent";
+import { AnniversaryGiveawayBanner } from "@/components/viral/AnniversaryGiveawayBanner";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 

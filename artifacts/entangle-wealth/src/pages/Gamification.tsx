@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { trackEvent } from "@/lib/trackEvent";
 import { useAuth, useUser } from "@clerk/react";
 import { Layout } from "@/components/layout/Layout";
 import { authFetch } from "@/lib/authFetch";
@@ -253,6 +254,7 @@ export default function Gamification() {
           setBigWinLabel("BIG WIN");
           setShowBigWin(true);
         }
+        trackEvent("gamification_spin_wheel", { rewardType: data.rewardType, reward: data.reward });
         toast({ title: "You spun the wheel!", description: `You won: ${data.reward}` });
       }, 4200);
     } catch {
@@ -275,6 +277,7 @@ export default function Gamification() {
           setBigWinLabel("JACKPOT!");
           setShowBigWin(true);
         }
+        trackEvent("gamification_daily_claim", { xpEarned: data.xpEarned, streakBonus: data.streakBonus });
         toast({ title: "Daily Reward Claimed!", description: `+${data.xpEarned} XP earned${data.streakBonus > 0 ? ` (+${data.streakBonus} streak bonus)` : ""}` });
         fetchStatus();
       } else {

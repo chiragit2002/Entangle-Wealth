@@ -36,6 +36,7 @@ import habitsRouter from "./habits";
 import lifeOutcomesRouter from "./lifeOutcomes";
 import coachingRouter from "./coaching";
 import businessDocsRouter from "./businessDocs";
+import feedbackRouter from "./feedback";
 import { createSecurityRouter } from "./security";
 
 export function createRouter(app: Express): IRouter {
@@ -78,6 +79,7 @@ router.use(habitsRouter);
 router.use(lifeOutcomesRouter);
 router.use(coachingRouter);
 router.use(businessDocsRouter);
+router.use(feedbackRouter);
 router.use(createSecurityRouter(app));
 
 return router;

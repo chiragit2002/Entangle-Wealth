@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@clerk/react";
 import { useLocation } from "wouter";
 import { authFetch } from "@/lib/authFetch";
@@ -16,6 +16,14 @@ import {
   ArrowDownRight,
   RefreshCw,
   FileText,
+  Star,
+  MessageSquare,
+  ThumbsUp,
+  Calendar,
+  Timer,
+  X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   BarChart,
@@ -31,6 +39,16 @@ import {
   Pie,
   Cell,
 } from "recharts";
+
+interface FeedbackEntry {
+  id: number;
+  user_id: string;
+  rating: number;
+  comment?: string;
+  category: string;
+  admin_response?: string;
+  created_at: string;
+}
 
 interface DashboardData {
   kpi: {
@@ -56,9 +74,17 @@ interface DashboardData {
   dailyEvents: { date: string; count: number }[];
   referralFunnel: { clicks: number; signups: number; conversions: number };
   contentByPlatform: { platform: string; status: string; count: number }[];
+  feedback: {
+    stats: { avgRating: number; totalCount: number; satisfactionRate: number };
+    recent: FeedbackEntry[];
+    categoryBreakdown: { category: string; count: number; avgRating: number }[];
+    trend: { date: string; count: number; avgRating: number }[];
+  };
 }
 
 const COLORS = ["#00D4FF", "#FFD700", "#00ff88", "#ff3366", "#9c27b0", "#ff9800", "#4caf50", "#2196f3"];
+
+type DatePreset = "7d" | "30d" | "90d" | "custom";
 
 function formatEventName(event: string): string {
   return event.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
@@ -120,6 +146,19 @@ function ChartCard({ title, children }: { title: string; children: React.ReactNo
   );
 }
 
+function StarDisplay({ rating }: { rating: number }) {
+  return (
+    <div className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <Star
+          key={s}
+          className={`w-3 h-3 ${s <= Math.round(rating) ? "text-[#FFD700] fill-[#FFD700]" : "text-white/20"}`}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function Analytics() {
   const { getToken } = useAuth();
   const isAdmin = useIsAdmin();
@@ -128,17 +167,79 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [datePreset, setDatePreset] = useState<DatePreset>("30d");
+  const [customStart, setCustomStart] = useState("");
+  const [customEnd, setCustomEnd] = useState("");
+
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const autoRefreshRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const [drilldownEvent, setDrilldownEvent] = useState<string | null>(null);
+  const [drilldownData, setDrilldownData] = useState<{
+    event: string;
+    total: number;
+    uniqueUsers: number;
+    limit: number;
+    offset: number;
+    events: { id: number; userId: string; sessionId: string; properties: Record<string, unknown>; createdAt: string }[];
+    dailyBreakdown: { date: string; count: number; uniqueUsers: number }[];
+  } | null>(null);
+  const [drilldownLoading, setDrilldownLoading] = useState(false);
+  const [drilldownOffset, setDrilldownOffset] = useState(0);
+  const DRILLDOWN_LIMIT = 20;
+
   useEffect(() => {
     if (isAdmin === false) {
       setLocation("/dashboard");
     }
   }, [isAdmin, setLocation]);
 
-  const fetchDashboard = async () => {
+  const buildQuery = useCallback(() => {
+    if (datePreset === "custom" && customStart && customEnd) {
+      return `?startDate=${customStart}&endDate=${customEnd}`;
+    }
+    const days = datePreset === "7d" ? 7 : datePreset === "90d" ? 90 : 30;
+    return `?days=${days}`;
+  }, [datePreset, customStart, customEnd]);
+
+  const fetchDrilldown = useCallback(async (event: string, offset = 0) => {
+    setDrilldownLoading(true);
+    try {
+      const baseQuery = buildQuery().replace("?", "&");
+      const res = await authFetch(
+        `/analytics/events/drilldown?event=${encodeURIComponent(event)}&limit=${DRILLDOWN_LIMIT}&offset=${offset}${baseQuery}`,
+        getToken
+      );
+      if (res.ok) {
+        const json = await res.json();
+        setDrilldownData(json);
+        setDrilldownOffset(offset);
+      }
+    } catch {
+      // silently fail — drilldown is non-critical
+    } finally {
+      setDrilldownLoading(false);
+    }
+  }, [buildQuery, getToken]);
+
+  const openDrilldown = useCallback((event: string) => {
+    setDrilldownEvent(event);
+    setDrilldownData(null);
+    setDrilldownOffset(0);
+    fetchDrilldown(event, 0);
+  }, [fetchDrilldown]);
+
+  const closeDrilldown = useCallback(() => {
+    setDrilldownEvent(null);
+    setDrilldownData(null);
+  }, []);
+
+  const fetchDashboard = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await authFetch("/analytics/dashboard", getToken);
+      const query = buildQuery();
+      const res = await authFetch(`/analytics/dashboard${query}`, getToken);
       if (!res.ok) {
         const body = await res.json().catch(() => ({ error: "Access denied" }));
         setError(body.error || "Failed to load");
@@ -151,11 +252,22 @@ export default function Analytics() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [buildQuery, getToken]);
 
   useEffect(() => {
     fetchDashboard();
-  }, []);
+  }, [fetchDashboard]);
+
+  useEffect(() => {
+    if (autoRefresh) {
+      autoRefreshRef.current = setInterval(fetchDashboard, 30000);
+    } else {
+      if (autoRefreshRef.current) clearInterval(autoRefreshRef.current);
+    }
+    return () => {
+      if (autoRefreshRef.current) clearInterval(autoRefreshRef.current);
+    };
+  }, [autoRefresh, fetchDashboard]);
 
   const FUNNEL_COLORS = ["#00D4FF", "#FFD700", "#00ff88", "#9c27b0"];
   const funnelData = data
@@ -178,7 +290,7 @@ export default function Analytics() {
     <div className="min-h-screen" style={{ background: "#020204" }}>
       <Navbar />
       <main className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white flex items-center gap-3">
               <BarChart3 className="w-8 h-8 text-[#00D4FF]" />
@@ -186,19 +298,81 @@ export default function Analytics() {
             </h1>
             <p className="text-white/40 text-sm mt-1">Platform health metrics & user intelligence</p>
           </div>
-          <button
-            onClick={fetchDashboard}
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
-            style={{
-              background: "rgba(0,212,255,0.1)",
-              border: "1px solid rgba(0,212,255,0.3)",
-              color: "#00D4FF",
-            }}
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-            Refresh
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setAutoRefresh(!autoRefresh)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all"
+              style={{
+                background: autoRefresh ? "rgba(0,255,136,0.1)" : "rgba(255,255,255,0.05)",
+                border: `1px solid ${autoRefresh ? "rgba(0,255,136,0.3)" : "rgba(255,255,255,0.1)"}`,
+                color: autoRefresh ? "#00ff88" : "rgba(255,255,255,0.5)",
+              }}
+            >
+              <Timer className="w-3.5 h-3.5" />
+              Auto-refresh {autoRefresh ? "ON" : "OFF"}
+            </button>
+            <button
+              onClick={fetchDashboard}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
+              style={{
+                background: "rgba(0,212,255,0.1)",
+                border: "1px solid rgba(0,212,255,0.3)",
+                color: "#00D4FF",
+              }}
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <div
+          className="rounded-xl p-4 mb-6 border flex flex-wrap items-center gap-3"
+          style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}
+        >
+          <Calendar className="w-4 h-4 text-white/40" />
+          <span className="text-xs text-white/50 uppercase tracking-wider font-semibold">Date Range</span>
+          {(["7d", "30d", "90d", "custom"] as DatePreset[]).map((preset) => (
+            <button
+              key={preset}
+              onClick={() => setDatePreset(preset)}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+              style={{
+                background: datePreset === preset ? "rgba(0,212,255,0.2)" : "rgba(255,255,255,0.05)",
+                border: `1px solid ${datePreset === preset ? "rgba(0,212,255,0.4)" : "rgba(255,255,255,0.08)"}`,
+                color: datePreset === preset ? "#00D4FF" : "rgba(255,255,255,0.5)",
+              }}
+            >
+              {preset === "7d" ? "Last 7 days" : preset === "30d" ? "Last 30 days" : preset === "90d" ? "Last 90 days" : "Custom"}
+            </button>
+          ))}
+          {datePreset === "custom" && (
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={customStart}
+                onChange={(e) => setCustomStart(e.target.value)}
+                className="text-xs px-2 py-1.5 rounded-lg text-white focus:outline-none"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
+              />
+              <span className="text-white/30 text-xs">to</span>
+              <input
+                type="date"
+                value={customEnd}
+                onChange={(e) => setCustomEnd(e.target.value)}
+                className="text-xs px-2 py-1.5 rounded-lg text-white focus:outline-none"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
+              />
+              <button
+                onClick={fetchDashboard}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#00D4FF]"
+                style={{ background: "rgba(0,212,255,0.1)", border: "1px solid rgba(0,212,255,0.3)" }}
+              >
+                Apply
+              </button>
+            </div>
+          )}
         </div>
 
         {error && (
@@ -229,7 +403,7 @@ export default function Analytics() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <ChartCard title="User Growth (30 Days)">
+              <ChartCard title="User Growth">
                 <div className="h-72">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={data.dailySignups}>
@@ -257,7 +431,7 @@ export default function Analytics() {
                 </div>
               </ChartCard>
 
-              <ChartCard title="Daily Event Volume (30 Days)">
+              <ChartCard title="Daily Event Volume">
                 <div className="h-72">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data.dailyEvents}>
@@ -289,7 +463,7 @@ export default function Analytics() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               <ChartCard title="Conversion Funnel: Visitor → Free → Pro → Business">
                 <div className="space-y-4">
-                  {funnelData.map((item, i) => {
+                  {funnelData.map((item) => {
                     const maxVal = funnelData[0].value || 1;
                     const pct = ((item.value / maxVal) * 100).toFixed(0);
                     return (
@@ -407,10 +581,21 @@ export default function Analytics() {
                         formatter={(value: number) => [value.toLocaleString(), "Events"]}
                         labelFormatter={formatEventName}
                       />
-                      <Bar dataKey="count" fill="#00D4FF" radius={[0, 4, 4, 0]} name="Count" />
+                      <Bar
+                        dataKey="count"
+                        fill="#00D4FF"
+                        radius={[0, 4, 4, 0]}
+                        name="Count"
+                        cursor="pointer"
+                        onClick={(entry: { event?: string; payload?: { event?: string } }) => {
+                          const eventName = entry?.payload?.event ?? entry?.event;
+                          if (eventName) openDrilldown(eventName);
+                        }}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
+                <p className="text-xs text-white/40 mt-2 text-center">Click any bar to drill into event details</p>
               </ChartCard>
 
               <ChartCard title="Content by Platform & Status">
@@ -437,10 +622,269 @@ export default function Analytics() {
                 )}
               </ChartCard>
             </div>
+
+            {/* User Feedback Section */}
+            <div className="mb-8">
+              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <MessageSquare className="w-6 h-6 text-[#FFD700]" />
+                User Feedback
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <KPICard
+                  label="Avg Satisfaction Rating"
+                  value={data.feedback.stats.avgRating > 0 ? `${data.feedback.stats.avgRating} / 5` : "—"}
+                  icon={Star}
+                  color="#FFD700"
+                />
+                <KPICard
+                  label="Total Feedback Submitted"
+                  value={data.feedback.stats.totalCount.toLocaleString()}
+                  icon={MessageSquare}
+                  color="#00D4FF"
+                />
+                <KPICard
+                  label="Satisfaction Rate (4-5★)"
+                  value={data.feedback.stats.totalCount > 0 ? `${data.feedback.stats.satisfactionRate}%` : "—"}
+                  icon={ThumbsUp}
+                  color="#00ff88"
+                  trend={data.feedback.stats.satisfactionRate >= 70 ? "up" : data.feedback.stats.satisfactionRate > 0 ? "down" : "neutral"}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <ChartCard title="Satisfaction Trend">
+                  {data.feedback.trend.length > 0 ? (
+                    <div className="h-48">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={data.feedback.trend}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                          <XAxis
+                            dataKey="date"
+                            stroke="rgba(255,255,255,0.3)"
+                            tick={{ fontSize: 10, fill: "rgba(255,255,255,0.4)" }}
+                            tickFormatter={(v) => new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          />
+                          <YAxis domain={[1, 5]} stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 10, fill: "rgba(255,255,255,0.4)" }} />
+                          <Tooltip
+                            contentStyle={{
+                              background: "rgba(8,8,20,0.95)",
+                              border: "1px solid rgba(255,255,255,0.1)",
+                              borderRadius: "8px",
+                              color: "white",
+                              fontSize: "12px",
+                            }}
+                            labelFormatter={(v) => new Date(v).toLocaleDateString()}
+                          />
+                          <Line type="monotone" dataKey="avgRating" stroke="#FFD700" strokeWidth={2} dot={false} name="Avg Rating" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  ) : (
+                    <div className="h-48 flex items-center justify-center text-white/30 text-sm">
+                      <div className="text-center">
+                        <Star className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                        <p>No feedback yet</p>
+                      </div>
+                    </div>
+                  )}
+                </ChartCard>
+
+                <ChartCard title="Category Breakdown">
+                  {data.feedback.categoryBreakdown.length > 0 ? (
+                    <div className="space-y-3">
+                      {data.feedback.categoryBreakdown.map((cat, i) => {
+                        const maxCount = data.feedback.categoryBreakdown[0].count || 1;
+                        const pct = ((cat.count / maxCount) * 100).toFixed(0);
+                        return (
+                          <div key={cat.category}>
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-white/60 capitalize">{cat.category}</span>
+                              <span className="text-white font-mono flex items-center gap-2">
+                                {cat.count}
+                                <span className="text-[#FFD700]">★{cat.avgRating}</span>
+                              </span>
+                            </div>
+                            <div className="h-3 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
+                              <div
+                                className="h-full rounded-full"
+                                style={{ width: `${pct}%`, background: COLORS[i % COLORS.length], opacity: 0.8 }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="h-48 flex items-center justify-center text-white/30 text-sm">
+                      <p>No category data</p>
+                    </div>
+                  )}
+                </ChartCard>
+
+                <ChartCard title="Recent Submissions">
+                  {data.feedback.recent.length > 0 ? (
+                    <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+                      {data.feedback.recent.map((fb) => (
+                        <div
+                          key={fb.id}
+                          className="rounded-lg p-3"
+                          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <StarDisplay rating={fb.rating} />
+                            <span className="text-[10px] text-white/30 capitalize px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.05)" }}>
+                              {fb.category}
+                            </span>
+                          </div>
+                          {fb.comment && (
+                            <p className="text-xs text-white/60 mt-1 line-clamp-2">{fb.comment}</p>
+                          )}
+                          {fb.admin_response && (
+                            <div className="mt-1.5 px-2 py-1 rounded text-[10px] text-[#00D4FF]" style={{ background: "rgba(0,212,255,0.05)", borderLeft: "2px solid rgba(0,212,255,0.3)" }}>
+                              {fb.admin_response}
+                            </div>
+                          )}
+                          <p className="text-[10px] text-white/25 mt-1">
+                            {new Date(fb.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="h-48 flex items-center justify-center text-white/30 text-sm">
+                      <div className="text-center">
+                        <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                        <p>No recent feedback</p>
+                      </div>
+                    </div>
+                  )}
+                </ChartCard>
+              </div>
+            </div>
           </>
         )}
       </main>
       <Footer />
+
+      {drilldownEvent && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
+          onClick={closeDrilldown}
+        >
+          <div
+            className="w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-2xl flex flex-col"
+            style={{ background: "rgba(8,8,20,0.98)", border: "1px solid rgba(0,212,255,0.25)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+              <div>
+                <h2 className="text-white font-semibold text-lg">{formatEventName(drilldownEvent)}</h2>
+                {drilldownData && (
+                  <p className="text-white/50 text-sm mt-0.5">
+                    {drilldownData.total.toLocaleString()} total &middot; {drilldownData.uniqueUsers.toLocaleString()} unique users
+                  </p>
+                )}
+              </div>
+              <button onClick={closeDrilldown} className="text-white/40 hover:text-white transition-colors p-1">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {drilldownLoading && (
+                <div className="flex items-center justify-center h-40 text-white/40">
+                  <RefreshCw className="w-6 h-6 animate-spin mr-2" />
+                  Loading...
+                </div>
+              )}
+
+              {!drilldownLoading && drilldownData && (
+                <>
+                  {drilldownData.dailyBreakdown.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-3">Daily Trend</h3>
+                      <div className="h-40">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={drilldownData.dailyBreakdown}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                            <XAxis
+                              dataKey="date"
+                              stroke="rgba(255,255,255,0.3)"
+                              tick={{ fontSize: 10, fill: "rgba(255,255,255,0.4)" }}
+                              tickFormatter={(v: string) => new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                            />
+                            <YAxis stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 10, fill: "rgba(255,255,255,0.4)" }} />
+                            <Tooltip
+                              contentStyle={{ background: "rgba(8,8,20,0.95)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "white", fontSize: "12px" }}
+                              labelFormatter={(v: string) => new Date(v).toLocaleDateString()}
+                            />
+                            <Line type="monotone" dataKey="count" stroke="#00D4FF" strokeWidth={2} dot={false} name="Events" />
+                            <Line type="monotone" dataKey="uniqueUsers" stroke="#FFD700" strokeWidth={2} dot={false} name="Unique Users" />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-3">Recent Occurrences</h3>
+                    {drilldownData.events.length === 0 ? (
+                      <p className="text-white/30 text-sm text-center py-8">No events in this date range</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {drilldownData.events.map((evt) => (
+                          <div
+                            key={evt.id}
+                            className="rounded-lg p-3 text-xs"
+                            style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-white/50 font-mono">{evt.userId ? `${evt.userId.slice(0, 16)}…` : "Anonymous"}</span>
+                              <span className="text-white/30">{new Date(evt.createdAt).toLocaleString()}</span>
+                            </div>
+                            {evt.properties && Object.keys(evt.properties).length > 0 && (
+                              <div className="flex flex-wrap gap-2 mt-1">
+                                {Object.entries(evt.properties).map(([k, v]) => (
+                                  <span key={k} className="px-2 py-0.5 rounded font-mono" style={{ background: "rgba(0,212,255,0.08)", color: "#00D4FF" }}>
+                                    {k}: {String(v)}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {drilldownData.total > DRILLDOWN_LIMIT && (
+                      <div className="flex items-center justify-between mt-4 text-xs text-white/40">
+                        <span>{drilldownOffset + 1}–{Math.min(drilldownOffset + DRILLDOWN_LIMIT, drilldownData.total)} of {drilldownData.total.toLocaleString()}</span>
+                        <div className="flex gap-2">
+                          <button
+                            disabled={drilldownOffset === 0}
+                            onClick={() => fetchDrilldown(drilldownEvent, drilldownOffset - DRILLDOWN_LIMIT)}
+                            className="p-1 rounded disabled:opacity-30 hover:text-white transition-colors"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </button>
+                          <button
+                            disabled={drilldownOffset + DRILLDOWN_LIMIT >= drilldownData.total}
+                            onClick={() => fetchDrilldown(drilldownEvent, drilldownOffset + DRILLDOWN_LIMIT)}
+                            className="p-1 rounded disabled:opacity-30 hover:text-white transition-colors"
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

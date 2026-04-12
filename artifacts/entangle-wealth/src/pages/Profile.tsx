@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
 import { useUser, useAuth, useClerk } from "@clerk/react";
-import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target, Wallet, Coins, Users, Fingerprint, Upload, X, Image, Building2 } from "lucide-react";
+import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target, Wallet, Coins, Users, Fingerprint, Upload, X, Image, Building2, MessageSquare, CheckCircle, Clock } from "lucide-react";
 import { OccupationDropdown } from "@/components/OccupationDropdown";
 import { getOccupationById } from "@workspace/occupations";
 import { ReferralSection } from "@/components/viral/ReferralSection";
@@ -62,6 +62,99 @@ interface ResumePreview {
   summary: string;
   skills: string[];
   experiences: { company: string; title: string; isGigWork: string }[];
+}
+
+interface FeedbackItem {
+  id: number;
+  rating: number;
+  comment?: string;
+  category: string;
+  admin_response?: string;
+  created_at: string;
+}
+
+function MyFeedback() {
+  const { getToken } = useAuth();
+  const [feedbackList, setFeedbackList] = useState<FeedbackItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    authFetch("/feedback/mine", getToken)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) {
+          setFeedbackList(data.feedback || []);
+          setTotal(data.total || 0);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [getToken]);
+
+  if (loading) return null;
+
+  return (
+    <div className="glass-panel p-6 mb-6">
+      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <MessageSquare className="w-5 h-5 text-[#00D4FF]" /> My Feedback
+        {feedbackList.length > 0 && (
+          <span className="ml-auto text-xs text-muted-foreground">{total} submission{total !== 1 ? "s" : ""}</span>
+        )}
+      </h3>
+      {feedbackList.length === 0 && (
+        <div className="text-center py-6 text-white/30 text-sm">
+          <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-30" />
+          <p>You haven&apos;t submitted any feedback yet.</p>
+          <p className="text-xs mt-1 opacity-70">Use the feedback button to share your thoughts!</p>
+        </div>
+      )}
+      <div className="space-y-3">
+        {feedbackList.map((fb) => (
+          <div
+            key={fb.id}
+            className="rounded-xl p-4"
+            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className="flex gap-0.5">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star key={s} className={`w-3.5 h-3.5 ${s <= fb.rating ? "text-[#FFD700] fill-[#FFD700]" : "text-white/20"}`} />
+                  ))}
+                </div>
+                <span className="text-xs px-2 py-0.5 rounded-full capitalize text-white/50" style={{ background: "rgba(255,255,255,0.05)" }}>
+                  {fb.category}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[10px] text-white/30">
+                {fb.admin_response ? (
+                  <><CheckCircle className="w-3 h-3 text-[#00ff88]" /><span className="text-[#00ff88]">Responded</span></>
+                ) : (
+                  <><Clock className="w-3 h-3" /><span>Pending</span></>
+                )}
+              </div>
+            </div>
+            {fb.comment && (
+              <p className="text-sm text-white/60 mb-2">{fb.comment}</p>
+            )}
+            {fb.admin_response && (
+              <div
+                className="rounded-lg p-3 text-sm text-[#00D4FF]"
+                style={{ background: "rgba(0,212,255,0.05)", borderLeft: "3px solid rgba(0,212,255,0.3)" }}
+              >
+                <p className="text-[10px] text-[#00D4FF]/60 uppercase tracking-wider mb-1">Team Response</p>
+                {fb.admin_response}
+              </div>
+            )}
+            <p className="text-[10px] text-white/25 mt-2">
+              {new Date(fb.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function AlertDigestSettings() {
@@ -1201,6 +1294,8 @@ export default function Profile() {
           </div>
           <p className="text-[10px] text-muted-foreground mt-3">Additional privacy controls (portfolio visibility, gig profile) coming soon.</p>
         </div>
+
+        <MyFeedback />
 
         <AlertDigestSettings />
 

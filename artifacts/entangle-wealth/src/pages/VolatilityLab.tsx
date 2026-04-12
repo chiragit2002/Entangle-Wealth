@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { trackEvent } from "@/lib/trackEvent";
 import { Layout } from "@/components/layout/Layout";
 import { fetchAlpacaBars, type AlpacaBar } from "@/lib/api";
 import { Input } from "@/components/ui/input";
@@ -209,6 +210,7 @@ export default function VolatilityLab() {
         setLoading(false);
         return;
       }
+      trackEvent("volatility_lab_analyzed", { symbol: s });
       setResult(computeResult(s, data.bars));
     } catch {
       setError("Failed to fetch data. Check symbol and try again.");

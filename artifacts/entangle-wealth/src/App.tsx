@@ -13,8 +13,10 @@ import { NotificationPrompt } from "@/components/pwa/NotificationPrompt";
 import { PageSkeleton, ChartSkeleton, TableSkeleton } from "@/components/pwa/PageSkeleton";
 import { captureReferralCode } from "@/lib/referral";
 import { trackEvent } from "@/lib/trackEvent";
+import { usePageTracking } from "@/hooks/usePageTracking";
 import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { Info } from "lucide-react";
 import { AuthErrorHandler } from "@/components/AuthErrorHandler";
 import { AuthTokenError } from "@/lib/authFetch";
@@ -303,6 +305,11 @@ function LazyProtected({ component: Component }: { component: React.ComponentTyp
   );
 }
 
+function PageTracker() {
+  usePageTracking();
+  return null;
+}
+
 function ClerkProviderWithRoutes() {
   const [, setLocation] = useLocation();
   const queryClient = useMemo(() => createQueryClient(), []);
@@ -316,6 +323,7 @@ function ClerkProviderWithRoutes() {
     >
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
+        <PageTracker />
         <AuthErrorHandler />
         <TooltipProvider>
           <PopupQueueProvider>
@@ -396,6 +404,7 @@ function ClerkProviderWithRoutes() {
             <MilestoneCelebrationModal />
           </Suspense>
           <CookieConsentBanner />
+          <FeedbackWidget />
           <InstallPrompt />
           <NotificationPrompt />
           <Toaster />

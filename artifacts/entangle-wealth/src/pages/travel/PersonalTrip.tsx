@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { trackEvent } from "@/lib/trackEvent";
 import { Map, List, BarChart3 } from "lucide-react";
 import type { PersonalTripForm, PersonalActivity } from "./types";
 import PersonalTripFormComponent from "./PersonalTripForm";
@@ -56,7 +57,14 @@ export default function PersonalTrip() {
   };
 
   if (!planned) {
-    return <PersonalTripFormComponent form={form} onChange={setForm} onPlan={() => setPlanned(true)} />;
+    return <PersonalTripFormComponent form={form} onChange={setForm} onPlan={() => {
+      trackEvent("travel_plan_created", {
+        destinations: form.destinations.length,
+        budgetLevel: form.budgetLevel,
+        travelers: form.travelers,
+      });
+      setPlanned(true);
+    }} />;
   }
 
   const views: { key: ViewMode; label: string; icon: typeof Map }[] = [

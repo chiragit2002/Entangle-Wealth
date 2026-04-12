@@ -48,6 +48,8 @@ I prefer concise and direct communication. When making changes, prioritize funct
     - **Research/News**: Live news intelligence with scraping, sentiment analysis, and caching.
     - **Legal**: Comprehensive legal pages (Terms, Privacy, Disclaimers, etc.).
     - **Support System**: Help Center, ticket submission, system status page.
+    - **User Feedback System**: Lightweight floating feedback widget (persistent button → modal) on all pages for logged-in users. Rating 1-5 stars, category tag, optional comment. Submissions stored in `user_feedback` table. Users can view past submissions with admin responses in "My Feedback" section on Profile page.
+    - **Analytics Pipeline**: `trackEvent` uses `BASE_URL` prefix for correct proxy routing. Automatic page-view tracking on every route change via `usePageTracking` hook. Key feature interactions instrumented: terminal, gigs, volatility lab, sector flow, time machine, resume builder, job search. Analytics dashboard supports date-range filtering (7d/30d/90d/custom), auto-refresh toggle (30s interval), and a "User Feedback" panel (avg rating, satisfaction rate, trend chart, category breakdown, recent submissions).
     - **Admin Tools**: Launch Readiness checks, Scalability Dashboard.
     - **EntangleCoin Token System**: ERC-20 token wallet, transaction history, travel marketplace, reward system, and admin controls.
     - **AI Marketing Command Center**: Admin-only platform for AI-generated marketing content across various social media and content types.

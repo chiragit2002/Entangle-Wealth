@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { trackEvent } from "@/lib/trackEvent";
 import { Layout } from "@/components/layout/Layout";
 import { fetchAlpacaSnapshots } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -138,6 +139,7 @@ export default function SectorFlow() {
 
   const loadData = useCallback(async () => {
     setLoading(true);
+    trackEvent("sector_flow_refreshed");
     try {
       const allSymbols = Object.values(SECTOR_STOCKS).flat();
       const snapshots = await fetchAlpacaSnapshots(allSymbols);

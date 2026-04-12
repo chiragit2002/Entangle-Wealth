@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
+import { trackEvent } from "@/lib/trackEvent";
 import { Layout } from "@/components/layout/Layout";
 import { FlashCouncil } from "@/components/FlashCouncil";
 import { MarketTicker } from "@/components/MarketTicker";
@@ -46,6 +47,7 @@ export default function Terminal() {
   const { promptConfig, showUpgradePrompt, closePrompt } = useUpgradePrompt();
 
   const handleSpinBalanceChange = useCallback(() => {
+    trackEvent("terminal_spin_wheel_used");
     setPortfolioRefreshKey(k => k + 1);
   }, []);
 

@@ -1,3 +1,6 @@
+const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+const TRACK_URL = `${BASE_URL}/api/analytics/track`;
+
 let sessionId: string | null = null;
 
 function getSessionId(): string {
@@ -27,9 +30,9 @@ export function trackEvent(event: string, properties?: Record<string, unknown>):
 
     if (typeof navigator !== "undefined" && navigator.sendBeacon) {
       const blob = new Blob([body], { type: "application/json" });
-      navigator.sendBeacon("/api/analytics/track", blob);
+      navigator.sendBeacon(TRACK_URL, blob);
     } else {
-      fetch("/api/analytics/track", {
+      fetch(TRACK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body,

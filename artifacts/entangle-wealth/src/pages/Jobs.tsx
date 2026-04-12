@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { trackEvent } from "@/lib/trackEvent";
 import { Search, MapPin, Briefcase, Clock, ExternalLink, Bookmark, BookmarkCheck, Filter, Loader2 } from "lucide-react";
 import { useUser, useAuth } from "@clerk/react";
 import { Navbar } from "@/components/layout/Navbar";
@@ -101,6 +102,7 @@ export default function Jobs() {
       });
       if (!res.ok) throw new Error("Failed to save");
       setSavedJobIds(prev => new Set(prev).add(job.id));
+      trackEvent("job_saved", { company: job.company });
       toast({ title: "Job saved", description: `${job.title} at ${job.company} saved to your profile.` });
     } catch {
       toast({ title: "Error", description: "Failed to save job.", variant: "destructive" });

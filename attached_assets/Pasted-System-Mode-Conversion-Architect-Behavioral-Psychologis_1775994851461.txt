@@ -1,0 +1,216 @@
+System Mode: Conversion Architect + Behavioral Psychologist + Elite Product Designer
+
+Codename: DECISION ENGINE
+
+Mission:
+Transform this application into a high-conversion system that drives users to take action confidently, quickly, and without hesitation.
+
+This is not UI work.
+
+This is:
+→ persuasion through clarity
+→ behavioral guidance
+→ decision acceleration
+
+---
+
+# CORE PRINCIPLE
+
+Users don’t convert because of features.
+
+Users convert because:
+→ they feel understood
+→ they feel guided
+→ they feel certain
+
+---
+
+# PHASE 1 — VALUE CLARITY (ABOVE ALL)
+
+Rewrite the main screen:
+
+User must instantly understand:
+
+1. What this does  
+2. Why it matters  
+3. What they get  
+
+---
+
+## EXAMPLE STRUCTURE
+
+Title:
+"Stop guessing what to do with your money"
+
+Subtext:
+"Get a clear next step based on your situation in under 60 seconds"
+
+---
+
+# PHASE 2 — ONBOARDING AS MOMENTUM (CRITICAL)
+
+Your current flow feels like a form.
+
+It must feel like:
+
+→ progress  
+→ personalization  
+→ movement toward outcome  
+
+---
+
+## REQUIRED STRUCTURE
+
+Step 1:
+"What do you do for work?" (Occupation dropdown)
+
+Step 2:
+"What’s your current financial focus?"
+- saving
+- investing
+- debt
+- unsure
+
+Step 3:
+"What outcome do you want?"
+- clarity
+- growth
+- stability
+
+---
+
+Each step must:
+→ feel fast  
+→ feel relevant  
+→ feel purposeful  
+
+---
+
+# PHASE 3 — PROGRESS PSYCHOLOGY
+
+Replace boring progress bar with:
+
+→ “Step 1 of 3 — Building your plan”
+
+User must feel:
+👉 they are progressing toward something valuable  
+
+---
+
+# PHASE 4 — MICRO COMMITMENTS
+
+Each step should:
+
+→ require minimal effort  
+→ give immediate feedback  
+
+Example:
+User selects occupation → instant subtle confirmation
+
+---
+
+# PHASE 5 — TRUST CONVERSION LAYER
+
+Add:
+
+- “Takes less than 60 seconds”
+- “No financial expertise needed”
+- “Your data stays private”
+
+---
+
+# PHASE 6 — CTA OPTIMIZATION
+
+Replace weak buttons:
+
+BAD:
+"Submit"
+
+GOOD:
+"See my plan"
+"Get my next step"
+"Build my strategy"
+
+---
+
+# PHASE 7 — FRICTION KILL SWITCH
+
+Remove:
+
+- unnecessary fields
+- optional clutter
+- confusing labels
+
+If user hesitates → system failed
+
+---
+
+# PHASE 8 — RESULT REWARD (CRITICAL)
+
+After onboarding:
+
+User MUST get:
+
+→ immediate value  
+→ clear output  
+
+Example:
+
+"Here’s your next move:
+Focus on X based on your situation"
+
+---
+
+# PHASE 9 — EMOTIONAL POSITIONING
+
+User should feel:
+
+→ relief  
+→ clarity  
+→ control  
+
+NOT:
+→ confusion  
+→ overwhelm  
+
+---
+
+# PHASE 10 — FINAL CONVERSION TEST
+
+Simulate user:
+
+Open → onboard → result
+
+Ask:
+
+- Did I understand this instantly?
+- Did I feel guided?
+- Did I feel confident taking action?
+
+If not:
+→ refine again
+
+---
+
+# OUTPUT
+
+Return:
+
+1. 🔴 Conversion blockers removed
+2. 🟠 Flow improvements
+3. 🟡 Messaging upgrades
+4. 🟢 Behavioral optimizations
+5. 🚀 Conversion readiness score
+
+---
+
+# FINAL RULE
+
+This is NOT done when it looks good.
+
+This is done when:
+→ users move forward without hesitation
+→ users feel clarity instantly
+→ users trust the system
+
+END

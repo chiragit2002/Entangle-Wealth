@@ -30,6 +30,7 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **Data Management**: LocalStorage for client-side persistence.
 - **Occupation System**: `@workspace/occupations` package — 536 structured occupations across 26 categories with tax category mappings (W-2, 1099, Business Owner). Used in Profile, ProfileCompletionGate, coaching AI context.
 - **Security**: Helmet for HTTP security headers, global and AI-specific rate limiting.
+- **Freemium Gating**: High-value personalized features require sign-in (TaxGPT, Terminal, Tax Strategy, Receipts, Wealth Sim, Alternate Timeline, Habits, Life Outcomes, AI Coach). Browsable content remains public (Home, Dashboard, Stocks, Options, Charts, Technical Analysis, Market Overview, Screener, Vol Lab, Time Machine, Sector Flow, Community, Blog, Giveaway, Tax overview, Travel, Earn, Jobs, Gigs). Gating enforced via `ProtectedRoute` in App.tsx which redirects to Clerk sign-in.
 - **Performance**: Paginated endpoints, database indexing, AI request queuing, exponential backoff with jitter, circuit breaker patterns, image compression, and real-time metrics.
 
 ## Feature Specifications

@@ -306,6 +306,14 @@ function LazyProtected({ component: Component }: { component: React.ComponentTyp
   );
 }
 
+function LazyProtectedChart({ component: Component }: { component: React.ComponentType }) {
+  return (
+    <Suspense fallback={<ChartSkeleton />}>
+      <ProtectedRoute component={Component} />
+    </Suspense>
+  );
+}
+
 function PageTracker() {
   usePageTracking();
   return null;
@@ -339,15 +347,15 @@ function ClerkProviderWithRoutes() {
             <Route path="/gigs">{() => <LazyTable component={Gigs} />}</Route>
             <Route path="/community">{() => <LazyPage component={Community} />}</Route>
             <Route path="/tax">{() => <LazyPage component={Tax} />}</Route>
-            <Route path="/receipts">{() => <LazyPage component={Receipts} />}</Route>
+            <Route path="/receipts">{() => <LazyProtected component={Receipts} />}</Route>
             <Route path="/travel">{() => <LazyPage component={Travel} />}</Route>
-            <Route path="/tax-strategy">{() => <LazyPage component={TaxStrategy} />}</Route>
-            <Route path="/taxgpt">{() => <LazyPage component={TaxGPT} />}</Route>
+            <Route path="/tax-strategy">{() => <LazyProtected component={TaxStrategy} />}</Route>
+            <Route path="/taxgpt">{() => <LazyProtected component={TaxGPT} />}</Route>
             <Route path="/technical">{() => <LazyChart component={TechnicalAnalysis} />}</Route>
             <Route path="/charts">{() => <LazyChart component={Charts} />}</Route>
             <Route path="/market-overview">{() => <LazyChart component={MarketOverview} />}</Route>
             <Route path="/screener">{() => <LazyTable component={Screener} />}</Route>
-            <Route path="/terminal">{() => <LazyPage component={Terminal} />}</Route>
+            <Route path="/terminal">{() => <LazyProtected component={Terminal} />}</Route>
             <Route path="/about">{() => <LazyPage component={About} />}</Route>
             <Route path="/terms">{() => <LazyPage component={Terms} />}</Route>
             <Route path="/privacy">{() => <LazyPage component={Privacy} />}</Route>
@@ -392,10 +400,10 @@ function ClerkProviderWithRoutes() {
             <Route path="/gamification">{() => <LazyProtected component={GamificationPage} />}</Route>
             <Route path="/giveaway">{() => <LazyPage component={GiveawayPage} />}</Route>
             <Route path="/admin/kyc">{() => <LazyProtected component={AdminKycPage} />}</Route>
-            <Route path="/wealth-sim">{() => <LazyPage component={WealthSimPage} />}</Route>
-            <Route path="/alternate-timeline">{() => <LazyPage component={AlternateTimeline} />}</Route>
-            <Route path="/habits">{() => <LazyPage component={HabitsDashboard} />}</Route>
-            <Route path="/life-outcomes">{() => <LazyPage component={LifeOutcomes} />}</Route>
+            <Route path="/wealth-sim">{() => <LazyProtectedChart component={WealthSimPage} />}</Route>
+            <Route path="/alternate-timeline">{() => <LazyProtectedChart component={AlternateTimeline} />}</Route>
+            <Route path="/habits">{() => <LazyProtected component={HabitsDashboard} />}</Route>
+            <Route path="/life-outcomes">{() => <LazyProtectedChart component={LifeOutcomes} />}</Route>
             <Route path="/ai-coach">{() => <LazyProtected component={AICoach} />}</Route>
             <Route path="/admin/evolution">{() => <LazyProtected component={EvolutionDashboard} />}</Route>
             <Route component={NotFound} />

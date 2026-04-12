@@ -1,6 +1,6 @@
 import { db } from "@workspace/db";
-import { usersTable } from "@workspace/db/schema";
-import { eq } from "drizzle-orm";
+import { usersTable, referralsTable } from "@workspace/db/schema";
+import { eq, and, count } from "drizzle-orm";
 
 const FREE_DAILY_SIGNALS = 3;
 const REFERRAL_BONUS_SIGNALS = 5;
@@ -18,7 +18,7 @@ function getDayKey(): number {
 
 export async function checkSignalLimit(clerkId: string): Promise<{ allowed: boolean; remaining: number; maxAllowed: number; referralBonus: boolean }> {
   const [user] = await db
-    .select({ subscriptionTier: usersTable.subscriptionTier, referralExtraSignalsUntil: usersTable.referralExtraSignalsUntil })
+    .select({ subscriptionTier: usersTable.subscriptionTier })
     .from(usersTable)
     .where(eq(usersTable.clerkId, clerkId));
 
@@ -26,8 +26,13 @@ export async function checkSignalLimit(clerkId: string): Promise<{ allowed: bool
     return { allowed: true, remaining: 999, maxAllowed: 999, referralBonus: false };
   }
 
-  const now = new Date();
-  const hasReferralBonus = !!(user?.referralExtraSignalsUntil && new Date(user.referralExtraSignalsUntil) > now);
+  const [stats] = await db
+    .select({ converted: count() })
+    .from(referralsTable)
+    .where(and(eq(referralsTable.referrerId, clerkId), eq(referralsTable.converted, true)));
+  const referralCount = Number(stats?.converted || 0);
+
+  const hasReferralBonus = referralCount >= 3;
   const maxAllowed = FREE_DAILY_SIGNALS + (hasReferralBonus ? REFERRAL_BONUS_SIGNALS : 0);
 
   const resetAt = getDayKey();
@@ -54,7 +59,7 @@ export function incrementSignalCount(clerkId: string): void {
 
 export async function checkTaxGptLimit(clerkId: string): Promise<{ allowed: boolean; remaining: number; maxAllowed: number; referralBonus: boolean }> {
   const [user] = await db
-    .select({ subscriptionTier: usersTable.subscriptionTier, referralTaxGptUntil: usersTable.referralTaxGptUntil })
+    .select({ subscriptionTier: usersTable.subscriptionTier })
     .from(usersTable)
     .where(eq(usersTable.clerkId, clerkId));
 
@@ -62,8 +67,13 @@ export async function checkTaxGptLimit(clerkId: string): Promise<{ allowed: bool
     return { allowed: true, remaining: 999, maxAllowed: 999, referralBonus: false };
   }
 
-  const now = new Date();
-  const hasReferralBonus = !!(user?.referralTaxGptUntil && new Date(user.referralTaxGptUntil) > now);
+  const [stats] = await db
+    .select({ converted: count() })
+    .from(referralsTable)
+    .where(and(eq(referralsTable.referrerId, clerkId), eq(referralsTable.converted, true)));
+  const referralCount = Number(stats?.converted || 0);
+
+  const hasReferralBonus = referralCount >= 10;
 
   if (hasReferralBonus) {
     return { allowed: true, remaining: 999, maxAllowed: 999, referralBonus: true };

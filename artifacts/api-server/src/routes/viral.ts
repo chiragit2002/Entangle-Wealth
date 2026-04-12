@@ -83,23 +83,20 @@ router.get("/viral/referral/milestones", requireAuth, async (req, res) => {
 
     const [user] = await db
       .select({
-        referralExtraSignalsUntil: usersTable.referralExtraSignalsUntil,
-        referralTaxGptUntil: usersTable.referralTaxGptUntil,
         referralAmbassador: usersTable.referralAmbassador,
         referralMilestonesSeen: usersTable.referralMilestonesSeen,
       })
       .from(usersTable)
       .where(eq(usersTable.clerkId, userId));
 
-    const now = new Date();
     const seenKeys: string[] = Array.isArray(user?.referralMilestonesSeen) ? (user.referralMilestonesSeen as string[]) : [];
 
     const milestonesWithStatus = REFERRAL_MILESTONES.map((m) => {
       const reached = referralCount >= m.threshold;
       let unlocked = false;
-      if (m.key === "extra_signals") unlocked = !!(user?.referralExtraSignalsUntil && new Date(user.referralExtraSignalsUntil) > now);
+      if (m.key === "extra_signals") unlocked = reached;
       else if (m.key === "pro_trial") unlocked = reached;
-      else if (m.key === "taxgpt_unlimited") unlocked = !!(user?.referralTaxGptUntil && new Date(user.referralTaxGptUntil) > now);
+      else if (m.key === "taxgpt_unlimited") unlocked = reached;
       else if (m.key === "ambassador") unlocked = !!(user?.referralAmbassador);
 
       return {

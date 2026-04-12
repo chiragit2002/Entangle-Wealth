@@ -179,14 +179,14 @@ async function applyFeatureUnlocks(referrerId: string, userId: string, referralC
 
   if (referralCount >= 3) {
     const current = user.referralExtraSignalsUntil;
-    if (!current || current < now) {
+    if (!current || current < thirtyDaysFromNow) {
       updates.referralExtraSignalsUntil = thirtyDaysFromNow;
     }
   }
 
   if (referralCount >= 10) {
     const current = user.referralTaxGptUntil;
-    if (!current || current < now) {
+    if (!current || current < thirtyDaysFromNow) {
       updates.referralTaxGptUntil = thirtyDaysFromNow;
     }
   }

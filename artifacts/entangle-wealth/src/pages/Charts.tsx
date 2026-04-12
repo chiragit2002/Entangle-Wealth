@@ -66,7 +66,7 @@ const WL_STORAGE = "ew-charts-watchlist";
 const ALERTS_STORAGE = "ew-charts-alerts";
 const DRAWINGS_STORAGE = "ew-charts-drawings";
 const SETTINGS_STORAGE = "ew-charts-settings";
-const CLAUDE_KEY_STORAGE = "ew-claude-api-key";
+const CLAUDE_KEY_STORAGE = "ew-claude-api-key-session";
 
 function sigColor(s: string) {
   if (s === "STRONG_BUY") return "#00E676";
@@ -121,7 +121,9 @@ export default function Charts() {
   const [scanProgress, setScanProgress] = useState({ done: 0, total: 0 });
   const [scanTab, setScanTab] = useState<"buy" | "call" | "put">("buy");
 
-  const [claudeKey, setClaudeKey] = useState(() => localStorage.getItem(CLAUDE_KEY_STORAGE) || "");
+  const [claudeKey, setClaudeKey] = useState(() => {
+    try { return sessionStorage.getItem(CLAUDE_KEY_STORAGE) || ""; } catch { return ""; }
+  });
   const [claudeAnalysis, setClaudeAnalysis] = useState<ClaudeAnalysis | null>(null);
   const [claudeLoading, setClaudeLoading] = useState(false);
   const [showClaudeModal, setShowClaudeModal] = useState(false);
@@ -157,7 +159,9 @@ export default function Charts() {
   useEffect(() => { localStorage.setItem(WL_STORAGE, JSON.stringify(watchlist)); }, [watchlist]);
   useEffect(() => { localStorage.setItem(ALERTS_STORAGE, JSON.stringify(alerts)); }, [alerts]);
   useEffect(() => { localStorage.setItem(DRAWINGS_STORAGE, JSON.stringify(drawings)); }, [drawings]);
-  useEffect(() => { if (claudeKey) localStorage.setItem(CLAUDE_KEY_STORAGE, claudeKey); }, [claudeKey]);
+  useEffect(() => {
+    try { if (claudeKey) sessionStorage.setItem(CLAUDE_KEY_STORAGE, claudeKey); else sessionStorage.removeItem(CLAUDE_KEY_STORAGE); } catch {}
+  }, [claudeKey]);
 
   const searchResults = useMemo(() => {
     if (!searchText.trim()) return [];
@@ -655,7 +659,7 @@ export default function Charts() {
                 <input value={claudeKey} onChange={e => setClaudeKey(e.target.value)}
                   type="password" placeholder="sk-ant-..."
                   className="w-full bg-[#2A2E39] text-xs text-[#D1D4DC] rounded px-2 py-1.5 outline-none border border-[#363A45] focus:border-[#2962FF]" />
-                <p className="text-[9px] text-[#787B86] mt-1">Stored in localStorage only. Enables AI deep analysis on scanner results.</p>
+                <p className="text-[9px] text-[#787B86] mt-1">Stored in session memory only (cleared on tab close). Enables AI deep analysis on scanner results.</p>
               </div>
             </div>
           </div>

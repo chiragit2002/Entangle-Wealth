@@ -3,6 +3,7 @@ import { Switch, Route, useLocation, Router as WouterRouter, Redirect, useSearch
 import { ClerkProvider, SignIn, SignUp, Show, useClerk } from "@clerk/react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
+import * as SentryReact from "@sentry/react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ErrorFallback from "@/components/ErrorFallback";
@@ -404,7 +405,12 @@ function App() {
   }, []);
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
+    <ErrorBoundary FallbackComponent={ErrorFallback} onError={(error, info) => {
+      SentryReact.withScope((scope) => {
+        scope.setExtras({ componentStack: info.componentStack });
+        SentryReact.captureException(error);
+      });
+    }}>
       <WouterRouter base={basePath}>
         <ClerkProviderWithRoutes />
       </WouterRouter>

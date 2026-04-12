@@ -29,6 +29,10 @@ async function buildAll() {
     // - use path traversal to read files (e.g. @google-cloud/secret-manager loads sibling .proto files)
     external: [
       "*.node",
+      "@sentry/node",
+      "@sentry/core",
+      "@sentry/node-core",
+      "@sentry/opentelemetry",
       "sharp",
       "better-sqlite3",
       "sqlite3",

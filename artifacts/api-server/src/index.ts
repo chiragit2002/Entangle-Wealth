@@ -1,3 +1,6 @@
+import { initSentry, Sentry } from "./lib/sentry";
+initSentry();
+
 import express from "express";
 import app from "./app";
 import { logger } from "./lib/logger";
@@ -501,3 +504,17 @@ function gracefulShutdown(signal: string) {
 
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+
+process.on("unhandledRejection", (reason) => {
+  logger.error({ reason }, "Unhandled promise rejection");
+  Sentry.captureException(reason instanceof Error ? reason : new Error(String(reason)));
+  gracefulShutdown("unhandledRejection");
+});
+
+process.on("uncaughtException", (err) => {
+  logger.error({ err }, "Uncaught exception");
+  Sentry.captureException(err);
+  const timer = setTimeout(() => process.exit(1), 3000);
+  timer.unref();
+  gracefulShutdown("uncaughtException");
+});

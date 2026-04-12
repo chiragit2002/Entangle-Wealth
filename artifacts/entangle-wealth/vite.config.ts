@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 
 const rawPort = process.env.PORT;
 
@@ -46,6 +47,18 @@ export default defineConfig({
           ),
         ]
       : []),
+    ...(process.env.NODE_ENV === "production" && process.env.SENTRY_AUTH_TOKEN
+      ? [
+          sentryVitePlugin({
+            org: "entaglewealth",
+            project: "entangle-wealth-frontend",
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            sourcemaps: {
+              filesToDeleteAfterUpload: ["./dist/public/**/*.js.map"],
+            },
+          }),
+        ]
+      : []),
   ],
   resolve: {
     alias: {
@@ -58,6 +71,7 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    sourcemap: process.env.NODE_ENV === "production" ? "hidden" : false,
   },
   server: {
     port,

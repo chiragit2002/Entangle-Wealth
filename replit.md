@@ -81,3 +81,13 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **Maps**: Leaflet.js with OpenStreetMap tiles and Nominatim geocoding
 - **Market Data**: Alpaca Markets API
 - **Client-side Routing**: wouter
+- **Error Monitoring**: Sentry (@sentry/react for frontend, @sentry/node for backend)
+
+# Security & Monitoring Notes
+
+- **Sentry**: Integrated for both frontend and backend. Frontend DSN in `VITE_SENTRY_DSN`, backend DSN in `SENTRY_DSN`. Source maps uploaded to Sentry on production builds (requires `SENTRY_AUTH_TOKEN`). Sensitive headers (Authorization, Cookie, x-csrf-token) and API keys are scrubbed from Sentry events before they are sent.
+- **Cookie Consent**: Analytics events only fire after explicit `accepted` consent (opt-in). Dismissing or clicking "Essential Only" = no analytics.
+- **Claude API Key**: Moved from `localStorage` (persistent) to `sessionStorage` (cleared on tab close) for the Charts page. The key is never sent to any backend.
+- **github-finder.html**: Removed from `public/` folder — it was an unauthenticated, public-facing tool.
+- **ErrorFallback**: Shows generic message in production, detailed error in development.
+- **Environment Variables Required**: `VITE_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `DATABASE_URL`, `SESSION_SECRET`, `ALPACA_API_KEY`, `ALPACA_API_SECRET`, `OPENAI_API_KEY` (or AI integrations), `VITE_SENTRY_DSN`, `SENTRY_DSN`. Optional: `SENTRY_AUTH_TOKEN` (for source map uploads), `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `RESEND_API_KEY`.

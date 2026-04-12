@@ -34,6 +34,10 @@ channel = "stable-25_05"
 [userenv.shared]
 NODE_ENV = "production"
 VAPID_SUBJECT = "mailto:support@entanglewealth.com"
+VITE_SENTRY_DSN = "https://e51e1521ea1515e5a7c0f7c6042cf872@o4511203334356992.ingest.us.sentry.io/4511204336861184"
+SENTRY_DSN = "https://9c54de2529677f71a4d9556d20a0b1e3@o4511203334356992.ingest.us.sentry.io/4511204337385472"
+VITE_SENTRY_ENVIRONMENT = "production"
+SENTRY_ENVIRONMENT = "production"
 
 [userenv.production]
 VITE_CLERK_PROXY_URL = "https://entanglewealth.com/api/__clerk"

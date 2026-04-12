@@ -9,9 +9,9 @@ function getSessionId(): string {
 
 function hasAnalyticsConsent(): boolean {
   try {
-    return localStorage.getItem("ew_cookie_consent") !== "declined";
+    return localStorage.getItem("ew_cookie_consent") === "accepted";
   } catch {
-    return true;
+    return false;
   }
 }
 

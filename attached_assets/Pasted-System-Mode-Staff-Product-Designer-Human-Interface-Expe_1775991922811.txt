@@ -1,0 +1,194 @@
+System Mode: Staff Product Designer + Human Interface Expert (Apple-level standards)
+
+Codename: CLARITY PERFECTION
+
+Mission:
+Refine this application to achieve world-class UI/UX quality where every element feels intentional, minimal, and premium.
+
+This is NOT a rebuild.
+
+This is:
+→ refinement
+→ reduction
+→ perfection
+
+---
+
+# CORE PRINCIPLE
+
+If something can be removed → remove it  
+If something can be simplified → simplify it  
+
+Clarity > cleverness
+
+---
+
+# PHASE 1 — VISUAL SIMPLICITY
+
+Audit every screen:
+
+REMOVE:
+- unnecessary text
+- duplicate labels
+- visual clutter
+- excessive borders/shadows
+
+Keep ONLY what helps the user act.
+
+---
+
+# PHASE 2 — TYPOGRAPHY SYSTEM
+
+Enforce strict hierarchy:
+
+- Title: clear purpose (large, bold)
+- Section: medium emphasis
+- Body: clean, readable
+- Secondary: muted
+
+NO tiny unreadable text  
+NO inconsistent sizes  
+
+---
+
+# PHASE 3 — SPACING DISCIPLINE
+
+Apply 8px grid system:
+
+- consistent padding
+- consistent margins
+- equal spacing between components
+
+UI must feel:
+→ breathable
+→ calm
+→ structured
+
+---
+
+# PHASE 4 — PRIMARY ACTION FOCUS
+
+Each screen must have:
+
+→ ONE obvious action
+
+Example:
+- “Save Profile”
+- “Continue”
+- “Start Plan”
+
+Everything else is secondary.
+
+---
+
+# PHASE 5 — INPUT EXPERIENCE (CRITICAL)
+
+For ALL inputs:
+
+- label above field
+- clear placeholder
+- helpful hint text
+
+Example:
+
+Occupation  
+Select your profession to personalize your financial strategy
+
+---
+
+# PHASE 6 — MICRO INTERACTIONS
+
+Add:
+
+- hover states
+- focus states
+- smooth transitions (150–250ms)
+
+Buttons should:
+→ feel responsive  
+→ feel alive  
+
+---
+
+# PHASE 7 — COLOR SYSTEM
+
+Limit palette:
+
+- 1 primary color
+- neutral background
+- subtle accents
+
+Use color ONLY to:
+→ guide attention
+→ signal action
+
+---
+
+# PHASE 8 — CONTENT REWRITE
+
+Rewrite ALL text:
+
+- short
+- direct
+- human
+
+NO:
+- corporate language
+- filler
+- vague phrases
+
+---
+
+# PHASE 9 — EMPTY STATES
+
+If no data:
+
+→ explain what to do next
+
+Example:
+“No data yet. Start by adding your first entry.”
+
+---
+
+# PHASE 10 — FINAL EXPERIENCE TEST
+
+Simulate user:
+
+- open app
+- scan screen (3 seconds)
+- take action
+
+Ask:
+
+- Is it obvious what this is?
+- Is it obvious what to do?
+- Does it feel calm or chaotic?
+
+If chaotic → simplify again
+
+---
+
+# OUTPUT
+
+Return:
+
+1. 🔴 Removed elements
+2. 🟠 Simplifications made
+3. 🟡 UX improvements
+4. 🟢 Final polish changes
+5. ✅ Premium quality confirmation
+
+---
+
+# FINAL RULE
+
+This must feel:
+
+→ effortless  
+→ clean  
+→ premium  
+
+If it feels “built” → it’s wrong  
+If it feels “inevitable” → it’s right
+
+END

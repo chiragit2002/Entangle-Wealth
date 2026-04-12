@@ -1,0 +1,212 @@
+System Mode: Principal Software Engineer + Security Architect + Product Designer (Top 0.1%)
+
+Codename: FINAL SYSTEM DOMINANCE
+
+Mission:
+Transform this entire application into a production-grade, investor-ready, enterprise-level product with:
+
+- zero security issues
+- flawless UI/UX
+- structured data systems
+- clean, scalable code
+
+No shortcuts. No partial fixes.
+
+---
+
+# 🔴 PHASE 1 — SECURITY LOCKDOWN (CRITICAL)
+
+Identify ALL exposed secrets and API keys.
+
+IMMEDIATELY:
+
+1. Remove any hardcoded keys from:
+   - routes
+   - config files
+   - frontend code
+
+2. Move ALL secrets to environment variables:
+   - process.env.*
+
+3. Refactor code to securely access them
+
+4. Remove any:
+   - gitleaks suppressions
+   - insecure bypass comments
+
+5. Ensure:
+   - no secrets in client bundle
+   - no secrets in logs
+
+---
+
+# 🟠 PHASE 2 — API + BACKEND INTEGRITY
+
+- Validate every route
+- Ensure auth is required where needed
+- Fix:
+   → unauthorized access paths
+   → unsafe conditions (like m.key checks)
+
+Add:
+- strict validation (zod or equivalent)
+- consistent error handling
+
+---
+
+# 🟡 PHASE 3 — UI/UX PROFESSIONALIZATION
+
+Audit ENTIRE frontend.
+
+Fix:
+
+- inconsistent spacing
+- weak hierarchy
+- unclear labels
+- misaligned elements
+
+MANDATORY FIX:
+
+"Headline" → "Occupation"
+
+---
+
+# 🟢 PHASE 4 — OCCUPATION SYSTEM (ENTERPRISE DATA MODEL)
+
+Replace free text with:
+
+Searchable dropdown with 500+ occupations.
+
+---
+
+## DATA MODEL
+
+occupation: {
+  id: string
+  name: string
+  category: string
+  taxCategory: string
+}
+
+---
+
+## UI REQUIREMENTS
+
+- searchable input
+- categorized options
+- fast filtering
+- clean selection UI
+
+---
+
+## BACKEND INTEGRATION
+
+- store occupation ID (NOT string)
+- connect to:
+   → tax logic
+   → itinerary engine
+   → financial planning
+
+---
+
+# 🔵 PHASE 5 — FORM UX (NO MORE AI SLOP)
+
+Every form must:
+
+- guide the user
+- validate inputs
+- show helpful feedback
+
+Example:
+
+Occupation  
+"Select your primary profession to optimize tax insights and recommendations"
+
+---
+
+# 🟣 PHASE 6 — COMPONENT SYSTEM
+
+Standardize:
+
+- Inputs
+- Buttons
+- Cards
+- Layout containers
+
+Rules:
+
+- 8px spacing grid
+- consistent radius
+- consistent typography
+
+---
+
+# ⚫ PHASE 7 — STATE CONTROL
+
+Fix ALL rendering issues:
+
+Only ONE state visible:
+
+if (loading) return <Loading />
+if (error) return <Error />
+if (!data) return <Empty />
+return <MainUI />
+
+---
+
+# ⚪ PHASE 8 — PERFORMANCE + CLEAN CODE
+
+- remove unused files
+- remove console logs
+- optimize re-renders
+- clean dependency chains
+
+---
+
+# 🟤 PHASE 9 — UX FLOW VALIDATION
+
+Simulate:
+
+- new user signup
+- onboarding
+- dashboard usage
+
+Fix ANY confusion.
+
+---
+
+# 🟠 PHASE 10 — FINAL QUALITY BAR
+
+Ask:
+
+- does this look like a $100M startup?
+- would Stripe ship this?
+- is anything unclear or weak?
+
+If YES → fix.
+
+---
+
+# OUTPUT
+
+Return:
+
+1. 🔴 Security issues fixed
+2. 🟠 Backend fixes
+3. 🟡 UI improvements
+4. 🟢 Data systems added
+5. 🛠 Code changes
+6. ✅ Final readiness status
+
+---
+
+# FINAL RULE
+
+You are not done when it works.
+
+You are done when:
+→ it is clean
+→ it is secure
+→ it is professional
+
+END

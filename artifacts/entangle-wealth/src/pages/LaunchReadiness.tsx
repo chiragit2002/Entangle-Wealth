@@ -89,15 +89,15 @@ const CATEGORY_ICONS: Record<string, typeof Server> = {
 };
 
 const ENV_VARS = [
-  { name: "DATABASE_URL", desc: "Production PostgreSQL connection string", production: "postgresql://user:pass@host:5432/dbname" },
-  { name: "CLERK_SECRET_KEY", desc: "Clerk production secret key", production: "sk_live_..." },
-  { name: "VITE_CLERK_PUBLISHABLE_KEY", desc: "Clerk production publishable key", production: "pk_live_..." },
-  { name: "STRIPE_SECRET_KEY", desc: "Stripe live secret key", production: "sk_live_..." },
-  { name: "STRIPE_WEBHOOK_SECRET", desc: "Stripe webhook signing secret", production: "whsec_..." },
-  { name: "VITE_STRIPE_PUBLISHABLE_KEY", desc: "Stripe live publishable key", production: "pk_live_..." },
+  { name: "DATABASE_URL", desc: "Production PostgreSQL connection string", production: "<your-production-db-url>" },
+  { name: "CLERK_SECRET_KEY", desc: "Clerk production secret key", production: "<clerk-live-secret>" },
+  { name: "VITE_CLERK_PUBLISHABLE_KEY", desc: "Clerk production publishable key", production: "<clerk-live-publishable>" },
+  { name: "STRIPE_SECRET_KEY", desc: "Stripe live secret key", production: "<stripe-live-secret>" },
+  { name: "STRIPE_WEBHOOK_SECRET", desc: "Stripe webhook signing secret", production: "<stripe-webhook-secret>" },
+  { name: "VITE_STRIPE_PUBLISHABLE_KEY", desc: "Stripe live publishable key", production: "<stripe-live-publishable>" },
   { name: "ALPACA_API_KEY", desc: "Alpaca live trading API key", production: "configured" },
-  { name: "ALPACA_API_SECRET", desc: "Alpaca live trading API secret", production: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" },
-  { name: "SESSION_SECRET", desc: "Session signing secret (min 32 chars)", production: "random-32-char-string" },
+  { name: "ALPACA_API_SECRET", desc: "Alpaca live trading API secret", production: "<alpaca-api-secret>" },
+  { name: "SESSION_SECRET", desc: "Session signing secret (min 32 chars)", production: "<random-32-char-string>" },
   { name: "NODE_ENV", desc: "Environment mode", production: "production" },
 ];
 

@@ -1,10 +1,12 @@
 import { Router } from "express";
+import { PUBLIC_ENDPOINT_POLICY } from "../lib/publicEndpointPolicy";
 import { db } from "@workspace/db";
-import { resumesTable, resumeExperiencesTable, resumeEducationTable } from "@workspace/db/schema";
+import { resumesTable, resumeExperiencesTable, resumeEducationTable, usersTable } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { validateBody, validateParams, IntIdParamsSchema, z } from "../lib/validateRequest";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -14,7 +16,7 @@ router.get("/resumes", requireAuth, async (req, res) => {
     const resumes = await db.select().from(resumesTable).where(eq(resumesTable.userId, userId));
     res.json(resumes);
   } catch (error) {
-    console.error("Error fetching resumes:", error);
+    logger.error({ err: error }, "Error fetching resumes:");
     res.status(500).json({ error: "Failed to fetch resumes" });
   }
 });
@@ -66,7 +68,7 @@ router.post("/resumes", requireAuth, validateBody(ResumeCreateSchema), async (re
     }).returning();
     res.json(resume);
   } catch (error) {
-    console.error("Error creating resume:", error);
+    logger.error({ err: error }, "Error creating resume:");
     res.status(500).json({ error: "Failed to create resume" });
   }
 });
@@ -92,7 +94,7 @@ router.get("/resumes/:id", requireAuth, validateParams(IntIdParamsSchema), async
 
     res.json({ ...resume, experiences, education });
   } catch (error) {
-    console.error("Error fetching resume:", error);
+    logger.error({ err: error }, "Error fetching resume:");
     res.status(500).json({ error: "Failed to fetch resume" });
   }
 });
@@ -159,7 +161,7 @@ router.put("/resumes/:id", requireAuth, validateParams(IntIdParamsSchema), valid
 
     res.json({ ...updated, experiences: updatedExperiences, education: updatedEducation });
   } catch (error) {
-    console.error("Error updating resume:", error);
+    logger.error({ err: error }, "Error updating resume:");
     res.status(500).json({ error: "Failed to update resume" });
   }
 });
@@ -180,7 +182,7 @@ router.delete("/resumes/:id", requireAuth, validateParams(IntIdParamsSchema), as
     await db.delete(resumesTable).where(eq(resumesTable.id, resumeId));
     res.json({ success: true });
   } catch (error) {
-    console.error("Error deleting resume:", error);
+    logger.error({ err: error }, "Error deleting resume:");
     res.status(500).json({ error: "Failed to delete resume" });
   }
 });
@@ -189,13 +191,27 @@ const PublicUserIdParamsSchema = z.object({
   userId: z.string().min(1).max(100),
 });
 
+// Public endpoint — approved in publicEndpointPolicy.ts (PUBLIC_ENDPOINT_POLICY[3]).
+// Only serves resume data when usersTable.isPublicProfile=true (opt-in).
+// Returns 404 for both non-existent and private profiles to prevent enumeration.
+void PUBLIC_ENDPOINT_POLICY[3];
 router.get("/resumes/public/:userId", validateParams(PublicUserIdParamsSchema), async (req, res) => {
   try {
+    const [user] = await db
+      .select({ isPublicProfile: usersTable.isPublicProfile })
+      .from(usersTable)
+      .where(eq(usersTable.id, req.params.userId));
+
+    if (!user || !user.isPublicProfile) {
+      res.status(404).json({ error: "Resume not found" });
+      return;
+    }
+
     const resumes = await db.select().from(resumesTable)
       .where(eq(resumesTable.userId, req.params.userId));
 
     if (resumes.length === 0) {
-      res.status(404).json({ error: "No résumés found" });
+      res.status(404).json({ error: "Resume not found" });
       return;
     }
 
@@ -207,7 +223,7 @@ router.get("/resumes/public/:userId", validateParams(PublicUserIdParamsSchema), 
 
     res.json({ ...resume, experiences, education });
   } catch (error) {
-    console.error("Error fetching public resume:", error);
+    logger.error({ err: error }, "Error fetching public resume");
     res.status(500).json({ error: "Failed to fetch resume" });
   }
 });

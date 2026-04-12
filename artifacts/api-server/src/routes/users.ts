@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { PUBLIC_ENDPOINT_POLICY } from "../lib/publicEndpointPolicy";
 import { db } from "@workspace/db";
 import {
   usersTable,
@@ -37,7 +38,7 @@ router.get("/users/me", requireAuth, async (req, res) => {
     const occupation = user.occupationId ? getOccupationById(user.occupationId) : null;
     res.json({ ...user, occupation: occupation ?? null });
   } catch (error) {
-    console.error("Error fetching user:", error);
+    logger.error({ err: error }, "Error fetching user");
     res.status(500).json({ error: "Failed to fetch user" });
   }
 });
@@ -165,13 +166,10 @@ router.post("/users/sync", requireAuth, validateBody(UserSyncSchema), async (req
             }).catch(err => logger.warn({ err, referrerId: referrer.clerkId, referredUserEmail: created.email }, 'Failed to send referral_conversion Zapier webhook'));
 
             processReferralMilestones(referrer.clerkId).catch((err) =>
-              console.error("[referral] milestone processing failed:", err),
+              logger.error({ err }, "[referral] milestone processing failed"),
             );
           } catch (refErr) {
-            console.error(
-              "[referral] Failed to create referral record:",
-              refErr,
-            );
+            logger.error({ err: refErr }, "[referral] Failed to create referral record");
           }
         }
       }
@@ -179,7 +177,7 @@ router.post("/users/sync", requireAuth, validateBody(UserSyncSchema), async (req
       res.json(created);
     }
   } catch (error) {
-    console.error("Error syncing user:", error);
+    logger.error({ err: error }, "Error syncing user");
     res.status(500).json({ error: "Failed to sync user" });
   }
 });
@@ -228,11 +226,15 @@ router.put("/users/me", requireAuth, validateBody(UserUpdateSchema), async (req,
     }
     res.json(updated);
   } catch (error) {
-    console.error("Error updating user:", error);
+    logger.error({ err: error }, "Error updating user");
     res.status(500).json({ error: "Failed to update user" });
   }
 });
 
+// Public endpoint — approved in publicEndpointPolicy.ts (PUBLIC_ENDPOINT_POLICY[2]).
+// Returns only fields users have explicitly chosen to make public (isPublicProfile opt-in).
+// Returns 404 for both private and non-existent profiles to prevent enumeration.
+void PUBLIC_ENDPOINT_POLICY[2];
 router.get("/users/:userId/profile", validateParams(UserIdParamsSchema), async (req, res) => {
   try {
     const [user] = await db
@@ -256,7 +258,7 @@ router.get("/users/:userId/profile", validateParams(UserIdParamsSchema), async (
     const { isPublicProfile, ...publicProfile } = user;
     res.json(publicProfile);
   } catch (error) {
-    console.error("Error fetching profile:", error);
+    logger.error({ err: error }, "Error fetching profile");
     res.status(500).json({ error: "Failed to fetch profile" });
   }
 });

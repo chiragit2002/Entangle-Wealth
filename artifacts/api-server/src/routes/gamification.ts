@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { PUBLIC_ENDPOINT_POLICY } from "../lib/publicEndpointPolicy";
 import { validateBody, validateQuery, validateParams, PaginationQuerySchema, z } from "../lib/validateRequest";
 import { db } from "@workspace/db";
 import {
@@ -20,6 +21,7 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
 import { evaluateStreak } from "../lib/streakUtils";
 import { calculateLevel, calculateTier, xpForLevel, xpForNextLevel, applyMultiplier, TIER_THRESHOLDS } from "@workspace/xp";
+import { logger } from "../lib/logger";
 
 const ChallengeIdParamsSchema = z.object({
   challengeId: z.coerce.number().int().positive(),
@@ -79,7 +81,7 @@ router.get("/gamification/me", requireAuth, async (req, res) => {
       nextLevelXp,
     });
   } catch (error) {
-    console.error("Error fetching gamification data:", error);
+    logger.error({ err: error }, "Error fetching gamification data:");
     res.status(500).json({ error: "Failed to fetch gamification data" });
   }
 });
@@ -152,7 +154,7 @@ router.post("/gamification/xp", requireAuth, validateBody(XpSchema), async (req,
       tierChanged: newTier !== xpRow.tier,
     });
   } catch (error) {
-    console.error("Error adding XP:", error);
+    logger.error({ err: error }, "Error adding XP:");
     res.status(500).json({ error: "Failed to add XP" });
   }
 });
@@ -206,7 +208,7 @@ router.post("/gamification/streak/checkin", requireAuth, validateBody(z.object({
 
     res.json({ ...updated, protectionUsed: consumedProtection });
   } catch (error) {
-    console.error("Error checking in streak:", error);
+    logger.error({ err: error }, "Error checking in streak:");
     res.status(500).json({ error: "Failed to check in" });
   }
 });
@@ -216,7 +218,7 @@ router.get("/gamification/badges", async (_req, res) => {
     const badges = await db.select().from(badgesTable).orderBy(badgesTable.category, badgesTable.name);
     res.json(badges);
   } catch (error) {
-    console.error("Error fetching badges:", error);
+    logger.error({ err: error }, "Error fetching badges:");
     res.status(500).json({ error: "Failed to fetch badges" });
   }
 });
@@ -242,7 +244,7 @@ router.get("/gamification/badges/me", requireAuth, async (req, res) => {
 
     res.json(result);
   } catch (error) {
-    console.error("Error fetching user badges:", error);
+    logger.error({ err: error }, "Error fetching user badges:");
     res.status(500).json({ error: "Failed to fetch badges" });
   }
 });
@@ -254,7 +256,7 @@ router.get("/gamification/challenges", async (_req, res) => {
       .orderBy(challengesTable.type, challengesTable.title);
     res.json(challenges);
   } catch (error) {
-    console.error("Error fetching challenges:", error);
+    logger.error({ err: error }, "Error fetching challenges:");
     res.status(500).json({ error: "Failed to fetch challenges" });
   }
 });
@@ -285,7 +287,7 @@ router.get("/gamification/challenges/me", requireAuth, async (req, res) => {
 
     res.json(result);
   } catch (error) {
-    console.error("Error fetching user challenges:", error);
+    logger.error({ err: error }, "Error fetching user challenges:");
     res.status(500).json({ error: "Failed to fetch challenges" });
   }
 });
@@ -337,11 +339,15 @@ router.post("/gamification/challenges/:challengeId/progress", requireAuth, valid
 
     res.json({ ...updated, challenge, justCompleted: completed && !userChallenge.completed });
   } catch (error) {
-    console.error("Error updating challenge progress:", error);
+    logger.error({ err: error }, "Error updating challenge progress:");
     res.status(500).json({ error: "Failed to update progress" });
   }
 });
 
+// Public endpoint — approved in publicEndpointPolicy.ts (PUBLIC_ENDPOINT_POLICY[0]).
+// User names are anonymized to "FirstName L." format server-side; raw PII (full lastName, photoUrl)
+// is never returned. Accessing this policy object here ensures a compile-time reference to the docs.
+void PUBLIC_ENDPOINT_POLICY[0];
 router.get("/gamification/leaderboard", validateQuery(LeaderboardQuerySchema), async (req, res) => {
   const period = (req.query.period as string) || "monthly";
   const limit = Math.min(parseInt(req.query.limit as string) || 100, 100);
@@ -357,7 +363,6 @@ router.get("/gamification/leaderboard", validateQuery(LeaderboardQuerySchema), a
         weeklyXp: userXpTable.weeklyXp,
         firstName: usersTable.firstName,
         lastName: usersTable.lastName,
-        photoUrl: usersTable.photoUrl,
       })
       .from(userXpTable)
       .innerJoin(usersTable, eq(userXpTable.userId, usersTable.id))
@@ -368,15 +373,22 @@ router.get("/gamification/leaderboard", validateQuery(LeaderboardQuerySchema), a
       )
       .limit(limit);
 
-    const ranked = leaderboard.map((entry, index) => ({
-      rank: index + 1,
-      ...entry,
-      gainPercent: parseFloat((Math.random() * 40 - 5).toFixed(2)),
-    }));
+    const ranked = leaderboard.map((entry, index) => {
+      const { firstName, lastName, ...rest } = entry;
+      const displayName = firstName
+        ? `${firstName}${lastName ? " " + lastName.charAt(0).toUpperCase() + "." : ""}`
+        : `User ${entry.userId.slice(0, 6)}`;
+      return {
+        rank: index + 1,
+        ...rest,
+        displayName,
+        gainPercent: parseFloat((Math.random() * 40 - 5).toFixed(2)),
+      };
+    });
 
     res.json(ranked);
   } catch (error) {
-    console.error("Error fetching leaderboard:", error);
+    logger.error({ err: error }, "Error fetching leaderboard");
     res.status(500).json({ error: "Failed to fetch leaderboard" });
   }
 });
@@ -418,7 +430,7 @@ router.get("/gamification/leaderboard/rank", requireAuth, validateQuery(PeriodQu
       totalUsers: Number(totalCount[0].count),
     });
   } catch (error) {
-    console.error("Error fetching rank:", error);
+    logger.error({ err: error }, "Error fetching rank:");
     res.status(500).json({ error: "Failed to fetch rank" });
   }
 });
@@ -439,7 +451,7 @@ router.get("/gamification/xp/history", requireAuth, validateQuery(XpHistoryQuery
       .limit(limit);
     res.json(history);
   } catch (error) {
-    console.error("Error fetching XP history:", error);
+    logger.error({ err: error }, "Error fetching XP history:");
     res.status(500).json({ error: "Failed to fetch XP history" });
   }
 });
@@ -514,7 +526,7 @@ router.get("/gamification/weekly-summary", requireAuth, async (req, res) => {
       percentile,
     });
   } catch (error) {
-    console.error("Error fetching weekly summary:", error);
+    logger.error({ err: error }, "Error fetching weekly summary:");
     res.status(500).json({ error: "Failed to fetch weekly summary" });
   }
 });
@@ -582,7 +594,7 @@ router.get("/gamification/spin/status", requireAuth, async (req, res) => {
 
     res.json({ canSpin, nextSpinAt, lastReward: lastSpin?.reward || null, history, isFounder: !!founder, rewards: SPIN_REWARDS.map(r => ({ reward: r.reward, rewardType: r.rewardType })) });
   } catch (error) {
-    console.error("Error checking spin status:", error);
+    logger.error({ err: error }, "Error checking spin status:");
     res.status(500).json({ error: "Failed to check spin status" });
   }
 });
@@ -684,7 +696,7 @@ router.post("/gamification/spin", requireAuth, validateBody(z.object({}).strict(
     const nextSpinAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
     res.json({ reward: picked.reward, rewardType: picked.rewardType, rewardValue: picked.rewardValue, founderMultiplier, streakBonus, newStreak, nextSpinAt });
   } catch (error) {
-    console.error("Error spinning wheel:", error);
+    logger.error({ err: error }, "Error spinning wheel:");
     res.status(500).json({ error: "Failed to spin wheel" });
   }
 });
@@ -784,7 +796,7 @@ router.get("/gamification/status", requireAuth, async (req, res) => {
       alreadyClaimedDaily,
     });
   } catch (error) {
-    console.error("Error fetching gamification status:", error);
+    logger.error({ err: error }, "Error fetching gamification status:");
     res.status(500).json({ error: "Failed to fetch gamification status" });
   }
 });
@@ -862,7 +874,7 @@ router.post("/gamification/claim-daily", requireAuth, validateBody(z.object({}).
       streakBonus: newStreak >= 7 ? 200 : newStreak >= 3 ? 50 : 0,
     });
   } catch (error) {
-    console.error("Error claiming daily reward:", error);
+    logger.error({ err: error }, "Error claiming daily reward:");
     res.status(500).json({ error: "Failed to claim daily reward" });
   }
 });
@@ -878,7 +890,7 @@ router.get("/gamification/founder/status", requireAuth, async (req, res) => {
 
     res.json({ isFounder: !!founder, founderCount: count, xpMultiplier: founder?.xpMultiplier || 1.0, grantedAt: founder?.grantedAt || null });
   } catch (error) {
-    console.error("Error checking founder status:", error);
+    logger.error({ err: error }, "Error checking founder status:");
     res.status(500).json({ error: "Failed to check founder status" });
   }
 });

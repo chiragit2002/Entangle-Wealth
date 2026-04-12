@@ -7,6 +7,7 @@ import { requireAdmin } from "../middlewares/requireAdmin";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { isUploadOwnedBy } from "./storage";
 import { validateBody, validateParams, z } from "../lib/validateRequest";
+import { logger } from "../lib/logger";
 
 const BusinessDocUserIdParamsSchema = z.object({
   userId: z.string().min(1).max(100),
@@ -32,7 +33,7 @@ router.get("/business-docs/status", requireAuth, async (req, res) => {
     }
     res.json(user);
   } catch (error) {
-    console.error("Error fetching business doc status:", error);
+    logger.error({ err: error }, "Error fetching business doc status:");
     res.status(500).json({ error: "Failed to fetch business doc status" });
   }
 });
@@ -84,7 +85,7 @@ router.post("/business-docs/submit", requireAuth, validateBody(BusinessDocSubmit
       message: "Business documents submitted for review. You will be notified once verified.",
     });
   } catch (error) {
-    console.error("Error submitting business docs:", error);
+    logger.error({ err: error }, "Error submitting business docs:");
     res.status(500).json({ error: "Failed to submit business documents" });
   }
 });
@@ -106,7 +107,7 @@ router.post("/business-docs/approve/:userId", requireAuth, requireAdmin, validat
 
     res.json({ status: "verified", message: "Business documents approved" });
   } catch (error) {
-    console.error("Error approving business docs:", error);
+    logger.error({ err: error }, "Error approving business docs:");
     res.status(500).json({ error: "Failed to approve business documents" });
   }
 });
@@ -129,7 +130,7 @@ router.post("/business-docs/reject/:userId", requireAuth, requireAdmin, validate
 
     res.json({ status: "rejected", message: "Business documents rejected" });
   } catch (error) {
-    console.error("Error rejecting business docs:", error);
+    logger.error({ err: error }, "Error rejecting business docs:");
     res.status(500).json({ error: "Failed to reject business documents" });
   }
 });
@@ -159,7 +160,7 @@ router.get("/business-docs/admin/submissions", requireAuth, requireAdmin, async 
 
     res.json(submissionsWithUrls);
   } catch (error) {
-    console.error("Error fetching business doc submissions:", error);
+    logger.error({ err: error }, "Error fetching business doc submissions:");
     res.status(500).json({ error: "Failed to fetch business document submissions" });
   }
 });

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { PUBLIC_ENDPOINT_POLICY } from "../lib/publicEndpointPolicy";
 import { validateBody, validateQuery, z } from "../lib/validateRequest";
 import { db } from "@workspace/db";
 import {
@@ -13,6 +14,7 @@ import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -118,7 +120,7 @@ router.get("/giveaway/info", async (_req, res) => {
       totalEntries: Number(entriesRow?.total || 0),
     });
   } catch (error) {
-    console.error("Error fetching giveaway info:", error);
+    logger.error({ err: error }, "Error fetching giveaway info:");
     res.status(500).json({ error: "Failed to fetch giveaway info" });
   }
 });
@@ -156,11 +158,14 @@ router.get("/giveaway/my-entries", requireAuth, async (req, res) => {
       anniversaryDate: ANNIVERSARY_DATE.toISOString(),
     });
   } catch (error) {
-    console.error("Error fetching user giveaway entries:", error);
+    logger.error({ err: error }, "Error fetching user giveaway entries:");
     res.status(500).json({ error: "Failed to fetch giveaway entries" });
   }
 });
 
+// Public endpoint — approved in publicEndpointPolicy.ts (PUBLIC_ENDPOINT_POLICY[4]).
+// User names are anonymized to "FirstName L." server-side; no full lastName, email, or photoUrl returned.
+void PUBLIC_ENDPOINT_POLICY[4];
 router.get("/giveaway/leaderboard", validateQuery(z.object({ limit: z.coerce.number().int().min(1).max(50).optional().default(20) })), async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
   try {
@@ -200,7 +205,7 @@ router.get("/giveaway/leaderboard", validateQuery(z.object({ limit: z.coerce.num
 
     res.json({ leaderboard: ranked, totalEntries });
   } catch (error) {
-    console.error("Error fetching giveaway leaderboard:", error);
+    logger.error({ err: error }, "Error fetching giveaway leaderboard:");
     res.status(500).json({ error: "Failed to fetch leaderboard" });
   }
 });
@@ -218,7 +223,7 @@ router.post("/giveaway/admin/sync-all", requireAuth, requireAdmin, validateBody(
 
     res.json({ ok: true, synced });
   } catch (error) {
-    console.error("Error syncing giveaway entries:", error);
+    logger.error({ err: error }, "Error syncing giveaway entries:");
     res.status(500).json({ error: "Failed to sync entries" });
   }
 });
@@ -292,7 +297,7 @@ router.post("/giveaway/admin/draw-winner", requireAuth, requireAdmin, validateQu
       },
     });
   } catch (error) {
-    console.error("Error drawing giveaway winner:", error);
+    logger.error({ err: error }, "Error drawing giveaway winner:");
     res.status(500).json({ error: "Failed to draw winner" });
   }
 });

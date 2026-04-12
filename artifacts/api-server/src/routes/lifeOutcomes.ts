@@ -6,6 +6,7 @@ import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
 import { validateBody, z } from "../lib/validateRequest";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -230,7 +231,7 @@ router.post("/life-outcomes/project", validateBody(LifeOutcomesSchema), async (r
       },
     });
   } catch (error) {
-    console.error("Error projecting life outcomes:", error);
+    logger.error({ err: error }, "Error projecting life outcomes:");
     res.status(500).json({ error: "Failed to project life outcomes" });
   }
 });
@@ -266,7 +267,7 @@ router.get("/life-outcomes/from-profile", requireAuth, async (req, res) => {
 
     res.json({ hasProfile: true, profile: profileData });
   } catch (error) {
-    console.error("Error fetching profile for life outcomes:", error);
+    logger.error({ err: error }, "Error fetching profile for life outcomes:");
     res.status(500).json({ error: "Failed to fetch profile" });
   }
 });

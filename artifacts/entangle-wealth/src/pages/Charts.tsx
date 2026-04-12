@@ -657,7 +657,7 @@ export default function Charts() {
               <div className="border-t border-[#363A45] pt-3">
                 <label className="text-[9px] uppercase tracking-wider text-[#787B86] block mb-1">Claude API Key (optional)</label>
                 <input value={claudeKey} onChange={e => setClaudeKey(e.target.value)}
-                  type="password" placeholder="sk-ant-..."
+                  type="password" placeholder="Enter API key..."
                   className="w-full bg-[#2A2E39] text-xs text-[#D1D4DC] rounded px-2 py-1.5 outline-none border border-[#363A45] focus:border-[#2962FF]" />
                 <p className="text-[9px] text-[#787B86] mt-1">Stored in session memory only (cleared on tab close). Enables AI deep analysis on scanner results.</p>
               </div>

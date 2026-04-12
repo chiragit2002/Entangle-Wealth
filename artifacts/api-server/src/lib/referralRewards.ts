@@ -10,6 +10,7 @@ import {
 import { eq, count, and } from "drizzle-orm";
 import { getUncachableStripeClient } from "../stripeClient";
 import { resolveUserId } from "./resolveUserId";
+import { logger } from "./logger";
 
 const REFERRAL_BADGES = [
   { slug: "referral-bronze", name: "Referral Bronze", icon: "bronze", description: "Referred 3 users who signed up", category: "referral", xpReward: 100, threshold: 3 },
@@ -85,7 +86,7 @@ export async function ensureReferralBadgesExist(): Promise<void> {
 export async function processReferralMilestones(referrerId: string): Promise<{ newMilestones: string[] }> {
   const userId = await resolveUserId(referrerId);
   if (!userId) {
-    console.warn(`[referral] Could not resolve DB user ID for Clerk ID ${referrerId}`);
+    logger.warn({ referrerId }, "[referral] Could not resolve DB user ID for Clerk ID");
     return { newMilestones: [] };
   }
 
@@ -248,7 +249,7 @@ async function applyStripeCouponIfEligible(referrerId: string, referralCount: nu
 
   const couponId = process.env.STRIPE_REFERRAL_COUPON;
   if (!couponId) {
-    console.log(`[referral] User ${referrerId} hit ${referralCount} referrals but STRIPE_REFERRAL_COUPON not configured`);
+    logger.info({ referrerId, referralCount }, "[referral] STRIPE_REFERRAL_COUPON not configured, skipping coupon reward");
     return;
   }
 
@@ -259,12 +260,12 @@ async function applyStripeCouponIfEligible(referrerId: string, referralCount: nu
       .where(eq(usersTable.clerkId, referrerId));
 
     if (!user?.stripeSubscriptionId) {
-      console.log(`[referral] User ${referrerId} has no active subscription to apply coupon to`);
+      logger.info({ referrerId }, "[referral] User has no active subscription to apply coupon to");
       return;
     }
 
     if (user.referralCouponApplied) {
-      console.log(`[referral] Coupon already applied for user ${referrerId}`);
+      logger.info({ referrerId }, "[referral] Coupon already applied for user");
       return;
     }
 
@@ -276,8 +277,8 @@ async function applyStripeCouponIfEligible(referrerId: string, referralCount: nu
       .update(usersTable)
       .set({ referralCouponApplied: true, updatedAt: new Date() })
       .where(eq(usersTable.clerkId, referrerId));
-    console.log(`[referral] Applied coupon ${couponId} to subscription for user ${referrerId}`);
+    logger.info({ referrerId }, "[referral] Applied referral coupon to subscription");
   } catch (error) {
-    console.error(`[referral] Failed to apply Stripe coupon for user ${referrerId}:`, error);
+    logger.error({ referrerId, err: error }, "[referral] Failed to apply Stripe coupon");
   }
 }

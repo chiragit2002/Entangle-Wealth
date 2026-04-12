@@ -9,6 +9,7 @@ import { aiQueue } from "../lib/aiQueue";
 import { anthropicCircuit } from "../lib/circuitBreaker";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { validateBody, z } from "../lib/validateRequest";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -248,7 +249,7 @@ router.post("/marketing/generate", requireAuth, requireAdmin, validateBody(Marke
       generatedAt: new Date().toISOString()
     });
   } catch (err: any) {
-    console.error("Marketing generate error:", err);
+    logger.error({ err: err }, "Marketing generate error:");
     res.status(500).json({ error: "Failed to generate content" });
   }
 });

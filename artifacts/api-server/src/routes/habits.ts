@@ -14,6 +14,7 @@ import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
 import { validateBody, validateParams, validateQuery, z } from "../lib/validateRequest";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -64,7 +65,7 @@ router.get("/habits", async (_req, res) => {
       .orderBy(habitDefinitionsTable.category, habitDefinitionsTable.title);
     res.json(habits);
   } catch (error) {
-    console.error("Error fetching habits:", error);
+    logger.error({ err: error }, "Error fetching habits:");
     res.status(500).json({ error: "Failed to fetch habits" });
   }
 });
@@ -120,7 +121,7 @@ router.get("/habits/me", requireAuth, async (req, res) => {
 
     res.json(result);
   } catch (error) {
-    console.error("Error fetching user habits:", error);
+    logger.error({ err: error }, "Error fetching user habits:");
     res.status(500).json({ error: "Failed to fetch user habits" });
   }
 });
@@ -234,7 +235,7 @@ router.post("/habits/:habitId/complete", requireAuth, validateParams(HabitComple
       streakBonus: streakBonus > 1 ? streakBonus : null,
     });
   } catch (error) {
-    console.error("Error completing habit:", error);
+    logger.error({ err: error }, "Error completing habit:");
     res.status(500).json({ error: "Failed to complete habit" });
   }
 });
@@ -295,7 +296,7 @@ router.get("/habits/summary", requireAuth, async (req, res) => {
       totalLifetimeCompletions: totalCompletions,
     });
   } catch (error) {
-    console.error("Error fetching habit summary:", error);
+    logger.error({ err: error }, "Error fetching habit summary:");
     res.status(500).json({ error: "Failed to fetch summary" });
   }
 });
@@ -326,7 +327,7 @@ router.get("/habits/history", requireAuth, validateQuery(z.object({ limit: z.coe
       habit: h.habit,
     })));
   } catch (error) {
-    console.error("Error fetching habit history:", error);
+    logger.error({ err: error }, "Error fetching habit history:");
     res.status(500).json({ error: "Failed to fetch history" });
   }
 });

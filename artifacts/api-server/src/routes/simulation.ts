@@ -14,6 +14,7 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
 import { calculateLevel, calculateTier } from "@workspace/xp";
 import { validateBody, z } from "../lib/validateRequest";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -110,7 +111,7 @@ router.get("/simulation/profile", requireAuth, async (req, res) => {
     }
     res.json(profile);
   } catch (error) {
-    console.error("Error fetching simulation profile:", error);
+    logger.error({ err: error }, "Error fetching simulation profile:");
     res.status(500).json({ error: "Failed to fetch simulation profile" });
   }
 });
@@ -185,7 +186,7 @@ router.post("/simulation/profile", requireAuth, validateBody(SimulationProfileSc
 
     res.json(profile);
   } catch (error) {
-    console.error("Error saving simulation profile:", error);
+    logger.error({ err: error }, "Error saving simulation profile:");
     res.status(500).json({ error: "Failed to save simulation profile" });
   }
 });
@@ -304,7 +305,7 @@ router.post("/simulation/project", requireAuth, validateBody(SimulationProjectSc
       newMilestones: newlyUnlocked,
     });
   } catch (error) {
-    console.error("Error running projection:", error);
+    logger.error({ err: error }, "Error running projection:");
     res.status(500).json({ error: "Failed to run projection" });
   }
 });
@@ -332,7 +333,7 @@ router.get("/simulation/milestones", requireAuth, async (req, res) => {
 
     res.json(result);
   } catch (error) {
-    console.error("Error fetching milestones:", error);
+    logger.error({ err: error }, "Error fetching milestones:");
     res.status(500).json({ error: "Failed to fetch milestones" });
   }
 });
@@ -351,7 +352,7 @@ router.get("/simulation/snapshots", requireAuth, async (req, res) => {
       .limit(10);
     res.json(snapshots);
   } catch (error) {
-    console.error("Error fetching snapshots:", error);
+    logger.error({ err: error }, "Error fetching snapshots:");
     res.status(500).json({ error: "Failed to fetch snapshots" });
   }
 });

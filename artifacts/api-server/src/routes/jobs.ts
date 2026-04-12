@@ -5,6 +5,7 @@ import { eq, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { validateBody, validateQuery, validateParams, IntIdParamsSchema, z } from "../lib/validateRequest";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -84,7 +85,7 @@ router.get("/jobs/search", validateQuery(JobsSearchQuerySchema), async (req, res
       disclaimer: "Job listings sourced from third-party providers. Verify details before applying.",
     });
   } catch (error) {
-    console.error("Job search error:", error);
+    logger.error({ err: error }, "Job search error:");
     const mockJobs = generateMockJobs((q as string) || "developer", (location as string) || "", pageNum);
     res.json(mockJobs);
   }
@@ -144,7 +145,7 @@ router.get("/jobs/saved", requireAuth, async (req, res) => {
     const saved = await db.select().from(savedJobsTable).where(eq(savedJobsTable.userId, userId));
     res.json(saved);
   } catch (error) {
-    console.error("Error fetching saved jobs:", error);
+    logger.error({ err: error }, "Error fetching saved jobs:");
     res.status(500).json({ error: "Failed to fetch saved jobs" });
   }
 });
@@ -187,7 +188,7 @@ router.post("/jobs/save", requireAuth, validateBody(SaveJobSchema), async (req, 
     });
     res.json({ saved: true });
   } catch (error) {
-    console.error("Error saving job:", error);
+    logger.error({ err: error }, "Error saving job:");
     res.status(500).json({ error: "Failed to save job" });
   }
 });
@@ -201,7 +202,7 @@ router.delete("/jobs/saved/:id", requireAuth, validateParams(IntIdParamsSchema),
       .where(and(eq(savedJobsTable.id, jobId), eq(savedJobsTable.userId, userId)));
     res.json({ success: true });
   } catch (error) {
-    console.error("Error removing saved job:", error);
+    logger.error({ err: error }, "Error removing saved job:");
     res.status(500).json({ error: "Failed to remove saved job" });
   }
 });

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { PUBLIC_ENDPOINT_POLICY } from "../lib/publicEndpointPolicy";
 import { validateBody, validateQuery, PaginationQuerySchema, z } from "../lib/validateRequest";
 import { db } from "@workspace/db";
 import {
@@ -196,6 +197,9 @@ router.get("/token/rewards", requireAuth, validateQuery(PaginationQuerySchema), 
   }
 });
 
+// Public endpoint — approved in publicEndpointPolicy.ts (PUBLIC_ENDPOINT_POLICY[5]).
+// User names are anonymized to "FirstName L." server-side; no full lastName, email, or photoUrl returned.
+void PUBLIC_ENDPOINT_POLICY[5];
 router.get("/token/rewards/history", validateQuery(PaginationQuerySchema), async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);

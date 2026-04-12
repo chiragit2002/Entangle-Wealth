@@ -7,6 +7,7 @@ import { requireAdmin } from "../middlewares/requireAdmin";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { isUploadOwnedBy } from "./storage";
 import { validateBody, validateParams, z } from "../lib/validateRequest";
+import { logger } from "../lib/logger";
 
 const AdminUserIdParamsSchema = z.object({
   userId: z.string().min(1).max(100),
@@ -31,7 +32,7 @@ router.get("/kyc/status", requireAuth, async (req, res) => {
     }
     res.json(user);
   } catch (error) {
-    console.error("Error fetching KYC status:", error);
+    logger.error({ err: error }, "Error fetching KYC status");
     res.status(500).json({ error: "Failed to fetch KYC status" });
   }
 });
@@ -102,7 +103,7 @@ router.post("/kyc/submit", requireAuth, validateBody(KycSubmitSchema), async (re
       message: "KYC submitted for review. You will be notified once verified.",
     });
   } catch (error) {
-    console.error("Error submitting KYC:", error);
+    logger.error({ err: error }, "Error submitting KYC");
     res.status(500).json({ error: "Failed to submit KYC" });
   }
 });
@@ -124,7 +125,7 @@ router.post("/kyc/approve/:userId", requireAuth, requireAdmin, validateParams(Ad
 
     res.json({ status: "verified", message: "KYC approved" });
   } catch (error) {
-    console.error("Error approving KYC:", error);
+    logger.error({ err: error }, "Error approving KYC");
     res.status(500).json({ error: "Failed to approve KYC" });
   }
 });
@@ -145,7 +146,7 @@ router.post("/kyc/reject/:userId", requireAuth, requireAdmin, validateParams(Adm
 
     res.json({ status: "rejected", message: "KYC rejected" });
   } catch (error) {
-    console.error("Error rejecting KYC:", error);
+    logger.error({ err: error }, "Error rejecting KYC");
     res.status(500).json({ error: "Failed to reject KYC" });
   }
 });
@@ -179,7 +180,7 @@ router.get("/kyc/admin/submissions", requireAuth, requireAdmin, async (req, res)
 
     res.json(submissionsWithUrls);
   } catch (error) {
-    console.error("Error fetching KYC submissions:", error);
+    logger.error({ err: error }, "Error fetching KYC submissions");
     res.status(500).json({ error: "Failed to fetch KYC submissions" });
   }
 });

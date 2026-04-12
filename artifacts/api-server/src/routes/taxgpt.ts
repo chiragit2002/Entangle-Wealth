@@ -8,13 +8,14 @@ import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { getOccupationById } from "@workspace/occupations";
+import { logger } from "../lib/logger";
 
 let openai: any = null;
 try {
   const mod = await import("@workspace/integrations-openai-ai-server");
   openai = mod.openai;
 } catch {
-  console.log("OpenAI not available for TaxGPT, using fallback responses");
+  logger.warn("OpenAI not available for TaxGPT, using fallback responses");
 }
 
 const router = Router();
@@ -295,7 +296,7 @@ router.post("/taxgpt", requireAuth, validateBody(TaxGptRequestSchema), async (re
     incrementTaxGptCount(clerkId);
     res.json({ answer });
   } catch (error) {
-    console.error("TaxGPT error:", error);
+    logger.error({ err: error }, "TaxGPT error:");
     res.status(500).json({ error: "Failed to generate response" });
   }
 });

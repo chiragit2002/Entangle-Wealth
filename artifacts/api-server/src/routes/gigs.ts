@@ -5,9 +5,15 @@ import { eq, desc, ilike, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import crypto from "crypto";
-import { validateBody, validateParams, z } from "../lib/validateRequest";
+import { validateBody, validateParams, validateQuery, z } from "../lib/validateRequest";
+import { logger } from "../lib/logger";
 
 const router = Router();
+
+const GigsQuerySchema = z.object({
+  category: z.string().max(100).optional(),
+  q: z.string().max(200).optional(),
+});
 
 const MOCK_GIGS = [
   { id: "mock-1", userId: "system", title: "Pressure Wash Driveway & Walkway", description: "Professional pressure washing. Before/after photos provided.", price: "$120", category: "outdoor", contactName: "Marcus J.", rating: "4.9", completedJobs: 47, isActive: true, createdAt: new Date() },
@@ -20,7 +26,7 @@ const MOCK_GIGS = [
   { id: "mock-8", userId: "system", title: "Junk Removal & Haul Away", description: "Same-day pickup. Furniture, appliances, yard waste. Free estimates.", price: "$80+", category: "moving", contactName: "Ray D.", rating: "4.6", completedJobs: 42, isActive: true, createdAt: new Date() },
 ];
 
-router.get("/gigs", async (req, res) => {
+router.get("/gigs", validateQuery(GigsQuerySchema), async (req, res) => {
   const { category, q } = req.query;
   try {
     const conditions = [eq(gigsTable.isActive, true)];
@@ -51,7 +57,7 @@ router.get("/gigs", async (req, res) => {
 
     res.json(allGigs);
   } catch (error) {
-    console.error("Error fetching gigs:", error);
+    logger.error({ err: error }, "Error fetching gigs:");
     let mockFiltered = MOCK_GIGS;
     if (category && category !== "all") {
       mockFiltered = mockFiltered.filter(g => g.category === category);
@@ -89,7 +95,7 @@ router.post("/gigs", requireAuth, validateBody(GigCreateSchema), async (req, res
 
     res.status(201).json(gig);
   } catch (error) {
-    console.error("Error creating gig:", error);
+    logger.error({ err: error }, "Error creating gig:");
     res.status(500).json({ error: "Failed to create gig" });
   }
 });
@@ -116,7 +122,7 @@ router.delete("/gigs/:id", requireAuth, validateParams(GigIdParamsSchema), async
 
     res.json({ success: true });
   } catch (error) {
-    console.error("Error deleting gig:", error);
+    logger.error({ err: error }, "Error deleting gig:");
     res.status(500).json({ error: "Failed to delete gig" });
   }
 });

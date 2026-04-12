@@ -1,13 +1,14 @@
 import { Router } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
 import { validateBody, z } from "../lib/validateRequest";
+import { logger } from "../lib/logger";
 
 let openai: any = null;
 try {
   const mod = await import("@workspace/integrations-openai-ai-server");
   openai = mod.openai;
 } catch {
-  console.log("OpenAI not available for document analysis");
+  logger.warn("OpenAI not available for document analysis");
 }
 
 const router = Router();
@@ -105,7 +106,7 @@ router.post("/analyze-document", requireAuth, validateBody(DocumentAnalyzeSchema
       });
     }
   } catch (error) {
-    console.error("Document analysis error:", error);
+    logger.error({ err: error }, "Document analysis error");
     res.status(500).json({ error: "Failed to analyze document" });
   }
 });

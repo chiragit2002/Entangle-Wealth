@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { PUBLIC_ENDPOINT_POLICY } from "../lib/publicEndpointPolicy";
 import { db } from "@workspace/db";
 import { referralsTable, testimonialsTable, usersTable, badgesTable, userBadgesTable, alertHistoryTable } from "@workspace/db/schema";
 import { eq, desc, sql, count, and, like } from "drizzle-orm";
@@ -7,6 +8,7 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import crypto from "crypto";
 import { REFERRAL_MILESTONES } from "../lib/referralRewards";
 import { validateBody, validateQuery, PaginationQuerySchema, z } from "../lib/validateRequest";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -66,7 +68,7 @@ router.get("/viral/referral/code", requireAuth, async (req, res) => {
       totalConverted: Number(convertedStats?.converted || 0),
     });
   } catch (error) {
-    console.error("Error getting referral code:", error);
+    logger.error({ err: error }, "Error getting referral code");
     res.status(500).json({ error: "Failed to get referral code" });
   }
 });
@@ -117,7 +119,7 @@ router.get("/viral/referral/milestones", requireAuth, async (req, res) => {
       newMilestones,
     });
   } catch (error) {
-    console.error("Error getting referral milestones:", error);
+    logger.error({ err: error }, "Error getting referral milestones");
     res.status(500).json({ error: "Failed to get referral milestones" });
   }
 });
@@ -148,7 +150,7 @@ router.post("/viral/referral/milestones/seen", requireAuth, validateBody(Milesto
     await db.update(usersTable).set({ referralMilestonesSeen: merged, updatedAt: new Date() }).where(eq(usersTable.clerkId, userId));
     res.json({ ok: true });
   } catch (error) {
-    console.error("Error marking milestones seen:", error);
+    logger.error({ err: error }, "Error marking milestones seen");
     res.status(500).json({ error: "Failed to mark milestones seen" });
   }
 });
@@ -194,17 +196,20 @@ router.get("/viral/referral/badges", requireAuth, async (req, res) => {
 
     res.json({ referralCount, badges });
   } catch (error) {
-    console.error("Error getting referral badges:", error);
+    logger.error({ err: error }, "Error getting referral badges");
     res.status(500).json({ error: "Failed to get referral badges" });
   }
 });
 
+// Public endpoint — approved in publicEndpointPolicy.ts (PUBLIC_ENDPOINT_POLICY[6]).
+// Only returns COUNT(*) aggregate — no individual user records are accessed.
+void PUBLIC_ENDPOINT_POLICY[6];
 router.get("/stats/user-count", async (_req, res) => {
   try {
     const [result] = await db.select({ count: count() }).from(usersTable);
     res.json({ count: Number(result?.count || 0) });
   } catch (error) {
-    console.error("Error getting user count:", error);
+    logger.error({ err: error }, "Error getting user count");
     res.status(500).json({ error: "Failed to get user count" });
   }
 });
@@ -213,6 +218,9 @@ const ACCURACY_BASELINE = 87;
 const SIGNALS_BASELINE = 1247;
 const MEMBERS_BASELINE = 4891;
 
+// Public endpoint — approved in publicEndpointPolicy.ts (PUBLIC_ENDPOINT_POLICY[7]).
+// Only returns COUNT(*) aggregates — no individual user records are accessed.
+void PUBLIC_ENDPOINT_POLICY[7];
 router.get("/stats/hero", async (_req, res) => {
   try {
     const [memberResult] = await db.select({ count: count() }).from(usersTable);
@@ -240,11 +248,15 @@ router.get("/stats/hero", async (_req, res) => {
 
     res.json({ members, signals, accuracy });
   } catch (error) {
-    console.error("Error getting hero stats:", error);
+    logger.error({ err: error }, "Error getting hero stats");
     res.status(500).json({ error: "Failed to get hero stats" });
   }
 });
 
+// Public endpoint — approved in publicEndpointPolicy.ts (PUBLIC_ENDPOINT_POLICY[1]).
+// Raw PII is fully anonymized server-side: only "FirstName L." + relative time returned.
+// No emails, full surnames, IDs, or exact timestamps are exposed.
+void PUBLIC_ENDPOINT_POLICY[1];
 router.get("/stats/recent-signups", validateQuery(PaginationQuerySchema), async (req, res) => {
   try {
     const limit = Math.min(Math.max(parseInt(String(req.query.limit)) || 10, 1), 50);
@@ -273,7 +285,7 @@ router.get("/stats/recent-signups", validateQuery(PaginationQuerySchema), async 
 
     res.json(anonymized);
   } catch (error) {
-    console.error("Error getting recent signups:", error);
+    logger.error({ err: error }, "Error getting recent signups");
     res.status(500).json({ error: "Failed to get recent signups" });
   }
 });
@@ -296,7 +308,7 @@ router.post("/viral/testimonials", requireAuth, validateBody(TestimonialSchema),
 
     res.json(testimonial);
   } catch (error) {
-    console.error("Error creating testimonial:", error);
+    logger.error({ err: error }, "Error creating testimonial");
     res.status(500).json({ error: "Failed to create testimonial" });
   }
 });
@@ -315,7 +327,7 @@ router.get("/viral/testimonials", validateQuery(PaginationQuerySchema), async (r
 
     res.json(testimonials);
   } catch (error) {
-    console.error("Error fetching testimonials:", error);
+    logger.error({ err: error }, "Error fetching testimonials");
     res.status(500).json({ error: "Failed to fetch testimonials" });
   }
 });

@@ -17,6 +17,7 @@ import { resolveUserId } from "../lib/resolveUserId";
 import { getAuth } from "@clerk/express";
 import { calculateLevel, calculateTier } from "@workspace/xp";
 import { validateBody, validateParams, z } from "../lib/validateRequest";
+import { logger } from "../lib/logger";
 
 const TimelineIdParamsSchema = z.object({
   id: z.string().regex(/^\d+$/, "ID must be a number"),
@@ -281,7 +282,7 @@ router.post("/timeline/simulate", validateBody(TimelineParamsBodySchema), async 
 
     res.json({ params, results, simulatedAt: new Date().toISOString() });
   } catch (err) {
-    console.error("Simulation error:", err);
+    logger.error({ err }, "Simulation error");
     res.status(500).json({ error: "Simulation failed" });
   }
 });
@@ -344,7 +345,7 @@ router.post("/timeline/save", requireAuth, validateBody(TimelineSaveSchema), asy
 
     res.json({ timeline, results });
   } catch (err) {
-    console.error("Save timeline error:", err);
+    logger.error({ err }, "Save timeline error");
     res.status(500).json({ error: "Failed to save timeline" });
   }
 });
@@ -368,7 +369,7 @@ router.get("/timeline/saved", requireAuth, async (req, res) => {
 
     res.json(timelines.map(t => ({ ...t, results: results[t.id] || [] })));
   } catch (err) {
-    console.error("Get saved timelines error:", err);
+    logger.error({ err }, "Get saved timelines error");
     res.status(500).json({ error: "Failed to fetch timelines" });
   }
 });
@@ -391,7 +392,7 @@ router.get("/timeline/:id", requireAuth, validateParams(TimelineIdParamsSchema),
 
     res.json({ ...timeline, results });
   } catch (err) {
-    console.error("Get timeline error:", err);
+    logger.error({ err }, "Get timeline error");
     res.status(500).json({ error: "Failed to fetch timeline" });
   }
 });
@@ -413,7 +414,7 @@ router.delete("/timeline/:id", requireAuth, validateParams(TimelineIdParamsSchem
     await db.delete(timelinesTable).where(eq(timelinesTable.id, timelineId));
     res.json({ success: true });
   } catch (err) {
-    console.error("Delete timeline error:", err);
+    logger.error({ err }, "Delete timeline error");
     res.status(500).json({ error: "Failed to delete timeline" });
   }
 });
@@ -487,7 +488,7 @@ router.post("/timeline/compare", validateBody(TimelineCompareSchema), async (req
       comparedAt: new Date().toISOString(),
     });
   } catch (err) {
-    console.error("Compare error:", err);
+    logger.error({ err }, "Compare error");
     res.status(500).json({ error: "Comparison failed" });
   }
 });
@@ -505,7 +506,7 @@ router.get("/timeline/identity/me", requireAuth, async (req, res) => {
 
     res.json(stage);
   } catch (err) {
-    console.error("Identity stage error:", err);
+    logger.error({ err }, "Identity stage error");
     res.status(500).json({ error: "Failed to fetch identity stage" });
   }
 });
@@ -654,7 +655,7 @@ router.post("/timeline/what-if/model", validateBody(WhatIfModelSchema), async (r
       modeledAt: new Date().toISOString(),
     });
   } catch (err) {
-    console.error("What-if model error:", err);
+    logger.error({ err }, "What-if model error");
     res.status(500).json({ error: "What-if modeling failed" });
   }
 });

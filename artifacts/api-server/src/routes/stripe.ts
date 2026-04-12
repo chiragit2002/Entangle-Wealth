@@ -7,6 +7,7 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { getUncachableStripeClient, getStripePublishableKey } from "../stripeClient";
 import { resolveUserId } from "../lib/resolveUserId";
 import { validateBody, z } from "../lib/validateRequest";
+import { logger } from "../lib/logger";
 
 const PriceIdSchema = z.object({
   priceId: z.string().regex(/^price_/, "Must be a valid Stripe price ID"),
@@ -19,7 +20,7 @@ router.get("/stripe/config", async (_req, res) => {
     const publishableKey = await getStripePublishableKey();
     res.json({ publishableKey });
   } catch (error) {
-    console.error("Error getting Stripe config:", error);
+    logger.error({ err: error }, "Error getting Stripe config");
     res.status(500).json({ error: "Failed to get Stripe configuration" });
   }
 });
@@ -51,8 +52,8 @@ router.get("/stripe/products", async (_req, res) => {
 
     res.json(result);
   } catch (error) {
-    console.error("Error fetching products:", error);
-    res.json([]);
+    logger.error({ err: error }, "Error fetching products");
+    res.status(500).json({ error: "Failed to fetch products" });
   }
 });
 
@@ -112,7 +113,7 @@ router.post("/stripe/create-checkout", requireAuth, validateBody(PriceIdSchema),
 
     res.json({ url: session.url });
   } catch (error) {
-    console.error("Checkout error:", error);
+    logger.error({ err: error }, "Checkout error");
     res.status(500).json({ error: "Failed to create checkout session" });
   }
 });
@@ -137,8 +138,8 @@ router.get("/stripe/subscription", requireAuth, async (req, res) => {
       currentPeriodEnd: (subscription as any).current_period_end ?? null,
     });
   } catch (error) {
-    console.error("Subscription check error:", error);
-    res.json({ active: false, tier: "free" });
+    logger.error({ err: error }, "Subscription check error");
+    res.status(500).json({ error: "Failed to check subscription status" });
   }
 });
 
@@ -168,8 +169,8 @@ router.get("/stripe/virtual-cash-products", async (_req, res) => {
 
     res.json(virtualCashProducts);
   } catch (error) {
-    console.error("Error fetching virtual cash products:", error);
-    res.json([]);
+    logger.error({ err: error }, "Error fetching virtual cash products");
+    res.status(500).json({ error: "Failed to fetch virtual cash products" });
   }
 });
 
@@ -227,7 +228,7 @@ router.post("/stripe/create-virtual-cash-checkout", requireAuth, validateBody(Pr
 
     res.json({ url: session.url });
   } catch (error) {
-    console.error("Virtual cash checkout error:", error);
+    logger.error({ err: error }, "Virtual cash checkout error");
     res.status(500).json({ error: "Failed to create checkout session" });
   }
 });
@@ -250,8 +251,8 @@ router.get("/stripe/virtual-cash-purchases", requireAuth, async (req, res) => {
 
     res.json(purchases);
   } catch (error) {
-    console.error("Error fetching purchase history:", error);
-    res.json([]);
+    logger.error({ err: error }, "Error fetching purchase history");
+    res.status(500).json({ error: "Failed to fetch purchase history" });
   }
 });
 
@@ -276,7 +277,7 @@ router.post("/stripe/create-portal", requireAuth, validateBody(z.object({}).stri
 
     res.json({ url: session.url });
   } catch (error) {
-    console.error("Portal error:", error);
+    logger.error({ err: error }, "Portal error");
     res.status(500).json({ error: "Failed to create portal session" });
   }
 });

@@ -21,6 +21,7 @@ import { resolveUserId } from "../lib/resolveUserId";
 import { aiQueue } from "../lib/aiQueue";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { getOccupationById } from "@workspace/occupations";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -204,7 +205,7 @@ router.post("/coaching/chat", requireAuth, validateBody(CoachingChatSchema), asy
       },
     });
   } catch (error) {
-    console.error("Coaching chat error:", error);
+    logger.error({ err: error }, "Coaching chat error:");
     res.status(500).json({ error: "Failed to get coaching response" });
   }
 });
@@ -261,7 +262,7 @@ router.get("/coaching/nudge", requireAuth, async (req, res) => {
 
     res.json({ nudge, context });
   } catch (error) {
-    console.error("Nudge error:", error);
+    logger.error({ err: error }, "Nudge error:");
     res.status(500).json({ error: "Failed to generate nudge" });
   }
 });
@@ -337,7 +338,7 @@ Respond in JSON format:
 
     res.json(newSummary);
   } catch (error) {
-    console.error("Weekly summary error:", error);
+    logger.error({ err: error }, "Weekly summary error:");
     res.status(500).json({ error: "Failed to generate weekly summary" });
   }
 });
@@ -361,7 +362,7 @@ router.get("/coaching/history", requireAuth, validateQuery(z.object({ limit: z.c
 
     res.json(sessions);
   } catch (error) {
-    console.error("Coaching history error:", error);
+    logger.error({ err: error }, "Coaching history error:");
     res.status(500).json({ error: "Failed to fetch coaching history" });
   }
 });

@@ -6,8 +6,11 @@ import {
   referralsTable,
   analyticsEventsTable,
   emailSubscribersTable,
+  giveawayEntriesTable,
+  userXpTable,
+  streaksTable,
 } from "@workspace/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, count, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { getAuth } from "@clerk/express";
@@ -17,6 +20,46 @@ import { sendZapierWebhook } from "../lib/zapierWebhook";
 import { validateBody, validateParams, z } from "../lib/validateRequest";
 import { logger } from "../lib/logger";
 import { getOccupationById } from "@workspace/occupations";
+
+async function autoEnrollInGiveaway(userId: string, clerkId: string) {
+  await db
+    .insert(giveawayEntriesTable)
+    .values({ userId })
+    .onConflictDoNothing({ target: giveawayEntriesTable.userId });
+
+  const [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+  const [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
+  const [refStats] = await db
+    .select({ converted: count() })
+    .from(referralsTable)
+    .where(and(eq(referralsTable.referrerId, clerkId), eq(referralsTable.converted, true)));
+
+  const xpLevel = xpRow?.level || 1;
+  const totalXp = xpRow?.totalXp || 0;
+  const currentStreak = streak?.currentStreak || 0;
+  const convertedReferrals = Number(refStats?.converted || 0);
+
+  const tradeEntries = Math.min(Math.floor(totalXp / 500), 50);
+  const streakEntries = Math.min(currentStreak, 30);
+  const xpMilestoneEntries = Math.floor(xpLevel / 5);
+  const loginEntries = Math.min(Math.floor(totalXp / 100), 30);
+  const referralEntries = convertedReferrals * 5;
+  const totalEntries = tradeEntries + streakEntries + xpMilestoneEntries + loginEntries + referralEntries;
+
+  await db
+    .update(giveawayEntriesTable)
+    .set({
+      totalEntries,
+      tradeEntries,
+      streakEntries,
+      loginEntries,
+      xpMilestoneEntries,
+      referralEntries,
+      convertedReferrals,
+      updatedAt: new Date(),
+    })
+    .where(eq(giveawayEntriesTable.userId, userId));
+}
 
 const UserIdParamsSchema = z.object({
   userId: z.string().min(1).max(100),
@@ -172,6 +215,12 @@ router.post("/users/sync", requireAuth, validateBody(UserSyncSchema), async (req
             logger.error({ err: refErr }, "[referral] Failed to create referral record");
           }
         }
+      }
+
+      try {
+        await autoEnrollInGiveaway(clerkId, clerkId);
+      } catch (err) {
+        logger.warn({ err, userId: clerkId }, "[giveaway] Auto-enrollment failed (non-fatal)");
       }
 
       res.json(created);

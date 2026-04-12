@@ -592,6 +592,10 @@ function gracefulShutdown(signal: string) {
   isShuttingDown = true;
 
   logger.info({ signal }, "Received shutdown signal, closing server...");
+  if (!httpServer) {
+    pool.end().catch(() => {}).finally(() => process.exit(0));
+    return;
+  }
   httpServer.close(() => {
     logger.info("HTTP server closed");
     pool.end().then(() => {

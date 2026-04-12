@@ -24,6 +24,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  ExternalLink,
 } from "lucide-react";
 import {
   BarChart,
@@ -162,7 +163,7 @@ function StarDisplay({ rating }: { rating: number }) {
 export default function Analytics() {
   const { getToken } = useAuth();
   const isAdmin = useIsAdmin();
-  const [, setLocation] = useLocation();
+  const [, navigate] = useLocation();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -190,9 +191,9 @@ export default function Analytics() {
 
   useEffect(() => {
     if (isAdmin === false) {
-      setLocation("/dashboard");
+      navigate("/dashboard");
     }
-  }, [isAdmin, setLocation]);
+  }, [isAdmin, navigate]);
 
   const buildQuery = useCallback(() => {
     if (datePreset === "custom" && customStart && customEnd) {
@@ -299,6 +300,18 @@ export default function Analytics() {
             <p className="text-white/40 text-sm mt-1">Platform health metrics & user intelligence</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => navigate("/admin/evolution")}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
+              style={{
+                background: "rgba(255,215,0,0.1)",
+                border: "1px solid rgba(255,215,0,0.3)",
+                color: "#FFD700",
+              }}
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Evolution
+            </button>
             <button
               onClick={() => setAutoRefresh(!autoRefresh)}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all"

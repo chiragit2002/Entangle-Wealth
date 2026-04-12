@@ -18,7 +18,7 @@ export function initSentry() {
       }),
     ],
     tracesSampleRate: isDev ? 0 : 0.1,
-    replaysSessionSampleRate: 0,
+    replaysSessionSampleRate: isDev ? 0 : 0.1,
     replaysOnErrorSampleRate: isDev ? 0 : 1.0,
     beforeSend(event) {
       scrubSensitiveData(event);

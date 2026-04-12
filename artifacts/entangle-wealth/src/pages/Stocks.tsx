@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { StockAnalysisPanel } from "@/components/StockAnalysisPanel";
+import { MicroFeedback } from "@/components/MicroFeedback";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -504,6 +505,11 @@ export default function Stocks() {
         </section>
       </main>
       <Footer />
+      <div className="fixed bottom-20 left-4 z-40">
+        {selectedStock && (
+          <MicroFeedback context="stock_analysis" label="Was this analysis helpful?" className="bg-[#0a0a14] border border-white/10 rounded-xl p-3 shadow-xl" />
+        )}
+      </div>
       <PaperTradingWidget variant="floating" initialSymbol={selectedStock?.symbol || ""} />
     </div>
   );

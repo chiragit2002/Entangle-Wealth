@@ -15,6 +15,7 @@ import { SpinWheel } from "@/components/SpinWheel";
 import { UpgradePrompt, useUpgradePrompt } from "@/components/UpgradePrompt";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
+import { MicroFeedback } from "@/components/MicroFeedback";
 
 function PanelHeader({ title, icon, color = "cyan", rightContent }: { title: string; icon?: React.ReactNode; color?: string; rightContent?: React.ReactNode }) {
   const borderColor = color === "cyan" ? "border-l-[#00D4FF]" : color === "gold" ? "border-l-[#FFD700]" : color === "green" ? "border-l-[#00ff88]" : color === "red" ? "border-l-[#ff3366]" : color === "purple" ? "border-l-[#9c27b0]" : "border-l-white/20";
@@ -239,6 +240,9 @@ export default function Terminal() {
             <span>REAL-TIME ANALYSIS</span>
           </div>
           <span className="text-[7px] font-mono text-white/10">Demo data · Not financial advice · Press ? for shortcuts</span>
+        </div>
+        <div className="mt-2 flex justify-end">
+          <MicroFeedback context="ai_terminal" label="Was the terminal helpful?" />
         </div>
       </div>
       <PaperTradingWidget variant="floating" />

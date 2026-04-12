@@ -11,3 +11,4 @@ export * from "./emailSubscribers";
 export * from "./wealthSimulation";
 export * from "./timelines";
 export * from "./behavioralFinance";
+export * from "./microfeedback";

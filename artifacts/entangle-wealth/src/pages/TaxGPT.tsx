@@ -9,6 +9,7 @@ import { ENTITY_SHORT_LABELS } from "@/lib/taxflow-types";
 import { getActiveProfile, getChatHistory, saveChatHistory } from "@/lib/taxflow-profile";
 import { trackEvent } from "@/lib/trackEvent";
 import { UpgradePrompt, useUpgradePrompt } from "@/components/UpgradePrompt";
+import { MicroFeedback } from "@/components/MicroFeedback";
 
 interface AuditRisk {
   title: string;
@@ -272,6 +273,9 @@ export default function TaxGPT() {
                 <Loader2 className="w-4 h-4 animate-spin text-[#9c27b0]" />
                 <span className="text-[14px] text-muted-foreground">Researching IRS publications...</span>
               </div>
+            )}
+            {messages.length > 1 && !loading && messages[messages.length - 1]?.role === "ai" && (
+              <MicroFeedback context="taxgpt" label="Was this answer helpful?" className="mt-2" />
             )}
           </div>
           <div className="flex gap-2">

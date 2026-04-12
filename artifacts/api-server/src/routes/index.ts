@@ -38,6 +38,9 @@ import coachingRouter from "./coaching";
 import businessDocsRouter from "./businessDocs";
 import feedbackRouter from "./feedback";
 import { createSecurityRouter } from "./security";
+import funnelsRouter from "./funnels";
+import microfeedbackRouter from "./microfeedback";
+import insightsRouter from "./insights";
 
 export function createRouter(app: Express): IRouter {
 const router: IRouter = Router();
@@ -81,6 +84,9 @@ router.use(coachingRouter);
 router.use(businessDocsRouter);
 router.use(feedbackRouter);
 router.use(createSecurityRouter(app));
+router.use(funnelsRouter);
+router.use(microfeedbackRouter);
+router.use(insightsRouter);
 
 return router;
 }

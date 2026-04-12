@@ -60,12 +60,6 @@ export const csrfProtection = (req: Request, res: Response, next: NextFunction) 
 
   const allowed = getAllowedOrigins();
 
-  const host = req.headers["host"];
-  if (host) {
-    allowed.add(`https://${host}`);
-    allowed.add(`http://${host}`);
-  }
-
   if (allowed.has(origin)) {
     return next();
   }

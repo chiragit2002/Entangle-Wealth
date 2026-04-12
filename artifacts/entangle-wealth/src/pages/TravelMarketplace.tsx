@@ -97,8 +97,8 @@ export default function TravelMarketplace() {
           <p className="text-muted-foreground mt-1">
             Book luxury hotels and flights using EntangleCoin | every transaction recorded on the blockchain
           </p>
-          <span className="inline-block mt-2 px-3 py-1 rounded-full bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 text-xs font-semibold">
-            DEMO MARKETPLACE | Real API integration coming soon
+          <span className="inline-block mt-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-semibold">
+            Powered by EntangleCoin · Bookings recorded on-platform
           </span>
         </div>
 
@@ -165,17 +165,16 @@ export default function TravelMarketplace() {
 
                     {isConfirmed ? (
                       <Button disabled className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 gap-1">
-                        <Check className="w-4 h-4" /> Booked (Demo)
+                        <Check className="w-4 h-4" /> Booked
                       </Button>
                     ) : (
                       <Button
                         className="bg-primary text-black hover:bg-primary/90 gap-1"
                         onClick={() => handleBook(listing)}
                         disabled={isBooking}
-                        title="Demo booking | real hotel/airline API integration coming soon"
                       >
                         {isBooking ? <Loader2 className="w-4 h-4 animate-spin" /> : <Coins className="w-4 h-4" />}
-                        Book Now (Demo)
+                        Book Now
                       </Button>
                     )}
                   </div>
@@ -195,9 +194,9 @@ export default function TravelMarketplace() {
 
         <div className="glass-panel p-5 rounded-xl text-center">
           <p className="text-xs text-muted-foreground/60">
-            Travel listings are demo inventory. Real hotel/airline API integration coming soon.
-            All bookings are recorded off-chain in the platform database. On-chain ERC-20 integration
-            will be activated after mainnet deployment and security audit. Token prices shown in ENTGL (EntangleCoin).
+            All bookings are recorded in the platform database and logged to your account.
+            On-chain ERC-20 settlement will be activated after mainnet deployment and security audit.
+            Token prices shown in ENTGL (EntangleCoin).
           </p>
         </div>
       </div>

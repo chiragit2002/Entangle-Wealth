@@ -6,6 +6,26 @@ import { Shield, ShieldCheck, Loader2, ExternalLink, User, Check, X, RefreshCw, 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
+function DocImageOrPlaceholder({ url, alt }: { url: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) {
+    return (
+      <div className="w-full h-28 rounded-lg border border-white/10 bg-white/[0.02] flex flex-col items-center justify-center gap-1">
+        <FileText className="w-6 h-6 text-white/30" />
+        <span className="text-[10px] text-white/30">PDF Document</span>
+      </div>
+    );
+  }
+  return (
+    <img
+      src={url}
+      alt={alt}
+      className="w-full h-28 object-cover rounded-lg border border-white/10 group-hover:border-primary/40 transition-colors"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 interface KycSubmission {
   id: string;
   clerkId: string;
@@ -424,19 +444,7 @@ export default function AdminKyc() {
                             <div key={idx}>
                               <p className="text-[10px] text-white/40 mb-1">Document {idx + 1}</p>
                               <div className="relative cursor-pointer group" onClick={() => setPreviewUrl(url)}>
-                                <img
-                                  src={url}
-                                  alt={`Business doc ${idx + 1}`}
-                                  className="w-full h-28 object-cover rounded-lg border border-white/10 group-hover:border-primary/40 transition-colors"
-                                  onError={e => {
-                                    const el = e.target as HTMLImageElement;
-                                    el.style.display = "none";
-                                    const parent = el.parentElement;
-                                    if (parent) {
-                                      parent.innerHTML = `<div class="w-full h-28 rounded-lg border border-white/10 bg-white/[0.02] flex flex-col items-center justify-center gap-1"><svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 text-white/30' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><polyline points='14 2 14 8 20 8'/></svg><span class='text-[10px] text-white/30'>PDF Document</span></div>`;
-                                    }
-                                  }}
-                                />
+                                <DocImageOrPlaceholder url={url} alt={`Business doc ${idx + 1}`} />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-colors flex items-center justify-center">
                                   <ExternalLink className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>

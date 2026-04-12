@@ -1,6 +1,6 @@
 import { useLocation, Link } from "wouter";
 import { Home, TrendingUp, BarChart3, Newspaper, Trophy, Clock, Radar, Activity, MoreHorizontal } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 
 const primaryItems = [
   { href: "/", label: "Home", icon: Home },
@@ -16,7 +16,7 @@ const moreItems = [
   { href: "/volatility", label: "Vol Lab", icon: Activity },
 ];
 
-export function BottomNav() {
+function BottomNavComponent() {
   const [location] = useLocation();
   const [showMore, setShowMore] = useState(false);
 
@@ -119,3 +119,5 @@ export function BottomNav() {
     </>
   );
 }
+
+export const BottomNav = memo(BottomNavComponent);

@@ -33,6 +33,7 @@ async function buildAll() {
       "@sentry/core",
       "@sentry/node-core",
       "@sentry/opentelemetry",
+      "drizzle-orm",
       "sharp",
       "better-sqlite3",
       "sqlite3",

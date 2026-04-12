@@ -378,8 +378,8 @@ export default function Community() {
                 <Button className="bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold min-h-[44px]" onClick={createPost}>
                   Post
                 </Button>
-                <Button variant="outline" className="border-white/10 text-muted-foreground/50 min-h-[44px] cursor-not-allowed opacity-60" disabled title="Photo uploads coming soon">
-                  Photo (Coming Soon)
+                <Button variant="outline" className="border-white/10 text-muted-foreground/50 min-h-[44px] cursor-not-allowed opacity-60" disabled title="Photo uploads not available">
+                  Photo
                 </Button>
               </div>
             </div>

@@ -227,7 +227,7 @@ export default function Gigs() {
                     const name = gig.contactName || "Service Provider";
                     toast({
                       title: `Contact ${name}`,
-                      description: "Send an email to support@entanglewealth.com with the gig title to get connected with this provider.",
+                      description: `Use the message in your profile to reach ${name} directly, or connect through the community board.`,
                     });
                   }}
                 >

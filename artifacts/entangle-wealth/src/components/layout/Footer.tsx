@@ -1,7 +1,8 @@
+import { memo } from "react";
 import { Link } from "wouter";
 import logoImg from "@assets/Gemini_Generated_Image_nso2qnso2qnso2qn_1775900950533.png";
 
-export function Footer() {
+function FooterComponent() {
   return (
     <footer className="w-full border-t border-border/60 bg-background py-10 mt-auto">
       <div className="container mx-auto px-4 md:px-6 flex flex-col md:flex-row justify-between gap-8">
@@ -68,3 +69,5 @@ export function Footer() {
     </footer>
   );
 }
+
+export const Footer = memo(FooterComponent);

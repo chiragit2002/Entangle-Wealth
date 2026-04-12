@@ -3,6 +3,8 @@ import { Link, useParams } from "wouter";
 import { Layout } from "@/components/layout/Layout";
 import { ArrowLeft, Calendar, Clock, FileText } from "lucide-react";
 import { loadBlogPosts } from "@/lib/seoStore";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 
 function estimateReadTime(text: string): number {
   const words = text.trim().split(/\s+/).length;
@@ -10,25 +12,16 @@ function estimateReadTime(text: string): number {
 }
 
 function renderMarkdown(md: string): string {
-  let html = md
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-
-  html = html.replace(/^### (.+)$/gm, '<h3 class="text-lg font-bold text-white mt-6 mb-2">$1</h3>');
-  html = html.replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold text-white mt-8 mb-3">$1</h2>');
-  html = html.replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold text-white mt-8 mb-4">$1</h1>');
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>');
-  html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
-  html = html.replace(/`([^`]+)`/g, '<code class="bg-white/[0.06] px-1.5 py-0.5 rounded text-primary text-sm font-mono">$1</code>');
-  html = html.replace(/^- (.+)$/gm, '<li class="ml-4 text-white/70 mb-1">• $1</li>');
-  html = html.replace(/^\d+\. (.+)$/gm, '<li class="ml-4 text-white/70 mb-1">$1</li>');
-  html = html.replace(/\n\n/g, '</p><p class="text-white/70 leading-relaxed mb-4">');
-  html = `<p class="text-white/70 leading-relaxed mb-4">${html}</p>`;
-  html = html.replace(/<p class="text-white\/70 leading-relaxed mb-4">(<h[1-3])/g, "$1");
-  html = html.replace(/(<\/h[1-3]>)<\/p>/g, "$1");
-
-  return html;
+  const raw = marked.parse(md, { async: false }) as string;
+  return DOMPurify.sanitize(raw, {
+    ALLOWED_TAGS: [
+      "h1","h2","h3","h4","h5","h6","p","strong","em","code","pre",
+      "ul","ol","li","blockquote","a","br","hr","table","thead","tbody",
+      "tr","th","td","img","span","div",
+    ],
+    ALLOWED_ATTR: ["href","src","alt","title","class","target","rel"],
+    ALLOW_DATA_ATTR: false,
+  });
 }
 
 export default function BlogPostPage() {

@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Menu, X, LogOut, User, ChevronDown, Volume2, VolumeX } from "lucide-react";
 import logoImg from "@assets/Gemini_Generated_Image_nso2qnso2qnso2qn_1775900950533.png";
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, memo } from "react";
 import { useUser, useClerk, Show } from "@clerk/react";
 import { Button } from "@/components/ui/button";
 import NotificationCenter from "@/components/NotificationCenter";
@@ -215,7 +215,7 @@ const ADMIN_MOBILE_SECTION = {
   ],
 };
 
-export function Navbar() {
+function NavbarComponent() {
   const [location, setLocation] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -411,3 +411,5 @@ export function Navbar() {
     </nav>
   );
 }
+
+export const Navbar = memo(NavbarComponent);

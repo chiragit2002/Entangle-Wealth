@@ -18,7 +18,9 @@ import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { Info } from "lucide-react";
 import { AuthErrorHandler } from "@/components/AuthErrorHandler";
 import { AuthTokenError } from "@/lib/authFetch";
-import { MilestoneCelebrationModal } from "@/components/viral/MilestoneCelebrationModal";
+const MilestoneCelebrationModal = lazy(() =>
+  import("@/components/viral/MilestoneCelebrationModal").then((m) => ({ default: m.MilestoneCelebrationModal }))
+);
 import { ProfileCompletionGate } from "@/components/ProfileCompletionGate";
 
 const Home = lazy(() => import("@/pages/Home"));
@@ -388,7 +390,9 @@ function ClerkProviderWithRoutes() {
           </Switch>
           </ProfileCompletionGate>
           <OnboardingProvider />
-          <MilestoneCelebrationModal />
+          <Suspense fallback={null}>
+            <MilestoneCelebrationModal />
+          </Suspense>
           <CookieConsentBanner />
           <InstallPrompt />
           <NotificationPrompt />

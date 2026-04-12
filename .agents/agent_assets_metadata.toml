@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "R9uuH3vQkirpOrfQuRdl1"
+uri = "file://exports/evolution-core.pdf"
+type = "pdf"
+title = "Evolution Core PDF"

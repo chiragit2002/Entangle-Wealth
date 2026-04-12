@@ -435,6 +435,54 @@
   .animate-ping { animation: none !important; }
 }
 
+@keyframes referral-celebrate {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.18); }
+  50% { transform: scale(0.96); }
+  75% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+@keyframes referral-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.referral-celebrate-num {
+  animation: referral-celebrate 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.referral-share-btn {
+  background-size: 200% 100% !important;
+  animation: referral-share-pulse 3s ease-in-out infinite;
+}
+@keyframes referral-share-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0); background-position: 0% 50%; }
+  50% { box-shadow: 0 4px 24px rgba(0,212,255,0.3), 0 0 40px rgba(0,212,255,0.1); background-position: 100% 50%; }
+}
+
+.referral-share-btn:hover {
+  box-shadow: 0 6px 32px rgba(0,212,255,0.4), 0 0 60px rgba(0,212,255,0.15) !important;
+  transform: translateY(-1px);
+}
+
+.referral-share-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: referral-shimmer 2.5s linear infinite;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.referral-unlock-badge {
+  animation: referral-unlock-glow 2.5s ease-in-out infinite;
+}
+@keyframes referral-unlock-glow {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; box-shadow: 0 0 10px currentColor; }
+}
+
 @keyframes slide-up-fade {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }

@@ -1,69 +1,267 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@clerk/react";
-import { Copy, Check, Users, Award, Share2, ChevronRight, Trophy, Gift } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Copy, Check, Share2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/trackEvent";
 import { Link } from "wouter";
 
-const BADGE_TIERS = [
-  { tier: "Bronze", icon: "🥉", threshold: 3, color: "#cd7f32" },
-  { tier: "Silver", icon: "🥈", threshold: 10, color: "#c0c0c0" },
-  { tier: "Gold", icon: "🥇", threshold: 25, color: "#ffd700" },
-  { tier: "Platinum", icon: "💎", threshold: 50, color: "#00d4ff" },
+const TIERS = [
+  {
+    key: "extra_signals",
+    threshold: 3,
+    name: "Entangled",
+    benefit: "Never miss a trade again",
+    detail: "5 bonus signals every day for 30 days",
+    color: "#00d4ff",
+    glow: "rgba(0,212,255,0.35)",
+  },
+  {
+    key: "taxgpt_unlimited",
+    threshold: 10,
+    name: "Quantum",
+    benefit: "Your taxes, handled by AI",
+    detail: "Unlimited TaxGPT access for 30 days",
+    color: "#7c3aed",
+    glow: "rgba(124,58,237,0.35)",
+  },
+  {
+    key: "ambassador",
+    threshold: 25,
+    name: "Singularity",
+    benefit: "Shape the future of finance",
+    detail: "Permanent Ambassador status + share of the $36K pool",
+    color: "#f5c842",
+    glow: "rgba(245,200,66,0.35)",
+  },
 ];
 
-const MILESTONES = [
-  { key: "extra_signals", threshold: 3, label: "5 Extra Daily Signals", icon: "⚡" },
-  { key: "pro_trial", threshold: 5, label: "1 Month Pro Trial", icon: "🚀" },
-  { key: "taxgpt_unlimited", threshold: 10, label: "Unlimited TaxGPT", icon: "🧾" },
-  { key: "ambassador", threshold: 25, label: "Ambassador Badge", icon: "🏆" },
-];
+function getActiveTier(referralCount: number): (typeof TIERS)[number] | null {
+  return TIERS.find((t) => referralCount < t.threshold) ?? null;
+}
+
+function getProgressPct(referralCount: number, activeTier: (typeof TIERS)[number] | null): number {
+  if (!activeTier) return 100;
+  const tierIdx = TIERS.indexOf(activeTier);
+  const prev = tierIdx > 0 ? TIERS[tierIdx - 1].threshold : 0;
+  const next = activeTier.threshold;
+  return Math.min(((referralCount - prev) / (next - prev)) * 100, 100);
+}
+
+function OrbitalRing({
+  pct,
+  color,
+  glow,
+  count,
+  allDone,
+  celebrating,
+}: {
+  pct: number;
+  color: string;
+  glow: string;
+  count: number;
+  allDone: boolean;
+  celebrating: boolean;
+}) {
+  const r = 52;
+  const circ = 2 * Math.PI * r;
+  const filled = (pct / 100) * circ;
+
+  return (
+    <div
+      className="relative flex items-center justify-center"
+      style={{ width: 140, height: 140 }}
+      aria-label={`Progress: ${Math.round(pct)}%`}
+    >
+      <svg
+        width="140"
+        height="140"
+        viewBox="0 0 140 140"
+        style={{ position: "absolute", inset: 0 }}
+      >
+        <circle
+          cx="70"
+          cy="70"
+          r={r}
+          fill="none"
+          stroke="rgba(255,255,255,0.06)"
+          strokeWidth="8"
+        />
+        <circle
+          cx="70"
+          cy="70"
+          r={r}
+          fill="none"
+          stroke={color}
+          strokeWidth="8"
+          strokeLinecap="round"
+          strokeDasharray={`${filled} ${circ - filled}`}
+          strokeDashoffset={circ / 4}
+          style={{
+            transition: "stroke-dasharray 1s cubic-bezier(0.4,0,0.2,1), stroke 0.5s ease",
+            filter: `drop-shadow(0 0 8px ${glow})`,
+          }}
+        />
+        {allDone && (
+          <circle
+            cx="70"
+            cy="70"
+            r={r + 6}
+            fill="none"
+            stroke={color}
+            strokeWidth="1.5"
+            strokeOpacity="0.25"
+            className="animate-ping"
+            style={{ animationDuration: "2s" }}
+          />
+        )}
+      </svg>
+      <div className="flex flex-col items-center justify-center z-10" style={{ gap: 2 }}>
+        <motion.span
+          key={count}
+          animate={celebrating ? { scale: [1, 1.25, 0.95, 1.1, 1] } : {}}
+          transition={{ duration: 0.55, ease: "easeOut" }}
+          className="font-mono font-bold leading-none"
+          style={{ fontSize: 34, color, textShadow: `0 0 16px ${glow}` }}
+        >
+          {count}
+        </motion.span>
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-white/40">
+          {count === 1 ? "person" : "people"}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function TierIcon({
+  color,
+  done,
+  active,
+}: {
+  color: string;
+  done: boolean;
+  active: boolean;
+}) {
+  const opacity = done ? 1 : active ? 0.7 : 0.25;
+  return (
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 28 28"
+      fill="none"
+      style={{ opacity, flexShrink: 0 }}
+    >
+      <circle cx="14" cy="14" r="13" stroke={color} strokeWidth="1.5" />
+      <circle
+        cx="14"
+        cy="14"
+        r="6"
+        fill={done || active ? color : "transparent"}
+        style={{
+          filter: done ? `drop-shadow(0 0 6px ${color})` : "none",
+          transition: "fill 0.4s ease",
+        }}
+      />
+      {done && (
+        <path
+          d="M10 14l2.5 2.5L18 11"
+          stroke="#000"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      )}
+    </svg>
+  );
+}
+
+function UnlockFlash({ color, glow }: { color: string; glow: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.7 }}
+      animate={{ opacity: [0, 1, 1, 0], scale: [0.7, 1.08, 1.04, 0.9] }}
+      transition={{ duration: 0.75, ease: "easeOut" }}
+      style={{
+        position: "absolute",
+        inset: -4,
+        borderRadius: 16,
+        border: `1px solid ${color}80`,
+        boxShadow: `0 0 24px ${glow}, inset 0 0 16px ${glow}`,
+        pointerEvents: "none",
+        zIndex: 20,
+      }}
+    />
+  );
+}
 
 export function ReferralSection() {
   const { getToken, isSignedIn } = useAuth();
   const { toast } = useToast();
   const [code, setCode] = useState("");
-  const [stats, setStats] = useState({ totalReferred: 0, totalConverted: 0 });
-  const [badges, setBadges] = useState<{ tier: string; icon: string; threshold: number; earned: boolean }[]>([]);
-  const [copied, setCopied] = useState(false);
-  const [nextMilestone, setNextMilestone] = useState<{ threshold: number; label: string; icon: string; remaining: number } | null>(null);
   const [referralCount, setReferralCount] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const [celebratingTierKey, setCelebratingTierKey] = useState<string | null>(null);
+  const seenKeysRef = useRef<Set<string>>(new Set());
+
+  const triggerCelebration = useCallback((key: string) => {
+    setCelebratingTierKey(key);
+    setTimeout(() => setCelebratingTierKey(null), 1200);
+  }, []);
+
+  const markNewMilestonesSeen = useCallback(
+    async (keys: string[]) => {
+      try {
+        await authFetch("/viral/referral/milestones/seen", getToken, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ keys }),
+        });
+      } catch {}
+    },
+    [getToken]
+  );
 
   const fetchData = useCallback(async () => {
     if (!isSignedIn) return;
     try {
-      const [codeRes, badgeRes, milestoneRes] = await Promise.all([
+      const [codeRes, milestoneRes] = await Promise.all([
         authFetch("/viral/referral/code", getToken),
-        authFetch("/viral/referral/badges", getToken),
         authFetch("/viral/referral/milestones", getToken),
       ]);
       if (codeRes.ok) {
         const data = await codeRes.json();
         setCode(data.code);
-        setStats({ totalReferred: data.totalReferred, totalConverted: data.totalConverted });
-      }
-      if (badgeRes.ok) {
-        const data = await badgeRes.json();
-        setBadges(data.badges);
-        setReferralCount(data.referralCount || 0);
       }
       if (milestoneRes.ok) {
         const data = await milestoneRes.json();
-        if (data.nextMilestone) {
-          const ms = MILESTONES.find((m) => m.threshold === data.nextMilestone.threshold);
-          setNextMilestone(ms ? { ...ms, remaining: data.nextMilestone.remaining } : null);
-        } else {
-          setNextMilestone(null);
+        const count: number = data.referralCount ?? 0;
+        setReferralCount(count);
+
+        const newMilestones: { key: string }[] = data.newMilestones ?? [];
+        const unseenKeys = newMilestones
+          .map((m) => m.key)
+          .filter((k) => !seenKeysRef.current.has(k));
+
+        if (unseenKeys.length > 0) {
+          const celebratableKey = unseenKeys.find((k) =>
+            TIERS.some((t) => t.key === k)
+          );
+          if (celebratableKey) {
+            triggerCelebration(celebratableKey);
+          }
+          unseenKeys.forEach((k) => seenKeysRef.current.add(k));
+          markNewMilestonesSeen(unseenKeys);
         }
-        if (data.referralCount !== undefined) setReferralCount(data.referralCount);
       }
     } catch {}
-  }, [getToken, isSignedIn]);
+  }, [getToken, isSignedIn, triggerCelebration, markNewMilestonesSeen]);
 
   useEffect(() => {
     fetchData();
+    const interval = setInterval(fetchData, 30_000);
+    return () => clearInterval(interval);
   }, [fetchData]);
 
   const referralLink = code ? `${window.location.origin}?ref=${code}` : "";
@@ -73,156 +271,253 @@ export function ReferralSection() {
     await navigator.clipboard.writeText(referralLink);
     setCopied(true);
     trackEvent("referral_click", { action: "copy" });
-    toast({ title: "Copied", description: "Referral link copied to clipboard." });
+    toast({ title: "Copied", description: "Share it with someone who deserves an edge." });
     setTimeout(() => setCopied(false), 2000);
   }, [referralLink, toast]);
 
   const shareLink = useCallback(async () => {
     if (!referralLink) return;
+    trackEvent("referral_click", { action: "share" });
+    const shareMessage =
+      "I've been using EntangleWealth for institutional-grade trading signals and AI-powered tax tools. Join me — it's genuinely different from anything else out there.";
     if (navigator.share) {
-      await navigator.share({
-        title: "Join EntangleWealth",
-        text: "Get institutional-grade financial analysis with AI-powered signals.",
-        url: referralLink,
-      });
-    } else {
-      copyLink();
+      try {
+        await navigator.share({
+          title: "Join me on EntangleWealth",
+          text: shareMessage,
+          url: referralLink,
+        });
+        return;
+      } catch {}
     }
-  }, [referralLink, copyLink]);
+    await navigator.clipboard.writeText(`${shareMessage}\n${referralLink}`);
+    toast({ title: "Link copied", description: "Share it with someone who deserves an edge." });
+  }, [referralLink, toast]);
 
   if (!isSignedIn) return null;
 
-  const progressMilestone = nextMilestone || MILESTONES[MILESTONES.length - 1];
-  const prevThreshold = (() => {
-    const idx = MILESTONES.findIndex((m) => m.threshold === progressMilestone.threshold);
-    return idx > 0 ? MILESTONES[idx - 1].threshold : 0;
-  })();
-  const progressPct = nextMilestone
-    ? Math.min(((referralCount - prevThreshold) / (progressMilestone.threshold - prevThreshold)) * 100, 100)
-    : 100;
+  const activeTier = getActiveTier(referralCount);
+  const progressPct = getProgressPct(referralCount, activeTier);
+  const allDone = !activeTier;
+  const ringColor = activeTier?.color ?? TIERS[TIERS.length - 1].color;
+  const ringGlow = activeTier?.glow ?? TIERS[TIERS.length - 1].glow;
+  const celebratingCount = celebratingTierKey !== null;
 
   return (
-    <div className="glass-panel rounded-xl p-5">
-      <div className="flex items-center gap-2 mb-3">
-        <Users className="w-5 h-5 text-primary" />
-        <h3 className="text-base font-bold">Refer & Earn</h3>
-      </div>
+    <div className="referral-section glass-panel rounded-2xl p-6 overflow-hidden relative">
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at 80% 20%, rgba(0,212,255,0.04) 0%, transparent 60%)",
+        }}
+      />
 
-      <div className="mb-4 rounded-xl border border-[#f5c842]/25 bg-[#f5c842]/5 p-3 flex items-center gap-3">
-        <Trophy className="w-5 h-5 text-[#f5c842] shrink-0" />
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-bold text-[#f5c842]">$36,000 Referral Bonus Pool</p>
-          <p className="text-[10px] text-white/50 leading-tight mt-0.5">Invite friends | earn your share of the $36K pool + 5 entries into the $50K giveaway per referral.</p>
+      <div className="relative z-10">
+        <div className="mb-5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30 mb-1">
+            Referral Program
+          </p>
+          <h3 className="text-xl font-bold text-white leading-tight">
+            You're building the future of finance.
+          </h3>
+          <p className="text-sm text-white/45 mt-1.5 leading-relaxed">
+            Every person you bring in unlocks something real — not points, not badges. Genuine upgrades to how you invest.
+          </p>
         </div>
-        <Link href="/giveaway">
-          <button className="shrink-0 text-[#f5c842]/60 hover:text-[#f5c842] transition-colors">
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </Link>
-      </div>
 
-      <p className="text-xs text-muted-foreground mb-4">
-        Share your link and unlock real features: extra signals, Pro trial, TaxGPT, and more.
-      </p>
-
-      {code && (
-        <div className="flex gap-2 mb-4">
-          <div className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm font-mono text-white/80 truncate">
-            {referralLink}
+        <div className="flex flex-col sm:flex-row items-center gap-6 mb-6">
+          <div className="flex-shrink-0">
+            <OrbitalRing
+              pct={progressPct}
+              color={ringColor}
+              glow={ringGlow}
+              count={referralCount}
+              allDone={allDone}
+              celebrating={celebratingCount}
+            />
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            className="border-primary/30 text-primary gap-1 shrink-0"
-            onClick={copyLink}
-          >
-            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="border-[#00ff88]/30 text-[#00ff88] gap-1 shrink-0"
-            onClick={shareLink}
-          >
-            <Share2 className="w-4 h-4" />
-          </Button>
-        </div>
-      )}
 
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-white/[0.03] rounded-lg p-3 text-center border border-white/5">
-          <p className="text-xl font-bold font-mono text-primary">{stats.totalReferred}</p>
-          <p className="text-[10px] text-muted-foreground uppercase">Total Referred</p>
-        </div>
-        <div className="bg-white/[0.03] rounded-lg p-3 text-center border border-white/5">
-          <p className="text-xl font-bold font-mono text-[#00ff88]">{stats.totalConverted}</p>
-          <p className="text-[10px] text-muted-foreground uppercase">Converted</p>
-        </div>
-      </div>
+          <div className="flex-1 w-full space-y-3">
+            {TIERS.map((tier) => {
+              const done = referralCount >= tier.threshold;
+              const isNext = activeTier?.threshold === tier.threshold;
+              const isCelebrating = celebratingTierKey === tier.key;
+              const remainingForTier = done
+                ? 0
+                : tier.threshold - referralCount;
 
-      <div className="mb-4 bg-white/[0.02] rounded-lg border border-white/5 p-3">
-        <div className="flex items-center justify-between mb-1.5">
-          <p className="text-xs font-semibold text-white/70 flex items-center gap-1">
-            {progressMilestone.icon} {nextMilestone ? "Next unlock" : "All milestones reached!"}
-          </p>
-          {nextMilestone && (
-            <p className="text-xs text-muted-foreground flex items-center gap-0.5">
-              <span className="font-mono font-bold text-primary">{nextMilestone.remaining}</span>
-              <ChevronRight className="w-3 h-3" />
-              <span>{progressMilestone.label}</span>
-            </p>
-          )}
+              return (
+                <div key={tier.key} className="relative">
+                  <AnimatePresence>
+                    {isCelebrating && (
+                      <UnlockFlash color={tier.color} glow={tier.glow} />
+                    )}
+                  </AnimatePresence>
+                  <motion.div
+                    className="flex items-center gap-3 rounded-xl p-3"
+                    animate={
+                      isCelebrating
+                        ? {
+                            boxShadow: [
+                              `0 0 0px ${tier.glow}`,
+                              `0 0 20px ${tier.glow}`,
+                              `0 0 8px ${tier.glow}`,
+                            ],
+                          }
+                        : {}
+                    }
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                    style={
+                      done
+                        ? {
+                            background: `linear-gradient(135deg, ${tier.color}12, ${tier.color}06)`,
+                            border: `1px solid ${tier.color}30`,
+                          }
+                        : isNext
+                        ? {
+                            background: "rgba(255,255,255,0.03)",
+                            border: `1px solid ${tier.color}20`,
+                          }
+                        : {
+                            background: "rgba(255,255,255,0.02)",
+                            border: "1px solid rgba(255,255,255,0.05)",
+                          }
+                    }
+                  >
+                    <TierIcon color={tier.color} done={done} active={isNext} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span
+                          className="text-xs font-bold tracking-wide"
+                          style={{
+                            color:
+                              done || isNext
+                                ? tier.color
+                                : "rgba(255,255,255,0.3)",
+                          }}
+                        >
+                          {tier.name}
+                        </span>
+                        <span className="text-[10px] text-white/25 font-mono">
+                          {tier.threshold} people
+                        </span>
+                      </div>
+                      <p
+                        className="text-xs leading-snug mt-0.5"
+                        style={{
+                          color: done
+                            ? "rgba(255,255,255,0.7)"
+                            : isNext
+                            ? "rgba(255,255,255,0.5)"
+                            : "rgba(255,255,255,0.2)",
+                        }}
+                      >
+                        {done ? tier.detail : tier.benefit}
+                      </p>
+                    </div>
+                    {done && (
+                      <div
+                        className="shrink-0 referral-unlock-badge"
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: "50%",
+                          background: `${tier.color}22`,
+                          border: `1px solid ${tier.color}50`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 12 12">
+                          <path
+                            d="M2 6l2.5 2.5L10 3"
+                            stroke={tier.color}
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            fill="none"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                    {isNext && remainingForTier > 0 && (
+                      <span
+                        className="shrink-0 text-[10px] font-mono font-bold"
+                        style={{ color: tier.color }}
+                      >
+                        {remainingForTier} left
+                      </span>
+                    )}
+                  </motion.div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-        <div className="w-full bg-white/5 rounded-full h-2 mb-1.5">
+
+        {activeTier?.key === "ambassador" && (
           <div
-            className="h-2 rounded-full bg-gradient-to-r from-primary to-[#00ff88] transition-all duration-500"
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-        {nextMilestone && (
-          <p className="text-[10px] text-muted-foreground">
-            {referralCount} / {progressMilestone.threshold} referrals | {nextMilestone.remaining} more to unlock {progressMilestone.label}
-          </p>
+            className="rounded-xl p-3 mb-5 flex items-center gap-3"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(245,200,66,0.07), rgba(245,200,66,0.02))",
+              border: "1px solid rgba(245,200,66,0.18)",
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+              <circle cx="8" cy="8" r="7" stroke="#f5c842" strokeWidth="1.2" />
+              <path d="M8 4v4l2.5 1.5" stroke="#f5c842" strokeWidth="1.4" strokeLinecap="round" />
+            </svg>
+            <p className="text-[11px] text-[#f5c842]/80 leading-tight">
+              Reach Singularity and earn your share of the{" "}
+              <Link href="/giveaway">
+                <span className="text-[#f5c842] font-bold cursor-pointer hover:underline">
+                  $36,000 referral bonus pool
+                </span>
+              </Link>{" "}
+              + 5 entries per referral into the $50K giveaway.
+            </p>
+          </div>
         )}
 
-        <div className="mt-3 space-y-1.5">
-          {MILESTONES.map((m) => {
-            const done = referralCount >= m.threshold;
-            return (
-              <div key={m.key || m.threshold} className="flex items-center gap-2 text-xs">
-                <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold ${done ? "bg-[#00ff88] text-black" : "bg-white/10 text-white/30"}`}>
-                  {done ? "✓" : m.threshold}
-                </span>
-                <span className={done ? "text-white/70" : "text-white/30"}>{m.icon} {m.label}</span>
-                <span className="ml-auto text-[9px] text-muted-foreground/50">{m.threshold} refs</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+        <button
+          onClick={shareLink}
+          disabled={!code}
+          className="referral-share-btn w-full relative overflow-hidden rounded-xl py-4 font-bold text-sm text-black transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed mb-3"
+          style={{
+            background: code
+              ? "linear-gradient(135deg, #00d4ff 0%, #0099cc 50%, #00ff88 100%)"
+              : "rgba(255,255,255,0.1)",
+            backgroundSize: "200% 100%",
+          }}
+        >
+          <span className="referral-share-shimmer" aria-hidden="true" />
+          <span className="relative z-10 flex items-center justify-center gap-2">
+            <Share2 className="w-4 h-4" />
+            Invite someone who deserves an edge
+          </span>
+        </button>
 
-      <div>
-        <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1">
-          <Award className="w-3.5 h-3.5" /> Referral Badges
-        </p>
-        <div className="flex gap-2">
-          {(badges.length > 0 ? badges : BADGE_TIERS.map((b) => ({ ...b, earned: false }))).map((b) => (
-            <div
-              key={b.tier}
-              className={`flex-1 rounded-lg p-2 text-center border transition-all ${
-                b.earned
-                  ? "bg-white/[0.06] border-white/15"
-                  : "bg-white/[0.02] border-white/5 opacity-40"
-              }`}
-            >
-              <span className="text-lg">{BADGE_TIERS.find((t) => t.tier === b.tier)?.icon || ""}</span>
-              <p className="text-[9px] font-bold mt-0.5" style={{ color: b.earned ? BADGE_TIERS.find((t) => t.tier === b.tier)?.color : undefined }}>
-                {b.tier}
-              </p>
-              <p className="text-[8px] text-muted-foreground">{b.threshold}+</p>
+        {code && (
+          <div className="flex items-center gap-2">
+            <div className="flex-1 bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs font-mono text-white/40 truncate select-all">
+              {referralLink}
             </div>
-          ))}
-        </div>
+            <button
+              onClick={copyLink}
+              className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-white/40 hover:text-white/80 hover:border-white/20 transition-colors"
+              title="Copy link"
+            >
+              {copied ? (
+                <Check className="w-4 h-4 text-[#00ff88]" />
+              ) : (
+                <Copy className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -14,6 +14,11 @@ import { validateBody, validateQuery, validateParams, PaginationQuerySchema, Int
 
 const router = Router();
 
+function flushSseResponse(res: Response): void {
+  const r = res as unknown as { flush?: () => void };
+  if (typeof r.flush === "function") r.flush();
+}
+
 const ALERT_TYPES = [
   "price_above",
   "price_below",
@@ -91,16 +96,18 @@ router.get("/alerts", requireAuth, validateQuery(PaginationQuerySchema), async (
   }
 });
 
+const ALERT_TYPES_TUPLE = [...ALERT_TYPES] as [string, ...string[]];
+
 const AlertCreateSchema = z.object({
   symbol: z.string().min(1).max(10).regex(/^[A-Za-z0-9.]{1,10}$/, "Invalid symbol"),
-  alertType: z.enum(ALERT_TYPES as [string, ...string[]]),
+  alertType: z.enum(ALERT_TYPES_TUPLE as [string, ...string[]]),
   threshold: z.number().optional(),
 });
 
 const AlertPatchSchema = z.object({
   enabled: z.boolean().optional(),
   threshold: z.number().optional(),
-  alertType: z.enum(ALERT_TYPES as [string, ...string[]]).optional(),
+  alertType: z.enum(ALERT_TYPES_TUPLE as [string, ...string[]]).optional(),
 });
 
 const AlertMarkReadSchema = z.object({
@@ -277,9 +284,7 @@ router.get("/alerts/stream", (req: Request, res: Response) => {
     });
     res.flushHeaders();
     res.write(`event: auth_error\ndata: ${JSON.stringify({ type: "auth_error", message: "Token expired or missing. Please refresh and reconnect." })}\n\n`);
-    if (typeof (res as Record<string, unknown>).flush === "function") {
-      (res as Record<string, (() => void)>).flush();
-    }
+    flushSseResponse(res);
     res.end();
     return;
   }
@@ -292,9 +297,7 @@ router.get("/alerts/stream", (req: Request, res: Response) => {
   });
   res.flushHeaders();
   res.write("data: {\"type\":\"connected\"}\n\n");
-  if (typeof (res as Record<string, unknown>).flush === "function") {
-    (res as Record<string, (() => void)>).flush();
-  }
+  flushSseResponse(res);
 
   if (!sseClients.has(userId)) {
     sseClients.set(userId, new Set());

@@ -1,6 +1,7 @@
 import { initSentry, Sentry } from "./lib/sentry";
 initSentry();
 
+import { exec } from "child_process";
 import express from "express";
 import app from "./app";
 import { logger } from "./lib/logger";
@@ -461,37 +462,128 @@ async function initStripe() {
   }
 }
 
-const httpServer = server.listen(port, async () => {
+const PROTECTED_PROCESS_NAMES = ["systemd", "init", "kernel", "kthreadd", "dockerd", "containerd", "sshd"];
 
-  logger.info({ port }, "Server listening");
+async function evictProcessOnPort(targetPort: number): Promise<void> {
+  const pids = await new Promise<string[]>((resolve) => {
+    exec(`lsof -ti tcp:${targetPort}`, (err, stdout) => {
+      resolve(err || !stdout.trim() ? [] : stdout.trim().split("\n").filter(Boolean));
+    });
+  });
+
+  if (pids.length === 0) return;
+
+  const safePids: string[] = [];
+  for (const pid of pids) {
+    if (pid === String(process.pid)) continue;
+    const name = await new Promise<string>((resolve) => {
+      exec(`ps -p ${pid} -o comm=`, (err, out) => resolve(err ? "" : out.trim().toLowerCase()));
+    });
+    if (PROTECTED_PROCESS_NAMES.some((n) => name.startsWith(n))) {
+      logger.warn({ pid, name, port: targetPort }, "Skipping protected process on port");
+      continue;
+    }
+    safePids.push(pid);
+  }
+
+  if (safePids.length === 0) return;
+
+  logger.warn({ port: targetPort, pids: safePids }, "Sending SIGTERM to stale process(es) holding port");
+  await new Promise<void>((resolve) => {
+    exec(`kill -TERM ${safePids.join(" ")}`, () => resolve());
+  });
+  await new Promise<void>((resolve) => setTimeout(resolve, 1000));
+
+  const remaining = await new Promise<string[]>((resolve) => {
+    exec(`lsof -ti tcp:${targetPort}`, (err, stdout) => {
+      resolve(err || !stdout.trim() ? [] : stdout.trim().split("\n").filter(Boolean));
+    });
+  });
+
+  const stillAlive = remaining.filter((p) => safePids.includes(p));
+  if (stillAlive.length > 0) {
+    logger.warn({ pids: stillAlive }, "Process(es) did not exit after SIGTERM — sending SIGKILL");
+    await new Promise<void>((resolve) => {
+      exec(`kill -9 ${stillAlive.join(" ")}`, () => resolve());
+    });
+    await new Promise<void>((resolve) => setTimeout(resolve, 500));
+  }
+}
+
+function bindServer(bindPort: number): Promise<ReturnType<typeof server.listen>> {
+  return new Promise((resolve, reject) => {
+    const srv = server.listen(bindPort, () => resolve(srv));
+    srv.once("error", (err: NodeJS.ErrnoException) => reject(err));
+  });
+}
+
+const ALLOW_PORT_EVICTION = process.env.ALLOW_PORT_EVICTION === "true";
+
+async function tryListen(bindPort: number, retryCount = 0): Promise<ReturnType<typeof server.listen>> {
+  try {
+    return await bindServer(bindPort);
+  } catch (err) {
+    const portErr = err as NodeJS.ErrnoException;
+    if (portErr.code === "EADDRINUSE" && ALLOW_PORT_EVICTION && retryCount < 2) {
+      logger.warn({ port: bindPort, attempt: retryCount + 1 }, "Port in use — attempting stale-process eviction (ALLOW_PORT_EVICTION=true)");
+      await evictProcessOnPort(bindPort);
+      return tryListen(bindPort, retryCount + 1);
+    }
+    if (portErr.code === "EADDRINUSE") {
+      const fallbackPort = bindPort + 1;
+      if (ALLOW_PORT_EVICTION) {
+        logger.error({ port: bindPort, fallbackPort }, "Port still in use after eviction attempts. Trying fallback port.");
+      } else {
+        logger.warn({ port: bindPort, fallbackPort }, "Port in use — binding fallback port (set ALLOW_PORT_EVICTION=true to evict stale processes)");
+      }
+      return bindServer(fallbackPort);
+    }
+    if (portErr.code === "EACCES") {
+      logger.error({ port: bindPort }, "Permission denied on port. Use a port > 1024.");
+    } else {
+      logger.error({ err }, "Server startup error");
+    }
+    throw err;
+  }
+}
+
+let httpServer: ReturnType<typeof server.listen>;
+try {
+  httpServer = await tryListen(port, 0);
+  const boundAddr = httpServer.address();
+  const boundPort = boundAddr && typeof boundAddr === "object" ? boundAddr.port : port;
+  if (boundPort !== port) {
+    logger.warn({ requestedPort: port, boundPort }, "Server bound to fallback port");
+  } else {
+    logger.info({ port: boundPort }, "Server listening");
+  }
   trackConnections(httpServer);
-  ensureReferralBadgesExist().catch((err) =>
-    logger.warn({ error: err }, "Failed to seed referral badges (non-fatal)")
-  );
-  await ensureDailyContentTable();
-  await ensureAlertTables();
-  await ensurePaperTradingTables();
-  await ensureGamificationTables();
-  await ensureEmailSubscribersTable();
-  await ensureTimelineTables();
-  ensurePerformanceIndexes().catch((err) =>
-    logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
-  );
-  startAlertEvaluator();
-  startDigestScheduler();
-  startDailyContentScheduler();
-  startDripScheduler();
-  await initStripe();
-});
+} catch {
+  process.exit(1);
+  throw new Error("unreachable");
+}
 
 httpServer.on("error", (err: NodeJS.ErrnoException) => {
-  if (err.code === "EADDRINUSE") {
-    logger.error({ port }, "Port is already in use");
-  } else {
-    logger.error({ err }, "Server error");
-  }
-  process.exit(1);
+  logger.error({ err }, "Unexpected server error after startup");
 });
+
+ensureReferralBadgesExist().catch((err) =>
+  logger.warn({ error: err }, "Failed to seed referral badges (non-fatal)")
+);
+await ensureDailyContentTable();
+await ensureAlertTables();
+await ensurePaperTradingTables();
+await ensureGamificationTables();
+await ensureEmailSubscribersTable();
+await ensureTimelineTables();
+ensurePerformanceIndexes().catch((err) =>
+  logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
+);
+startAlertEvaluator();
+startDigestScheduler();
+startDailyContentScheduler();
+startDripScheduler();
+await initStripe();
 
 let isShuttingDown = false;
 

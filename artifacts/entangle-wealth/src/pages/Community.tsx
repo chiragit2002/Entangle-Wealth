@@ -406,11 +406,13 @@ export default function Community() {
                   <div className="flex gap-4 pt-3 border-t border-white/5">
                     <button
                       onClick={() => likePost(p.id)}
+                      aria-label={p.liked ? "Unlike post" : "Like post"}
+                      aria-pressed={p.liked}
                       className={`flex items-center gap-1.5 text-xs min-h-[36px] px-2 transition-colors ${p.liked ? "text-primary" : "text-[#555] hover:text-primary"}`}
                     >
                       <ThumbsUp className="w-4 h-4" /> {p.likes}
                     </button>
-                    <button className="flex items-center gap-1.5 text-xs text-[#555] hover:text-primary min-h-[36px] px-2 transition-colors">
+                    <button aria-label={`${p.comments} comments`} className="flex items-center gap-1.5 text-xs text-[#555] hover:text-primary min-h-[36px] px-2 transition-colors">
                       <MessageCircle className="w-4 h-4" /> {p.comments}
                     </button>
                     <button

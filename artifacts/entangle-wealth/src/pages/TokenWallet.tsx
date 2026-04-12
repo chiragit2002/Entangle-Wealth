@@ -159,15 +159,19 @@ export default function TokenWallet() {
                 {showLinkForm ? (
                   <div className="flex gap-2">
                     <Input
+                      aria-label="Ethereum wallet address"
                       placeholder="0x... Ethereum wallet address"
                       value={walletInput}
                       onChange={(e) => setWalletInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") linkWallet(); }}
                       className="bg-white/5 border-white/10 font-mono text-sm"
+                      autoComplete="off"
+                      spellCheck={false}
                     />
-                    <Button onClick={linkWallet} disabled={linking} className="bg-primary text-black px-4">
+                    <Button onClick={linkWallet} disabled={linking} aria-label="Link wallet" className="bg-primary text-black px-4">
                       {linking ? <Loader2 className="w-4 h-4 animate-spin" /> : "Link"}
                     </Button>
-                    <Button variant="ghost" onClick={() => setShowLinkForm(false)} className="text-muted-foreground">
+                    <Button variant="ghost" onClick={() => setShowLinkForm(false)} aria-label="Cancel" className="text-muted-foreground">
                       Cancel
                     </Button>
                   </div>

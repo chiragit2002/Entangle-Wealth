@@ -276,17 +276,20 @@ export default function TaxGPT() {
           </div>
           <div className="flex gap-2">
             <Input
+              aria-label="Tax question"
               placeholder="Ask about any deduction or strategy..."
               value={input}
               onChange={e => setInput(e.target.value.slice(0, 1000))}
               onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               maxLength={1000}
+              disabled={loading}
               className="bg-white/5 border-white/10 flex-1"
             />
             <Button
+              aria-label="Send question"
               className="bg-gradient-to-r from-[#9c27b0] to-[#6a1b9a] text-white font-bold px-4 min-h-[44px] min-w-[44px]"
               onClick={() => sendMessage()}
-              disabled={loading}
+              disabled={loading || !input.trim()}
             >
               <Send className="w-4 h-4" />
             </Button>

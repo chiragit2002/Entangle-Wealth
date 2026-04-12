@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useAuth } from "@clerk/react";
-import { useUser } from "@clerk/react";
+import { useAuth, useUser } from "@clerk/react";
 import { Layout } from "@/components/layout/Layout";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";

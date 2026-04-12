@@ -11,6 +11,10 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("/sw.js", { scope: "/" })
-      .catch(err => console.error('Service worker registration failed:', err));
+      .catch((err) => {
+        if (import.meta.env.DEV) {
+          console.warn("[SW] Registration failed (non-fatal):", err);
+        }
+      });
   });
 }

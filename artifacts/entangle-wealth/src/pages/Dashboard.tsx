@@ -548,15 +548,15 @@ export default function Dashboard() {
                       <button onClick={() => setTradeSide("sell")} className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-colors ${tradeSide === "sell" ? "bg-red-500/15 text-red-400 border border-red-500/30" : "bg-white/[0.03] text-white/40 border border-white/[0.06]"}`}>Sell</button>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
-                      <input value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40" />
-                      <input value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40" />
-                      <input value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40" />
+                      <input aria-label="Ticker symbol" value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40 transition-colors" />
+                      <input aria-label="Quantity" value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" min="1" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40 transition-colors" />
+                      <input aria-label="Price per share" value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" min="0.01" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40 transition-colors" />
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} className={`flex-1 h-10 text-sm font-bold rounded-xl transition-colors ${tradeSide === "buy" ? "bg-primary text-black hover:bg-primary/90" : "bg-red-500 text-white hover:bg-red-500/90"} disabled:opacity-40`}>
-                        {tradeLoading ? "Executing..." : `${tradeSide === "buy" ? "Buy" : "Sell"} Order`}
+                      <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} aria-label={`${tradeSide === "buy" ? "Buy" : "Sell"} order`} className={`flex-1 h-10 text-sm font-bold rounded-xl transition-colors ${tradeSide === "buy" ? "bg-primary text-black hover:bg-primary/90 active:scale-[0.98]" : "bg-red-500 text-white hover:bg-red-500/90 active:scale-[0.98]"} disabled:opacity-40 disabled:cursor-not-allowed`}>
+                        {tradeLoading ? <span className="flex items-center justify-center gap-1.5"><span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />Executing...</span> : `${tradeSide === "buy" ? "Buy" : "Sell"} Order`}
                       </button>
-                      <button onClick={resetPortfolio} className="px-4 h-10 text-sm font-medium text-white/40 bg-white/[0.03] border border-white/[0.06] rounded-xl hover:text-white/60 transition-colors">
+                      <button onClick={resetPortfolio} title="Reset portfolio to $100,000" className="px-4 h-10 text-sm font-medium text-white/40 bg-white/[0.03] border border-white/[0.06] rounded-xl hover:text-white/60 hover:border-white/10 transition-colors active:scale-[0.98]">
                         Reset
                       </button>
                     </div>

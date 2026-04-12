@@ -45,7 +45,8 @@ export class CircuitBreaker {
       this.failureCount++;
       this.lastFailureTime = Date.now();
 
-      if (this.failureCount >= this.failureThreshold && this.state !== "open") {
+      const currentState = this.state;
+      if (this.failureCount >= this.failureThreshold && currentState !== "open") {
         this.state = "open";
         logger.error(
           { circuit: this.name, failureCount: this.failureCount },

@@ -163,8 +163,11 @@ app.use(cors({
     }
   },
 }));
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  const isDocUpload = req.path.startsWith("/api/analyze-document") || req.path.startsWith("/api/kyc");
+  express.json({ limit: isDocUpload ? "10mb" : "1mb" })(req, res, next);
+});
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 app.use(csrfProtection);
 app.use(inputSanitizer);

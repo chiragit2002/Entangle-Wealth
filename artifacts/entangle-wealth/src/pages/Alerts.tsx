@@ -367,33 +367,46 @@ export default function Alerts() {
                 </Button>
               ) : (
                 <div className="rounded-xl bg-white/[0.03] border border-[#00D4FF]/20 p-4">
-                  <p className="text-sm font-bold text-[#00D4FF] mb-3 font-[family-name:var(--font-mono)]">Create Alert Rule</p>
+                  <p className="text-sm font-bold text-[#00D4FF] mb-1 font-[family-name:var(--font-mono)]">Create Alert Rule</p>
+                  <p className="text-xs text-white/30 mb-4">Get notified instantly when your conditions are met — supports price levels and 4 technical indicators.</p>
                   <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                    <input
-                      placeholder="Symbol (e.g. AAPL)"
-                      value={newSymbol}
-                      onChange={e => setNewSymbol(e.target.value.toUpperCase().replace(/[^A-Z0-9.]/g, "").slice(0, 10))}
-                      maxLength={10}
-                      className="bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/30 font-[family-name:var(--font-mono)]"
-                    />
-                    <select
-                      value={newType}
-                      onChange={e => setNewType(e.target.value)}
-                      className="bg-[#0d0d1a] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none [&>option]:bg-[#0d0d1a] [&>option]:text-white"
-                    >
-                      {ALERT_TYPE_OPTIONS.map(o => (
-                        <option key={o.value} value={o.value}>{o.label}</option>
-                      ))}
-                    </select>
-                    {needsThreshold(newType) && (
+                    <div className="form-field">
+                      <label className="form-label">Ticker Symbol</label>
                       <input
-                        placeholder="Price ($)"
-                        value={newThreshold}
-                        onChange={e => setNewThreshold(e.target.value.replace(/[^0-9.]/g, ""))}
-                        className="bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/30 font-[family-name:var(--font-mono)]"
+                        placeholder="e.g. AAPL"
+                        value={newSymbol}
+                        onChange={e => setNewSymbol(e.target.value.toUpperCase().replace(/[^A-Z0-9.]/g, "").slice(0, 10))}
+                        maxLength={10}
+                        aria-label="Ticker symbol"
+                        className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/30 font-[family-name:var(--font-mono)]"
                       />
-                    )}
-                    <div className="flex gap-2">
+                    </div>
+                    <div className="form-field">
+                      <label className="form-label">Alert Type</label>
+                      <select
+                        value={newType}
+                        onChange={e => setNewType(e.target.value)}
+                        aria-label="Alert type"
+                        className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none [&>option]:bg-[#0d0d1a] [&>option]:text-white"
+                      >
+                        {ALERT_TYPE_OPTIONS.map(o => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    {needsThreshold(newType) ? (
+                      <div className="form-field">
+                        <label className="form-label">Target Price ($)</label>
+                        <input
+                          placeholder="e.g. 185.00"
+                          value={newThreshold}
+                          onChange={e => setNewThreshold(e.target.value.replace(/[^0-9.]/g, ""))}
+                          aria-label="Target price"
+                          className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/30 font-[family-name:var(--font-mono)]"
+                        />
+                      </div>
+                    ) : <div />}
+                    <div className="flex gap-2 items-end">
                       <Button
                         onClick={createAlert}
                         disabled={creating || !newSymbol.trim()}

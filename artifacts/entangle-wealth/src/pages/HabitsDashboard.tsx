@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Target, Flame, Zap, CheckCircle2, Circle, Shield, DollarSign,
   TrendingUp, CreditCard, BarChart3, BookOpen, Activity, GitBranch,
-  Briefcase, PieChart, RefreshCw, Trophy, Star, Calendar,
+  Briefcase, PieChart, RefreshCw, Trophy, Star, Calendar, AlertTriangle,
 } from "lucide-react";
 import { fireConfetti } from "@/lib/confetti";
 import { Link } from "wouter";
@@ -137,11 +137,13 @@ export default function HabitsDashboard() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [summary, setSummary] = useState<HabitSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [completing, setCompleting] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("all");
 
   const fetchHabits = useCallback(async () => {
     setLoading(true);
+    setFetchError(false);
     try {
       const token = isSignedIn ? await getToken() : null;
       const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -152,10 +154,14 @@ export default function HabitsDashboard() {
         fetch(`${API_BASE}/habits/summary`, { headers }),
       ]);
 
-      if (habitsRes.ok) setHabits(await habitsRes.json());
+      if (!habitsRes.ok) {
+        setFetchError(true);
+        return;
+      }
+      setHabits(await habitsRes.json());
       if (summaryRes.ok) setSummary(await summaryRes.json());
-    } catch (err) {
-      console.error("Error fetching habits:", err);
+    } catch {
+      setFetchError(true);
     } finally {
       setLoading(false);
     }
@@ -299,6 +305,28 @@ export default function HabitsDashboard() {
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="h-44 bg-white/[0.04] rounded-xl animate-pulse border border-white/10" />
               ))}
+            </div>
+          ) : fetchError ? (
+            <div className="text-center py-16 bg-white/[0.02] border border-red-500/20 rounded-xl">
+              <AlertTriangle className="w-10 h-10 text-red-400/60 mx-auto mb-3" />
+              <p className="text-white/60 text-sm font-medium">Failed to load habits</p>
+              <p className="text-white/30 text-xs mt-1 mb-4">There was a problem connecting to the server.</p>
+              <button onClick={fetchHabits} className="text-xs text-[#00D4FF] hover:underline">Try again</button>
+            </div>
+          ) : filteredHabits.length === 0 ? (
+            <div className="text-center py-16 bg-white/[0.02] border border-white/[0.06] rounded-xl">
+              <Target className="w-10 h-10 text-white/10 mx-auto mb-3" />
+              {activeCategory === "all" ? (
+                <>
+                  <p className="text-white/40 text-sm font-medium">No habits available</p>
+                  <p className="text-white/20 text-xs mt-1">Check back later — habits are refreshed regularly.</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-white/40 text-sm font-medium">No habits in "{activeCategory}"</p>
+                  <button onClick={() => setActiveCategory("all")} className="mt-3 text-xs text-[#00D4FF] hover:underline">View all habits</button>
+                </>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

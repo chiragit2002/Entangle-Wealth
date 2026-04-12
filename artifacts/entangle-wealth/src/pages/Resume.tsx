@@ -509,28 +509,34 @@ export default function Resume() {
                         </div>
                       ))}
                     </div>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="https://linkedin.com/in/your-profile"
-                        value={linkedInUrl}
-                        onChange={(e) => setLinkedInUrl(e.target.value)}
-                        className="bg-white/5 border-white/10 flex-1"
-                      />
-                      <Button
-                        className="bg-[#0A66C2] hover:bg-[#094D92] text-white gap-2"
-                        onClick={handleLinkedInConnect}
-                        disabled={linkedInImporting}
-                      >
-                        {linkedInImporting ? (
-                          <><Loader2 className="w-4 h-4 animate-spin" /> Importing...</>
-                        ) : (
-                          <><Link2 className="w-4 h-4" /> Connect</>
-                        )}
-                      </Button>
+                    <div className="space-y-1.5">
+                      <label htmlFor="linkedin-url" className="text-xs text-white/50">LinkedIn Profile URL</label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="linkedin-url"
+                          placeholder="https://linkedin.com/in/your-profile"
+                          value={linkedInUrl}
+                          onChange={(e) => setLinkedInUrl(e.target.value)}
+                          className="bg-white/5 border-white/10 flex-1"
+                          type="url"
+                          autoComplete="url"
+                        />
+                        <Button
+                          className="bg-[#0A66C2] hover:bg-[#094D92] text-white gap-2"
+                          onClick={handleLinkedInConnect}
+                          disabled={linkedInImporting}
+                        >
+                          {linkedInImporting ? (
+                            <><Loader2 className="w-4 h-4 animate-spin" /> Importing...</>
+                          ) : (
+                            <><Link2 className="w-4 h-4" /> Connect</>
+                          )}
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Tip: You can also go to LinkedIn → More → Save to PDF, then upload the file here for instant import.
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Tip: You can also go to LinkedIn → More → Save to PDF, then upload the file here for instant import.
-                    </p>
                   </div>
                 )}
               </div>

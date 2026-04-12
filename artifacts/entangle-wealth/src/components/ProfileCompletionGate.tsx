@@ -455,16 +455,19 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
               error={errors.occupationId}
               placeholder="Select your occupation..."
             />
-            {errors.occupationId && (
+            {errors.occupationId ? (
               <p id="gate-occupation-error" className="text-[10px] text-red-400 mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3 shrink-0" />
                 {errors.occupationId}
               </p>
-            )}
-            {form.occupationId && !errors.occupationId && (
+            ) : form.occupationId ? (
               <p className="text-[10px] text-primary/60 mt-1 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3 shrink-0" />
                 {getOccupationById(form.occupationId)?.name}
+              </p>
+            ) : (
+              <p id="gate-occupation-hint" className="text-[10px] text-white/30 mt-1">
+                Select your profession or role — used to personalize tax insights and recommendations.
               </p>
             )}
           </div>
@@ -481,13 +484,17 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
               onBlur={() => handleBlur("location")}
               className={`bg-white/5 border-white/10 transition-colors ${errors.location ? "border-red-500/50 focus:border-red-500" : "focus:border-primary/50"}`}
               aria-invalid={!!errors.location}
-              aria-describedby={errors.location ? "gate-location-error" : undefined}
+              aria-describedby={errors.location ? "gate-location-error" : "gate-location-hint"}
               autoComplete="address-level2"
             />
-            {errors.location && (
+            {errors.location ? (
               <p id="gate-location-error" className="text-[10px] text-red-400 mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3 shrink-0" />
                 {errors.location}
+              </p>
+            ) : (
+              <p id="gate-location-hint" className="text-[10px] text-white/30 mt-1">
+                Used to surface region-specific tax rules and local job opportunities.
               </p>
             )}
           </div>

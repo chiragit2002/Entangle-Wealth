@@ -4,8 +4,8 @@ import { Layout } from "@/components/layout/Layout";
 import { authFetch } from "@/lib/authFetch";
 import {
   Brain, Send, RefreshCw, Zap, Star, Target, TrendingUp,
-  MessageCircle, Sparkles, Calendar, Trophy, Flame, CheckCircle,
-  ChevronDown, ChevronUp, Info,
+  Sparkles, Calendar, Trophy, CheckCircle,
+  ChevronUp, Info, AlertCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -51,29 +51,35 @@ export default function AICoach() {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [nudge, setNudge] = useState<NudgeData | null>(null);
+  const [nudgeError, setNudgeError] = useState(false);
   const [weeklySummary, setWeeklySummary] = useState<WeeklySummary | null>(null);
   const [loadingNudge, setLoadingNudge] = useState(false);
   const [loadingSummary, setLoadingSummary] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
   const fetchNudge = useCallback(async () => {
     if (!isSignedIn) return;
     setLoadingNudge(true);
+    setNudgeError(false);
     try {
       const res = await authFetch("/coaching/nudge", getToken, {});
+      if (!res.ok) {
+        setNudgeError(true);
+        return;
+      }
       const data = await res.json();
       setNudge(data);
-    } catch (err) {
-      console.error("Nudge error:", err);
+    } catch {
+      setNudgeError(true);
     } finally {
       setLoadingNudge(false);
     }
@@ -87,8 +93,7 @@ export default function AICoach() {
       const data = await res.json();
       setWeeklySummary(data);
       setShowSummary(true);
-    } catch (err) {
-      console.error("Weekly summary error:", err);
+    } catch {
       toast({ title: "Error", description: "Failed to generate weekly summary.", variant: "destructive" });
     } finally {
       setLoadingSummary(false);
@@ -109,7 +114,7 @@ export default function AICoach() {
     }
   }, [isSignedIn, fetchNudge]);
 
-  const sendMessage = async (text?: string) => {
+  const sendMessage = useCallback(async (text?: string) => {
     const messageText = (text || input).trim();
     if (!messageText || sending) return;
 
@@ -146,19 +151,19 @@ export default function AICoach() {
       };
 
       setMessages(prev => [...prev, assistantMsg]);
-    } catch (err) {
+    } catch {
       toast({ title: "Error", description: "Failed to get coaching response.", variant: "destructive" });
     } finally {
       setSending(false);
     }
-  };
+  }, [input, sending, isSignedIn, getToken, toast]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
-  };
+  }, [sendMessage]);
 
   return (
     <Layout>
@@ -187,7 +192,15 @@ export default function AICoach() {
             </div>
           </div>
 
-          {nudge && (
+          {loadingNudge ? (
+            <div className="border border-white/10 rounded-xl p-4 animate-pulse h-16 bg-white/[0.02]" aria-label="Loading daily nudge" />
+          ) : nudgeError ? (
+            <div className="border border-white/10 rounded-xl p-3 flex items-center gap-2 text-xs text-white/30">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+              <span>Daily nudge unavailable — couldn't reach the server.</span>
+              <button onClick={fetchNudge} className="ml-auto text-primary/60 hover:text-primary shrink-0">Retry</button>
+            </div>
+          ) : nudge ? (
             <div className="border border-[#00D4FF]/20 bg-[#00D4FF]/5 rounded-xl p-4 flex items-start gap-3">
               <Sparkles className="w-5 h-5 text-[#00D4FF] mt-0.5 flex-shrink-0" />
               <div>
@@ -202,7 +215,7 @@ export default function AICoach() {
                 )}
               </div>
             </div>
-          )}
+          ) : null}
 
           {showSummary && weeklySummary && (
             <div className="border border-amber-500/20 bg-amber-500/5 rounded-xl overflow-hidden">

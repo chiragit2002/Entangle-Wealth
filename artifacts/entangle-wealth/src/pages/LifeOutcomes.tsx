@@ -88,6 +88,38 @@ function CustomTooltip({ active, payload, label }: Record<string, unknown>) {
   );
 }
 
+type ParamKey = "currentAge" | "annualIncome" | "monthlyInvestment" | "currentSavings" | "expectedReturnRate" | "inflationRate" | "monthlyExpenses";
+
+interface SliderRowProps {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step?: number;
+  format: (v: number) => string;
+  field: ParamKey;
+  onChange: (field: ParamKey, v: number) => void;
+}
+
+function SliderRow({ label, value, min, max, step = 1, format, field, onChange }: SliderRowProps) {
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between text-sm">
+        <span className="text-white/60">{label}</span>
+        <span className="text-white font-medium">{format(value)}</span>
+      </div>
+      <Slider
+        value={[value]}
+        min={min}
+        max={max}
+        step={step}
+        onValueChange={([v]) => onChange(field, v)}
+        className="w-full"
+      />
+    </div>
+  );
+}
+
 export default function LifeOutcomes() {
   const [params, setParams] = useState({
     currentAge: 30,
@@ -101,10 +133,16 @@ export default function LifeOutcomes() {
 
   const [result, setResult] = useState<ProjectionResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [projectionError, setProjectionError] = useState(false);
   const [showParams, setShowParams] = useState(true);
+
+  const handleParamChange = useCallback((field: ParamKey, v: number) => {
+    setParams(p => ({ ...p, [field]: v }));
+  }, []);
 
   const runProjection = useCallback(async () => {
     setLoading(true);
+    setProjectionError(false);
     try {
       const res = await fetch(`${API_BASE}/life-outcomes/project`, {
         method: "POST",
@@ -115,45 +153,12 @@ export default function LifeOutcomes() {
       const data = await res.json();
       setResult(data);
       setShowParams(false);
-    } catch (err) {
-      console.error("Life outcomes error:", err);
+    } catch {
+      setProjectionError(true);
     } finally {
       setLoading(false);
     }
   }, [params]);
-
-  const SliderRow = ({
-    label,
-    value,
-    min,
-    max,
-    step = 1,
-    format,
-    field,
-  }: {
-    label: string;
-    value: number;
-    min: number;
-    max: number;
-    step?: number;
-    format: (v: number) => string;
-    field: keyof typeof params;
-  }) => (
-    <div className="space-y-2">
-      <div className="flex justify-between text-sm">
-        <span className="text-white/60">{label}</span>
-        <span className="text-white font-medium">{format(value)}</span>
-      </div>
-      <Slider
-        value={[value]}
-        min={min}
-        max={max}
-        step={step}
-        onValueChange={([v]) => setParams(p => ({ ...p, [field]: v }))}
-        className="w-full"
-      />
-    </div>
-  );
 
   return (
     <Layout>
@@ -166,7 +171,7 @@ export default function LifeOutcomes() {
             </div>
           </div>
 
-          <FinancialDisclaimerBanner />
+          <FinancialDisclaimerBanner pageKey="life-outcomes" />
 
           <div className="bg-white/[0.04] border border-white/10 rounded-xl overflow-hidden">
             <button
@@ -183,13 +188,19 @@ export default function LifeOutcomes() {
             {showParams && (
               <div className="px-6 pb-6 space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <SliderRow label="Current Age" value={params.currentAge} min={18} max={65} field="currentAge" format={v => `${v} yrs`} />
-                  <SliderRow label="Annual Income" value={params.annualIncome} min={20000} max={500000} step={1000} field="annualIncome" format={v => fmt(v)} />
-                  <SliderRow label="Monthly Investment" value={params.monthlyInvestment} min={0} max={10000} step={50} field="monthlyInvestment" format={v => `$${v.toLocaleString()}/mo`} />
-                  <SliderRow label="Current Savings" value={params.currentSavings} min={0} max={500000} step={500} field="currentSavings" format={v => fmt(v)} />
-                  <SliderRow label="Expected Return Rate" value={params.expectedReturnRate} min={1} max={15} step={0.5} field="expectedReturnRate" format={v => `${v}%/yr`} />
-                  <SliderRow label="Monthly Expenses" value={params.monthlyExpenses} min={500} max={20000} step={100} field="monthlyExpenses" format={v => `$${v.toLocaleString()}/mo`} />
+                  <SliderRow label="Current Age" value={params.currentAge} min={18} max={65} field="currentAge" format={v => `${v} yrs`} onChange={handleParamChange} />
+                  <SliderRow label="Annual Income" value={params.annualIncome} min={20000} max={500000} step={1000} field="annualIncome" format={v => fmt(v)} onChange={handleParamChange} />
+                  <SliderRow label="Monthly Investment" value={params.monthlyInvestment} min={0} max={10000} step={50} field="monthlyInvestment" format={v => `$${v.toLocaleString()}/mo`} onChange={handleParamChange} />
+                  <SliderRow label="Current Savings" value={params.currentSavings} min={0} max={500000} step={500} field="currentSavings" format={v => fmt(v)} onChange={handleParamChange} />
+                  <SliderRow label="Expected Return Rate" value={params.expectedReturnRate} min={1} max={15} step={0.5} field="expectedReturnRate" format={v => `${v}%/yr`} onChange={handleParamChange} />
+                  <SliderRow label="Monthly Expenses" value={params.monthlyExpenses} min={500} max={20000} step={100} field="monthlyExpenses" format={v => `$${v.toLocaleString()}/mo`} onChange={handleParamChange} />
                 </div>
+
+                {projectionError && (
+                  <p className="text-xs text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2">
+                    Failed to run projection. Please check your inputs and try again.
+                  </p>
+                )}
 
                 <button
                   onClick={runProjection}

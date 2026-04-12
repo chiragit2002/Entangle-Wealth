@@ -211,15 +211,17 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
 
         {step === 1 && (
           <div>
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-1">
               <Building2 className="w-5 h-5 text-[#00c8f8]" />
               <h3 className="font-semibold text-white">What describes you best?</h3>
             </div>
+            <p className="text-[11px] text-white/40 mb-4">Select your primary business structure — this determines which tax strategies and deductions apply to you.</p>
             <div className="space-y-2">
               {(Object.entries(ENTITY_LABELS) as [EntityType, string][]).map(([key, label]) => (
                 <button
                   key={key}
                   onClick={() => selectEntity(key)}
+                  aria-pressed={hasSelectedEntity && profile.entityType === key}
                   className={`w-full text-left p-3 rounded-xl border text-[13px] transition-all min-h-[44px] ${
                     hasSelectedEntity && profile.entityType === key
                       ? "border-[#00c8f8]/50 bg-[#00c8f8]/10 text-[#00c8f8]"
@@ -241,11 +243,11 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
             </div>
             <div className="space-y-3">
               <div>
-                <label className="text-[11px] text-white/50 mb-1 block">Business Name *</label>
+                <label className="form-label">Business Name *</label>
                 <Input value={profile.businessName} onChange={e => update({ businessName: e.target.value.slice(0, 100) })} placeholder="Your Business LLC" className="bg-white/5 border-white/10" />
               </div>
               <div>
-                <label className="text-[11px] text-white/50 mb-1 block">EIN (Employer Identification Number)</label>
+                <label className="form-label">EIN (Employer Identification Number)</label>
                 <Input
                   value={profile.ein}
                   onChange={e => update({ ein: formatEin(e.target.value) })}
@@ -258,11 +260,11 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                 )}
               </div>
               <div>
-                <label className="text-[11px] text-white/50 mb-1 block">Industry</label>
+                <label className="form-label">Industry</label>
                 <Input value={profile.industry} onChange={e => update({ industry: e.target.value.slice(0, 100) })} placeholder="e.g., Graphic Design, Consulting" className="bg-white/5 border-white/10" />
               </div>
               <div>
-                <label className="text-[11px] text-white/50 mb-1 block">State of Residence *</label>
+                <label className="form-label">State of Residence *</label>
                 <select
                   value={profile.homeState}
                   onChange={e => update({ homeState: e.target.value, state: e.target.value })}
@@ -273,22 +275,23 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                 </select>
               </div>
               <div>
-                <label className="text-[11px] text-white/50 mb-1 block">Year Business Started</label>
+                <label className="form-label">Year Business Started</label>
                 <Input type="number" value={profile.yearStarted} onChange={e => update({ yearStarted: e.target.value })} placeholder="2020" min="1950" max="2026" className="bg-white/5 border-white/10" />
               </div>
               <div>
-                <label className="text-[11px] text-white/50 mb-1 block">Primary Business Activity</label>
+                <label className="form-label">Primary Business Activity</label>
                 <Input value={profile.primaryActivity} onChange={e => update({ primaryActivity: e.target.value.slice(0, 200) })} placeholder="What does your business do?" className="bg-white/5 border-white/10" />
               </div>
 
               <div className="border-t border-white/10 pt-4 mt-4">
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-1">
                   <ShieldCheck className="w-4 h-4 text-[#00c8f8]" />
                   <h4 className="font-semibold text-white text-sm">Identity Verification (KYC) *</h4>
                 </div>
+                <p className="text-[11px] text-white/30 mb-3">Required for tax filing and compliance. Your data is encrypted and never shared with third parties.</p>
                 <div className="space-y-3">
                   <div>
-                    <label className="text-[11px] text-white/50 mb-1 block">Full Legal Name *</label>
+                    <label className="form-label">Full Legal Name *</label>
                     <Input
                       value={profile.kyc.fullLegalName}
                       onChange={e => updateKyc({ fullLegalName: e.target.value.slice(0, 100) })}
@@ -297,7 +300,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-white/50 mb-1 block">Date of Birth *</label>
+                    <label className="form-label">Date of Birth *</label>
                     <Input
                       type="date"
                       value={profile.kyc.dateOfBirth}
@@ -306,7 +309,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-white/50 mb-1 block">Address *</label>
+                    <label className="form-label">Address *</label>
                     <Input
                       value={profile.kyc.address}
                       onChange={e => updateKyc({ address: e.target.value.slice(0, 200) })}
@@ -315,7 +318,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-white/50 mb-1 block">ID Type *</label>
+                    <label className="form-label">ID Type *</label>
                     <select
                       value={profile.kyc.idType}
                       onChange={e => updateKyc({ idType: e.target.value })}
@@ -326,7 +329,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                     </select>
                   </div>
                   <div>
-                    <label className="text-[11px] text-white/50 mb-1 block">ID Number *</label>
+                    <label className="form-label">ID Number *</label>
                     <Input
                       value={profile.kyc.idNumber}
                       onChange={e => updateKyc({ idNumber: e.target.value.slice(0, 30) })}
@@ -348,15 +351,15 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
             </div>
             <div className="space-y-3">
               <div>
-                <label className="text-[11px] text-white/50 mb-1 block">Estimated Annual Gross Revenue *</label>
+                <label className="form-label">Estimated Annual Gross Revenue *</label>
                 <Input type="number" value={profile.grossRevenue || ""} onChange={e => update({ grossRevenue: Math.max(0, Number(e.target.value)) })} placeholder="100000" className="bg-white/5 border-white/10" />
               </div>
               <div>
-                <label className="text-[11px] text-white/50 mb-1 block">W-2 Income (if any)</label>
+                <label className="form-label">W-2 Income (if any)</label>
                 <Input type="number" value={profile.w2Income || ""} onChange={e => update({ w2Income: Math.max(0, Number(e.target.value)) })} placeholder="0" className="bg-white/5 border-white/10" />
               </div>
               <div>
-                <label className="text-[11px] text-white/50 mb-1 block">Number of Employees/Contractors You Pay</label>
+                <label className="form-label">Number of Employees/Contractors You Pay</label>
                 <Input type="number" value={profile.employeeCount || ""} onChange={e => update({ employeeCount: Math.max(0, Number(e.target.value)) })} placeholder="0" className="bg-white/5 border-white/10" />
               </div>
               <div className="flex items-center justify-between p-3 rounded-xl border border-white/10">
@@ -365,7 +368,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
               </div>
               {profile.hasHomeOffice && (
                 <div>
-                  <label className="text-[11px] text-white/50 mb-1 block">Home Office Square Footage</label>
+                  <label className="form-label">Home Office Square Footage</label>
                   <Input type="number" value={profile.homeOfficeSqft || ""} onChange={e => update({ homeOfficeSqft: Math.min(300, Math.max(0, Number(e.target.value))) })} placeholder="150" max="300" className="bg-white/5 border-white/10" />
                 </div>
               )}
@@ -375,7 +378,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
               </div>
               {profile.usesVehicle && (
                 <div>
-                  <label className="text-[11px] text-white/50 mb-1 block">Business Use Percentage</label>
+                  <label className="form-label">Business Use Percentage</label>
                   <Input type="number" value={profile.vehicleBusinessPct || ""} onChange={e => update({ vehicleBusinessPct: Math.min(100, Math.max(0, Number(e.target.value))) })} placeholder="70" max="100" className="bg-white/5 border-white/10" />
                 </div>
               )}

@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
 import { useAuth } from "@clerk/react";
+import { useToast } from "@/hooks/use-toast";
 
 const API_BASE = "/api";
 
@@ -1020,6 +1021,7 @@ const DEFAULT_PARAMS_B: TimelineParams = {
 
 export default function AlternateTimeline() {
   const { getToken, isSignedIn } = useAuth();
+  const { toast } = useToast();
 
   const [paramsA, setParamsA] = useState<TimelineParams>(DEFAULT_PARAMS_A);
   const [paramsB, setParamsB] = useState<TimelineParams>(DEFAULT_PARAMS_B);
@@ -1105,13 +1107,15 @@ export default function AlternateTimeline() {
         if (bParams) {
           setParamsB(bParams);
         }
+      } else {
+        toast({ title: "Modeling failed", description: "Could not run the what-if model. Please try again.", variant: "destructive" });
       }
-    } catch (err) {
-      console.error("What-if model error", err);
+    } catch {
+      toast({ title: "Modeling failed", description: "Could not run the what-if model. Please try again.", variant: "destructive" });
     } finally {
       setModelingWhatIf(false);
     }
-  }, [selectedDecisionIds, paramsA, isSignedIn, getToken]);
+  }, [selectedDecisionIds, paramsA, isSignedIn, getToken, toast]);
 
   useEffect(() => {
     fetchStage();
@@ -1138,15 +1142,19 @@ export default function AlternateTimeline() {
       if (resB.ok) setResultB(await resB.json());
       if (resC.ok) setCompareResult(await resC.json());
 
+      if (!resA.ok && !resB.ok) {
+        toast({ title: "Simulation failed", description: "Could not run the timeline simulation. Please try again.", variant: "destructive" });
+      }
+
       if (isSignedIn) {
         fetchStage();
       }
-    } catch (err) {
-      console.error("Simulation error", err);
+    } catch {
+      toast({ title: "Simulation failed", description: "Could not run the timeline simulation. Please try again.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
-  }, [isSignedIn, getToken, fetchStage]);
+  }, [isSignedIn, getToken, fetchStage, toast]);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -1185,11 +1193,14 @@ export default function AlternateTimeline() {
       if (res.ok) {
         await fetchSaved();
         await fetchStage();
+        toast({ title: "Timeline saved", description: `"${name}" has been saved to your library.` });
         if (which === "A") { setShowSaveFormA(false); setSaveAnnotationA(""); }
         else { setShowSaveFormB(false); setSaveAnnotationB(""); }
+      } else {
+        toast({ title: "Save failed", description: "Could not save this timeline. Please try again.", variant: "destructive" });
       }
-    } catch (err) {
-      console.error("Save error", err);
+    } catch {
+      toast({ title: "Save failed", description: "Could not save this timeline. Please try again.", variant: "destructive" });
     } finally {
       if (which === "A") setSavingA(false); else setSavingB(false);
     }
@@ -1199,12 +1210,18 @@ export default function AlternateTimeline() {
     if (!isSignedIn) return;
     try {
       const token = await getToken();
-      await fetch(`${API_BASE}/timeline/${id}`, {
+      const res = await fetch(`${API_BASE}/timeline/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      await fetchSaved();
-    } catch {}
+      if (res.ok) {
+        await fetchSaved();
+      } else {
+        toast({ title: "Delete failed", description: "Could not delete this timeline. Please try again.", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Delete failed", description: "Could not delete this timeline. Please try again.", variant: "destructive" });
+    }
   };
 
   const loadSaved = (tl: SavedTimeline, which: "A" | "B") => {

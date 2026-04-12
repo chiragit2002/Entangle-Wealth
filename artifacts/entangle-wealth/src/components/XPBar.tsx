@@ -20,7 +20,7 @@ interface XPBarProps {
 }
 
 export function XPBar({ level, levelProgress, xpToNextLevel, tier, variant = "compact" }: XPBarProps) {
-  const validTier = TIER_NAMES.includes(tier) ? tier : "Bronze";
+  const validTier = TIER_NAMES.includes(tier as typeof TIER_NAMES[number]) ? tier : "Bronze";
   const colors = TIER_GRADIENTS[validTier] ?? TIER_GRADIENTS.Bronze;
   const clampedProgress = Math.min(Math.max(levelProgress, 0), 100);
   const isCompact = variant === "compact";

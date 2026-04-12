@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { Download, Zap, Shield, Target, TrendingUp, AlertTriangle, Crown, ChevronDown, ChevronUp, Star, Check, X, Minus } from "lucide-react";
 
 const REPORT_DATE = "April 2026";
@@ -316,6 +317,7 @@ function CompetitorCard({ c, isExpanded, onToggle }: { c: Competitor; isExpanded
 }
 
 export default function CompetitiveAnalysis() {
+  const { toast } = useToast();
   const [expandedCompetitor, setExpandedCompetitor] = useState<string | null>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
@@ -509,12 +511,12 @@ export default function CompetitiveAnalysis() {
       addFooter(page.n);
 
       doc.save("EntangleWealth_Competitive_Intelligence_Q2_2026.pdf");
-    } catch (err) {
-      console.error("PDF generation error:", err);
+    } catch {
+      toast({ title: "Export failed", description: "Could not generate the PDF report. Please try again.", variant: "destructive" });
     } finally {
       setIsGeneratingPDF(false);
     }
-  }, []);
+  }, [toast]);
 
   const ewScore = featureMatrix.filter((f) => f.ew).length;
   const competitorScores = competitors.map((c) => ({

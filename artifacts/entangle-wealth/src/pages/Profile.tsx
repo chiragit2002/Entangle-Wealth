@@ -618,9 +618,9 @@ export default function Profile() {
           </div>
 
           {editing && (
-            <div className="space-y-4 border-t border-white/10 pt-5">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-white/50 flex items-center gap-1">
+            <div className="space-y-4 border-t border-white/10 pt-4">
+              <div className="form-field">
+                <label className="form-label flex items-center gap-1">
                   <Briefcase className="w-3 h-3" /> Occupation
                 </label>
                 <OccupationDropdown
@@ -628,29 +628,46 @@ export default function Profile() {
                   onChange={(id) => setProfile(prev => ({ ...prev, occupationId: id }))}
                   placeholder="Select your occupation..."
                 />
+                <p className="form-helper">Used to personalize tax recommendations and AI coaching based on your tax class (W-2, 1099, etc.).</p>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-white/50">Bio</label>
+              <div className="form-field">
+                <label htmlFor="profile-bio" className="form-label">Bio</label>
                 <textarea
-                  placeholder="A short intro about yourself..."
+                  id="profile-bio"
+                  placeholder="Tell employers about yourself — your skills, experience, and what you're looking for."
                   value={profile.bio}
                   onChange={(e) => setProfile(prev => ({ ...prev, bio: e.target.value }))}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white placeholder:text-muted-foreground/50 min-h-[80px] resize-none focus:outline-none focus:border-primary/50"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white placeholder:text-muted-foreground/50 min-h-[80px] resize-none focus:outline-none focus:border-primary/50 text-sm"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-white/50">Phone</label>
-                  <Input placeholder="+1 (555) 000-0000" value={profile.phone} onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))} className="bg-white/5 border-white/10" />
+                <div className="form-field">
+                  <label htmlFor="profile-phone" className="form-label">Phone</label>
+                  <Input
+                    id="profile-phone"
+                    placeholder="+1 (555) 000-0000"
+                    value={profile.phone}
+                    onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
+                    className="bg-white/5 border-white/10 focus:border-primary/50"
+                    type="tel"
+                    autoComplete="tel"
+                  />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-white/50">Location</label>
-                  <Input placeholder="City, State" value={profile.location} onChange={(e) => setProfile(prev => ({ ...prev, location: e.target.value }))} className="bg-white/5 border-white/10" />
+                <div className="form-field">
+                  <label htmlFor="profile-location" className="form-label">Location</label>
+                  <Input
+                    id="profile-location"
+                    placeholder="City, State"
+                    value={profile.location}
+                    onChange={(e) => setProfile(prev => ({ ...prev, location: e.target.value }))}
+                    className="bg-white/5 border-white/10 focus:border-primary/50"
+                    autoComplete="address-level2"
+                  />
                 </div>
               </div>
               <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
                 <input type="checkbox" checked={profile.isPublicProfile} onChange={(e) => setProfile(prev => ({ ...prev, isPublicProfile: e.target.checked }))} className="accent-primary" />
-                Make profile visible to employers
+                Public profile — visible to employers and the community
               </label>
             </div>
           )}

@@ -162,6 +162,7 @@ export default function MarketOverview() {
 
   const loadLiveData = useCallback(async () => {
     setLiveLoading(true);
+    setIsLive(false);
     try {
       const [snaps, movers] = await Promise.all([
         fetchSnapshots(allSectorSymbols),
@@ -170,8 +171,8 @@ export default function MarketOverview() {
       setLiveSnapshots(snaps);
       setLiveMovers({ gainers: movers.gainers, losers: movers.losers });
       setIsLive(true);
-    } catch (err) {
-      console.error("Failed to load live data:", err);
+    } catch {
+      setIsLive(false);
     } finally {
       setLiveLoading(false);
     }

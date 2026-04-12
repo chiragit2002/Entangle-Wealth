@@ -1,0 +1,176 @@
+System Mode: Production Monitoring + User Intelligence + Continuous Optimization Engine
+
+Codename: REALITY LOOP
+
+Mission:
+Connect this application to real-world signals including user behavior, system errors, and feedback, then use those signals to continuously improve the product.
+
+---
+
+# CORE PRINCIPLE
+
+The system must evolve based on:
+
+→ what users actually do
+→ where users struggle
+→ where the system fails
+
+---
+
+# SYSTEM COMPONENTS
+
+You must implement and integrate:
+
+1. MONITORING SYSTEM
+2. ERROR TRACKING SYSTEM
+3. USER BEHAVIOR TRACKING
+4. FEEDBACK COLLECTION
+5. IMPROVEMENT LOOP
+
+---
+
+# PHASE 1 — ERROR MONITORING (CRITICAL)
+
+Integrate:
+
+- Sentry or equivalent
+
+Track:
+
+- frontend errors
+- backend errors
+- API failures
+- unhandled exceptions
+
+Ensure:
+
+→ every error is logged
+→ no silent failures exist
+
+---
+
+# PHASE 2 — USER BEHAVIOR TRACKING
+
+Integrate:
+
+- PostHog or similar analytics
+
+Track:
+
+- page views
+- button clicks
+- drop-off points
+- onboarding completion rate
+
+---
+
+# PHASE 3 — USER FLOW ANALYSIS
+
+Identify:
+
+- where users stop
+- where users hesitate
+- where users abandon
+
+Flag:
+
+🔴 high drop-off areas  
+🟠 slow interactions  
+🟡 confusing flows  
+
+---
+
+# PHASE 4 — FEEDBACK SYSTEM
+
+Add in-app feedback:
+
+- “Was this helpful?” (yes/no)
+- short feedback input
+
+Place:
+
+- after onboarding
+- after result screen
+
+---
+
+# PHASE 5 — SESSION RECORDING (ADVANCED)
+
+Integrate:
+
+- session replay (PostHog / FullStory)
+
+Observe:
+
+- how users interact
+- where they get stuck
+- what they ignore
+
+---
+
+# PHASE 6 — DATA INTERPRETATION
+
+Convert data into insights:
+
+- identify friction patterns
+- identify confusion areas
+- identify drop-off causes
+
+---
+
+# PHASE 7 — IMPROVEMENT LOOP
+
+Feed insights into:
+
+→ self_improving_system_engine
+
+Then:
+
+- fix issues
+- simplify flows
+- optimize UX
+
+---
+
+# PHASE 8 — PRIORITIZATION
+
+Fix based on:
+
+1. user impact
+2. drop-off rate
+3. conversion impact
+
+---
+
+# PHASE 9 — CONTINUOUS EVOLUTION
+
+Loop:
+
+- track
+- analyze
+- fix
+- refine
+
+NEVER stop improving
+
+---
+
+# OUTPUT
+
+Return:
+
+1. 🔴 Issues detected from real users
+2. 🟠 Behavior insights
+3. 🟡 UX friction points
+4. 🟢 Improvements applied
+5. 🚀 System evolution score
+
+---
+
+# FINAL RULE
+
+You are no longer building blindly.
+
+You are evolving based on reality.
+
+END

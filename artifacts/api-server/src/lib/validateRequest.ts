@@ -23,7 +23,11 @@ export function validateQuery<T extends z.ZodTypeAny>(schema: T) {
       res.status(400).json({ error: "Invalid query parameters", details: result.error.issues.map(i => i.message) });
       return;
     }
-    req.query = result.data as typeof req.query;
+    Object.defineProperty(req, "query", {
+      value: result.data as typeof req.query,
+      writable: true,
+      configurable: true,
+    });
     next();
   };
 }

@@ -119,7 +119,23 @@ async function ensureGamificationTables() {
           xp_multiplier REAL NOT NULL DEFAULT 1.5,
           granted_at TIMESTAMPTZ DEFAULT now()
         );
+        CREATE TABLE IF NOT EXISTS giveaway_entries (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+          total_entries INTEGER NOT NULL DEFAULT 0,
+          trade_entries INTEGER NOT NULL DEFAULT 0,
+          streak_entries INTEGER NOT NULL DEFAULT 0,
+          login_entries INTEGER NOT NULL DEFAULT 0,
+          xp_milestone_entries INTEGER NOT NULL DEFAULT 0,
+          referral_entries INTEGER NOT NULL DEFAULT 0,
+          referral_bonus_share REAL NOT NULL DEFAULT 0,
+          converted_referrals INTEGER NOT NULL DEFAULT 0,
+          drawing_won BOOLEAN DEFAULT false,
+          drawn_at TIMESTAMPTZ,
+          updated_at TIMESTAMPTZ DEFAULT now()
+        );
         CREATE INDEX IF NOT EXISTS idx_daily_spins_user ON daily_spins (user_id);
+        CREATE INDEX IF NOT EXISTS idx_giveaway_entries_user ON giveaway_entries (user_id);
         ALTER TABLE streaks ADD COLUMN IF NOT EXISTS streak_protection_active BOOLEAN NOT NULL DEFAULT false;
         ALTER TABLE daily_spins ADD COLUMN IF NOT EXISTS reward_type TEXT NOT NULL DEFAULT 'cash';
         ALTER TABLE daily_spins ADD COLUMN IF NOT EXISTS reward_label TEXT NOT NULL DEFAULT '';

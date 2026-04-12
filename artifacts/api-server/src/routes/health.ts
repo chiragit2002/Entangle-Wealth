@@ -3,6 +3,7 @@ import type { Server } from "node:http";
 import type { Socket } from "node:net";
 import { getAuthEventStats } from "../lib/authEventLogger";
 import { requireAuth } from "../middlewares/requireAuth";
+import { pool } from "@workspace/db";
 
 const router: IRouter = Router();
 
@@ -54,6 +55,119 @@ router.get("/health/detailed", requireAuth, (_req, res) => {
     node: process.version,
     platform: process.platform,
     auth: getAuthEventStats(),
+    timestamp: new Date().toISOString(),
+  });
+});
+
+type DepStatus = "ok" | "degraded" | "unavailable";
+
+interface DependencyCheck {
+  status: DepStatus;
+  latencyMs?: number;
+  detail?: string;
+}
+
+async function checkDb(): Promise<DependencyCheck> {
+  const t0 = Date.now();
+  try {
+    await pool.query("SELECT 1");
+    return { status: "ok", latencyMs: Date.now() - t0 };
+  } catch (e: unknown) {
+    return {
+      status: "unavailable",
+      latencyMs: Date.now() - t0,
+      detail: e instanceof Error ? e.message : String(e),
+    };
+  }
+}
+
+async function checkClerk(): Promise<DependencyCheck> {
+  const key = process.env.CLERK_SECRET_KEY;
+  if (!key) return { status: "degraded", detail: "CLERK_SECRET_KEY not configured" };
+  const t0 = Date.now();
+  try {
+    const resp = await fetch("https://api.clerk.com/v1/users?limit=1", {
+      headers: { Authorization: `Bearer ${key}` },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (resp.ok) return { status: "ok", latencyMs: Date.now() - t0 };
+    return { status: "degraded", latencyMs: Date.now() - t0, detail: `HTTP ${resp.status}` };
+  } catch (e: unknown) {
+    return {
+      status: "degraded",
+      latencyMs: Date.now() - t0,
+      detail: e instanceof Error ? e.message : String(e),
+    };
+  }
+}
+
+async function checkStripe(): Promise<DependencyCheck> {
+  const key = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_API_KEY;
+  if (!key) return { status: "degraded", detail: "Stripe key not configured" };
+  const t0 = Date.now();
+  try {
+    const resp = await fetch("https://api.stripe.com/v1/balance", {
+      headers: { Authorization: `Bearer ${key}` },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (resp.ok) return { status: "ok", latencyMs: Date.now() - t0 };
+    return { status: "degraded", latencyMs: Date.now() - t0, detail: `HTTP ${resp.status}` };
+  } catch (e: unknown) {
+    return {
+      status: "degraded",
+      latencyMs: Date.now() - t0,
+      detail: e instanceof Error ? e.message : String(e),
+    };
+  }
+}
+
+async function checkAlpaca(): Promise<DependencyCheck> {
+  const key = process.env.ALPACA_API_KEY || process.env.ALPACA_KEY_ID;
+  const secret = process.env.ALPACA_API_SECRET;
+  if (!key || !secret) return { status: "degraded", detail: "Alpaca credentials not configured" };
+  const t0 = Date.now();
+  try {
+    const resp = await fetch("https://data.alpaca.markets/v2/stocks/bars/latest?symbols=AAPL", {
+      headers: {
+        "APCA-API-KEY-ID": key,
+        "APCA-API-SECRET-KEY": secret,
+      },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (resp.ok) return { status: "ok", latencyMs: Date.now() - t0 };
+    return { status: "degraded", latencyMs: Date.now() - t0, detail: `HTTP ${resp.status}` };
+  } catch (e: unknown) {
+    return {
+      status: "degraded",
+      latencyMs: Date.now() - t0,
+      detail: e instanceof Error ? e.message : String(e),
+    };
+  }
+}
+
+router.get("/health/dependencies", async (_req, res) => {
+  const [db, clerk, stripe, alpaca] = await Promise.all([
+    checkDb(),
+    checkClerk(),
+    checkStripe(),
+    checkAlpaca(),
+  ]);
+
+  const deps = { db, clerk, stripe, alpaca };
+  const anyUnavailable = Object.values(deps).some((d) => d.status === "unavailable");
+  const anyDegraded = Object.values(deps).some((d) => d.status === "degraded");
+
+  const overallStatus: DepStatus = anyUnavailable
+    ? "unavailable"
+    : anyDegraded
+    ? "degraded"
+    : "ok";
+
+  const httpStatus = overallStatus === "unavailable" ? 503 : 200;
+
+  res.status(httpStatus).json({
+    status: overallStatus,
+    dependencies: deps,
     timestamp: new Date().toISOString(),
   });
 });

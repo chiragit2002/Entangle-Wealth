@@ -150,7 +150,7 @@ function DropdownMenu({ group, isOpen, onToggle }: { group: NavGroup; isOpen: bo
         aria-expanded={isOpen}
         aria-controls={dropdownId}
         aria-haspopup="true"
-        className={`flex items-center gap-1 text-sm font-medium px-2 py-1.5 rounded-lg transition-all duration-200 hover:text-primary hover:bg-white/[0.03] ${
+        className={`flex items-center gap-1 text-sm font-medium px-2.5 py-1.5 rounded-lg transition-colors duration-150 hover:text-foreground hover:bg-white/[0.04] ${
           isGroupActive ? "text-primary" : "text-muted-foreground"
         }`}
       >
@@ -162,12 +162,11 @@ function DropdownMenu({ group, isOpen, onToggle }: { group: NavGroup; isOpen: bo
         <div
           id={dropdownId}
           role="menu"
-          className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
+          className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
           style={{
-            background: "rgba(8,8,20,0.97)",
-            backdropFilter: "blur(24px) saturate(1.3)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)",
+            background: "hsl(220 18% 8%)",
+            border: "1px solid hsl(220 15% 14%)",
+            boxShadow: "0 16px 40px rgba(0,0,0,0.5)",
           }}
         >
           <div className="p-1.5">
@@ -177,14 +176,14 @@ function DropdownMenu({ group, isOpen, onToggle }: { group: NavGroup; isOpen: bo
                 href={item.href}
                 onClick={onToggle}
                 role="menuitem"
-                className={`flex flex-col px-3 py-2.5 rounded-lg transition-all duration-150 ${
+                className={`flex flex-col px-3 py-2.5 rounded-lg transition-colors duration-150 ${
                   location === item.href
                     ? "bg-primary/10 text-primary"
-                    : "text-white/80 hover:bg-white/[0.04] hover:text-white"
+                    : "text-foreground/70 hover:bg-white/[0.04] hover:text-foreground"
                 }`}
               >
-                <span className="text-[13px] font-semibold">{item.label}</span>
-                {item.desc && <span className="text-[10px] text-muted-foreground mt-0.5">{item.desc}</span>}
+                <span className="text-[13px] font-medium">{item.label}</span>
+                {item.desc && <span className="text-[11px] text-muted-foreground mt-0.5">{item.desc}</span>}
               </Link>
             ))}
           </div>
@@ -247,23 +246,22 @@ export function Navbar() {
   }, [isAdmin]);
 
   return (
-    <nav className="sticky top-0 z-50 w-full" aria-label="Main navigation" style={{
-      background: "rgba(0,0,0,0.75)",
-      backdropFilter: "blur(20px) saturate(1.3)",
-      borderBottom: "1px solid rgba(255,255,255,0.06)",
-    }}>
-      <div className="absolute bottom-0 left-0 right-0 h-[1px]" style={{
-        background: "linear-gradient(90deg, transparent 0%, rgba(0,212,255,0.12) 30%, rgba(0,212,255,0.12) 70%, transparent 100%)",
-      }} />
-
-      <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
+    <nav
+      className="sticky top-0 z-50 w-full border-b border-border/60"
+      aria-label="Main navigation"
+      style={{
+        background: "hsl(220 20% 4% / 0.9)",
+        backdropFilter: "blur(16px)",
+      }}
+    >
+      <div className="container mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
           <img
             src={logoImg}
             alt="EntangleWealth logo"
-            className="w-9 h-9 rounded-lg object-contain transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(0,212,255,0.3)]"
+            className="w-8 h-8 rounded-lg object-contain transition-opacity duration-200 group-hover:opacity-90"
           />
-          <span className="font-bold text-lg tracking-tight text-white">
+          <span className="font-bold text-base tracking-tight text-foreground">
             Entangle<span className="text-primary">Wealth</span>
           </span>
         </Link>
@@ -279,12 +277,12 @@ export function Navbar() {
           ))}
         </div>
 
-        <div className="hidden lg:flex items-center gap-2">
+        <div className="hidden lg:flex items-center gap-1.5">
           <TaxYearSelector />
           <button
             onClick={handleToggleMute}
             title={soundMuted ? "Unmute sounds" : "Mute sounds"}
-            className="w-9 h-9 flex items-center justify-center rounded-lg text-white/40 hover:text-white/70 hover:bg-white/[0.05] transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/[0.04] transition-colors duration-150"
             aria-label={soundMuted ? "Unmute sounds" : "Mute sounds"}
           >
             {soundMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
@@ -294,7 +292,7 @@ export function Navbar() {
           <Show when="signed-in">
             <div className="flex items-center gap-1 ml-1">
               <Link href="/profile">
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary gap-1.5 text-xs h-9">
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground gap-1.5 text-xs h-8">
                   <User className="w-3.5 h-3.5" />
                   {user?.firstName || "Profile"}
                 </Button>
@@ -303,7 +301,7 @@ export function Navbar() {
                 variant="ghost"
                 size="sm"
                 aria-label="Sign out"
-                className="text-muted-foreground hover:text-red-400 h-9 w-9 p-0"
+                className="text-muted-foreground hover:text-destructive h-8 w-8 p-0"
                 onClick={() => signOut(() => setLocation("/"))}
               >
                 <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
@@ -313,12 +311,12 @@ export function Navbar() {
 
           <Show when="signed-out">
             <Link href="/sign-in">
-              <Button variant="ghost" size="sm" className="h-9 px-4 text-xs font-medium text-white/70 hover:text-white hover:bg-white/[0.05]">
+              <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground">
                 Sign In
               </Button>
             </Link>
             <Link href="/sign-up">
-              <Button size="sm" className="h-9 px-4 text-xs font-bold bg-primary text-black hover:bg-primary/90 shadow-[0_0_20px_rgba(0,212,255,0.2)]">
+              <Button size="sm" className="h-8 px-3 text-xs font-semibold">
                 Get Started
               </Button>
             </Link>
@@ -328,7 +326,7 @@ export function Navbar() {
         <div className="lg:hidden flex items-center gap-1">
           <NotificationCenter />
           <button
-            className="w-10 h-10 flex items-center justify-center rounded-lg text-white hover:bg-white/[0.05] transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/[0.04] transition-colors duration-150"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
@@ -339,29 +337,29 @@ export function Navbar() {
 
       {isMobileMenuOpen && (
         <div
-          className="lg:hidden absolute top-16 left-0 w-full border-b border-white/[0.06] animate-in slide-in-from-top-2 duration-200 max-h-[calc(100dvh-4rem)] overflow-y-auto"
+          className="lg:hidden absolute top-14 left-0 w-full border-b border-border/60 animate-in slide-in-from-top-2 duration-200 max-h-[calc(100dvh-3.5rem)] overflow-y-auto"
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation menu"
           style={{
-            background: "rgba(4,4,14,0.98)",
-            backdropFilter: "blur(24px)",
+            background: "hsl(220 20% 5% / 0.98)",
+            backdropFilter: "blur(16px)",
           }}
         >
-          <div className="p-4 space-y-6">
+          <div className="p-4 space-y-5">
             {mobileSections.map((section) => (
               <div key={section.title}>
-                <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary/50 mb-2.5 px-1">{section.title}</div>
-                <div className="grid grid-cols-2 gap-1.5">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/60 mb-2 px-1">{section.title}</div>
+                <div className="grid grid-cols-2 gap-1">
                   {section.links.map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`text-sm font-medium px-3 py-2.5 rounded-xl transition-colors ${
+                      className={`text-sm font-medium px-3 py-2 rounded-lg transition-colors duration-150 ${
                         location === link.href
                           ? "bg-primary/10 text-primary"
-                          : "text-white/70 hover:bg-white/[0.04] hover:text-white"
+                          : "text-foreground/60 hover:bg-white/[0.04] hover:text-foreground"
                       }`}
                     >
                       {link.label}
@@ -371,36 +369,36 @@ export function Navbar() {
               </div>
             ))}
 
-            <div className="pt-4 border-t border-white/[0.06] space-y-2">
+            <div className="pt-4 border-t border-border/60 space-y-1">
               <button
                 onClick={handleToggleMute}
-                className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-white/50 hover:bg-white/[0.04] hover:text-white/70 transition-colors"
+                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-white/[0.04] hover:text-foreground transition-colors duration-150"
               >
                 {soundMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                 {soundMuted ? "Unmute sounds" : "Mute sounds"}
               </button>
               <Show when="signed-in">
                 <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
-                  <span className="flex items-center gap-2 text-sm font-medium px-3 py-2.5 rounded-xl text-white/70 hover:bg-white/[0.04]">
+                  <span className="flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg text-foreground/60 hover:bg-white/[0.04] hover:text-foreground transition-colors duration-150">
                     <User className="w-4 h-4" /> Profile
                   </span>
                 </Link>
                 <Button
-                  className="w-full bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 h-11 mt-1"
+                  className="w-full bg-destructive/10 text-destructive hover:bg-destructive/15 border border-destructive/20 h-10 mt-1 text-sm font-medium"
                   onClick={() => { setIsMobileMenuOpen(false); signOut(() => setLocation("/")); }}
                 >
                   Sign Out
                 </Button>
               </Show>
               <Show when="signed-out">
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 mt-1">
                   <Link href="/sign-in" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full border-white/10 text-white hover:bg-white/[0.05] h-11 font-medium">
+                    <Button variant="outline" className="w-full h-10 text-sm font-medium">
                       Sign In
                     </Button>
                   </Link>
                   <Link href="/sign-up" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button className="w-full bg-primary text-black hover:bg-primary/90 h-11 font-bold shadow-[0_0_20px_rgba(0,212,255,0.2)]">
+                    <Button className="w-full h-10 text-sm font-semibold">
                       Get Started
                     </Button>
                   </Link>

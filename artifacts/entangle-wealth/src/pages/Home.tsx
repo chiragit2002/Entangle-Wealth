@@ -17,7 +17,6 @@ import {
   Globe,
 } from "lucide-react";
 import { EmailCapture } from "@/components/EmailCapture";
-import { AnniversaryGiveawayBanner } from "@/components/viral/AnniversaryGiveawayBanner";
 import { trackEvent } from "@/lib/trackEvent";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
@@ -233,9 +232,9 @@ function RecentSignupTicker({
 }
 
 const GOAL_OPTIONS = [
-  { id: "clarity", label: "Get clarity on my finances", icon: Lightbulb },
-  { id: "invest", label: "Start investing smarter", icon: TrendingUp },
-  { id: "stress", label: "Reduce money stress", icon: Heart },
+  { id: "clarity", label: "I want to know exactly where I stand", icon: Lightbulb },
+  { id: "invest", label: "I want my money working harder", icon: TrendingUp },
+  { id: "stress", label: "I want less stress about money", icon: Heart },
 ];
 
 function GoalSelector({ onSelect }: { onSelect: (goal: string) => void }) {
@@ -362,7 +361,7 @@ function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
           setStep("goal");
           trackEvent("hero_cta_clicked");
         }}
-        className="h-12 px-8 bg-gradient-to-r from-[#00c8f8] to-[#0088cc] text-black font-bold hover:opacity-90 text-base rounded-full shadow-[0_0_24px_rgba(0,200,248,0.25)]"
+        className="h-12 px-8 bg-gradient-to-r from-[#00c8f8] to-[#0088cc] text-black font-bold hover:opacity-90 active:scale-[0.97] text-base rounded-full shadow-[0_0_24px_rgba(0,200,248,0.25)] transition-all duration-150"
       >
         Get clarity — it's free
       </Button>
@@ -431,8 +430,7 @@ export default function Home() {
             </h1>
 
             <p className="max-w-lg text-base md:text-lg text-white/60 leading-relaxed">
-              Plain-language guidance on your finances — no jargon, no charts to decode. Just clear
-              answers you can act on.
+              Get a clear next step based on your situation — in under 60 seconds. No jargon, no charts to decode.
             </p>
 
             <MicroConversionFlow referralCode={referralCode || undefined} />
@@ -444,7 +442,7 @@ export default function Home() {
             <div className="flex flex-wrap items-center justify-center gap-5 pt-1">
               <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#00e676]" />
-                No credit card
+                Takes less than 60 seconds
               </span>
               <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
                 <Lock className="w-3.5 h-3.5 text-[#00c8f8]" />
@@ -458,11 +456,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        {/* Anniversary Giveaway Banner */}
-        <div className="container mx-auto px-4 max-w-3xl pb-4">
-          <AnniversaryGiveawayBanner />
-        </div>
 
         {/* Problem */}
         <section className="py-16 lg:py-24 px-4 border-t border-white/5">
@@ -712,27 +705,17 @@ export default function Home() {
         <section className="py-20 lg:py-28 px-4 border-t border-white/5">
           <div className="container mx-auto max-w-2xl text-center flex flex-col items-center space-y-6">
             <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
-              Ready to feel good about your money?
+              Your next financial move is one step away.
             </h2>
             <p className="text-base text-white/50 max-w-md leading-relaxed">
-              It starts with a single step. No commitment, no credit card, no overwhelm — just
-              clarity.
+              Answer three quick questions and get a clear, specific recommendation — no credit card, no commitment.
             </p>
 
             <MicroConversionFlow referralCode={referralCode || undefined} />
 
             <p className="text-[11px] text-white/25 max-w-xs leading-relaxed">
-              This is a financial guidance tool. It won't guarantee outcomes — nothing can. But it
-              will help you feel more informed and in control.
+              For guidance and education. Not a substitute for professional financial advice.
             </p>
-
-            <div className="flex items-center gap-2 text-[11px] text-white/30">
-              <Link href="/pricing">
-                <button className="flex items-center gap-1 hover:text-white/60 transition-colors">
-                  See what's included <ChevronRight className="w-3 h-3" />
-                </button>
-              </Link>
-            </div>
           </div>
         </section>
       </HomeErrorBoundary>

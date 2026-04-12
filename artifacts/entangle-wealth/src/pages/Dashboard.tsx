@@ -12,15 +12,12 @@ import { EconomicCalendar } from "@/components/EconomicCalendar";
 import { stockAlerts, optionsAlerts, unusualOptionsActivity, optionsIncomeData, agentLogMessages } from "@/lib/mock-data";
 import { authFetch } from "@/lib/authFetch";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpRight, ArrowDownRight, Activity, Zap, Minus, TrendingUp, Shield, RefreshCw, Search, BarChart3, X, Terminal, Globe, Layers, Clock, Keyboard, ChevronUp, ChevronDown, Eye, Trophy, Flame, Award } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Activity, Zap, Minus, TrendingUp, Shield, RefreshCw, Search, BarChart3, X, Terminal, Globe, Layers, Clock, Keyboard, ChevronUp, ChevronDown, Eye } from "lucide-react";
 import { generateMockOHLCV, runAllIndicators, getOverallSignal } from "@/lib/indicators";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/trackEvent";
 import { Area, AreaChart, Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from "recharts";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
-import { GamificationWidget } from "@/components/GamificationWidget";
-import { WeeklyProgressCard } from "@/components/WeeklyProgressCard";
-import { StreakNudge } from "@/components/StreakNudge";
 import { FinishSetupNudge } from "@/components/FinishSetupNudge";
 
 const DASHBOARD_STOCKS: { symbol: string; name: string }[] = [
@@ -497,10 +494,8 @@ export default function Dashboard() {
           </Panel>
         )}
 
-        {/* Nudge cards */}
+        {/* Nudge — setup reminder only (highest priority) */}
         <div className="grid grid-cols-12 gap-3">
-          <WeeklyProgressCard />
-          <StreakNudge />
           <FinishSetupNudge />
         </div>
 
@@ -553,7 +548,7 @@ export default function Dashboard() {
                       <input aria-label="Price per share" value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" min="0.01" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40 transition-colors" />
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} aria-label={`${tradeSide === "buy" ? "Buy" : "Sell"} order`} className={`flex-1 h-10 text-sm font-bold rounded-xl transition-colors ${tradeSide === "buy" ? "bg-primary text-black hover:bg-primary/90 active:scale-[0.98]" : "bg-red-500 text-white hover:bg-red-500/90 active:scale-[0.98]"} disabled:opacity-40 disabled:cursor-not-allowed`}>
+                      <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} aria-label={`${tradeSide === "buy" ? "Buy" : "Sell"} order`} className={`flex-1 h-10 text-sm font-bold rounded-xl active:scale-[0.97] transition-all duration-150 ${tradeSide === "buy" ? "bg-primary text-black hover:bg-primary/90" : "bg-red-500 text-white hover:bg-red-500/90"} disabled:opacity-40 disabled:cursor-not-allowed`}>
                         {tradeLoading ? <span className="flex items-center justify-center gap-1.5"><span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />Executing...</span> : `${tradeSide === "buy" ? "Buy" : "Sell"} Order`}
                       </button>
                       <button onClick={resetPortfolio} title="Reset portfolio to $100,000" className="px-4 h-10 text-sm font-medium text-white/40 bg-white/[0.03] border border-white/[0.06] rounded-xl hover:text-white/60 hover:border-white/10 transition-colors active:scale-[0.98]">
@@ -581,8 +576,8 @@ export default function Dashboard() {
                         <TrendingUp className="w-10 h-10 text-white/10 mb-3" />
                         <p className="text-sm text-white/40 mb-1">$100,000 starting balance</p>
                         <p className="text-xs text-white/25 mb-4">Place your first paper trade to start tracking</p>
-                        <button onClick={() => setShowTradePanel(true)} className="px-4 py-2 text-sm font-semibold text-primary bg-primary/10 rounded-xl hover:bg-primary/20 transition-colors border border-primary/20">
-                          Start Trading
+                        <button onClick={() => setShowTradePanel(true)} className="px-4 py-2 text-sm font-semibold text-primary bg-primary/10 rounded-xl hover:bg-primary/20 active:scale-[0.97] transition-all duration-150 border border-primary/20">
+                          Place your first trade
                         </button>
                       </div>
                     ) : (

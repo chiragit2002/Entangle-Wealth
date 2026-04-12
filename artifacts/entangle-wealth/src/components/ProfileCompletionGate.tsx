@@ -329,7 +329,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
       }
 
       setShowGate(false);
-      toast({ title: "Profile completed!", description: "Welcome to EntangleWealth." });
+      toast({ title: "Setup complete!", description: "Your plan is ready. Welcome to EntangleWealth." });
     } catch {
       toast({ title: "Error", description: "Failed to save profile. Please try again.", variant: "destructive" });
     } finally {
@@ -367,8 +367,8 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
               <User className="w-5 h-5 text-black" aria-hidden="true" />
             </div>
             <div>
-              <h2 id="profile-gate-title" className="text-xl font-bold text-white">Complete Your Profile</h2>
-              <p className="text-xs text-white/50">Personalize your experience on EntangleWealth</p>
+              <h2 id="profile-gate-title" className="text-xl font-bold text-white">Finish setup to unlock your plan</h2>
+              <p className="text-xs text-white/50">Takes 30 seconds — personalizes everything</p>
             </div>
           </div>
           <button
@@ -381,9 +381,9 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
           </button>
         </div>
 
-        <div className="mb-6" aria-label={`Profile ${pct}% complete`}>
+        <div className="mb-6" aria-label={`Setup ${pct}% complete`}>
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs text-white/40">Profile completion</span>
+            <span className="text-xs text-white/40">Setup progress</span>
             <span className="text-xs text-primary font-bold tabular-nums">{pct}%</span>
           </div>
           <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
@@ -602,7 +602,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
             </>
           ) : (
             <>
-              Save & Continue
+              Unlock my plan
               <ChevronRight className="w-4 h-4" aria-hidden="true" />
             </>
           )}

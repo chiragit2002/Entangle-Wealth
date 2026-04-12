@@ -317,7 +317,7 @@ export function Navbar() {
             </Link>
             <Link href="/sign-up">
               <Button size="sm" className="h-8 px-3 text-xs font-semibold">
-                Get Started
+                Get clarity — it's free
               </Button>
             </Link>
           </Show>
@@ -399,7 +399,7 @@ export function Navbar() {
                   </Link>
                   <Link href="/sign-up" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button className="w-full h-10 text-sm font-semibold">
-                      Get Started
+                      Get clarity — free
                     </Button>
                   </Link>
                 </div>

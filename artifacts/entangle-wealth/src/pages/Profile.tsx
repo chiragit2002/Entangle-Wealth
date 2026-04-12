@@ -606,13 +606,13 @@ export default function Profile() {
                 </Button>
               )}
               <Button
-                className={editing ? "bg-[#00c8f8] text-black font-bold hover:bg-[#00c8f8]/90 gap-2" : "border-white/20 gap-2"}
+                className={editing ? "bg-[#00c8f8] text-black font-bold hover:bg-[#00c8f8]/90 active:scale-[0.97] transition-all duration-150 gap-2" : "border-white/20 gap-2"}
                 variant={editing ? "default" : "outline"}
                 onClick={() => editing ? saveProfile() : setEditing(true)}
                 disabled={saving}
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : editing ? <Save className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
-                {editing ? "Save changes" : "Edit"}
+                {editing ? "Save my profile" : "Edit profile"}
               </Button>
             </div>
           </div>
@@ -705,8 +705,8 @@ export default function Profile() {
               <p className="font-medium">{kycStatusText()}</p>
             </div>
             {profile.kycStatus === "not_started" && (
-              <Button size="sm" variant="outline" className="ml-auto border-primary/30 text-primary" onClick={() => setShowKyc(true)}>
-                Verify
+              <Button size="sm" variant="outline" className="ml-auto border-primary/30 text-primary active:scale-[0.97] transition-all duration-150" onClick={() => setShowKyc(true)}>
+                Verify identity
               </Button>
             )}
           </div>
@@ -812,10 +812,10 @@ export default function Profile() {
               </div>
 
               <div className="flex gap-2">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={submitKyc} disabled={submittingKyc}>
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.97] transition-all duration-150" onClick={submitKyc} disabled={submittingKyc}>
                   {submittingKyc ? (
                     <><Loader2 className="w-4 h-4 animate-spin mr-2" />{uploadingKycDocs ? "Uploading..." : "Submitting..."}</>
-                  ) : "Submit for Verification"}
+                  ) : "Verify my identity"}
                 </Button>
                 <Button variant="ghost" className="text-muted-foreground" onClick={() => setShowKyc(false)}>Cancel</Button>
               </div>
@@ -905,8 +905,8 @@ export default function Profile() {
                   </>
                 )}
                 <div className="flex gap-2">
-                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={submitBusinessDocs} disabled={submittingBusinessDocs || businessDocFiles.length === 0}>
-                    {submittingBusinessDocs ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Submitting...</> : "Submit Documents"}
+                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.97] transition-all duration-150" onClick={submitBusinessDocs} disabled={submittingBusinessDocs || businessDocFiles.length === 0}>
+                    {submittingBusinessDocs ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Submitting...</> : "Submit for review"}
                   </Button>
                   <Button variant="ghost" className="text-muted-foreground" onClick={() => { setShowBusinessDocUpload(false); setBusinessDocFiles([]); setBusinessDocPreviews([]); }}>Cancel</Button>
                 </div>
@@ -976,7 +976,7 @@ export default function Profile() {
 
         <div className="glass-panel p-6 mb-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-yellow-400" /> Gamification
+            <Trophy className="w-5 h-5 text-yellow-400" /> Your Progress
           </h3>
           {gamification ? (
             <>
@@ -1036,17 +1036,17 @@ export default function Profile() {
               )}
               <div className="mt-4 flex gap-2 flex-wrap">
                 <Link href="/leaderboard">
-                  <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1">
+                  <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1 active:scale-[0.97] transition-all duration-150">
                     <Trophy className="w-3.5 h-3.5" /> Leaderboard
                   </Button>
                 </Link>
                 <Link href="/achievements">
-                  <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1">
+                  <Button variant="outline" size="sm" className="border-primary/30 text-primary gap-1 active:scale-[0.97] transition-all duration-150">
                     <Target className="w-3.5 h-3.5" /> Achievements
                   </Button>
                 </Link>
                 <Link href="/giveaway">
-                  <Button variant="outline" size="sm" className="border-[#f5c842]/40 text-[#f5c842] gap-1">
+                  <Button variant="outline" size="sm" className="border-[#f5c842]/40 text-[#f5c842] gap-1 active:scale-[0.97] transition-all duration-150">
                     <Star className="w-3.5 h-3.5" /> Anniversary Giveaway
                   </Button>
                 </Link>

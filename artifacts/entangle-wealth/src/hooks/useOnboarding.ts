@@ -8,12 +8,17 @@ interface OnboardingState {
   checklist: Record<string, boolean>;
   firstName: string | null;
   daysSinceSignup: number;
+  financialFocus?: string;
+  desiredOutcome?: string;
+  occupationId?: string;
+  occupationName?: string;
 }
 
 export function useOnboarding() {
   const { getToken, isSignedIn } = useAuth();
   const [state, setState] = useState<OnboardingState | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showResultScreen, setShowResultScreen] = useState(false);
 
   const fetch_ = useCallback(async () => {
     if (!isSignedIn) {
@@ -35,9 +40,26 @@ export function useOnboarding() {
     fetch_();
   }, [fetch_]);
 
-  const markWelcomeComplete = useCallback(() => {
-    setState((prev) => (prev ? { ...prev, onboardingCompleted: true } : prev));
+  const markWelcomeComplete = useCallback((resultData?: { financialFocus?: string; desiredOutcome?: string; occupationId?: string; occupationName?: string }) => {
+    setState((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        onboardingCompleted: true,
+        financialFocus: resultData?.financialFocus || prev.financialFocus,
+        desiredOutcome: resultData?.desiredOutcome || prev.desiredOutcome,
+        occupationId: resultData?.occupationId || prev.occupationId,
+        occupationName: resultData?.occupationName || prev.occupationName,
+      };
+    });
+    if (resultData?.financialFocus || resultData?.desiredOutcome) {
+      setShowResultScreen(true);
+    }
   }, []);
 
-  return { state, loading, markWelcomeComplete, isSignedIn: isSignedIn ?? false };
+  const dismissResultScreen = useCallback(() => {
+    setShowResultScreen(false);
+  }, []);
+
+  return { state, loading, markWelcomeComplete, dismissResultScreen, showResultScreen, isSignedIn: isSignedIn ?? false };
 }

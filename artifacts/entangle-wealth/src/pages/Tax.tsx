@@ -221,7 +221,7 @@ export default function Tax() {
       <div className="container mx-auto px-4 py-10 max-w-3xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight text-white mb-1">TaxFlow</h1>
-          <p className="text-white/50 text-sm">Track your deductions, find savings, and plan smarter — before tax season.</p>
+          <p className="text-white/50 text-sm">Find deductions you're missing and see exactly how much you could save this year.</p>
         </div>
         {isSignedIn && kycStatus && (
           <div className={`rounded-xl p-4 mb-4 border flex items-start gap-3 ${
@@ -337,18 +337,18 @@ export default function Tax() {
 
         <div className="flex gap-3 mb-8 overflow-x-auto pb-2">
           <Link href="/taxgpt">
-            <Button className="bg-[#00c8f8] text-black font-bold gap-2 whitespace-nowrap min-h-[44px] hover:bg-[#00c8f8]/90">
-              <MessageCircle className="w-4 h-4" /> Ask TaxGPT
+            <Button className="bg-[#00c8f8] text-black font-bold gap-2 whitespace-nowrap min-h-[44px] hover:bg-[#00c8f8]/90 active:scale-[0.97] transition-all">
+              <MessageCircle className="w-4 h-4" /> Get my tax answers
             </Button>
           </Link>
           <Link href="/receipts">
-            <Button variant="outline" className="border-primary/30 text-primary gap-2 whitespace-nowrap min-h-[44px]">
-              <Receipt className="w-4 h-4" /> Upload Receipts
+            <Button variant="outline" className="border-primary/30 text-primary gap-2 whitespace-nowrap min-h-[44px] active:scale-[0.97] transition-all">
+              <Receipt className="w-4 h-4" /> Log receipts
             </Button>
           </Link>
           <Link href="/tax-strategy">
-            <Button variant="outline" className="border-secondary/30 text-secondary gap-2 whitespace-nowrap min-h-[44px]">
-              <Lightbulb className="w-4 h-4" /> Strategies
+            <Button variant="outline" className="border-secondary/30 text-secondary gap-2 whitespace-nowrap min-h-[44px] active:scale-[0.97] transition-all">
+              <Lightbulb className="w-4 h-4" /> See strategies
             </Button>
           </Link>
         </div>

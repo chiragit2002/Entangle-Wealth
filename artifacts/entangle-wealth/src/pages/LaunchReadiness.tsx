@@ -95,7 +95,7 @@ const ENV_VARS = [
   { name: "STRIPE_SECRET_KEY", desc: "Stripe live secret key", production: "sk_live_..." },
   { name: "STRIPE_WEBHOOK_SECRET", desc: "Stripe webhook signing secret", production: "whsec_..." },
   { name: "VITE_STRIPE_PUBLISHABLE_KEY", desc: "Stripe live publishable key", production: "pk_live_..." },
-  { name: "ALPACA_API_KEY", desc: "Alpaca live trading API key", production: "AKXXXXXXXXXXXXXXXXXX" },
+  { name: "ALPACA_API_KEY", desc: "Alpaca live trading API key", production: "configured" },
   { name: "ALPACA_API_SECRET", desc: "Alpaca live trading API secret", production: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" },
   { name: "SESSION_SECRET", desc: "Session signing secret (min 32 chars)", production: "random-32-char-string" },
   { name: "NODE_ENV", desc: "Environment mode", production: "production" },

@@ -1,0 +1,182 @@
+System Mode: Conversion Strategist + Behavioral UX Architect + Product Psychologist
+
+Codename: MOMENT OF TRUTH
+
+Mission:
+Design a result screen that instantly delivers perceived value, builds trust, and drives the user to take the next action without hesitation.
+
+This screen is NOT informational.
+
+This screen is:
+→ emotional payoff
+→ clarity delivery
+→ decision trigger
+
+---
+
+# CORE PRINCIPLE
+
+User must feel within 3 seconds:
+
+→ “This understands me”
+→ “This is useful”
+→ “I should keep going”
+
+---
+
+# PHASE 1 — IMMEDIATE VALUE (ABOVE THE FOLD)
+
+Top section MUST show:
+
+## HEADLINE:
+"Here’s your next financial move"
+
+## SUBTEXT:
+"Based on your profile, this is the most impactful step right now"
+
+---
+
+# PHASE 2 — PERSONALIZED OUTPUT (CRITICAL)
+
+Display:
+
+→ user occupation
+→ user goal
+→ user focus
+
+Example:
+
+"As a [Occupation] focusing on [Goal], your best next step is:"
+
+---
+
+# PHASE 3 — CLEAR ACTION
+
+Show ONE recommendation:
+
+## PRIMARY ACTION BLOCK:
+
+- bold title
+- 1–2 sentence explanation
+- WHY it matters
+
+Example:
+
+"Prioritize building a 3-month cash buffer  
+This reduces risk and gives you flexibility before investing."
+
+---
+
+# PHASE 4 — CONFIDENCE BUILDER
+
+Add:
+
+→ "This recommendation is based on your inputs"
+→ "Designed to reduce risk and increase clarity"
+
+User must feel:
+👉 this is tailored  
+👉 this is safe  
+
+---
+
+# PHASE 5 — NEXT STEP CTA (HIGH CONVERSION)
+
+Primary button:
+
+"Build my full plan"
+
+OR
+
+"See my full strategy"
+
+---
+
+# PHASE 6 — SECONDARY VALUE (OPTIONAL)
+
+Below main result:
+
+→ 2–3 supporting insights
+
+Example:
+
+- "You may be overexposed to X"
+- "You have room to optimize Y"
+
+---
+
+# PHASE 7 — TRUST SIGNALS
+
+Add subtle:
+
+- clean card layout
+- minimal text
+- no clutter
+- smooth transitions
+
+---
+
+# PHASE 8 — ZERO OVERWHELM
+
+DO NOT:
+
+- show charts
+- show complex data
+- show multiple paths
+
+User gets:
+→ ONE clear direction
+
+---
+
+# PHASE 9 — EMOTIONAL STATE
+
+User must feel:
+
+→ relief  
+→ clarity  
+→ control  
+
+NOT:
+
+→ confusion  
+→ doubt  
+→ overload  
+
+---
+
+# PHASE 10 — FINAL TEST
+
+Ask:
+
+- Is this instantly understandable?
+- Is this actionable?
+- Would a user trust this?
+
+If not:
+→ simplify again
+
+---
+
+# OUTPUT
+
+Return:
+
+1. 🔴 Conversion blockers removed
+2. 🟠 Value clarity improvements
+3. 🟡 Personalization upgrades
+4. 🟢 UX enhancements
+5. 🚀 Conversion strength rating
+
+---
+
+# FINAL RULE
+
+This screen must feel like:
+
+→ “this is exactly what I needed”
+
+If user hesitates → you failed  
+If user clicks → you win
+
+END

@@ -6,6 +6,7 @@ import { usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { logger } from "../lib/logger";
 import { validateBody, z } from "../lib/validateRequest";
+import { getOccupationById } from "@workspace/occupations";
 
 const router = Router();
 
@@ -19,6 +20,7 @@ router.get("/onboarding", requireAuth, async (req: Request, res: Response) => {
         onboardingChecklist: usersTable.onboardingChecklist,
         createdAt: usersTable.createdAt,
         firstName: usersTable.firstName,
+        occupationId: usersTable.occupationId,
       })
       .from(usersTable)
       .where(eq(usersTable.clerkId, userId))
@@ -31,6 +33,8 @@ router.get("/onboarding", requireAuth, async (req: Request, res: Response) => {
         checklist: {},
         firstName: null,
         daysSinceSignup: 0,
+        occupationId: null,
+        financialFocus: null,
       });
       return;
     }
@@ -40,12 +44,17 @@ router.get("/onboarding", requireAuth, async (req: Request, res: Response) => {
       ? Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24))
       : 0;
 
+    const interests = (user.onboardingInterests as string[]) ?? [];
+    const financialFocus = interests.find(i => i.startsWith("focus:"))?.replace("focus:", "") ?? null;
+
     res.json({
       onboardingCompleted: user.onboardingCompleted ?? false,
-      interests: (user.onboardingInterests as string[]) ?? [],
+      interests,
       checklist: (user.onboardingChecklist as Record<string, boolean>) ?? {},
       firstName: user.firstName,
       daysSinceSignup,
+      occupationId: user.occupationId ?? null,
+      financialFocus,
     });
   } catch (err) {
     logger.error({ err }, "Failed to fetch onboarding state");
@@ -55,6 +64,9 @@ router.get("/onboarding", requireAuth, async (req: Request, res: Response) => {
 
 const OnboardingWelcomeSchema = z.object({
   interests: z.array(z.string().max(100)).max(50).optional(),
+  occupationId: z.string().max(100).optional(),
+  financialFocus: z.string().max(100).optional(),
+  desiredOutcome: z.string().max(100).optional(),
 });
 
 const OnboardingChecklistSchema = z.object({
@@ -64,16 +76,49 @@ const OnboardingChecklistSchema = z.object({
 
 router.post("/onboarding/complete-welcome", requireAuth, validateBody(OnboardingWelcomeSchema), async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
-  const { interests } = req.body as { interests?: string[] };
+  const { interests, occupationId, financialFocus } = req.body as {
+    interests?: string[];
+    occupationId?: string;
+    financialFocus?: string;
+    desiredOutcome?: string;
+  };
 
   try {
+    const rows = await db
+      .select({ onboardingInterests: usersTable.onboardingInterests })
+      .from(usersTable)
+      .where(eq(usersTable.clerkId, userId))
+      .limit(1);
+
+    const existingInterests = (rows[0]?.onboardingInterests as string[]) ?? [];
+
+    let updatedInterests: string[] = interests ?? existingInterests;
+
+    if (financialFocus) {
+      updatedInterests = [
+        ...updatedInterests.filter(i => !i.startsWith("focus:")),
+        `focus:${financialFocus}`,
+      ];
+    }
+
+    const setFields: Record<string, unknown> = {
+      onboardingCompleted: true,
+      onboardingInterests: updatedInterests,
+      updatedAt: new Date(),
+    };
+
+    if (occupationId !== undefined) {
+      if (occupationId) {
+        const occ = getOccupationById(occupationId);
+        if (occ) {
+          setFields.occupationId = occupationId;
+        }
+      }
+    }
+
     await db
       .update(usersTable)
-      .set({
-        onboardingCompleted: true,
-        onboardingInterests: interests ?? [],
-        updatedAt: new Date(),
-      })
+      .set(setFields)
       .where(eq(usersTable.clerkId, userId));
 
     res.json({ ok: true });

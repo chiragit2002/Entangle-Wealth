@@ -129,6 +129,7 @@ export default function Pricing() {
     );
 
     if (!matchedProduct) {
+      trackEvent("upgrade_checkout_failed", { tier: plan.tier, reason: "product_not_found" });
       toast({
         title: "Setting up checkout",
         description: "Stripe products are being configured. Please try again in a moment.",
@@ -147,13 +148,25 @@ export default function Pricing() {
       const data = await res.json();
 
       if (!res.ok) {
+        const reason = data.error || "server_error";
+        trackEvent("upgrade_checkout_failed", { tier: plan.tier, reason });
         throw new Error(data.error || "Failed to create checkout session");
       }
 
       if (data.url) {
         window.location.href = data.url;
+      } else {
+        trackEvent("upgrade_checkout_failed", { tier: plan.tier, reason: "no_url" });
+        toast({
+          title: "Checkout error",
+          description: "Could not redirect to checkout. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (err: any) {
+      if (!err.message?.includes("checkout")) {
+        trackEvent("upgrade_checkout_failed", { tier: plan.tier, reason: "network_error" });
+      }
       toast({
         title: "Checkout error",
         description: err.message || "Could not start checkout. Please try again.",

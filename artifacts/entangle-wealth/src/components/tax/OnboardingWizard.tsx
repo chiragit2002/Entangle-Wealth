@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { X, ChevronRight, ChevronLeft, Building2, Briefcase, DollarSign, Target, Plus, Trash2, ShieldCheck } from "lucide-react";
+import { X, ChevronRight, ChevronLeft, Building2, DollarSign, Target, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { UserProfile, EntityType, BusinessTripDeduction, KycData } from "@/lib/taxflow-types";
+import type { UserProfile, EntityType, BusinessTripDeduction } from "@/lib/taxflow-types";
 import { ENTITY_LABELS } from "@/lib/taxflow-types";
 import { createDefaultProfile, saveProfile, setOnboardingDone } from "@/lib/taxflow-profile";
 
@@ -14,13 +14,6 @@ const US_STATES = [
   "New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania",
   "Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont",
   "Virginia","Washington","West Virginia","Wisconsin","Wyoming",
-];
-
-const KYC_ID_TYPES = [
-  { value: "drivers_license", label: "Driver's License" },
-  { value: "passport", label: "Passport" },
-  { value: "state_id", label: "State ID" },
-  { value: "military_id", label: "Military ID" },
 ];
 
 function formatEin(value: string): string {
@@ -78,12 +71,8 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
   const [step, setStep] = useState(1);
   const [profile, setProfile] = useState<UserProfile>(createDefaultProfile());
   const [hasSelectedEntity, setHasSelectedEntity] = useState(false);
-  const [kycSubmitting, setKycSubmitting] = useState(false);
-  const [kycError, setKycError] = useState("");
 
   const update = (partial: Partial<UserProfile>) => setProfile(p => ({ ...p, ...partial }));
-  const updateKyc = (partial: Partial<KycData>) =>
-    setProfile(p => ({ ...p, kyc: { ...p.kyc, ...partial } }));
 
   const selectEntity = (entityType: EntityType) => {
     update({ entityType });
@@ -95,66 +84,21 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
     if (step === 2) {
       const hasBasicInfo = !!profile.businessName && !!profile.homeState;
       const einValid = !profile.ein || isValidEin(profile.ein);
-      const hasKyc =
-        !!profile.kyc.fullLegalName &&
-        !!profile.kyc.dateOfBirth &&
-        !!profile.kyc.address &&
-        !!profile.kyc.idType &&
-        !!profile.kyc.idNumber;
-      return hasBasicInfo && einValid && hasKyc;
+      return hasBasicInfo && einValid;
     }
     if (step === 3) return profile.grossRevenue > 0;
     if (step === 4) return !!profile.primaryGoal && !!profile.filingTime;
     return true;
   };
 
-  const submitKycToBackend = async (kycData: KycData): Promise<boolean> => {
-    try {
-      const baseUrl = import.meta.env.BASE_URL || "/";
-      const apiBase = `${baseUrl}api`.replace(/\/+/g, "/");
-      const res = await fetch(`${window.location.origin}${apiBase}/kyc/submit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          fullLegalName: kycData.fullLegalName,
-          dateOfBirth: kycData.dateOfBirth,
-          address: kycData.address,
-          idType: kycData.idType,
-          idNumber: kycData.idNumber,
-        }),
-      });
-      return res.ok;
-    } catch {
-      return false;
-    }
-  };
-
-  const finish = async () => {
-    setKycSubmitting(true);
-    setKycError("");
-
-    const kycSuccess = await submitKycToBackend(profile.kyc);
-
+  const finish = () => {
     const finalProfile = {
       ...profile,
       name: profile.name || profile.businessName || "My Business",
-      kyc: {
-        ...profile.kyc,
-        submitted: kycSuccess,
-        idNumber: "",
-        dateOfBirth: "",
-      },
     };
-
-    if (!kycSuccess) {
-      setKycSubmitting(false);
-      setKycError("KYC verification could not be submitted. You can continue and retry later from your profile settings.");
-    }
 
     saveProfile(finalProfile);
     setOnboardingDone(true);
-    setKycSubmitting(false);
     onComplete(finalProfile);
   };
 
@@ -238,7 +182,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
         {step === 2 && (
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Briefcase className="w-5 h-5 text-[#00c8f8]" />
+              <Building2 className="w-5 h-5 text-[#00c8f8]" />
               <h3 className="font-semibold text-white">Business Information</h3>
             </div>
             <div className="space-y-3">
@@ -281,63 +225,6 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
               <div>
                 <label className="form-label">Primary Business Activity</label>
                 <Input value={profile.primaryActivity} onChange={e => update({ primaryActivity: e.target.value.slice(0, 200) })} placeholder="What does your business do?" className="bg-white/5 border-white/10" />
-              </div>
-
-              <div className="border-t border-white/10 pt-4 mt-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <ShieldCheck className="w-4 h-4 text-[#00c8f8]" />
-                  <h4 className="font-semibold text-white text-sm">Identity Verification (KYC) *</h4>
-                </div>
-                <p className="text-[11px] text-white/30 mb-3">Required for tax filing and compliance. Your data is encrypted and never shared with third parties.</p>
-                <div className="space-y-3">
-                  <div>
-                    <label className="form-label">Full Legal Name *</label>
-                    <Input
-                      value={profile.kyc.fullLegalName}
-                      onChange={e => updateKyc({ fullLegalName: e.target.value.slice(0, 100) })}
-                      placeholder="John Michael Doe"
-                      className="bg-white/5 border-white/10"
-                    />
-                  </div>
-                  <div>
-                    <label className="form-label">Date of Birth *</label>
-                    <Input
-                      type="date"
-                      value={profile.kyc.dateOfBirth}
-                      onChange={e => updateKyc({ dateOfBirth: e.target.value })}
-                      className="bg-white/5 border-white/10"
-                    />
-                  </div>
-                  <div>
-                    <label className="form-label">Address *</label>
-                    <Input
-                      value={profile.kyc.address}
-                      onChange={e => updateKyc({ address: e.target.value.slice(0, 200) })}
-                      placeholder="123 Main St, City, State, ZIP"
-                      className="bg-white/5 border-white/10"
-                    />
-                  </div>
-                  <div>
-                    <label className="form-label">ID Type *</label>
-                    <select
-                      value={profile.kyc.idType}
-                      onChange={e => updateKyc({ idType: e.target.value })}
-                      className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg p-3 text-white text-sm min-h-[44px] [&>option]:bg-[#0d0d1a]"
-                    >
-                      <option value="">Select ID Type</option>
-                      {KYC_ID_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="form-label">ID Number *</label>
-                    <Input
-                      value={profile.kyc.idNumber}
-                      onChange={e => updateKyc({ idNumber: e.target.value.slice(0, 30) })}
-                      placeholder="ID Number"
-                      className="bg-white/5 border-white/10"
-                    />
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -486,13 +373,9 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
           </div>
         )}
 
-        {kycError && (
-          <p className="text-[12px] text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 rounded-lg p-3 mt-4">{kycError}</p>
-        )}
-
         <div className="flex gap-3 mt-6">
           {step > 1 && (
-            <Button variant="outline" onClick={() => setStep(s => s - 1)} disabled={kycSubmitting} className="border-white/10 text-white/60 gap-1 min-h-[44px]">
+            <Button variant="outline" onClick={() => setStep(s => s - 1)} className="border-white/10 text-white/60 gap-1 min-h-[44px]">
               <ChevronLeft className="w-4 h-4" /> Back
             </Button>
           )}
@@ -502,8 +385,8 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
               Continue <ChevronRight className="w-4 h-4" />
             </Button>
           ) : (
-            <Button onClick={finish} disabled={!canNext() || kycSubmitting} className="bg-gradient-to-r from-[#00e676] to-[#00c853] text-black font-bold gap-1 min-h-[44px]">
-              {kycSubmitting ? "Submitting..." : "Complete Setup"} <ChevronRight className="w-4 h-4" />
+            <Button onClick={finish} disabled={!canNext()} className="bg-gradient-to-r from-[#00e676] to-[#00c853] text-black font-bold gap-1 min-h-[44px]">
+              Complete Setup <ChevronRight className="w-4 h-4" />
             </Button>
           )}
         </div>

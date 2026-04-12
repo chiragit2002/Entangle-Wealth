@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@clerk/react";
-import { X, Sparkles, Zap, Lock, Loader2 } from "lucide-react";
+import { X, Sparkles, Zap, Lock, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { authFetch } from "@/lib/authFetch";
 import { trackEvent } from "@/lib/trackEvent";
+import { Link } from "wouter";
 
 export interface UpgradePromptConfig {
   limitType: "signals" | "alert_rules" | "alert_triggers" | "taxgpt" | "terminal";
@@ -45,6 +46,8 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
   const { getToken, isSignedIn } = useAuth();
   const [loading, setLoading] = useState(false);
   const [suppressed, setSuppressed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isKycError, setIsKycError] = useState(false);
 
   useEffect(() => {
     trackEvent("upgrade_prompt_shown", { limitType: config.limitType });
@@ -57,13 +60,17 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
     }
 
     setLoading(true);
+    setErrorMessage(null);
+    setIsKycError(false);
+
     try {
       const productsRes = await fetch("/api/stripe/products");
       const products = productsRes.ok ? await productsRes.json() : [];
       const proProduct = products.find((p: { metadata?: { tier?: string }; price_id?: string }) => p.metadata?.tier === "pro");
 
       if (!proProduct) {
-        window.location.href = "/pricing";
+        setErrorMessage("We couldn't find the Pro plan right now. Please try again in a moment.");
+        trackEvent("upgrade_checkout_failed", { limitType: config.limitType, reason: "product_not_found" });
         return;
       }
 
@@ -74,14 +81,30 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
       });
 
       const data = await res.json();
+
+      if (!res.ok) {
+        const reason = data.error || "server_error";
+        trackEvent("upgrade_checkout_failed", { limitType: config.limitType, reason });
+
+        if (res.status === 403 && data.error?.toLowerCase().includes("kyc")) {
+          setIsKycError(true);
+          setErrorMessage("Identity verification is required before checkout.");
+        } else {
+          setErrorMessage(data.error || "Something went wrong starting checkout. Please try again.");
+        }
+        return;
+      }
+
       if (data.url) {
         trackEvent("upgrade_checkout_started", { limitType: config.limitType });
         window.location.href = data.url;
       } else {
-        window.location.href = "/pricing";
+        setErrorMessage("Checkout session could not be created. Please try again.");
+        trackEvent("upgrade_checkout_failed", { limitType: config.limitType, reason: "no_url" });
       }
     } catch {
-      window.location.href = "/pricing";
+      setErrorMessage("A network error occurred. Please check your connection and try again.");
+      trackEvent("upgrade_checkout_failed", { limitType: config.limitType, reason: "network_error" });
     } finally {
       setLoading(false);
     }
@@ -137,6 +160,24 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
             ))}
           </ul>
         </div>
+
+        {errorMessage && (
+          <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-4" role="alert">
+            <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="flex-1">
+              <p className="text-[11px] text-red-300 leading-relaxed">{errorMessage}</p>
+              {isKycError && (
+                <Link
+                  href="/profile"
+                  onClick={onClose}
+                  className="inline-flex items-center gap-1 mt-1.5 text-[11px] font-semibold text-[#00c8f8] hover:text-[#00a8d8] underline underline-offset-2 transition-colors"
+                >
+                  Go to profile settings to verify identity
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="text-[10px] text-white/20 mb-3 text-center">
           30-day free trial · No credit card required

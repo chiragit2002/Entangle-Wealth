@@ -82,11 +82,6 @@ router.post("/stripe/create-checkout", requireAuth, validateBody(PriceIdSchema),
       return;
     }
 
-    if (user.kycStatus !== "verified" && user.kycStatus !== "pending_review") {
-      res.status(403).json({ error: "KYC verification required before making payments." });
-      return;
-    }
-
     let customerId = user.stripeCustomerId;
     if (!customerId) {
       const customer = await stripe.customers.create({
@@ -195,6 +190,11 @@ router.post("/stripe/create-virtual-cash-checkout", requireAuth, validateBody(Pr
     const [user] = await db.select().from(usersTable).where(eq(usersTable.clerkId, userId));
     if (!user) {
       res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    if (user.kycStatus !== "verified" && user.kycStatus !== "pending_review") {
+      res.status(403).json({ error: "KYC verification required before making real-money purchases. Please complete identity verification in your profile settings." });
       return;
     }
 

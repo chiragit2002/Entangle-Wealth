@@ -18,7 +18,6 @@ export function useOnboarding() {
   const { getToken, isSignedIn } = useAuth();
   const [state, setState] = useState<OnboardingState | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showResultScreen, setShowResultScreen] = useState(false);
 
   const fetch_ = useCallback(async () => {
     if (!isSignedIn) {
@@ -52,14 +51,7 @@ export function useOnboarding() {
         occupationName: resultData?.occupationName || prev.occupationName,
       };
     });
-    if (resultData?.financialFocus || resultData?.desiredOutcome) {
-      setShowResultScreen(true);
-    }
   }, []);
 
-  const dismissResultScreen = useCallback(() => {
-    setShowResultScreen(false);
-  }, []);
-
-  return { state, loading, markWelcomeComplete, dismissResultScreen, showResultScreen, isSignedIn: isSignedIn ?? false };
+  return { state, loading, markWelcomeComplete, isSignedIn: isSignedIn ?? false };
 }

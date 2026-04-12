@@ -35,10 +35,23 @@ interface OnboardingEventDetail {
   event: string;
 }
 
+function isFirstSession(): boolean {
+  try {
+    const visited = localStorage.getItem("ew_visited_before");
+    if (!visited) {
+      localStorage.setItem("ew_visited_before", "true");
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 export function GettingStartedChecklist() {
   const { getToken, isSignedIn } = useAuth();
   const [checklist, setChecklist] = useState<Record<string, boolean>>({});
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => isFirstSession());
   const [dismissed, setDismissed] = useState(false);
   const [daysSinceSignup, setDaysSinceSignup] = useState(0);
   const [loaded, setLoaded] = useState(false);

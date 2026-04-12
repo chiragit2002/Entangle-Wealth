@@ -20,6 +20,7 @@ import { trackEvent } from "@/lib/trackEvent";
 import { Area, AreaChart, Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from "recharts";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
 import { FinishSetupNudge } from "@/components/FinishSetupNudge";
+import { ProgressiveProfileCard } from "@/components/onboarding/ProgressiveProfileCard";
 
 const DASHBOARD_STOCKS: { symbol: string; name: string }[] = [
   { symbol: "AAPL", name: "Apple Inc." }, { symbol: "MSFT", name: "Microsoft Corporation" },
@@ -500,6 +501,9 @@ export default function Dashboard() {
         <div className="grid grid-cols-12 gap-3">
           <FinishSetupNudge />
         </div>
+
+        {/* Progressive profiling — deferred occupation/focus questions */}
+        <ProgressiveProfileCard className="mb-1" />
 
         {/* Section 2: Hero Panels — QuantumViz + Portfolio + Watchlist */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

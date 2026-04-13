@@ -2,10 +2,11 @@ import { useEffect, useState, useCallback } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Check, X, Sparkles, Users, Zap, Loader2 } from "lucide-react";
+import { Check, X, Sparkles, Users, Zap, Loader2, TrendingUp, DollarSign, Clock } from "lucide-react";
 import { trackEvent } from "@/lib/trackEvent";
 import { useAuth, useUser } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
+import { SocialProofTicker } from "@/components/SocialProofTicker";
 
 interface StripeProduct {
   id: string;
@@ -227,7 +228,7 @@ export default function Pricing() {
           </div>
         )}
 
-        <div className="text-center mb-10">
+        <div className="text-center mb-8">
           <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-3">
             Institutional tools. <span className="electric-text">Not institutional prices.</span>
           </h1>
@@ -239,6 +240,40 @@ export default function Pricing() {
               30-DAY FREE TRIAL | NO CREDIT CARD NEEDED
             </div>
           )}
+        </div>
+
+        {/* Value anchoring section — shown before pricing */}
+        {!promo?.active && (
+          <div className="mb-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="relative overflow-hidden bg-[#0a0a14] border border-[#FFB800]/25 rounded-xl p-5 text-center">
+              <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at top, rgba(255,184,0,0.08) 0%, transparent 70%)" }} />
+              <DollarSign className="w-6 h-6 text-[#FFB800] mx-auto mb-2" />
+              <p className="text-2xl font-black text-[#FFB800] mb-0.5">$4,800</p>
+              <p className="text-sm font-bold text-white/70">avg saved per year</p>
+              <p className="text-xs text-white/35 mt-1">Pro users find this in tax deductions alone</p>
+            </div>
+            <div className="relative overflow-hidden bg-[#0a0a14] border border-[#00D4FF]/25 rounded-xl p-5 text-center">
+              <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at top, rgba(0,212,255,0.08) 0%, transparent 70%)" }} />
+              <TrendingUp className="w-6 h-6 text-[#00D4FF] mx-auto mb-2" />
+              <p className="text-2xl font-black text-[#00D4FF] mb-0.5">
+                <span className="line-through text-white/20 text-lg mr-1">$99</span>$29
+              </p>
+              <p className="text-sm font-bold text-white/70">less than $1/day</p>
+              <p className="text-xs text-white/35 mt-1">vs. Bloomberg Terminal at $2,000+/mo</p>
+            </div>
+            <div className="relative overflow-hidden bg-[#0a0a14] border border-[#00FF41]/25 rounded-xl p-5 text-center">
+              <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at top, rgba(0,255,65,0.08) 0%, transparent 70%)" }} />
+              <Clock className="w-6 h-6 text-[#00FF41] mx-auto mb-2" />
+              <p className="text-2xl font-black text-[#00FF41] mb-0.5">30 days</p>
+              <p className="text-sm font-bold text-white/70">completely free</p>
+              <p className="text-xs text-white/35 mt-1">No credit card. Cancel anytime. Zero risk.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Social proof */}
+        <div className="mb-6">
+          <SocialProofTicker />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">

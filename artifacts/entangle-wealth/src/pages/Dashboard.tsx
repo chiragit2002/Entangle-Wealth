@@ -28,6 +28,15 @@ import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanne
 import { FinishSetupNudge } from "@/components/FinishSetupNudge";
 import { ProgressiveProfileCard } from "@/components/onboarding/ProgressiveProfileCard";
 import { EntangledInsightsFeed } from "@/components/EntanglementCard";
+import { LossAversionNudge } from "@/components/LossAversionNudge";
+import { SocialProofTicker } from "@/components/SocialProofTicker";
+import { ZeigarnikProgressBar } from "@/components/ZeigarnikProgressBar";
+import { IdentityLabel } from "@/components/IdentityLabel";
+import { GoalGradientAccelerator } from "@/components/GoalGradientAccelerator";
+import { FreshStartPrompt } from "@/components/FreshStartPrompt";
+import { VariableSurpriseReward } from "@/components/VariableSurpriseReward";
+import { SessionRecapOverlay } from "@/components/SessionRecapOverlay";
+import { CommitmentEscalationFlow } from "@/components/CommitmentEscalationFlow";
 import { generateEntanglementInsights, type UserEntanglementContext } from "@/lib/entanglementEngine";
 import { getActiveProfile } from "@/lib/taxflow-profile";
 
@@ -724,10 +733,18 @@ export default function Dashboard() {
           </Panel>
         )}
 
-        {/* Nudge — setup reminder only (highest priority) */}
+        {/* Behavioral nudges — stacked priority system */}
         <div className="grid grid-cols-12 gap-3">
+          <FreshStartPrompt />
+          <LossAversionNudge />
           <FinishSetupNudge />
         </div>
+
+        {/* Identity nudge — contextual, below setup nudges */}
+        <IdentityLabel variant="nudge" />
+
+        {/* Social proof */}
+        <SocialProofTicker />
 
         {/* Progressive profiling — deferred occupation/focus questions */}
         <ProgressiveProfileCard className="mb-1" />
@@ -850,6 +867,9 @@ export default function Dashboard() {
                 <FearGreedGauge />
               </div>
             </Panel>
+            <ZeigarnikProgressBar />
+            <IdentityLabel variant="card" />
+            <GoalGradientAccelerator />
             <Panel>
               <PanelHeader title="Watchlist" icon={<Eye className="w-3.5 h-3.5" />} />
               <div className="p-2">
@@ -1064,6 +1084,11 @@ export default function Dashboard() {
           }}
         />
       )}
+
+      {/* Behavioral psychology layers */}
+      <VariableSurpriseReward />
+      <SessionRecapOverlay />
+      <CommitmentEscalationFlow />
     </Layout>
   );
 }

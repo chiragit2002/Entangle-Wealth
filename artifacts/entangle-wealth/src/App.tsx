@@ -402,14 +402,14 @@ function ClerkProviderWithRoutes() {
           <ProfileCompletionGate>
           <Switch>
             <Route path="/">{() => <LazyPage component={Home} />}</Route>
-            <Route path="/dashboard">{() => <LazyPage component={Dashboard} />}</Route>
-            <Route path="/earn">{() => <LazyPage component={Earn} />}</Route>
-            <Route path="/options">{() => <LazyPage component={Options} />}</Route>
+            <Route path="/dashboard">{() => <LazyProtected component={Dashboard} />}</Route>
+            <Route path="/earn">{() => <LazyProtected component={Earn} />}</Route>
+            <Route path="/options">{() => <LazyProtected component={Options} />}</Route>
             <Route path="/stocks">{() => <LazyTable component={Stocks} />}</Route>
             <Route path="/jobs">{() => <LazyTable component={Jobs} />}</Route>
             <Route path="/gigs">{() => <LazyTable component={Gigs} />}</Route>
-            <Route path="/community">{() => <LazyPage component={Community} />}</Route>
-            <Route path="/tax">{() => <LazyPage component={Tax} />}</Route>
+            <Route path="/community">{() => <LazyProtected component={Community} />}</Route>
+            <Route path="/tax">{() => <LazyProtected component={Tax} />}</Route>
             <Route path="/receipts">{() => <LazyProtected component={Receipts} />}</Route>
             <Route path="/integrations">{() => <LazyProtected component={Integrations} />}</Route>
             <Route path="/travel">{() => <LazyPage component={Travel} />}</Route>
@@ -430,8 +430,8 @@ function ClerkProviderWithRoutes() {
             <Route path="/competitive-intel">{() => <LazyPage component={CompetitiveAnalysis} />}</Route>
             <Route path="/open-source-intel">{() => <LazyPage component={OpenSourceIntel} />}</Route>
             <Route path="/case-study">{() => <LazyPage component={CaseStudy} />}</Route>
-            <Route path="/leaderboard">{() => <LazyPage component={Leaderboard} />}</Route>
-            <Route path="/achievements">{() => <LazyPage component={Achievements} />}</Route>
+            <Route path="/leaderboard">{() => <LazyProtected component={Leaderboard} />}</Route>
+            <Route path="/achievements">{() => <LazyProtected component={Achievements} />}</Route>
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?" component={SignUpPage} />
             <Route path="/resume">{() => <LazyProtected component={Resume} />}</Route>
@@ -471,7 +471,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/admin/evolution">{() => <LazyProtected component={EvolutionDashboard} />}</Route>
             <Route path="/admin/monitoring">{() => <LazyProtected component={AdminMonitoringPage} />}</Route>
             <Route path="/admin/audit">{() => <LazyProtected component={AdminAuditPage} />}</Route>
-            <Route path="/command-center">{() => <LazyPage component={CommandCenter} />}</Route>
+            <Route path="/command-center">{() => <LazyProtected component={CommandCenter} />}</Route>
             <Route path="/__test">{() => <Suspense fallback={null}>{IS_DEV && TestFixture ? <TestFixture /> : null}</Suspense>}</Route>
             <Route component={NotFound} />
           </Switch>

@@ -41,7 +41,7 @@ export function trackEvent(event: string, properties?: Record<string, unknown>):
     }
 
     window.dispatchEvent(
-      new CustomEvent("onboarding-event", { detail: { event } })
+      new CustomEvent("onboarding-event", { detail: { event, properties } })
     );
   } catch {
     // non-blocking

@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { authFetch } from "@/lib/authFetch";
 import { getStoredReferralCode, clearStoredReferralCode } from "@/lib/referral";
+import { IdentityLabel } from "@/components/IdentityLabel";
 
 interface PasskeyResource {
   id: string;
@@ -686,6 +687,7 @@ export default function Profile() {
                       🏆 Ambassador
                     </span>
                   )}
+                  <IdentityLabel variant="badge" />
                 </div>
                 {(profile.occupationId ? getOccupationById(profile.occupationId)?.name : profile.headline) && (
                   <p className="text-primary">{profile.occupationId ? getOccupationById(profile.occupationId)?.name : profile.headline}</p>

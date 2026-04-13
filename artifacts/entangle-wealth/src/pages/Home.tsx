@@ -26,6 +26,7 @@ import { trackEvent } from "@/lib/trackEvent";
 import { AnniversaryGiveawayBanner } from "@/components/viral/AnniversaryGiveawayBanner";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
+import { SocialProofTicker } from "@/components/SocialProofTicker";
 
 const API_BASE = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 
@@ -677,6 +678,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Social proof ticker */}
+        <SocialProofTicker />
 
         {/* Your Edge */}
         <YourEdgeSection />

@@ -124,7 +124,7 @@ const XP_REWARDS: Record<string, Record<string, number>> = {
   gig: { gig_completed: 50, gig_posted: 20 },
   community: { post_created: 15, comment_added: 10 },
   engagement: { daily_checkin: 25, profile_updated: 10 },
-  backtesting: { backtest_run: 20, winning_backtest: 50, "10x_bagger": 100, milestone_projection: 75 },
+  backtesting: { backtest_run: 30, winning_backtest: 50, "10x_bagger": 100, milestone_projection: 75, backtest_beats_benchmark: 75 },
 };
 
 const MAX_XP_PER_ACTION = 150;
@@ -1087,6 +1087,119 @@ router.post("/gamification/claim-daily", requireAuth, validateBody(z.object({}).
   } catch (error) {
     logger.error({ err: error }, "Error claiming daily reward:");
     res.status(500).json({ error: "Failed to claim daily reward" });
+  }
+});
+
+const BacktesterBadgeSchema = z.object({
+  backtestCount: z.coerce.number().int().min(1),
+  totalReturn: z.number(),
+  sharpe: z.number(),
+  winRate: z.number(),
+  tradeCount: z.coerce.number().int().min(0),
+  beatBenchmark: z.boolean().optional().default(false),
+});
+
+const BACKTESTER_BADGES = [
+  {
+    slug: "strategy-scientist",
+    name: "Strategy Scientist",
+    description: "Ran your first backtested strategy",
+    icon: "flask",
+    category: "backtester",
+    xpReward: 50,
+    requirement: "Run 1 backtest",
+    threshold: 1,
+    check: (data: { backtestCount: number }) => data.backtestCount >= 1,
+  },
+  {
+    slug: "alpha-finder",
+    name: "Alpha Finder",
+    description: "Backtested a strategy that beat the benchmark (10%+ return, Sharpe > 1.0)",
+    icon: "target",
+    category: "backtester",
+    xpReward: 150,
+    requirement: "Beat benchmark with a backtest",
+    threshold: 1,
+    check: (data: { beatBenchmark: boolean }) => data.beatBenchmark,
+  },
+  {
+    slug: "ten-bagger",
+    name: "10-Bagger",
+    description: "Backtested a strategy achieving 100%+ total return",
+    icon: "rocket",
+    category: "backtester",
+    xpReward: 300,
+    requirement: "Achieve 100%+ total return in a backtest",
+    threshold: 1,
+    check: (data: { totalReturn: number }) => data.totalReturn >= 100,
+  },
+  {
+    slug: "quant-veteran",
+    name: "Quant Veteran",
+    description: "Ran 10 or more backtests",
+    icon: "brain",
+    category: "backtester",
+    xpReward: 200,
+    requirement: "Run 10 backtests",
+    threshold: 10,
+    check: (data: { backtestCount: number }) => data.backtestCount >= 10,
+  },
+];
+
+router.post("/gamification/backtester/award-badges", requireAuth, validateBody(BacktesterBadgeSchema), async (req, res) => {
+  const clerkId = (req as AuthenticatedRequest).userId;
+  const { backtestCount, totalReturn, beatBenchmark } = req.body;
+
+  try {
+    const userId = await resolveUserId(clerkId, req);
+    if (!userId) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    const newlyEarned: string[] = [];
+    const notifications: { name: string; description: string; xpReward: number }[] = [];
+
+    for (const badgeDef of BACKTESTER_BADGES) {
+      const meetsCondition = badgeDef.check({ backtestCount, totalReturn, beatBenchmark: beatBenchmark ?? false });
+      if (!meetsCondition) continue;
+
+      let [badge] = await db.select().from(badgesTable).where(eq(badgesTable.slug, badgeDef.slug));
+      if (!badge) continue;
+
+      const [existing] = await db.select().from(userBadgesTable)
+        .where(and(eq(userBadgesTable.userId, userId), eq(userBadgesTable.badgeId, badge.id)));
+      if (existing) continue;
+
+      await db.insert(userBadgesTable).values({ userId, badgeId: badge.id }).onConflictDoNothing();
+
+      if (badge.xpReward > 0) {
+        const [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+        if (xpRow) {
+          const newTotal = xpRow.totalXp + badge.xpReward;
+          await db.update(userXpTable).set({
+            totalXp: newTotal,
+            monthlyXp: xpRow.monthlyXp + badge.xpReward,
+            weeklyXp: xpRow.weeklyXp + badge.xpReward,
+            updatedAt: new Date(),
+          }).where(eq(userXpTable.userId, userId));
+          await db.insert(xpTransactionsTable).values({
+            userId,
+            amount: badge.xpReward,
+            reason: `badge_${badge.slug}`,
+            category: "backtester",
+          });
+        }
+      }
+
+      newlyEarned.push(badge.slug);
+      notifications.push({ name: badge.name, description: badge.description, xpReward: badge.xpReward });
+    }
+
+    res.json({ badgesEarned: newlyEarned, notifications });
+  } catch (error) {
+    logger.error({ err: error }, "Error awarding backtester badges:");
+    res.status(500).json({ error: "Failed to award badges" });
   }
 });
 

@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@clerk/react";
 import {
   BarChart3, Search, TrendingUp, TrendingDown, Activity, Volume2,
   Waves, ChevronDown, ChevronUp, Zap, Shield, Brain, Eye,
@@ -269,6 +270,7 @@ function sigBg(s: IndicatorResult["signal"]) {
 
 export default function TechnicalAnalysis() {
   const { toast } = useToast();
+  const { getToken, isSignedIn } = useAuth();
   const [search, setSearch] = useState("");
   const [activeSymbol, setActiveSymbol] = useState("");
   const [category, setCategory] = useState<Category>("all");
@@ -298,6 +300,62 @@ export default function TechnicalAnalysis() {
     winRate: number; sharpe: number; maxDrawdown: number; totalReturn: number;
     equityCurve: { bar: number; equity: number }[];
   } | null>(null);
+
+  const backtestCountRef = useRef<number>(
+    (() => { try { return parseInt(localStorage.getItem("ew_backtest_count") || "0", 10) || 0; } catch { return 0; } })()
+  );
+
+  const awardBacktesterXP = useCallback(async (result: {
+    totalReturn: number; sharpe: number; winRate: number; trades: unknown[];
+  }) => {
+    if (!isSignedIn) return;
+    try {
+      const token = await getToken();
+      if (!token) return;
+
+      const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+
+      await fetch("/api/gamification/xp", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ reason: "backtest_run", category: "backtester" }),
+      });
+
+      const beatBenchmark = result.totalReturn > 10 && result.sharpe > 1.0;
+      if (beatBenchmark) {
+        await fetch("/api/gamification/xp", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ reason: "backtest_beats_benchmark", category: "backtester" }),
+        });
+      }
+
+      const count = backtestCountRef.current + 1;
+      backtestCountRef.current = count;
+      try { localStorage.setItem("ew_backtest_count", String(count)); } catch {}
+
+      await fetch("/api/gamification/backtester/award-badges", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          backtestCount: count,
+          totalReturn: result.totalReturn,
+          sharpe: result.sharpe,
+          winRate: result.winRate,
+          tradeCount: result.trades.length,
+          beatBenchmark,
+        }),
+      });
+
+      if (beatBenchmark) {
+        toast({
+          title: "Strategy beat the benchmark!",
+          description: `+bonus XP earned. Check Achievements for new badges.`,
+          duration: 4000,
+        });
+      }
+    } catch {}
+  }, [isSignedIn, getToken, toast]);
 
   useEffect(() => { trackEvent("signal_viewed"); }, []);
   const analyzeIdRef = useRef(0);
@@ -509,6 +567,7 @@ export default function TechnicalAnalysis() {
     if (trades.length === 0) {
       setStratRunning(false);
       setStratResult({ trades: [], winRate: 0, sharpe: 0, maxDrawdown: 0, totalReturn: 0, equityCurve: [{ bar: 0, equity: 10000 }] });
+      awardBacktesterXP({ totalReturn: 0, sharpe: 0, winRate: 0, trades: [] });
       return;
     }
 
@@ -534,9 +593,11 @@ export default function TechnicalAnalysis() {
     const stdR = Math.sqrt(rets.reduce((a, b) => a + Math.pow(b - meanR, 2), 0) / rets.length);
     const sharpe = stdR === 0 ? 0 : (meanR / stdR) * Math.sqrt(252 / (n / trades.length));
 
-    setStratResult({ trades, winRate, sharpe, maxDrawdown, totalReturn, equityCurve });
+    const result = { trades, winRate, sharpe, maxDrawdown, totalReturn, equityCurve };
+    setStratResult(result);
     setStratRunning(false);
-  }, [stockData, stratIndicator, stratCondition, stratThreshold, stratPeriod]);
+    awardBacktesterXP({ totalReturn, sharpe, winRate, trades });
+  }, [stockData, stratIndicator, stratCondition, stratThreshold, stratPeriod, awardBacktesterXP]);
 
   const startFlashCouncilStream = useCallback(() => {
     if (!activeSymbol || streamStatus === "streaming") return;

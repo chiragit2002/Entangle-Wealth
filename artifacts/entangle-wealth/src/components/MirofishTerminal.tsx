@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { terminalOrderFlow, terminalSystemLog, marketTickerData } from "@/lib/mock-data";
 import { quickAnalyzeStock, fetchStocks, fetchNews, type NewsItem } from "@/lib/api";
 import { useAuth } from "@clerk/react";
+import { getActiveProfile } from "@/lib/taxflow-profile";
+import { getMarginalRate } from "@/lib/taxflow-rates";
 
 interface TerminalNewsItem {
   time: string;
@@ -32,6 +34,104 @@ interface TaxSettings {
   lotMethod: "FIFO" | "LIFO" | "SPECIFIC";
   visible: boolean;
   disclaimerShown: boolean;
+}
+
+const DEFAULT_ST_RATE = 0.37;
+const DEFAULT_LT_RATE = 0.20;
+const NIIT_RATE = 0.038;
+
+function getTaxFlowRates(): { stRate: number; ltRate: number; entityType: string } {
+  try {
+    const profile = getActiveProfile();
+    if (profile && profile.grossRevenue > 0) {
+      const taxableIncome = profile.grossRevenue * 0.7;
+      const stRate = getMarginalRate(taxableIncome, profile.taxYear || 2026);
+      const ltRate = taxableIncome > 518900 ? 0.20 : taxableIncome > 291850 ? 0.15 : 0.0;
+      return { stRate, ltRate: Math.max(ltRate, 0.15), entityType: profile.entityType || "contractor" };
+    }
+  } catch {}
+  return { stRate: DEFAULT_ST_RATE, ltRate: DEFAULT_LT_RATE, entityType: "individual" };
+}
+
+function formatTaxImpact(side: "buy" | "sell", qty: number, sym: string, fillPrice: number, position?: { avg_entry_price: string; qty: string; unrealized_pl: string } | null): string {
+  const { stRate: ST_RATE, ltRate: LT_RATE, entityType } = getTaxFlowRates();
+  const profileNote = entityType !== "individual" ? ` · ${entityType.replace("_", " ").toUpperCase()}` : "";
+  const totalValue = qty * fillPrice;
+  const lines: string[] = [];
+  lines.push(`─── Real-Time Tax Impact${profileNote} ───`);
+
+  if (side === "buy") {
+    const costBasis = totalValue;
+    const hypothetical5pct = totalValue * 0.05;
+    const hypothetical20pct = totalValue * 0.20;
+    const stTax5 = hypothetical5pct * ST_RATE;
+    const ltTax5 = hypothetical5pct * LT_RATE;
+    const stTax20 = hypothetical20pct * ST_RATE;
+    const ltTax20 = hypothetical20pct * LT_RATE;
+    lines.push(`  Cost Basis: ${qty} × $${fillPrice.toFixed(2)} = $${costBasis.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+    lines.push(`  ┌─────────────────────────────────────────────┐`);
+    lines.push(`  │ IF SOLD @ +5%  ($${(fillPrice * 1.05).toFixed(2)})                    │`);
+    lines.push(`  │   Gain: $${hypothetical5pct.toFixed(2).padStart(10)}                          │`);
+    lines.push(`  │   Short-Term Tax (${(ST_RATE * 100).toFixed(0)}%): $${stTax5.toFixed(2).padStart(8)}  (<1 yr)   │`);
+    lines.push(`  │   Long-Term Tax  (${(LT_RATE * 100).toFixed(0)}%): $${ltTax5.toFixed(2).padStart(8)}  (>1 yr)   │`);
+    lines.push(`  │   Tax Savings by Holding: $${(stTax5 - ltTax5).toFixed(2).padStart(7)}          │`);
+    lines.push(`  ├─────────────────────────────────────────────┤`);
+    lines.push(`  │ IF SOLD @ +20% ($${(fillPrice * 1.20).toFixed(2)})                    │`);
+    lines.push(`  │   Gain: $${hypothetical20pct.toFixed(2).padStart(10)}                          │`);
+    lines.push(`  │   Short-Term Tax (${(ST_RATE * 100).toFixed(0)}%): $${stTax20.toFixed(2).padStart(8)}  (<1 yr)   │`);
+    lines.push(`  │   Long-Term Tax  (${(LT_RATE * 100).toFixed(0)}%): $${ltTax20.toFixed(2).padStart(8)}  (>1 yr)   │`);
+    lines.push(`  │   Tax Savings by Holding: $${(stTax20 - ltTax20).toFixed(2).padStart(7)}          │`);
+    lines.push(`  └─────────────────────────────────────────────┘`);
+    lines.push(`  Tip: Hold >1 year to qualify for long-term rates.`);
+  } else {
+    const proceeds = totalValue;
+    lines.push(`  Proceeds: ${qty} × $${fillPrice.toFixed(2)} = $${proceeds.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+
+    const rawEntry = position ? parseFloat(position.avg_entry_price) : NaN;
+    if (!position || isNaN(rawEntry)) {
+      lines.push(`  Cost Basis: unavailable (no matching position found)`);
+      lines.push(`  ┌─────────────────────────────────────────────┐`);
+      lines.push(`  │ Cannot compute realized gain/loss without   │`);
+      lines.push(`  │ a cost basis. Check POSITIONS after fill.   │`);
+      lines.push(`  └─────────────────────────────────────────────┘`);
+    } else {
+      const entryPrice = rawEntry;
+      const costBasis = entryPrice * qty;
+      const gain = proceeds - costBasis;
+      const isGain = gain >= 0;
+      const stTax = Math.max(0, gain * ST_RATE);
+      const ltTax = Math.max(0, gain * LT_RATE);
+      const niit = Math.max(0, gain * NIIT_RATE);
+      const netAfterST = proceeds - stTax - niit;
+      const netAfterLT = proceeds - ltTax - niit;
+      lines.push(`  Cost Basis: ${qty} × $${entryPrice.toFixed(2)} = $${costBasis.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+      lines.push(`  ${isGain ? "Realized Gain" : "Realized Loss"}: ${isGain ? "+" : "-"}$${Math.abs(gain).toFixed(2)}`);
+      if (isGain) {
+        lines.push(`  ┌─────────────────────────────────────────────┐`);
+        lines.push(`  │ SHORT-TERM (held <1 yr)                     │`);
+        lines.push(`  │   Federal Tax (${(ST_RATE * 100).toFixed(0)}%):    $${stTax.toFixed(2).padStart(10)}         │`);
+        lines.push(`  │   NIIT (3.8%):          $${niit.toFixed(2).padStart(10)}         │`);
+        lines.push(`  │   Net After Tax:        $${netAfterST.toFixed(2).padStart(10)}         │`);
+        lines.push(`  ├─────────────────────────────────────────────┤`);
+        lines.push(`  │ LONG-TERM (held >1 yr)                     │`);
+        lines.push(`  │   Federal Tax (${(LT_RATE * 100).toFixed(0)}%):    $${ltTax.toFixed(2).padStart(10)}         │`);
+        lines.push(`  │   NIIT (3.8%):          $${niit.toFixed(2).padStart(10)}         │`);
+        lines.push(`  │   Net After Tax:        $${netAfterLT.toFixed(2).padStart(10)}         │`);
+        lines.push(`  └─────────────────────────────────────────────┘`);
+        lines.push(`  Tax Savings (LT vs ST): $${(stTax - ltTax).toFixed(2)}`);
+      } else {
+        lines.push(`  ┌─────────────────────────────────────────────┐`);
+        lines.push(`  │ TAX-LOSS HARVESTING OPPORTUNITY             │`);
+        lines.push(`  │   Deductible Loss: $${Math.abs(gain).toFixed(2).padStart(10)}              │`);
+        lines.push(`  │   Max Annual Offset: $3,000 vs income       │`);
+        lines.push(`  │   Remaining Carry-Forward: $${Math.max(0, Math.abs(gain) - 3000).toFixed(2).padStart(8)}     │`);
+        lines.push(`  └─────────────────────────────────────────────┘`);
+        lines.push(`  Note: Loss offsets gains first, then up to $3k income/yr.`);
+      }
+    }
+  }
+  lines.push(`  ⚠ Estimates only — consult a tax professional.`);
+  return lines.join("\n");
 }
 
 const DEFAULT_TAX_SETTINGS: TaxSettings = {

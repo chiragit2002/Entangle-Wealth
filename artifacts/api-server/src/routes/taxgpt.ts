@@ -9,6 +9,7 @@ import { usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { getOccupationById } from "@workspace/occupations";
 import { logger } from "../lib/logger";
+import { sanitizeAiOutput, appendDisclaimer } from "../middlewares/inputSanitizer";
 
 let openai: any = null;
 try {
@@ -224,8 +225,8 @@ router.post("/taxgpt", requireAuth, validateBody(TaxGptRequestSchema), async (re
     return;
   }
 
-  const sanitized = question.trim().slice(0, 1000);
-  if (sanitized.length === 0) {
+  const sanitizedQuestion = question.trim().slice(0, 1000);
+  if (sanitizedQuestion.length === 0) {
     res.status(400).json({ error: "Question cannot be empty" });
     return;
   }
@@ -284,7 +285,7 @@ router.post("/taxgpt", requireAuth, validateBody(TaxGptRequestSchema), async (re
           model: "gpt-4o-mini",
           messages: [
             { role: "system", content: systemPrompt },
-            { role: "user", content: sanitized },
+            { role: "user", content: sanitizedQuestion },
           ],
           max_tokens: 1500,
           temperature: 0.3,
@@ -292,7 +293,9 @@ router.post("/taxgpt", requireAuth, validateBody(TaxGptRequestSchema), async (re
       { label: "openai-taxgpt", maxRetries: 4 }
     );
 
-    const answer = completion.choices?.[0]?.message?.content || "I couldn't generate a response. Please try rephrasing your question.";
+    const rawAnswer = completion.choices?.[0]?.message?.content || "I couldn't generate a response. Please try rephrasing your question.";
+    const sanitizedAnswer = sanitizeAiOutput(rawAnswer);
+    const answer = appendDisclaimer(sanitizedAnswer);
     incrementTaxGptCount(clerkId);
     res.json({ answer });
   } catch (error) {

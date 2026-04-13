@@ -1,59 +1,18 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, paperOptionsTradesTable, paperOptionsPositionsTable, dailySpinsTable, userXpTable, xpTransactionsTable, streaksTable, usersTable } from "@workspace/db/schema";
+import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, paperOptionsTradesTable, paperOptionsPositionsTable, dailySpinsTable, usersTable } from "@workspace/db/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { resolveUserId } from "../lib/resolveUserId";
 import { logger } from "../lib/logger";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
-import { calculateLevel, calculateTier } from "@workspace/xp";
 import { validateBody, z } from "../lib/validateRequest";
+import { getStockBySymbol } from "../data/nasdaq-stocks";
 
 const router = Router();
 
 const DEFAULT_STARTING_CASH = 100_000;
 const EARLY_ADOPTER_STARTING_CASH = 1_000_000;
-
-type SpinRewardType = "cash" | "xp" | "multiplier" | "streak_protection";
-
-interface SpinReward {
-  rewardType: SpinRewardType;
-  label: string;
-  cashAmount: number;
-  xpAmount: number;
-  weight: number;
-}
-
-const SPIN_PRIZES: SpinReward[] = [
-  { rewardType: "cash", label: "$1K", cashAmount: 1_000, xpAmount: 0, weight: 603.4 },
-  { rewardType: "cash", label: "$2K", cashAmount: 2_000, xpAmount: 0, weight: 142.9 },
-  { rewardType: "cash", label: "$3K", cashAmount: 3_000, xpAmount: 0, weight: 100 },
-  { rewardType: "cash", label: "$4K", cashAmount: 4_000, xpAmount: 0, weight: 66.7 },
-  { rewardType: "cash", label: "$5K", cashAmount: 5_000, xpAmount: 0, weight: 50 },
-  { rewardType: "cash", label: "$7.5K", cashAmount: 7_500, xpAmount: 0, weight: 20 },
-  { rewardType: "cash", label: "$10K", cashAmount: 10_000, xpAmount: 0, weight: 10 },
-  { rewardType: "cash", label: "$25K", cashAmount: 25_000, xpAmount: 0, weight: 5 },
-  { rewardType: "cash", label: "$50K", cashAmount: 50_000, xpAmount: 0, weight: 2 },
-  { rewardType: "cash", label: "$100K", cashAmount: 100_000, xpAmount: 0, weight: 1 },
-  { rewardType: "xp", label: "+50 XP", cashAmount: 0, xpAmount: 50, weight: 50 },
-  { rewardType: "xp", label: "+100 XP", cashAmount: 0, xpAmount: 100, weight: 30 },
-  { rewardType: "xp", label: "+250 XP", cashAmount: 0, xpAmount: 250, weight: 15 },
-  { rewardType: "multiplier", label: "2x Boost", cashAmount: 0, xpAmount: 0, weight: 4 },
-  { rewardType: "streak_protection", label: "Streak Boost", cashAmount: 0, xpAmount: 0, weight: 1 },
-];
-
-const TOTAL_WEIGHT = SPIN_PRIZES.reduce((sum, p) => sum + p.weight, 0);
-
-function pickPrize(): SpinReward {
-  const rand = Math.random() * TOTAL_WEIGHT;
-  let cumulative = 0;
-  for (const prize of SPIN_PRIZES) {
-    cumulative += prize.weight;
-    if (rand < cumulative) return prize;
-  }
-  return SPIN_PRIZES[0];
-}
-
 
 function getTodayUTC(): string {
   return new Date().toISOString().split("T")[0];
@@ -151,7 +110,6 @@ const TradeSchema = z.object({
   symbol: z.string().min(1).max(10).regex(/^[A-Za-z]{1,10}$/, "Symbol must be 1-10 letters"),
   side: z.enum(["buy", "sell"]),
   quantity: z.number().int().positive().max(1_000_000),
-  price: z.number().positive().max(1_000_000),
 });
 
 router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), async (req, res) => {
@@ -163,12 +121,17 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
       return;
     }
 
-    const { symbol, side, quantity, price } = req.body;
+    const { symbol, side, quantity } = req.body;
     const qty = Math.floor(Number(quantity));
-    const px = Number(price);
-
-    const totalCost = qty * px;
     const upperSymbol = symbol.toUpperCase();
+
+    const stockData = getStockBySymbol(upperSymbol);
+    if (!stockData || typeof stockData.price !== "number" || stockData.price <= 0) {
+      res.status(422).json({ error: `Cannot execute trade: market price unavailable for ${upperSymbol}` });
+      return;
+    }
+    const px = stockData.price;
+    const totalCost = qty * px;
     const startingCash = await getStartingCash(dbUserId);
 
     const result = await db.transaction(async (tx) => {
@@ -267,14 +230,17 @@ router.post("/paper-trading/reset", requireAuth, validateBody(z.object({}).stric
 
     const startingCash = await getStartingCash(dbUserId);
 
-    await db.delete(paperTradesTable).where(eq(paperTradesTable.userId, dbUserId));
-    await db.delete(paperPositionsTable).where(eq(paperPositionsTable.userId, dbUserId));
-    await db.delete(paperOptionsTradesTable).where(eq(paperOptionsTradesTable.userId, dbUserId));
-    await db.delete(paperOptionsPositionsTable).where(eq(paperOptionsPositionsTable.userId, dbUserId));
-    await db
-      .update(paperPortfoliosTable)
-      .set({ cashBalance: startingCash, updatedAt: new Date() })
-      .where(eq(paperPortfoliosTable.userId, dbUserId));
+    await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${dbUserId} || '_paper_trade'))`);
+      await tx.delete(paperTradesTable).where(eq(paperTradesTable.userId, dbUserId));
+      await tx.delete(paperPositionsTable).where(eq(paperPositionsTable.userId, dbUserId));
+      await tx.delete(paperOptionsTradesTable).where(eq(paperOptionsTradesTable.userId, dbUserId));
+      await tx.delete(paperOptionsPositionsTable).where(eq(paperOptionsPositionsTable.userId, dbUserId));
+      await tx
+        .update(paperPortfoliosTable)
+        .set({ cashBalance: startingCash, updatedAt: new Date() })
+        .where(eq(paperPortfoliosTable.userId, dbUserId));
+    });
 
     const formattedBalance = startingCash.toLocaleString("en-US");
     res.json({ success: true, message: `Portfolio reset to $${formattedBalance}` });
@@ -291,7 +257,6 @@ const OptionsTradeSchema = z.object({
   expiration: z.string().min(1).max(20),
   side: z.enum(["buy", "sell"]),
   contracts: z.number().int().positive().max(10_000),
-  premium: z.number().positive().max(100_000),
 });
 
 router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTradeSchema), async (req, res) => {
@@ -303,8 +268,16 @@ router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTra
       return;
     }
 
-    const { symbol, optionType, strike, expiration, side, contracts, premium } = req.body;
+    const { symbol, optionType, strike, expiration, side, contracts } = req.body;
     const upperSymbol = symbol.toUpperCase();
+
+    const stockData = getStockBySymbol(upperSymbol);
+    if (!stockData || typeof stockData.price !== "number" || stockData.price <= 0) {
+      res.status(422).json({ error: `Cannot execute options trade: market price unavailable for ${upperSymbol}` });
+      return;
+    }
+    const underlyingPrice = stockData.price;
+    const premium = Math.max(0.01, Math.abs(underlyingPrice - strike) * 0.05 + underlyingPrice * 0.005);
     const totalCost = contracts * premium * 100;
     const startingCash = await getStartingCash(dbUserId);
 
@@ -469,103 +442,8 @@ router.get("/paper-trading/spin/status", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/paper-trading/spin", requireAuth, validateBody(z.object({}).strict()), async (req, res) => {
-  try {
-    const clerkId = (req as AuthenticatedRequest).userId;
-    const dbUserId = await resolveUserId(clerkId, req);
-    if (!dbUserId) {
-      res.status(400).json({ error: "User not found. Please complete onboarding first." });
-      return;
-    }
-
-    const today = getTodayUTC();
-    const tomorrow = new Date();
-    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-    tomorrow.setUTCHours(0, 0, 0, 0);
-
-    const picked = pickPrize();
-    const startingCash = await getStartingCash(dbUserId);
-
-    const txResult = await db.transaction(async (tx) => {
-      const inserted = await tx
-        .insert(dailySpinsTable)
-        .values({ userId: dbUserId, prizeAmount: picked.cashAmount, spinDate: today, rewardType: picked.rewardType, rewardLabel: picked.label })
-        .onConflictDoNothing({ target: [dailySpinsTable.userId, dailySpinsTable.spinDate] })
-        .returning({ id: dailySpinsTable.id });
-
-      if (inserted.length === 0) {
-        return { alreadySpun: true };
-      }
-
-      if (picked.rewardType === "cash" && picked.cashAmount > 0) {
-        const [portfolio] = await tx
-          .select()
-          .from(paperPortfoliosTable)
-          .where(eq(paperPortfoliosTable.userId, dbUserId));
-
-        if (portfolio) {
-          await tx
-            .update(paperPortfoliosTable)
-            .set({ cashBalance: portfolio.cashBalance + picked.cashAmount, updatedAt: new Date() })
-            .where(eq(paperPortfoliosTable.userId, dbUserId));
-        } else {
-          await tx
-            .insert(paperPortfoliosTable)
-            .values({ userId: dbUserId, cashBalance: startingCash + picked.cashAmount });
-        }
-      } else if (picked.rewardType === "xp" && picked.xpAmount > 0) {
-        let [xpRow] = await tx.select().from(userXpTable).where(eq(userXpTable.userId, dbUserId));
-        if (!xpRow) {
-          [xpRow] = await tx.insert(userXpTable).values({ userId: dbUserId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
-        }
-        const newTotalXp = xpRow.totalXp + picked.xpAmount;
-        const newLevel = calculateLevel(newTotalXp);
-        const newTier = calculateTier(newLevel, newTotalXp);
-        await tx.update(userXpTable).set({
-          totalXp: newTotalXp, level: newLevel, tier: newTier,
-          monthlyXp: xpRow.monthlyXp + picked.xpAmount,
-          weeklyXp: xpRow.weeklyXp + picked.xpAmount,
-          updatedAt: new Date(),
-        }).where(eq(userXpTable.userId, dbUserId));
-        await tx.insert(xpTransactionsTable).values({ userId: dbUserId, amount: picked.xpAmount, reason: "paper_trading_spin", category: "engagement" });
-      } else if (picked.rewardType === "multiplier") {
-        let [streak] = await tx.select().from(streaksTable).where(eq(streaksTable.userId, dbUserId));
-        if (!streak) {
-          [streak] = await tx.insert(streaksTable).values({ userId: dbUserId, currentStreak: 0, longestStreak: 0, multiplier: 1.0 }).returning();
-        }
-        await tx.update(streaksTable).set({
-          multiplier: Math.min(3.0, Math.max(streak.multiplier, 2.0)),
-          updatedAt: new Date(),
-        }).where(eq(streaksTable.userId, dbUserId));
-      } else if (picked.rewardType === "streak_protection") {
-        const [streakRow] = await tx.select().from(streaksTable).where(eq(streaksTable.userId, dbUserId));
-        if (!streakRow) {
-          await tx.insert(streaksTable).values({ userId: dbUserId, currentStreak: 0, longestStreak: 0, multiplier: 1.0, streakProtectionActive: true });
-        } else {
-          await tx.update(streaksTable).set({ streakProtectionActive: true, updatedAt: new Date() }).where(eq(streaksTable.userId, dbUserId));
-        }
-      }
-
-      return { alreadySpun: false };
-    });
-
-    if (txResult.alreadySpun) {
-      res.json({ alreadySpun: true, nextSpinAt: tomorrow.toISOString() });
-      return;
-    }
-
-    res.json({
-      success: true,
-      rewardType: picked.rewardType,
-      label: picked.label,
-      prize: picked.cashAmount,
-      xpAmount: picked.xpAmount,
-      nextSpinAt: tomorrow.toISOString(),
-    });
-  } catch (err) {
-    logger.error("Spin error:", err);
-    res.status(500).json({ error: "Spin failed" });
-  }
+router.post("/paper-trading/spin", requireAuth, validateBody(z.object({}).strict()), (req, res) => {
+  res.redirect(307, "/api/gamification/spin");
 });
 
 router.get("/paper-trading/spin/history", requireAuth, async (req, res) => {

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { validateBody, validateQuery, z } from "../lib/validateRequest";
+import { sanitizeAiOutput, appendDisclaimer } from "../middlewares/inputSanitizer";
 import { db } from "@workspace/db";
 import {
   coachingSessionsTable,
@@ -185,7 +186,8 @@ router.post("/coaching/chat", requireAuth, validateBody(CoachingChatSchema), asy
       })
     );
 
-    const coachResponse = response.choices[0]?.message?.content || "I'm here to help with your financial journey. What's on your mind?";
+    const rawCoachResponse = response.choices[0]?.message?.content || "I'm here to help with your financial journey. What's on your mind?";
+    const coachResponse = appendDisclaimer(sanitizeAiOutput(rawCoachResponse));
 
     const [session] = await db.insert(coachingSessionsTable).values({
       userId,
@@ -251,7 +253,7 @@ router.get("/coaching/nudge", requireAuth, async (req, res) => {
       })
     );
 
-    const nudge = response.choices[0]?.message?.content || "Keep up the great work on your financial journey!";
+    const nudge = appendDisclaimer(sanitizeAiOutput(response.choices[0]?.message?.content || "Keep up the great work on your financial journey!"));
 
     await db.insert(coachingSessionsTable).values({
       userId,
@@ -328,12 +330,16 @@ Respond in JSON format:
     const content = response.choices[0]?.message?.content || "{}";
     const parsed = JSON.parse(content);
 
+    const cleanSummary = appendDisclaimer(sanitizeAiOutput(parsed.summary || "Great week of financial engagement!"));
+    const cleanWins = (parsed.topWins || []).map((w: string) => sanitizeAiOutput(w));
+    const cleanActions = (parsed.suggestedActions || []).map((a: string) => sanitizeAiOutput(a));
+
     const [newSummary] = await db.insert(weeklyCoachingSummariesTable).values({
       userId,
       weekStart,
-      summary: parsed.summary || "Great week of financial engagement!",
-      topWins: parsed.topWins || [],
-      suggestedActions: parsed.suggestedActions || [],
+      summary: cleanSummary,
+      topWins: cleanWins,
+      suggestedActions: cleanActions,
     }).returning();
 
     res.json(newSummary);

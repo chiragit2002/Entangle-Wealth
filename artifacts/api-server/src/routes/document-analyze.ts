@@ -2,6 +2,7 @@ import { Router } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
 import { validateBody, z } from "../lib/validateRequest";
 import { logger } from "../lib/logger";
+import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 let openai: any = null;
 try {
@@ -13,17 +14,51 @@ try {
 
 const router = Router();
 
+const MAX_BASE64_BYTES = 5 * 1024 * 1024;
+const MAX_CONCURRENT_PER_USER = 2;
+
+const userConcurrency = new Map<string, number>();
+
+function acquireSlot(userId: string): boolean {
+  const current = userConcurrency.get(userId) ?? 0;
+  if (current >= MAX_CONCURRENT_PER_USER) return false;
+  userConcurrency.set(userId, current + 1);
+  return true;
+}
+
+function releaseSlot(userId: string): void {
+  const current = userConcurrency.get(userId) ?? 1;
+  const next = Math.max(0, current - 1);
+  if (next === 0) {
+    userConcurrency.delete(userId);
+  } else {
+    userConcurrency.set(userId, next);
+  }
+}
+
 const DocumentAnalyzeSchema = z.object({
-  fileData: z.string().min(1),
+  fileData: z.string().min(1).max(MAX_BASE64_BYTES),
   fileType: z.string().min(1).max(100).regex(/^(image\/|application\/pdf)/, "Only image or PDF file types allowed"),
   fileName: z.string().max(255).optional(),
 });
 
 router.post("/analyze-document", requireAuth, validateBody(DocumentAnalyzeSchema), async (req, res) => {
+  const clerkId = (req as AuthenticatedRequest).userId;
   const { fileData, fileType, fileName } = req.body;
 
   if (!openai) {
     res.status(503).json({ error: "AI service not available" });
+    return;
+  }
+
+  const rawBytes = Buffer.byteLength(fileData, "utf8");
+  if (rawBytes > MAX_BASE64_BYTES) {
+    res.status(413).json({ error: "File too large. Maximum size is 5 MB." });
+    return;
+  }
+
+  if (!acquireSlot(clerkId)) {
+    res.status(429).json({ error: "Too many concurrent document analysis requests. Please wait for your current upload to finish." });
     return;
   }
 
@@ -108,6 +143,8 @@ router.post("/analyze-document", requireAuth, validateBody(DocumentAnalyzeSchema
   } catch (error) {
     logger.error({ err: error }, "Document analysis error");
     res.status(500).json({ error: "Failed to analyze document" });
+  } finally {
+    releaseSlot(clerkId);
   }
 });
 

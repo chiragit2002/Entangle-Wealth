@@ -6,6 +6,7 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { checkSignalLimit, incrementSignalCount } from "../lib/userDailyLimits";
 import { logger } from "../lib/logger";
 import { validateParams, validateBody, z } from "../lib/validateRequest";
+import { sanitizeAiOutput, appendDisclaimer, deepSanitizeObject } from "../middlewares/inputSanitizer";
 
 const router = Router();
 
@@ -141,7 +142,9 @@ Then synthesize with the Flash Council and deliver the consensus signal.`;
       return;
     }
 
-    const analysis = JSON.parse(content);
+    const rawAnalysis = JSON.parse(content);
+    const analysis = deepSanitizeObject(rawAnalysis);
+    analysis.disclaimer = "This is AI-generated analysis for educational purposes only. Not financial advice. Always do your own research.";
     incrementSignalCount(clerkId);
     res.json(analysis);
   } catch (error: unknown) {
@@ -184,7 +187,10 @@ router.post("/stocks/:symbol/quick-analyze", requireAuth, validateParams(StockSy
       return;
     }
 
-    res.json(JSON.parse(content));
+    const rawQuickAnalysis = JSON.parse(content);
+    const quickAnalysis = deepSanitizeObject(rawQuickAnalysis);
+    quickAnalysis.disclaimer = "AI-generated analysis for educational purposes only. Not financial advice. Always do your own research.";
+    res.json(quickAnalysis);
   } catch (error: unknown) {
     logger.error({ err: error, symbol: req.params.symbol }, "Quick stock analysis error");
     res.status(500).json({ error: "Quick analysis failed. Please try again." });

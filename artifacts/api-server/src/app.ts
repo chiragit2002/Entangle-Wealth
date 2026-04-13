@@ -163,9 +163,20 @@ app.use(cors({
     }
   },
 }));
+const DOC_UPLOAD_MAX_BYTES = 6 * 1024 * 1024;
+
+app.use("/api/analyze-document", (req: Request, res: Response, next: NextFunction) => {
+  const contentLength = parseInt(req.headers["content-length"] || "0", 10);
+  if (contentLength > DOC_UPLOAD_MAX_BYTES) {
+    res.status(413).json({ error: "Request payload too large. Maximum allowed size is 6 MB." });
+    return;
+  }
+  next();
+});
+
 app.use((req, res, next) => {
   const isDocUpload = req.path.startsWith("/api/analyze-document") || req.path.startsWith("/api/kyc");
-  express.json({ limit: isDocUpload ? "10mb" : "1mb" })(req, res, next);
+  express.json({ limit: isDocUpload ? "6mb" : "1mb" })(req, res, next);
 });
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 

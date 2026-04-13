@@ -1,0 +1,76 @@
+Wire TaxFlow directly into the Mirofish Terminal so every trade command instantly shows its real-time tax consequence inline. Here is the exact behavior I want:
+
+CORE BEHAVIOR — TAX IMPACT ON EVERY TRADE:
+• Every time a user executes BUY or SELL in the Mirofish Terminal, the terminal must immediately print a TaxFlow impact block directly below the order confirmation — before the next prompt appears
+• The tax block must be calculated in real time from the user's actual trade history and holding periods
+• Example of what the terminal output should look like after a SELL command:
+
+  > SELL 10 AAPL @ $189.42 — ORDER FILLED
+  ─────────────────────────────────────────
+  TAX IMPACT ANALYSIS
+  ─────────────────────────────────────────
+  HOLDING PERIOD............ 47 DAYS (SHORT-TERM)
+  COST BASIS................ $1,741.20
+  PROCEEDS.................. $1,894.20
+  REALIZED GAIN............. +$153.00
+  TAX CLASSIFICATION........ SHORT-TERM CAPITAL GAIN
+  EST. TAX LIABILITY........ $36.72 (24% BRACKET)
+  YTD REALIZED GAINS........ $1,247.50
+  YTD EST. TAX BILL......... $299.40
+  ─────────────────────────────────────────
+  > TIP: HOLD 318 MORE DAYS FOR LONG-TERM RATE (15%)
+  > POTENTIAL TAX SAVINGS IF HELD: $14.18
+  ─────────────────────────────────────────
+
+HOLDING PERIOD LOGIC:
+• Calculate exact days held for each lot using FIFO (first in, first out) by default
+• If holding period is under 365 days → label SHORT-TERM, apply ordinary income tax rate
+• If holding period is 365+ days → label LONG-TERM, apply 15% or 20% capital gains rate
+• Always show how many days remain until the position flips to long-term, if applicable
+• Support LIFO and specific lot selection as optional terminal commands:
+  > SET LOT METHOD FIFO
+  > SET LOT METHOD LIFO
+  > SET LOT METHOD SPECIFIC
+
+TAX BRACKET DETECTION:
+• During onboarding the user selected their occupation and location — use this to estimate their federal tax bracket
+• Default to 24% federal bracket if unknown
+• Show state tax addendum for high-tax states (CA, NY, NJ, OR, MN) if user location is set there:
+  > STATE TAX (CA 13.3%)....... $20.35
+  > COMBINED EST. LIABILITY.... $57.07
+
+NEW TERMINAL COMMANDS TO ADD:
+• TAX SUMMARY — prints full year-to-date tax report in terminal format
+• TAX PROJECTION — shows estimated end-of-year tax bill based on current trading pace
+• TAX OPTIMIZE [TICKER] — analyzes open positions and suggests which to sell for best tax outcome
+• HARVEST — identifies positions with unrealized losses that could offset gains (tax loss harvesting)
+• SET BRACKET [RATE] — lets user manually set their tax rate (e.g. SET BRACKET 32)
+• SET STATE [STATE] — sets state tax rate (e.g. SET STATE NC)
+
+WASH SALE DETECTION:
+• If a user sells a position at a loss and then buys the same ticker within 30 days, print:
+  > ⚠ WASH SALE RULE TRIGGERED — LOSS DISALLOWED BY IRS
+  > REPURCHASED AAPL WITHIN 30-DAY WINDOW
+  > DISALLOWED LOSS: $124.00 — ADDED TO COST BASIS
+
+YEAR-END EXPORT COMMAND:
+• EXPORT TAX REPORT — generates and downloads a formatted PDF/CSV showing:
+  — All realized gains and losses
+  — Short-term vs long-term breakdown
+  — Wash sale adjustments
+  — Estimated quarterly payment schedule
+  — Formatted for CPA review
+
+STYLING RULES:
+• All TaxFlow output must match Bloomberg terminal aesthetic — monospace font, dark background, no colors except:
+  — GREEN for gains and tax savings opportunities
+  — RED for tax liabilities and wash sale warnings
+  — AMBER for tips and optimization suggestions
+• Tax block is collapsible — user can type HIDE TAX to suppress it and SHOW TAX to bring it back
+• Disclaimer printed once per session at bottom of first tax block:
+  > AI-ESTIMATED TAX FIGURES — NOT PROFESSIONAL TAX ADVICE — CONSULT A LICENSED CPA
+
+DATA INTEGRITY:
+• All calculations must use real trade history from the Alpaca paper trading account — no mock data
+• If trade history is unavailable, print: > TAX DATA UNAVAILABLE — ENSURE ALPACA CONNECTION IS ACTIVE
+• Store all tax events in a tax_events table: ticker, buy date, sell date, cost basis, proceeds, gain/loss, classification, estimated liability

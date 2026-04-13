@@ -36,9 +36,9 @@ if (envPub && envPriv && tryConfigureVapid(envPub, envPriv)) {
   const generated = webpush.generateVAPIDKeys();
   if (tryConfigureVapid(generated.publicKey, generated.privateKey)) {
     vapidConfigured = true;
-    logger.info({ publicKey: generated.publicKey }, "VAPID keys auto-generated (set VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY env vars for persistence across restarts)");
+    logger.info("VAPID keys auto-generated (push notifications active; set VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY for persistence)");
   } else {
-    logger.warn("Failed to configure VAPID keys — push notifications disabled");
+    logger.info("Push notifications disabled (VAPID configuration failed)");
   }
 }
 

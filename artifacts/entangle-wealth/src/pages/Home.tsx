@@ -16,6 +16,7 @@ import {
   RefreshCw,
   Globe,
 } from "lucide-react";
+import { fetchWithRetry } from "@/lib/api";
 import { EmailCapture } from "@/components/EmailCapture";
 import { trackEvent } from "@/lib/trackEvent";
 import { AnniversaryGiveawayBanner } from "@/components/viral/AnniversaryGiveawayBanner";
@@ -46,8 +47,7 @@ function useHeroStats(): FetchState<HeroStats> & { defaultStats: HeroStats } {
 
   useEffect(() => {
     const fetchStats = () => {
-      setState((prev) => ({ ...prev, loading: true, error: false }));
-      fetch(`${API_BASE}/stats/hero`)
+      fetchWithRetry(`${API_BASE}/stats/hero`)
         .then((r) => {
           if (!r.ok) throw new Error(`HTTP ${r.status}`);
           return r.json();
@@ -55,12 +55,9 @@ function useHeroStats(): FetchState<HeroStats> & { defaultStats: HeroStats } {
         .then((d) => {
           if (d && typeof d.members === "number") {
             setState({ data: d, error: false, loading: false });
-          } else {
-            setState((prev) => ({ ...prev, loading: false }));
           }
         })
         .catch(() => {
-          setState((prev) => ({ ...prev, loading: false, error: true }));
         });
     };
     fetchStats();
@@ -78,7 +75,7 @@ function useRecentSignups(): FetchState<{ name: string; timeLabel: string }[]> {
     loading: true,
   });
   useEffect(() => {
-    fetch(`${API_BASE}/stats/recent-signups`)
+    fetchWithRetry(`${API_BASE}/stats/recent-signups`)
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
@@ -101,7 +98,7 @@ function useTestimonials(): FetchState<
   >({ data: null, error: false, loading: true });
 
   useEffect(() => {
-    fetch(`${API_BASE}/viral/testimonials`)
+    fetchWithRetry(`${API_BASE}/viral/testimonials`)
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
@@ -222,16 +219,7 @@ function RecentSignupTicker({
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] text-white/25">
-        <AlertCircle className="w-3 h-3" aria-hidden="true" />
-        <span>Live activity unavailable</span>
-      </div>
-    );
-  }
-
-  if (!signups || signups.length === 0) {
+  if (error || !signups || signups.length === 0) {
     return (
       <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-transparent bg-transparent" style={{ minHeight: "2rem" }} aria-hidden="true" />
     );
@@ -464,7 +452,7 @@ export default function Home() {
                 <Lock className="w-3.5 h-3.5 text-[#00c8f8]" />
                 Private by default
               </span>
-              {!heroStatsState.error && stats.members > 0 && (
+              {stats.members > 0 && (
                 <span className="text-[11px] text-white/30 font-medium">
                   {animatedMembers.toLocaleString()}+ members
                 </span>
@@ -658,17 +646,11 @@ export default function Home() {
               ))}
             </div>
             <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-sm text-white/30 font-medium">
-              {heroStatsState.error ? (
-                <InlineError message="Live stats unavailable right now." />
-              ) : (
-                <>
-                  <span>{stats.accuracy}% guidance accuracy</span>
-                  <span>·</span>
-                  <span>{animatedMembers.toLocaleString()}+ members</span>
-                  <span>·</span>
-                  <span>Free forever tier</span>
-                </>
-              )}
+              <span>{stats.accuracy}% guidance accuracy</span>
+              <span>·</span>
+              <span>{animatedMembers.toLocaleString()}+ members</span>
+              <span>·</span>
+              <span>Free forever tier</span>
             </div>
           </div>
         </section>

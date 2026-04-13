@@ -107,7 +107,7 @@ async function sendDigestForUser(userId: string, email: string, since: Date, res
 export async function runDailyDigest() {
   const resend = getResend();
   if (!resend) {
-    logger.warn("RESEND_API_KEY not set, skipping daily digest");
+    logger.info("Daily digest skipped (RESEND_API_KEY not configured)");
     return;
   }
 
@@ -125,7 +125,7 @@ export async function runDailyDigest() {
 export async function runWeeklyDigest() {
   const resend = getResend();
   if (!resend) {
-    logger.warn("RESEND_API_KEY not set, skipping weekly digest");
+    logger.info("Weekly digest skipped (RESEND_API_KEY not configured)");
     return;
   }
 

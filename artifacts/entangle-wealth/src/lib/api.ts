@@ -1,5 +1,27 @@
 const API_BASE = "/api";
 
+export async function fetchWithRetry(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+  maxAttempts = 3
+): Promise<Response> {
+  let attempt = 0;
+  while (true) {
+    attempt++;
+    try {
+      const res = await fetch(input, init);
+      if ((res.status === 502 || res.status === 503) && attempt < maxAttempts) {
+        await new Promise((r) => setTimeout(r, 500 * attempt));
+        continue;
+      }
+      return res;
+    } catch (err) {
+      if (attempt >= maxAttempts) throw err;
+      await new Promise((r) => setTimeout(r, 500 * attempt));
+    }
+  }
+}
+
 export interface Stock {
   symbol: string;
   name: string;
@@ -92,7 +114,7 @@ export async function fetchStocks(params: {
   if (params.sortBy) sp.set("sortBy", params.sortBy);
   if (params.sortDir) sp.set("sortDir", params.sortDir);
 
-  const res = await fetch(`${API_BASE}/stocks?${sp.toString()}`);
+  const res = await fetchWithRetry(`${API_BASE}/stocks?${sp.toString()}`);
   if (!res.ok) throw new Error("Failed to fetch stocks");
   return res.json();
 }
@@ -104,13 +126,13 @@ export async function fetchStock(symbol: string): Promise<Stock> {
 }
 
 export async function fetchMovers(): Promise<Movers> {
-  const res = await fetch(`${API_BASE}/stocks/movers`);
+  const res = await fetchWithRetry(`${API_BASE}/stocks/movers`);
   if (!res.ok) throw new Error("Failed to fetch movers");
   return res.json();
 }
 
 export async function fetchSectors(): Promise<{ sectors: SectorSummary[] }> {
-  const res = await fetch(`${API_BASE}/stocks/sectors`);
+  const res = await fetchWithRetry(`${API_BASE}/stocks/sectors`);
   if (!res.ok) throw new Error("Failed to fetch sectors");
   return res.json();
 }
@@ -217,7 +239,7 @@ export async function fetchNews(params?: {
   if (params?.search) sp.set("search", params.search);
   if (params?.limit) sp.set("limit", String(params.limit));
   if (params?.offset) sp.set("offset", String(params.offset));
-  const res = await fetch(`${API_BASE}/news?${sp.toString()}`, { signal: params?.signal });
+  const res = await fetchWithRetry(`${API_BASE}/news?${sp.toString()}`, { signal: params?.signal });
   if (!res.ok) throw new Error("Failed to fetch news");
   return res.json();
 }

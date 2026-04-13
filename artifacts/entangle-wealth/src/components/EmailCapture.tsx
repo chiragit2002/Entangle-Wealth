@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Mail, Check, Zap } from "lucide-react";
+import { fetchWithRetry } from "@/lib/api";
 
 const API_BASE = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 
@@ -19,7 +20,7 @@ export function EmailCapture() {
     setMessage("");
 
     try {
-      const res = await fetch(`${API_BASE}/subscribers`, {
+      const res = await fetchWithRetry(`${API_BASE}/subscribers`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim(), preference }),

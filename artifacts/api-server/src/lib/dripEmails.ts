@@ -224,7 +224,7 @@ const DRIP_EMAILS: Array<{
 export async function runDripScheduler() {
   const resend = getResend();
   if (!resend) {
-    logger.warn("RESEND_API_KEY not set, skipping drip scheduler");
+    logger.info("Email drip scheduler skipped (RESEND_API_KEY not configured)");
     return;
   }
 

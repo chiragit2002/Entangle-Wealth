@@ -111,6 +111,8 @@ export default function Achievements() {
   const [badgeFilter, setBadgeFilter] = useState<string>("All");
   const [showSpinWheel, setShowSpinWheel] = useState(false);
   const [showBigWin, setShowBigWin] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchAuth = useCallback((path: string, options: RequestInit = {}) => {
     return authFetch(path, getToken, options);
@@ -121,6 +123,8 @@ export default function Achievements() {
   }, []);
 
   const loadData = async () => {
+    setIsLoading(true);
+    setLoadError(null);
     try {
       const [badgesRes, challengesRes, gamRes] = await Promise.allSettled([
         fetchAuth("/gamification/badges/me"),
@@ -128,7 +132,10 @@ export default function Achievements() {
         fetchAuth("/gamification/me"),
       ]);
 
+      let anySuccess = false;
+
       if (badgesRes.status === "fulfilled" && badgesRes.value.ok) {
+        anySuccess = true;
         const data: BadgeData[] = await badgesRes.value.json();
         if (data.length > 0) {
           const seenKey = "ew_celebrated_badges";
@@ -149,17 +156,27 @@ export default function Achievements() {
           }
           setBadges(data);
         }
+      } else if (badgesRes.status === "rejected" || (badgesRes.status === "fulfilled" && !badgesRes.value.ok)) {
+        setLoadError("Could not load your badges — showing defaults. Check your connection and try again.");
       }
       if (challengesRes.status === "fulfilled" && challengesRes.value.ok) {
+        anySuccess = true;
         const data = await challengesRes.value.json();
         if (data.length > 0) setChallenges(data);
       }
       if (gamRes.status === "fulfilled" && gamRes.value.ok) {
+        anySuccess = true;
         setGamification(await gamRes.value.json());
+      }
+
+      if (!anySuccess) {
+        setLoadError("Failed to load your achievements. Showing demo data — your progress is safe.");
       }
     } catch (err) {
       console.error("[Achievements] Failed to load achievements data:", err);
-      toast({ title: "Could not load achievements", description: "Please refresh to try again.", variant: "destructive" });
+      setLoadError("Network error — couldn't reach the server. Your progress is saved and will appear when reconnected.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -172,6 +189,23 @@ export default function Achievements() {
     <Layout>
       <BigWinOverlay show={showBigWin} label="ACHIEVEMENT!" onDone={() => setShowBigWin(false)} />
       <div className="container mx-auto px-4 py-6 max-w-5xl">
+
+        {loadError && (
+          <div className="mb-4 flex items-start gap-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 px-4 py-3">
+            <Zap className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-yellow-300 font-medium">Couldn't load live data</p>
+              <p className="text-xs text-yellow-400/70 mt-0.5">{loadError}</p>
+            </div>
+            <button
+              onClick={() => loadData()}
+              className="shrink-0 text-xs font-mono text-yellow-400 hover:text-yellow-300 border border-yellow-500/30 rounded px-2 py-1 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">

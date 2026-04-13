@@ -431,6 +431,21 @@ export default function Tax() {
           </p>
         </div>
 
+        {!profile && !showOnboarding && (
+          <div className="glass-panel rounded-xl p-6 mb-6 border border-[#FF8C00]/20 bg-[#FF8C00]/[0.03] flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-white mb-1">No tax profile set up yet</p>
+              <p className="text-sm text-white/50">Add your income and entity type to see personalized deductions, savings estimates, and quarterly tax payments.</p>
+            </div>
+            <Button
+              onClick={() => setShowOnboarding(true)}
+              className="shrink-0 bg-[#FF8C00] text-black font-bold hover:bg-[#FF8C00]/90 gap-2"
+            >
+              <Calculator className="w-4 h-4" /> Set up TaxFlow
+            </Button>
+          </div>
+        )}
+
         {profile && (
           <div className="glass-panel rounded-xl p-4 mb-6 border-l-4 border-l-[#FF8C00]">
             <div className="flex items-center justify-between">

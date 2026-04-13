@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
-import { Trophy, Medal, Crown, TrendingUp, Flame, Star, User } from "lucide-react";
+import { Trophy, Medal, Crown, TrendingUp, Flame, Star, User, AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface LeaderboardEntry {
@@ -109,6 +109,7 @@ export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [myRank, setMyRank] = useState<{ rank: number | null; totalUsers: number } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const fetchAuth = useCallback((path: string, options: RequestInit = {}) => {
     return authFetch(path, getToken, options);
@@ -121,11 +122,21 @@ export default function Leaderboard() {
 
   const loadLeaderboard = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await fetch(`/api/gamification/leaderboard?period=${period}&limit=100`);
-      if (res.ok) setLeaderboard(await res.json());
+      if (res.ok) {
+        setLeaderboard(await res.json());
+      } else if (res.status === 429) {
+        setLoadError("Rate limit reached — leaderboard data will refresh shortly.");
+      } else if (res.status >= 500) {
+        setLoadError("Server error loading leaderboard. Showing demo data.");
+      } else {
+        setLoadError("Could not load leaderboard data. Check your connection.");
+      }
     } catch (err) {
       console.error("[Leaderboard] Failed to load leaderboard:", err);
+      setLoadError("Network error — couldn't reach the leaderboard server. Showing demo data.");
     }
     setLoading(false);
   };
@@ -166,6 +177,22 @@ export default function Leaderboard() {
             })}
           </div>
         </div>
+
+        {loadError && (
+          <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-red-300 font-medium">Leaderboard unavailable</p>
+              <p className="text-xs text-red-400/70 mt-0.5">{loadError}</p>
+            </div>
+            <button
+              onClick={loadLeaderboard}
+              className="shrink-0 flex items-center gap-1 text-xs font-mono text-red-400 hover:text-red-300 border border-red-500/30 rounded px-2 py-1 transition-colors"
+            >
+              <RefreshCw className="w-3 h-3" /> Retry
+            </button>
+          </div>
+        )}
 
         {/* Period Tabs */}
         <div className="flex gap-1.5 mb-6 bg-white/[0.03] rounded-xl p-1 border border-white/[0.06] w-fit">

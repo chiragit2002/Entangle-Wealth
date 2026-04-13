@@ -19,7 +19,6 @@ import { pool } from "@workspace/db";
 const REQUIRED_ENV_VARS = [
   "CLERK_SECRET_KEY",
   "DATABASE_URL",
-  "STRIPE_SECRET_KEY",
 ] as const;
 
 const OPTIONAL_WARNED_ENV_VARS = [

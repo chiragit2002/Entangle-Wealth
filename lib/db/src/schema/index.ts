@@ -12,3 +12,5 @@ export * from "./wealthSimulation";
 export * from "./timelines";
 export * from "./behavioralFinance";
 export * from "./microfeedback";
+export * from "./conversations";
+export * from "./messages";

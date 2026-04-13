@@ -166,6 +166,76 @@ function useFacebookOAuth() {
   return { signInWithFacebook };
 }
 
+function AuthPageShell({ children, reason }: { children: React.ReactNode; reason?: string | null }) {
+  return (
+    <div className="min-h-screen bg-black flex">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center bg-gradient-to-br from-[#0a0a14] via-[#0d1117] to-[#0a0a14]">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#00D4FF]/10 rounded-full blur-[120px] animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#FFD700]/8 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#9c27b0]/8 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '2s' }} />
+        </div>
+        <div className="relative z-10 max-w-md px-8 text-center">
+          <div className="mb-8 flex items-center justify-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00D4FF] to-[#00D4FF]/60 flex items-center justify-center">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
+            </div>
+            <span className="text-2xl font-bold text-white tracking-tight">EntangleWealth</span>
+          </div>
+          <h2 className="text-3xl font-bold text-white mb-4">Smart Financial Decisions Start Here</h2>
+          <p className="text-white/50 text-base leading-relaxed mb-8">
+            AI-powered stock analysis, tax tools, wealth simulation, and more — built for families who want to grow their money wisely.
+          </p>
+          <div className="space-y-4 text-left">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-[#00D4FF]/10 flex items-center justify-center shrink-0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              </div>
+              <span className="text-white/70 text-sm">AI consensus signals from 7 specialized agents</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-[#FFD700]/10 flex items-center justify-center shrink-0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              </div>
+              <span className="text-white/70 text-sm">TaxFlow intelligence with IRS deduction tracking</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-[#9c27b0]/10 flex items-center justify-center shrink-0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9c27b0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              </div>
+              <span className="text-white/70 text-sm">Wealth simulator with alternate timeline projections</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-4 sm:p-8 relative">
+        <div className="lg:hidden mb-8 flex items-center gap-2">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#00D4FF] to-[#00D4FF]/60 flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
+            </svg>
+          </div>
+          <span className="text-xl font-bold text-white tracking-tight">EntangleWealth</span>
+        </div>
+        {reason === "protected" && (
+          <div className="mb-4 flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#00D4FF]/10 border border-[#00D4FF]/20 text-[#00D4FF] text-sm max-w-md w-full">
+            <Info className="w-4 h-4 shrink-0" />
+            <span>Sign in to access this feature</span>
+          </div>
+        )}
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function SignInPage() {
   const searchString = useSearch();
   const params = new URLSearchParams(searchString);
@@ -173,13 +243,7 @@ function SignInPage() {
   const { signInWithFacebook } = useFacebookOAuth();
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
-      {redirectReason === "protected" && (
-        <div className="mb-4 flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#00D4FF]/10 border border-[#00D4FF]/20 text-[#00D4FF] text-sm max-w-md w-full">
-          <Info className="w-4 h-4 shrink-0" />
-          <span>Sign in to access this page</span>
-        </div>
-      )}
+    <AuthPageShell reason={redirectReason}>
       <SignIn
         routing="path"
         path={`${basePath}/sign-in`}
@@ -195,7 +259,7 @@ function SignInPage() {
       >
         Continue with Facebook
       </button>
-    </div>
+    </AuthPageShell>
   );
 }
 
@@ -203,7 +267,7 @@ function SignUpPage() {
   const { signInWithFacebook } = useFacebookOAuth();
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <AuthPageShell>
       <SignUp
         routing="path"
         path={`${basePath}/sign-up`}
@@ -219,7 +283,7 @@ function SignUpPage() {
       >
         Continue with Facebook
       </button>
-    </div>
+    </AuthPageShell>
   );
 }
 

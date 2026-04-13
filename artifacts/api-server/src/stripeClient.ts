@@ -30,7 +30,7 @@ async function getCredentials() {
     }
   });
 
-  const data = await response.json();
+  const data: any = await response.json();
   connectionSettings = data.items?.[0];
 
   if (!connectionSettings || (!connectionSettings.settings.publishable || !connectionSettings.settings.secret)) {

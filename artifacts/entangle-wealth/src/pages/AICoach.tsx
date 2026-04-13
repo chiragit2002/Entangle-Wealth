@@ -176,7 +176,7 @@ export default function AICoach() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">AI Financial Coach</h1>
-                <p className="text-white/40 text-xs">Personalized behavioral finance guidance</p>
+                <p className="text-white/50 text-xs">Personalized behavioral finance guidance</p>
               </div>
             </div>
 
@@ -224,7 +224,7 @@ export default function AICoach() {
                   <Calendar className="w-4 h-4 text-amber-400" />
                   <span className="font-semibold text-white text-sm">Weekly Coaching Summary</span>
                 </div>
-                <button onClick={() => setShowSummary(false)} className="text-white/40 hover:text-white transition-colors">
+                <button onClick={() => setShowSummary(false)} className="text-white/50 hover:text-white transition-colors">
                   <ChevronUp className="w-4 h-4" />
                 </button>
               </div>
@@ -271,7 +271,7 @@ export default function AICoach() {
               {messages.length === 0 && !isSignedIn && (
                 <div className="flex flex-col items-center justify-center h-full text-center gap-4">
                   <Brain className="w-12 h-12 text-[#00D4FF]/50" />
-                  <p className="text-white/40 text-sm">Sign in to chat with your personalized AI coach</p>
+                  <p className="text-white/50 text-sm">Sign in to chat with your personalized AI coach</p>
                 </div>
               )}
 
@@ -361,7 +361,7 @@ export default function AICoach() {
                   {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-xs text-white/20 mt-2 flex items-center gap-1">
+              <p className="text-xs text-white/50 mt-2 flex items-center gap-1">
                 <Info className="w-3 h-3" />
                 Educational guidance only, not financial advice. Press Enter to send.
               </p>
@@ -370,7 +370,7 @@ export default function AICoach() {
 
           {messages.length === 0 && isSignedIn && (
             <div>
-              <p className="text-xs text-white/40 mb-3">Try asking:</p>
+              <p className="text-xs text-white/50 mb-3">Try asking:</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {SUGGESTED_PROMPTS.map(prompt => (
                   <button

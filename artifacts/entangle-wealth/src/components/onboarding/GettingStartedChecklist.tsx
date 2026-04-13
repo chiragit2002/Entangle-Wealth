@@ -151,7 +151,7 @@ export function GettingStartedChecklist() {
                   setDismissed(true);
                   localStorage.setItem("ew_checklist_dismissed", "true");
                 }}
-                className="text-white/15 hover:text-white/40 transition-colors p-1 rounded min-w-[28px] min-h-[28px] flex items-center justify-center"
+                className="text-white/50 hover:text-white/40 transition-colors p-1 rounded min-w-[28px] min-h-[28px] flex items-center justify-center"
                 aria-label="Dismiss checklist"
               >
                 <X className="w-3.5 h-3.5" />
@@ -191,7 +191,7 @@ export function GettingStartedChecklist() {
                     {done ? (
                       <CheckCircle2 className="w-4 h-4 text-[#00ff88] shrink-0" aria-hidden="true" />
                     ) : (
-                      <Circle className="w-4 h-4 text-white/20 shrink-0 group-hover:text-white/40 transition-colors" aria-hidden="true" />
+                      <Circle className="w-4 h-4 text-white/40 shrink-0 group-hover:text-white/40 transition-colors" aria-hidden="true" />
                     )}
                     <div className="flex-1 min-w-0">
                       <span
@@ -212,7 +212,7 @@ export function GettingStartedChecklist() {
                 );
               })}
               <div className="pt-1 pb-2">
-                <p className="text-[9px] text-white/20 text-center">Complete all 5 to earn a bonus reward!</p>
+                <p className="text-[9px] text-white/40 text-center">Complete all 5 to earn a bonus reward!</p>
               </div>
             </div>
           )}

@@ -141,12 +141,12 @@ export default function Terminal() {
           <span className="text-[9px] font-mono text-white/30">7 AI MODELS · MULTI-PANEL</span>
         </div>
         <div className="flex items-center gap-4">
-          <button onClick={() => setShowShortcuts(v => !v)} aria-label="Show keyboard shortcuts" className="flex items-center gap-1 text-[9px] font-mono text-white/20 hover:text-white/40 transition-colors">
+          <button onClick={() => setShowShortcuts(v => !v)} aria-label="Show keyboard shortcuts" className="flex items-center gap-1 text-[9px] font-mono text-white/40 hover:text-white/40 transition-colors">
             <Keyboard className="w-3 h-3" />
             <span>?</span>
           </button>
           <div className="flex items-center gap-1.5">
-            <Clock className="w-3 h-3 text-white/20" />
+            <Clock className="w-3 h-3 text-white/40" />
             <span className="text-[11px] font-mono font-bold text-white/60 tabular-nums">{clock}</span>
           </div>
         </div>
@@ -157,7 +157,7 @@ export default function Terminal() {
           <div className="bg-[#0a0a14] border border-white/10 rounded-sm p-6 max-w-md w-full" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <span className="text-[12px] font-mono font-bold text-[#00D4FF] tracking-wider">KEYBOARD SHORTCUTS</span>
-              <button onClick={() => setShowShortcuts(false)} aria-label="Close shortcuts" className="text-white/20 hover:text-white/40"><X className="w-4 h-4" /></button>
+              <button onClick={() => setShowShortcuts(false)} aria-label="Close shortcuts" className="text-white/50 hover:text-white/40"><X className="w-4 h-4" /></button>
             </div>
             <div className="space-y-1">
               {[
@@ -167,7 +167,7 @@ export default function Terminal() {
               ].map(([key, desc]) => (
                 <div key={key} className="flex items-center gap-3 py-1">
                   <kbd className="min-w-[28px] text-center px-1.5 py-0.5 bg-white/[0.04] border border-white/10 rounded-sm text-[10px] font-mono font-bold text-white/60">{key}</kbd>
-                  <span className="text-[10px] text-white/40">{desc}</span>
+                  <span className="text-[10px] text-white/50">{desc}</span>
                 </div>
               ))}
             </div>
@@ -179,7 +179,7 @@ export default function Terminal() {
         <div className="mb-1.5">
           <BloombergPanel>
             <PanelHeader title="MIROFISH TERMINAL" icon={<TerminalIcon className="w-3 h-3" />} color="cyan" rightContent={
-              <span className="text-[8px] font-mono text-white/20">Type <span className="text-[#00D4FF]/50">help</span> to see all commands</span>
+              <span className="text-[8px] font-mono text-white/40">Type <span className="text-[#00D4FF]/50">help</span> to see all commands</span>
             } />
             <div className="p-0">
               <MirofishTerminal />
@@ -232,7 +232,7 @@ export default function Terminal() {
         </div>
 
         <div className="flex items-center justify-between px-2 py-1 bg-[#0a0a0f] border border-white/[0.04] rounded-sm">
-          <div className="flex items-center gap-4 text-[8px] font-mono text-white/15">
+          <div className="flex items-center gap-4 text-[8px] font-mono text-white/40">
             <span>ENTANGLEWEALTH TERMINAL v3.0</span>
             <span>·</span>
             <span>7 AI MODELS</span>

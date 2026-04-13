@@ -211,7 +211,7 @@ export function TimelinePane({
             className="space-y-3 pt-3 border-t border-white/[0.06]"
           >
             <div className="text-center">
-              <div className="text-[10px] text-white/40 uppercase tracking-wider font-mono mb-1">Net Worth @ {selectedHorizon}</div>
+              <div className="text-[10px] text-white/50 uppercase tracking-wider font-mono mb-1">Net Worth @ {selectedHorizon}</div>
               <div className="text-2xl font-black font-mono" style={{ color: borderColor }} aria-live="polite" aria-label={`Net worth at ${selectedHorizon}: ${fmt(horizonResult.projectedNetWorth)}`}>
                 <AnimatedNumber value={horizonResult.projectedNetWorth} prefix="$" />
               </div>

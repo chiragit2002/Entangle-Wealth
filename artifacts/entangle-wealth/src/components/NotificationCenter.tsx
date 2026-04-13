@@ -315,10 +315,10 @@ export default function NotificationCenter() {
               {tab === "notifications" && (
                 <>
                   {notifications.length === 0 ? (
-                    <div className="text-center py-10 text-white/20">
+                    <div className="text-center py-10 text-white/40">
                       <Bell className="w-8 h-8 mx-auto mb-2 opacity-30" />
                       <p className="text-[13px]">No notifications yet</p>
-                      <p className="text-[11px] text-white/15 mt-1">Configure alerts to get started</p>
+                      <p className="text-[11px] text-white/50 mt-1">Configure alerts to get started</p>
                     </div>
                   ) : (
                     <div className="divide-y divide-white/[0.04]">
@@ -332,8 +332,8 @@ export default function NotificationCenter() {
                               </p>
                               {!n.read && <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />}
                             </div>
-                            <p className="text-[11px] text-white/40 mt-0.5 line-clamp-2">{n.message}</p>
-                            <p className="text-[10px] text-white/20 mt-1">{formatTime(n.time)}</p>
+                            <p className="text-[11px] text-white/50 mt-0.5 line-clamp-2">{n.message}</p>
+                            <p className="text-[10px] text-white/50 mt-1">{formatTime(n.time)}</p>
                           </div>
                         </div>
                       ))}
@@ -350,12 +350,12 @@ export default function NotificationCenter() {
                       <input placeholder="Symbol" value={newAlert.symbol}
                         onChange={e => setNewAlert(p => ({ ...p, symbol: e.target.value.toUpperCase().replace(/[^A-Z0-9.]/g, "").slice(0, 10) }))}
                         maxLength={10}
-                        className="flex-1 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white focus:outline-none focus:border-primary/30 placeholder:text-white/20 min-w-0" />
+                        className="flex-1 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white focus:outline-none focus:border-primary/30 placeholder:text-white/40 min-w-0" />
                       {needsThreshold(newAlert.type) && (
                         <input placeholder="Price" value={newAlert.value}
                           onChange={e => setNewAlert(p => ({ ...p, value: e.target.value.replace(/[^0-9.]/g, "").slice(0, 20) }))}
                           maxLength={20}
-                          className="w-[80px] bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white focus:outline-none focus:border-primary/30 placeholder:text-white/20" />
+                          className="w-[80px] bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white focus:outline-none focus:border-primary/30 placeholder:text-white/40" />
                       )}
                     </div>
                     <div className="flex gap-2">
@@ -372,7 +372,7 @@ export default function NotificationCenter() {
                       {[1, 2].map(i => <div key={i} className="h-14 rounded-lg bg-white/[0.02] animate-pulse" />)}
                     </div>
                   ) : alerts.length === 0 ? (
-                    <p className="text-[12px] text-white/20 text-center py-4">No alerts configured</p>
+                    <p className="text-[12px] text-white/50 text-center py-4">No alerts configured</p>
                   ) : (
                     <div className="space-y-2">
                       {alerts.map(a => (
@@ -384,10 +384,10 @@ export default function NotificationCenter() {
                               {a.threshold != null ? ` @ $${a.threshold.toFixed(2)}` : ""}
                             </p>
                           </div>
-                          <button onClick={() => toggleAlert(a.id)} className={`p-1.5 rounded ${a.enabled ? "text-[#00ff88]" : "text-white/20"}`}>
+                          <button onClick={() => toggleAlert(a.id)} className={`p-1.5 rounded ${a.enabled ? "text-[#00ff88]" : "text-white/40"}`}>
                             <Check className="w-3.5 h-3.5" />
                           </button>
-                          <button onClick={() => removeAlert(a.id)} className="p-1.5 text-white/20 hover:text-[#ff3366]">
+                          <button onClick={() => removeAlert(a.id)} className="p-1.5 text-white/40 hover:text-[#ff3366]">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>

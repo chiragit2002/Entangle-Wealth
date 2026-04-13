@@ -373,7 +373,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
           </div>
           <button
             onClick={handleRemindLater}
-            className="text-white/20 hover:text-white/50 transition-colors p-1 rounded-md hover:bg-white/[0.04] shrink-0 min-w-[32px] min-h-[32px] flex items-center justify-center"
+            className="text-white/50 hover:text-white/50 transition-colors p-1 rounded-md hover:bg-white/[0.04] shrink-0 min-w-[32px] min-h-[32px] flex items-center justify-center"
             aria-label="Remind me later"
             title="Remind me later"
           >
@@ -383,7 +383,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
 
         <div className="mb-6" aria-label={`Setup ${pct}% complete`}>
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs text-white/40">Setup progress</span>
+            <span className="text-xs text-white/50">Setup progress</span>
             <span className="text-xs text-primary font-bold tabular-nums">{pct}%</span>
           </div>
           <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
@@ -528,7 +528,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
               <p className="text-[11px] text-white/70 font-medium mb-1 flex items-center gap-1">
                 <FileText className="w-3 h-3 text-primary" /> Business Document Upload <span className="text-primary">*</span>
               </p>
-              <p className="text-[10px] text-white/40 mb-3">Upload at least one: business license, EIN letter, or articles of incorporation. (JPG, PNG, WebP, or PDF · Max 10MB each)</p>
+              <p className="text-[10px] text-white/50 mb-3">Upload at least one: business license, EIN letter, or articles of incorporation. (JPG, PNG, WebP, or PDF · Max 10MB each)</p>
 
               {docFiles.length > 0 && (
                 <div className="space-y-2 mb-3">
@@ -582,8 +582,8 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
                 aria-label="Click or drag to upload business documents"
               >
                 <Upload className="w-5 h-5 text-white/30" aria-hidden="true" />
-                <span className="text-[11px] text-white/40">{dragActive ? "Drop files here" : "Click or drag to upload"}</span>
-                <span className="text-[10px] text-white/20">JPG, PNG, WebP, PDF · Max 10MB</span>
+                <span className="text-[11px] text-white/50">{dragActive ? "Drop files here" : "Click or drag to upload"}</span>
+                <span className="text-[10px] text-white/50">JPG, PNG, WebP, PDF · Max 10MB</span>
               </div>
             </div>
           )}
@@ -616,7 +616,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
 
         <button
           onClick={handleRemindLater}
-          className="w-full mt-3 text-center text-xs text-white/20 hover:text-white/40 transition-colors py-1"
+          className="w-full mt-3 text-center text-xs text-white/40 hover:text-white/40 transition-colors py-1"
         >
           Remind me later
         </button>

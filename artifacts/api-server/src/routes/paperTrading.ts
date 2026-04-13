@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, dailySpinTable, userXpTable, xpTransactionsTable, streaksTable, usersTable } from "@workspace/db/schema";
+import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, dailySpinsTable, userXpTable, xpTransactionsTable, streaksTable, usersTable } from "@workspace/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { resolveUserId } from "../lib/resolveUserId";
@@ -276,8 +276,8 @@ router.get("/paper-trading/spin/status", requireAuth, async (req, res) => {
     const today = getTodayUTC();
     const [todaySpin] = await db
       .select()
-      .from(dailySpinTable)
-      .where(and(eq(dailySpinTable.userId, dbUserId), eq(dailySpinTable.spinDate, today)));
+      .from(dailySpinsTable)
+      .where(and(eq(dailySpinsTable.userId, dbUserId), eq(dailySpinsTable.spinDate, today)));
 
     if (todaySpin) {
       const tomorrow = new Date();
@@ -313,10 +313,10 @@ router.post("/paper-trading/spin", requireAuth, validateBody(z.object({}).strict
 
     const txResult = await db.transaction(async (tx) => {
       const inserted = await tx
-        .insert(dailySpinTable)
+        .insert(dailySpinsTable)
         .values({ userId: dbUserId, prizeAmount: picked.cashAmount, spinDate: today, rewardType: picked.rewardType, rewardLabel: picked.label })
-        .onConflictDoNothing({ target: [dailySpinTable.userId, dailySpinTable.spinDate] })
-        .returning({ id: dailySpinTable.id });
+        .onConflictDoNothing({ target: [dailySpinsTable.userId, dailySpinsTable.spinDate] })
+        .returning({ id: dailySpinsTable.id });
 
       if (inserted.length === 0) {
         return { alreadySpun: true };
@@ -404,9 +404,9 @@ router.get("/paper-trading/spin/history", requireAuth, async (req, res) => {
 
     const history = await db
       .select()
-      .from(dailySpinTable)
-      .where(eq(dailySpinTable.userId, dbUserId))
-      .orderBy(desc(dailySpinTable.createdAt))
+      .from(dailySpinsTable)
+      .where(eq(dailySpinsTable.userId, dbUserId))
+      .orderBy(desc(dailySpinsTable.createdAt))
       .limit(30);
 
     res.json(history);

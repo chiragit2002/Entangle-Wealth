@@ -85,7 +85,7 @@ export default function Status() {
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-3">
             System <span className="electric-text">Status</span>
           </h1>
-          <p className="text-white/40 text-sm">
+          <p className="text-white/50 text-sm">
             Current operational status of EntangleWealth services
           </p>
         </div>
@@ -149,7 +149,7 @@ export default function Status() {
                     <div className="flex items-start justify-between mb-2">
                       <div>
                         <h3 className="text-sm font-semibold text-white/80">{inc.title}</h3>
-                        <p className="text-[10px] text-white/20 font-mono mt-0.5">{inc.service_name}</p>
+                        <p className="text-[10px] text-white/50 font-mono mt-0.5">{inc.service_name}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border" style={{ color: severityColor, borderColor: `${severityColor}33`, backgroundColor: `${severityColor}10` }}>
@@ -160,8 +160,8 @@ export default function Status() {
                         </span>
                       </div>
                     </div>
-                    {inc.description && <p className="text-xs text-white/40">{inc.description}</p>}
-                    <p className="text-[10px] text-white/15 mt-2 font-mono">
+                    {inc.description && <p className="text-xs text-white/50">{inc.description}</p>}
+                    <p className="text-[10px] text-white/50 mt-2 font-mono">
                       {new Date(inc.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                       {inc.resolved_at && <> | Resolved {new Date(inc.resolved_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</>}
                     </p>
@@ -173,7 +173,7 @@ export default function Status() {
         </div>
 
         <div className="mt-8 text-center">
-          <Link href="/help" className="text-xs text-white/20 hover:text-[#00D4FF] transition-colors">
+          <Link href="/help" className="text-xs text-white/50 hover:text-[#00D4FF] transition-colors">
             Need help? Visit the Help Center
           </Link>
         </div>

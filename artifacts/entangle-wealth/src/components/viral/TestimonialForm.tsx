@@ -90,7 +90,7 @@ export function TestimonialForm() {
                 className="p-1 transition-transform hover:scale-110"
               >
                 <Star
-                  className={`w-5 h-5 ${s <= rating ? "text-[#FFD700] fill-[#FFD700]" : "text-white/20"}`}
+                  className={`w-5 h-5 ${s <= rating ? "text-[#FFD700] fill-[#FFD700]" : "text-white/40"}`}
                 />
               </button>
             ))}

@@ -169,7 +169,7 @@ export function PersonalizedResultScreen({
             Build my full plan
             <ArrowRight className="w-4 h-4" />
           </button>
-          <p className="text-center text-[10px] text-white/20 mt-3">
+          <p className="text-center text-[10px] text-white/40 mt-3">
             Your personalized dashboard is ready with tools matched to your goal
           </p>
         </div>

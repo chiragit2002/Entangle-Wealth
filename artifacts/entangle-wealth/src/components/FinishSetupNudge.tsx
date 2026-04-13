@@ -87,7 +87,7 @@ export function FinishSetupNudge() {
           </div>
           <button
             onClick={dismiss}
-            className="text-white/15 hover:text-white/40 transition-colors p-0.5 flex-shrink-0"
+            className="text-white/50 hover:text-white/40 transition-colors p-0.5 flex-shrink-0"
             aria-label="Dismiss setup nudge"
           >
             <X className="w-3.5 h-3.5" />

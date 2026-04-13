@@ -126,7 +126,7 @@ export default function AdminStatus() {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-20 text-center">
-          <RefreshCw className="w-6 h-6 text-white/20 animate-spin mx-auto mb-3" />
+          <RefreshCw className="w-6 h-6 text-white/40 animate-spin mx-auto mb-3" />
           <p className="text-white/30 text-sm">Checking access...</p>
         </div>
       </Layout>
@@ -187,7 +187,7 @@ export default function AdminStatus() {
                     </button>
                   ))}
                 </div>
-                <p className="text-[10px] text-white/15 mt-2 font-mono">Updated: {new Date(svc.updated_at).toLocaleString()}</p>
+                <p className="text-[10px] text-white/50 mt-2 font-mono">Updated: {new Date(svc.updated_at).toLocaleString()}</p>
               </div>
             );
           })}
@@ -241,7 +241,7 @@ export default function AdminStatus() {
                   onChange={(e) => setIncidentForm((f) => ({ ...f, title: e.target.value }))}
                   placeholder="Brief incident title"
                   maxLength={200}
-                  className="w-full h-9 mt-1 px-3 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/40"
+                  className="w-full h-9 mt-1 px-3 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/40"
                 />
               </div>
               <div>
@@ -252,7 +252,7 @@ export default function AdminStatus() {
                   placeholder="Details about the incident..."
                   rows={3}
                   maxLength={2000}
-                  className="w-full mt-1 px-3 py-2 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/40 resize-none"
+                  className="w-full mt-1 px-3 py-2 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/40 resize-none"
                 />
               </div>
               <div className="flex gap-2">
@@ -279,7 +279,7 @@ export default function AdminStatus() {
                   <div key={inc.id} className="px-4 py-3 bg-white/[0.02] border border-white/[0.06] rounded-xl flex items-center justify-between">
                     <div>
                       <p className="text-sm font-semibold text-white/70">{inc.title}</p>
-                      <p className="text-[10px] text-white/20 font-mono">{inc.service_name} · {new Date(inc.created_at).toLocaleDateString()}</p>
+                      <p className="text-[10px] text-white/50 font-mono">{inc.service_name} · {new Date(inc.created_at).toLocaleDateString()}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border" style={{ color: sevColor, borderColor: `${sevColor}33`, backgroundColor: `${sevColor}10` }}>

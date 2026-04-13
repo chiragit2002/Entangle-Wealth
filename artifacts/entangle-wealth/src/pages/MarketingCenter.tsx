@@ -157,7 +157,7 @@ function AgentPanel({
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder={`What should ${agent.name} content be about?`}
-              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/20 resize-none focus:outline-none focus:border-primary/40 transition-colors"
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/40 resize-none focus:outline-none focus:border-primary/40 transition-colors"
               rows={2}
             />
           </div>
@@ -175,7 +175,7 @@ function AgentPanel({
               value={context}
               onChange={(e) => setContext(e.target.value)}
               placeholder="Any specific angles, data points, or requirements..."
-              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/20 resize-none focus:outline-none focus:border-primary/40 transition-colors"
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/40 resize-none focus:outline-none focus:border-primary/40 transition-colors"
               rows={2}
             />
           )}
@@ -537,7 +537,7 @@ export default function MarketingCenter() {
             {aiQueueStatus.queued > 0 && (
               <span className="text-[#FFD700] font-mono">{aiQueueStatus.queued} waiting</span>
             )}
-            <span className="text-white/40">|</span>
+            <span className="text-white/50">|</span>
             <span className="text-[#00ff88] font-mono">{aiQueueStatus.totalProcessed} processed</span>
             {aiQueueStatus.totalFailed > 0 && (
               <span className="text-[#ff3366] font-mono">{aiQueueStatus.totalFailed} failed</span>

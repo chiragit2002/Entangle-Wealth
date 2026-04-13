@@ -125,7 +125,7 @@ export function ActivityNudge() {
             </button>
             <button
               onClick={dismiss}
-              className="text-white/20 hover:text-white/50 transition-colors p-0.5"
+              className="text-white/50 hover:text-white/50 transition-colors p-0.5"
               aria-label="Dismiss"
             >
               <X className="w-3.5 h-3.5" />
@@ -158,7 +158,7 @@ export function ActivityNudge() {
         </div>
         <button
           onClick={dismiss}
-          className="text-white/20 hover:text-white/50 transition-colors p-0.5 flex-shrink-0 mt-0.5"
+          className="text-white/50 hover:text-white/50 transition-colors p-0.5 flex-shrink-0 mt-0.5"
           aria-label="Dismiss"
         >
           <X className="w-3.5 h-3.5" />

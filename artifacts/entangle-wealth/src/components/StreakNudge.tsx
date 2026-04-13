@@ -83,7 +83,7 @@ export function StreakNudge() {
           </button>
           <button
             onClick={dismiss}
-            className="text-white/15 hover:text-white/40 transition-colors p-0.5"
+            className="text-white/50 hover:text-white/40 transition-colors p-0.5"
             aria-label="Dismiss streak nudge"
           >
             <X className="w-3.5 h-3.5" />

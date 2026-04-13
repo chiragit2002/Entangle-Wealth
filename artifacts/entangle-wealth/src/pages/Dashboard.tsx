@@ -13,6 +13,7 @@ import { EconomicCalendar } from "@/components/EconomicCalendar";
 import { stockAlerts, optionsAlerts, unusualOptionsActivity, optionsIncomeData, agentLogMessages } from "@/lib/mock-data";
 import { authFetch } from "@/lib/authFetch";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ArrowUpRight, ArrowDownRight, Activity, Zap, Minus, TrendingUp, Shield, RefreshCw, Search, BarChart3, X, Terminal, Globe, Layers, Clock, Keyboard, ChevronUp, ChevronDown, Eye } from "lucide-react";
 import { generateMockOHLCV, runAllIndicators, getOverallSignal } from "@/lib/indicators";
 import { useToast } from "@/hooks/use-toast";
@@ -126,7 +127,7 @@ const emptyPortfolio: PaperPortfolio = {
 
 function Panel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-[#0a0a0f] border border-white/[0.06] rounded-xl overflow-hidden ${className}`}>
+    <div className={`glass-panel rounded-xl overflow-hidden ${className}`}>
       {children}
     </div>
   );
@@ -147,7 +148,7 @@ function PanelHeader({ title, icon, rightContent }: { title: string; icon?: Reac
 function DataRow({ label, value, change }: { label: string; value: string; change?: number }) {
   return (
     <div className="flex items-center justify-between px-4 py-2 hover:bg-white/[0.02] transition-colors">
-      <span className="text-xs text-white/40 font-mono">{label}</span>
+      <span className="text-xs text-white/50 font-mono">{label}</span>
       <div className="flex items-center gap-2">
         <span className="text-xs font-mono font-medium text-white/80">{value}</span>
         {change !== undefined && (
@@ -346,11 +347,11 @@ export default function Dashboard() {
               {isMarketOpen ? "Market Open" : "Market Closed"}
             </span>
           </div>
-          <span className="text-[9px] font-mono text-white/20 hidden sm:inline">Simulated data · for practice only</span>
+          <span className="text-[9px] font-mono text-white/50">Simulated data · for practice only</span>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20" />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
             <input
               data-cmd-search
               placeholder="Search ticker..."
@@ -359,36 +360,37 @@ export default function Dashboard() {
               onFocus={() => setShowSearchDropdown(true)}
               onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
               onKeyDown={(e) => { if (e.key === "Enter" && searchQuery.trim()) { e.preventDefault(); runQuickAnalysis(searchQuery.toUpperCase().trim()); } }}
-              className="w-44 h-7 pl-7 pr-2 text-xs bg-white/[0.04] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40 transition-colors"
+              className="w-44 h-7 pl-7 pr-2 text-xs bg-white/[0.04] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-primary/40 transition-colors"
             />
             {showSearchDropdown && searchResults.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-[#0a0a14] border border-white/10 rounded-xl z-50 shadow-2xl overflow-hidden">
                 {searchResults.map(s => (
-                  <button key={s.symbol} onClick={() => { setSearchQuery(s.symbol); runQuickAnalysis(s.symbol); }}
-                    className="w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-primary/[0.06] transition-colors border-b border-white/[0.03] last:border-0">
+                  <Button key={s.symbol} onClick={() => { setSearchQuery(s.symbol); runQuickAnalysis(s.symbol); }}
+                    variant="ghost"
+                    className="w-full justify-start px-3 py-2 h-auto rounded-none text-left flex items-center gap-2 hover:bg-primary/[0.06] border-b border-white/[0.03] last:border-0">
                     <span className="text-xs font-bold font-mono text-primary">{s.symbol}</span>
                     <span className="text-[10px] text-white/30 truncate">{s.name}</span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}
           </div>
-          <button onClick={() => setShowShortcuts(v => !v)} aria-label="Keyboard shortcuts" className="text-white/25 hover:text-white/50 transition-colors">
+          <Button onClick={() => setShowShortcuts(v => !v)} aria-label="Keyboard shortcuts" size="icon" variant="ghost" className="w-7 h-7 text-white/25 hover:text-white/50">
             <Keyboard className="w-3.5 h-3.5" />
-          </button>
+          </Button>
           <div className="flex items-center gap-1.5">
-            <Clock className="w-3 h-3 text-white/20" />
+            <Clock className="w-3 h-3 text-white/40" />
             <span className="text-[11px] font-mono font-semibold text-white/50 tabular-nums">{clock}</span>
           </div>
         </div>
       </div>
 
       {showShortcuts && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowShortcuts(false)} role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowShortcuts(false)} role="dialog" aria-modal="true" aria-labelledby="shortcuts-dialog-title">
           <div className="bg-[#0a0a14] border border-white/10 rounded-2xl p-6 max-w-sm w-full mx-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <span className="text-sm font-bold text-white">Keyboard Shortcuts</span>
-              <button onClick={() => setShowShortcuts(false)} aria-label="Close" className="text-white/30 hover:text-white/60"><X className="w-4 h-4" /></button>
+              <span id="shortcuts-dialog-title" className="text-sm font-bold text-white">Keyboard Shortcuts</span>
+              <Button onClick={() => setShowShortcuts(false)} aria-label="Close" size="icon" variant="ghost" className="w-7 h-7 text-white/30 hover:text-white/60"><X className="w-4 h-4" /></Button>
             </div>
             <div className="space-y-2">
               {[
@@ -404,7 +406,7 @@ export default function Dashboard() {
               ].map(([key, desc]) => (
                 <div key={key} className="flex items-center gap-3">
                   <kbd className="min-w-[28px] text-center px-1.5 py-0.5 bg-white/[0.06] border border-white/10 rounded text-[10px] font-mono font-bold text-white/50">{key}</kbd>
-                  <span className="text-xs text-white/40">{desc}</span>
+                  <span className="text-xs text-white/50">{desc}</span>
                 </div>
               ))}
             </div>
@@ -458,7 +460,7 @@ export default function Dashboard() {
         {(quickAnalysis || analyzingSymbol) && (
           <Panel>
             <PanelHeader title="Quick Analysis" icon={<BarChart3 className="w-3.5 h-3.5" />} rightContent={
-              <button onClick={() => { setQuickAnalysis(null); setAnalyzingSymbol(""); }} className="text-white/30 hover:text-white/60"><X className="w-4 h-4" /></button>
+              <Button onClick={() => { setQuickAnalysis(null); setAnalyzingSymbol(""); }} size="icon" variant="ghost" className="w-7 h-7 text-white/30 hover:text-white/60"><X className="w-4 h-4" /></Button>
             } />
             <div className="px-4 py-4">
               {analyzingSymbol ? (
@@ -523,9 +525,9 @@ export default function Dashboard() {
                   <span className={`text-sm font-semibold ${pnl >= 0 ? 'text-primary' : 'text-red-400'}`}>
                     {pnl >= 0 ? '+' : ''}{Math.abs(parseFloat(pnlPct)).toFixed(2)}%
                   </span>
-                  <button onClick={() => setShowTradePanel(v => !v)} className="text-xs font-semibold text-primary/70 hover:text-primary transition-colors border border-primary/20 rounded-lg px-2.5 py-1">
+                  <Button onClick={() => setShowTradePanel(v => !v)} variant="outline" size="sm" className="text-xs font-semibold text-primary/70 hover:text-primary border-primary/20 rounded-lg h-7 px-2.5">
                     {showTradePanel ? "View Chart" : "Trade"}
-                  </button>
+                  </Button>
                 </div>
               } />
               <div className="p-4">
@@ -545,21 +547,21 @@ export default function Dashboard() {
                       ))}
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => setTradeSide("buy")} className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-colors ${tradeSide === "buy" ? "bg-primary/15 text-primary border border-primary/30" : "bg-white/[0.03] text-white/40 border border-white/[0.06]"}`}>Buy</button>
-                      <button onClick={() => setTradeSide("sell")} className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-colors ${tradeSide === "sell" ? "bg-red-500/15 text-red-400 border border-red-500/30" : "bg-white/[0.03] text-white/40 border border-white/[0.06]"}`}>Sell</button>
+                      <Button onClick={() => setTradeSide("buy")} variant="ghost" className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-colors ${tradeSide === "buy" ? "bg-primary/15 text-primary border border-primary/30" : "bg-white/[0.03] text-white/40 border border-white/[0.06]"}`}>Buy</Button>
+                      <Button onClick={() => setTradeSide("sell")} variant="ghost" className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-colors ${tradeSide === "sell" ? "bg-red-500/15 text-red-400 border border-red-500/30" : "bg-white/[0.03] text-white/40 border border-white/[0.06]"}`}>Sell</Button>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
-                      <input aria-label="Ticker symbol" value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40 transition-colors" />
-                      <input aria-label="Quantity" value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" min="1" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40 transition-colors" />
-                      <input aria-label="Price per share" value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" min="0.01" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40 transition-colors" />
+                      <input aria-label="Ticker symbol" value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-primary/40 transition-colors" />
+                      <input aria-label="Quantity" value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" min="1" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-primary/40 transition-colors" />
+                      <input aria-label="Price per share" value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" min="0.01" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-primary/40 transition-colors" />
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} aria-label={`${tradeSide === "buy" ? "Buy" : "Sell"} order`} className={`flex-1 h-10 text-sm font-bold rounded-xl active:scale-[0.97] transition-all duration-150 ${tradeSide === "buy" ? "bg-primary text-black hover:bg-primary/90" : "bg-red-500 text-white hover:bg-red-500/90"} disabled:opacity-40 disabled:cursor-not-allowed`}>
-                        {tradeLoading ? <span className="flex items-center justify-center gap-1.5"><span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />Executing...</span> : `${tradeSide === "buy" ? "Buy" : "Sell"} Order`}
-                      </button>
-                      <button onClick={resetPortfolio} title="Reset portfolio to $100,000" className="px-4 h-10 text-sm font-medium text-white/40 bg-white/[0.03] border border-white/[0.06] rounded-xl hover:text-white/60 hover:border-white/10 transition-colors active:scale-[0.98]">
+                      <Button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} aria-label={`${tradeSide === "buy" ? "Buy" : "Sell"} order`} className={`flex-1 h-10 text-sm font-bold rounded-xl active:scale-[0.97] gap-1.5 ${tradeSide === "buy" ? "bg-primary text-black hover:bg-primary/90" : "bg-red-500 text-white hover:bg-red-500/90"}`}>
+                        {tradeLoading ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Executing...</> : `${tradeSide === "buy" ? "Buy" : "Sell"} Order`}
+                      </Button>
+                      <Button onClick={resetPortfolio} variant="outline" title="Reset portfolio to $100,000" className="px-4 h-10 text-sm font-medium text-white/40 border-white/[0.06] rounded-xl hover:text-white/60 hover:border-white/10">
                         Reset
-                      </button>
+                      </Button>
                     </div>
                     {portfolio.positions.length > 0 && (
                       <div className="border-t border-white/[0.06] pt-3">
@@ -567,7 +569,7 @@ export default function Dashboard() {
                         {portfolio.positions.map(p => (
                           <div key={p.id} className="flex items-center justify-between py-1.5 border-b border-white/[0.03] last:border-0">
                             <span className="text-sm font-semibold text-primary">{p.symbol}</span>
-                            <span className="text-xs text-white/40">{p.quantity} @ ${p.avgCost.toFixed(2)}</span>
+                            <span className="text-xs text-white/50">{p.quantity} @ ${p.avgCost.toFixed(2)}</span>
                             <span className="text-sm font-mono text-white/70">${(p.quantity * p.avgCost).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                           </div>
                         ))}
@@ -580,11 +582,11 @@ export default function Dashboard() {
                     {portfolio.trades.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-12 text-center">
                         <TrendingUp className="w-10 h-10 text-white/10 mb-3" />
-                        <p className="text-sm text-white/40 mb-1">$100,000 starting balance</p>
+                        <p className="text-sm text-white/50 mb-1">$100,000 starting balance</p>
                         <p className="text-xs text-white/25 mb-4">Place your first paper trade to start tracking</p>
-                        <button onClick={() => setShowTradePanel(true)} className="px-4 py-2 text-sm font-semibold text-primary bg-primary/10 rounded-xl hover:bg-primary/20 active:scale-[0.97] transition-all duration-150 border border-primary/20">
+                        <Button onClick={() => setShowTradePanel(true)} variant="outline" className="text-sm font-semibold text-primary bg-primary/10 rounded-xl hover:bg-primary/20 border-primary/20">
                           Place your first trade
-                        </button>
+                        </Button>
                       </div>
                     ) : (
                       <ResponsiveContainer width="100%" height={200}>
@@ -626,10 +628,10 @@ export default function Dashboard() {
               <PanelHeader title="Multi-Asset" icon={<Globe className="w-3.5 h-3.5" />} rightContent={
                 <div className="flex gap-1">
                   {(["crypto", "forex", "commodities", "bonds"] as const).map(tab => (
-                    <button key={tab} onClick={() => setActiveAssetTab(tab)}
-                      className={`px-2 py-0.5 text-xs font-semibold rounded-lg transition-colors ${activeAssetTab === tab ? 'bg-[#FFD700]/15 text-[#FFD700]' : 'text-white/30 hover:text-white/60'}`}>
+                    <Button key={tab} onClick={() => setActiveAssetTab(tab)} variant="ghost" size="sm"
+                      className={`px-2 py-0.5 h-auto text-xs font-semibold rounded-lg ${activeAssetTab === tab ? 'bg-[#FFD700]/15 text-[#FFD700]' : 'text-white/30 hover:text-white/60'}`}>
                       {tab === "commodities" ? "Cmdty" : tab.charAt(0).toUpperCase() + tab.slice(1)}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               } />
@@ -656,17 +658,18 @@ export default function Dashboard() {
           <div className="border-b border-white/[0.06]">
             <div className="flex px-2 py-1 gap-1">
               {SECONDARY_TABS.map(t => (
-                <button
+                <Button
                   key={t.key}
                   onClick={() => setSecondaryTab(t.key)}
-                  className={`px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors ${
+                  variant="ghost"
+                  className={`px-4 py-2.5 h-auto text-sm font-semibold rounded-lg ${
                     secondaryTab === t.key
                       ? "bg-primary/10 text-primary"
                       : "text-white/40 hover:text-white/70 hover:bg-white/[0.03]"
                   }`}
                 >
                   {t.label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -678,7 +681,7 @@ export default function Dashboard() {
                   <div className="flex items-center justify-between px-4 py-3">
                     <div className="flex items-center gap-4">
                       <span className="text-sm font-bold font-mono text-white w-14">{alert.symbol}</span>
-                      <span className="text-xs text-white/40">${alert.price.toFixed(2)}</span>
+                      <span className="text-xs text-white/50">${alert.price.toFixed(2)}</span>
                       <span className="text-xs text-white/25 hidden md:inline">{alert.pattern}</span>
                     </div>
                     <div className="flex items-center gap-4">
@@ -733,7 +736,7 @@ export default function Dashboard() {
                 ))}
               </div>
               <div className="border-t border-white/[0.06] p-4">
-                <p className="text-xs text-white/40 font-semibold mb-3">Options Income (Weekly)</p>
+                <p className="text-xs text-white/50 font-semibold mb-3">Options Income (Weekly)</p>
                 <ResponsiveContainer width="100%" height={160}>
                   <BarChart data={optionsIncomeData}>
                     <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
@@ -751,7 +754,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
               <div className="divide-y divide-white/[0.03]">
                 <div className="px-4 py-2.5">
-                  <p className="text-xs text-white/40 font-semibold">Market Internals</p>
+                  <p className="text-xs text-white/50 font-semibold">Market Internals</p>
                 </div>
                 <DataRow label="Advancing / Declining" value={`${MARKET_INTERNALS.advDecl.advancing} / ${MARKET_INTERNALS.advDecl.declining}`} change={((MARKET_INTERNALS.advDecl.advancing / MARKET_INTERNALS.advDecl.declining) - 1) * 100} />
                 <DataRow label="TICK" value={`${MARKET_INTERNALS.tick.current > 0 ? '+' : ''}${Math.abs(MARKET_INTERNALS.tick.current)}`} />
@@ -765,13 +768,13 @@ export default function Dashboard() {
               </div>
               <div className="divide-y divide-white/[0.03]">
                 <div className="px-4 py-2.5">
-                  <p className="text-xs text-white/40 font-semibold">Unusual Options Activity</p>
+                  <p className="text-xs text-white/50 font-semibold">Unusual Options Activity</p>
                 </div>
                 {unusualOptionsActivity.slice(0, 8).map(e => (
                   <div key={e.id} className="flex items-center gap-3 px-4 py-2 hover:bg-white/[0.01] transition-colors">
                     <span className="text-xs font-bold text-white w-12">{e.symbol}</span>
                     <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${e.type === 'CALL' ? 'bg-primary/10 text-primary' : 'bg-red-400/10 text-red-400'}`}>{e.type}</span>
-                    <span className="text-[10px] text-white/40">${e.strike}</span>
+                    <span className="text-[10px] text-white/50">${e.strike}</span>
                     <span className={`text-[10px] font-mono font-semibold ml-auto ${e.delta > 0 ? 'text-primary' : 'text-red-400'}`}>Δ {e.delta > 0 ? '+' : ''}{Math.abs(e.delta)}</span>
                     <span className={`text-[10px] font-semibold ${e.ivRank >= 70 ? 'text-[#FFD700]' : 'text-white/30'}`}>IV {e.ivRank}%</span>
                   </div>
@@ -783,11 +786,11 @@ export default function Dashboard() {
           {secondaryTab === "calendar" && (
             <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
               <div className="p-4">
-                <p className="text-xs text-white/40 font-semibold mb-3">Signal History</p>
+                <p className="text-xs text-white/50 font-semibold mb-3">Signal History</p>
                 <SignalHistory />
               </div>
               <div className="p-4">
-                <p className="text-xs text-white/40 font-semibold mb-3">Economic Calendar</p>
+                <p className="text-xs text-white/50 font-semibold mb-3">Economic Calendar</p>
                 <EconomicCalendar />
               </div>
             </div>

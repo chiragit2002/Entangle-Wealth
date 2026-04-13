@@ -45,7 +45,7 @@ export function CookieConsentBanner() {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-semibold text-white mb-0.5">We use cookies</h3>
-              <p className="text-xs text-white/40 leading-relaxed">
+              <p className="text-xs text-white/50 leading-relaxed">
                 Essential cookies for auth & security, plus optional analytics to improve your experience.{" "}
                 <Link href="/cookies" className="text-primary hover:underline">Cookie Policy</Link>
               </p>

@@ -104,7 +104,7 @@ export function FeedbackWidget() {
                 <MessageSquarePlus className="w-5 h-5 text-[#00D4FF]" />
                 Quick Feedback
               </h3>
-              <button onClick={handleClose} className="text-white/40 hover:text-white transition-colors">
+              <button onClick={handleClose} className="text-white/50 hover:text-white transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -132,7 +132,7 @@ export function FeedbackWidget() {
                       >
                         <Star
                           className={`w-8 h-8 transition-colors ${
-                            s <= effectiveRating ? "text-[#FFD700] fill-[#FFD700]" : "text-white/20"
+                            s <= effectiveRating ? "text-[#FFD700] fill-[#FFD700]" : "text-white/40"
                           }`}
                         />
                       </button>

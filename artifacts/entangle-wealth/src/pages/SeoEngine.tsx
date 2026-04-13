@@ -216,7 +216,7 @@ function KeywordsTab() {
                     <td className="px-4 py-2">
                       <div className="flex items-center gap-1">
                         <button onClick={handleEdit} className="text-emerald-400 hover:text-emerald-300 transition-colors" aria-label="Save edit"><Save className="w-3.5 h-3.5" aria-hidden="true" /></button>
-                        <button onClick={() => setEditingId(null)} className="text-white/40 hover:text-white transition-colors" aria-label="Cancel edit"><X className="w-3.5 h-3.5" aria-hidden="true" /></button>
+                        <button onClick={() => setEditingId(null)} className="text-white/50 hover:text-white transition-colors" aria-label="Cancel edit"><X className="w-3.5 h-3.5" aria-hidden="true" /></button>
                       </div>
                     </td>
                   </tr>
@@ -441,7 +441,7 @@ function BlogTab() {
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground font-mono">/blog/{post.slug}</p>
-                {post.metaDescription && <p className="text-xs text-white/40 mt-1 line-clamp-2">{post.metaDescription}</p>}
+                {post.metaDescription && <p className="text-xs text-white/50 mt-1 line-clamp-2">{post.metaDescription}</p>}
               </div>
               <div className="flex items-center gap-1 shrink-0">
                 {post.status === "published" && (
@@ -635,7 +635,7 @@ function BacklinksTab() {
                     <td className="px-4 py-2">
                       <div className="flex items-center gap-1">
                         <button onClick={handleEdit} className="text-emerald-400 hover:text-emerald-300 transition-colors" aria-label="Save edit"><Save className="w-3.5 h-3.5" aria-hidden="true" /></button>
-                        <button onClick={() => setEditingId(null)} className="text-white/40 hover:text-white transition-colors" aria-label="Cancel edit"><X className="w-3.5 h-3.5" aria-hidden="true" /></button>
+                        <button onClick={() => setEditingId(null)} className="text-white/50 hover:text-white transition-colors" aria-label="Cancel edit"><X className="w-3.5 h-3.5" aria-hidden="true" /></button>
                       </div>
                     </td>
                   </tr>

@@ -48,27 +48,6 @@ async function ensureAlertTables() {
     const client = await pool.connect();
     try {
       await client.query(`
-        CREATE TABLE IF NOT EXISTS alerts (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT NOT NULL,
-          symbol TEXT NOT NULL,
-          alert_type TEXT NOT NULL,
-          threshold REAL,
-          enabled BOOLEAN DEFAULT true,
-          created_at TIMESTAMPTZ DEFAULT now(),
-          updated_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE TABLE IF NOT EXISTS alert_history (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT NOT NULL,
-          alert_id INTEGER,
-          symbol TEXT NOT NULL,
-          alert_type TEXT NOT NULL,
-          triggered_value REAL,
-          message TEXT,
-          read BOOLEAN DEFAULT false,
-          triggered_at TIMESTAMPTZ DEFAULT now()
-        );
         ALTER TABLE users ADD COLUMN IF NOT EXISTS alert_email_digest TEXT DEFAULT 'off';
         CREATE TABLE IF NOT EXISTS push_subscriptions (
           id SERIAL PRIMARY KEY,
@@ -92,56 +71,24 @@ async function ensureAlertTables() {
         CREATE INDEX IF NOT EXISTS idx_analytics_created_at ON analytics_events (created_at);
         CREATE INDEX IF NOT EXISTS idx_analytics_user_id ON analytics_events (user_id);
       `);
-      logger.info("Alert tables ensured");
+      logger.info("Alert ancillary tables ensured");
     } finally {
       client.release();
     }
   } catch (err) {
-    logger.warn({ error: err }, "Failed to ensure alert tables (non-fatal)");
+    logger.warn({ error: err }, "Failed to ensure alert ancillary tables (non-fatal)");
   }
 }
 
 async function ensureGamificationTables() {
+  // Gamification tables (streaks, daily_spins, giveaway_entries, founder_status) are
+  // managed by Drizzle schema and pushed via `drizzle-kit push`. Column additions
+  // (streak_protection_active, reward_type, reward_label) are handled by schema push.
+  // This function handles only the irreversible data migration: changing last_activity_date
+  // from text → timestamptz, which cannot be expressed in Drizzle schema alone.
   try {
     const client = await pool.connect();
     try {
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS daily_spins (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-          reward TEXT NOT NULL,
-          reward_type TEXT NOT NULL,
-          reward_value INTEGER NOT NULL DEFAULT 0,
-          spun_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE TABLE IF NOT EXISTS founder_status (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-          xp_multiplier REAL NOT NULL DEFAULT 1.5,
-          granted_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE TABLE IF NOT EXISTS giveaway_entries (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-          total_entries INTEGER NOT NULL DEFAULT 0,
-          trade_entries INTEGER NOT NULL DEFAULT 0,
-          streak_entries INTEGER NOT NULL DEFAULT 0,
-          login_entries INTEGER NOT NULL DEFAULT 0,
-          xp_milestone_entries INTEGER NOT NULL DEFAULT 0,
-          referral_entries INTEGER NOT NULL DEFAULT 0,
-          referral_bonus_share REAL NOT NULL DEFAULT 0,
-          converted_referrals INTEGER NOT NULL DEFAULT 0,
-          drawing_won BOOLEAN DEFAULT false,
-          drawn_at TIMESTAMPTZ,
-          updated_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE INDEX IF NOT EXISTS idx_daily_spins_user ON daily_spins (user_id);
-        CREATE INDEX IF NOT EXISTS idx_giveaway_entries_user ON giveaway_entries (user_id);
-        ALTER TABLE streaks ADD COLUMN IF NOT EXISTS streak_protection_active BOOLEAN NOT NULL DEFAULT false;
-        ALTER TABLE daily_spins ADD COLUMN IF NOT EXISTS reward_type TEXT NOT NULL DEFAULT 'cash';
-        ALTER TABLE daily_spins ADD COLUMN IF NOT EXISTS reward_label TEXT NOT NULL DEFAULT '';
-      `);
-
       const colTypeResult = await client.query(`
         SELECT data_type FROM information_schema.columns
         WHERE table_name = 'streaks' AND column_name = 'last_activity_date';
@@ -159,56 +106,20 @@ async function ensureGamificationTables() {
         `);
         logger.info("Migrated streaks.last_activity_date from text to timestamptz");
       }
-
-      logger.info("Gamification tables ensured");
+      logger.info("Gamification data migration check complete");
     } finally {
       client.release();
     }
   } catch (err) {
-    logger.warn({ error: err }, "Failed to ensure gamification tables (non-fatal)");
+    logger.warn({ error: err }, "Failed to run gamification data migration (non-fatal)");
   }
 }
 
 async function ensurePaperTradingTables() {
-  try {
-    const client = await pool.connect();
-    try {
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS paper_portfolios (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT NOT NULL UNIQUE,
-          cash_balance REAL NOT NULL DEFAULT 100000,
-          created_at TIMESTAMPTZ DEFAULT now(),
-          updated_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE TABLE IF NOT EXISTS paper_trades (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT NOT NULL,
-          symbol TEXT NOT NULL,
-          side TEXT NOT NULL,
-          quantity INTEGER NOT NULL,
-          price REAL NOT NULL,
-          total_cost REAL NOT NULL,
-          created_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE TABLE IF NOT EXISTS paper_positions (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT NOT NULL,
-          symbol TEXT NOT NULL,
-          quantity INTEGER NOT NULL DEFAULT 0,
-          avg_cost REAL NOT NULL DEFAULT 0,
-          updated_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE INDEX IF NOT EXISTS idx_paper_trades_user ON paper_trades (user_id);
-        CREATE INDEX IF NOT EXISTS idx_paper_positions_user ON paper_positions (user_id);
-      `);
-      logger.info("Paper trading tables ensured");
-    } finally {
-      client.release();
-    }
-  } catch (err) {
-    logger.warn({ error: err }, "Failed to ensure paper trading tables (non-fatal)");
-  }
+  // Paper trading tables (paper_portfolios, paper_trades, paper_positions) are
+  // managed by Drizzle schema and pushed via `drizzle-kit push`. This function
+  // is retained for potential runtime column migrations in the future.
+  logger.info("Paper trading tables managed by Drizzle schema");
 }
 
 async function ensureEmailSubscribersTable() {

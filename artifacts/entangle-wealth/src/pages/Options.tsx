@@ -92,7 +92,7 @@ export default function Options() {
   const SortHeader = ({ field, children, className = "" }: { field: SortField; children: React.ReactNode; className?: string }) => (
     <button onClick={() => handleSort(field)} className={`flex items-center gap-1 hover:text-primary transition-colors group ${className}`}>
       {children}
-      <ArrowUpDown className={`w-3 h-3 transition-colors ${sortField === field ? 'text-primary' : 'text-white/20 group-hover:text-white/40'}`} />
+      <ArrowUpDown className={`w-3 h-3 transition-colors ${sortField === field ? 'text-primary' : 'text-white/40 group-hover:text-white/40'}`} />
       {sortField === field && <span className="text-primary text-[9px]">{sortDir === "asc" ? "↑" : "↓"}</span>}
     </button>
   );
@@ -318,7 +318,7 @@ export default function Options() {
                           <div className="w-10 flex items-center justify-center">
                             <button
                               onClick={(e) => { e.stopPropagation(); toggleSave(item.id, item.symbol); }}
-                              className={`p-1.5 rounded-md transition-colors ${isSaved ? 'text-secondary hover:text-secondary/80' : 'text-white/20 hover:text-white/50'}`}
+                              className={`p-1.5 rounded-md transition-colors ${isSaved ? 'text-secondary hover:text-secondary/80' : 'text-white/40 hover:text-white/50'}`}
                             >
                               {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                             </button>

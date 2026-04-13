@@ -307,7 +307,7 @@ export default function Receipts() {
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Receipts & Docs</h1>
-            <p className="text-[12px] text-white/40">Upload receipts, log mileage, track deductions — all in one place.</p>
+            <p className="text-[12px] text-white/50">Upload receipts, log mileage, track deductions — all in one place.</p>
           </div>
         </div>
 
@@ -412,7 +412,7 @@ export default function Receipts() {
                     <p className="font-semibold text-white/40 mb-1">
                       {documents.length === 0 ? "No receipts yet" : "No receipts match that filter"}
                     </p>
-                    <p className="text-sm text-white/20">
+                    <p className="text-sm text-white/50">
                       {documents.length === 0 ? "Drop a file above or type in the form to add your first expense." : "Try a different category or clear the filter."}
                     </p>
                   </div>
@@ -452,7 +452,7 @@ export default function Receipts() {
                         <p className="text-[11px] text-[#9c27b0] font-semibold mb-1">AI Analysis</p>
                         <p className="text-[12px] text-white/60">{d.aiAnalysis.suggestedPurpose || d.aiAnalysis.notes}</p>
                         {d.aiAnalysis.items.length > 0 && (
-                          <p className="text-[11px] text-white/40 mt-1">Items: {d.aiAnalysis.items.join(", ")}</p>
+                          <p className="text-[11px] text-white/50 mt-1">Items: {d.aiAnalysis.items.join(", ")}</p>
                         )}
                         <p className="text-[11px] mt-1">
                           <span className={d.aiAnalysis.auditReady ? "text-[#00e676]" : "text-[#ffb800]"}>
@@ -462,7 +462,7 @@ export default function Receipts() {
                         </p>
                       </div>
                     )}
-                    <p className="text-[11px] text-white/40 mt-2">{d.purpose}</p>
+                    <p className="text-[11px] text-white/50 mt-2">{d.purpose}</p>
                   </div>
                 ))}
               </div>
@@ -495,7 +495,7 @@ export default function Receipts() {
                           }}>{d.status}</span>
                         </td>
                         <td className="p-3">
-                          <button onClick={() => removeDocument(d.id)} className="text-white/20 hover:text-[#ff4757]">
+                          <button onClick={() => removeDocument(d.id)} className="text-white/50 hover:text-[#ff4757]">
                             <Trash2 className="w-3 h-3" />
                           </button>
                         </td>
@@ -560,7 +560,7 @@ export default function Receipts() {
               <div className="text-center py-12">
                 <Car className="w-10 h-10 mx-auto mb-3 text-white/10" />
                 <p className="font-semibold text-white/40 mb-1">No trips logged yet</p>
-                <p className="text-sm text-white/20">Fill in the form above to add your first business trip.</p>
+                <p className="text-sm text-white/50">Fill in the form above to add your first business trip.</p>
               </div>
             ) : (
               <div className="glass-panel rounded-xl overflow-x-auto mb-6">
@@ -586,7 +586,7 @@ export default function Receipts() {
                         <td className="p-3 text-white/50">{m.purpose}</td>
                         <td className="p-3 text-right font-mono font-bold text-[#00e676]">${m.deductible.toFixed(2)}</td>
                         <td className="p-3">
-                          <button onClick={() => setMileage(prev => prev.filter(e => e.id !== m.id))} className="text-white/20 hover:text-[#ff4757]">
+                          <button onClick={() => setMileage(prev => prev.filter(e => e.id !== m.id))} className="text-white/50 hover:text-[#ff4757]">
                             <Trash2 className="w-3 h-3" />
                           </button>
                         </td>

@@ -123,7 +123,7 @@ export function FirstVisitTooltips() {
           <p className="text-xs text-white/70 leading-relaxed">{activeTooltip.message}</p>
           <button
             onClick={handleDismiss}
-            className="text-white/20 hover:text-white/50 transition-colors shrink-0 mt-0.5"
+            className="text-white/50 hover:text-white/50 transition-colors shrink-0 mt-0.5"
             aria-label="Dismiss tooltip"
           >
             <X className="w-3.5 h-3.5" />

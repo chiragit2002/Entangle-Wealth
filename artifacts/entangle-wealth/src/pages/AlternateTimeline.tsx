@@ -101,7 +101,7 @@ function ChartSection({
       <div className="flex items-center gap-2">
         <TrendingUp className="w-4 h-4 text-primary" aria-hidden="true" />
         <span className="font-bold text-sm">Net Worth Projection</span>
-        <span className="text-[10px] text-white/40 ml-auto font-mono">Simulation — not financial advice</span>
+        <span className="text-[10px] text-white/50 ml-auto font-mono">Simulation — not financial advice</span>
       </div>
       <div className="h-52" role="img" aria-label="Net worth projection chart comparing two financial paths over time">
         <ResponsiveContainer width="100%" height="100%">
@@ -191,7 +191,7 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
         <Zap className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
         <div className="flex-1">
           <div className="text-xs font-bold text-white/70">Immediate — Sliders Update Instantly</div>
-          <div className="text-[11px] text-white/40 mt-0.5">
+          <div className="text-[11px] text-white/50 mt-0.5">
             Every slider change recalculates both timelines in real time. Numbers animate to their new values as you explore.
           </div>
         </div>
@@ -310,7 +310,7 @@ function IdentityBadge({ stage }: { stage: Stage }) {
       </div>
       <div>
         <div className={`text-xs font-bold font-mono ${STAGE_COLORS[stage]}`}>{stage}</div>
-        <div className="text-[10px] text-white/40">{STAGE_DESCS[stage]}</div>
+        <div className="text-[10px] text-white/50">{STAGE_DESCS[stage]}</div>
       </div>
     </div>
   );
@@ -434,7 +434,7 @@ function EnhancedSnapshotCompare({
                     </span>
                   </div>
                   {tl.annotation && (
-                    <div className="text-[11px] text-white/40 mt-1 italic">{tl.annotation}</div>
+                    <div className="text-[11px] text-white/50 mt-1 italic">{tl.annotation}</div>
                   )}
                   <div className="text-[9px] text-white/30 font-mono mt-1">{generateAnnotation(tl)}</div>
                 </div>
@@ -451,7 +451,7 @@ function EnhancedSnapshotCompare({
                   >B</button>
                   <button
                     onClick={() => onDelete(tl.id)}
-                    className="text-white/20 hover:text-red-400 transition-colors p-1"
+                    className="text-white/50 hover:text-red-400 transition-colors p-1"
                     aria-label={`Delete scenario: ${tl.name}`}
                   >
                     <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
@@ -473,7 +473,7 @@ function EnhancedSnapshotCompare({
           <div className="flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-primary" aria-hidden="true" />
             <span className="font-bold text-sm">Multi-Scenario Overlay</span>
-            <span className="text-[10px] text-white/40 ml-auto font-mono">{selectedTLs.length} scenarios</span>
+            <span className="text-[10px] text-white/50 ml-auto font-mono">{selectedTLs.length} scenarios</span>
           </div>
           <div className="h-52" role="img" aria-label={`Multi-scenario comparison chart for ${selectedTLs.map(t => t.name).join(", ")}`}>
             <ResponsiveContainer width="100%" height="100%">
@@ -508,7 +508,7 @@ function EnhancedSnapshotCompare({
           </div>
 
           <div className="space-y-2">
-            <div className="text-[10px] text-white/40 font-mono uppercase tracking-wider">Scenario Summary</div>
+            <div className="text-[10px] text-white/50 font-mono uppercase tracking-wider">Scenario Summary</div>
             <div className="overflow-x-auto">
               <table className="w-full text-[10px] font-mono" aria-label="Scenario comparison summary table">
                 <thead>
@@ -803,7 +803,7 @@ export default function AlternateTimeline() {
                 <span className="electric-text">Alternate</span> Timeline
               </h1>
             </div>
-            <p className="text-xs text-white/40 font-mono">
+            <p className="text-xs text-white/50 font-mono">
               Compare two financial futures side-by-side. Projections are simulations — not financial advice.
             </p>
           </div>
@@ -836,7 +836,7 @@ export default function AlternateTimeline() {
               variant="ghost"
               size="sm"
               onClick={handleReset}
-              className="text-white/40 hover:text-white text-xs border border-white/10 h-9"
+              className="text-white/50 hover:text-white text-xs border border-white/10 h-9"
               aria-label="Reset all parameters to defaults"
             >
               <RefreshCw className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
@@ -988,7 +988,7 @@ export default function AlternateTimeline() {
 
             {showWhatIf && (
               <div className="px-4 pb-4 space-y-4">
-                <p className="text-xs text-white/40">
+                <p className="text-xs text-white/50">
                   Toggle key life decisions to see the ripple effect across your entire financial timeline. Selected decisions auto-populate the "Better Path" pane.
                 </p>
 
@@ -1040,19 +1040,19 @@ export default function AlternateTimeline() {
                     <div className="text-[10px] text-purple-400 font-semibold uppercase tracking-wider">Decision Impact at 20 Years</div>
                     <div className="grid grid-cols-3 gap-3">
                       <div className="text-center rounded-xl p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div className="text-[10px] text-white/40 font-mono uppercase">Net Worth Gain</div>
+                        <div className="text-[10px] text-white/50 font-mono uppercase">Net Worth Gain</div>
                         <div className={`text-lg font-black font-mono mt-1 ${whatIfResult.summary.netWorthGain20yr >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                           {whatIfResult.summary.netWorthGain20yr >= 0 ? "+" : ""}{fmt(whatIfResult.summary.netWorthGain20yr)}
                         </div>
                       </div>
                       <div className="text-center rounded-xl p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div className="text-[10px] text-white/40 font-mono uppercase">Stress Reduction</div>
+                        <div className="text-[10px] text-white/50 font-mono uppercase">Stress Reduction</div>
                         <div className={`text-lg font-black font-mono mt-1 ${whatIfResult.summary.stressReduction >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                           {whatIfResult.summary.stressReduction >= 0 ? "+" : ""}{whatIfResult.summary.stressReduction.toFixed(1)}pts
                         </div>
                       </div>
                       <div className="text-center rounded-xl p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div className="text-[10px] text-white/40 font-mono uppercase">Opportunity Gain</div>
+                        <div className="text-[10px] text-white/50 font-mono uppercase">Opportunity Gain</div>
                         <div className={`text-lg font-black font-mono mt-1 ${whatIfResult.summary.opportunityGain >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                           {whatIfResult.summary.opportunityGain >= 0 ? "+" : ""}{whatIfResult.summary.opportunityGain.toFixed(1)}pts
                         </div>
@@ -1103,7 +1103,7 @@ export default function AlternateTimeline() {
                 style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(255,255,255,0.06)" }}
                 aria-label={`${label}: ${value >= 0 ? "+" : ""}${isMoney ? fmt(value) : `${value.toFixed(1)}${suffix || ""}`}`}
               >
-                <Icon className="w-4 h-4 mx-auto mb-1 text-white/20" aria-hidden="true" />
+                <Icon className="w-4 h-4 mx-auto mb-1 text-white/40" aria-hidden="true" />
                 <div className="text-[9px] text-white/40 font-mono uppercase tracking-wider">{label}</div>
                 <div className={`text-sm font-black font-mono mt-0.5 ${value >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                   {value >= 0 ? "+" : ""}
@@ -1139,7 +1139,7 @@ export default function AlternateTimeline() {
                     </div>
                     <button
                       onClick={() => setShowForm(v => !v)}
-                      className="text-white/40 hover:text-white transition-colors"
+                      className="text-white/50 hover:text-white transition-colors"
                       aria-expanded={showForm}
                       aria-controls={`save-form-${which}`}
                       aria-label={`${showForm ? "Collapse" : "Expand"} save form for ${label}`}
@@ -1201,7 +1201,7 @@ export default function AlternateTimeline() {
               <div className="flex items-center gap-2 mb-4">
                 <BookmarkCheck className="w-4 h-4 text-primary" aria-hidden="true" />
                 <span className="font-bold text-sm">Saved Scenarios</span>
-                <span className="text-[10px] text-white/40 ml-auto">{savedTimelines.length} saved</span>
+                <span className="text-[10px] text-white/50 ml-auto">{savedTimelines.length} saved</span>
               </div>
               <EnhancedSnapshotCompare
                 savedTimelines={savedTimelines}
@@ -1225,7 +1225,7 @@ export default function AlternateTimeline() {
         <div className="mt-4 rounded-xl px-4 py-3"
           style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
           <div className="flex items-start gap-2">
-            <Info className="w-3.5 h-3.5 text-white/20 mt-0.5 shrink-0" aria-hidden="true" />
+            <Info className="w-3.5 h-3.5 text-white/40 mt-0.5 shrink-0" aria-hidden="true" />
             <p className="text-[10px] text-white/30 leading-relaxed">
               All projections are illustrative simulations using compound interest, simple debt amortization, and linear savings models. They do not account for taxes, inflation adjustments, market volatility, or individual circumstances. This tool is for educational exploration only — not financial advice. Assumptions: savings split 60% investments / 40% liquid. Debt is modeled as a fixed monthly payment over 36 months. Investment returns are annual rate applied monthly.
             </p>

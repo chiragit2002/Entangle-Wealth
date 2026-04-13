@@ -135,7 +135,7 @@ export function OccupationDropdown({
                   setQuery("");
                 }
               }}
-              className="text-white/20 hover:text-white/50 rounded p-0.5 transition-colors"
+              className="text-white/50 hover:text-white/50 rounded p-0.5 transition-colors"
               aria-label="Clear selection"
             >
               <X className="w-3 h-3" />

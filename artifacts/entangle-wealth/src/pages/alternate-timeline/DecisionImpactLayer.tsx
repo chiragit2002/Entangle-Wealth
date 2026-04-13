@@ -44,7 +44,7 @@ export function DecisionImpactLayer({ compareResult, selectedHorizon }: {
       <div className="flex items-center gap-2">
         <Layers className="w-4 h-4 text-primary" aria-hidden="true" />
         <span className="font-bold text-sm">Decision Impact</span>
-        <span className="text-[10px] text-white/40 ml-auto font-mono">@ {selectedHorizon}</span>
+        <span className="text-[10px] text-white/50 ml-auto font-mono">@ {selectedHorizon}</span>
       </div>
 
       <div className="flex items-center gap-3" aria-hidden="true">

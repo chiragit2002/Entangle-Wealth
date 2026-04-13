@@ -115,12 +115,12 @@ export function OptionsChain() {
           </select>
         </div>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-[10px] text-white/20">
+          <div className="flex items-center gap-2 text-[10px] text-white/40">
             <span>P/C Ratio: <span className="font-mono font-bold text-white/40">{pcRatio}</span></span>
             <span>Call Vol: <span className="font-mono text-primary/50">{totalCallVol.toLocaleString()}</span></span>
             <span>Put Vol: <span className="font-mono text-[#ff3366]/50">{totalPutVol.toLocaleString()}</span></span>
           </div>
-          <button onClick={() => setShowGreeks(!showGreeks)} className="text-[10px] text-white/20 hover:text-white/40 transition-colors">
+          <button onClick={() => setShowGreeks(!showGreeks)} className="text-[10px] text-white/50 hover:text-white/40 transition-colors">
             {showGreeks ? "Hide Greeks" : "Show Greeks"}
           </button>
         </div>
@@ -131,10 +131,10 @@ export function OptionsChain() {
           <thead>
             <tr className="border-b border-white/[0.04]">
               <th colSpan={showGreeks ? 9 : 5} className="text-center py-1.5 text-primary/40 font-bold text-[9px] uppercase tracking-wider bg-primary/[0.02]">CALLS</th>
-              <th className="text-center py-1.5 text-white/20 font-bold text-[9px] uppercase tracking-wider bg-white/[0.02]">STRIKE</th>
+              <th className="text-center py-1.5 text-white/40 font-bold text-[9px] uppercase tracking-wider bg-white/[0.02]">STRIKE</th>
               <th colSpan={showGreeks ? 9 : 5} className="text-center py-1.5 text-[#ff3366]/40 font-bold text-[9px] uppercase tracking-wider bg-[#ff3366]/[0.02]">PUTS</th>
             </tr>
-            <tr className="border-b border-white/[0.04] text-white/15">
+            <tr className="border-b border-white/[0.04] text-white/40">
               <th className="px-2 py-1.5 text-right font-normal">Bid</th>
               <th className="px-2 py-1.5 text-right font-normal">Ask</th>
               <th className="px-2 py-1.5 text-right font-normal">Last</th>
@@ -170,13 +170,13 @@ export function OptionsChain() {
                   <td className={`px-2 py-1.5 text-right ${callITM ? "text-primary/60 bg-primary/[0.02]" : "text-white/25"}`}>{row.callBid}</td>
                   <td className={`px-2 py-1.5 text-right ${callITM ? "text-primary/60 bg-primary/[0.02]" : "text-white/25"}`}>{row.callAsk}</td>
                   <td className={`px-2 py-1.5 text-right font-bold ${callITM ? "text-primary/70 bg-primary/[0.02]" : "text-white/35"}`}>{row.callLast}</td>
-                  <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} ${row.callVol > 2000 ? "text-primary/50 font-bold" : "text-white/15"}`}>{row.callVol.toLocaleString()}</td>
+                  <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} ${row.callVol > 2000 ? "text-primary/50 font-bold" : "text-white/40"}`}>{row.callVol.toLocaleString()}</td>
                   <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/12`}>{row.callOI.toLocaleString()}</td>
                   {showGreeks && <>
-                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/20`}>{Math.abs(row.callDelta)}</td>
+                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/40`}>{Math.abs(row.callDelta)}</td>
                     <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/12`}>{Math.abs(row.callGamma)}</td>
                     <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-[#ff3366]/30`}>{Math.abs(row.callTheta).toFixed(3)}</td>
-                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/15`}>{row.callIV}</td>
+                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/40`}>{row.callIV}</td>
                   </>}
                   <td className={`px-3 py-1.5 text-center font-bold text-[11px] ${isATM ? "text-[#ffd700] bg-[#ffd700]/[0.05]" : "text-white/40 bg-white/[0.015]"}`}>
                     {row.strike.toFixed(2)}
@@ -185,13 +185,13 @@ export function OptionsChain() {
                   <td className={`px-2 py-1.5 text-right ${putITM ? "text-[#ff3366]/60 bg-[#ff3366]/[0.02]" : "text-white/25"}`}>{row.putBid}</td>
                   <td className={`px-2 py-1.5 text-right ${putITM ? "text-[#ff3366]/60 bg-[#ff3366]/[0.02]" : "text-white/25"}`}>{row.putAsk}</td>
                   <td className={`px-2 py-1.5 text-right font-bold ${putITM ? "text-[#ff3366]/70 bg-[#ff3366]/[0.02]" : "text-white/35"}`}>{row.putLast}</td>
-                  <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} ${row.putVol > 2000 ? "text-[#ff3366]/50 font-bold" : "text-white/15"}`}>{row.putVol.toLocaleString()}</td>
+                  <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} ${row.putVol > 2000 ? "text-[#ff3366]/50 font-bold" : "text-white/40"}`}>{row.putVol.toLocaleString()}</td>
                   <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/12`}>{row.putOI.toLocaleString()}</td>
                   {showGreeks && <>
-                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/20`}>{Math.abs(row.putDelta)}</td>
+                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/40`}>{Math.abs(row.putDelta)}</td>
                     <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/12`}>{Math.abs(row.putGamma)}</td>
                     <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-[#ff3366]/30`}>{Math.abs(row.putTheta).toFixed(3)}</td>
-                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/15`}>{row.putIV}</td>
+                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/40`}>{row.putIV}</td>
                   </>}
                 </tr>
               );

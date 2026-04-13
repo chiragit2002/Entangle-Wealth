@@ -92,7 +92,7 @@ export default function AdminTickets() {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-20 text-center">
-          <RefreshCw className="w-6 h-6 text-white/20 animate-spin mx-auto mb-3" />
+          <RefreshCw className="w-6 h-6 text-white/40 animate-spin mx-auto mb-3" />
           <p className="text-white/30 text-sm">Checking access...</p>
         </div>
       </Layout>
@@ -123,7 +123,7 @@ export default function AdminTickets() {
         </div>
 
         <div className="flex items-center gap-2 mb-6">
-          <Filter className="w-4 h-4 text-white/20" />
+          <Filter className="w-4 h-4 text-white/40" />
           {STATUS_OPTIONS.map((s) => (
             <button
               key={s}
@@ -142,7 +142,7 @@ export default function AdminTickets() {
 
         {loading && tickets.length === 0 ? (
           <div className="text-center py-20">
-            <RefreshCw className="w-6 h-6 text-white/20 animate-spin mx-auto mb-3" />
+            <RefreshCw className="w-6 h-6 text-white/40 animate-spin mx-auto mb-3" />
             <p className="text-white/30 text-sm">Loading tickets...</p>
           </div>
         ) : tickets.length === 0 ? (
@@ -160,18 +160,18 @@ export default function AdminTickets() {
                 <div key={ticket.id} className={`border rounded-xl overflow-hidden transition-colors ${isExpanded ? "border-[#00D4FF]/20 bg-white/[0.02]" : "border-white/[0.06] bg-white/[0.01]"}`}>
                   <button onClick={() => setExpandedId(isExpanded ? null : ticket.id)} className="w-full flex items-center justify-between px-5 py-4 text-left">
                     <div className="flex items-center gap-4 min-w-0 flex-1">
-                      <span className="text-xs font-mono text-white/20 shrink-0">#{ticket.id}</span>
+                      <span className="text-xs font-mono text-white/40 shrink-0">#{ticket.id}</span>
                       <StatusIcon className="w-4 h-4 shrink-0" style={{ color: cfg.color }} />
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-semibold text-white/80 truncate">{ticket.subject}</p>
-                        <p className="text-[10px] text-white/20 font-mono">{ticket.user_email} · {ticket.category} · {new Date(ticket.created_at).toLocaleDateString()}</p>
+                        <p className="text-[10px] text-white/50 font-mono">{ticket.user_email} · {ticket.category} · {new Date(ticket.created_at).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 shrink-0 ml-4">
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border" style={{ color: cfg.color, borderColor: `${cfg.color}33`, backgroundColor: `${cfg.color}10` }}>
                         {cfg.label}
                       </span>
-                      {isExpanded ? <ChevronUp className="w-4 h-4 text-white/20" /> : <ChevronDown className="w-4 h-4 text-white/20" />}
+                      {isExpanded ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
                     </div>
                   </button>
 
@@ -183,16 +183,16 @@ export default function AdminTickets() {
                           <p className="text-sm text-white/50 whitespace-pre-wrap leading-relaxed bg-white/[0.02] border border-white/[0.04] rounded-lg p-4">{ticket.description}</p>
                           <div className="grid grid-cols-2 gap-3 mt-4 text-xs">
                             <div>
-                              <span className="text-white/20">Created:</span>
+                              <span className="text-white/50">Created:</span>
                               <span className="text-white/50 ml-1 font-mono">{new Date(ticket.created_at).toLocaleString()}</span>
                             </div>
                             <div>
-                              <span className="text-white/20">Updated:</span>
+                              <span className="text-white/50">Updated:</span>
                               <span className="text-white/50 ml-1 font-mono">{new Date(ticket.updated_at).toLocaleString()}</span>
                             </div>
                             {ticket.resolved_at && (
                               <div>
-                                <span className="text-white/20">Resolved:</span>
+                                <span className="text-white/50">Resolved:</span>
                                 <span className="text-[#00ff88] ml-1 font-mono">{new Date(ticket.resolved_at).toLocaleString()}</span>
                               </div>
                             )}
@@ -203,7 +203,7 @@ export default function AdminTickets() {
                           <h4 className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-2">Admin Actions</h4>
                           <div className="space-y-3">
                             <div>
-                              <label className="text-[10px] text-white/20 uppercase tracking-wider">Status</label>
+                              <label className="text-[10px] text-white/50 uppercase tracking-wider">Status</label>
                               <div className="flex gap-2 mt-1 flex-wrap">
                                 {(["open", "in_progress", "resolved", "closed"] as const).map((s) => (
                                   <button
@@ -222,12 +222,12 @@ export default function AdminTickets() {
                               </div>
                             </div>
                             <div>
-                              <label className="text-[10px] text-white/20 uppercase tracking-wider">Internal Notes</label>
+                              <label className="text-[10px] text-white/50 uppercase tracking-wider">Internal Notes</label>
                               <textarea
                                 value={editNotes[ticket.id] ?? ticket.admin_notes ?? ""}
                                 onChange={(e) => setEditNotes((prev) => ({ ...prev, [ticket.id]: e.target.value }))}
                                 rows={3}
-                                className="w-full mt-1 px-3 py-2 text-xs bg-white/[0.03] border border-white/[0.06] rounded-lg text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30 resize-none"
+                                className="w-full mt-1 px-3 py-2 text-xs bg-white/[0.03] border border-white/[0.06] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/30 resize-none"
                                 placeholder="Add internal notes..."
                               />
                               <button

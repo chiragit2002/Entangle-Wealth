@@ -127,7 +127,7 @@ function KPICard({
         )}
       </div>
       <div className="text-2xl font-bold text-white font-mono">{value}</div>
-      <div className="text-xs text-white/40 mt-1">{label}</div>
+      <div className="text-xs text-white/50 mt-1">{label}</div>
     </div>
   );
 }
@@ -153,7 +153,7 @@ function StarDisplay({ rating }: { rating: number }) {
       {[1, 2, 3, 4, 5].map((s) => (
         <Star
           key={s}
-          className={`w-3 h-3 ${s <= Math.round(rating) ? "text-[#FFD700] fill-[#FFD700]" : "text-white/20"}`}
+          className={`w-3 h-3 ${s <= Math.round(rating) ? "text-[#FFD700] fill-[#FFD700]" : "text-white/40"}`}
         />
       ))}
     </div>
@@ -297,7 +297,7 @@ export default function Analytics() {
               <BarChart3 className="w-8 h-8 text-[#00D4FF]" />
               Analytics Dashboard
             </h1>
-            <p className="text-white/40 text-sm mt-1">Platform health metrics & user intelligence</p>
+            <p className="text-white/50 text-sm mt-1">Platform health metrics & user intelligence</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -608,7 +608,7 @@ export default function Analytics() {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-                <p className="text-xs text-white/40 mt-2 text-center">Click any bar to drill into event details</p>
+                <p className="text-xs text-white/50 mt-2 text-center">Click any bar to drill into event details</p>
               </ChartCard>
 
               <ChartCard title="Content by Platform & Status">
@@ -799,7 +799,7 @@ export default function Analytics() {
                   </p>
                 )}
               </div>
-              <button onClick={closeDrilldown} className="text-white/40 hover:text-white transition-colors p-1">
+              <button onClick={closeDrilldown} className="text-white/50 hover:text-white transition-colors p-1">
                 <X className="w-5 h-5" />
               </button>
             </div>

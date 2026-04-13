@@ -292,7 +292,7 @@ export default function LifeOutcomes() {
                         )}
                       </div>
 
-                      <p className="text-xs text-white/40 italic">{tier.desc}</p>
+                      <p className="text-xs text-white/50 italic">{tier.desc}</p>
                     </div>
                   );
                 })}
@@ -393,18 +393,18 @@ export default function LifeOutcomes() {
                         </div>
                         <div>
                           <h4 className="font-semibold text-white text-sm">{milestone.label}</h4>
-                          <p className="text-xs text-white/40">{milestone.description}</p>
+                          <p className="text-xs text-white/50">{milestone.description}</p>
                         </div>
                       </div>
                       <div className="space-y-1.5">
                         <div className="flex justify-between text-xs">
-                          <span className="text-white/40">Current Path</span>
+                          <span className="text-white/50">Current Path</span>
                           <span className={milestone.currentPathAge ? "text-white" : "text-red-400"}>
                             {milestone.currentPathAge ? `Age ${milestone.currentPathAge}` : "Not achieved"}
                           </span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-white/40">Optimized Path</span>
+                          <span className="text-white/50">Optimized Path</span>
                           <span className={milestone.optimizedPathAge ? "text-[#00D4FF]" : "text-red-400"}>
                             {milestone.optimizedPathAge ? `Age ${milestone.optimizedPathAge}` : "Not achieved"}
                           </span>
@@ -421,7 +421,7 @@ export default function LifeOutcomes() {
                     <Zap className="w-8 h-8 text-emerald-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
                     <div>
                       <p className="text-white font-medium text-sm">Build the Habits</p>
-                      <p className="text-white/40 text-xs">Take daily actions to reach this path</p>
+                      <p className="text-white/50 text-xs">Take daily actions to reach this path</p>
                     </div>
                   </a>
                 </Link>
@@ -430,7 +430,7 @@ export default function LifeOutcomes() {
                     <Brain className="w-8 h-8 text-[#00D4FF] flex-shrink-0 group-hover:scale-110 transition-transform" />
                     <div>
                       <p className="text-white font-medium text-sm">Ask Your Coach</p>
-                      <p className="text-white/40 text-xs">Get guidance on reaching this outcome</p>
+                      <p className="text-white/50 text-xs">Get guidance on reaching this outcome</p>
                     </div>
                   </a>
                 </Link>
@@ -439,7 +439,7 @@ export default function LifeOutcomes() {
                     <GitBranch className="w-8 h-8 text-purple-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
                     <div>
                       <p className="text-white font-medium text-sm">Alternate Timeline</p>
-                      <p className="text-white/40 text-xs">Compare decision paths side by side</p>
+                      <p className="text-white/50 text-xs">Compare decision paths side by side</p>
                     </div>
                   </a>
                 </Link>

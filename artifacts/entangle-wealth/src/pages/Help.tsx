@@ -49,19 +49,19 @@ export default function Help() {
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-3">
             Help <span className="electric-text">Center</span>
           </h1>
-          <p className="text-white/40 max-w-lg mx-auto">
+          <p className="text-white/50 max-w-lg mx-auto">
             Find answers to common questions or submit a support ticket for
             personalized assistance.
           </p>
         </div>
 
         <div className="relative mb-8 max-w-xl mx-auto">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search for help..."
-            className="w-full h-12 pl-12 pr-4 text-sm bg-white/[0.03] border border-white/[0.08] rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/40 transition-colors"
+            className="w-full h-12 pl-12 pr-4 text-sm bg-white/[0.03] border border-white/[0.08] rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/40 transition-colors"
           />
         </div>
 
@@ -128,7 +128,7 @@ export default function Help() {
                     className="w-full flex items-center justify-between px-5 py-4 text-left"
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <span className="text-[10px] font-mono text-white/20 uppercase tracking-wider shrink-0 w-20">
+                      <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider shrink-0 w-20">
                         {
                           FAQ_CATEGORIES.find((c) => c.key === faq.category)
                             ?.label
@@ -141,7 +141,7 @@ export default function Help() {
                     {isOpen ? (
                       <ChevronUp className="w-4 h-4 text-[#00D4FF] shrink-0 ml-2" />
                     ) : (
-                      <ChevronDown className="w-4 h-4 text-white/20 shrink-0 ml-2" />
+                      <ChevronDown className="w-4 h-4 text-white/40 shrink-0 ml-2" />
                     )}
                   </button>
                   {isOpen && (
@@ -167,7 +167,7 @@ export default function Help() {
           <h2 className="text-xl font-bold text-white mb-2">
             Still need help?
           </h2>
-          <p className="text-white/40 text-sm mb-6 max-w-md mx-auto">
+          <p className="text-white/50 text-sm mb-6 max-w-md mx-auto">
             Can't find what you're looking for? Submit a support ticket and our
             team will get back to you within 1–2 business days.
           </p>
@@ -181,7 +181,7 @@ export default function Help() {
         <div className="mt-8 text-center">
           <Link
             href="/status"
-            className="text-xs text-white/20 hover:text-[#00D4FF] transition-colors"
+            className="text-xs text-white/50 hover:text-[#00D4FF] transition-colors"
           >
             Check system status
           </Link>

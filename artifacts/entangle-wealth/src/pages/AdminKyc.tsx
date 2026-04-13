@@ -322,7 +322,7 @@ export default function AdminKyc() {
                         <div className="grid grid-cols-2 gap-3">
                           {s.idPhotoUrl && (
                             <div>
-                              <p className="text-xs text-white/40 mb-1">Government ID</p>
+                              <p className="text-xs text-white/50 mb-1">Government ID</p>
                               <div
                                 className="relative cursor-pointer group"
                                 onClick={() => setPreviewUrl(getDocUrl(s.kycIdPhotoPath!))}
@@ -344,7 +344,7 @@ export default function AdminKyc() {
                           )}
                           {s.selfieUrl && (
                             <div>
-                              <p className="text-xs text-white/40 mb-1">Selfie with ID</p>
+                              <p className="text-xs text-white/50 mb-1">Selfie with ID</p>
                               <div
                                 className="relative cursor-pointer group"
                                 onClick={() => setPreviewUrl(getDocUrl(s.kycSelfiePath!))}
@@ -370,7 +370,7 @@ export default function AdminKyc() {
 
                     {!s.kycFullLegalName && !s.kycDateOfBirth && !s.idPhotoUrl && !s.selfieUrl && (
                       <div className="mb-4 p-3 rounded-lg border border-white/5 bg-white/[0.02]">
-                        <p className="text-xs text-white/40">No details or documents in this submission</p>
+                        <p className="text-xs text-white/50">No details or documents in this submission</p>
                       </div>
                     )}
 
@@ -442,7 +442,7 @@ export default function AdminKyc() {
                         <div className="grid grid-cols-3 gap-3">
                           {s.docUrls.map((url, idx) => (
                             <div key={idx}>
-                              <p className="text-[10px] text-white/40 mb-1">Document {idx + 1}</p>
+                              <p className="text-[10px] text-white/50 mb-1">Document {idx + 1}</p>
                               <div className="relative cursor-pointer group" onClick={() => setPreviewUrl(url)}>
                                 <DocImageOrPlaceholder url={url} alt={`Business doc ${idx + 1}`} />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-colors flex items-center justify-center">

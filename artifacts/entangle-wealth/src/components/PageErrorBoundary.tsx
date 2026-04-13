@@ -32,7 +32,7 @@ export class PageErrorBoundary extends Component<Props, State> {
             <h2 className="text-base font-semibold text-white/70">
               {this.props.fallbackTitle ?? "Something went wrong"}
             </h2>
-            <p className="text-sm text-white/40 max-w-sm">
+            <p className="text-sm text-white/50 max-w-sm">
               This section encountered an error. Your data is safe — try refreshing.
             </p>
           </div>

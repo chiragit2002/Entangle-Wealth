@@ -210,10 +210,19 @@ export default function Screener() {
   }, [search, sectorFilter, signalFilter, changeFilter, sortField, sortDir, analyzedStocks]);
 
   const SortHeader = ({ field, children, className = "" }: { field: SortField; children: React.ReactNode; className?: string }) => (
-    <button onClick={() => handleSort(field)} className={`flex items-center gap-1 text-[9px] font-bold text-white/25 uppercase tracking-wider hover:text-white/50 transition-colors ${className}`}>
-      {children}
-      {sortField === field && <span className="text-primary">{sortDir === "asc" ? "↑" : "↓"}</span>}
-    </button>
+    <div
+      role="columnheader"
+      aria-sort={sortField === field ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
+      className={`flex ${className}`}
+    >
+      <button
+        onClick={() => handleSort(field)}
+        className="flex items-center gap-1 text-[9px] font-bold text-white/25 uppercase tracking-wider hover:text-white/50 transition-colors"
+      >
+        {children}
+        {sortField === field && <span className="text-primary">{sortDir === "asc" ? "↑" : "↓"}</span>}
+      </button>
+    </div>
   );
 
   const sigBadge = (signal: string) => {
@@ -233,14 +242,14 @@ export default function Screener() {
             <div className="flex items-center gap-3">
               <Filter className="w-4 h-4 text-primary" />
               <span className="text-[13px] font-bold">Stock Screener</span>
-              <span className="text-[10px] text-white/15 font-mono">{filteredStocks.length} stocks</span>
+              <span className="text-[10px] text-white/50 font-mono">{filteredStocks.length} stocks</span>
               {isLive && <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#00ff88]/10 text-[#00ff88] animate-pulse">LIVE</span>}
             </div>
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-white/15" />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-white/40" />
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Filter..."
-                  className="bg-white/[0.04] border border-white/[0.06] rounded-lg pl-8 pr-3 py-1.5 text-[12px] text-white w-[180px] focus:outline-none focus:border-primary/30 placeholder:text-white/10 font-mono" />
+                  className="bg-white/[0.04] border border-white/[0.06] rounded-lg pl-8 pr-3 py-1.5 text-[12px] text-white w-[180px] focus:outline-none focus:border-primary/30 placeholder:text-white/40 font-mono" />
               </div>
               <Button variant="outline" size="sm" className="border-white/[0.06] text-white/30 text-[10px] h-7 gap-1" onClick={analyzeAll}>
                 <Zap className="w-3 h-3" /> Scan All
@@ -273,7 +282,7 @@ export default function Screener() {
             </select>
             {(sectorFilter !== "All" || signalFilter !== "All" || changeFilter !== "All") && (
               <button onClick={() => { setSectorFilter("All"); setSignalFilter("All"); setChangeFilter("All"); }}
-                className="text-[10px] text-white/20 hover:text-white/40 flex items-center gap-1 px-2">
+                className="text-[10px] text-white/50 hover:text-white/40 flex items-center gap-1 px-2">
                 <X className="w-3 h-3" /> Clear
               </button>
             )}
@@ -281,81 +290,85 @@ export default function Screener() {
         )}
 
         <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden">
-          <div className="grid grid-cols-[40px_1fr_90px_80px_70px_80px_70px_100px_80px_40px] items-center px-4 py-2.5 border-b border-white/[0.04] gap-2">
-            <span className="text-[9px] font-bold text-white/15">#</span>
-            <SortHeader field="symbol">Symbol</SortHeader>
-            <SortHeader field="price" className="justify-end">Price</SortHeader>
-            <SortHeader field="change" className="justify-end">Change</SortHeader>
-            <span className="text-[9px] font-bold text-white/15 text-right">Volume</span>
-            <span className="text-[9px] font-bold text-white/15 text-right">Mkt Cap</span>
-            <SortHeader field="pe" className="justify-end">P/E</SortHeader>
-            <span className="text-[9px] font-bold text-white/15 text-center">AI Signal</span>
-            <SortHeader field="confidence" className="justify-end">Conf.</SortHeader>
-            <span />
-          </div>
-
-          <div className="max-h-[calc(100vh-240px)] overflow-y-auto">
-            {filteredStocks.length === 0 && (
-              <div className="text-center py-16">
-                <p className="text-white/30 text-sm font-semibold mb-1">No stocks match your filters</p>
-                <p className="text-white/15 text-xs">Try adjusting your search or filter criteria.</p>
+          <div className="overflow-x-auto">
+            <div className="min-w-[640px]">
+              <div className="grid grid-cols-[40px_1fr_90px_80px_70px_80px_70px_100px_80px_40px] items-center px-4 py-2.5 border-b border-white/[0.04] gap-2">
+                <span className="text-[9px] font-bold text-white/40">#</span>
+                <SortHeader field="symbol">Symbol</SortHeader>
+                <SortHeader field="price" className="justify-end">Price</SortHeader>
+                <SortHeader field="change" className="justify-end">Change</SortHeader>
+                <span className="text-[9px] font-bold text-white/40 text-right">Volume</span>
+                <span className="text-[9px] font-bold text-white/40 text-right">Mkt Cap</span>
+                <SortHeader field="pe" className="justify-end">P/E</SortHeader>
+                <span className="text-[9px] font-bold text-white/40 text-center">AI Signal</span>
+                <SortHeader field="confidence" className="justify-end">Conf.</SortHeader>
+                <span />
               </div>
-            )}
-            {filteredStocks.map((stock, i) => {
-              const analysis = analyzedStocks.get(stock.symbol);
-              const isAnalyzing = analyzing.has(stock.symbol);
-              const inWL = watchlist.has(stock.symbol);
-              const w52pos = ((stock.price - stock.week52Low) / (stock.week52High - stock.week52Low)) * 100;
-              return (
-                <div key={stock.symbol} className="grid grid-cols-[40px_1fr_90px_80px_70px_80px_70px_100px_80px_40px] items-center px-4 py-2 border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors gap-2 group">
-                  <span className="text-[10px] text-white/10 font-mono">{i + 1}</span>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <Link href="/technical" className="text-[13px] font-bold font-mono hover:text-primary transition-colors">{stock.symbol}</Link>
-                      <span className="text-[9px] text-white/15 px-1.5 py-0.5 rounded bg-white/[0.02] border border-white/[0.04]">{stock.sector}</span>
-                    </div>
-                    <p className="text-[9px] text-white/20 truncate">{stock.name}</p>
-                    <div className="w-full bg-white/[0.03] rounded-full h-0.5 mt-1">
-                      <div className="h-full rounded-full bg-primary/30" style={{ width: `${Math.min(100, Math.max(0, w52pos))}%` }} />
-                    </div>
+
+              <div className="max-h-[calc(100vh-240px)] overflow-y-auto">
+                {filteredStocks.length === 0 && (
+                  <div className="text-center py-16">
+                    <p className="text-white/50 text-sm font-semibold mb-1">No stocks match your filters</p>
+                    <p className="text-white/50 text-xs">Try adjusting your search or filter criteria.</p>
                   </div>
-                  <span className="text-[13px] font-mono font-bold text-right">${stock.price.toFixed(2)}</span>
-                  <span className={`text-[12px] font-mono font-bold text-right ${stock.change >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
-                    {stock.change >= 0 ? "+" : ""}{Math.abs(stock.change).toFixed(2)}%
-                  </span>
-                  <span className="text-[10px] font-mono text-white/25 text-right">{stock.volume}</span>
-                  <span className="text-[10px] font-mono text-white/25 text-right">{stock.marketCap}</span>
-                  <span className="text-[10px] font-mono text-white/30 text-right">{stock.pe ? stock.pe.toFixed(1) : "—"}</span>
-                  <div className="text-center">
-                    {isAnalyzing ? (
-                      <RefreshCw className="w-3 h-3 text-primary animate-spin mx-auto" />
-                    ) : analysis ? (
-                      sigBadge(analysis.signal)
-                    ) : (
-                      <button onClick={() => analyzeStock(stock.symbol)} className="text-[9px] text-white/15 hover:text-primary transition-colors font-mono">
-                        Analyze
+                )}
+                {filteredStocks.map((stock, i) => {
+                  const analysis = analyzedStocks.get(stock.symbol);
+                  const isAnalyzing = analyzing.has(stock.symbol);
+                  const inWL = watchlist.has(stock.symbol);
+                  const w52pos = ((stock.price - stock.week52Low) / (stock.week52High - stock.week52Low)) * 100;
+                  return (
+                    <div key={stock.symbol} className="grid grid-cols-[40px_1fr_90px_80px_70px_80px_70px_100px_80px_40px] items-center px-4 py-2 border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors gap-2 group">
+                      <span className="text-[10px] text-white/30 font-mono">{i + 1}</span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <Link href="/technical" className="text-[13px] font-bold font-mono hover:text-primary transition-colors">{stock.symbol}</Link>
+                          <span className="text-[9px] text-white/40 px-1.5 py-0.5 rounded bg-white/[0.02] border border-white/[0.04]">{stock.sector}</span>
+                        </div>
+                        <p className="text-[9px] text-white/40 truncate">{stock.name}</p>
+                        <div className="w-full bg-white/[0.03] rounded-full h-0.5 mt-1">
+                          <div className="h-full rounded-full bg-primary/30" style={{ width: `${Math.min(100, Math.max(0, w52pos))}%` }} />
+                        </div>
+                      </div>
+                      <span className="text-[13px] font-mono font-bold text-right">${stock.price.toFixed(2)}</span>
+                      <span className={`text-[12px] font-mono font-bold text-right ${stock.change >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
+                        {stock.change >= 0 ? "+" : ""}{Math.abs(stock.change).toFixed(2)}%
+                      </span>
+                      <span className="text-[10px] font-mono text-white/40 text-right">{stock.volume}</span>
+                      <span className="text-[10px] font-mono text-white/40 text-right">{stock.marketCap}</span>
+                      <span className="text-[10px] font-mono text-white/40 text-right">{stock.pe ? stock.pe.toFixed(1) : "—"}</span>
+                      <div className="text-center">
+                        {isAnalyzing ? (
+                          <RefreshCw className="w-3 h-3 text-primary animate-spin mx-auto" />
+                        ) : analysis ? (
+                          sigBadge(analysis.signal)
+                        ) : (
+                          <button onClick={() => analyzeStock(stock.symbol)} className="text-[9px] text-white/40 hover:text-primary transition-colors font-mono">
+                            Analyze
+                          </button>
+                        )}
+                      </div>
+                      <span className="text-[11px] font-mono text-right text-white/40">
+                        {analysis ? `${analysis.confidence}%` : "—"}
+                      </span>
+                      <button onClick={() => {
+                        const next = new Set(watchlist);
+                        if (inWL) next.delete(stock.symbol); else next.add(stock.symbol);
+                        setWatchlist(next);
+                        toast({ title: inWL ? "Removed" : "Added", description: `${stock.symbol} ${inWL ? "removed from" : "added to"} watchlist` });
+                      }} className={`p-1 rounded transition-colors ${inWL ? "text-[#ffd700]" : "text-white/40 group-hover:text-white/40 hover:!text-white/60"}`}>
+                        {inWL ? <BookmarkCheck className="w-3 h-3" /> : <Bookmark className="w-3 h-3" />}
                       </button>
-                    )}
-                  </div>
-                  <span className="text-[11px] font-mono text-right text-white/25">
-                    {analysis ? `${analysis.confidence}%` : "—"}
-                  </span>
-                  <button onClick={() => {
-                    const next = new Set(watchlist);
-                    if (inWL) next.delete(stock.symbol); else next.add(stock.symbol);
-                    setWatchlist(next);
-                    toast({ title: inWL ? "Removed" : "Added", description: `${stock.symbol} ${inWL ? "removed from" : "added to"} watchlist` });
-                  }} className={`p-1 rounded transition-colors ${inWL ? "text-[#ffd700]" : "text-white/5 group-hover:text-white/15 hover:!text-white/30"}`}>
-                    {inWL ? <BookmarkCheck className="w-3 h-3" /> : <Bookmark className="w-3 h-3" />}
-                  </button>
-                </div>
-              );
-            })}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
         <div className="mt-3 rounded-lg bg-white/[0.01] border border-white/[0.04] p-3">
-          <p className="text-[10px] text-white/15 text-center">
+          <p className="text-[10px] text-white/50 text-center">
             {isLive ? "Live prices powered by Alpaca Markets (IEX feed)." : "Prices are pre-loaded estimates."} AI signals run 55+ technical indicators on {isLive ? "real historical" : "simulated"} OHLCV data. Results are for educational purposes only.
           </p>
         </div>

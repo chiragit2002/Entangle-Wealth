@@ -228,7 +228,7 @@ export default function Earn() {
           </CardContent>
         </Card>
 
-        <p className="text-xs text-white/20 text-center pb-4">Demo data — opportunities and earnings shown are examples, not guarantees.</p>
+        <p className="text-xs text-white/50 text-center pb-4">Demo data — opportunities and earnings shown are examples, not guarantees.</p>
 
         <AnniversaryGiveawayBanner />
         <ReferralSection />

@@ -1,6 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
 
-// ATTORNEY REVIEW: This Accessibility Statement should be reviewed by legal counsel to ensure compliance with ADA, Section 508, and applicable state laws.
 export default function Accessibility() {
   return (
     <Layout>
@@ -8,7 +7,7 @@ export default function Accessibility() {
         <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-2">
           Accessibility <span className="electric-text">Statement</span>
         </h1>
-        <p className="text-sm text-white/20 mb-10 font-mono">Last Updated: April 11, 2026</p>
+        <p className="text-sm text-white/50 mb-10 font-mono">Last Updated: April 11, 2026</p>
 
         <div className="space-y-10 text-white/60 leading-relaxed">
           <section>
@@ -16,7 +15,6 @@ export default function Accessibility() {
             <p>EntangleWealth is committed to ensuring digital accessibility for people with disabilities. We are continually improving the user experience for everyone and applying the relevant accessibility standards to ensure we provide equal access to all users.</p>
           </section>
 
-          {/* ATTORNEY REVIEW: Confirm WCAG version and conformance level target */}
           <section>
             <h2 className="text-xl font-bold text-white mb-3">Conformance Goal</h2>
             <p>We aim to conform to the <strong className="text-white">Web Content Accessibility Guidelines (WCAG) 2.1, Level AA</strong>. These guidelines explain how to make web content more accessible to people with a wide range of disabilities, including:</p>

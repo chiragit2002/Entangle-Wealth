@@ -318,12 +318,12 @@ export default function HabitsDashboard() {
               <Target className="w-10 h-10 text-white/10 mx-auto mb-3" />
               {activeCategory === "all" ? (
                 <>
-                  <p className="text-white/40 text-sm font-medium">No habits available</p>
-                  <p className="text-white/20 text-xs mt-1">Check back later — habits are refreshed regularly.</p>
+                  <p className="text-white/50 text-sm font-medium">No habits available</p>
+                  <p className="text-white/50 text-xs mt-1">Check back later — habits are refreshed regularly.</p>
                 </>
               ) : (
                 <>
-                  <p className="text-white/40 text-sm font-medium">No habits in "{activeCategory}"</p>
+                  <p className="text-white/50 text-sm font-medium">No habits in "{activeCategory}"</p>
                   <button onClick={() => setActiveCategory("all")} className="mt-3 text-xs text-[#00D4FF] hover:underline">View all habits</button>
                 </>
               )}
@@ -423,7 +423,7 @@ export default function HabitsDashboard() {
                 <TrendingUp className="w-8 h-8 text-[#00D4FF] flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <div>
                   <p className="text-white font-medium text-sm">Life Outcomes</p>
-                  <p className="text-white/40 text-xs">See your habit impact projected forward</p>
+                  <p className="text-white/50 text-xs">See your habit impact projected forward</p>
                 </div>
               </a>
             </Link>
@@ -432,7 +432,7 @@ export default function HabitsDashboard() {
                 <Activity className="w-8 h-8 text-purple-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <div>
                   <p className="text-white font-medium text-sm">AI Coach</p>
-                  <p className="text-white/40 text-xs">Get personalized behavioral guidance</p>
+                  <p className="text-white/50 text-xs">Get personalized behavioral guidance</p>
                 </div>
               </a>
             </Link>
@@ -441,7 +441,7 @@ export default function HabitsDashboard() {
                 <GitBranch className="w-8 h-8 text-emerald-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <div>
                   <p className="text-white font-medium text-sm">Alternate Timeline</p>
-                  <p className="text-white/40 text-xs">Model what-if financial decisions</p>
+                  <p className="text-white/50 text-xs">Model what-if financial decisions</p>
                 </div>
               </a>
             </Link>

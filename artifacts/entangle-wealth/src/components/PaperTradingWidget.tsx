@@ -138,7 +138,7 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
             <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>
               {pnl >= 0 ? '+' : ''}{pnlPct}%
             </span>
-            <button onClick={(e) => { e.stopPropagation(); setIsMinimized(true); }} className="text-white/20 hover:text-white/50 transition-colors">
+            <button onClick={(e) => { e.stopPropagation(); setIsMinimized(true); }} className="text-white/50 hover:text-white/50 transition-colors">
               <X className="w-3 h-3" />
             </button>
           </div>
@@ -170,9 +170,9 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
           </div>
 
           <div className="grid grid-cols-3 gap-1">
-            <input value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30" />
-            <input value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30" />
-            <input value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30" />
+            <input value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/30" />
+            <input value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/30" />
+            <input value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/30" />
           </div>
 
           <div className="flex gap-1">
@@ -221,7 +221,7 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
           )}
 
           {portfolio.positions.length > 0 && (
-            <button onClick={() => setIsExpanded(v => !v)} className="w-full flex items-center justify-center gap-1 py-0.5 text-[8px] font-mono text-white/20 hover:text-white/40 transition-colors">
+            <button onClick={() => setIsExpanded(v => !v)} className="w-full flex items-center justify-center gap-1 py-0.5 text-[8px] font-mono text-white/40 hover:text-white/40 transition-colors">
               {isExpanded ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
               {isExpanded ? "COLLAPSE" : `${portfolio.positions.length} POSITION${portfolio.positions.length !== 1 ? 'S' : ''}`}
             </button>
@@ -281,9 +281,9 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
         </div>
 
         <div className="grid grid-cols-3 gap-1">
-          <input value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30" />
-          <input value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30" />
-          <input value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/15 focus:outline-none focus:border-[#00D4FF]/30" />
+          <input value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/30" />
+          <input value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/30" />
+          <input value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/30" />
         </div>
 
         <div className="flex gap-1">

@@ -468,7 +468,7 @@ export default function Charts() {
     setClaudeAnalysis(analysis);
     setClaudeLoading(false);
     if (analysis) setShowClaudeModal(true);
-    else toast({ title: "Analysis Failed", description: "Claude API error | check your API key", variant: "destructive" });
+    else toast({ title: "Analysis Failed", description: "Something went wrong — please try again", variant: "destructive" });
   }, [claudeKey, toast]);
 
   const buySignals = useMemo(() => scanResults.filter(r => r.signal === "BUY" || r.signal === "STRONG_BUY").sort((a, b) => b.score - a.score), [scanResults]);

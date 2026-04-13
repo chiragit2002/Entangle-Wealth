@@ -279,7 +279,7 @@ export default function Achievements() {
                   <div className={`w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center border ${
                     badge.earned
                       ? CATEGORY_COLORS[badge.category] || "text-white bg-white/10 border-white/20"
-                      : "text-white/20 bg-white/5 border-white/10"
+                      : "text-white/40 bg-white/5 border-white/10"
                   }`}>
                     {badge.isSecret && !badge.earned ? (
                       <Lock className="w-6 h-6" />

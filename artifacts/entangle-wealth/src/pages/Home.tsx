@@ -180,7 +180,7 @@ class HomeErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundary
     if (this.state.hasError) {
       return (
         <div className="flex flex-col items-center justify-center py-20 px-4 text-center space-y-4">
-          <AlertCircle className="w-10 h-10 text-white/20" />
+          <AlertCircle className="w-10 h-10 text-white/40" />
           <p className="text-base text-white/50 font-medium">Something went wrong loading this page.</p>
           <p className="text-sm text-white/30">Please refresh to try again.</p>
           <Button
@@ -680,7 +680,7 @@ export default function Home() {
               <h2 className="text-2xl md:text-4xl font-bold text-white mb-3">
                 What members are saying
               </h2>
-              <p className="text-sm text-white/40">Real experiences from Entangled Wealth users.</p>
+              <p className="text-sm text-white/50">Real experiences from Entangled Wealth users.</p>
             </div>
 
             {testimonialsState.error && (

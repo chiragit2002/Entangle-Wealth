@@ -1,7 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 import { Link } from "wouter";
 
-// ATTORNEY REVIEW: This entire Cookie Policy page requires review by legal counsel before production use.
 export default function Cookies() {
   return (
     <Layout>
@@ -9,10 +8,9 @@ export default function Cookies() {
         <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-2">
           Cookie <span className="electric-text">Policy</span>
         </h1>
-        <p className="text-sm text-white/20 mb-10 font-mono">Last Updated: April 11, 2026</p>
+        <p className="text-sm text-white/50 mb-10 font-mono">Last Updated: April 11, 2026</p>
 
         <div className="space-y-10 text-white/60 leading-relaxed">
-          {/* ATTORNEY REVIEW: Section 1 | verify scope and legal definitions for your jurisdiction */}
           <section>
             <h2 className="text-xl font-bold text-white mb-3">1. What Are Cookies</h2>
             <p>Cookies are small text files that are placed on your computer or mobile device when you visit a website. They are widely used to make websites work more efficiently, provide a better user experience, and give website owners usage information.</p>
@@ -45,7 +43,6 @@ export default function Cookies() {
               <li><strong className="text-white/80">Session identifiers:</strong> Anonymous session IDs to group usage events within a single visit</li>
             </ul>
 
-            {/* ATTORNEY REVIEW: Add third-party analytics cookies if applicable (e.g., Google Analytics) */}
             <h3 className="text-base font-semibold text-white/80 mt-5 mb-2">2.4 Third-Party Cookies</h3>
             <p>Our platform integrates with third-party services that may set their own cookies:</p>
             <ul className="list-disc list-inside mt-3 space-y-2 ml-4">
@@ -64,7 +61,6 @@ export default function Cookies() {
             </ul>
           </section>
 
-          {/* ATTORNEY REVIEW: Verify data retention periods comply with applicable regulations */}
           <section>
             <h2 className="text-xl font-bold text-white mb-3">4. Cookie Retention</h2>
             <p>Different cookies have different lifespans:</p>
@@ -90,7 +86,7 @@ export default function Cookies() {
           </section>
 
           <section>
-            <p className="text-xs text-white/20">See also: <Link href="/privacy" className="text-[#00D4FF] hover:underline">Privacy Policy</Link> · <Link href="/terms" className="text-[#00D4FF] hover:underline">Terms of Use</Link></p>
+            <p className="text-xs text-white/50">See also: <Link href="/privacy" className="text-[#00D4FF] hover:underline">Privacy Policy</Link> · <Link href="/terms" className="text-[#00D4FF] hover:underline">Terms of Use</Link></p>
           </section>
         </div>
       </div>

@@ -176,14 +176,14 @@ function CandlestickChartBase({ data, symbol, height = 380 }: CandlestickChartPr
         <div className="flex items-center gap-3">
           <span className="text-[12px] font-bold font-mono">{symbol}</span>
           <span className="text-[11px] font-mono text-white/30">OHLCV</span>
-          <span className="text-[10px] text-white/15 font-mono">{bars.length} bars</span>
+          <span className="text-[10px] text-white/50 font-mono">{bars.length} bars</span>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-[11px] font-mono font-bold">${lastPrice.toFixed(2)}</span>
           <span className={`text-[10px] font-mono font-bold ${isUp ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
             {isUp ? "+" : ""}{pctChange}%
           </span>
-          <div className="flex items-center gap-2 text-[9px] text-white/15">
+          <div className="flex items-center gap-2 text-[9px] text-white/40">
             <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-[#ffd700] inline-block rounded" />SMA20</span>
             <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-[#a855f7] inline-block rounded" />SMA50</span>
           </div>

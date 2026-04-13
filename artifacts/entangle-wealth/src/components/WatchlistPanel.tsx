@@ -55,7 +55,7 @@ export function WatchlistPanel({ externalItems, onRemove }: WatchlistPanelProps 
         <div className="flex flex-col items-center justify-center py-8 text-center gap-1.5">
           <Eye className="w-8 h-8 text-white/10 mb-1" />
           <p className="text-xs font-medium text-white/30">Your watchlist is empty</p>
-          <p className="text-[10px] text-white/15 max-w-[140px] leading-relaxed">Bookmark a signal from the Signals page to track it here</p>
+          <p className="text-[10px] text-white/50 max-w-[140px] leading-relaxed">Bookmark a signal from the Signals page to track it here</p>
         </div>
       ) : (
         <div className="space-y-1">
@@ -83,7 +83,7 @@ export function WatchlistPanel({ externalItems, onRemove }: WatchlistPanelProps 
                 </div>
                 <button
                   onClick={() => toggleAlert(item.symbol)}
-                  className={`p-1 rounded transition-colors ${hasAlert ? "text-secondary" : "text-white/20 hover:text-white/40"}`}
+                  className={`p-1 rounded transition-colors ${hasAlert ? "text-secondary" : "text-white/40 hover:text-white/40"}`}
                   aria-label={hasAlert ? `Disable alert for ${item.symbol}` : `Enable alert for ${item.symbol}`}
                 >
                   {hasAlert ? <Bell className="w-3 h-3" /> : <BellOff className="w-3 h-3" />}

@@ -143,7 +143,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
           </div>
           <div>
             <h2 className="text-lg font-bold text-white">TaxFlow Setup</h2>
-            <p className="text-[11px] text-white/40">Step {step} of {totalSteps}</p>
+            <p className="text-[11px] text-white/50">Step {step} of {totalSteps}</p>
           </div>
         </div>
 
@@ -159,7 +159,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
               <Building2 className="w-5 h-5 text-[#00c8f8]" />
               <h3 className="font-semibold text-white">What describes you best?</h3>
             </div>
-            <p className="text-[11px] text-white/40 mb-4">Select your primary business structure — this determines which tax strategies and deductions apply to you.</p>
+            <p className="text-[11px] text-white/50 mb-4">Select your primary business structure — this determines which tax strategies and deductions apply to you.</p>
             <div className="space-y-2">
               {(Object.entries(ENTITY_LABELS) as [EntityType, string][]).map(([key, label]) => (
                 <button

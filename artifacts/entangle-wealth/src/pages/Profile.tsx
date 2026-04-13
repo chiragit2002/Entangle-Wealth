@@ -120,7 +120,7 @@ function MyFeedback() {
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
                   {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className={`w-3.5 h-3.5 ${s <= fb.rating ? "text-[#FFD700] fill-[#FFD700]" : "text-white/20"}`} />
+                    <Star key={s} className={`w-3.5 h-3.5 ${s <= fb.rating ? "text-[#FFD700] fill-[#FFD700]" : "text-white/40"}`} />
                   ))}
                 </div>
                 <span className="text-xs px-2 py-0.5 rounded-full capitalize text-white/50" style={{ background: "rgba(255,255,255,0.05)" }}>
@@ -694,7 +694,7 @@ export default function Profile() {
             </div>
             <div className="flex gap-2">
               {editing && (
-                <Button variant="ghost" size="sm" className="text-white/40 hover:text-white/60" onClick={() => setEditing(false)}>
+                <Button variant="ghost" size="sm" className="text-white/50 hover:text-white/60" onClick={() => setEditing(false)}>
                   Cancel
                 </Button>
               )}

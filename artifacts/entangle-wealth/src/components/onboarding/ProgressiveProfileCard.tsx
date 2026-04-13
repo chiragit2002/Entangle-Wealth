@@ -122,7 +122,7 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
         </div>
         <button
           onClick={dismiss}
-          className="text-white/20 hover:text-white/50 transition-colors p-0.5 shrink-0"
+          className="text-white/50 hover:text-white/50 transition-colors p-0.5 shrink-0"
           aria-label="Dismiss"
         >
           <X className="w-3.5 h-3.5" />

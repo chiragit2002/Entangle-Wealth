@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, serial, boolean, real, unique } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer, serial, boolean, real, unique, index } from "drizzle-orm/pg-core";
 import { usersTable } from "./users";
 
 export const userXpTable = pgTable("user_xp", {
@@ -96,11 +96,18 @@ export const leaderboardSnapshotsTable = pgTable("leaderboard_snapshots", {
 export const dailySpinsTable = pgTable("daily_spins", {
   id: serial("id").primaryKey(),
   userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
-  reward: text("reward").notNull(),
-  rewardType: text("reward_type").notNull(),
+  spinDate: text("spin_date").notNull().default(""),
+  prizeAmount: real("prize_amount").notNull().default(0),
+  rewardType: text("reward_type").notNull().default("cash"),
+  rewardLabel: text("reward_label").notNull().default(""),
+  reward: text("reward").default(""),
   rewardValue: integer("reward_value").notNull().default(0),
   spunAt: timestamp("spun_at", { withTimezone: true }).defaultNow(),
-});
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+}, (table) => ({
+  userSpinDateUniq: unique("daily_spins_user_spin_date_uniq").on(table.userId, table.spinDate),
+  userIdIdx: index("idx_daily_spins_user_id").on(table.userId),
+}));
 
 export const founderStatusTable = pgTable("founder_status", {
   id: serial("id").primaryKey(),

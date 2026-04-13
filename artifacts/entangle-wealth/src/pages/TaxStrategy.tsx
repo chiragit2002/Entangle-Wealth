@@ -166,7 +166,7 @@ export default function TaxStrategy() {
                       {isExpanded ? <ChevronUp className="w-4 h-4 text-white/30" /> : <ChevronDown className="w-4 h-4 text-white/30" />}
                     </div>
                   </div>
-                  <p className="text-[12px] text-white/40">{strategy.maxBenefit}</p>
+                  <p className="text-[12px] text-white/50">{strategy.maxBenefit}</p>
                   {estimated !== null && estimated > 0 && (
                     <p className="text-[13px] font-mono font-bold text-[#00e676] mt-1">
                       Est. deduction: {formatDollar(Math.round(estimated))}

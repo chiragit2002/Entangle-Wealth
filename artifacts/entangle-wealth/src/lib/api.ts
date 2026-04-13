@@ -121,8 +121,8 @@ export async function analyzeStock(symbol: string): Promise<FullAnalysis> {
     headers: { "Content-Type": "application/json" },
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: "Analysis failed" }));
-    throw new Error(err.error || "Analysis failed");
+    const err = await res.json().catch(() => ({ error: "Something went wrong — please try again" }));
+    throw new Error(err.error || "Something went wrong — please try again");
   }
   return res.json();
 }

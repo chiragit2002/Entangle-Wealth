@@ -60,7 +60,7 @@ export function WeeklyProgressCard() {
           <div className="flex items-center gap-2">
             <Trophy className="w-3.5 h-3.5 text-[#f5c842]" />
             <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#f5c842]">YOUR WEEK IN REVIEW</span>
-            <span className="text-[9px] font-mono text-white/20">·</span>
+            <span className="text-[9px] font-mono text-white/40">·</span>
             <span className="text-[9px] font-mono text-white/30">
               You're in the top {Math.max(1, 100 - summary.percentile)}% of all users
             </span>
@@ -68,13 +68,13 @@ export function WeeklyProgressCard() {
           <div className="flex items-center gap-2">
             <button
               onClick={(e) => { e.stopPropagation(); dismiss(); }}
-              className="text-white/15 hover:text-white/40 transition-colors p-0.5"
+              className="text-white/50 hover:text-white/40 transition-colors p-0.5"
               aria-label="Dismiss weekly summary"
             >
               <X className="w-3 h-3" />
             </button>
             <ChevronUp
-              className={`w-3.5 h-3.5 text-white/20 transition-transform ${collapsed ? "rotate-180" : ""}`}
+              className={`w-3.5 h-3.5 text-white/40 transition-transform ${collapsed ? "rotate-180" : ""}`}
             />
           </div>
         </div>

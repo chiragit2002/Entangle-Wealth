@@ -67,7 +67,7 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
               <h2 id="welcome-modal-title" className="text-lg font-bold text-white leading-tight">
                 {firstName ? `Welcome, ${firstName}!` : "Welcome!"}
               </h2>
-              <p className="text-xs text-white/40 mt-0.5">Quick question before you dive in</p>
+              <p className="text-xs text-white/50 mt-0.5">Quick question before you dive in</p>
             </div>
           </div>
         </div>
@@ -89,7 +89,7 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
               >
                 <div className="flex-1">
                   <p className="text-sm font-semibold">{opt.label}</p>
-                  <p className="text-[11px] text-white/40">{opt.desc}</p>
+                  <p className="text-[11px] text-white/50">{opt.desc}</p>
                 </div>
                 {goal === opt.id && <CheckCircle2 className="w-4 h-4 text-[#00c8f8] shrink-0" aria-hidden="true" />}
               </button>

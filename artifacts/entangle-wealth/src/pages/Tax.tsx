@@ -273,7 +273,7 @@ export default function Tax() {
         )}
 
         <div className="glass-panel rounded-xl p-4 mb-6 border border-[rgba(255,215,0,0.15)] bg-[rgba(255,215,0,0.02)]">
-          <p className="text-[12px] text-white/40 leading-relaxed">
+          <p className="text-[12px] text-white/50 leading-relaxed">
             For education only. Not tax advice — consult a licensed CPA for your specific situation.
           </p>
         </div>

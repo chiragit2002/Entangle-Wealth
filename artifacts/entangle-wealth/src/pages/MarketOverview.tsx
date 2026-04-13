@@ -235,10 +235,10 @@ export default function MarketOverview() {
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-[11px] font-mono text-white/20">
+              <span className="text-[11px] font-mono text-white/40">
                 {clock.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} ET
               </span>
-              <span className="text-[10px] text-white/15">A/D: <span className="text-[#00ff88]">{advDecl.adv}</span>/<span className="text-[#ff3366]">{advDecl.decl}</span> ({advDecl.ratio}%)</span>
+              <span className="text-[10px] text-white/50">A/D: <span className="text-[#00ff88]">{advDecl.adv}</span>/<span className="text-[#ff3366]">{advDecl.decl}</span> ({advDecl.ratio}%)</span>
             </div>
           </div>
         </div>
@@ -261,7 +261,7 @@ export default function MarketOverview() {
                   ({idx.changePercent >= 0 ? "+" : ""}{Math.abs(idx.changePercent).toFixed(2)}%)
                 </span>
               </div>
-              <p className="text-[9px] text-white/15 mt-1">{idx.name}</p>
+              <p className="text-[9px] text-white/40 mt-1">{idx.name}</p>
             </div>
           ))}
         </div>
@@ -269,10 +269,10 @@ export default function MarketOverview() {
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-5">
           {ECON_INDICATORS.map(e => (
             <div key={e.name} className="bg-[#0a0a16] border border-white/[0.04] rounded-lg px-3 py-2">
-              <p className="text-[9px] text-white/20 font-bold uppercase tracking-wider">{e.name}</p>
+              <p className="text-[9px] text-white/40 font-bold uppercase tracking-wider">{e.name}</p>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="text-[14px] font-black font-mono">{e.value}</span>
-                {e.status === "up" ? <ArrowUpRight className="w-3 h-3 text-[#ff3366]" /> : e.status === "down" ? <ArrowDownRight className="w-3 h-3 text-[#00ff88]" /> : <Activity className="w-3 h-3 text-white/20" />}
+                {e.status === "up" ? <ArrowUpRight className="w-3 h-3 text-[#ff3366]" /> : e.status === "down" ? <ArrowDownRight className="w-3 h-3 text-[#00ff88]" /> : <Activity className="w-3 h-3 text-white/40" />}
               </div>
               <p className="text-[8px] text-white/10 mt-0.5">Prev: {e.prev} · {e.date}</p>
             </div>
@@ -290,10 +290,10 @@ export default function MarketOverview() {
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <span className="text-[12px] font-bold">{sector.name}</span>
-                    <span className="text-[9px] text-white/15 ml-2 font-mono">{sector.ticker}</span>
+                    <span className="text-[9px] text-white/40 ml-2 font-mono">{sector.ticker}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[9px] text-white/15">{sector.volume} vol</span>
+                    <span className="text-[9px] text-white/40">{sector.volume} vol</span>
                     <span className={`text-[13px] font-black font-mono ${sector.change >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
                       {sector.change >= 0 ? "+" : ""}{Math.abs(sector.change).toFixed(2)}%
                     </span>
@@ -327,7 +327,7 @@ export default function MarketOverview() {
                   <span className="text-[10px] text-white/10 font-mono w-5">{i + 1}</span>
                   <div className="flex-1 min-w-0">
                     <span className="text-[12px] font-bold font-mono">{s.symbol}</span>
-                    <span className="text-[10px] text-white/20 ml-2">{s.name}</span>
+                    <span className="text-[10px] text-white/50 ml-2">{s.name}</span>
                   </div>
                   <span className="text-[11px] font-mono text-white/40 mr-3">${s.price.toFixed(2)}</span>
                   <span className="text-[12px] font-mono font-bold text-[#00ff88]">+{s.change.toFixed(2)}%</span>
@@ -347,7 +347,7 @@ export default function MarketOverview() {
                   <span className="text-[10px] text-white/10 font-mono w-5">{i + 1}</span>
                   <div className="flex-1 min-w-0">
                     <span className="text-[12px] font-bold font-mono">{s.symbol}</span>
-                    <span className="text-[10px] text-white/20 ml-2">{s.name}</span>
+                    <span className="text-[10px] text-white/50 ml-2">{s.name}</span>
                   </div>
                   <span className="text-[11px] font-mono text-white/40 mr-3">${s.price.toFixed(2)}</span>
                   <span className="text-[12px] font-mono font-bold text-[#ff3366]">{s.change.toFixed(2)}%</span>
@@ -366,7 +366,7 @@ export default function MarketOverview() {
             {GLOBAL_MARKETS.map(m => (
               <div key={m.name} className="bg-[#0a0a16] border border-white/[0.04] rounded-lg px-3 py-2.5 hover:border-white/10 transition-colors">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[9px] text-white/20 font-bold uppercase">{m.region}</span>
+                  <span className="text-[9px] text-white/40 font-bold uppercase">{m.region}</span>
                   {m.change >= 0 ? <ArrowUpRight className="w-2.5 h-2.5 text-[#00ff88]/50" /> : <ArrowDownRight className="w-2.5 h-2.5 text-[#ff3366]/50" />}
                 </div>
                 <p className="text-[11px] font-bold truncate">{m.name}</p>
@@ -382,7 +382,7 @@ export default function MarketOverview() {
         </div>
 
         <div className="rounded-lg bg-white/[0.01] border border-white/[0.04] p-3">
-          <p className="text-[10px] text-white/15 text-center">
+          <p className="text-[10px] text-white/50 text-center">
             {isLive ? "Live market data powered by Alpaca Markets. Stock prices and heat map reflect real-time trading data via IEX feed." : "Loading live data... Falling back to illustrative values."} Economic indicators and global markets are for reference only.
           </p>
         </div>

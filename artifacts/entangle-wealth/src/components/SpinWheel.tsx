@@ -415,7 +415,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
 
         <button
           onClick={() => { setShowHistory(v => !v); if (!historyLoaded) loadHistory(); }}
-          className="mt-2 w-full flex items-center justify-center gap-1 py-1 text-[8px] font-mono text-white/20 hover:text-white/40 transition-colors"
+          className="mt-2 w-full flex items-center justify-center gap-1 py-1 text-[8px] font-mono text-white/40 hover:text-white/40 transition-colors"
         >
           {showHistory ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           {showHistory ? "HIDE HISTORY" : "SPIN HISTORY"}
@@ -424,7 +424,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
         {showHistory && (
           <div className="border-t border-white/[0.06] pt-2 mt-1 max-h-[140px] overflow-y-auto space-y-0.5">
             {history.length === 0 ? (
-              <p className="text-[8px] font-mono text-white/20 text-center py-2">No spins yet</p>
+              <p className="text-[8px] font-mono text-white/40 text-center py-2">No spins yet</p>
             ) : (
               history.map(h => (
                 <div key={h.id} className="flex items-center justify-between py-0.5">

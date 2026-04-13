@@ -267,7 +267,7 @@ export function MirofishTerminal() {
                 <div className="flex items-center gap-2 mb-0.5">
                   <span className="text-white/30">{log.time}</span>
                   <span className={`text-[8px] font-bold ${getLevelColor(log.level)}`}>{log.level}</span>
-                  <span className="text-white/20 text-[8px]">{log.module}</span>
+                  <span className="text-white/50 text-[8px]">{log.module}</span>
                 </div>
                 <p className="text-white/60 leading-tight">{log.message}</p>
               </div>

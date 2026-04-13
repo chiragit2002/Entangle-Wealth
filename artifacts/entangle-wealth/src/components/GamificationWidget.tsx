@@ -179,14 +179,14 @@ export function GamificationWidget() {
                   </div>
                 ))}
                 {data.badges.length > 6 && (
-                  <span className="text-[8px] font-mono text-white/20 self-center">+{data.badges.length - 6}</span>
+                  <span className="text-[8px] font-mono text-white/40 self-center">+{data.badges.length - 6}</span>
                 )}
               </div>
             </div>
           )}
 
           <div className="flex items-center justify-between pt-0.5">
-            <span className="text-[8px] font-mono text-white/15">Weekly: +{data.xp.weeklyXp.toLocaleString()} XP</span>
+            <span className="text-[8px] font-mono text-white/40">Weekly: +{data.xp.weeklyXp.toLocaleString()} XP</span>
             <a href="/achievements" className="flex items-center gap-0.5 text-[8px] font-mono text-[#00D4FF]/50 hover:text-[#00D4FF] transition-colors">
               View All <ChevronRight className="w-2.5 h-2.5" />
             </a>

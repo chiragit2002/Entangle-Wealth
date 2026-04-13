@@ -24,19 +24,19 @@ export function HelpWidget() {
               <HelpCircle className="w-4 h-4 text-[#00D4FF]" />
               <span className="text-sm font-bold text-white">Help</span>
             </div>
-            <button onClick={() => setOpen(false)} className="text-white/20 hover:text-white/50 transition-colors" aria-label="Close help">
+            <button onClick={() => setOpen(false)} className="text-white/50 hover:text-white/50 transition-colors" aria-label="Close help">
               <X className="w-4 h-4" />
             </button>
           </div>
 
           <div className="p-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search FAQ..."
-                className="w-full h-9 pl-9 pr-3 text-xs bg-white/[0.04] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/40 transition-colors"
+                className="w-full h-9 pl-9 pr-3 text-xs bg-white/[0.04] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/40 transition-colors"
                 autoFocus
               />
             </div>
@@ -44,7 +44,7 @@ export function HelpWidget() {
 
           <div className="flex-1 overflow-y-auto px-3 pb-3 min-h-0">
             {search.trim() && results.length === 0 ? (
-              <p className="text-xs text-white/20 text-center py-6">No results found</p>
+              <p className="text-xs text-white/50 text-center py-6">No results found</p>
             ) : search.trim() ? (
               <div className="space-y-1.5">
                 {results.map((faq) => (
@@ -66,14 +66,14 @@ export function HelpWidget() {
                     <ExternalLink className="w-3.5 h-3.5 text-[#00D4FF]" />
                     <span className="text-xs font-medium text-white/60 group-hover:text-white/80">Help Center</span>
                   </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-white/15" />
+                  <ChevronRight className="w-3.5 h-3.5 text-white/40" />
                 </Link>
                 <Link href="/submit-ticket" onClick={() => setOpen(false)} className="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-white/[0.04] transition-colors group">
                   <div className="flex items-center gap-2">
                     <MessageSquarePlus className="w-3.5 h-3.5 text-[#FFD700]" />
                     <span className="text-xs font-medium text-white/60 group-hover:text-white/80">Submit a Ticket</span>
                   </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-white/15" />
+                  <ChevronRight className="w-3.5 h-3.5 text-white/40" />
                 </Link>
                 <Link href="/status" onClick={() => setOpen(false)} className="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-white/[0.04] transition-colors group">
                   <div className="flex items-center gap-2">
@@ -83,7 +83,7 @@ export function HelpWidget() {
                     </span>
                     <span className="text-xs font-medium text-white/60 group-hover:text-white/80">System Status</span>
                   </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-white/15" />
+                  <ChevronRight className="w-3.5 h-3.5 text-white/40" />
                 </Link>
               </div>
             )}

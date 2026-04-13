@@ -35,7 +35,7 @@ const EVENTS: EconEvent[] = [
   { date: "May 3", time: "8:30 AM", name: "Unemployment Rate", impact: "high", previous: "3.8%", forecast: "3.9%", category: "employment" },
 ];
 
-const impactColor = (i: string) => i === "high" ? "text-[#ff3366] bg-[#ff3366]/10" : i === "medium" ? "text-[#ffd700] bg-[#ffd700]/10" : "text-white/20 bg-white/[0.03]";
+const impactColor = (i: string) => i === "high" ? "text-[#ff3366] bg-[#ff3366]/10" : i === "medium" ? "text-[#ffd700] bg-[#ffd700]/10" : "text-white/40 bg-white/[0.03]";
 const catIcon = (c: string) => c === "fed" ? "FED" : c === "employment" ? "EMP" : c === "inflation" ? "CPI" : c === "gdp" ? "GDP" : c === "earnings" ? "ERN" : "HSG";
 
 export function EconomicCalendar() {
@@ -53,7 +53,7 @@ export function EconomicCalendar() {
         <div className="flex items-center gap-1">
           {["all", "fed", "earnings", "inflation", "employment"].map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-2 py-0.5 rounded text-[9px] font-bold transition-colors ${filter === f ? "bg-primary/10 text-primary" : "text-white/15 hover:text-white/30"}`}>
+              className={`px-2 py-0.5 rounded text-[9px] font-bold transition-colors ${filter === f ? "bg-primary/10 text-primary" : "text-white/40 hover:text-white/30"}`}>
               {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
             </button>
           ))}
@@ -69,7 +69,7 @@ export function EconomicCalendar() {
             <span className={`text-[7px] font-black px-1.5 py-0.5 rounded ${impactColor(event.impact)} flex-shrink-0 w-7 text-center`}>
               {event.impact === "high" ? "!!!" : event.impact === "medium" ? "!!" : "!"}
             </span>
-            <span className="text-[8px] font-mono text-white/15 w-6 flex-shrink-0">{catIcon(event.category)}</span>
+            <span className="text-[8px] font-mono text-white/40 w-6 flex-shrink-0">{catIcon(event.category)}</span>
             <span className="text-[11px] font-medium flex-1 min-w-0 truncate">{event.name}</span>
             <div className="flex items-center gap-3 flex-shrink-0">
               <div className="text-right">

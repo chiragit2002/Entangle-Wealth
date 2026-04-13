@@ -229,7 +229,7 @@ export default function Giveaway() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
           <div className="col-span-1 md:col-span-2 glass-panel rounded-2xl p-6 flex flex-col gap-4">
-            <p className="text-[10px] text-white/40 uppercase tracking-widest font-mono">Drawing countdown</p>
+            <p className="text-[10px] text-white/50 uppercase tracking-widest font-mono">Drawing countdown</p>
             {countdown.passed ? (
               <div className="text-center py-4">
                 <p className="text-2xl font-black text-[#f5c842]">Drawing has occurred!</p>
@@ -256,7 +256,7 @@ export default function Giveaway() {
                 <span className="text-xs font-bold uppercase tracking-wider text-[#f5c842]">Grand Prize</span>
               </div>
               <p className="text-3xl font-black text-white">${PRIZE_POOL.toLocaleString()}</p>
-              <p className="text-[10px] text-white/40">1 grand prize winner</p>
+              <p className="text-[10px] text-white/50">1 grand prize winner</p>
             </div>
             <div className="glass-panel rounded-2xl p-5 flex flex-col gap-1 border border-[#00d4ff]/15">
               <div className="flex items-center gap-2 mb-1">
@@ -264,7 +264,7 @@ export default function Giveaway() {
                 <span className="text-xs font-bold uppercase tracking-wider text-[#00d4ff]">Referral Pool</span>
               </div>
               <p className="text-3xl font-black text-white">${REFERRAL_BONUS_POOL.toLocaleString()}</p>
-              <p className="text-[10px] text-white/40">Split among all referrers</p>
+              <p className="text-[10px] text-white/50">Split among all referrers</p>
             </div>
           </div>
         </div>
@@ -373,7 +373,7 @@ export default function Giveaway() {
             <Crown className="w-5 h-5 text-[#f5c842]" />
             Entry Leaderboard
           </h2>
-          <p className="text-xs text-white/40 mb-5">Top participants ranked by total entries. More entries = better odds.</p>
+          <p className="text-xs text-white/50 mb-5">Top participants ranked by total entries. More entries = better odds.</p>
 
           {leaderboard.length === 0 ? (
             <div className="glass-panel rounded-xl p-8 text-center text-white/30 text-sm">
@@ -441,7 +441,7 @@ export default function Giveaway() {
               ].map((t) => (
                 <div key={t.label} className="bg-white/[0.03] rounded-xl p-4 border border-white/5 text-center">
                   <t.icon className={`w-5 h-5 ${t.color} mx-auto mb-2`} />
-                  <p className="text-xs text-white/40">{t.val}</p>
+                  <p className="text-xs text-white/50">{t.val}</p>
                   <p className={`text-lg font-black ${t.color}`}>{t.bonus}</p>
                   <p className="text-[10px] text-white/30">{t.label}</p>
                 </div>
@@ -474,7 +474,7 @@ export default function Giveaway() {
               </li>
             ))}
           </ul>
-          <p className="text-[10px] text-white/20 mt-4">
+          <p className="text-[10px] text-white/50 mt-4">
             <a href="/terms" className="underline hover:text-white/40 transition-colors">Full Terms & Conditions</a>
           </p>
         </div>

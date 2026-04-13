@@ -572,16 +572,17 @@ router.get("/gamification/spin/status", requireAuth, async (req, res) => {
     const userId = await resolveUserId(clerkId, req);
     if (!userId) { res.status(404).json({ error: "User not found" }); return; }
 
-    const [lastSpin] = await db
+    const now = new Date();
+    const today = now.toISOString().slice(0, 10);
+
+    const [todaySpin] = await db
       .select()
       .from(dailySpinsTable)
-      .where(eq(dailySpinsTable.userId, userId))
-      .orderBy(desc(dailySpinsTable.spunAt))
+      .where(and(eq(dailySpinsTable.userId, userId), eq(dailySpinsTable.spinDate, today)))
       .limit(1);
 
-    const now = new Date();
-    const canSpin = !lastSpin || (now.getTime() - new Date(lastSpin.spunAt!).getTime()) >= 24 * 60 * 60 * 1000;
-    const nextSpinAt = lastSpin ? new Date(new Date(lastSpin.spunAt!).getTime() + 24 * 60 * 60 * 1000).toISOString() : null;
+    const canSpin = !todaySpin;
+    const nextSpinAt = todaySpin ? new Date(new Date(now).setUTCHours(24, 0, 0, 0)).toISOString() : null;
 
     const history = await db
       .select()
@@ -592,7 +593,7 @@ router.get("/gamification/spin/status", requireAuth, async (req, res) => {
 
     const [founder] = await db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
 
-    res.json({ canSpin, nextSpinAt, lastReward: lastSpin?.reward || null, history, isFounder: !!founder, rewards: SPIN_REWARDS.map(r => ({ reward: r.reward, rewardType: r.rewardType })) });
+    res.json({ canSpin, nextSpinAt, lastReward: todaySpin?.reward || null, history, isFounder: !!founder, rewards: SPIN_REWARDS.map(r => ({ reward: r.reward, rewardType: r.rewardType })) });
   } catch (error) {
     logger.error({ err: error }, "Error checking spin status:");
     res.status(500).json({ error: "Failed to check spin status" });
@@ -613,27 +614,28 @@ router.post("/gamification/spin", requireAuth, validateBody(z.object({}).strict(
     const result = await db.transaction(async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_daily_spin'))`);
 
+      const now = new Date();
+      const today = now.toISOString().slice(0, 10);
+
       const [lastSpin] = await tx
         .select()
         .from(dailySpinsTable)
-        .where(eq(dailySpinsTable.userId, userId))
-        .orderBy(desc(dailySpinsTable.spunAt))
+        .where(and(eq(dailySpinsTable.userId, userId), eq(dailySpinsTable.spinDate, today)))
         .limit(1);
 
-      const now = new Date();
-      if (lastSpin && (now.getTime() - new Date(lastSpin.spunAt!).getTime()) < 24 * 60 * 60 * 1000) {
-        const nextSpinAt = new Date(new Date(lastSpin.spunAt!).getTime() + 24 * 60 * 60 * 1000).toISOString();
+      if (lastSpin) {
+        const nextSpinAt = new Date(new Date(now).setUTCHours(24, 0, 0, 0)).toISOString();
         return { alreadySpun: true, nextSpinAt };
       }
 
       const picked = pickWeightedReward();
-
       await tx.insert(dailySpinsTable).values({
         userId,
+        spinDate: today,
         reward: picked.reward,
         rewardType: picked.rewardType,
         rewardValue: picked.rewardValue,
-      });
+      }).onConflictDoNothing();
 
       return { alreadySpun: false, picked, now };
     });
@@ -717,16 +719,17 @@ router.get("/gamification/status", requireAuth, async (req, res) => {
       [streak] = await db.insert(streaksTable).values({ userId, currentStreak: 0, longestStreak: 0, multiplier: 1.0 }).returning();
     }
 
-    const [lastSpin] = await db
+    const now = new Date();
+    const today = now.toISOString().slice(0, 10);
+
+    const [todaySpin] = await db
       .select()
       .from(dailySpinsTable)
-      .where(eq(dailySpinsTable.userId, userId))
-      .orderBy(desc(dailySpinsTable.spunAt))
+      .where(and(eq(dailySpinsTable.userId, userId), eq(dailySpinsTable.spinDate, today)))
       .limit(1);
 
-    const now = new Date();
-    const canSpin = !lastSpin || (now.getTime() - new Date(lastSpin.spunAt!).getTime()) >= 24 * 60 * 60 * 1000;
-    const nextSpinAt = lastSpin ? new Date(new Date(lastSpin.spunAt!).getTime() + 24 * 60 * 60 * 1000).toISOString() : null;
+    const canSpin = !todaySpin;
+    const nextSpinAt = todaySpin ? new Date(new Date(now).setUTCHours(24, 0, 0, 0)).toISOString() : null;
 
     const recentXpTxns = await db
       .select()
@@ -788,7 +791,7 @@ router.get("/gamification/status", requireAuth, async (req, res) => {
       nextLevelXp,
       canSpin,
       nextSpinAt,
-      lastSpin: lastSpin || null,
+      lastSpin: todaySpin || null,
       recentRewards: recentActivity,
       recentSpins,
       isFounder: !!founder,

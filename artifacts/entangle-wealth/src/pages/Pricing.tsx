@@ -260,7 +260,7 @@ export default function Pricing() {
           <p className="text-sm text-muted-foreground leading-relaxed mb-1">
             Earn <strong className="text-[#f5c842]">20% monthly</strong> for every person you refer. For life. Build your own income stream.
           </p>
-          <p className="text-xs text-white/40 mb-4">
+          <p className="text-xs text-white/50 mb-4">
             Plus: every referral earns you 5 entries into the $50K anniversary drawing and a share of the $36K referral bonus pool.
           </p>
           <Button

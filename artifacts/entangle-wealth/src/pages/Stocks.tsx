@@ -127,6 +127,8 @@ export default function Stocks() {
       {sortBy === field && <ArrowUpDown className="w-3 h-3 text-primary" />}
     </button>
   );
+  const sortAttr = (field: string): React.AriaAttributes["aria-sort"] =>
+    sortBy === field ? (sortDir === "asc" ? "ascending" : "descending") : "none";
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -374,12 +376,12 @@ export default function Stocks() {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-white/10">
-                          <th className="text-left p-3"><SortHeader field="symbol" label="Symbol" /></th>
-                          <th className="text-left p-3 hidden md:table-cell"><SortHeader field="name" label="Company" /></th>
-                          <th className="text-right p-3"><SortHeader field="price" label="Price" className="justify-end" /></th>
-                          <th className="text-right p-3"><SortHeader field="changePercent" label="Change" className="justify-end" /></th>
-                          <th className="text-right p-3 hidden lg:table-cell"><SortHeader field="volume" label="Volume" className="justify-end" /></th>
-                          <th className="text-right p-3 hidden lg:table-cell"><SortHeader field="marketCap" label="Market Cap" className="justify-end" /></th>
+                          <th aria-sort={sortAttr("symbol")} className="text-left p-3"><SortHeader field="symbol" label="Symbol" /></th>
+                          <th aria-sort={sortAttr("name")} className="text-left p-3 hidden md:table-cell"><SortHeader field="name" label="Company" /></th>
+                          <th aria-sort={sortAttr("price")} className="text-right p-3"><SortHeader field="price" label="Price" className="justify-end" /></th>
+                          <th aria-sort={sortAttr("changePercent")} className="text-right p-3"><SortHeader field="changePercent" label="Change" className="justify-end" /></th>
+                          <th aria-sort={sortAttr("volume")} className="text-right p-3 hidden lg:table-cell"><SortHeader field="volume" label="Volume" className="justify-end" /></th>
+                          <th aria-sort={sortAttr("marketCap")} className="text-right p-3 hidden lg:table-cell"><SortHeader field="marketCap" label="Market Cap" className="justify-end" /></th>
                           <th className="text-center p-3 hidden md:table-cell">Sector</th>
                           <th className="text-center p-3">
                             <span className="text-xs font-medium text-muted-foreground">AI</span>

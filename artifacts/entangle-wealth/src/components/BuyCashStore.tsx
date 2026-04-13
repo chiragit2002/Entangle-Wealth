@@ -120,7 +120,7 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
               <p className="text-[10px] font-mono text-white/30">Top up your paper trading account</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-white/20 hover:text-white/50 transition-colors p-1">
+          <button onClick={onClose} className="text-white/50 hover:text-white/50 transition-colors p-1">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -215,7 +215,7 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
                 </p>
               )}
               <div className="mt-4 p-3 bg-white/[0.02] rounded-lg border border-white/[0.04]">
-                <p className="text-[9px] font-mono text-white/20 text-center leading-relaxed">
+                <p className="text-[9px] font-mono text-white/40 text-center leading-relaxed">
                   Virtual cash is for paper trading practice only and has no real-world monetary value.
                   Payments are processed securely by Stripe.
                 </p>
@@ -263,7 +263,7 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
                         <p className="text-[11px] font-mono font-bold text-white">
                           ${(purchase.amountPaidCents / 100).toFixed(0)}
                         </p>
-                        <p className="text-[9px] font-mono text-white/20 uppercase">paid</p>
+                        <p className="text-[9px] font-mono text-white/40 uppercase">paid</p>
                       </div>
                     </div>
                   ))}

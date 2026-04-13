@@ -137,7 +137,7 @@ function ScoreRing({ score, ready }: { score: number; ready: boolean }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className="text-3xl font-bold font-mono" style={{ color }}>{score}%</span>
-        <span className="text-[10px] text-white/40 uppercase tracking-wider">
+        <span className="text-[10px] text-white/50 uppercase tracking-wider">
           {ready ? "Ready" : "Not Ready"}
         </span>
       </div>
@@ -256,17 +256,17 @@ export default function LaunchReadiness() {
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <div className="text-2xl font-bold font-mono text-[#00ff88]">{autoPassCount + manualPassCount}</div>
-                <div className="text-xs text-white/40">Passing</div>
+                <div className="text-xs text-white/50">Passing</div>
               </div>
               <div>
                 <div className="text-2xl font-bold font-mono text-[#FFD700]">{data?.summary.warnings || 0}</div>
-                <div className="text-xs text-white/40">Warnings</div>
+                <div className="text-xs text-white/50">Warnings</div>
               </div>
               <div>
                 <div className="text-2xl font-bold font-mono text-[#ff3366]">
                   {(data?.summary.failing || 0) + manualChecks.filter((c) => !c.checked).length}
                 </div>
-                <div className="text-xs text-white/40">Failing</div>
+                <div className="text-xs text-white/50">Failing</div>
               </div>
             </div>
             <div className="text-xs text-white/30">
@@ -283,7 +283,7 @@ export default function LaunchReadiness() {
             <div className="flex items-center gap-3">
               <Server className="w-5 h-5 text-[#00D4FF]" />
               <span className="text-lg font-semibold text-white">Automated Checks</span>
-              <span className="text-xs text-white/40 bg-white/5 px-2 py-0.5 rounded-full">
+              <span className="text-xs text-white/50 bg-white/5 px-2 py-0.5 rounded-full">
                 {autoPassCount}/{autoChecks.length} passing
               </span>
             </div>
@@ -309,8 +309,8 @@ export default function LaunchReadiness() {
                         <Icon className="w-3.5 h-3.5 text-white/30" />
                         <span className="text-sm font-medium text-white">{check.label}</span>
                       </div>
-                      <p className="text-xs text-white/40 mt-1">{check.detail}</p>
-                      <span className="text-[10px] text-white/20 uppercase tracking-wider">{check.category}</span>
+                      <p className="text-xs text-white/50 mt-1">{check.detail}</p>
+                      <span className="text-[10px] text-white/50 uppercase tracking-wider">{check.category}</span>
                     </div>
                   </div>
                 );
@@ -327,7 +327,7 @@ export default function LaunchReadiness() {
             <div className="flex items-center gap-3">
               <CheckCircle2 className="w-5 h-5 text-[#FFD700]" />
               <span className="text-lg font-semibold text-white">Manual Checks</span>
-              <span className="text-xs text-white/40 bg-white/5 px-2 py-0.5 rounded-full">
+              <span className="text-xs text-white/50 bg-white/5 px-2 py-0.5 rounded-full">
                 {manualPassCount}/{manualChecks.length} confirmed
               </span>
             </div>
@@ -354,8 +354,8 @@ export default function LaunchReadiness() {
                         <Icon className="w-3.5 h-3.5 text-white/30" />
                         <span className="text-sm font-medium text-white">{check.label}</span>
                       </div>
-                      <p className="text-xs text-white/40 mt-1">{check.detail}</p>
-                      <span className="text-[10px] text-white/20 uppercase tracking-wider">{check.category}</span>
+                      <p className="text-xs text-white/50 mt-1">{check.detail}</p>
+                      <span className="text-[10px] text-white/50 uppercase tracking-wider">{check.category}</span>
                     </div>
                   </button>
                 );
@@ -429,7 +429,7 @@ export default function LaunchReadiness() {
           {expandedSection === "env" && (
             <div className="bg-[#0a0a0f] border border-white/10 rounded-xl overflow-hidden">
               <div className="p-4 border-b border-white/5">
-                <p className="text-xs text-white/40">
+                <p className="text-xs text-white/50">
                   These environment variables must be updated when switching from development to production.
                   Click the copy icon to copy the variable name.
                 </p>
@@ -442,7 +442,7 @@ export default function LaunchReadiness() {
                         <code className="text-sm font-mono text-[#00D4FF]">{v.name}</code>
                         <button
                           onClick={() => copyToClipboard(v.name, v.name)}
-                          className="text-white/20 hover:text-white/60 transition"
+                          className="text-white/50 hover:text-white/60 transition"
                         >
                           <Copy className="w-3.5 h-3.5" />
                         </button>
@@ -450,9 +450,9 @@ export default function LaunchReadiness() {
                           <span className="text-[10px] text-[#00ff88]">Copied!</span>
                         )}
                       </div>
-                      <p className="text-xs text-white/40 mt-0.5">{v.desc}</p>
+                      <p className="text-xs text-white/50 mt-0.5">{v.desc}</p>
                     </div>
-                    <code className="text-xs text-white/20 font-mono hidden md:block">{v.production}</code>
+                    <code className="text-xs text-white/50 font-mono hidden md:block">{v.production}</code>
                   </div>
                 ))}
               </div>

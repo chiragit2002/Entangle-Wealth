@@ -125,7 +125,7 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
       <div className="relative bg-[#0a0a14] border border-[#f5c842]/20 rounded-2xl p-6 max-w-sm w-full shadow-2xl shadow-black/60 animate-in fade-in zoom-in-95 duration-200">
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-white/20 hover:text-white/50 transition-colors"
+          className="absolute top-3 right-3 text-white/40 hover:text-white/50 transition-colors"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
@@ -179,7 +179,7 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
           </div>
         )}
 
-        <div className="text-[10px] text-white/20 mb-3 text-center">
+        <div className="text-[10px] text-white/50 mb-3 text-center">
           30-day free trial · No credit card required
         </div>
 
@@ -197,7 +197,7 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
 
         <button
           onClick={() => { setSuppressed(true); onClose(); }}
-          className="w-full mt-2 text-[10px] text-white/15 hover:text-white/30 transition-colors py-1"
+          className="w-full mt-2 text-[10px] text-white/40 hover:text-white/30 transition-colors py-1"
         >
           Maybe later
         </button>

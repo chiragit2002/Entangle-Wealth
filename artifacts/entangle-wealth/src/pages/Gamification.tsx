@@ -344,7 +344,7 @@ export default function Gamification() {
                     />
                   </div>
                 )}
-                <span className="text-[9px] font-mono text-white/20">{status ? `${status.xp.totalXp.toLocaleString()} XP` : "..."}</span>
+                <span className="text-[9px] font-mono text-white/40">{status ? `${status.xp.totalXp.toLocaleString()} XP` : "..."}</span>
               </div>
             </div>
           </div>
@@ -360,7 +360,7 @@ export default function Gamification() {
 
         {loading ? (
           <div className="flex items-center justify-center py-24">
-            <RefreshCw className="w-6 h-6 text-white/20 animate-spin" />
+            <RefreshCw className="w-6 h-6 text-white/40 animate-spin" />
           </div>
         ) : (
           <div className="p-4 max-w-6xl mx-auto space-y-4">
@@ -467,7 +467,7 @@ export default function Gamification() {
                         {status?.nextSpinAt ? <CountdownTimer nextSpinAt={status.nextSpinAt} /> : "—"}
                       </div>
                       {status?.lastSpin && (
-                        <p className="text-[9px] font-mono text-white/20 mt-1">Last: {status.lastSpin.reward}</p>
+                        <p className="text-[9px] font-mono text-white/40 mt-1">Last: {status.lastSpin.reward}</p>
                       )}
                     </div>
                   )}
@@ -574,7 +574,7 @@ export default function Gamification() {
                             {milestone.active ? (
                               <CheckCircle className="w-3.5 h-3.5 text-[#00ff88]" />
                             ) : (
-                              <Clock className="w-3.5 h-3.5 text-white/20" />
+                              <Clock className="w-3.5 h-3.5 text-white/40" />
                             )}
                             <span className="text-[10px] font-mono text-white/60">{milestone.days}-day streak</span>
                           </div>
@@ -617,7 +617,7 @@ export default function Gamification() {
                   <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#00ff88]">
                     <TrendingUp className="w-3.5 h-3.5 text-[#00ff88]" />
                     <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00ff88]">Recent Rewards</span>
-                    <Link href="/achievements" className="ml-auto text-[9px] font-mono text-white/20 hover:text-white/40 flex items-center gap-0.5 transition-colors">
+                    <Link href="/achievements" className="ml-auto text-[9px] font-mono text-white/40 hover:text-white/40 flex items-center gap-0.5 transition-colors">
                       View all <ChevronRight className="w-2.5 h-2.5" />
                     </Link>
                   </div>
@@ -650,7 +650,7 @@ export default function Gamification() {
                             ) : (
                               <span className="text-[11px] font-mono font-bold text-orange-400">Streak+</span>
                             )}
-                            <p className="text-[8px] font-mono text-white/20">
+                            <p className="text-[8px] font-mono text-white/40">
                               {new Date(r.createdAt).toLocaleDateString([], { month: "short", day: "numeric" })}
                             </p>
                           </div>
@@ -658,7 +658,7 @@ export default function Gamification() {
                       ))
                     ) : (
                       <div className="px-3 py-6 text-center">
-                        <p className="text-[10px] font-mono text-white/20">No rewards yet | start earning XP!</p>
+                        <p className="text-[10px] font-mono text-white/40">No rewards yet | start earning XP!</p>
                       </div>
                     )}
                   </div>
@@ -698,15 +698,15 @@ export default function Gamification() {
                 <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.02] border-b border-white/[0.06]">
                   <Lock className="w-3.5 h-3.5 text-white/30" />
                   <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-white/30">Founders Badge</span>
-                  <span className="ml-auto text-[8px] font-mono text-white/20">Early adopter exclusive</span>
+                  <span className="ml-auto text-[8px] font-mono text-white/40">Early adopter exclusive</span>
                 </div>
                 <div className="p-4 flex items-center gap-4">
                   <div className="w-12 h-12 rounded-sm bg-white/[0.03] border border-white/[0.06] flex items-center justify-center shrink-0">
-                    <Crown className="w-6 h-6 text-white/15" />
+                    <Crown className="w-6 h-6 text-white/40" />
                   </div>
                   <div>
                     <p className="text-[11px] font-mono font-bold text-white/30">Founders Badge | Locked</p>
-                    <p className="text-[9px] font-mono text-white/20">Reserved for early EntangleWealth members. Stay active to unlock exclusive perks.</p>
+                    <p className="text-[9px] font-mono text-white/40">Reserved for early EntangleWealth members. Stay active to unlock exclusive perks.</p>
                   </div>
                 </div>
               </div>

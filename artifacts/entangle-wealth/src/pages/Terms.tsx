@@ -8,7 +8,7 @@ export default function Terms() {
         <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-2">
           Terms of <span className="electric-text">Use</span>
         </h1>
-        <p className="text-sm text-white/20 mb-10 font-mono">Last Updated: April 6, 2026</p>
+        <p className="text-sm text-white/50 mb-10 font-mono">Last Updated: April 6, 2026</p>
 
         <div className="space-y-10 text-white/60 leading-relaxed">
           <section>

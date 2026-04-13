@@ -118,7 +118,7 @@ function Slider({ label, value, min, max, step = 1, unit = "", onChange, color =
           style={{ left: `calc(${pct}% - 6px)`, background: color }}
         />
       </div>
-      <div className="flex justify-between text-[8px] font-mono text-white/20">
+      <div className="flex justify-between text-[8px] font-mono text-white/40">
         <span>{unit === "$" ? formatCurrency(min) : `${min}${unit}`}</span>
         <span>{unit === "$" ? formatCurrency(max) : `${max}${unit}`}</span>
       </div>
@@ -143,7 +143,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-[#0d0d1a] border border-white/[0.08] rounded-sm px-3 py-2 text-[10px] font-mono min-w-[160px]">
-      <p className="text-white/40 mb-1.5">Year {label}</p>
+      <p className="text-white/50 mb-1.5">Year {label}</p>
       {payload.map((p) => (
         <div key={p.name} className="flex items-center justify-between gap-4">
           <span style={{ color: p.color }}>{p.name}</span>
@@ -165,7 +165,7 @@ function WizardStep({ step, title, subtitle, children, onNext, onBack, isLast = 
           <span className="text-[9px] font-mono text-white/30 uppercase tracking-widest">Step {step} of 4</span>
         </div>
         <h2 className="text-lg font-black text-white font-mono">{title}</h2>
-        <p className="text-[11px] text-white/40 mt-0.5">{subtitle}</p>
+        <p className="text-[11px] text-white/50 mt-0.5">{subtitle}</p>
       </div>
       <div className="space-y-5">{children}</div>
       <div className="flex items-center gap-3 pt-2">
@@ -381,7 +381,7 @@ export default function WealthSim() {
   const monthlyIncomeNeeded = finalNetWorth * 0.04 / 12;
 
   if (!isLoaded) {
-    return <Layout><div className="min-h-screen bg-[#040408] flex items-center justify-center"><RefreshCw className="w-6 h-6 text-white/20 animate-spin" /></div></Layout>;
+    return <Layout><div className="min-h-screen bg-[#040408] flex items-center justify-center"><RefreshCw className="w-6 h-6 text-white/40 animate-spin" /></div></Layout>;
   }
 
   if (!isSignedIn && wizardStep < 4) {
@@ -391,7 +391,7 @@ export default function WealthSim() {
           <div className="text-center max-w-md">
             <TrendingUp className="w-14 h-14 text-[#00D4FF] mx-auto mb-4" />
             <h1 className="text-2xl font-black text-white font-mono mb-2">Wealth Simulation Engine</h1>
-            <p className="text-white/40 text-sm mb-6">Visualize how your financial decisions compound over time. Sign in to save your progress and earn XP.</p>
+            <p className="text-white/50 text-sm mb-6">Visualize how your financial decisions compound over time. Sign in to save your progress and earn XP.</p>
             <div className="flex gap-3 justify-center">
               <a href="/sign-in" className="px-5 py-2.5 bg-[#00D4FF] text-black font-bold font-mono text-[11px] uppercase tracking-widest rounded-sm hover:bg-[#00D4FF]/90 transition-colors">Sign In</a>
               <button onClick={() => setWizardStep(1)} className="px-5 py-2.5 border border-white/10 text-white/60 font-mono text-[11px] uppercase tracking-widest rounded-sm hover:border-white/20 hover:text-white/80 transition-colors">Try Without Account</button>
@@ -425,7 +425,7 @@ export default function WealthSim() {
             <div className="bg-gradient-to-r from-[#0a0a14] via-[#0d0d1f] to-[#0a0a14] border border-white/[0.08] rounded-sm p-6 text-center">
               <div className="text-5xl mb-3">📈</div>
               <h1 className="text-2xl font-black text-white font-mono mb-2">Wealth Simulation Engine</h1>
-              <p className="text-white/40 text-sm max-w-lg mx-auto mb-6">See how your money grows over time. Adjust your savings rate, investment allocation, and time horizon | watch your future net worth update in real time.</p>
+              <p className="text-white/50 text-sm max-w-lg mx-auto mb-6">See how your money grows over time. Adjust your savings rate, investment allocation, and time horizon | watch your future net worth update in real time.</p>
               <div className="grid grid-cols-3 gap-3 max-w-lg mx-auto mb-6">
                 {[
                   { icon: <DollarSign className="w-4 h-4" />, label: "Compound Growth", desc: "See contributions vs. returns" },
@@ -469,8 +469,8 @@ export default function WealthSim() {
                   <Slider label="Current Savings" value={profile.currentSavings} min={0} max={500000} step={1000} unit="$" onChange={v => handleProfileChange("currentSavings", v)} color="#00ff88" tip="Your current savings/investment account balance" />
 
                   <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm p-3 text-[10px] font-mono space-y-1">
-                    <div className="flex justify-between"><span className="text-white/40">Monthly Income</span><span className="text-white/70">{formatFullCurrency(profile.annualIncome / 12)}</span></div>
-                    <div className="flex justify-between"><span className="text-white/40">After Expenses</span><span className={profile.annualIncome / 12 - profile.monthlyExpenses > 0 ? "text-[#00ff88]" : "text-[#ff3366]"}>{formatFullCurrency(profile.annualIncome / 12 - profile.monthlyExpenses)}</span></div>
+                    <div className="flex justify-between"><span className="text-white/50">Monthly Income</span><span className="text-white/70">{formatFullCurrency(profile.annualIncome / 12)}</span></div>
+                    <div className="flex justify-between"><span className="text-white/50">After Expenses</span><span className={profile.annualIncome / 12 - profile.monthlyExpenses > 0 ? "text-[#00ff88]" : "text-[#ff3366]"}>{formatFullCurrency(profile.annualIncome / 12 - profile.monthlyExpenses)}</span></div>
                   </div>
                 </WizardStep>
               )}
@@ -502,8 +502,8 @@ export default function WealthSim() {
                   </div>
 
                   <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm p-3 text-[10px] font-mono space-y-1">
-                    <div className="flex justify-between"><span className="text-white/40">Auto-Saved Monthly</span><span className="text-[#00ff88]">{formatFullCurrency(profile.annualIncome / 12 * profile.savingsRate / 100)}</span></div>
-                    <div className="flex justify-between"><span className="text-white/40">Total Invested Monthly</span><span className="text-[#00D4FF]">{formatFullCurrency(profile.monthlyInvestment)}</span></div>
+                    <div className="flex justify-between"><span className="text-white/50">Auto-Saved Monthly</span><span className="text-[#00ff88]">{formatFullCurrency(profile.annualIncome / 12 * profile.savingsRate / 100)}</span></div>
+                    <div className="flex justify-between"><span className="text-white/50">Total Invested Monthly</span><span className="text-[#00D4FF]">{formatFullCurrency(profile.monthlyInvestment)}</span></div>
                   </div>
 
                   {profile.savingsRate < 15 && (
@@ -528,8 +528,8 @@ export default function WealthSim() {
                   <Slider label="Inflation Rate" value={profile.inflationRate} min={0} max={10} step={0.5} unit="%" onChange={v => handleProfileChange("inflationRate", v)} color="#ff6b35" tip="Long-run US average is ~3%. Adjusts real purchasing power." />
 
                   <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm p-3 text-[10px] font-mono space-y-1">
-                    <div className="flex justify-between"><span className="text-white/40">Real Return (after inflation)</span><span className="text-white/70">{(profile.expectedReturnRate - profile.inflationRate).toFixed(1)}%</span></div>
-                    <div className="flex justify-between"><span className="text-white/40">Projection Period</span><span className="text-white/70">{profile.timeHorizonYears} years</span></div>
+                    <div className="flex justify-between"><span className="text-white/50">Real Return (after inflation)</span><span className="text-white/70">{(profile.expectedReturnRate - profile.inflationRate).toFixed(1)}%</span></div>
+                    <div className="flex justify-between"><span className="text-white/50">Projection Period</span><span className="text-white/70">{profile.timeHorizonYears} years</span></div>
                   </div>
 
                   <div className="bg-[#040408] border border-amber-500/10 rounded-sm p-3 flex items-start gap-2">
@@ -583,8 +583,8 @@ export default function WealthSim() {
               {wizardStep === 4 && !simulated && (
                 <div className="space-y-4">
                   <div className="text-center py-8">
-                    <RefreshCw className="w-8 h-8 text-white/20 mx-auto mb-3 animate-spin" />
-                    <p className="text-[11px] text-white/40 font-mono">Running simulation...</p>
+                    <RefreshCw className="w-8 h-8 text-white/40 mx-auto mb-3 animate-spin" />
+                    <p className="text-[11px] text-white/50 font-mono">Running simulation...</p>
                   </div>
                 </div>
               )}
@@ -723,7 +723,7 @@ export default function WealthSim() {
                                   className="relative z-10 w-6 h-6 rounded-sm flex items-center justify-center text-sm border"
                                   style={achieved ? { borderColor: color, background: `${color}20` } : projected ? { borderColor: `${color}40`, background: "rgba(0,0,0,0.5)" } : { borderColor: "rgba(255,255,255,0.06)", background: "rgba(0,0,0,0.3)" }}
                                 >
-                                  {achieved ? <CheckCircle className="w-3.5 h-3.5" style={{ color }} /> : projected ? icon : <Lock className="w-3 h-3 text-white/20" />}
+                                  {achieved ? <CheckCircle className="w-3.5 h-3.5" style={{ color }} /> : projected ? icon : <Lock className="w-3 h-3 text-white/40" />}
                                 </div>
                                 <div className="flex-1 flex items-center justify-between">
                                   <div>
@@ -749,22 +749,22 @@ export default function WealthSim() {
                       <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm p-3">
                         <p className="text-white/30 mb-1">Today's Net Worth</p>
                         <p className="text-lg font-black text-white/70">{formatCurrency(profile.currentSavings)}</p>
-                        <p className="text-white/20 text-[8px] mt-0.5">Starting point</p>
+                        <p className="text-white/50 text-[8px] mt-0.5">Starting point</p>
                       </div>
                       <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm p-3">
                         <p className="text-white/30 mb-1">Future Self</p>
                         <p className="text-lg font-black" style={{ color: "#00D4FF" }}>{formatCurrency(finalNetWorth)}</p>
-                        <p className="text-white/20 text-[8px] mt-0.5">In {profile.timeHorizonYears} years</p>
+                        <p className="text-white/50 text-[8px] mt-0.5">In {profile.timeHorizonYears} years</p>
                       </div>
                       <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm p-3">
                         <p className="text-white/30 mb-1">Monthly 4% Rule Income</p>
                         <p className="text-lg font-black text-[#00ff88]">{formatCurrency(monthlyIncomeNeeded)}</p>
-                        <p className="text-white/20 text-[8px] mt-0.5">Safe withdrawal rate</p>
+                        <p className="text-white/50 text-[8px] mt-0.5">Safe withdrawal rate</p>
                       </div>
                       <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm p-3">
                         <p className="text-white/30 mb-1">Growth Multiplier</p>
                         <p className="text-lg font-black text-[#FFD700]">{profile.currentSavings > 0 ? `${(finalNetWorth / profile.currentSavings).toFixed(1)}x` : "∞"}</p>
-                        <p className="text-white/20 text-[8px] mt-0.5">Compounding power</p>
+                        <p className="text-white/50 text-[8px] mt-0.5">Compounding power</p>
                       </div>
                     </div>
 
@@ -787,7 +787,7 @@ export default function WealthSim() {
                 <div className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm p-5 text-center">
                   <div className="text-4xl mb-3">📊</div>
                   <p className="text-[11px] font-mono text-white/30 mb-2">Your projection will appear here after the simulation runs</p>
-                  <p className="text-[9px] font-mono text-white/15">Complete the wizard to see your wealth curve</p>
+                  <p className="text-[9px] font-mono text-white/40">Complete the wizard to see your wealth curve</p>
                 </div>
               )}
             </div>
@@ -796,7 +796,7 @@ export default function WealthSim() {
 
         {wizardStep === 4 && (
           <div className="text-center py-4">
-            <p className="text-[8px] font-mono text-white/15">
+            <p className="text-[8px] font-mono text-white/40">
               ⚠️ All projections are simulations using compound interest formulas. Not financial advice. Actual returns vary.
               Assumptions: {profile.expectedReturnRate}% annual return, {profile.inflationRate}% inflation, {profile.timeHorizonYears}-year horizon.
             </p>

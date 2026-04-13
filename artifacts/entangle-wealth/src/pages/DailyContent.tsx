@@ -163,7 +163,7 @@ function PostCard({
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white/90 placeholder:text-white/20 resize-none focus:outline-none focus:border-primary/40 transition-colors font-sans leading-relaxed"
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white/90 placeholder:text-white/40 resize-none focus:outline-none focus:border-primary/40 transition-colors font-sans leading-relaxed"
               rows={8}
             />
             <div className="flex gap-2">
@@ -180,7 +180,7 @@ function PostCard({
                 size="sm"
                 variant="ghost"
                 onClick={handleCancelEdit}
-                className="text-white/40 hover:text-white/70 gap-1.5 text-xs"
+                className="text-white/50 hover:text-white/70 gap-1.5 text-xs"
               >
                 <X className="w-3.5 h-3.5" /> Cancel
               </Button>

@@ -3,11 +3,28 @@ import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Bell, Plus, Trash2, ToggleLeft, ToggleRight, History, AlertTriangle, TrendingUp, TrendingDown, Zap, Activity, Settings, Pencil, X, Mail } from "lucide-react";
+import { Bell, Plus, Trash2, ToggleLeft, ToggleRight, History, AlertTriangle, TrendingUp, TrendingDown, Zap, Activity, Settings, Pencil, X, Mail, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/trackEvent";
 import { UpgradePrompt, useUpgradePrompt } from "@/components/UpgradePrompt";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+
+const alertFormSchema = z.object({
+  symbol: z.string().min(1, "Ticker symbol is required").max(10).regex(/^[A-Za-z][A-Za-z0-9./]{0,9}$/, "Enter a valid ticker (e.g. AAPL, BRK.B)"),
+  alertType: z.string().min(1),
+  threshold: z.string().optional(),
+}).superRefine((data, ctx) => {
+  const needsThresh = data.alertType === "price_above" || data.alertType === "price_below";
+  if (needsThresh && !data.threshold?.trim()) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Target price is required", path: ["threshold"] });
+  } else if (needsThresh && data.threshold && isNaN(parseFloat(data.threshold))) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Enter a valid price", path: ["threshold"] });
+  }
+});
 
 interface AlertRule {
   id: number;
@@ -70,9 +87,6 @@ export default function Alerts() {
   const [tier, setTier] = useState("free");
   const [dailyLimit, setDailyLimit] = useState<number | null>(null);
   const [dailyUsed, setDailyUsed] = useState(0);
-  const [newSymbol, setNewSymbol] = useState("");
-  const [newType, setNewType] = useState("price_above");
-  const [newThreshold, setNewThreshold] = useState("");
   const [creating, setCreating] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -82,6 +96,13 @@ export default function Alerts() {
   const [rulesTotal, setRulesTotal] = useState(0);
   const [historyTotal, setHistoryTotal] = useState(0);
   const [loadingMore, setLoadingMore] = useState(false);
+
+  type AlertFormValues = z.infer<typeof alertFormSchema>;
+  const alertForm = useForm<AlertFormValues>({
+    resolver: zodResolver(alertFormSchema),
+    defaultValues: { symbol: "", alertType: "price_above", threshold: "" },
+  });
+  const watchedAlertType = alertForm.watch("alertType");
 
   const fetchRules = useCallback(async (append = false) => {
     try {
@@ -154,10 +175,7 @@ export default function Alerts() {
     }
   }, [dailyUsed, dailyLimit, tier, showUpgradePrompt]);
 
-  const createAlert = async () => {
-    if (!newSymbol.trim()) return;
-    if (needsThreshold(newType) && !newThreshold.trim()) return;
-
+  const createAlert = alertForm.handleSubmit(async (values: z.infer<typeof alertFormSchema>) => {
     if (tier === "free" && rules.length >= 20) {
       showUpgradePrompt({
         limitType: "alert_rules",
@@ -176,22 +194,22 @@ export default function Alerts() {
 
     setCreating(true);
     try {
+      const symbol = values.symbol.trim().toUpperCase();
       const res = await authFetch("/alerts", getToken, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          symbol: newSymbol.trim().toUpperCase(),
-          alertType: newType,
-          threshold: needsThreshold(newType) ? parseFloat(newThreshold) : null,
+          symbol,
+          alertType: values.alertType,
+          threshold: needsThreshold(values.alertType) ? parseFloat(values.threshold || "0") : null,
         }),
       });
       if (res.ok) {
-        setNewSymbol("");
-        setNewThreshold("");
+        alertForm.reset();
         setShowForm(false);
         fetchRules();
-        toast({ title: "Alert created", description: `${newSymbol.trim().toUpperCase()} alert rule added.` });
-        trackEvent("alert_created", { symbol: newSymbol.trim().toUpperCase(), type: newType });
+        toast({ title: "Alert created", description: `${symbol} alert rule added.` });
+        trackEvent("alert_created", { symbol, type: values.alertType });
       } else {
         const err = await res.json().catch(() => ({ error: "Failed to create alert" }));
         if (res.status === 403) {
@@ -211,10 +229,10 @@ export default function Alerts() {
           toast({ title: "Error", description: err.error || "Failed to create alert", variant: "destructive" });
         }
       }
-    } catch { toast({ title: "Error", description: "Network error", variant: "destructive" }); } finally {
+    } catch { toast({ title: "Error", description: "Something went wrong — please try again", variant: "destructive" }); } finally {
       setCreating(false);
     }
-  };
+  });
 
   const toggleAlert = async (id: number, currentEnabled: boolean) => {
     setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
@@ -230,7 +248,7 @@ export default function Alerts() {
       }
     } catch {
       setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: currentEnabled } : r));
-      toast({ title: "Error", description: "Network error", variant: "destructive" });
+      toast({ title: "Error", description: "Something went wrong — please try again", variant: "destructive" });
     }
   };
 
@@ -245,7 +263,7 @@ export default function Alerts() {
       }
     } catch {
       setRules(prev);
-      toast({ title: "Error", description: "Network error", variant: "destructive" });
+      toast({ title: "Error", description: "Something went wrong — please try again", variant: "destructive" });
     }
   };
 
@@ -308,7 +326,7 @@ export default function Alerts() {
             <h1 className="text-3xl font-bold tracking-tight font-[family-name:var(--font-mono)]">
               <span className="text-[#00D4FF]">Real-Time</span> Alerts
             </h1>
-            <p className="text-white/40 text-sm mt-1">
+            <p className="text-white/50 text-sm mt-1">
               Configure price, RSI, MACD, and Bollinger alerts with live evaluation
             </p>
           </div>
@@ -316,8 +334,8 @@ export default function Alerts() {
             {dailyLimit && (
               <div className="text-xs text-white/30 bg-white/[0.04] rounded-lg px-3 py-2 border border-white/[0.06]">
                 <span className="text-[#ffd700] font-bold">{dailyUsed}</span>
-                <span className="text-white/20">/{dailyLimit} daily alerts</span>
-                <span className="text-white/15 ml-1">(Free)</span>
+                <span className="text-white/50">/{dailyLimit} daily alerts</span>
+                <span className="text-white/50 ml-1">(Free)</span>
               </div>
             )}
             {tier === "pro" && (
@@ -329,16 +347,18 @@ export default function Alerts() {
         </div>
 
         <div className="flex gap-2 mb-6">
-          <button
+          <Button
             onClick={() => setTab("rules")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${tab === "rules" ? "bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/20" : "text-white/40 hover:text-white/60"}`}
+            variant="ghost"
+            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "rules" ? "bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/20" : "text-white/40 hover:text-white/60"}`}
           >
             <Settings className="w-4 h-4" /> Alert Rules
             <span className="text-xs bg-white/[0.06] px-2 py-0.5 rounded-full">{rules.length}</span>
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setTab("history")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${tab === "history" ? "bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/20" : "text-white/40 hover:text-white/60"}`}
+            variant="ghost"
+            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "history" ? "bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/20" : "text-white/40 hover:text-white/60"}`}
           >
             <History className="w-4 h-4" /> Triggered History
             {history.filter(h => !h.read).length > 0 && (
@@ -346,7 +366,7 @@ export default function Alerts() {
                 {history.filter(h => !h.read).length}
               </span>
             )}
-          </button>
+          </Button>
         </div>
 
         {loading ? (
@@ -366,64 +386,94 @@ export default function Alerts() {
                   <Plus className="w-4 h-4 mr-2" /> New Alert Rule
                 </Button>
               ) : (
-                <div className="rounded-xl bg-white/[0.03] border border-[#00D4FF]/20 p-4">
-                  <p className="text-sm font-bold text-[#00D4FF] mb-1 font-[family-name:var(--font-mono)]">Create Alert Rule</p>
-                  <p className="text-xs text-white/30 mb-4">Get notified instantly when your conditions are met — supports price levels and 4 technical indicators.</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                    <div className="form-field">
-                      <label className="form-label">Ticker Symbol</label>
-                      <input
-                        placeholder="e.g. AAPL"
-                        value={newSymbol}
-                        onChange={e => setNewSymbol(e.target.value.toUpperCase().replace(/[^A-Z0-9.]/g, "").slice(0, 10))}
-                        maxLength={10}
-                        aria-label="Ticker symbol"
-                        className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/30 font-[family-name:var(--font-mono)]"
+                <Form {...alertForm}>
+                  <form onSubmit={createAlert} className="rounded-xl bg-white/[0.03] border border-[#00D4FF]/20 p-4">
+                    <p className="text-sm font-bold text-[#00D4FF] mb-1 font-[family-name:var(--font-mono)]">Create Alert Rule</p>
+                    <p className="text-xs text-white/30 mb-4">Get notified instantly when your conditions are met — supports price levels and 4 technical indicators.</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                      <FormField
+                        control={alertForm.control}
+                        name="symbol"
+                        render={({ field }) => (
+                          <FormItem className="form-field">
+                            <label className="form-label">Ticker Symbol</label>
+                            <FormControl>
+                              <input
+                                {...field}
+                                placeholder="e.g. AAPL"
+                                maxLength={10}
+                                aria-label="Ticker symbol"
+                                aria-invalid={!!alertForm.formState.errors.symbol}
+                                onChange={e => field.onChange(e.target.value.toUpperCase().replace(/[^A-Z0-9./]/g, "").slice(0, 10))}
+                                className={`w-full bg-white/[0.05] border rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:outline-none font-[family-name:var(--font-mono)] ${alertForm.formState.errors.symbol ? "border-[#ff3366]/60" : "border-white/10 focus:border-[#00D4FF]/30"}`}
+                              />
+                            </FormControl>
+                            <FormMessage className="text-[11px] text-[#ff3366]" />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                    <div className="form-field">
-                      <label className="form-label">Alert Type</label>
-                      <select
-                        value={newType}
-                        onChange={e => setNewType(e.target.value)}
-                        aria-label="Alert type"
-                        className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none [&>option]:bg-[#0d0d1a] [&>option]:text-white"
-                      >
-                        {ALERT_TYPE_OPTIONS.map(o => (
-                          <option key={o.value} value={o.value}>{o.label}</option>
-                        ))}
-                      </select>
-                    </div>
-                    {needsThreshold(newType) ? (
-                      <div className="form-field">
-                        <label className="form-label">Target Price ($)</label>
-                        <input
-                          placeholder="e.g. 185.00"
-                          value={newThreshold}
-                          onChange={e => setNewThreshold(e.target.value.replace(/[^0-9.]/g, ""))}
-                          aria-label="Target price"
-                          className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/30 font-[family-name:var(--font-mono)]"
+                      <FormField
+                        control={alertForm.control}
+                        name="alertType"
+                        render={({ field }) => (
+                          <FormItem className="form-field">
+                            <label className="form-label">Alert Type</label>
+                            <FormControl>
+                              <select
+                                {...field}
+                                aria-label="Alert type"
+                                className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none [&>option]:bg-[#0d0d1a] [&>option]:text-white"
+                              >
+                                {ALERT_TYPE_OPTIONS.map(o => (
+                                  <option key={o.value} value={o.value}>{o.label}</option>
+                                ))}
+                              </select>
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      {needsThreshold(watchedAlertType) ? (
+                        <FormField
+                          control={alertForm.control}
+                          name="threshold"
+                          render={({ field }) => (
+                            <FormItem className="form-field">
+                              <label className="form-label">Target Price ($)</label>
+                              <FormControl>
+                                <input
+                                  {...field}
+                                  placeholder="e.g. 185.00"
+                                  aria-label="Target price"
+                                  aria-invalid={!!alertForm.formState.errors.threshold}
+                                  onChange={e => field.onChange(e.target.value.replace(/[^0-9.]/g, ""))}
+                                  className={`w-full bg-white/[0.05] border rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:outline-none font-[family-name:var(--font-mono)] ${alertForm.formState.errors.threshold ? "border-[#ff3366]/60" : "border-white/10 focus:border-[#00D4FF]/30"}`}
+                                />
+                              </FormControl>
+                              <FormMessage className="text-[11px] text-[#ff3366]" />
+                            </FormItem>
+                          )}
                         />
+                      ) : <div />}
+                      <div className="flex gap-2 items-end">
+                        <Button
+                          type="submit"
+                          disabled={creating}
+                          className="flex-1 bg-[#00D4FF] text-black font-bold hover:bg-[#00D4FF]/80 gap-1"
+                        >
+                          {creating ? <><RefreshCw className="w-3 h-3 animate-spin" /> Creating...</> : "Create"}
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={() => { setShowForm(false); alertForm.reset(); }}
+                          variant="ghost"
+                          className="text-white/50 hover:text-white"
+                        >
+                          Cancel
+                        </Button>
                       </div>
-                    ) : <div />}
-                    <div className="flex gap-2 items-end">
-                      <Button
-                        onClick={createAlert}
-                        disabled={creating || !newSymbol.trim()}
-                        className="flex-1 bg-[#00D4FF] text-black font-bold hover:bg-[#00D4FF]/80"
-                      >
-                        {creating ? "Creating..." : "Create"}
-                      </Button>
-                      <Button
-                        onClick={() => setShowForm(false)}
-                        variant="ghost"
-                        className="text-white/40 hover:text-white"
-                      >
-                        Cancel
-                      </Button>
                     </div>
-                  </div>
-                </div>
+                  </form>
+                </Form>
               )}
             </div>
 
@@ -431,10 +481,10 @@ export default function Alerts() {
               <div className="text-center py-20 rounded-xl bg-white/[0.02] border border-white/[0.06]">
                 <Bell className="w-12 h-12 mx-auto mb-3 text-white/10" />
                 <p className="text-white/30 text-sm font-semibold">No alert rules yet</p>
-                <p className="text-white/15 text-xs mt-1 max-w-xs mx-auto">Set up your first price alert to get notified when stocks hit your target levels.</p>
-                <button onClick={() => setShowForm(true)} className="mt-4 px-4 py-2 rounded-lg bg-gradient-to-r from-[#00D4FF] to-[#0099cc] text-black text-xs font-bold hover:opacity-90 transition-opacity">
+                <p className="text-white/50 text-xs mt-1 max-w-xs mx-auto">Set up your first price alert to get notified when stocks hit your target levels.</p>
+                <Button onClick={() => setShowForm(true)} className="mt-4 bg-gradient-to-r from-[#00D4FF] to-[#0099cc] text-black text-xs font-bold hover:opacity-90">
                   Create Your First Alert
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -451,9 +501,9 @@ export default function Alerts() {
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-bold text-[#00D4FF] font-[family-name:var(--font-mono)]">Edit: {rule.symbol}</p>
-                            <button onClick={() => setEditingId(null)} className="p-1 text-white/30 hover:text-white">
+                            <Button onClick={() => setEditingId(null)} size="icon" variant="ghost" className="w-7 h-7 text-white/30 hover:text-white">
                               <X className="w-4 h-4" />
-                            </button>
+                            </Button>
                           </div>
                           <select
                             value={editType}
@@ -469,12 +519,12 @@ export default function Alerts() {
                               placeholder="Threshold ($)"
                               value={editThreshold}
                               onChange={e => setEditThreshold(e.target.value.replace(/[^0-9.]/g, ""))}
-                              className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/30 font-[family-name:var(--font-mono)]"
+                              className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/30 font-[family-name:var(--font-mono)]"
                             />
                           )}
                           <div className="flex gap-2">
                             <Button onClick={() => saveEdit(rule.id)} className="flex-1 bg-[#00D4FF] text-black font-bold text-xs">Save</Button>
-                            <Button onClick={() => setEditingId(null)} variant="ghost" className="text-white/40 text-xs">Cancel</Button>
+                            <Button onClick={() => setEditingId(null)} variant="ghost" className="text-white/50 text-xs">Cancel</Button>
                           </div>
                         </div>
                       ) : (
@@ -494,25 +544,34 @@ export default function Alerts() {
                             </div>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <button
+                            <Button
                               onClick={() => startEdit(rule)}
-                              className="p-1.5 text-white/20 hover:text-[#00D4FF] transition-colors"
+                              size="icon"
+                              variant="ghost"
+                              className="w-7 h-7 text-white/30 hover:text-[#00D4FF]"
+                              aria-label="Edit alert"
                             >
                               <Pencil className="w-4 h-4" />
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                               onClick={() => toggleAlert(rule.id, rule.enabled)}
-                              className="p-1.5 transition-colors"
-                              style={{ color: rule.enabled ? "#00ff88" : "rgba(255,255,255,0.2)" }}
+                              size="icon"
+                              variant="ghost"
+                              className="w-7 h-7"
+                              style={{ color: rule.enabled ? "#00ff88" : "rgba(255,255,255,0.3)" }}
+                              aria-label={rule.enabled ? "Disable alert" : "Enable alert"}
                             >
                               {rule.enabled ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                               onClick={() => deleteAlert(rule.id)}
-                              className="p-1.5 text-white/20 hover:text-[#ff3366] transition-colors"
+                              size="icon"
+                              variant="ghost"
+                              className="w-7 h-7 text-white/30 hover:text-[#ff3366]"
+                              aria-label="Delete alert"
                             >
                               <Trash2 className="w-4 h-4" />
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       )}
@@ -523,8 +582,8 @@ export default function Alerts() {
             )}
             {rules.length > 0 && rules.length < rulesTotal && (
               <div className="text-center mt-4">
-                <Button onClick={loadMoreRules} disabled={loadingMore} variant="ghost" className="text-[#00D4FF] text-xs">
-                  {loadingMore ? "Loading..." : `Load More (${rules.length}/${rulesTotal})`}
+                <Button onClick={loadMoreRules} disabled={loadingMore} variant="ghost" className="text-[#00D4FF] text-xs gap-2">
+                  {loadingMore ? <><RefreshCw className="w-3 h-3 animate-spin" /> Loading...</> : `Load More (${rules.length}/${rulesTotal})`}
                 </Button>
               </div>
             )}
@@ -546,7 +605,7 @@ export default function Alerts() {
               <div className="text-center py-20 rounded-xl bg-white/[0.02] border border-white/[0.06]">
                 <History className="w-12 h-12 mx-auto mb-3 text-white/10" />
                 <p className="text-white/30 text-sm font-semibold">No triggered alerts yet</p>
-                <p className="text-white/15 text-xs mt-1 max-w-xs mx-auto">When your alert conditions are met, triggered notifications will appear here.</p>
+                <p className="text-white/50 text-xs mt-1 max-w-xs mx-auto">When your alert conditions are met, triggered notifications will appear here.</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -566,11 +625,11 @@ export default function Alerts() {
                           <span className="text-sm font-bold font-[family-name:var(--font-mono)]" style={{ color }}>
                             {h.symbol}
                           </span>
-                          <span className="text-xs text-white/20">{getAlertTypeLabel(h.alertType)}</span>
+                          <span className="text-xs text-white/50">{getAlertTypeLabel(h.alertType)}</span>
                           {!h.read && <div className="w-2 h-2 rounded-full bg-[#00D4FF]" />}
                         </div>
                         <p className="text-xs text-white/50 mt-1">{h.message}</p>
-                        <p className="text-[10px] text-white/20 mt-1 font-[family-name:var(--font-mono)]">
+                        <p className="text-[10px] text-white/50 mt-1 font-[family-name:var(--font-mono)]">
                           {formatTime(h.triggeredAt)}
                           {h.triggeredValue != null && (
                             <span className="ml-2">Value: {h.triggeredValue.toFixed(2)}</span>
@@ -584,8 +643,8 @@ export default function Alerts() {
             )}
             {history.length > 0 && history.length < historyTotal && (
               <div className="text-center mt-4">
-                <Button onClick={loadMoreHistory} disabled={loadingMore} variant="ghost" className="text-[#00D4FF] text-xs">
-                  {loadingMore ? "Loading..." : `Load More (${history.length}/${historyTotal})`}
+                <Button onClick={loadMoreHistory} disabled={loadingMore} variant="ghost" className="text-[#00D4FF] text-xs gap-2">
+                  {loadingMore ? <><RefreshCw className="w-3 h-3 animate-spin" /> Loading...</> : `Load More (${history.length}/${historyTotal})`}
                 </Button>
               </div>
             )}
@@ -620,13 +679,14 @@ export default function Alerts() {
                 { value: "daily", label: "Daily" },
                 { value: "weekly", label: "Weekly" },
               ].map(opt => (
-                <button
+                <Button
                   key={opt.value}
                   onClick={() => updateDigestPref(opt.value)}
-                  className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${digestFrequency === opt.value ? "bg-[#00D4FF]/15 text-[#00D4FF] border border-[#00D4FF]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06] hover:text-white/50"}`}
+                  variant="ghost"
+                  className={`flex-1 h-auto py-2.5 rounded-lg text-xs font-semibold ${digestFrequency === opt.value ? "bg-[#00D4FF]/15 text-[#00D4FF] border border-[#00D4FF]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06] hover:text-white/50"}`}
                 >
                   {opt.label}
-                </button>
+                </Button>
               ))}
             </div>
             {digestFrequency !== "off" && (

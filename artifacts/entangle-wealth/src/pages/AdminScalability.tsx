@@ -59,7 +59,7 @@ function MetricCard({ icon: Icon, label, value, sub }: { icon: typeof Activity; 
         <span className="text-sm text-white/60">{label}</span>
       </div>
       <div className="text-2xl font-bold text-white font-mono">{value}</div>
-      {sub && <div className="text-xs text-white/40 mt-1">{sub}</div>}
+      {sub && <div className="text-xs text-white/50 mt-1">{sub}</div>}
     </div>
   );
 }
@@ -221,7 +221,7 @@ export default function AdminScalability() {
                           <CircuitStateIcon state={circuit.state} />
                           <div>
                             <div className="text-white font-medium capitalize">{circuit.name}</div>
-                            <div className="text-xs text-white/40">
+                            <div className="text-xs text-white/50">
                               {circuit.failureCount} failures
                               {circuit.lastFailureTime > 0 && ` | Last: ${new Date(circuit.lastFailureTime).toLocaleTimeString()}`}
                             </div>
@@ -251,13 +251,13 @@ export default function AdminScalability() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-3 bg-white/5 rounded-lg">
-                        <div className="text-xs text-white/40">Active</div>
+                        <div className="text-xs text-white/50">Active</div>
                         <div className="text-2xl font-mono text-[#00D4FF]">
                           {metrics.aiQueue.active}/{metrics.aiQueue.maxConcurrent}
                         </div>
                       </div>
                       <div className="p-3 bg-white/5 rounded-lg">
-                        <div className="text-xs text-white/40">Queued</div>
+                        <div className="text-xs text-white/50">Queued</div>
                         <div className="text-2xl font-mono text-[#FFD700]">{metrics.aiQueue.queued}</div>
                       </div>
                     </div>
@@ -315,7 +315,7 @@ export default function AdminScalability() {
                         )}
                         <div>
                           <div className={`text-sm ${item.ok ? "text-white/70" : "text-[#ff3366]"}`}>{item.label}</div>
-                          <div className="text-xs text-white/40">{item.detail}</div>
+                          <div className="text-xs text-white/50">{item.detail}</div>
                         </div>
                       </div>
                     ))}

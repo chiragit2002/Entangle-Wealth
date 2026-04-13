@@ -3,6 +3,7 @@ import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { Trophy, Medal, Crown, TrendingUp, Flame, Star, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface LeaderboardEntry {
   rank: number;
@@ -78,23 +79,24 @@ export default function Leaderboard() {
             <Trophy className="w-7 h-7 text-[#FFD700]" />
             <h1 className="text-3xl font-bold tracking-tight text-white">Leaderboard</h1>
           </div>
-          <p className="text-white/40 text-sm">Top 100 traders ranked by performance</p>
+          <p className="text-white/50 text-sm">Top 100 traders ranked by performance</p>
         </div>
 
         {/* Period Tabs */}
         <div className="flex gap-1.5 mb-6 bg-white/[0.03] rounded-xl p-1 border border-white/[0.06] w-fit">
           {periods.map(p => (
-            <button
+            <Button
               key={p}
               onClick={() => setPeriod(p)}
-              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              variant="ghost"
+              className={`px-4 py-1.5 h-auto rounded-lg text-sm font-medium ${
                 period === p
                   ? "bg-primary/15 text-primary"
                   : "text-white/40 hover:text-white/70"
               }`}
             >
               {p === "all-time" ? "All Time" : p.charAt(0).toUpperCase() + p.slice(1)}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -131,7 +133,7 @@ export default function Leaderboard() {
                   <img src={entry.photoUrl} alt="" className="w-12 h-12 rounded-full mx-auto mb-2 border-2 border-white/10" />
                 ) : (
                   <div className="w-12 h-12 rounded-full mx-auto mb-2 bg-white/[0.04] border-2 border-white/10 flex items-center justify-center">
-                    <User className="w-6 h-6 text-white/20" />
+                    <User className="w-6 h-6 text-white/40" />
                   </div>
                 )}
                 <p className="font-semibold text-sm text-white mb-0.5">{entry.firstName || "Trader"} {entry.lastName?.charAt(0) || ""}</p>
@@ -149,13 +151,13 @@ export default function Leaderboard() {
         )}
 
         {/* Full table */}
-        <div className="bg-[#0a0a0f] border border-white/[0.06] rounded-xl overflow-hidden">
-          <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-white/[0.02] border-b border-white/[0.06] text-[10px] font-semibold text-white/30 uppercase tracking-wider">
-            <div className="col-span-1">#</div>
-            <div className="col-span-5">Trader</div>
-            <div className="col-span-2 text-right">Level</div>
-            <div className="col-span-2 text-right">Gain</div>
-            <div className="col-span-2 text-right">XP</div>
+        <div className="bg-[#0a0a0f] border border-white/[0.06] rounded-xl overflow-hidden" role="table" aria-label="Leaderboard rankings sorted by XP">
+          <div role="row" className="grid grid-cols-12 gap-2 px-4 py-3 bg-white/[0.02] border-b border-white/[0.06] text-[10px] font-semibold text-white/30 uppercase tracking-wider">
+            <div role="columnheader" aria-sort="ascending" className="col-span-1">#</div>
+            <div role="columnheader" className="col-span-5">Trader</div>
+            <div role="columnheader" className="col-span-2 text-right">Level</div>
+            <div role="columnheader" className="col-span-2 text-right">Gain</div>
+            <div role="columnheader" aria-sort="descending" className="col-span-2 text-right">XP</div>
           </div>
 
           {loading ? (
@@ -179,7 +181,7 @@ export default function Leaderboard() {
                       <img src={entry.photoUrl} alt="" className="w-7 h-7 rounded-full" />
                     ) : (
                       <div className="w-7 h-7 rounded-full bg-white/[0.05] flex items-center justify-center">
-                        <User className="w-3.5 h-3.5 text-white/20" />
+                        <User className="w-3.5 h-3.5 text-white/40" />
                       </div>
                     )}
                     <div>

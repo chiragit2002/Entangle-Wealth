@@ -112,7 +112,7 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <span className="text-xs text-white/40">{label}</span>
+      <span className="text-xs text-white/50">{label}</span>
       <button
         onClick={() => handleVote(true)}
         className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-[#00ff88] hover:bg-[#00ff88]/10 border border-white/10 hover:border-[#00ff88]/30 transition-all"

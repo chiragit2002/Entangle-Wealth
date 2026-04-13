@@ -178,7 +178,7 @@ function HealthScoreGauge({ score }: { score: number }) {
           style={{ background: "#020204" }}
         >
           <span className="text-3xl font-bold font-mono" style={{ color }}>{score}</span>
-          <span className="text-[10px] text-white/40">/ 100</span>
+          <span className="text-[10px] text-white/50">/ 100</span>
         </div>
       </div>
       <span className="mt-2 text-sm font-medium" style={{ color }}>{label}</span>
@@ -195,7 +195,7 @@ function FunnelViz({ funnel }: { funnel: FunnelData }) {
     >
       <div className="mb-3">
         <h3 className="text-sm font-semibold text-white">{funnel.name}</h3>
-        <p className="text-xs text-white/40">{funnel.description}</p>
+        <p className="text-xs text-white/50">{funnel.description}</p>
       </div>
       <div className="space-y-3">
         {funnel.steps.map((step, i) => {
@@ -237,7 +237,7 @@ function FunnelViz({ funnel }: { funnel: FunnelData }) {
         })}
       </div>
       <div className="mt-3 flex items-center justify-between text-xs border-t border-white/5 pt-3">
-        <span className="text-white/40">Overall conversion</span>
+        <span className="text-white/50">Overall conversion</span>
         <span
           className="font-mono font-bold"
           style={{ color: funnel.overallConversion >= 50 ? "#00ff88" : funnel.overallConversion >= 20 ? "#FFD700" : "#ff3366" }}
@@ -318,7 +318,7 @@ export default function EvolutionDashboard() {
               <Zap className="w-8 h-8 text-[#FFD700]" />
               Evolution Dashboard
             </h1>
-            <p className="text-white/40 text-sm mt-1">UX intelligence, friction signals & system health</p>
+            <p className="text-white/50 text-sm mt-1">UX intelligence, friction signals & system health</p>
           </div>
           <div className="flex items-center gap-3">
             <a
@@ -357,17 +357,17 @@ export default function EvolutionDashboard() {
             <div className="grid grid-cols-1 gap-4 md:col-span-3 md:grid-cols-3">
               <div className="rounded-xl border p-5" style={{ background: "rgba(255,51,102,0.05)", borderColor: "rgba(255,51,102,0.15)" }}>
                 <div className="text-3xl font-bold font-mono text-[#ff3366]">{insightsSummary.critical}</div>
-                <div className="text-xs text-white/40 mt-1">Critical Issues</div>
+                <div className="text-xs text-white/50 mt-1">Critical Issues</div>
                 <div className="mt-2 text-xs text-white/30">{insightsSummary.warning} warnings · {insightsSummary.info} info</div>
               </div>
               <div className="rounded-xl border p-5" style={{ background: "rgba(255,215,0,0.05)", borderColor: "rgba(255,215,0,0.15)" }}>
                 <div className="text-3xl font-bold font-mono text-[#FFD700]">{insightsSummary.rageClickTotal}</div>
-                <div className="text-xs text-white/40 mt-1">Rage Clicks (7d)</div>
+                <div className="text-xs text-white/50 mt-1">Rage Clicks (7d)</div>
                 <div className="mt-2 text-xs text-white/30">{insightsSummary.totalEvents7d.toLocaleString()} total events</div>
               </div>
               <div className="rounded-xl border p-5" style={{ background: "rgba(0,255,136,0.05)", borderColor: "rgba(0,255,136,0.15)" }}>
                 <div className="text-3xl font-bold font-mono text-[#00ff88]">{insightsSummary.avgSatisfaction}%</div>
-                <div className="text-xs text-white/40 mt-1">Avg Satisfaction</div>
+                <div className="text-xs text-white/50 mt-1">Avg Satisfaction</div>
                 <div className="mt-2 text-xs text-white/30">Micro-feedback score</div>
               </div>
             </div>
@@ -396,7 +396,7 @@ export default function EvolutionDashboard() {
               </div>
             ) : funnels.length === 0 ? (
               <div className="rounded-xl border p-8 text-center" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}>
-                <Activity className="w-8 h-8 mx-auto mb-2 text-white/20" />
+                <Activity className="w-8 h-8 mx-auto mb-2 text-white/40" />
                 <p className="text-white/30 text-sm">No funnel data yet — events will populate as users flow through the app</p>
               </div>
             ) : (
@@ -462,9 +462,9 @@ export default function EvolutionDashboard() {
             ) : (
               <div className="h-64 flex items-center justify-center">
                 <div className="text-center">
-                  <ThumbsUp className="w-8 h-8 mx-auto mb-2 text-white/20" />
+                  <ThumbsUp className="w-8 h-8 mx-auto mb-2 text-white/40" />
                   <p className="text-white/30 text-sm">No feedback collected yet</p>
-                  <p className="text-white/20 text-xs mt-1">Micro-feedback prompts appear after key flows</p>
+                  <p className="text-white/50 text-xs mt-1">Micro-feedback prompts appear after key flows</p>
                 </div>
               </div>
             )}
@@ -475,7 +475,7 @@ export default function EvolutionDashboard() {
                   <div key={f.context} className="flex items-center justify-between text-xs">
                     <span className="text-white/60 capitalize">{f.context.replace(/_/g, " ")}</span>
                     <div className="flex items-center gap-3">
-                      <span className="text-white/40">{f.total} responses</span>
+                      <span className="text-white/50">{f.total} responses</span>
                       <div className="flex items-center gap-1">
                         <ThumbsUp className="w-3 h-3 text-[#00ff88]" />
                         <span className="text-[#00ff88] font-mono">{f.helpfulCount}</span>
@@ -504,8 +504,8 @@ export default function EvolutionDashboard() {
                       ) : (
                         <ThumbsDown className="w-3 h-3 text-[#ff3366] flex-shrink-0" />
                       )}
-                      <span className="text-[10px] text-white/40 capitalize">{c.context.replace(/_/g, " ")}</span>
-                      <span className="text-[10px] text-white/20 ml-auto">
+                      <span className="text-[10px] text-white/50 capitalize">{c.context.replace(/_/g, " ")}</span>
+                      <span className="text-[10px] text-white/50 ml-auto">
                         {new Date(c.created_at).toLocaleDateString()}
                       </span>
                     </div>
@@ -516,9 +516,9 @@ export default function EvolutionDashboard() {
             ) : (
               <div className="h-72 flex items-center justify-center">
                 <div className="text-center">
-                  <Info className="w-8 h-8 mx-auto mb-2 text-white/20" />
+                  <Info className="w-8 h-8 mx-auto mb-2 text-white/40" />
                   <p className="text-white/30 text-sm">No comments yet</p>
-                  <p className="text-white/20 text-xs mt-1">Users can leave optional comments with their feedback</p>
+                  <p className="text-white/50 text-xs mt-1">Users can leave optional comments with their feedback</p>
                 </div>
               </div>
             )}
@@ -533,12 +533,12 @@ export default function EvolutionDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="rounded-lg border p-4 text-center" style={{ background: "rgba(156,39,176,0.05)", borderColor: "rgba(156,39,176,0.15)" }}>
               <div className="text-2xl font-bold font-mono text-[#9c27b0] mb-1">10%</div>
-              <div className="text-xs text-white/40">Session Replay Sampling</div>
+              <div className="text-xs text-white/50">Session Replay Sampling</div>
               <div className="text-[10px] text-white/25 mt-1">1 in 10 sessions recorded</div>
             </div>
             <div className="rounded-lg border p-4 text-center" style={{ background: "rgba(0,255,136,0.05)", borderColor: "rgba(0,255,136,0.15)" }}>
               <div className="text-2xl font-bold font-mono text-[#00ff88] mb-1">100%</div>
-              <div className="text-xs text-white/40">Error Session Capture</div>
+              <div className="text-xs text-white/50">Error Session Capture</div>
               <div className="text-[10px] text-white/25 mt-1">All error sessions recorded</div>
             </div>
             <div className="flex items-center justify-center">

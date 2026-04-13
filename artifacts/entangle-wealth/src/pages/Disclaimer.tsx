@@ -9,7 +9,7 @@ export default function Disclaimer() {
         <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-2">
           Financial <span className="electric-text">Disclaimer</span>
         </h1>
-        <p className="text-sm text-white/20 mb-10 font-mono">Last Updated: April 11, 2026</p>
+        <p className="text-sm text-white/50 mb-10 font-mono">Last Updated: April 11, 2026</p>
 
         <div className="space-y-10 text-white/60 leading-relaxed">
           {/* ATTORNEY REVIEW: Verify this disclaimer is sufficient for your regulatory jurisdiction(s) */}
@@ -106,7 +106,7 @@ export default function Disclaimer() {
           </section>
 
           <section>
-            <p className="text-xs text-white/20">See also: <Link href="/terms" className="text-[#00D4FF] hover:underline">Terms of Use</Link> · <Link href="/privacy" className="text-[#00D4FF] hover:underline">Privacy Policy</Link></p>
+            <p className="text-xs text-white/50">See also: <Link href="/terms" className="text-[#00D4FF] hover:underline">Terms of Use</Link> · <Link href="/privacy" className="text-[#00D4FF] hover:underline">Privacy Policy</Link></p>
           </section>
         </div>
       </div>

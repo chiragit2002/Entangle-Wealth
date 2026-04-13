@@ -371,7 +371,7 @@ server.post(
       res.status(200).json({ received: true });
     } catch (error) {
       logger.error({ error }, "Webhook processing error");
-      res.status(400).json({ error: "Webhook processing failed" });
+      res.status(500).json({ error: "Webhook processing failed" });
     }
   }
 );

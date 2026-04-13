@@ -2,12 +2,12 @@ import { useLocation } from "wouter";
 import { ArrowRight, CheckCircle2, Briefcase, Target, TrendingUp, Shield, Zap, Sparkles } from "lucide-react";
 
 const FOCUS_LABELS: Record<string, string> = {
-  saving: "Building savings",
-  investing: "Investing smarter",
-  debt: "Managing debt",
-  unsure: "Exploring my options",
-  tax: "Reducing my tax bill",
-  clarity: "Getting financial clarity",
+  saving: "Cutting waste, building buffer",
+  investing: "Putting money to actual work",
+  debt: "Killing high-interest debt",
+  unsure: "Getting the full picture first",
+  tax: "Stopping overpayment to the IRS",
+  clarity: "Understanding where I actually stand",
 };
 
 const FOCUS_COLORS: Record<string, string> = {
@@ -28,55 +28,55 @@ interface Recommendation {
 function getRecommendation(focus: string, outcome: string): Recommendation {
   if (focus === "saving" || outcome === "stability") {
     return {
-      title: "Build a 3-month emergency fund first",
-      why: "Before any other financial move, having a safety net removes the stress from every other decision. It's the single highest-leverage thing you can do right now.",
+      title: "Three months of runway — build it before anything else",
+      why: "An emergency fund isn't cautious. It's the highest-leverage financial move you can make. It removes the anxiety from every decision that comes after it.",
       insights: [
-        "67% of people who feel financially stable have 3+ months saved",
-        "An emergency fund turns unexpected costs from crises into inconveniences",
-        "Once saved, your next move becomes dramatically clearer",
+        "67% of people who describe themselves as financially stable have 3+ months saved",
+        "An emergency fund turns an unexpected cost from a crisis into an inconvenience",
+        "Once it's funded, every next move — investing, paying off debt — becomes obvious",
       ],
     };
   }
   if (focus === "debt") {
     return {
-      title: "Attack your highest-interest debt first",
-      why: "High-interest debt is the fastest way to lose money you never see leave. Eliminating it is the highest guaranteed return available to you right now.",
+      title: "Hit your highest-interest debt first. Nothing else until it's gone.",
+      why: "High-interest debt is a guaranteed loss you're paying every single month. Eliminating it is the only investment with a certain, immediate return.",
       insights: [
-        "Credit card debt averaging 22% APR costs more than most investments return",
-        "The debt avalanche method saves the most money over time",
-        "Clearing one debt creates momentum and frees cash for the next goal",
+        "Credit card debt at 22% APR costs more than almost any investment will ever return",
+        "The avalanche method — highest rate first — saves the most over time",
+        "Every paid-off balance frees cash and momentum for the next target",
       ],
     };
   }
   if (focus === "investing" || outcome === "growth") {
     return {
-      title: "Start with a low-cost index fund strategy",
-      why: "Index funds outperform 80% of professional fund managers over a 10-year period. Starting simple beats waiting for the perfect moment.",
+      title: "Start simple. Index funds. Consistent contributions. No timing.",
+      why: "Index funds beat 80% of professional fund managers over 10 years. The people waiting for the right moment are watching the people who started simple build wealth.",
       insights: [
-        "Time in the market beats timing the market — consistent contributions win",
-        "Low-cost index funds (0.03–0.2% fees) keep more of your returns",
-        "Maxing your employer 401(k) match is a 50–100% instant return",
+        "Time in the market wins. Timing the market costs you both time and returns.",
+        "Low-cost index funds (0.03–0.2% expense ratios) keep your gains instead of paying them out",
+        "If your employer matches 401(k) contributions, that's a 50–100% instant return. Max it.",
       ],
     };
   }
   if (focus === "tax") {
     return {
-      title: "Uncover deductions you're leaving on the table",
-      why: "Most people overpay on taxes by $1,500–$5,000 per year without knowing it. A single tax scan can reveal deductions that pay for themselves many times over.",
+      title: "You're almost certainly overpaying your taxes. Let's find where.",
+      why: "The average person misses thousands in deductions every year — not through fraud, just through not knowing what they're entitled to claim.",
       insights: [
-        "The average person misses 12+ deductions they're entitled to claim",
-        "Self-employed individuals often miss home office, mileage, and equipment deductions",
-        "Proactive tax planning can legally reduce your bill by 15–30% annually",
+        "Most people miss 12+ legitimate deductions on every return",
+        "Self-employed? Home office, mileage, equipment, and health insurance deductions are frequently skipped",
+        "Proactive tax strategy legally cuts most people's bills by 15–30% annually",
       ],
     };
   }
   return {
-    title: "Get a clear picture of where you stand",
-    why: "Financial clarity is the foundation of every good decision. Knowing exactly where your money goes unlocks your ability to direct it with intention.",
+    title: "Start with the truth of where you actually stand.",
+    why: "You cannot improve a financial situation you don't fully see. Clarity is the foundation. Every good move comes after it.",
     insights: [
-      "Most people are surprised where their money actually goes each month",
-      "Clarity on your situation makes every next step obvious",
-      "A single honest look at your finances is worth more than 10 articles",
+      "Most people are genuinely shocked by where their money actually goes each month",
+      "One honest audit of your finances is worth more than a hundred articles about personal finance",
+      "Clarity doesn't create problems — it reveals which ones are actually worth solving",
     ],
   };
 }
@@ -131,9 +131,9 @@ export function PersonalizedResultScreen({
           </div>
           <h2 id="result-screen-title" className="text-xl font-bold text-white leading-snug">
             {firstName ? (
-              <>{firstName}, here's your <span className="text-[#FF8C00]">next financial move</span></>
+              <>{firstName}, here's the <span className="text-[#FF8C00]">one move that matters most</span></>
             ) : (
-              <>Here's your <span className="text-[#FF8C00]">next financial move</span></>
+              <>Here's the <span className="text-[#FF8C00]">one move that matters most</span></>
             )}
           </h2>
           {(focusLabel || occupationName) && (
@@ -196,11 +196,11 @@ export function PersonalizedResultScreen({
             onClick={handleCTA}
             className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#FF8C00] to-[#0099cc] text-black text-sm font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-[0_0_24px_rgba(255,140,0,0.2)] min-h-[48px]"
           >
-            Build my full plan
+            Open my dashboard
             <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </button>
           <p className="text-center text-[11px] text-white/20 mt-3 leading-relaxed">
-            Your personalized dashboard is ready with tools matched to your goal
+            Your dashboard is configured and ready — tools matched to your goal, not a generic template
           </p>
         </div>
       </div>

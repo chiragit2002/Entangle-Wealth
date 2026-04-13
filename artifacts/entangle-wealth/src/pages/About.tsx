@@ -7,68 +7,68 @@ export default function About() {
       <div className="container mx-auto px-4 py-20 max-w-4xl">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-            Built for people who <span className="electric-text">can't afford to get this wrong.</span>
+            We built this because we were <span className="electric-text">angry the alternative didn't exist.</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            EntangleWealth runs multiple AI models simultaneously, cross-checks their outputs, and only surfaces signals when there's real consensus. Built for people who trade to take care of their families — not to chase dopamine.
+            EntangleWealth runs multiple AI models simultaneously, cross-checks their outputs, and only surfaces a signal when there's real consensus. Built for people who trade to take care of their families — not to chase dopamine.
           </p>
         </div>
 
         <div className="flex flex-col gap-12 mb-16">
           <div>
-            <h2 className="text-2xl font-bold mb-4">One analysis method can be wrong. Two can still be wrong.</h2>
+            <h2 className="text-2xl font-bold mb-4">One model can be wrong. Two can still be wrong. So we run six.</h2>
             <p className="text-muted-foreground text-lg leading-relaxed">
-              So we run multiple independent methods on every ticker, every few seconds: price action, volume, options flow, sentiment, risk modeling — all at once. When they disagree, we say nothing. When they converge, we tell you — with a confidence score and specific reasoning, not just an arrow pointing up.
+              Every ticker gets analyzed by multiple independent methods simultaneously: price action, volume, options flow, sentiment, risk modeling — all at once, all cross-checking each other. When they disagree, we say nothing. When they converge, we tell you — with a confidence score and specific reasoning, not a colored arrow pointing up.
             </p>
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold mb-4">The market isn't the only way to build wealth.</h2>
+            <h2 className="text-2xl font-bold mb-4">The market is one way to build wealth. We cover the others too.</h2>
             <p className="text-muted-foreground text-lg leading-relaxed">
-              We surface income opportunities beyond your brokerage — gig work, freelance openings, and options income strategies like covered calls and cash-secured puts. More angles, more information, better tools than 14 browser tabs at midnight.
+              We surface income opportunities beyond your brokerage — gig work, freelance openings, and options income strategies like covered calls and cash-secured puts. More angles. Better tools. No more 14 browser tabs at midnight trying to assemble a picture that was never meant to fit together.
             </p>
           </div>
 
           <div>
             <h2 className="text-2xl font-bold mb-4">What we won't do.</h2>
             <p className="text-muted-foreground text-lg leading-relaxed">
-              We won't promise you returns, show you a highlight reel of wins, or pretend this is easy — because it isn't. Most retail traders lose money. That's documented fact, not fine print. We offer better information, better analysis, and better risk management than going it alone. You still make the decisions.
+              We won't promise returns. We won't show you a highlight reel of wins. We won't pretend this is easy — because it isn't. Most retail traders lose money. That's documented fact, not fine print we're hiding. We offer better information, better analysis, and better risk management than going it alone. You still make the decisions. That's how it should be.
             </p>
           </div>
         </div>
 
         <div className="mb-16">
-          <h2 className="text-2xl font-bold mb-8">How the analysis works.</h2>
+          <h2 className="text-2xl font-bold mb-8">How the analysis actually works.</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
               <BarChart3 className="w-7 h-7 text-primary" />
               <h3 className="font-bold">Price Action</h3>
-              <p className="text-sm text-muted-foreground">Candlestick patterns, support/resistance, breakouts, reversals, and continuation setups.</p>
+              <p className="text-sm text-muted-foreground">Candlestick patterns, support/resistance, breakouts, reversals, and continuation setups — the foundation every other signal builds on.</p>
             </div>
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
               <Activity className="w-7 h-7 text-secondary" />
               <h3 className="font-bold">Volume Analysis</h3>
-              <p className="text-sm text-muted-foreground">Where institutional money is flowing — VWAP, volume profiles, accumulation/distribution.</p>
+              <p className="text-sm text-muted-foreground">Where institutional money is actually moving — VWAP, volume profiles, accumulation/distribution. Follow the real money, not the noise.</p>
             </div>
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
               <Target className="w-7 h-7 text-primary" />
               <h3 className="font-bold">Options Flow</h3>
-              <p className="text-sm text-muted-foreground">Large premium sweeps, block trades, and unusual open interest across all major exchanges.</p>
+              <p className="text-sm text-muted-foreground">Large premium sweeps, block trades, and unusual open interest across every major exchange. Whales leave footprints.</p>
             </div>
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
               <Shield className="w-7 h-7 text-green-400" />
               <h3 className="font-bold">Greeks Analysis</h3>
-              <p className="text-sm text-muted-foreground">Delta, Gamma, Theta, and Vega on every contract. Dealer gamma exposure and IV rank.</p>
+              <p className="text-sm text-muted-foreground">Delta, Gamma, Theta, and Vega on every contract. Dealer gamma exposure and IV rank — the data your brokerage doesn't surface.</p>
             </div>
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
               <Users className="w-7 h-7 text-purple-400" />
               <h3 className="font-bold">Sentiment</h3>
-              <p className="text-sm text-muted-foreground">News flow, social data, and put/call ratios — helps identify crowd extremes.</p>
+              <p className="text-sm text-muted-foreground">News flow, social data, and put/call ratios — used to identify crowd extremes before they reverse, not to chase them.</p>
             </div>
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
               <AlertTriangle className="w-7 h-7 text-red-400" />
               <h3 className="font-bold">Risk Management</h3>
-              <p className="text-sm text-muted-foreground">Position sizing on every signal. Risk capped at 2% per trade via Kelly Criterion. Capital preservation first.</p>
+              <p className="text-sm text-muted-foreground">Position sizing baked into every signal. Risk capped at 2% per trade via Kelly Criterion. Capital preservation is the first priority, always.</p>
             </div>
           </div>
         </div>
@@ -76,7 +76,7 @@ export default function About() {
         <div className="mb-16">
           <h2 className="text-2xl font-bold mb-4">Why we built this.</h2>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            Because institutional-grade tools have always been locked behind fees that would eat a working person's entire trading account. We wanted to build something a parent could open on their phone at lunch, get real information, and close knowing what to do next. That's the whole point.
+            Institutional-grade tools have always been locked behind fees that would consume a working person's entire trading account. We wanted to build something a parent could open on their phone at lunch, get real analysis, and close knowing exactly what to do next. That's the entire point. Nothing else.
           </p>
         </div>
 

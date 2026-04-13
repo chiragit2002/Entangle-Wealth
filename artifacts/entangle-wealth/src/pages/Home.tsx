@@ -304,9 +304,9 @@ function RecentSignupTicker({
 }
 
 const GOAL_OPTIONS = [
-  { id: "clarity", label: "I'm flying blind — I need to see the full picture", icon: Lightbulb },
-  { id: "invest", label: "My money is just sitting there. That has to stop.", icon: TrendingUp },
-  { id: "stress", label: "Money stress is taking up too much of my head", icon: Heart },
+  { id: "clarity", label: "I have no idea where I actually stand financially", icon: Lightbulb },
+  { id: "invest", label: "My money is sitting idle and I'm losing ground", icon: TrendingUp },
+  { id: "stress", label: "Money anxiety is wrecking my focus and sleep", icon: Heart },
 ];
 
 function GoalSelector({ onSelect }: { onSelect: (goal: string) => void }) {
@@ -320,7 +320,7 @@ function GoalSelector({ onSelect }: { onSelect: (goal: string) => void }) {
 
   return (
     <div className="w-full max-w-sm mx-auto space-y-3">
-      <p className="text-sm text-white/70 mb-4">What's actually going on for you right now?</p>
+      <p className="text-sm text-white/70 mb-4">What's the real problem right now?</p>
       {GOAL_OPTIONS.map(({ id, label, icon: Icon }) => (
         <button
           key={id}
@@ -419,10 +419,10 @@ const EDGE_INSIGHTS = [
     icon: Atom,
     iconColor: "#FF8C00",
     borderColor: "rgba(255,140,0,0.25)",
-    benefit: "Multi-model consensus — built to catch what single signals miss.",
+    benefit: "Six AI agents vote on every signal. Consensus only. No noise.",
     headline: "Quantum Consensus Engine",
-    body: "6 AI agents cross-check every signal independently, then converge on a verdict. No single model bias — just collective precision your brokerage can't replicate.",
-    cta: "See It In Action",
+    body: "6 independent AI models analyze the same signal simultaneously. When they disagree, you hear nothing. When they converge, you get a verdict with confidence score and hard reasoning — not a colored arrow.",
+    cta: "Watch It Work",
     ctaHref: "/terminal",
     tag: "Terminal",
   },
@@ -431,10 +431,10 @@ const EDGE_INSIGHTS = [
     icon: GitBranch,
     iconColor: "#FF8C00",
     borderColor: "rgba(255,140,0,0.22)",
-    benefit: "See how one decision today branches into radically different futures.",
+    benefit: "One decision today. Radically different futures tomorrow.",
     headline: "Alternate Timeline Simulator",
-    body: "See how a single decision today — save $200 more/month, pay off debt early — branches into radically different futures. No other platform shows you your money's parallel lives.",
-    cta: "Explore Your Timelines",
+    body: "Save $200 more a month. Pay off that card six months early. The simulator shows you exactly how one choice branches your financial life — in dollars and years, not percentages and jargon.",
+    cta: "See Your Futures",
     ctaHref: "/alternate-timeline",
     tag: "Alternate Timeline",
   },
@@ -443,10 +443,10 @@ const EDGE_INSIGHTS = [
     icon: FileSearch,
     iconColor: "#FFB800",
     borderColor: "rgba(245,200,66,0.22)",
-    benefit: "Analyzes every trade for deductions in real time.",
+    benefit: "You're leaving money on the table. We find exactly where.",
     headline: "TaxGPT — Deductions You're Missing",
-    body: "An AI trained on IRS publications scans your situation for overlooked deductions, audit risks, and tax strategies most CPAs don't surface in a 30-minute meeting.",
-    cta: "Find Your Savings",
+    body: "An AI built on IRS publications scans your situation for every deduction, audit risk, and tax strategy your CPA skips in a 30-minute meeting. Most users find thousands they didn't know they had.",
+    cta: "Find What You're Missing",
     ctaHref: "/taxgpt",
     tag: "TaxGPT",
   },
@@ -455,10 +455,10 @@ const EDGE_INSIGHTS = [
     icon: Brain,
     iconColor: "#a78bfa",
     borderColor: "rgba(167,139,250,0.22)",
-    benefit: "63+ AI disciplines applied to your behavioral finance habits.",
+    benefit: "Why you make bad money decisions — and how to stop.",
     headline: "Behavioral Finance Coach",
-    body: "Real-time nudges grounded in behavioral economics — the psychology of why you make money decisions, and how to make better ones. Not just analysis, but actual habit change.",
-    cta: "Meet Your Coach",
+    body: "63 disciplines of behavioral economics applied to your actual spending and decision patterns. Real-time nudges that interrupt the habits costing you money before you repeat them.",
+    cta: "Start Unlearning",
     ctaHref: "/ai-coach",
     tag: "AI Coach",
   },
@@ -618,10 +618,10 @@ function YourEdgeSection() {
             Your Edge
           </span>
           <h2 className="text-2xl md:text-4xl font-bold text-white leading-tight">
-            Capabilities no one else gives you
+            Tools your brokerage doesn't want you to have
           </h2>
           <p className="text-sm text-white/40 mt-3 max-w-lg mx-auto leading-relaxed">
-            EntangleWealth combines quantum-inspired consensus AI, timeline simulation, and behavioral coaching into one platform. Here's what sets us apart.
+            We built what we couldn't find anywhere else — consensus AI that kills single-model bias, timeline simulation no other platform offers, and behavioral coaching that actually changes habits.
           </p>
         </div>
 
@@ -700,7 +700,7 @@ function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
         }}
         className="h-11 px-8 bg-[#FF8C00] text-[#0A0E1A] font-mono font-bold hover:opacity-90 active:opacity-80 text-sm tracking-wider shadow-[0_0_20px_rgba(255,140,0,0.20)] transition-all duration-150"
       >
-        See exactly where you stand — free
+        Get my financial picture — free
       </Button>
     );
   }
@@ -761,13 +761,13 @@ export default function Home() {
             <RecentSignupTicker signups={signupsState.data} error={signupsState.error} loading={signupsState.loading} />
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
-              You shouldn't have to wonder
+              Stop guessing with
               <br />
-              <span className="text-[#FF8C00]">if you're doing it right.</span>
+              <span className="text-[#FF8C00]">your financial future.</span>
             </h1>
 
             <p className="max-w-lg text-base md:text-lg text-white/60 leading-relaxed">
-              Most people are one decision away from a completely different financial life. We tell you what that decision is — in plain English.
+              Most people have the income. What they're missing is clarity. We built the tool that tells you exactly what to do next — not eventually, right now.
             </p>
 
             <MicroConversionFlow referralCode={referralCode || undefined} />
@@ -794,28 +794,28 @@ export default function Home() {
         <SocialProofTicker />
 
         {/* Bridge: Hero → Problem */}
-        <SectionBridge>Sound familiar?</SectionBridge>
+        <SectionBridge>Be honest with yourself</SectionBridge>
 
         {/* Problem */}
         <section className="py-16 lg:py-24 px-4">
           <RevealSection>
             <div className="container mx-auto max-w-2xl text-center space-y-6">
               <p className="text-[11px] font-semibold tracking-widest uppercase text-[#FF8C00]/60">
-                You're not alone
+                The real problem
               </p>
               <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
-                The money guilt is real — and it compounds every month you wait.
+                The information isn't the problem. The paralysis is.
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
                 {[
                   {
-                    text: "You've got income coming in, but you're still not sure if you're saving enough, investing right, or just bleeding money you can't account for.",
+                    text: "Money is coming in. You just can't tell if it's going to the right places — or silently evaporating into a life that looks fine from the outside.",
                   },
                   {
-                    text: "You've downloaded the apps, read the Reddit threads, watched the YouTube videos. You still don't know what to do with YOUR situation.",
+                    text: "You've read the articles. Watched the videos. Opened the apps. None of it told you what to do with your specific income, your specific debt, your specific situation.",
                   },
                   {
-                    text: "You keep telling yourself you'll figure it out next month. Next month becomes next year. And the gap keeps growing.",
+                    text: "You keep waiting for the right moment to get serious. That moment doesn't come. The gap between where you are and where you should be quietly widens.",
                   },
                 ].map((item, i) => (
                   <RevealSection key={i} delay={i * 80}>
@@ -830,39 +830,38 @@ export default function Home() {
         </section>
 
         {/* Bridge: Problem → Solution */}
-        <SectionBridge>There's a better way</SectionBridge>
+        <SectionBridge>Here's what's different</SectionBridge>
 
         {/* Solution */}
         <section className="py-16 lg:py-24 px-4">
           <RevealSection>
             <div className="container mx-auto max-w-2xl text-center space-y-6">
               <p className="text-[11px] font-semibold tracking-widest uppercase text-[#FF8C00]/60">
-                Here's the difference
+                The fix
               </p>
               <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
-                Stop drowning in information. Start getting answers.
+                Not more information. Your next move.
               </h2>
               <p className="text-base text-white/50 max-w-lg mx-auto leading-relaxed">
-                We look at your actual situation — not some hypothetical average person — and tell you
-                exactly what to do next. Specific. Actionable. No degree required.
+                We analyze your actual situation — not a generic user profile — and surface one clear, specific action. Not a list of options. Not "it depends." The thing to do next.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
                 {[
                   {
                     title: "Clarity",
-                    desc: "See your full financial picture in one place. No more guessing, no more avoidance.",
+                    desc: "Your full financial picture, in one place, right now. No spreadsheets. No avoidance. Just the truth.",
                     color: "text-[#FF8C00]",
                     border: "border-[#FF8C00]/20",
                   },
                   {
                     title: "Simplicity",
-                    desc: "We cut through the noise so you don't have to. Just the next right move — in plain language.",
+                    desc: "We cut every piece of noise between you and the answer. One next step, in plain language, no degree required.",
                     color: "text-[#FF8C00]",
                     border: "border-[#FF8C00]/20",
                   },
                   {
                     title: "Confidence",
-                    desc: "Act without the second-guessing. Know why you're doing it, not just what to do.",
+                    desc: "Know why you're making the move, not just what it is. That's the difference between executing and hesitating.",
                     color: "text-[#f5c842]",
                     border: "border-[#f5c842]/20",
                   },
@@ -880,7 +879,7 @@ export default function Home() {
         </section>
 
         {/* Bridge: Solution → How It Works */}
-        <SectionBridge>Here's exactly how it works</SectionBridge>
+        <SectionBridge>Simple by design</SectionBridge>
 
         {/* How It Works */}
         <section className="py-16 lg:py-24 px-4">
@@ -891,29 +890,29 @@ export default function Home() {
                   How it works
                 </p>
                 <h2 className="text-2xl md:text-4xl font-bold text-white">
-                  Three steps. Finally, some answers.
+                  Three steps. Zero guessing.
                 </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {[
                   {
                     num: "1",
-                    title: "Tell us where you are",
-                    desc: "No 47-question form. No linking accounts. Just the basics — enough to give you something real.",
+                    title: "Tell us what you're working with",
+                    desc: "No 47-question form. No linking accounts you don't trust. Just enough to give you something real in under two minutes.",
                     color: "text-[#FF8C00]",
                     bg: "bg-[#FF8C00]/10",
                   },
                   {
                     num: "2",
-                    title: "We do the heavy lifting",
-                    desc: "Multiple AI models analyze your picture simultaneously. When they agree, we tell you — with confidence scores and clear reasoning.",
+                    title: "Six AI models go to work",
+                    desc: "Multiple models analyze your situation in parallel. When they converge on the same answer, we surface it — with confidence scores and the actual reasoning.",
                     color: "text-[#FF8C00]",
                     bg: "bg-[#FF8C00]/10",
                   },
                   {
                     num: "3",
-                    title: "You move forward",
-                    desc: "Not 'consider your options.' An actual next step. The one thing that will make the biggest difference given your specific situation.",
+                    title: "You get the one thing to do next",
+                    desc: "Not 'explore your options.' Not 'consider consulting a professional.' One specific action, calibrated to your situation. Do it. Move on.",
                     color: "text-[#f5c842]",
                     bg: "bg-[#f5c842]/10",
                   },
@@ -936,7 +935,7 @@ export default function Home() {
         </section>
 
         {/* Bridge: How It Works → Your Edge */}
-        <SectionBridge>See your edge</SectionBridge>
+        <SectionBridge>This is what the edge looks like</SectionBridge>
 
         {/* Your Edge */}
         <RevealSection>
@@ -944,7 +943,7 @@ export default function Home() {
         </RevealSection>
 
         {/* Bridge: Your Edge → Transformation */}
-        <SectionBridge>What changes when you have clarity</SectionBridge>
+        <SectionBridge>What clarity actually does</SectionBridge>
 
         {/* Transformation */}
         <section className="py-16 lg:py-24 px-4">
@@ -955,10 +954,10 @@ export default function Home() {
                   The shift
                 </p>
                 <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
-                  From overwhelmed to in control
+                  From frozen to moving
                 </h2>
                 <p className="mt-3 text-sm text-white/50 max-w-md mx-auto leading-relaxed">
-                  Here's what members tell us changes once they have a clear next step.
+                  Here's the difference one clear next step makes — according to people who actually used it.
                 </p>
               </div>
 
@@ -968,10 +967,10 @@ export default function Home() {
                     <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-5">Before</p>
                     <div className="space-y-4">
                       {[
-                        "Avoiding bank statements because they spike anxiety",
-                        "Saving random amounts with no idea if it's enough",
-                        "Second-guessing every financial decision for weeks",
-                        "Feeling behind compared to everyone else",
+                        "Avoiding your bank app because you don't want to know",
+                        "Saving whatever's left — which is usually nothing",
+                        "Lying awake running financial scenarios you can't solve",
+                        "Watching others build wealth while you stall",
                       ].map((text) => (
                         <div key={text} className="flex items-start gap-3">
                           <div className="w-4 h-4 rounded-full border border-white/15 flex-shrink-0 mt-0.5" />
@@ -987,10 +986,10 @@ export default function Home() {
                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF8C00]/60 mb-5">After</p>
                     <div className="space-y-4">
                       {[
-                        "A clear, specific action to take this week",
-                        "Knowing exactly how much to save and where",
-                        "Decisions made with confidence, not guesswork",
-                        "A plan that fits your life — not someone else's",
+                        "One specific action you can execute this week",
+                        "A savings target you understand, built around your reality",
+                        "Decisions made once, with conviction, and moved on from",
+                        "A financial trajectory you can actually explain to yourself",
                       ].map((text) => (
                         <div key={text} className="flex items-start gap-3">
                           <CheckCircle className="w-4 h-4 text-[#FF8C00] flex-shrink-0 mt-0.5" />
@@ -1006,7 +1005,7 @@ export default function Home() {
                 <div className="mt-6 flex items-center justify-center gap-3 px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                   <ArrowRight className="w-4 h-4 text-[#FF8C00] flex-shrink-0" />
                   <p className="text-sm text-white/50 leading-relaxed">
-                    Most members report feeling noticeably clearer within their first session.
+                    Members consistently report that the first session is the moment something finally clicks.
                   </p>
                 </div>
               </RevealSection>
@@ -1015,7 +1014,7 @@ export default function Home() {
         </section>
 
         {/* Bridge: Transformation → Testimonials */}
-        <SectionBridge>Don't just take our word for it</SectionBridge>
+        <SectionBridge>Hear it from them, not us</SectionBridge>
 
         {/* Testimonials */}
         <section className="py-16 lg:py-24 px-4">
@@ -1023,9 +1022,9 @@ export default function Home() {
             <div className="container mx-auto max-w-3xl">
               <div className="text-center mb-10">
                 <h2 className="text-2xl md:text-4xl font-bold text-white mb-3">
-                  What members are saying
+                  Real members. Real clarity.
                 </h2>
-                <p className="text-sm text-white/50">Real experiences from Entangled Wealth users.</p>
+                <p className="text-sm text-white/50">Unfiltered experiences from people who were exactly where you are now.</p>
               </div>
 
               {testimonialsState.error && (
@@ -1073,43 +1072,43 @@ export default function Home() {
         </section>
 
         {/* Bridge: Testimonials → Trust */}
-        <SectionBridge>Why we're different</SectionBridge>
+        <SectionBridge>Why it's built this way</SectionBridge>
 
         {/* Trust */}
         <section className="py-16 lg:py-24 px-4">
           <RevealSection>
             <div className="container mx-auto max-w-2xl text-center space-y-6">
               <p className="text-[11px] font-semibold tracking-widest uppercase text-white/30 mb-3">
-                Why people trust us
+                Built with intention
               </p>
               <h2 className="text-2xl md:text-4xl font-bold text-white">
-                Built to simplify, not overwhelm.
+                No tricks. No jargon. No excuses.
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 text-left">
                 {[
                   {
                     icon: CheckCircle,
                     color: "text-[#FF8C00]",
-                    title: "No confusing financial jargon",
-                    desc: "Every piece of guidance is written for real people, not finance professionals.",
+                    title: "Plain language, always",
+                    desc: "If you need a finance degree to understand our output, we failed. Every insight is written for a real person with real things to do.",
                   },
                   {
                     icon: ShieldCheck,
                     color: "text-[#FF8C00]",
-                    title: "Your privacy is protected",
-                    desc: "Your data is encrypted and never sold. You're a person, not a product.",
+                    title: "Your data is yours, full stop",
+                    desc: "Encrypted. Never sold. Never used to train models without consent. You're not the product here.",
                   },
                   {
                     icon: Lock,
                     color: "text-[#f5c842]",
-                    title: "No pressure, no upsells",
-                    desc: "Start free and upgrade only if you want more. No gotchas, no dark patterns.",
+                    title: "Free tier that's actually useful",
+                    desc: "Start free and get real value. Upgrade when you're ready. No countdown timers, no fake urgency.",
                   },
                   {
                     icon: Heart,
                     color: "text-[#ff8888]",
-                    title: "Designed for your peace of mind",
-                    desc: "We measure success by how much clearer and calmer you feel about your finances.",
+                    title: "We built this because we were frustrated",
+                    desc: "Institutional-grade analysis has always been behind a paywall that would eat your entire trading account. That's what we're fixing.",
                   },
                 ].map((item, i) => (
                   <RevealSection key={item.title} delay={i * 70}>
@@ -1135,7 +1134,7 @@ export default function Home() {
         </section>
 
         {/* Bridge: Trust → Email Capture */}
-        <SectionBridge>Stay in the loop</SectionBridge>
+        <SectionBridge>Don't go in blind</SectionBridge>
 
         {/* Email Capture */}
         <EmailCapture />
@@ -1154,9 +1153,9 @@ export default function Home() {
           <div className="container mx-auto max-w-3xl">
             <div className="text-center mb-10">
               <h2 className="text-2xl md:text-4xl font-bold text-white mb-3">
-                What members are saying
+                Real members. Real clarity.
               </h2>
-              <p className="text-sm text-white/50">Real experiences from Entangled Wealth users.</p>
+              <p className="text-sm text-white/50">Unfiltered experiences from people who were exactly where you are now.</p>
             </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1195,13 +1194,13 @@ export default function Home() {
           <RevealSection>
             <div className="container mx-auto max-w-2xl text-center flex flex-col items-center space-y-6">
               <p className="text-[11px] font-semibold tracking-widest uppercase text-[#FF8C00]/60">
-                You came here unsure. Now you know your next step.
+                You already know something has to change.
               </p>
               <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
-                Stop guessing. Start knowing.
+                Start with one honest look.
               </h2>
               <p className="text-base text-white/50 max-w-md leading-relaxed">
-                Answer three quick questions and get a clear, specific recommendation — no credit card, no commitment. In under 60 seconds.
+                Two minutes. Zero credit card. A real, specific recommendation for your situation — not a template. Do it now.
               </p>
 
               <MicroConversionFlow referralCode={referralCode || undefined} />

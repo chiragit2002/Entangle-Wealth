@@ -228,10 +228,10 @@ export default function Pricing() {
 
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-3">
-            Institutional tools. <span className="electric-text">Not institutional prices.</span>
+            The tools hedge funds use. <span className="electric-text">At a price you can actually afford.</span>
           </h1>
           <p className="text-muted-foreground text-base md:text-lg">
-            {promo?.active ? "Every Pro feature is unlocked. No card, no catch." : "30-day free trial. No credit card required."}
+            {promo?.active ? "Every Pro feature is unlocked right now. No card. No catch." : "30-day free trial. No credit card. Cancel any time."}
           </p>
         </div>
 
@@ -243,7 +243,7 @@ export default function Pricing() {
               <DollarSign className="w-6 h-6 text-[#FFB800] mx-auto mb-2" />
               <p className="text-2xl font-black text-[#FFB800] mb-0.5">$4,800</p>
               <p className="text-sm font-bold text-white/70">avg saved per year</p>
-              <p className="text-xs text-white/35 mt-1">Pro users find this in tax deductions alone</p>
+              <p className="text-xs text-white/35 mt-1">What Pro users recover in overlooked tax deductions alone</p>
             </div>
             <div className="relative overflow-hidden bg-[#0a0a14] border border-[#FF8C00]/25 rounded-xl p-5 text-center">
               <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at top, rgba(255,140,0,0.08) 0%, transparent 70%)" }} />
@@ -252,14 +252,14 @@ export default function Pricing() {
                 <span className="line-through text-white/20 text-lg mr-1">$99</span>$29
               </p>
               <p className="text-sm font-bold text-white/70">less than $1/day</p>
-              <p className="text-xs text-white/35 mt-1">vs. Bloomberg Terminal at $2,000+/mo</p>
+              <p className="text-xs text-white/35 mt-1">Bloomberg Terminal costs $2,000+/month. We charge $29.</p>
             </div>
             <div className="relative overflow-hidden bg-[#0a0a14] border border-[#FF8C00]/25 rounded-xl p-5 text-center">
               <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at top, rgba(255,140,0,0.08) 0%, transparent 70%)" }} />
               <Clock className="w-6 h-6 text-[#FF8C00] mx-auto mb-2" />
               <p className="text-2xl font-black text-[#FF8C00] mb-0.5">30 days</p>
               <p className="text-sm font-bold text-white/70">completely free</p>
-              <p className="text-xs text-white/35 mt-1">No credit card. Cancel anytime. Zero risk.</p>
+              <p className="text-xs text-white/35 mt-1">Full Pro access. If it's not worth it, cancel. No questions.</p>
             </div>
           </div>
         )}
@@ -332,15 +332,15 @@ export default function Pricing() {
         </div>
 
         <div className="mobile-card-glow text-center p-6 md:p-8">
-          <div className="text-2xl font-black tracking-tight mb-2">Get paid to share it.</div>
+          <div className="text-2xl font-black tracking-tight mb-2">Refer people. Get paid. Permanently.</div>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFB800]/10 border border-[#FFB800]/25 text-[#FFB800] text-xs font-bold mb-3">
-            🏆 $36,000 Anniversary Bonus Pool — Your slice is waiting
+            🏆 $36,000 Anniversary Bonus Pool — Your share is unclaimed
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed mb-1">
-            Earn <strong className="text-[#FFB800]">20% monthly</strong> for every person you refer — for life. That adds up faster than you'd think.
+            Earn <strong className="text-[#FFB800]">20% recurring</strong> for every person you refer — every month, for as long as they're a member. Not a one-time bonus. Recurring income.
           </p>
           <p className="text-xs text-white/50 mb-4">
-            Every referral also gets you 5 entries into the $50K anniversary drawing and a share of the $36K bonus pool. Real money, not just points.
+            Each referral earns you 5 entries into the $50K anniversary drawing and a cut of the $36K bonus pool. Actual money, not badges or points.
           </p>
           <Button
             onClick={async () => {

@@ -5,10 +5,10 @@ import { CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { trackEvent } from "@/lib/trackEvent";
 
 const GOAL_OPTIONS = [
-  { id: "investing", label: "Invest & grow my wealth" },
-  { id: "saving", label: "Save smarter" },
-  { id: "tax", label: "Reduce my tax bill" },
-  { id: "clarity", label: "Get financial clarity" },
+  { id: "investing", label: "Build actual wealth — not just income" },
+  { id: "saving", label: "Stop hemorrhaging money I can't account for" },
+  { id: "tax", label: "Stop overpaying the IRS every year" },
+  { id: "clarity", label: "Finally understand where I stand financially" },
 ];
 
 interface WelcomeModalProps {
@@ -73,13 +73,13 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
               <h2 id="welcome-modal-title" className="text-lg font-bold text-white leading-tight">
                 {firstName ? `Welcome, ${firstName}!` : "Welcome!"}
               </h2>
-              <p className="text-xs text-white/50 mt-0.5">One question to personalize your dashboard</p>
+              <p className="text-xs text-white/50 mt-0.5">One question. Thirty seconds. Then we get to work.</p>
             </div>
           </div>
         </div>
 
         <div className="px-6 pb-6 flex flex-col">
-          <p className="text-sm font-semibold text-white mb-4">What brings you here today?</p>
+          <p className="text-sm font-semibold text-white mb-4">What's the actual problem you're trying to solve?</p>
 
           <div className="space-y-2 mb-6">
             {GOAL_OPTIONS.map((opt) => (
@@ -113,7 +113,7 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
                 <span>Setting up your dashboard...</span>
               </>
             ) : (
-              "Go to my dashboard"
+              "Build my dashboard"
             )}
           </button>
 

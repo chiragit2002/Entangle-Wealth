@@ -6,7 +6,7 @@ function FooterComponent() {
   return (
     <footer className="w-full mt-auto" style={{ background: "#080C18", borderTop: "1px solid rgba(255,140,0,0.12)" }}>
       <div className="bloomberg-header" style={{ borderBottom: "1px solid rgba(255,140,0,0.08)" }}>
-        ENTANGLEWEALTH TERMINAL · INSTITUTIONAL CLARITY · EVERYDAY PRICE
+        ENTANGLEWEALTH TERMINAL · INSTITUTIONAL INTELLIGENCE · BUILT FOR REAL PEOPLE
       </div>
       <div className="container mx-auto px-4 md:px-6 py-6 flex flex-col md:flex-row justify-between gap-6">
         <div className="flex flex-col max-w-xs gap-2">
@@ -15,7 +15,7 @@ function FooterComponent() {
             <span className="font-mono font-bold text-xs tracking-widest" style={{ color: "#FF8C00" }}>ENTANGLEWEALTH</span>
           </div>
           <p className="text-[11px] text-muted-foreground font-mono leading-relaxed">
-            Institutional clarity. Everyday price.
+            The edge they kept to themselves. Now yours.
           </p>
         </div>
 

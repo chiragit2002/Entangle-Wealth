@@ -125,11 +125,10 @@ export function AnniversaryGiveawayBanner() {
         <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
           <div className="flex-1">
             <h2 className="text-xl md:text-3xl font-black tracking-tight text-white mb-1">
-              $50,000 Grand Prize <span className="text-[#FFB800]">Giveaway</span>
+              $50,000. <span className="text-[#FFB800]">One year. Real money.</span>
             </h2>
             <p className="text-xs md:text-sm text-white/60 max-w-md leading-relaxed">
-              EntangleWealth's 1-year anniversary celebration. Every trade, streak, login, and referral earns you entries.
-              Active members win.
+              We're giving back $50,000 to the members who showed up. Every trade, streak, login, and referral earns entries. The active members win — because they should.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 mt-3">

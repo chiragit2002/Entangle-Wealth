@@ -52,7 +52,7 @@ export function EmailCapture() {
             <div className="flex items-center justify-center gap-2 mb-4">
               <Mail className="w-4 h-4 text-[#FF8C00]" />
               <span className="text-[11px] font-mono text-[#FF8C00] uppercase tracking-widest">
-                Financial Clarity Updates
+                Signal, Not Noise
               </span>
             </div>
 
@@ -67,10 +67,10 @@ export function EmailCapture() {
             ) : (
               <>
                 <h3 className="text-xl md:text-2xl font-bold text-white text-center mb-2">
-                  Stay ahead of the noise
+                  The financial clarity you can't get from Twitter threads
                 </h3>
                 <p className="text-muted-foreground text-sm text-center mb-6 max-w-lg mx-auto">
-                  No spam. No daily emails. Just useful financial thinking, delivered a few times a month.
+                  No daily emails. No recycled advice. Just sharp, specific financial thinking a few times a month — the kind that actually changes how you make decisions.
                 </p>
 
                 <div className="flex gap-3 justify-center mb-6">
@@ -84,7 +84,7 @@ export function EmailCapture() {
                     }`}
                   >
                     <Zap className="w-3.5 h-3.5" />
-                    Financial thinking tips
+                    Sharp money insights
                   </button>
                   <button
                     type="button"

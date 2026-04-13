@@ -25,47 +25,47 @@ function roundTo(n: number, step: number): number {
 const TICKER_TEMPLATES: TickerTemplate[] = [
   {
     icon: <DollarSign className="w-3 h-3" />,
-    generate: () => `A member just saved $${roundTo(randBetween(400, 3800), 50).toLocaleString()} in deductions`,
+    generate: () => `A member just recovered $${roundTo(randBetween(400, 3800), 50).toLocaleString()} in missed deductions`,
     color: "#00FF41",
   },
   {
     icon: <Zap className="w-3 h-3" />,
-    generate: () => `${randBetween(40, 220)} analyses ran in the last hour`,
+    generate: () => `${randBetween(40, 220)} AI analyses completed in the last hour`,
     color: "#00D4FF",
   },
   {
     icon: <Award className="w-3 h-3" />,
     generate: () => {
       const tiers = ["Silver", "Gold", "Platinum"];
-      return `A member earned ${tiers[randBetween(0, tiers.length - 1)]} tier today`;
+      return `A member reached ${tiers[randBetween(0, tiers.length - 1)]} status today`;
     },
     color: "#FFB800",
   },
   {
     icon: <TrendingUp className="w-3 h-3" />,
-    generate: () => `Someone just hit a ${randBetween(7, 45)}-day streak`,
+    generate: () => `Someone is on a ${randBetween(7, 45)}-day activity streak`,
     color: "#ff6b35",
   },
   {
     icon: <Users className="w-3 h-3" />,
-    generate: () => `${randBetween(3, 18)} new members joined in the last 30 minutes`,
+    generate: () => `${randBetween(3, 18)} people joined in the last 30 minutes`,
     color: "#a855f7",
   },
   {
     icon: <Zap className="w-3 h-3" />,
-    generate: () => `${randBetween(30, 150)} signals fired in the last hour`,
+    generate: () => `${randBetween(30, 150)} consensus signals fired in the last hour`,
     color: "#00D4FF",
   },
   {
     icon: <DollarSign className="w-3 h-3" />,
-    generate: () => `A member saved $${roundTo(randBetween(200, 1200), 10).toLocaleString()} with the receipt scanner`,
+    generate: () => `A member found $${roundTo(randBetween(200, 1200), 10).toLocaleString()} in overlooked receipt deductions`,
     color: "#00FF41",
   },
   {
     icon: <Award className="w-3 h-3" />,
     generate: () => {
       const badges = ["Tax Strategist", "Early Adopter", "Wealth Builder", "Streak Master"];
-      return `Someone just unlocked the ${badges[randBetween(0, badges.length - 1)]} badge`;
+      return `Someone just earned the ${badges[randBetween(0, badges.length - 1)]} badge`;
     },
     color: "#FFB800",
   },

@@ -1,7 +1,9 @@
 import { useState, useCallback } from "react";
+import { useAuth } from "@clerk/react";
 import { trackEvent } from "@/lib/trackEvent";
 import { Layout } from "@/components/layout/Layout";
 import { fetchAlpacaBars, type AlpacaBar } from "@/lib/api";
+import { authFetch } from "@/lib/authFetch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,6 +11,7 @@ import {
   ArrowRight, Zap, AlertTriangle, Trophy, Skull,
 } from "lucide-react";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
+import { showBacktestXpToast, showBadgeUnlockToast } from "@/components/BloombergToast";
 
 interface TimeMachineResult {
   symbol: string;
@@ -158,12 +161,47 @@ const PRESETS = [
 ];
 
 export default function TimeMachine() {
+  const { isSignedIn, getToken } = useAuth();
   const [symbol, setSymbol] = useState("NVDA");
   const [startDate, setStartDate] = useState("2020-01-02");
   const [amount, setAmount] = useState("10000");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<TimeMachineResult | null>(null);
   const [error, setError] = useState("");
+
+  const awardBacktestXp = useCallback(async (computed: TimeMachineResult) => {
+    if (!isSignedIn) return;
+    try {
+      const { totalReturnPct, annualizedReturn } = computed;
+      let reason = "backtest_run";
+      if (totalReturnPct >= 1000) reason = "10x_bagger";
+      else if (totalReturnPct > 0) reason = "winning_backtest";
+
+      const res = await authFetch("/gamification/xp", getToken, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category: "backtesting",
+          reason,
+          metrics: { totalReturnPct, annualizedReturn },
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.xpEarned > 0) {
+          showBacktestXpToast(data.xpEarned);
+        }
+        if (data.newBadges?.length > 0) {
+          for (const badge of data.newBadges) {
+            setTimeout(() => showBadgeUnlockToast(badge), 600);
+          }
+        }
+      }
+    } catch {
+      // silent — XP award failure should not block UI
+    }
+  }, [isSignedIn, getToken]);
 
   const run = useCallback(async (sym?: string, date?: string, amt?: string) => {
     const s = (sym || symbol).toUpperCase();
@@ -184,13 +222,15 @@ export default function TimeMachine() {
         return;
       }
       trackEvent("time_machine_run", { symbol: s });
-      setResult(computeResult(s, d, a, data.bars));
+      const computed = computeResult(s, d, a, data.bars);
+      setResult(computed);
+      awardBacktestXp(computed);
     } catch {
       setError("Failed to fetch data. Check your symbol and try again.");
     } finally {
       setLoading(false);
     }
-  }, [symbol, startDate, amount]);
+  }, [symbol, startDate, amount, awardBacktestXp]);
 
   return (
     <Layout>

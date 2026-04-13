@@ -124,14 +124,149 @@ const XP_REWARDS: Record<string, Record<string, number>> = {
   gig: { gig_completed: 50, gig_posted: 20 },
   community: { post_created: 15, comment_added: 10 },
   engagement: { daily_checkin: 25, profile_updated: 10 },
+  backtesting: { backtest_run: 20, winning_backtest: 50, "10x_bagger": 100, milestone_projection: 75 },
 };
 
-const MAX_XP_PER_ACTION = 100;
+const MAX_XP_PER_ACTION = 150;
 
 const XpSchema = z.object({
   reason: z.string().min(1).max(100),
-  category: z.enum(["trading", "gig", "community", "engagement"]),
+  category: z.enum(["trading", "gig", "community", "engagement", "backtesting"]),
+  metrics: z.object({
+    totalReturnPct: z.number().optional(),
+    annualizedReturn: z.number().optional(),
+    projectedNetWorth: z.number().optional(),
+    simulationCount: z.number().optional(),
+  }).optional(),
 });
+
+const BACKTESTER_BADGES = [
+  {
+    slug: "time-traveler",
+    name: "Time Traveler",
+    description: "Ran your first backtест",
+    icon: "⏱️",
+    category: "backtesting",
+    xpReward: 50,
+    requirement: "Run 1 backtest",
+    threshold: 1,
+  },
+  {
+    slug: "bull-run",
+    name: "Bull Run",
+    description: "Achieved 100%+ return in a backtest",
+    icon: "🐂",
+    category: "backtesting",
+    xpReward: 150,
+    requirement: "100%+ total return",
+    threshold: 100,
+  },
+  {
+    slug: "10x-bagger",
+    name: "10x Bagger",
+    description: "Achieved 1000%+ return in a backtest",
+    icon: "🚀",
+    category: "backtesting",
+    xpReward: 500,
+    requirement: "1000%+ total return",
+    threshold: 1000,
+    isSecret: true,
+  },
+  {
+    slug: "beat-the-market",
+    name: "Beat the Market",
+    description: "Achieved an annualized return greater than 12% in a backtest",
+    icon: "📈",
+    category: "backtesting",
+    xpReward: 200,
+    requirement: "Annualized return > 12%",
+    threshold: 12,
+  },
+  {
+    slug: "wealth-architect",
+    name: "Wealth Architect",
+    description: "Projected $1M+ net worth in a Wealth Simulation",
+    icon: "👑",
+    category: "backtesting",
+    xpReward: 300,
+    requirement: "First $1M projection",
+    threshold: 1000000,
+  },
+  {
+    slug: "sim-addict",
+    name: "Sim Addict",
+    description: "Ran 10 Wealth Simulations",
+    icon: "🔁",
+    category: "backtesting",
+    xpReward: 100,
+    requirement: "Run 10 simulations",
+    threshold: 10,
+  },
+];
+
+export async function ensureBacktesterBadgesExist(): Promise<void> {
+  for (const badge of BACKTESTER_BADGES) {
+    const [existing] = await db.select().from(badgesTable).where(eq(badgesTable.slug, badge.slug));
+    if (!existing) {
+      await db.insert(badgesTable).values({
+        slug: badge.slug,
+        name: badge.name,
+        description: badge.description,
+        icon: badge.icon,
+        category: badge.category,
+        xpReward: badge.xpReward,
+        requirement: badge.requirement,
+        threshold: badge.threshold,
+        isSecret: badge.isSecret ?? false,
+      });
+    }
+  }
+}
+
+async function checkAndAwardBacktesterBadges(
+  userId: string,
+  reason: string,
+  metrics?: { totalReturnPct?: number; annualizedReturn?: number; projectedNetWorth?: number; simulationCount?: number }
+): Promise<{ slug: string; name: string; icon: string; xpReward: number }[]> {
+  const newBadges: { slug: string; name: string; icon: string; xpReward: number }[] = [];
+  const earnedRows = await db.select({ badgeId: userBadgesTable.badgeId })
+    .from(userBadgesTable)
+    .where(eq(userBadgesTable.userId, userId));
+  const earnedIds = new Set(earnedRows.map(r => r.badgeId));
+
+  const allBt = await db.select().from(badgesTable).where(eq(badgesTable.category, "backtesting"));
+  const bySlug = new Map(allBt.map(b => [b.slug, b]));
+
+  const award = async (slug: string) => {
+    const badge = bySlug.get(slug);
+    if (!badge || earnedIds.has(badge.id)) return;
+    await db.insert(userBadgesTable).values({ userId, badgeId: badge.id }).onConflictDoNothing();
+    newBadges.push({ slug: badge.slug, name: badge.name, icon: badge.icon, xpReward: badge.xpReward });
+  };
+
+  if (reason === "backtest_run" || reason === "winning_backtest" || reason === "10x_bagger") {
+    await award("time-traveler");
+  }
+
+  if (metrics?.totalReturnPct !== undefined) {
+    if (metrics.totalReturnPct >= 100) await award("bull-run");
+    if (metrics.totalReturnPct >= 1000) await award("10x-bagger");
+  }
+
+  if (metrics?.annualizedReturn !== undefined && metrics.annualizedReturn > 12) {
+    await award("beat-the-market");
+  }
+
+  if (metrics?.projectedNetWorth !== undefined && metrics.projectedNetWorth >= 1_000_000) {
+    await award("wealth-architect");
+  }
+
+  if (metrics?.simulationCount !== undefined && metrics.simulationCount >= 10) {
+    await award("sim-addict");
+  }
+
+  return newBadges;
+}
 
 const XP_COOLDOWN_MS = 60_000;
 const xpCooldownMap = new Map<string, Map<string, number>>();
@@ -206,12 +341,18 @@ router.post("/gamification/xp", requireAuth, validateBody(XpSchema), async (req,
       return { updated, xpEarned: finalAmount, multiplier, prevLevel: xpRow.level, prevTier: xpRow.tier };
     });
 
+    let newBadges: { slug: string; name: string; icon: string; xpReward: number }[] = [];
+    if (category === "backtesting") {
+      newBadges = await checkAndAwardBacktesterBadges(userId, reason, req.body.metrics);
+    }
+
     res.json({
       xp: result.updated,
       xpEarned: result.xpEarned,
       multiplier: result.multiplier,
       leveledUp: result.updated.level > result.prevLevel,
       tierChanged: result.updated.tier !== result.prevTier,
+      newBadges,
     });
     triggerGiveawaySync(userId, clerkId);
   } catch (error) {

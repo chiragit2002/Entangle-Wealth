@@ -63,6 +63,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   community: "text-purple-400 bg-purple-400/10 border-purple-400/30",
   milestone: "text-yellow-400 bg-yellow-400/10 border-yellow-400/30",
   gig: "text-green-400 bg-green-400/10 border-green-400/30",
+  backtesting: "text-[#FFD700] bg-[#FFD700]/10 border-[#FFD700]/30",
+  referral: "text-pink-400 bg-pink-400/10 border-pink-400/30",
 };
 
 const TIER_COLORS: Record<string, string> = {
@@ -97,7 +99,7 @@ const DEFAULT_CHALLENGES: ChallengeData[] = [
   { id: 6, title: "Streak Master", description: "Maintain your streak for 5 consecutive days", type: "weekly", category: "streak", xpReward: 100, target: 5, progress: 0, completed: false, completedAt: null },
 ];
 
-const categories = ["All", "trading", "streak", "community", "milestone", "gig"] as const;
+const categories = ["All", "trading", "backtesting", "streak", "community", "milestone", "gig"] as const;
 
 export default function Achievements() {
   const { getToken } = useAuth();

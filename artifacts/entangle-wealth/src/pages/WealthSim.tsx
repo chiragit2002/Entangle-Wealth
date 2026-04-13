@@ -4,6 +4,7 @@ import { Layout } from "@/components/layout/Layout";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
 import { fireConfetti } from "@/lib/confetti";
+import { showBacktestXpToast, showBadgeUnlockToast } from "@/components/BloombergToast";
 import {
   LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine, Legend,
@@ -247,6 +248,7 @@ export default function WealthSim() {
   const [showComparePanel, setShowComparePanel] = useState(false);
   const [activeScenario, setActiveScenario] = useState<"base" | "optimistic" | "pessimistic">("base");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const simCountRef = useRef<number>(0);
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
@@ -295,6 +297,35 @@ export default function WealthSim() {
     return results;
   };
 
+  const awardSimXp = useCallback(async (finalNetWorth: number, simCount: number) => {
+    if (!isSignedIn) return;
+    try {
+      const reason = finalNetWorth >= 1_000_000 ? "milestone_projection" : "backtest_run";
+      const res = await authFetch("/gamification/xp", getToken, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category: "backtesting",
+          reason,
+          metrics: { projectedNetWorth: finalNetWorth, simulationCount: simCount },
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.xpEarned > 0) {
+          showBacktestXpToast(data.xpEarned);
+        }
+        if (data.newBadges?.length > 0) {
+          for (const badge of data.newBadges) {
+            setTimeout(() => showBadgeUnlockToast(badge), 600);
+          }
+        }
+      }
+    } catch {
+      // silent — XP award failure should not block UI
+    }
+  }, [isSignedIn, getToken]);
+
   const runProjection = useCallback(async (p: SimProfile, save = false) => {
     setLoading(true);
     try {
@@ -336,6 +367,10 @@ export default function WealthSim() {
         }
         const msRes = await authFetch("/simulation/milestones", getToken);
         if (msRes.ok) setMilestones(await msRes.json());
+
+        simCountRef.current += 1;
+        const finalNetWorth = data.projections?.[data.projections.length - 1]?.netWorth ?? 0;
+        awardSimXp(finalNetWorth, simCountRef.current);
       } else {
         const localProjections = calcLocalProjections(p);
         setProjections(localProjections);
@@ -348,7 +383,7 @@ export default function WealthSim() {
     } finally {
       setLoading(false);
     }
-  }, [getToken, toast, isSignedIn]);
+  }, [getToken, toast, isSignedIn, awardSimXp]);
 
   const saveProfile = useCallback(async () => {
     if (!isSignedIn) return;

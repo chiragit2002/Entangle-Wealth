@@ -10,6 +10,7 @@ import { runMigrations } from "stripe-replit-sync";
 import { getStripeSync } from "./stripeClient";
 import { trackConnections } from "./routes/health";
 import { ensureReferralBadgesExist } from "./lib/referralRewards";
+import { ensureBacktesterBadgesExist } from "./routes/gamification";
 import { startAlertEvaluator, stopAlertEvaluator, closeAllSseConnections } from "./routes/alerts";
 import { startDigestScheduler, stopDigestScheduler } from "./lib/emailDigest";
 import { startDailyContentScheduler, stopDailyContentScheduler } from "./routes/dailyContent";
@@ -584,6 +585,9 @@ httpServer.on("error", (err: NodeJS.ErrnoException) => {
 
 ensureReferralBadgesExist().catch((err) =>
   logger.warn({ error: err }, "Failed to seed referral badges (non-fatal)")
+);
+ensureBacktesterBadgesExist().catch((err) =>
+  logger.warn({ error: err }, "Failed to seed backtester badges (non-fatal)")
 );
 await ensureHabitsTables();
 await ensureDailyContentTable();

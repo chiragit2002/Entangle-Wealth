@@ -7,6 +7,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import * as SentryReact from "@sentry/react";
 import { ThemeProvider, useTheme } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ErrorFallback from "@/components/ErrorFallback";
 import NotFound from "@/pages/not-found";
@@ -485,6 +486,7 @@ function ClerkProviderWithRoutes() {
           <InstallPrompt />
           <NotificationPrompt />
           <Toaster />
+          <SonnerToaster position="bottom-right" theme="dark" />
           </PopupQueueProvider>
         </TooltipProvider>
       </QueryClientProvider>

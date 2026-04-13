@@ -43,6 +43,7 @@ import microfeedbackRouter from "./microfeedback";
 import insightsRouter from "./insights";
 import sentryRouter from "./sentry";
 import integrationsRouter from "./integrations";
+import taxflowRouter from "./taxflow";
 
 export function createRouter(app: Express): IRouter {
 const router: IRouter = Router();
@@ -91,6 +92,7 @@ router.use(microfeedbackRouter);
 router.use(insightsRouter);
 router.use(sentryRouter);
 router.use(integrationsRouter);
+router.use(taxflowRouter);
 
 return router;
 }

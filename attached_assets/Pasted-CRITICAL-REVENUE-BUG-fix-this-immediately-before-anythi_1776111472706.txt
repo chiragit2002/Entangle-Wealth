@@ -1,0 +1,30 @@
+CRITICAL REVENUE BUG — fix this immediately before anything else.
+
+THE PROBLEM:
+In webhookHandlers.ts, when a user completes a Stripe checkout and pays real money, the webhook handler only sends a Zapier notification — it never writes the new subscription tier to the database. usersTable.subscriptionTier is never updated. The user pays, Stripe confirms, but your app still shows them as free tier. You are taking money without delivering the product.
+
+THE FIX — 3 specific changes required:
+
+CHANGE 1 — checkout.session.completed handler (lines 143-152):
+• After the Zapier notification, immediately add a database write:
+  UPDATE usersTable SET subscriptionTier = [tier from Stripe metadata] WHERE stripeCustomerId = [customer id from event]
+• The tier should be read from the Stripe session metadata or price ID — map each Stripe price ID to its corresponding tier (free / pro / enterprise)
+• If the DB write fails, throw an error so Stripe retries the webhook — do not silently swallow the failure
+
+CHANGE 2 — customer.subscription.updated handler (lines 155-171):
+• Same fix — after the Zapier notification, write the updated subscription tier to the database
+• Also handle subscription cancellations — if status = "canceled", downgrade the user back to free tier in the DB immediately
+
+CHANGE 3 — Add a webhook_events log table:
+• Create a webhook_events table with: event_id, event_type, customer_id, tier_before, tier_after, status (success/failed), timestamp
+• Log every Stripe webhook event to this table so every payment and tier change is permanently auditable
+• This means if a user ever disputes their subscription status, you have a full paper trail
+
+VERIFICATION — after making the fix:
+• Trigger a real Stripe test checkout using a Stripe test card
+• Confirm usersTable.subscriptionTier updates in the database within 5 seconds of payment
+• Confirm the webhook_events table logs the event correctly
+• Confirm that if the DB write fails, Stripe receives a non-200 response and schedules a retry
+• Show me the before and after database record as proof the fix works
+
+This is a legal and financial obligation — a user who pays must receive what they paid for instantly and reliably.

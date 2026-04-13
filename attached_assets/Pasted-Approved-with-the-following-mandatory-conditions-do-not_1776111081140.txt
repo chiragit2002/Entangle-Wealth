@@ -1,0 +1,37 @@
+Approved with the following mandatory conditions — do not proceed without implementing all of them:
+
+APPROVED:
+• The "Your Edge" section on the landing page with 3-4 rotating feature cards
+• The "Edge Pulse" widget on the dashboard with rotating real-time insight messages
+• "See It In Action" deep links to each feature
+• Fully responsive layout
+
+REQUIRED CHANGES BEFORE BUILD:
+
+1. NO FABRICATED METRICS ON THE CARDS:
+• Do not hardcode fake accuracy numbers like "94% consensus accuracy" or "saved users $1,800" unless these are pulled from real data
+• If real aggregate stats are not available yet, use benefit-focused copy instead of made-up numbers:
+  — Instead of "87% accuracy" → use "Multi-model consensus — built to catch what single signals miss"
+  — Instead of "$1,800 average savings" → use "TaxGPT analyzes every trade for deductions in real time"
+• Fake metrics on a fintech landing page are an FTC liability — do not use them
+
+2. EDGE PULSE MESSAGES MUST BE REAL OR CLEARLY LABELED:
+• "Consensus just flagged a false breakout on TSLA" — this must either be a real signal from the live system OR clearly labeled as a demo example
+• If the system cannot generate real pulse messages yet, label them: "> EXAMPLE SIGNAL — LIVE WHEN YOU CONNECT YOUR ACCOUNT"
+• Never show fabricated signals as if they are live — users will make decisions based on them
+
+3. NO GLOW EFFECTS:
+• Animated glow effects violate the Bloomberg terminal design system we have locked in
+• Replace glow animations with: subtle border pulse in green (#00FF41 at low opacity), or a clean left-border accent that fades in/out
+• The aesthetic must stay sharp, flat, and terminal-grade — not neon or sci-fi looking
+
+4. ROTATING CARDS MUST HAVE KEYBOARD AND ACCESSIBILITY SUPPORT:
+• Cards must be navigable via keyboard (arrow keys)
+• Include pause-on-hover so the rotation stops when a user is reading
+• Screen reader labels on all interactive elements
+
+5. "SEE IT IN ACTION" LINKS:
+• Must deep-link to the actual feature — not just the dashboard homepage
+• If the user is not logged in, the link must go to the sign-up page with the feature name pre-filled as the referral context
+
+Proceed with build once all 5 conditions are confirmed.

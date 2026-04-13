@@ -41,7 +41,7 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **TaxFlow Intelligence Platform**: Core data layer with IRS tax rates, 27 strategies, onboarding wizard, tax dashboard, strategy browser, document vault with AI analysis, TaxGPT, travel budget planner. Includes Receipt Capture System and Accounting Integrations.
 - **Alternate Timeline Mode**: Dual-pane comparison interface for financial futures with real-time sliders, animated charts, and decision impact layers.
 - **Alerts & Notifications**: Real-time SSE-powered notification center, web push notifications, and a full-stack alert engine.
-- **Terminal**: Bloomberg-style Analysis Terminal with multi-panel interface and command support.
+- **Terminal**: Bloomberg-style Analysis Terminal (Mirofish) with multi-panel interface and command support. Integrated TaxFlow engine provides real-time tax impact analysis on every BUY/SELL command using FIFO/LIFO lot matching, wash sale detection (±30 day window), YTD tax summary, end-of-year projection, tax optimization per symbol, tax-loss harvesting scanner, and CSV export. Commands: TAX SUMMARY, TAX PROJECTION, TAX OPTIMIZE, HARVEST, EXPORT TAX REPORT, SET BRACKET, SET STATE, SET LOT METHOD, HIDE/SHOW TAX. Backend: `/api/taxflow/*` routes in `taxflow.ts`. Tax settings persist in localStorage.
 - **Research/News**: Live news intelligence with scraping, sentiment analysis, and caching.
 - **Legal**: Comprehensive legal pages.
 - **Support System**: Help Center, ticket submission, system status page.

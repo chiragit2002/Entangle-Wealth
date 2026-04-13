@@ -1,0 +1,65 @@
+Verify, fix, and confirm all 6 layers of the self-auditing system are fully operational. Go through each layer one by one and report status before fixing:
+
+LAYER 1 — UI CRAWLER VERIFICATION:
+• Confirm Playwright or Puppeteer is installed and configured
+• Confirm the crawler visits every registered route in the app automatically
+• Confirm it checks: broken buttons, form submissions, missing assets, JS console errors, text overflow, page load time under 2s, mobile (375px) and desktop (1440px) viewports
+• Confirm findings are written to the audit_log table in the database with page URL, issue type, severity, screenshot, and timestamp
+• If any of the above is missing or broken — build and fix it now
+• Trigger a manual crawl run and show me the output
+
+LAYER 2 — VISUAL REGRESSION VERIFICATION:
+• Confirm screenshots are being taken of every page on every deploy
+• Confirm baseline screenshots exist and comparisons are running
+• Confirm diffs greater than 5% pixel change are flagged and stored with before/after images
+• If not working — set it up now using Playwright screenshot + pixelmatch or equivalent
+• Run a test comparison and show me a sample diff result
+
+LAYER 3 — REAL-TIME ERROR MONITORING VERIFICATION:
+• Confirm a global error boundary exists on every page catching React crashes, failed API calls, slow responses over 1 second, and JS runtime errors
+• Confirm all caught errors write to audit_log with page, component name, error message, timestamp, and anonymized session ID
+• Confirm the CRITICAL alert triggers if the same error fires 3+ times in 10 minutes
+• If any of this is missing — instrument it now across the entire app
+• Inject a test error and confirm it appears in audit_log within 5 seconds
+
+LAYER 4 — UX BEHAVIOR TRACKING VERIFICATION:
+• Confirm rage click detection is active (3+ clicks on same element within 2 seconds)
+• Confirm dead click detection is active (clicks on non-interactive areas)
+• Confirm form abandonment tracking is active on all forms
+• Confirm scroll depth tracking is active on all pages
+• Confirm all signals write to a ux_signals table every 5 minutes
+• If any signal is missing — add it now
+• Show me the last 10 rows written to ux_signals
+
+LAYER 5 — ADMIN AUDIT DASHBOARD VERIFICATION:
+• Confirm /admin/audit exists and is gated to admin accounts only — no public access
+• Confirm the dashboard displays ALL of the following in real time:
+  — SYSTEM STATUS panel (green/amber/red per feature)
+  — RECENT ISSUES feed with severity badges
+  — VISUAL REGRESSIONS panel with before/after screenshots
+  — UX SIGNALS panel with rage click and dead click data
+  — API HEALTH panel with response times for every endpoint
+  — ERROR RATE chart for last 24 hours
+• Confirm the dashboard auto-refreshes every 30 seconds
+• Confirm Bloomberg terminal styling throughout — dark navy, monospace font, green/amber/red indicators, no rounded cards
+• If anything is missing from the dashboard — build it now
+• Open /admin/audit and confirm everything renders with live data
+
+LAYER 6 — AUTO-HEALING VERIFICATION:
+• Confirm that if /api/news exceeds 3s response time, a background cache refresh is triggered automatically
+• Confirm that if any endpoint returns 500 three times in a row, the service restarts and logs the restart
+• Confirm that broken pages show the terminal fallback screen: "> SYSTEM ENCOUNTERED AN ERROR — LOGGING FOR REVIEW — REDIRECTING IN 5 SECONDS"
+• If any auto-heal is missing — wire it up now
+• Simulate a 500 error loop and confirm the auto-restart fires correctly
+
+FINAL CONFIRMATION REQUIRED:
+After fixing all 6 layers, provide a status report in this exact format:
+
+LAYER 1 — UI CRAWLER................[PASS / FAIL]
+LAYER 2 — VISUAL REGRESSION.........[PASS / FAIL]
+LAYER 3 — ERROR MONITORING...........[PASS / FAIL]
+LAYER 4 — UX BEHAVIOR TRACKING.......[PASS / FAIL]
+LAYER 5 — ADMIN DASHBOARD............[PASS / FAIL]
+LAYER 6 — AUTO-HEALING...............[PASS / FAIL]
+
+Do not mark any layer as PASS unless it has been tested end-to-end with real output.

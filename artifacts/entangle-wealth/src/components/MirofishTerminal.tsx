@@ -24,95 +24,286 @@ const HISTORY_KEY = "mirofish_cmd_history";
 const WATCHLIST_KEY = "mirofish_watchlist";
 const ALERTS_KEY = "mirofish_price_alerts";
 const MACROS_KEY = "mirofish_macros";
+const TAX_SETTINGS_KEY = "mirofish_tax_settings";
 
-const ST_RATE = 0.37;
-const LT_RATE = 0.20;
-const NIIT_RATE = 0.038;
-
-function formatTaxImpact(side: "buy" | "sell", qty: number, sym: string, fillPrice: number, position?: { avg_entry_price: string; qty: string; unrealized_pl: string } | null): string {
-  const totalValue = qty * fillPrice;
-  const lines: string[] = [];
-  lines.push(`─── Real-Time Tax Impact ───`);
-
-  if (side === "buy") {
-    const costBasis = totalValue;
-    const hypothetical5pct = totalValue * 0.05;
-    const hypothetical20pct = totalValue * 0.20;
-    const stTax5 = hypothetical5pct * ST_RATE;
-    const ltTax5 = hypothetical5pct * LT_RATE;
-    const stTax20 = hypothetical20pct * ST_RATE;
-    const ltTax20 = hypothetical20pct * LT_RATE;
-    lines.push(`  Cost Basis: ${qty} × $${fillPrice.toFixed(2)} = $${costBasis.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
-    lines.push(`  ┌─────────────────────────────────────────────┐`);
-    lines.push(`  │ IF SOLD @ +5%  ($${(fillPrice * 1.05).toFixed(2)})                    │`);
-    lines.push(`  │   Gain: $${hypothetical5pct.toFixed(2).padStart(10)}                          │`);
-    lines.push(`  │   Short-Term Tax (${(ST_RATE * 100).toFixed(0)}%): $${stTax5.toFixed(2).padStart(8)}  (<1 yr)   │`);
-    lines.push(`  │   Long-Term Tax  (${(LT_RATE * 100).toFixed(0)}%): $${ltTax5.toFixed(2).padStart(8)}  (>1 yr)   │`);
-    lines.push(`  │   Tax Savings by Holding: $${(stTax5 - ltTax5).toFixed(2).padStart(7)}          │`);
-    lines.push(`  ├─────────────────────────────────────────────┤`);
-    lines.push(`  │ IF SOLD @ +20% ($${(fillPrice * 1.20).toFixed(2)})                    │`);
-    lines.push(`  │   Gain: $${hypothetical20pct.toFixed(2).padStart(10)}                          │`);
-    lines.push(`  │   Short-Term Tax (${(ST_RATE * 100).toFixed(0)}%): $${stTax20.toFixed(2).padStart(8)}  (<1 yr)   │`);
-    lines.push(`  │   Long-Term Tax  (${(LT_RATE * 100).toFixed(0)}%): $${ltTax20.toFixed(2).padStart(8)}  (>1 yr)   │`);
-    lines.push(`  │   Tax Savings by Holding: $${(stTax20 - ltTax20).toFixed(2).padStart(7)}          │`);
-    lines.push(`  └─────────────────────────────────────────────┘`);
-    lines.push(`  Tip: Hold >1 year to qualify for long-term rates.`);
-  } else {
-    const proceeds = totalValue;
-    lines.push(`  Proceeds: ${qty} × $${fillPrice.toFixed(2)} = $${proceeds.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
-
-    const rawEntry = position ? parseFloat(position.avg_entry_price) : NaN;
-    if (!position || isNaN(rawEntry)) {
-      lines.push(`  Cost Basis: unavailable (no matching position found)`);
-      lines.push(`  ┌─────────────────────────────────────────────┐`);
-      lines.push(`  │ Cannot compute realized gain/loss without   │`);
-      lines.push(`  │ a cost basis. Check POSITIONS after fill.   │`);
-      lines.push(`  └─────────────────────────────────────────────┘`);
-    } else {
-      const entryPrice = rawEntry;
-      const costBasis = entryPrice * qty;
-      const gain = proceeds - costBasis;
-      const isGain = gain >= 0;
-      const stTax = Math.max(0, gain * ST_RATE);
-      const ltTax = Math.max(0, gain * LT_RATE);
-      const niit = Math.max(0, gain * NIIT_RATE);
-      const netAfterST = proceeds - stTax - niit;
-      const netAfterLT = proceeds - ltTax - niit;
-      lines.push(`  Cost Basis: ${qty} × $${entryPrice.toFixed(2)} = $${costBasis.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
-      lines.push(`  ${isGain ? "Realized Gain" : "Realized Loss"}: ${isGain ? "+" : "-"}$${Math.abs(gain).toFixed(2)}`);
-      if (isGain) {
-        lines.push(`  ┌─────────────────────────────────────────────┐`);
-        lines.push(`  │ SHORT-TERM (held <1 yr)                     │`);
-        lines.push(`  │   Federal Tax (${(ST_RATE * 100).toFixed(0)}%):    $${stTax.toFixed(2).padStart(10)}         │`);
-        lines.push(`  │   NIIT (3.8%):          $${niit.toFixed(2).padStart(10)}         │`);
-        lines.push(`  │   Net After Tax:        $${netAfterST.toFixed(2).padStart(10)}         │`);
-        lines.push(`  ├─────────────────────────────────────────────┤`);
-        lines.push(`  │ LONG-TERM (held >1 yr)                     │`);
-        lines.push(`  │   Federal Tax (${(LT_RATE * 100).toFixed(0)}%):    $${ltTax.toFixed(2).padStart(10)}         │`);
-        lines.push(`  │   NIIT (3.8%):          $${niit.toFixed(2).padStart(10)}         │`);
-        lines.push(`  │   Net After Tax:        $${netAfterLT.toFixed(2).padStart(10)}         │`);
-        lines.push(`  └─────────────────────────────────────────────┘`);
-        lines.push(`  Tax Savings (LT vs ST): $${(stTax - ltTax).toFixed(2)}`);
-      } else {
-        lines.push(`  ┌─────────────────────────────────────────────┐`);
-        lines.push(`  │ TAX-LOSS HARVESTING OPPORTUNITY             │`);
-        lines.push(`  │   Deductible Loss: $${Math.abs(gain).toFixed(2).padStart(10)}              │`);
-        lines.push(`  │   Max Annual Offset: $3,000 vs income       │`);
-        lines.push(`  │   Remaining Carry-Forward: $${Math.max(0, Math.abs(gain) - 3000).toFixed(2).padStart(8)}     │`);
-        lines.push(`  └─────────────────────────────────────────────┘`);
-        lines.push(`  Note: Loss offsets gains first, then up to $3k income/yr.`);
-      }
-    }
-  }
-  lines.push(`  ⚠ Estimates only — consult a tax professional.`);
-  return lines.join("\n");
+interface TaxSettings {
+  bracket: number;
+  state: string;
+  lotMethod: "FIFO" | "LIFO" | "SPECIFIC";
+  visible: boolean;
+  disclaimerShown: boolean;
 }
+
+const DEFAULT_TAX_SETTINGS: TaxSettings = {
+  bracket: 0.24,
+  state: "",
+  lotMethod: "FIFO",
+  visible: true,
+  disclaimerShown: false,
+};
+
+const HIGH_TAX_STATES: Record<string, number> = {
+  CA: 0.133, NY: 0.109, NJ: 0.1075, OR: 0.099, MN: 0.0985,
+  HI: 0.11, VT: 0.0875, IA: 0.085, DC: 0.0895,
+};
 
 function loadLS<T>(key: string, fallback: T): T {
   try { const s = localStorage.getItem(key); return s ? JSON.parse(s) : fallback; } catch { return fallback; }
 }
 function saveLS(key: string, val: unknown) {
   try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+
+function fmtMoney(n: number): string {
+  return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+async function fetchTaxApi(path: string, token: string | null, params?: Record<string, string>) {
+  const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+  const res = await fetch(`/api/taxflow${path}${qs}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+function formatTaxImpactFromApi(data: any, settings: TaxSettings): string {
+  const lines: string[] = [];
+  const sep = "─".repeat(50);
+
+  if (data.side === "buy") {
+    lines.push(sep);
+    lines.push("  TAX IMPACT ANALYSIS");
+    lines.push(sep);
+    lines.push(`  COST BASIS................ $${fmtMoney(data.costBasis)}`);
+    lines.push("");
+    lines.push(`  IF SOLD @ +5%  ($${data.price ? (data.price * 1.05).toFixed(2) : "N/A"}):`);
+    lines.push(`    Gain: $${fmtMoney(data.scenarios.plus5.gain)}`);
+    lines.push(`    Short-Term Tax (${(settings.bracket * 100).toFixed(0)}%): $${fmtMoney(data.scenarios.plus5.stTax)}`);
+    lines.push(`    Long-Term Tax  (15%): $${fmtMoney(data.scenarios.plus5.ltTax)}`);
+    lines.push(`    Tax Savings by Holding: $${fmtMoney(data.scenarios.plus5.savings)}`);
+    lines.push("");
+    lines.push(`  IF SOLD @ +20% ($${data.price ? (data.price * 1.20).toFixed(2) : "N/A"}):`);
+    lines.push(`    Gain: $${fmtMoney(data.scenarios.plus20.gain)}`);
+    lines.push(`    Short-Term Tax (${(settings.bracket * 100).toFixed(0)}%): $${fmtMoney(data.scenarios.plus20.stTax)}`);
+    lines.push(`    Long-Term Tax  (15%): $${fmtMoney(data.scenarios.plus20.ltTax)}`);
+    lines.push(`    Tax Savings by Holding: $${fmtMoney(data.scenarios.plus20.savings)}`);
+    if (data.stateTax) {
+      lines.push("");
+      lines.push(`  STATE TAX (${data.stateTax.code} ${(data.stateTax.rate * 100).toFixed(1)}%): applies on sale`);
+    }
+    lines.push(sep);
+    lines.push("  > TIP: HOLD >1 YEAR FOR LONG-TERM CAPITAL GAINS RATE (15%)");
+    lines.push(sep);
+  } else {
+    lines.push(sep);
+    lines.push("  TAX IMPACT ANALYSIS");
+    lines.push(sep);
+
+    if (data.washSale) {
+      lines.push("  ⚠ WASH SALE RULE TRIGGERED — LOSS DISALLOWED BY IRS");
+      lines.push(`  REPURCHASED ${data.symbol} WITHIN 30-DAY WINDOW`);
+      lines.push(`  DISALLOWED LOSS: $${fmtMoney(data.washSaleDisallowed)} — ADDED TO COST BASIS`);
+      lines.push(sep);
+    }
+
+    if (data.insufficientLots) {
+      lines.push(`  ⚠ INSUFFICIENT LOT INVENTORY: Only ${data.matchedQty} of ${data.qty} shares matched`);
+      lines.push(`  Tax figures below are based on matched lots only.`);
+      lines.push("");
+    }
+
+    lines.push(`  HOLDING PERIOD............ ${data.holdingDays} DAYS (${data.isLongTerm ? "LONG-TERM" : "SHORT-TERM"})`);
+
+    if (data.lots && data.lots.length > 0) {
+      const costBasis = data.lots.reduce((s: number, l: any) => s + l.buyPrice * l.quantity, 0);
+      lines.push(`  COST BASIS................ $${fmtMoney(costBasis)}`);
+    }
+
+    lines.push(`  PROCEEDS.................. $${fmtMoney(data.proceeds)}`);
+    lines.push(`  REALIZED ${data.isGain ? "GAIN" : "LOSS"}............. ${data.isGain ? "+" : "-"}$${fmtMoney(Math.abs(data.totalGain))}`);
+    lines.push(`  TAX CLASSIFICATION........ ${data.classification}`);
+
+    if (data.isGain) {
+      const estTax = data.isLongTerm ? data.ltTax : data.stTax;
+      lines.push(`  EST. TAX LIABILITY........ $${fmtMoney(estTax + data.niit)} (${data.isLongTerm ? "15%" : (settings.bracket * 100).toFixed(0) + "%"} + 3.8% NIIT)`);
+
+      if (data.stateTax) {
+        lines.push(`  STATE TAX (${data.stateTax.code} ${(data.stateTax.rate * 100).toFixed(1)}%)....... $${fmtMoney(data.stateTax.amount)}`);
+        const combined = estTax + data.niit + data.stateTax.amount;
+        lines.push(`  COMBINED EST. LIABILITY... $${fmtMoney(combined)}`);
+      }
+
+      lines.push(`  YTD REALIZED GAINS........ $${fmtMoney(data.ytdRealizedGains)}`);
+      lines.push(`  YTD EST. TAX BILL......... $${fmtMoney(data.ytdEstTaxBill)}`);
+
+      if (!data.isLongTerm && data.daysToLongTerm > 0) {
+        lines.push(sep);
+        lines.push(`  > TIP: HOLD ${data.daysToLongTerm} MORE DAYS FOR LONG-TERM RATE (15%)`);
+        lines.push(`  > POTENTIAL TAX SAVINGS IF HELD: $${fmtMoney(data.savings)}`);
+      }
+    } else {
+      lines.push(`  TAX-LOSS HARVESTING OPPORTUNITY`);
+      lines.push(`    Deductible Loss: $${fmtMoney(Math.abs(data.totalGain))}`);
+      lines.push(`    Max Annual Offset: $3,000 vs income`);
+      lines.push(`    Remaining Carry-Forward: $${fmtMoney(Math.max(0, Math.abs(data.totalGain) - 3000))}`);
+      lines.push(`  Note: Loss offsets gains first, then up to $3k income/yr.`);
+    }
+
+    if (data.lots && data.lots.length > 1) {
+      lines.push(sep);
+      lines.push(`  LOT DETAILS (${data.method}):`);
+      for (const lot of data.lots) {
+        const d = new Date(lot.buyDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" });
+        lines.push(`    ${d} | ${lot.quantity} shares @ $${lot.buyPrice.toFixed(2)} | ${lot.holdingDays}d | ${lot.isLongTerm ? "LT" : "ST"} | ${lot.gain >= 0 ? "+" : ""}$${fmtMoney(lot.gain)}`);
+      }
+    }
+
+    lines.push(sep);
+  }
+
+  return lines.join("\n");
+}
+
+function formatTaxSummary(data: any): string {
+  const lines: string[] = [];
+  const sep = "─".repeat(55);
+  lines.push(sep);
+  lines.push(`  TAX SUMMARY — ${data.year} YEAR-TO-DATE`);
+  lines.push(sep);
+  lines.push(`  TOTAL TRADES.............. ${data.totalTrades}`);
+  lines.push(`  WINNERS................... ${data.winners}`);
+  lines.push(`  LOSERS.................... ${data.losers}`);
+  lines.push(sep);
+  lines.push(`  SHORT-TERM GAINS.......... ${data.shortTermGains >= 0 ? "+" : ""}$${fmtMoney(data.shortTermGains)}`);
+  lines.push(`  LONG-TERM GAINS........... ${data.longTermGains >= 0 ? "+" : ""}$${fmtMoney(data.longTermGains)}`);
+  lines.push(`  TOTAL REALIZED............ ${data.totalRealizedGains >= 0 ? "+" : ""}$${fmtMoney(data.totalRealizedGains)}`);
+  if (data.washSaleAdjustments > 0) {
+    lines.push(`  WASH SALE ADJUSTMENTS..... $${fmtMoney(data.washSaleAdjustments)}`);
+  }
+  lines.push(sep);
+  lines.push(`  ESTIMATED FEDERAL TAX:`);
+  lines.push(`    Short-Term (ordinary):.. $${fmtMoney(data.estimatedTax.federal.shortTerm)}`);
+  lines.push(`    Long-Term (cap gains):.. $${fmtMoney(data.estimatedTax.federal.longTerm)}`);
+  lines.push(`    NIIT (3.8%):............ $${fmtMoney(data.estimatedTax.federal.niit)}`);
+  lines.push(`    Federal Total:.......... $${fmtMoney(data.estimatedTax.federal.total)}`);
+  if (data.estimatedTax.state) {
+    lines.push(`  STATE TAX (${data.estimatedTax.state.code} ${(data.estimatedTax.state.rate * 100).toFixed(1)}%):... $${fmtMoney(data.estimatedTax.state.amount)}`);
+  }
+  lines.push(`  COMBINED EST. TAX BILL:... $${fmtMoney(data.estimatedTax.combined)}`);
+  lines.push(sep);
+
+  if (data.events && data.events.length > 0) {
+    lines.push(`  RECENT TRANSACTIONS:`);
+    for (const e of data.events.slice(0, 10)) {
+      const d = new Date(e.sellDate).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      lines.push(`    ${d} SELL ${e.sellQty} ${e.symbol} @ $${e.sellPrice.toFixed(2)} | ${e.totalGain >= 0 ? "+" : ""}$${fmtMoney(e.totalGain)}${e.washSale ? " ⚠WASH" : ""}`);
+    }
+    lines.push(sep);
+  }
+
+  return lines.join("\n");
+}
+
+function formatTaxProjection(data: any): string {
+  const lines: string[] = [];
+  const sep = "─".repeat(55);
+  lines.push(sep);
+  lines.push(`  TAX PROJECTION — ${data.year} FULL YEAR ESTIMATE`);
+  lines.push(sep);
+  lines.push(`  DAY OF YEAR............... ${data.dayOfYear}/365`);
+  lines.push(`  YTD REALIZED GAINS........ ${data.ytdRealizedGains >= 0 ? "+" : ""}$${fmtMoney(data.ytdRealizedGains)}`);
+  lines.push(`  PROJECTED ANNUAL GAINS.... ${data.projectedAnnualGains >= 0 ? "+" : ""}$${fmtMoney(data.projectedAnnualGains)}`);
+  lines.push(sep);
+  lines.push(`  TRADING PACE:`);
+  lines.push(`    Trades/Day:............. ${data.tradingPace.tradesPerDay.toFixed(2)}`);
+  lines.push(`    Avg Gain/Trade:......... $${fmtMoney(data.tradingPace.avgGainPerTrade)}`);
+  lines.push(sep);
+  lines.push(`  PROJECTED TAX BILL:`);
+  lines.push(`    Federal:................ $${fmtMoney(data.projectedTax.federal)}`);
+  lines.push(`    NIIT:................... $${fmtMoney(data.projectedTax.niit)}`);
+  if (data.projectedTax.state) {
+    lines.push(`    State (${data.projectedTax.state.code}):............ $${fmtMoney(data.projectedTax.state.amount)}`);
+  }
+  lines.push(`    TOTAL PROJECTED:........ $${fmtMoney(data.projectedTax.total)}`);
+  lines.push(sep);
+  lines.push(`  QUARTERLY ESTIMATED PAYMENTS:`);
+  for (const [q, info] of Object.entries(data.quarterlyPayments) as [string, any][]) {
+    lines.push(`    ${q} (${info.due}): $${fmtMoney(info.amount)}`);
+  }
+  lines.push(sep);
+  return lines.join("\n");
+}
+
+function formatOptimize(data: any): string {
+  const lines: string[] = [];
+  const sep = "─".repeat(55);
+  lines.push(sep);
+  lines.push(`  TAX OPTIMIZE — ${data.symbol} @ $${data.currentPrice?.toFixed(2) || "N/A"}`);
+  lines.push(sep);
+
+  if (!data.lots || data.lots.length === 0) {
+    lines.push(`  No open lots found for ${data.symbol}.`);
+    lines.push(sep);
+    return lines.join("\n");
+  }
+
+  lines.push(`  OPEN LOTS:`);
+  for (const lot of data.lots) {
+    const d = new Date(lot.buyDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" });
+    const ltLabel = lot.isLongTerm ? "LT" : `ST (${lot.daysToLongTerm}d to LT)`;
+    lines.push(`    ${d} | ${lot.remaining} shares @ $${lot.buyPrice.toFixed(2)} | ${ltLabel} | ${lot.unrealizedGain >= 0 ? "+" : ""}$${fmtMoney(lot.unrealizedGain)}`);
+  }
+  lines.push(sep);
+  lines.push(`  TOTAL UNREALIZED:......... ${data.totalUnrealized >= 0 ? "+" : ""}$${fmtMoney(data.totalUnrealized)}`);
+  lines.push(`  TAX IF SOLD (ST RATE):.... $${fmtMoney(data.totalTaxIfSoldNow.shortTerm)}`);
+  lines.push(`  TAX IF SOLD (LT RATE):.... $${fmtMoney(data.totalTaxIfSoldNow.longTerm)}`);
+  lines.push(`  POTENTIAL SAVINGS:........ $${fmtMoney(data.totalTaxIfSoldNow.savings)}`);
+  lines.push(sep);
+
+  if (data.recommendations && data.recommendations.length > 0) {
+    lines.push(`  RECOMMENDATIONS:`);
+    for (const rec of data.recommendations) {
+      lines.push(`  > ${rec}`);
+    }
+    lines.push(sep);
+  }
+
+  return lines.join("\n");
+}
+
+function formatHarvest(data: any): string {
+  const lines: string[] = [];
+  const sep = "─".repeat(55);
+  lines.push(sep);
+  lines.push(`  TAX-LOSS HARVESTING OPPORTUNITIES`);
+  lines.push(sep);
+  lines.push(`  YTD REALIZED GAINS:....... ${data.ytdRealizedGains >= 0 ? "+" : ""}$${fmtMoney(data.ytdRealizedGains)}`);
+  lines.push(`  TOTAL HARVESTABLE:........ $${fmtMoney(data.totalHarvestable)}`);
+  lines.push(`  POTENTIAL TAX SAVINGS:.... $${fmtMoney(data.totalPotentialSavings)}`);
+  lines.push(`  MAX ANNUAL DEDUCTION:..... $${fmtMoney(data.maxAnnualDeduction)}`);
+  lines.push(sep);
+
+  if (!data.opportunities || data.opportunities.length === 0) {
+    lines.push(`  No tax-loss harvesting opportunities found.`);
+    lines.push(`  All positions are at a gain or no open positions.`);
+    lines.push(sep);
+    return lines.join("\n");
+  }
+
+  for (const opp of data.opportunities) {
+    lines.push(`  ${opp.symbol} — ${opp.lotCount} lot(s) with unrealized loss`);
+    lines.push(`    Total Loss: -$${fmtMoney(Math.abs(opp.totalUnrealizedLoss))}`);
+    lines.push(`    Tax Savings: $${fmtMoney(opp.potentialTaxSavings)}`);
+    for (const lot of opp.lots) {
+      const d = new Date(lot.buyDate).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      lines.push(`      ${d} | ${lot.remaining} @ $${lot.buyPrice.toFixed(2)} → $${lot.currentPrice.toFixed(2)} | -$${fmtMoney(Math.abs(lot.loss))} | ${lot.holdingDays}d`);
+    }
+  }
+  lines.push(sep);
+  lines.push(`  ⚠ WASH SALE WARNING: Do not repurchase within 30 days`);
+  lines.push(sep);
+  return lines.join("\n");
 }
 
 export function MirofishTerminal() {
@@ -124,6 +315,7 @@ export function MirofishTerminal() {
   const [watchlist, setWatchlist] = useState<string[]>(() => loadLS(WATCHLIST_KEY, ["AAPL", "NVDA", "TSLA"]));
   const [alerts, setAlerts] = useState<{ symbol: string; price: number; dir: "above" | "below" }[]>(() => loadLS(ALERTS_KEY, []));
   const [macros, setMacros] = useState<Record<string, string[]>>(() => loadLS(MACROS_KEY, {}));
+  const [taxSettings, setTaxSettings] = useState<TaxSettings>(() => loadLS(TAX_SETTINGS_KEY, DEFAULT_TAX_SETTINGS));
   const [liveOrderFlow, setLiveOrderFlow] = useState<OrderFlowItem[]>(terminalOrderFlow as OrderFlowItem[]);
   const [visibleLogs, setVisibleLogs] = useState(6);
   const [clock, setClock] = useState(new Date().toLocaleTimeString());
@@ -145,6 +337,7 @@ export function MirofishTerminal() {
   useEffect(() => { saveLS(WATCHLIST_KEY, watchlist); }, [watchlist]);
   useEffect(() => { saveLS(ALERTS_KEY, alerts); }, [alerts]);
   useEffect(() => { saveLS(MACROS_KEY, macros); }, [macros]);
+  useEffect(() => { saveLS(TAX_SETTINGS_KEY, taxSettings); }, [taxSettings]);
 
   useEffect(() => {
     let cancelled = false;
@@ -203,10 +396,23 @@ export function MirofishTerminal() {
     setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
   }, []);
 
+  const appendOutput = useCallback((output: string) => {
+    setCommandHistory(prev => [...prev, { input: "", output }]);
+    setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
+  }, []);
+
   const persistCmd = useCallback((cmd: string) => {
     setCmdHistory(prev => {
       const next = [cmd, ...prev.filter(c => c !== cmd)].slice(0, 100);
       saveLS(HISTORY_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const updateTaxSettings = useCallback((updates: Partial<TaxSettings>) => {
+    setTaxSettings(prev => {
+      const next = { ...prev, ...updates };
+      saveLS(TAX_SETTINGS_KEY, next);
       return next;
     });
   }, []);
@@ -238,7 +444,183 @@ export function MirofishTerminal() {
   STATUS                    — System status
   SIGNALS                   — Active signals
   PORTFOLIO                 — Portfolio summary
+  ─── TAX COMMANDS ─────────────────────────
+  TAX SUMMARY              — YTD tax report
+  TAX PROJECTION           — End-of-year tax estimate
+  TAX OPTIMIZE <SYM>       — Tax-optimal sell analysis
+  HARVEST                   — Tax-loss harvesting scan
+  EXPORT TAX REPORT        — Download CSV tax report
+  SET BRACKET <RATE>       — Set federal tax rate (e.g. 32)
+  SET STATE <ST>           — Set state for tax (e.g. CA)
+  SET LOT METHOD <M>      — FIFO, LIFO, or SPECIFIC
+  HIDE TAX                  — Suppress tax blocks
+  SHOW TAX                  — Show tax blocks
   CLEAR                     — Clear terminal`);
+      return;
+    }
+
+    if (cmd === "HIDE TAX") {
+      updateTaxSettings({ visible: false });
+      addOutput(rawInput, "[TAXFLOW] Tax impact blocks hidden. Type SHOW TAX to re-enable.");
+      return;
+    }
+
+    if (cmd === "SHOW TAX") {
+      updateTaxSettings({ visible: true });
+      addOutput(rawInput, "[TAXFLOW] Tax impact blocks enabled.");
+      return;
+    }
+
+    if (cmd.startsWith("SET BRACKET ")) {
+      const rate = parseFloat(cmd.slice(12).trim());
+      if (isNaN(rate) || rate < 0 || rate > 100) {
+        addOutput(rawInput, "[ERROR] Usage: SET BRACKET <RATE>  (e.g. SET BRACKET 32 for 32%)");
+        return;
+      }
+      const decimal = rate > 1 ? rate / 100 : rate;
+      updateTaxSettings({ bracket: decimal });
+      addOutput(rawInput, `[TAXFLOW] Federal tax bracket set to ${(decimal * 100).toFixed(0)}%.`);
+      return;
+    }
+
+    if (cmd.startsWith("SET STATE ")) {
+      const state = cmd.slice(10).trim().toUpperCase();
+      if (state.length !== 2) {
+        addOutput(rawInput, "[ERROR] Usage: SET STATE <2-LETTER CODE>  (e.g. SET STATE CA)");
+        return;
+      }
+      updateTaxSettings({ state });
+      const stateRate = HIGH_TAX_STATES[state];
+      const rateInfo = stateRate ? ` (${(stateRate * 100).toFixed(1)}% rate)` : " (no state income tax or standard rate)";
+      addOutput(rawInput, `[TAXFLOW] State set to ${state}${rateInfo}.`);
+      return;
+    }
+
+    if (cmd.startsWith("SET LOT METHOD ")) {
+      const method = cmd.slice(15).trim().toUpperCase();
+      if (method !== "FIFO" && method !== "LIFO" && method !== "SPECIFIC") {
+        addOutput(rawInput, "[ERROR] Usage: SET LOT METHOD <FIFO|LIFO|SPECIFIC>");
+        return;
+      }
+      if (method === "SPECIFIC") {
+        addOutput(rawInput, "[TAXFLOW] Specific lot identification is not yet supported in terminal mode. Use FIFO or LIFO.");
+        return;
+      }
+      updateTaxSettings({ lotMethod: method as "FIFO" | "LIFO" });
+      addOutput(rawInput, `[TAXFLOW] Lot method set to ${method}.`);
+      return;
+    }
+
+    if (cmd === "TAX SUMMARY") {
+      if (!isSignedIn) { addOutput(rawInput, "[ERROR] Sign in required."); return; }
+      addOutput(rawInput, "[TAXFLOW] Computing YTD tax summary...");
+      try {
+        const token = await getToken();
+        const data = await fetchTaxApi("/summary", token, {
+          bracket: taxSettings.bracket.toString(),
+          state: taxSettings.state,
+          method: taxSettings.lotMethod,
+        });
+        if (data.error) {
+          appendOutput(`[ERROR] ${data.error}`);
+        } else {
+          appendOutput(formatTaxSummary(data));
+        }
+      } catch {
+        appendOutput("[ERROR] Failed to compute tax summary. Ensure trade history is available.");
+      }
+      return;
+    }
+
+    if (cmd === "TAX PROJECTION") {
+      if (!isSignedIn) { addOutput(rawInput, "[ERROR] Sign in required."); return; }
+      addOutput(rawInput, "[TAXFLOW] Projecting end-of-year tax liability...");
+      try {
+        const token = await getToken();
+        const data = await fetchTaxApi("/projection", token, {
+          bracket: taxSettings.bracket.toString(),
+          state: taxSettings.state,
+          method: taxSettings.lotMethod,
+        });
+        if (data.error) {
+          appendOutput(`[ERROR] ${data.error}`);
+        } else {
+          appendOutput(formatTaxProjection(data));
+        }
+      } catch {
+        appendOutput("[ERROR] Failed to compute tax projection.");
+      }
+      return;
+    }
+
+    if (cmd.startsWith("TAX OPTIMIZE")) {
+      if (!isSignedIn) { addOutput(rawInput, "[ERROR] Sign in required."); return; }
+      const sym = cmd.slice(12).trim();
+      if (!sym) { addOutput(rawInput, "Usage: TAX OPTIMIZE <SYMBOL>  (e.g. TAX OPTIMIZE AAPL)"); return; }
+      addOutput(rawInput, `[TAXFLOW] Analyzing ${sym} for tax-optimal strategy...`);
+      try {
+        const token = await getToken();
+        const data = await fetchTaxApi(`/optimize/${sym}`, token, {
+          bracket: taxSettings.bracket.toString(),
+          method: taxSettings.lotMethod,
+        });
+        if (data.error) {
+          appendOutput(`[ERROR] ${data.error}`);
+        } else {
+          appendOutput(formatOptimize(data));
+        }
+      } catch {
+        appendOutput(`[ERROR] Failed to analyze ${sym}.`);
+      }
+      return;
+    }
+
+    if (cmd === "HARVEST") {
+      if (!isSignedIn) { addOutput(rawInput, "[ERROR] Sign in required."); return; }
+      addOutput(rawInput, "[TAXFLOW] Scanning portfolio for tax-loss harvesting opportunities...");
+      try {
+        const token = await getToken();
+        const data = await fetchTaxApi("/harvest", token, {
+          bracket: taxSettings.bracket.toString(),
+          method: taxSettings.lotMethod,
+        });
+        if (data.error) {
+          appendOutput(`[ERROR] ${data.error}`);
+        } else {
+          appendOutput(formatHarvest(data));
+        }
+      } catch {
+        appendOutput("[ERROR] Failed to scan for harvest opportunities.");
+      }
+      return;
+    }
+
+    if (cmd === "EXPORT TAX REPORT") {
+      if (!isSignedIn) { addOutput(rawInput, "[ERROR] Sign in required."); return; }
+      addOutput(rawInput, "[TAXFLOW] Generating tax report CSV...");
+      try {
+        const token = await getToken();
+        const params = new URLSearchParams({
+          bracket: taxSettings.bracket.toString(),
+          method: taxSettings.lotMethod,
+        });
+        const res = await fetch(`/api/taxflow/export?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `tax-report-${new Date().getFullYear()}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        appendOutput(`[TAXFLOW] Tax report downloaded: tax-report-${new Date().getFullYear()}.csv\n  Includes: All realized gains/losses, ST vs LT breakdown,\n  wash sale adjustments. Formatted for CPA review.`);
+      } catch {
+        appendOutput("[ERROR] Failed to generate tax report.");
+      }
       return;
     }
 
@@ -250,19 +632,17 @@ export function MirofishTerminal() {
       try {
         const data = await fetchNews({ topic: topicArg || undefined, limit: 8 });
         if (data.items.length === 0) {
-          setCommandHistory(prev => [...prev, { input: "", output: "[NEWS] No articles found. Try: NEWS Microelectronics" }]);
+          appendOutput("[NEWS] No articles found. Try: NEWS Microelectronics");
         } else {
           const lines = data.items.map((item: NewsItem, i: number) => {
             const sent = item.sentiment === "positive" ? "+" : item.sentiment === "negative" ? "▼" : "~";
             const tickers = item.tickers.length > 0 ? ` [${item.tickers.join(",")}]` : "";
             return `  ${i + 1}. [${sent}] ${item.title.slice(0, 70)}${tickers}\n     ${item.source} | ${item.topic}`;
           });
-          setCommandHistory(prev => [...prev, { input: "", output: `[NEWS] ${data.total} articles:\n${lines.join("\n")}` }]);
+          appendOutput(`[NEWS] ${data.total} articles:\n${lines.join("\n")}`);
         }
-        setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
       } catch {
-        setCommandHistory(prev => [...prev, { input: "", output: "[ERROR] Failed to fetch news." }]);
-        setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
+        appendOutput("[ERROR] Failed to fetch news.");
       }
       return;
     }
@@ -274,11 +654,9 @@ export function MirofishTerminal() {
       try {
         const result = await quickAnalyzeStock(sym);
         const out = `[QUANTUM] ${sym} — ${result.signal} @ ${result.confidence}% confidence | Risk: ${result.risk}\nKey Level: $${result.keyLevel}\n${result.summary}\n⚠ ${result.disclaimer}`;
-        setCommandHistory(prev => [...prev, { input: "", output: out }]);
-        setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
+        appendOutput(out);
       } catch {
-        setCommandHistory(prev => [...prev, { input: "", output: `[ERROR] Analysis failed for ${sym}.` }]);
-        setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
+        appendOutput(`[ERROR] Analysis failed for ${sym}.`);
       }
       return;
     }
@@ -340,19 +718,6 @@ export function MirofishTerminal() {
       try {
         const token = await getToken();
 
-        let existingPosition: { avg_entry_price: string; qty: string; unrealized_pl: string } | null = null;
-        if (side === "sell") {
-          try {
-            const posRes = await fetch("/api/alpaca/positions", { headers: { Authorization: `Bearer ${token}` } });
-            if (posRes.ok) {
-              const positions = await posRes.json();
-              if (Array.isArray(positions)) {
-                existingPosition = positions.find((p: any) => p.symbol === sym) || null;
-              }
-            }
-          } catch {}
-        }
-
         const res = await fetch("/api/alpaca/orders", {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -360,7 +725,7 @@ export function MirofishTerminal() {
         });
         const data = await res.json();
         if (!res.ok) {
-          setCommandHistory(prev => [...prev, { input: "", output: `[ERROR] Order failed: ${data.error || "Unknown error"}` }]);
+          appendOutput(`[ERROR] Order failed: ${data.error || "Unknown error"}`);
         } else {
           const fillPrice = data.filled_avg_price ? parseFloat(data.filled_avg_price) : 0;
 
@@ -382,15 +747,47 @@ export function MirofishTerminal() {
           const isFilled = data.status === "filled" && fillPrice > 0;
           const statusLabel = isFilled ? "FILLED" : "SUBMITTED";
           const priceLabel = isFilled ? `$${fillPrice.toFixed(2)}` : "MARKET (pending)";
-          const fillLine = `[${statusLabel}] ${data.side?.toUpperCase()} ${data.qty} ${data.symbol} @ ${priceLabel} | Status: ${data.status} | ID: ${data.id?.slice(0, 8)}`;
-          const taxLabel = isFilled ? "Realized" : "Projected";
-          const taxLine = `[TAXFLOW ${taxLabel}]\n` + formatTaxImpact(side, qty, sym, estimatedPrice, existingPosition);
-          setCommandHistory(prev => [...prev, { input: "", output: fillLine + "\n" + taxLine }]);
+          const fillLine = `> ${side.toUpperCase()} ${qty} ${sym} @ ${priceLabel} — ORDER ${statusLabel}`;
+          appendOutput(fillLine);
+
+          if (taxSettings.visible) {
+            try {
+              const taxData = await fetchTaxApi("/impact", token, {
+                symbol: sym,
+                side,
+                qty: qty.toString(),
+                price: estimatedPrice.toString(),
+                bracket: taxSettings.bracket.toString(),
+                state: taxSettings.state,
+                method: taxSettings.lotMethod,
+              });
+
+              if (!taxData.error) {
+                const taxBlock = formatTaxImpactFromApi(taxData, taxSettings);
+                let disclaimerBlock = "";
+                if (!taxSettings.disclaimerShown) {
+                  disclaimerBlock = "\n  ⚠ AI-ESTIMATED TAX FIGURES — NOT PROFESSIONAL TAX ADVICE — CONSULT A LICENSED CPA";
+                  updateTaxSettings({ disclaimerShown: true });
+                }
+                appendOutput(`[TAXFLOW]\n${taxBlock}${disclaimerBlock}`);
+              }
+            } catch {
+              appendOutput("[TAXFLOW] TAX DATA UNAVAILABLE — ENSURE TRADE HISTORY IS ACTIVE");
+            }
+
+            if (side === "sell") {
+              try {
+                const washData = await fetchTaxApi(`/wash-check/${sym}`, token);
+                if (washData.washSaleRisk) {
+                  appendOutput(`⚠ WASH SALE WARNING: You have recent buy/sell activity in ${sym} within 30 days.\n  IRS wash sale rule may apply — losses could be disallowed.`);
+                }
+              } catch {}
+            }
+          }
         }
         setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
       } catch (err: any) {
-        setCommandHistory(prev => [...prev, { input: "", output: `[ERROR] Order failed: ${err.message}` }]);
-        setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
+        appendOutput(`[ERROR] Order failed: ${err.message}`);
       }
       return;
     }
@@ -403,19 +800,17 @@ export function MirofishTerminal() {
         const res = await fetch("/api/alpaca/positions", { headers: { Authorization: `Bearer ${token}` } });
         const data = await res.json();
         if (!res.ok) {
-          setCommandHistory(prev => [...prev, { input: "", output: `[ERROR] ${data.error}` }]);
+          appendOutput(`[ERROR] ${data.error}`);
         } else if (!Array.isArray(data) || data.length === 0) {
-          setCommandHistory(prev => [...prev, { input: "", output: "[POSITIONS] No open positions." }]);
+          appendOutput("[POSITIONS] No open positions.");
         } else {
           const lines = data.map((p: any) =>
             `  ${(p.symbol || "").padEnd(6)} ${p.qty} shares @ $${parseFloat(p.avg_entry_price || 0).toFixed(2)} | MV: $${parseFloat(p.market_value || 0).toFixed(2)} | P/L: ${parseFloat(p.unrealized_pl || 0) >= 0 ? "+" : ""}$${parseFloat(p.unrealized_pl || 0).toFixed(2)} (${(parseFloat(p.unrealized_plpc || 0) * 100).toFixed(2)}%)`
           );
-          setCommandHistory(prev => [...prev, { input: "", output: `[POSITIONS] ${data.length} open:\n${lines.join("\n")}` }]);
+          appendOutput(`[POSITIONS] ${data.length} open:\n${lines.join("\n")}`);
         }
-        setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
       } catch {
-        setCommandHistory(prev => [...prev, { input: "", output: "[ERROR] Could not fetch positions." }]);
-        setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
+        appendOutput("[ERROR] Could not fetch positions.");
       }
       return;
     }
@@ -428,19 +823,17 @@ export function MirofishTerminal() {
         const res = await fetch("/api/alpaca/orders?status=all&limit=10", { headers: { Authorization: `Bearer ${token}` } });
         const data = await res.json();
         if (!res.ok) {
-          setCommandHistory(prev => [...prev, { input: "", output: `[ERROR] ${data.error}` }]);
+          appendOutput(`[ERROR] ${data.error}`);
         } else if (!Array.isArray(data) || data.length === 0) {
-          setCommandHistory(prev => [...prev, { input: "", output: "[ORDERS] No recent orders." }]);
+          appendOutput("[ORDERS] No recent orders.");
         } else {
           const lines = data.slice(0, 8).map((o: any) =>
             `  ${(o.side || "").toUpperCase().padEnd(5)} ${(o.qty || "").toString().padEnd(4)} ${(o.symbol || "").padEnd(6)} ${o.status?.padEnd(10)} ${o.filled_avg_price ? "$" + parseFloat(o.filled_avg_price).toFixed(2) : "PENDING"}`
           );
-          setCommandHistory(prev => [...prev, { input: "", output: `[ORDERS] Recent ${data.length} orders:\n${lines.join("\n")}` }]);
+          appendOutput(`[ORDERS] Recent ${data.length} orders:\n${lines.join("\n")}`);
         }
-        setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
       } catch {
-        setCommandHistory(prev => [...prev, { input: "", output: "[ERROR] Could not fetch orders." }]);
-        setTimeout(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight), 50);
+        appendOutput("[ERROR] Could not fetch orders.");
       }
       return;
     }
@@ -527,7 +920,7 @@ export function MirofishTerminal() {
     if (cmd === "RISK") {
       addOutput(rawInput, "Portfolio Risk: 8.4% | Max Drawdown: 0.8% | Beta: 1.35 | Sharpe: 2.1 | Kelly: 14.2%");
     } else if (cmd === "STATUS") {
-      addOutput(rawInput, "ENTANGLE-CORE: ONLINE | 7 AI Models Active | 5,000 NASDAQ Stocks | Consensus: 87% | Uptime: 99.97%");
+      addOutput(rawInput, `ENTANGLE-CORE: ONLINE | 7 AI Models Active | 5,000 NASDAQ Stocks | Tax: ${taxSettings.visible ? "ON" : "OFF"} (${(taxSettings.bracket * 100).toFixed(0)}% bracket, ${taxSettings.lotMethod}) | Uptime: 99.97%`);
     } else if (cmd === "SIGNALS") {
       addOutput(rawInput, "Active: NVDA BUY 87% | AMD BUY 83% | PLTR BUY 79% | TSLA SELL 74% | AAPL HOLD 52%");
     } else if (cmd === "PORTFOLIO") {
@@ -538,7 +931,7 @@ export function MirofishTerminal() {
     } else {
       addOutput(rawInput, `Unknown command: ${cmd}. Type HELP for available commands.`);
     }
-  }, [addOutput, persistCmd, isSignedIn, getToken, watchlist, alerts, macros, cmdHistory]);
+  }, [addOutput, appendOutput, persistCmd, updateTaxSettings, isSignedIn, getToken, watchlist, alerts, macros, cmdHistory, taxSettings]);
 
   const handleCommand = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -594,6 +987,8 @@ export function MirofishTerminal() {
         </div>
         <div className="flex items-center gap-4 text-[10px] font-mono">
           <span className="text-green-400">7 MODELS ONLINE</span>
+          <span className={`${taxSettings.visible ? "text-green-400" : "text-red-400/60"}`}>TAX:{taxSettings.visible ? "ON" : "OFF"}</span>
+          <span className="text-amber-400/60">{taxSettings.lotMethod}</span>
           <span className="text-amber-400/60">{watchlist.length} WATCHING</span>
           <span className="text-muted-foreground">{clock}</span>
         </div>
@@ -666,7 +1061,7 @@ export function MirofishTerminal() {
         <div className="flex items-center gap-2 mb-2">
           <div className="w-1.5 h-1.5 rounded-full bg-primary" />
           <span className="text-[9px] font-mono text-primary/60 uppercase tracking-wider">Command Interface</span>
-          <span className="text-[8px] font-mono text-muted-foreground ml-auto">↑↓ history · BUY/SELL/POSITIONS/ORDERS/WATCHLIST</span>
+          <span className="text-[8px] font-mono text-muted-foreground ml-auto">↑↓ history · BUY/SELL/TAX SUMMARY/HARVEST</span>
         </div>
         <div ref={scrollRef} className="max-h-40 overflow-y-auto mb-2 space-y-1">
           {commandHistory.map((cmd, i) => (
@@ -697,3 +1092,5 @@ export function MirofishTerminal() {
     </div>
   );
 }
+
+export default MirofishTerminal;

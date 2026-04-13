@@ -130,7 +130,9 @@ export default function NotificationCenter() {
   useEffect(() => {
     if (!isSignedIn) return;
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30_000);
+    const interval = setInterval(() => {
+      if (!document.hidden) fetchUnreadCount();
+    }, 60_000);
     return () => clearInterval(interval);
   }, [isSignedIn, fetchUnreadCount]);
 

@@ -453,7 +453,9 @@ export default function MarketingCenter() {
 
   useEffect(() => {
     if (!authorized) return;
-    const interval = setInterval(fetchQueueStatus, 15_000);
+    const interval = setInterval(() => {
+      if (!document.hidden) fetchQueueStatus();
+    }, 60_000);
     return () => clearInterval(interval);
   }, [authorized, fetchQueueStatus]);
 

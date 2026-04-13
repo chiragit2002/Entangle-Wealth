@@ -19,6 +19,7 @@ import { processReferralMilestones } from "../lib/referralRewards";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
 import { validateBody, validateParams, z } from "../lib/validateRequest";
 import { logger } from "../lib/logger";
+import { triggerGiveawaySync } from "../lib/giveawaySync";
 import { getOccupationById } from "@workspace/occupations";
 
 async function autoEnrollInGiveaway(userId: string, clerkId: string) {
@@ -211,6 +212,7 @@ router.post("/users/sync", requireAuth, validateBody(UserSyncSchema), async (req
             processReferralMilestones(referrer.clerkId).catch((err) =>
               logger.error({ err }, "[referral] milestone processing failed"),
             );
+            triggerGiveawaySync(referrer.id, referrer.clerkId);
           } catch (refErr) {
             logger.error({ err: refErr }, "[referral] Failed to create referral record");
           }

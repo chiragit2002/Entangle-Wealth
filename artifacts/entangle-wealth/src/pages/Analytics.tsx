@@ -261,7 +261,9 @@ export default function Analytics() {
 
   useEffect(() => {
     if (autoRefresh) {
-      autoRefreshRef.current = setInterval(fetchDashboard, 30000);
+      autoRefreshRef.current = setInterval(() => {
+        if (!document.hidden) fetchDashboard();
+      }, 30000);
     } else {
       if (autoRefreshRef.current) clearInterval(autoRefreshRef.current);
     }

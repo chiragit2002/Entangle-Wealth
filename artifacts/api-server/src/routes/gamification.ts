@@ -22,6 +22,7 @@ import { resolveUserId } from "../lib/resolveUserId";
 import { evaluateStreak } from "../lib/streakUtils";
 import { calculateLevel, calculateTier, xpForLevel, xpForNextLevel, applyMultiplier, TIER_THRESHOLDS } from "@workspace/xp";
 import { logger } from "../lib/logger";
+import { triggerGiveawaySync } from "../lib/giveawaySync";
 
 const ChallengeIdParamsSchema = z.object({
   challengeId: z.coerce.number().int().positive(),
@@ -59,6 +60,19 @@ function checkLeaderboardRateLimit(req: import("express").Request): boolean {
   return entry.count <= PUBLIC_LEADERBOARD_RATE_LIMIT_MAX;
 }
 
+async function loadUserGameState(userId: string) {
+  const [xpRows, streakRows, founderRows] = await Promise.all([
+    db.select().from(userXpTable).where(eq(userXpTable.userId, userId)),
+    db.select().from(streaksTable).where(eq(streaksTable.userId, userId)),
+    db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId)),
+  ]);
+  return {
+    xpRow: xpRows[0] ?? null,
+    streak: streakRows[0] ?? null,
+    founder: founderRows[0] ?? null,
+  };
+}
+
 router.get("/gamification/me", requireAuth, async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   try {
@@ -68,21 +82,23 @@ router.get("/gamification/me", requireAuth, async (req, res) => {
       return;
     }
 
-    let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+    let [gameState, earnedBadges] = await Promise.all([
+      loadUserGameState(userId),
+      db.select({ badge: badgesTable, earnedAt: userBadgesTable.earnedAt })
+        .from(userBadgesTable)
+        .innerJoin(badgesTable, eq(userBadgesTable.badgeId, badgesTable.id))
+        .where(eq(userBadgesTable.userId, userId)),
+    ]);
+
+    let { xpRow, streak } = gameState;
+
     if (!xpRow) {
       [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
     }
 
-    let [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
     if (!streak) {
       [streak] = await db.insert(streaksTable).values({ userId, currentStreak: 0, longestStreak: 0, multiplier: 1.0 }).returning();
     }
-
-    const earnedBadges = await db
-      .select({ badge: badgesTable, earnedAt: userBadgesTable.earnedAt })
-      .from(userBadgesTable)
-      .innerJoin(badgesTable, eq(userBadgesTable.badgeId, badgesTable.id))
-      .where(eq(userBadgesTable.userId, userId));
 
     const currentLevelXp = xpForLevel(xpRow.level);
     const nextLevelXp = xpForNextLevel(xpRow.level);
@@ -197,6 +213,7 @@ router.post("/gamification/xp", requireAuth, validateBody(XpSchema), async (req,
       leveledUp: result.updated.level > result.prevLevel,
       tierChanged: result.updated.tier !== result.prevTier,
     });
+    triggerGiveawaySync(userId, clerkId);
   } catch (error) {
     logger.error({ err: error }, "Error adding XP:");
     res.status(500).json({ error: "Failed to add XP" });
@@ -251,6 +268,7 @@ router.post("/gamification/streak/checkin", requireAuth, validateBody(z.object({
       .returning();
 
     res.json({ ...updated, protectionUsed: consumedProtection });
+    triggerGiveawaySync(userId, clerkId);
   } catch (error) {
     logger.error({ err: error }, "Error checking in streak:");
     res.status(500).json({ error: "Failed to check in" });
@@ -276,8 +294,10 @@ router.get("/gamification/badges/me", requireAuth, async (req, res) => {
       return;
     }
 
-    const allBadges = await db.select().from(badgesTable).orderBy(badgesTable.category, badgesTable.name);
-    const earned = await db.select().from(userBadgesTable).where(eq(userBadgesTable.userId, userId));
+    const [allBadges, earned] = await Promise.all([
+      db.select().from(badgesTable).orderBy(badgesTable.category, badgesTable.name),
+      db.select().from(userBadgesTable).where(eq(userBadgesTable.userId, userId)),
+    ]);
     const earnedIds = new Set(earned.map(e => e.badgeId));
 
     const result = allBadges.map(b => ({
@@ -480,14 +500,13 @@ router.get("/gamification/leaderboard/rank", requireAuth, validateQuery(PeriodQu
                         period === "monthly" ? xpRow.monthlyXp :
                         xpRow.totalXp;
 
-    const higherCount = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(userXpTable)
-      .where(sql`${xpField} > ${userXpValue}`);
-
-    const totalCount = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(userXpTable);
+    const [higherCount, totalCount] = await Promise.all([
+      db.select({ count: sql<number>`count(*)` })
+        .from(userXpTable)
+        .where(sql`${xpField} > ${userXpValue}`),
+      db.select({ count: sql<number>`count(*)` })
+        .from(userXpTable),
+    ]);
 
     res.json({
       rank: Number(higherCount[0].count) + 1,
@@ -532,44 +551,38 @@ router.get("/gamification/weekly-summary", requireAuth, async (req, res) => {
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
 
-    let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+    let [[xpRow], [streak], weeklyXpTxns, completedChallenges] = await Promise.all([
+      db.select().from(userXpTable).where(eq(userXpTable.userId, userId)),
+      db.select().from(streaksTable).where(eq(streaksTable.userId, userId)),
+      db.select().from(xpTransactionsTable).where(and(
+        eq(xpTransactionsTable.userId, userId),
+        gte(xpTransactionsTable.createdAt, weekAgo)
+      )),
+      db.select().from(userChallengesTable).where(and(
+        eq(userChallengesTable.userId, userId),
+        eq(userChallengesTable.completed, true),
+        gte(userChallengesTable.completedAt, weekAgo)
+      )),
+    ]);
+
     if (!xpRow) {
       [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
     }
 
-    let [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
     if (!streak) {
       [streak] = await db.insert(streaksTable).values({ userId, currentStreak: 0, longestStreak: 0, multiplier: 1.0 }).returning();
     }
 
-    const weeklyXpTxns = await db
-      .select()
-      .from(xpTransactionsTable)
-      .where(and(
-        eq(xpTransactionsTable.userId, userId),
-        gte(xpTransactionsTable.createdAt, weekAgo)
-      ));
-
     const weeklyXpEarned = weeklyXpTxns.reduce((sum, t) => sum + t.amount, 0);
     const signalsViewed = weeklyXpTxns.filter(t => t.reason === "signal_used" || t.reason === "analysis_run").length;
 
-    const completedChallenges = await db
-      .select()
-      .from(userChallengesTable)
-      .where(and(
-        eq(userChallengesTable.userId, userId),
-        eq(userChallengesTable.completed, true),
-        gte(userChallengesTable.completedAt, weekAgo)
-      ));
-
-    const [rankRow] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(userXpTable)
-      .where(sql`${userXpTable.totalXp} > ${xpRow.totalXp}`);
-
-    const [totalUsersRow] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(userXpTable);
+    const [[rankRow], [totalUsersRow]] = await Promise.all([
+      db.select({ count: sql<number>`count(*)` })
+        .from(userXpTable)
+        .where(sql`${userXpTable.totalXp} > ${xpRow.totalXp}`),
+      db.select({ count: sql<number>`count(*)` })
+        .from(userXpTable),
+    ]);
 
     const totalUsers = Number(totalUsersRow?.count || 1);
     const rank = Number(rankRow?.count || 0) + 1;
@@ -639,23 +652,19 @@ router.get("/gamification/spin/status", requireAuth, async (req, res) => {
     const now = new Date();
     const today = now.toISOString().slice(0, 10);
 
-    const [todaySpin] = await db
-      .select()
-      .from(dailySpinsTable)
-      .where(and(eq(dailySpinsTable.userId, userId), eq(dailySpinsTable.spinDate, today)))
-      .limit(1);
+    const [[todaySpin], history, [founder]] = await Promise.all([
+      db.select().from(dailySpinsTable)
+        .where(and(eq(dailySpinsTable.userId, userId), eq(dailySpinsTable.spinDate, today)))
+        .limit(1),
+      db.select().from(dailySpinsTable)
+        .where(eq(dailySpinsTable.userId, userId))
+        .orderBy(desc(dailySpinsTable.spunAt))
+        .limit(7),
+      db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId)),
+    ]);
 
     const canSpin = !todaySpin;
     const nextSpinAt = todaySpin ? new Date(new Date(now).setUTCHours(24, 0, 0, 0)).toISOString() : null;
-
-    const history = await db
-      .select()
-      .from(dailySpinsTable)
-      .where(eq(dailySpinsTable.userId, userId))
-      .orderBy(desc(dailySpinsTable.spunAt))
-      .limit(7);
-
-    const [founder] = await db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
 
     res.json({ canSpin, nextSpinAt, lastReward: todaySpin?.reward || null, history, isFounder: !!founder, rewards: SPIN_REWARDS.map(r => ({ reward: r.reward, rewardType: r.rewardType })) });
   } catch (error) {
@@ -759,6 +768,7 @@ router.post("/gamification/spin", requireAuth, validateBody(z.object({}).strict(
     const { picked, founderMultiplier, streakBonus, newStreak } = spinResult;
     const nextSpinAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
     res.json({ reward: picked.reward, rewardType: picked.rewardType, rewardValue: picked.rewardValue, founderMultiplier, streakBonus, newStreak, nextSpinAt });
+    triggerGiveawaySync(userId, clerkId);
   } catch (error) {
     logger.error({ err: error }, "Error spinning wheel:");
     res.status(500).json({ error: "Failed to spin wheel" });
@@ -771,41 +781,36 @@ router.get("/gamification/status", requireAuth, async (req, res) => {
     const userId = await resolveUserId(clerkId, req);
     if (!userId) { res.status(404).json({ error: "User not found" }); return; }
 
-    let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+    const now = new Date();
+    const today = now.toISOString().slice(0, 10);
+
+    let [[todaySpin], recentXpTxns, recentSpins, gameState] = await Promise.all([
+      db.select().from(dailySpinsTable)
+        .where(and(eq(dailySpinsTable.userId, userId), eq(dailySpinsTable.spinDate, today)))
+        .limit(1),
+      db.select().from(xpTransactionsTable)
+        .where(eq(xpTransactionsTable.userId, userId))
+        .orderBy(desc(xpTransactionsTable.createdAt))
+        .limit(15),
+      db.select().from(dailySpinsTable)
+        .where(eq(dailySpinsTable.userId, userId))
+        .orderBy(desc(dailySpinsTable.spunAt))
+        .limit(10),
+      loadUserGameState(userId),
+    ]);
+
+    let { xpRow, streak, founder } = gameState;
+
     if (!xpRow) {
       [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
     }
 
-    let [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
     if (!streak) {
       [streak] = await db.insert(streaksTable).values({ userId, currentStreak: 0, longestStreak: 0, multiplier: 1.0 }).returning();
     }
 
-    const now = new Date();
-    const today = now.toISOString().slice(0, 10);
-
-    const [todaySpin] = await db
-      .select()
-      .from(dailySpinsTable)
-      .where(and(eq(dailySpinsTable.userId, userId), eq(dailySpinsTable.spinDate, today)))
-      .limit(1);
-
     const canSpin = !todaySpin;
     const nextSpinAt = todaySpin ? new Date(new Date(now).setUTCHours(24, 0, 0, 0)).toISOString() : null;
-
-    const recentXpTxns = await db
-      .select()
-      .from(xpTransactionsTable)
-      .where(eq(xpTransactionsTable.userId, userId))
-      .orderBy(desc(xpTransactionsTable.createdAt))
-      .limit(15);
-
-    const recentSpins = await db
-      .select()
-      .from(dailySpinsTable)
-      .where(eq(dailySpinsTable.userId, userId))
-      .orderBy(desc(dailySpinsTable.spunAt))
-      .limit(10);
 
     const nonXpSpins = recentSpins.filter(s => s.rewardType !== "xp");
     const nonXpActivity = nonXpSpins.map(s => ({
@@ -833,8 +838,6 @@ router.get("/gamification/status", requireAuth, async (req, res) => {
     const recentActivity = [...xpActivity, ...nonXpActivity]
       .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime())
       .slice(0, 10);
-
-    const [founder] = await db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
 
     const currentLevelXp = xpForLevel(xpRow.level);
     const nextLevelXp = xpForNextLevel(xpRow.level);
@@ -912,10 +915,11 @@ router.post("/gamification/claim-daily", requireAuth, validateBody(z.object({}).
     if (newStreak >= 7) dailyXp += 200;
     else if (newStreak >= 3) dailyXp += 50;
 
-    const [founder] = await db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
+    const { founder, xpRow: xpRowResult } = await loadUserGameState(userId);
+
     if (founder) dailyXp = applyMultiplier(dailyXp, founder.xpMultiplier);
 
-    let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+    let xpRow = xpRowResult;
     if (!xpRow) {
       [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
     }
@@ -938,6 +942,7 @@ router.post("/gamification/claim-daily", requireAuth, validateBody(z.object({}).
       leveledUp: newLevel > xpRow.level,
       streakBonus: newStreak >= 7 ? 200 : newStreak >= 3 ? 50 : 0,
     });
+    triggerGiveawaySync(userId, clerkId);
   } catch (error) {
     logger.error({ err: error }, "Error claiming daily reward:");
     res.status(500).json({ error: "Failed to claim daily reward" });
@@ -950,8 +955,10 @@ router.get("/gamification/founder/status", requireAuth, async (req, res) => {
     const userId = await resolveUserId(clerkId, req);
     if (!userId) { res.status(404).json({ error: "User not found" }); return; }
 
-    const [founder] = await db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
-    const [{ count }] = await db.select({ count: sql<number>`count(*)::int` }).from(founderStatusTable);
+    const [[founder], [{ count }]] = await Promise.all([
+      db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId)),
+      db.select({ count: sql<number>`count(*)::int` }).from(founderStatusTable),
+    ]);
 
     res.json({ isFounder: !!founder, founderCount: count, xpMultiplier: founder?.xpMultiplier || 1.0, grantedAt: founder?.grantedAt || null });
   } catch (error) {

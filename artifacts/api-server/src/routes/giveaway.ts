@@ -4,17 +4,15 @@ import { validateBody, validateQuery, z } from "../lib/validateRequest";
 import { db } from "@workspace/db";
 import {
   giveawayEntriesTable,
-  userXpTable,
-  streaksTable,
   usersTable,
-  referralsTable,
 } from "@workspace/db/schema";
-import { eq, desc, count, and, sql } from "drizzle-orm";
+import { eq, desc, sql, count } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
 import { logger } from "../lib/logger";
+import { syncGiveawayEntries } from "../lib/giveawaySync";
 
 const router = Router();
 
@@ -41,58 +39,21 @@ async function getOrCreateEntry(userId: string) {
   return entry;
 }
 
-async function syncEntries(userId: string, clerkId: string) {
-  const [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
-  const [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
-
-  const xpLevel = xpRow?.level || 1;
-  const totalXp = xpRow?.totalXp || 0;
-  const currentStreak = streak?.currentStreak || 0;
-
-  const tradeEntries = Math.min(Math.floor(totalXp / 500), 50);
-  const streakEntries = Math.min(currentStreak, 30);
-  const xpMilestoneEntries = Math.floor(xpLevel / 5);
-  const loginEntries = Math.min(Math.floor(totalXp / 100), 30);
-
-  const [refStats] = await db
-    .select({ converted: count() })
-    .from(referralsTable)
-    .where(and(eq(referralsTable.referrerId, clerkId), eq(referralsTable.converted, true)));
-  const convertedReferrals = Number(refStats?.converted || 0);
-  const referralEntries = convertedReferrals * 5;
-
-  const totalEntries = tradeEntries + streakEntries + xpMilestoneEntries + loginEntries + referralEntries;
-
-  const [entry] = await db
-    .update(giveawayEntriesTable)
-    .set({
-      totalEntries,
-      tradeEntries,
-      streakEntries,
-      loginEntries,
-      xpMilestoneEntries,
-      referralEntries,
-      convertedReferrals,
-      updatedAt: new Date(),
-    })
-    .where(eq(giveawayEntriesTable.userId, userId))
-    .returning();
-
-  return entry;
-}
 
 async function syncReferralBonusShares() {
-  const allEntries = await db
-    .select({ userId: giveawayEntriesTable.userId, convertedReferrals: giveawayEntriesTable.convertedReferrals })
+  const [sumRow] = await db
+    .select({ total: sql<number>`COALESCE(SUM(converted_referrals), 0)` })
     .from(giveawayEntriesTable);
-
-  const totalReferrals = allEntries.reduce((s, e) => s + e.convertedReferrals, 0);
+  const totalReferrals = Number(sumRow?.total || 0);
   if (totalReferrals === 0) return;
 
-  for (const entry of allEntries) {
-    const share = entry.convertedReferrals > 0 ? (entry.convertedReferrals / totalReferrals) * REFERRAL_BONUS_POOL : 0;
-    await db.update(giveawayEntriesTable).set({ referralBonusShare: share }).where(eq(giveawayEntriesTable.userId, entry.userId));
-  }
+  await db.execute(sql`
+    UPDATE ${giveawayEntriesTable}
+    SET referral_bonus_share = CASE
+      WHEN converted_referrals > 0 THEN (converted_referrals::numeric / ${totalReferrals}) * ${REFERRAL_BONUS_POOL}
+      ELSE 0
+    END
+  `);
 }
 
 async function recalcUserBonusShare(userId: string, userConvertedReferrals: number) {
@@ -134,22 +95,28 @@ router.get("/giveaway/my-entries", requireAuth, async (req, res) => {
       return;
     }
 
-    await getOrCreateEntry(userId);
-    const entry = await syncEntries(userId, clerkId);
+    let [[entry], [totalRow], [refSumRow]] = await Promise.all([
+      db.select().from(giveawayEntriesTable).where(eq(giveawayEntriesTable.userId, userId)),
+      db.select({ total: sql<number>`COALESCE(SUM(total_entries), 0)` }).from(giveawayEntriesTable),
+      db.select({ total: sql<number>`COALESCE(SUM(converted_referrals), 0)` }).from(giveawayEntriesTable),
+    ]);
 
-    const [totalRow] = await db.select({ total: sql<number>`COALESCE(SUM(total_entries), 0)` }).from(giveawayEntriesTable);
-    const [refSumRow] = await db.select({ total: sql<number>`COALESCE(SUM(converted_referrals), 0)` }).from(giveawayEntriesTable);
+    if (!entry) {
+      await syncGiveawayEntries(userId, clerkId);
+      [entry] = await db.select().from(giveawayEntriesTable).where(eq(giveawayEntriesTable.userId, userId));
+    }
+
     const totalEntries = Number(totalRow?.total || 1);
     const totalReferrals = Number(refSumRow?.total || 0);
-    const referralBonusShare = totalReferrals > 0 && entry.convertedReferrals > 0
+    const referralBonusShare = entry && totalReferrals > 0 && entry.convertedReferrals > 0
       ? (entry.convertedReferrals / totalReferrals) * REFERRAL_BONUS_POOL
       : 0;
 
-    const odds = totalEntries > 0 ? ((entry.totalEntries / totalEntries) * 100).toFixed(3) : "0.000";
+    const odds = entry && totalEntries > 0 ? ((entry.totalEntries / totalEntries) * 100).toFixed(3) : "0.000";
     const countdown = getCountdown();
 
     res.json({
-      entries: { ...entry, referralBonusShare },
+      entries: entry ? { ...entry, referralBonusShare } : null,
       odds: `${odds}%`,
       totalPoolEntries: totalEntries,
       countdown,
@@ -182,8 +149,10 @@ router.get("/giveaway/leaderboard", validateQuery(z.object({ limit: z.coerce.num
       .orderBy(desc(giveawayEntriesTable.totalEntries))
       .limit(limit);
 
-    const [totalRow] = await db.select({ total: sql<number>`COALESCE(SUM(total_entries), 0)` }).from(giveawayEntriesTable);
-    const [refSumRow] = await db.select({ total: sql<number>`COALESCE(SUM(converted_referrals), 0)` }).from(giveawayEntriesTable);
+    const [[totalRow], [refSumRow]] = await Promise.all([
+      db.select({ total: sql<number>`COALESCE(SUM(total_entries), 0)` }).from(giveawayEntriesTable),
+      db.select({ total: sql<number>`COALESCE(SUM(converted_referrals), 0)` }).from(giveawayEntriesTable),
+    ]);
     const totalEntries = Number(totalRow?.total || 1);
     const totalReferrals = Number(refSumRow?.total || 0);
 
@@ -216,7 +185,7 @@ router.post("/giveaway/admin/sync-all", requireAuth, requireAdmin, validateBody(
     let synced = 0;
     for (const user of allUsers) {
       await getOrCreateEntry(user.id);
-      await syncEntries(user.id, user.clerkId);
+      await syncGiveawayEntries(user.id, user.clerkId);
       synced++;
     }
     await syncReferralBonusShares();

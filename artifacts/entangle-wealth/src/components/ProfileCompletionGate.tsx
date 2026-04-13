@@ -5,6 +5,8 @@ import { User, MapPin, Loader2, ChevronRight, Briefcase, Building2, Upload, X, F
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { OccupationDropdown } from "@/components/OccupationDropdown";
+import { CityAutocomplete } from "@/components/CityAutocomplete";
+import type { CityEntry } from "@/lib/cities-data";
 import { getOccupationById } from "@workspace/occupations";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
@@ -103,6 +105,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
   const [touched, setTouched] = useState<Partial<Record<keyof ProfileGateData, boolean>>>({});
   const [errors, setErrors] = useState<FieldErrors>({});
   const [form, setForm] = useState<ProfileGateData>({ firstName: "", lastName: "", occupationId: "", location: "" });
+  const [selectedCountryCode, setSelectedCountryCode] = useState<string>("");
 
   const [isBusinessOwner, setIsBusinessOwner] = useState<boolean | null>(null);
   const [businessOwnerAnswered, setBusinessOwnerAnswered] = useState(false);
@@ -142,6 +145,9 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
           occupationId: data.occupationId || "",
           location: data.location || "",
         };
+        if (data.countryCode) {
+          setSelectedCountryCode(data.countryCode);
+        }
 
         if (isProfileComplete(profileData)) {
           if (data.isBusinessOwner && data.businessDocStatus !== "pending_review" && data.businessDocStatus !== "verified") {
@@ -291,6 +297,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
         body: JSON.stringify({
           occupationId: form.occupationId.trim(),
           location: form.location.trim(),
+          countryCode: selectedCountryCode || undefined,
         }),
       });
 
@@ -476,16 +483,19 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
               <MapPin className="w-3 h-3" aria-hidden="true" />
               Location <span className="text-destructive" aria-hidden="true">*</span>
             </label>
-            <Input
+            <CityAutocomplete
               id="gate-location"
-              placeholder="City, State"
+              placeholder="Start typing a city name..."
               value={form.location}
-              onChange={e => handleFieldChange("location", e.target.value)}
+              onChange={(displayValue: string, entry: CityEntry | null) => {
+                handleFieldChange("location", displayValue);
+                setSelectedCountryCode(entry ? entry.countryCode : "");
+              }}
               onBlur={() => handleBlur("location")}
-              className={`bg-muted/50 border-border h-10 transition-colors ${errors.location ? "border-destructive/50 focus:border-destructive" : "focus:border-primary/50"}`}
+              hasError={!!errors.location}
+              className={`flex w-full bg-muted/50 border border-border h-10 rounded-[4px] px-3 py-2 text-sm transition-colors outline-none font-mono ${errors.location ? "border-destructive/50 focus:border-destructive" : "focus:border-primary/50"}`}
               aria-invalid={!!errors.location}
               aria-describedby={errors.location ? "gate-location-error" : "gate-location-hint"}
-              autoComplete="address-level2"
             />
             {errors.location ? (
               <p id="gate-location-error" className="text-[10px] text-destructive mt-1 flex items-center gap-1">

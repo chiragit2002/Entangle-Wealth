@@ -16,6 +16,7 @@ import { UpgradePrompt, useUpgradePrompt } from "@/components/UpgradePrompt";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { MicroFeedback } from "@/components/MicroFeedback";
+import { TradeFlowPanel } from "@/components/TradeFlowPanel";
 
 function PanelHeader({ title, icon, color = "cyan", rightContent }: { title: string; icon?: React.ReactNode; color?: string; rightContent?: React.ReactNode }) {
   const borderColor = color === "cyan" ? "border-l-[#00D4FF]" : color === "gold" ? "border-l-[#FFB800]" : color === "green" ? "border-l-[#00FF41]" : color === "red" ? "border-l-[#ff3366]" : color === "purple" ? "border-l-[#9c27b0]" : "border-l-white/20";
@@ -229,6 +230,10 @@ export default function Terminal() {
               <PaperTradingWidget key={portfolioRefreshKey} variant="inline" />
             </div>
           </BloombergPanel>
+        </div>
+
+        <div className="mb-1.5">
+          <TradeFlowPanel />
         </div>
 
         <div className="flex items-center justify-between px-2 py-1 bg-[#0A0E1A] border border-white/[0.04] rounded-sm">

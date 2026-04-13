@@ -12,6 +12,7 @@ import { stockCache, newsCache } from "../lib/cache";
 import { getPoolStats } from "@workspace/db";
 import { getSseConnectionStats } from "./alerts";
 import { logger } from "../lib/logger";
+import { getRateLimiterStats } from "../middlewares/userRateLimit";
 
 const router = Router();
 
@@ -55,6 +56,7 @@ router.get("/metrics", requireAuth, requireAdmin, async (req: Request, res: Resp
         pool: poolStats,
       },
       sse: sseStats,
+      rateLimiter: getRateLimiterStats(),
       memory: {
         rss: `${rssMB}MB`,
         heapUsed: `${heapUsedMB}MB`,

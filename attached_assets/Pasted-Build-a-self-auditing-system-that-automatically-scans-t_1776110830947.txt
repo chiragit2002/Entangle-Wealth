@@ -1,0 +1,61 @@
+Build a self-auditing system that automatically scans the app for UI/UX problems, broken functionality, and design inconsistencies — and reports findings in a live internal dashboard. Here is exactly what I want:
+
+LAYER 1 — AUTOMATED UI CRAWLER (runs on every deploy):
+• Use Playwright or Puppeteer to spin up a headless browser that visits every page in the app automatically
+• On each page it must check:
+  — Are all buttons clickable and do they trigger the correct action?
+  — Are all forms submittable with valid inputs?
+  — Are there any broken images, missing icons, or 404 assets?
+  — Are there any console errors or uncaught JavaScript exceptions?
+  — Does any text overflow its container or get clipped?
+  — Are any modals or dropdowns unreachable or stuck open?
+  — Does the page load in under 2 seconds?
+  — Does the page look correct on mobile viewport (375px) and desktop (1440px)?
+• Save all findings to an audit_log table in the database with: page URL, issue type, severity, screenshot, and timestamp
+
+LAYER 2 — VISUAL REGRESSION TESTING (runs on every deploy):
+• Take a screenshot of every page after every deploy
+• Compare against the last approved baseline screenshot
+• If any page has changed more than 5% pixel difference, flag it as a visual regression
+• Store before/after screenshots and highlight the diff areas in red
+• This catches accidental CSS breaks, layout shifts, and Bloomberg terminal design violations automatically
+
+LAYER 3 — REAL-TIME ERROR MONITORING (runs continuously in production):
+• Instrument every page with a global error boundary that catches:
+  — React component crashes
+  — Failed API calls (non-200 responses)
+  — Slow API responses (over 1 second)
+  — JavaScript runtime errors
+• Each caught error must: log to the audit_log table, include the page, component name, error message, and user session ID (anonymized)
+• If the same error occurs 3+ times in 10 minutes, trigger a CRITICAL alert
+
+LAYER 4 — UX BEHAVIOR TRACKING (runs continuously):
+• Track and log the following user behavior signals automatically:
+  — Rage clicks (user clicks same element 3+ times rapidly = something is broken or confusing)
+  — Dead clicks (user clicks an area with no interactive element = missing button or broken link)
+  — Form abandonment (user starts filling a form but leaves without submitting)
+  — Scroll depth (what % of each page do users actually see)
+• Log all signals to a ux_signals table — no third party tools, all internal
+
+LAYER 5 — INTERNAL AUDIT DASHBOARD (Bloomberg terminal style):
+• Build a protected internal page at /admin/audit visible only to admin accounts
+• Display in real time:
+  — SYSTEM STATUS panel: green/amber/red for each major feature (Trading, TaxFlow, Auth, News Feed, Leaderboard)
+  — RECENT ISSUES feed: scrolling list of latest audit findings with severity badges (CRITICAL / HIGH / MEDIUM / LOW)
+  — VISUAL REGRESSIONS panel: side-by-side before/after screenshots of any changed pages
+  — UX SIGNALS panel: rage click heatmap, dead click map, form abandonment rates
+  — API HEALTH panel: response times for every endpoint, updated every 60 seconds
+  — ERROR RATE chart: errors per hour over the last 24 hours
+• Style the entire dashboard in Bloomberg terminal aesthetic — dark navy, green/amber/red status indicators, monospace font, no rounded cards
+
+LAYER 6 — AUTO-HEALING (where possible):
+• If /api/news response time exceeds 3 seconds, automatically trigger a cache refresh in the background
+• If any API endpoint returns 500 three times in a row, automatically restart that service and log the restart
+• If a user hits a broken page (unhandled error), automatically show a terminal-style fallback: "> SYSTEM ENCOUNTERED AN ERROR — LOGGING FOR REVIEW — REDIRECTING IN 5 SECONDS"
+
+TRIGGER SCHEDULE:
+• Full Playwright UI crawl: on every deploy + once every 24 hours
+• Visual regression check: on every deploy
+• API health check: every 60 seconds
+• UX signal aggregation: real time, written to DB every 5 minutes
+• Audit dashboard: refreshes every 30 seconds automatically

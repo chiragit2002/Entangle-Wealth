@@ -129,3 +129,11 @@ function makeSpamGuard(windowMs: number, authenticatedMax: number, unauthenticat
 }
 
 export const unauthWriteSpamGuard = makeSpamGuard(60_000, 30, 5, "unauth-write");
+
+export function getRateLimiterStats() {
+  return {
+    userWindows: userWindows.size,
+    ipWindows: ipWindows.size,
+    totalTrackedKeys: userWindows.size + ipWindows.size,
+  };
+}

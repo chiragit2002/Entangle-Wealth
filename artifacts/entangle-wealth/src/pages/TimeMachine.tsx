@@ -200,7 +200,7 @@ export default function TimeMachine() {
             <span className="electric-text">What If</span> Time Machine
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            See what your investment would be worth today | powered by real market data
+            Real market data. Real results.
           </p>
         </div>
 

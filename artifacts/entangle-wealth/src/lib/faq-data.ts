@@ -17,7 +17,7 @@ export const FAQ_CATEGORIES: { key: FaqCategory; label: string }[] = [
 ];
 
 export const FAQ_DATA: FaqItem[] = [
-  { id: 1, category: "getting-started", question: "What is EntangleWealth?", answer: "EntangleWealth is a professional-grade financial analysis platform that provides real-time market data, 55+ technical indicators, AI-powered analysis, options flow tracking, and tax optimization tools | all in a Bloomberg Terminal-inspired interface designed for everyday investors." },
+  { id: 1, category: "getting-started", question: "What is EntangleWealth?", answer: "EntangleWealth is a financial analysis platform with real-time market data, 55+ technical indicators, AI analysis, options flow tracking, and tax tools — designed for everyday investors." },
   { id: 2, category: "getting-started", question: "How do I create an account?", answer: "Click 'Sign In' in the top navigation bar, then select 'Sign Up'. You can register with your email address or use Google/GitHub OAuth for instant access. No credit card is required for the free tier." },
   { id: 3, category: "getting-started", question: "Is EntangleWealth free to use?", answer: "Yes, EntangleWealth offers a free tier with access to core features including the dashboard, market overview, stock explorer, and basic technical analysis. Premium plans unlock advanced features like AI-powered signals, unlimited screener filters, and priority support." },
   { id: 4, category: "getting-started", question: "What markets does EntangleWealth cover?", answer: "We cover 5,000+ NASDAQ-listed stocks with real-time data from Alpaca Markets. Our platform also displays market data for major indices (S&P 500, NASDAQ, DOW), crypto, forex, commodities, and bonds." },

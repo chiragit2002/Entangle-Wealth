@@ -430,7 +430,7 @@ export default function WealthSim() {
           <div className="text-center max-w-md">
             <TrendingUp className="w-14 h-14 text-[#00D4FF] mx-auto mb-4" />
             <h1 className="text-2xl font-black text-white font-mono mb-2">Wealth Simulation Engine</h1>
-            <p className="text-white/50 text-sm mb-6">Visualize how your financial decisions compound over time. Sign in to save your progress and earn XP.</p>
+            <p className="text-white/50 text-sm mb-6">See how your decisions compound. Sign in to save progress and earn XP.</p>
             <div className="flex gap-3 justify-center">
               <a href="/sign-in" className="px-5 py-2.5 bg-[#00D4FF] text-black font-bold font-mono text-[11px] uppercase tracking-widest rounded-sm hover:bg-[#00D4FF]/90 transition-colors">Sign In</a>
               <button onClick={() => { setTryWithoutAccount(true); setWizardStep(1); }} className="px-5 py-2.5 border border-white/10 text-white/60 font-mono text-[11px] uppercase tracking-widest rounded-sm hover:border-white/20 hover:text-white/80 transition-colors">Try Without Account</button>

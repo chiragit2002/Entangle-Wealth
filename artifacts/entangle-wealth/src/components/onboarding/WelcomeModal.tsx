@@ -5,10 +5,10 @@ import { CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { trackEvent } from "@/lib/trackEvent";
 
 const GOAL_OPTIONS = [
-  { id: "investing", label: "Invest & grow my wealth", desc: "Build long-term financial freedom" },
-  { id: "saving", label: "Save smarter", desc: "Emergency fund & short-term goals" },
-  { id: "tax", label: "Reduce my tax bill", desc: "Keep more of what I earn" },
-  { id: "clarity", label: "Get financial clarity", desc: "Understand where I stand" },
+  { id: "investing", label: "Invest & grow wealth", desc: "Build long-term financial freedom" },
+  { id: "saving", label: "Save smarter", desc: "Emergency fund and short-term goals" },
+  { id: "tax", label: "Cut my tax bill", desc: "Keep more of what I earn" },
+  { id: "clarity", label: "Get financial clarity", desc: "See exactly where I stand" },
 ];
 
 interface WelcomeModalProps {
@@ -73,7 +73,7 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
               <h2 id="welcome-modal-title" className="text-lg font-bold text-white leading-tight">
                 {firstName ? `Welcome, ${firstName}!` : "Welcome!"}
               </h2>
-              <p className="text-xs text-white/50 mt-0.5">Quick question before you dive in</p>
+              <p className="text-xs text-white/50 mt-0.5">One question to personalize your dashboard</p>
             </div>
           </div>
         </div>
@@ -114,7 +114,7 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
                 <span>Setting up your dashboard...</span>
               </>
             ) : (
-              "Take me to the dashboard"
+              "Go to my dashboard"
             )}
           </button>
 

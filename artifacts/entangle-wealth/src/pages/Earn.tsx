@@ -66,7 +66,7 @@ export default function Earn() {
       <div className="container mx-auto px-4 py-6 max-w-5xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">Earn More</h1>
-          <p className="text-muted-foreground mt-1">Gig work, freelance, and options income — explore what fits your schedule.</p>
+          <p className="text-muted-foreground mt-1">Gig, freelance, and options income — find what fits your schedule.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">

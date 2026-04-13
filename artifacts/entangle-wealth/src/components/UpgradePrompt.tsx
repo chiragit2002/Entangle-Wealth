@@ -22,23 +22,23 @@ interface UpgradePromptProps {
 const LIMIT_COPY: Record<UpgradePromptConfig["limitType"], { headline: string; sub: string }> = {
   signals: {
     headline: "Daily signal limit reached",
-    sub: "Free users get 3 signals/day. Upgrade to Pro for unlimited real-time signals.",
+    sub: "Free tier: 3 signals/day. Pro unlocks unlimited real-time signals.",
   },
   alert_rules: {
     headline: "Alert rule limit reached",
-    sub: "Free users can create up to 20 alert rules. Pro gives you unlimited alerts.",
+    sub: "Free tier: 20 rules. Pro gives you unlimited.",
   },
   alert_triggers: {
-    headline: "Daily alert trigger limit reached",
-    sub: "You've hit the 10 daily alert triggers for free accounts. Go Pro for unlimited.",
+    headline: "Daily alert limit reached",
+    sub: "Free tier: 10 triggers/day. Pro removes the limit.",
   },
   taxgpt: {
-    headline: "TaxGPT is a Pro feature",
-    sub: "Upgrade to Pro to unlock unlimited TaxGPT queries and advanced tax analysis.",
+    headline: "TaxGPT requires Pro",
+    sub: "Unlimited queries and advanced tax analysis — Pro only.",
   },
   terminal: {
-    headline: "Bloomberg Terminal is Pro-only",
-    sub: "The full terminal with live data, Greeks, and advanced analytics requires Pro.",
+    headline: "Terminal requires Pro",
+    sub: "Live data, Greeks, and advanced analytics — Pro only.",
   },
 };
 

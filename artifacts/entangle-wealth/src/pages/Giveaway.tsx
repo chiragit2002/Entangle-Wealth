@@ -226,7 +226,7 @@ export default function Giveaway() {
             <span className="bg-gradient-to-r from-[#f5c842] to-[#cc9900] bg-clip-text text-transparent">Anniversary Giveaway</span>
           </h1>
           <p className="text-white/60 text-sm md:text-base max-w-xl mx-auto leading-relaxed">
-            Our biggest milestone is your reward. Every action on the platform | trading, streaks, referrals | earns you
+            Every action — trading, streaks, referrals — earns you
             entries. One winner takes $50,000 on our 1-year anniversary.
           </p>
         </div>

@@ -649,7 +649,7 @@ export default function Home() {
             </h1>
 
             <p className="max-w-lg text-base md:text-lg text-white/60 leading-relaxed">
-              Most people are one decision away from a completely different financial life. We tell you what that decision is — in plain English, in under 60 seconds.
+              Your next move, in 60 seconds. No jargon.
             </p>
 
             <MicroConversionFlow referralCode={referralCode || undefined} />
@@ -691,13 +691,13 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
               {[
                 {
-                  text: "You've got income coming in, but you're still not sure if you're saving enough, investing right, or just bleeding money you can't account for.",
+                  text: "You know you should act. You don't know where to start.",
                 },
                 {
-                  text: "You've downloaded the apps, read the Reddit threads, watched the YouTube videos. You still don't know what to do with YOUR situation.",
+                  text: "Apps and articles offer advice that doesn't fit your situation.",
                 },
                 {
-                  text: "You keep telling yourself you'll figure it out next month. Next month becomes next year. And the gap keeps growing.",
+                  text: "Thinking about money feels overwhelming, so you put it off.",
                 },
               ].map((item, i) => (
                 <div
@@ -718,29 +718,28 @@ export default function Home() {
               Here's the difference
             </p>
             <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
-              Stop drowning in information. Start getting answers.
+              Your situation. Specific guidance. Plain English.
             </h2>
             <p className="text-base text-white/50 max-w-lg mx-auto leading-relaxed">
-              We look at your actual situation — not some hypothetical average person — and tell you
-              exactly what to do next. Specific. Actionable. No degree required.
+              Answer a few questions. Get a clear next step. No expertise needed.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
               {[
                 {
                   title: "Clarity",
-                  desc: "See your full financial picture in one place. No more guessing, no more avoidance.",
+                  desc: "See exactly where you stand.",
                   color: "text-[#00c8f8]",
                   border: "border-[#00c8f8]/20",
                 },
                 {
                   title: "Simplicity",
-                  desc: "We cut through the noise so you don't have to. Just the next right move — in plain language.",
+                  desc: "No charts. No jargon. Just what to do.",
                   color: "text-[#00e676]",
                   border: "border-[#00e676]/20",
                 },
                 {
                   title: "Confidence",
-                  desc: "Act without the second-guessing. Know why you're doing it, not just what to do.",
+                  desc: "Decide without second-guessing.",
                   color: "text-[#f5c842]",
                   border: "border-[#f5c842]/20",
                 },
@@ -765,7 +764,7 @@ export default function Home() {
                 How it works
               </p>
               <h2 className="text-2xl md:text-4xl font-bold text-white">
-                Three steps. Finally, some answers.
+                Three steps to financial control
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -773,21 +772,21 @@ export default function Home() {
                 {
                   num: "1",
                   title: "Tell us where you are",
-                  desc: "No 47-question form. No linking accounts. Just the basics — enough to give you something real.",
+                  desc: "Three quick questions. No forms.",
                   color: "text-[#00c8f8]",
                   bg: "bg-[#00c8f8]/10",
                 },
                 {
                   num: "2",
-                  title: "We do the heavy lifting",
-                  desc: "Multiple AI models analyze your picture simultaneously. When they agree, we tell you — with confidence scores and clear reasoning.",
+                  title: "Get your next step",
+                  desc: "Specific guidance for your situation.",
                   color: "text-[#00e676]",
                   bg: "bg-[#00e676]/10",
                 },
                 {
                   num: "3",
-                  title: "You move forward",
-                  desc: "Not 'consider your options.' An actual next step. The one thing that will make the biggest difference given your specific situation.",
+                  title: "Act with clarity",
+                  desc: "Know exactly what to do — and why.",
                   color: "text-[#f5c842]",
                   bg: "bg-[#f5c842]/10",
                 },
@@ -825,33 +824,33 @@ export default function Home() {
               Why people trust us
             </p>
             <h2 className="text-2xl md:text-4xl font-bold text-white">
-              Built to simplify, not overwhelm.
+              Built for clarity, not complexity.
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 text-left">
               {[
                 {
                   icon: CheckCircle,
                   color: "text-[#00e676]",
-                  title: "No confusing financial jargon",
-                  desc: "Every piece of guidance is written for real people, not finance professionals.",
+                  title: "No financial jargon",
+                  desc: "Guidance written for real people.",
                 },
                 {
                   icon: ShieldCheck,
                   color: "text-[#00c8f8]",
-                  title: "Your privacy is protected",
-                  desc: "Your data is encrypted and never sold. You're a person, not a product.",
+                  title: "Your data stays yours",
+                  desc: "Encrypted and never sold.",
                 },
                 {
                   icon: Lock,
                   color: "text-[#f5c842]",
-                  title: "No pressure, no upsells",
-                  desc: "Start free and upgrade only if you want more. No gotchas, no dark patterns.",
+                  title: "No pressure, no gotchas",
+                  desc: "Free to start. Upgrade only if you want more.",
                 },
                 {
                   icon: Heart,
                   color: "text-[#ff8888]",
-                  title: "Designed for your peace of mind",
-                  desc: "We measure success by how much clearer and calmer you feel about your finances.",
+                  title: "Fewer money worries",
+                  desc: "We win when you feel clear about your finances.",
                 },
               ].map((item) => (
                 <div key={item.title} className="glass-panel rounded-2xl p-5 flex gap-4">
@@ -928,10 +927,10 @@ export default function Home() {
         <section className="py-20 lg:py-28 px-4 border-t border-white/5">
           <div className="container mx-auto max-w-2xl text-center flex flex-col items-center space-y-6">
             <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
-              Your next financial move is one step away.
+              Know what to do next — in 60 seconds.
             </h2>
             <p className="text-base text-white/50 max-w-md leading-relaxed">
-              Answer three quick questions and get a clear, specific recommendation — no credit card, no commitment.
+              Three questions. One specific recommendation. No card required.
             </p>
 
             <MicroConversionFlow referralCode={referralCode || undefined} />

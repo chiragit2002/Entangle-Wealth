@@ -107,7 +107,7 @@ export default function AICoach() {
       const greeting: ChatMessage = {
         id: "greeting",
         role: "assistant",
-        content: "Hello! I'm your EntangleWealth Behavioral Finance Coach. I'm here to help you build lasting financial habits, interpret your simulation results, and guide you toward your financial goals. What's on your mind today?",
+        content: "I'm your AI financial coach. Ask me about habits, strategies, or your simulation results.",
         timestamp: new Date(),
       };
       setMessages([greeting]);

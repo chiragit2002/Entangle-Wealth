@@ -217,7 +217,7 @@ export default function Pricing() {
                 Full Pro access. <span className="text-[#00e676]">Zero cost.</span> Right now.
               </h2>
               <p className="text-muted-foreground text-sm md:text-base">
-                Every Pro feature is unlocked until{" "}
+                All Pro features unlocked until{" "}
                 <span className="font-bold text-foreground">
                   {new Date(promo.endsAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                 </span>
@@ -232,7 +232,7 @@ export default function Pricing() {
             Institutional tools. <span className="electric-text">Not institutional prices.</span>
           </h1>
           <p className="text-muted-foreground text-base md:text-lg">
-            {promo?.active ? "Every Pro feature unlocked — no card, no commitment, no catch." : "Try everything free for 30 days. No card required. Cancel in one click."}
+            {promo?.active ? "All Pro features unlocked — no card needed." : "30 days free. No card. Cancel anytime."}
           </p>
           {!promo?.active && (
             <div className="inline-block mt-4 bg-[rgba(0,230,118,0.1)] border border-[rgba(0,230,118,0.3)] rounded-full px-4 py-1.5 text-xs font-bold text-[#00e676]">

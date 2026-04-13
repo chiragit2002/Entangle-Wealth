@@ -283,7 +283,7 @@ export function ReferralSection() {
     if (!referralLink) return;
     trackEvent("referral_click", { action: "share" });
     const shareMessage =
-      "I've been using EntangleWealth for institutional-grade trading signals and AI-powered tax tools. Join me — it's genuinely different from anything else out there.";
+      "I've been using EntangleWealth for trading signals and AI tax tools. Genuinely different — join me.";
     if (navigator.share) {
       try {
         await navigator.share({
@@ -323,10 +323,10 @@ export function ReferralSection() {
             Referral Program
           </p>
           <h3 className="text-xl font-bold text-white leading-tight">
-            You're building the future of finance.
+            Share the edge.
           </h3>
           <p className="text-sm text-white/45 mt-1.5 leading-relaxed">
-            Every person you bring in unlocks something real — not points, not badges. Genuine upgrades to how you invest.
+            Every referral unlocks real upgrades — not points or badges.
           </p>
         </div>
 

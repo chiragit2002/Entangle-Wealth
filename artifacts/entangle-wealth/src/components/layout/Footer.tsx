@@ -12,7 +12,7 @@ function FooterComponent() {
             <span className="font-semibold text-sm text-foreground">EntangleWealth</span>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Professional-grade alerts and analysis for the everyday investor. Trade smarter, live better.
+            Institutional clarity. Everyday price.
           </p>
         </div>
 

@@ -439,7 +439,7 @@ export default function Giveaway() {
             <p className="text-sm text-white/60 leading-relaxed mb-4">
               On top of the $50K grand prize drawing, there's a separate <strong className="text-[#00d4ff]">$36,000 referral bonus pool</strong> split
               among everyone who successfully brings friends onto the platform. The more friends you convert, the bigger your
-              share. This is in <em>addition</em> to all existing milestone rewards (extra signals, Pro trial, TaxGPT, Ambassador).
+              share. This is in addition to all existing milestone rewards (extra signals, Pro trial, TaxGPT, Ambassador).
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[

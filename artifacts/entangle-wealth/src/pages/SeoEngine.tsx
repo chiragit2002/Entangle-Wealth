@@ -341,7 +341,7 @@ function BlogTab() {
         .replace(/^## (.+)$/gm, "<h2>$1</h2>")
         .replace(/^# (.+)$/gm, "<h1>$1</h1>")
         .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-        .replace(/\*(.+?)\*/g, "<em>$1</em>")
+        .replace(/\*(.+?)\*/g, "$1")
         .replace(/^- (.+)$/gm, "<li>$1</li>")
         .replace(/\n/g, "<br/>\n");
       output = `<!DOCTYPE html>\n<html><head><title>${post.metaTitle}</title><meta name="description" content="${post.metaDescription}"/></head><body>\n<h1>${post.title}</h1>\n${htmlContent}\n</body></html>`;

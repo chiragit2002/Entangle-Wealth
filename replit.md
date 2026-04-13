@@ -1,6 +1,6 @@
 # Overview
 
-EntangleWealth is a pnpm monorepo financial analysis platform designed to help families make better financial decisions. It offers tools for stock analysis, job searching, résumé building, gig marketplaces, and a comprehensive TaxFlow suite. The platform features a "quantum entanglement" AI analysis method where multiple AI agents cross-check each other for consensus-based signals, aiming to provide honest and practical financial insights.
+EntangleWealth is a pnpm monorepo financial analysis platform designed to help families make better financial decisions. It offers tools for stock analysis, job searching, résumé building, gig marketplaces, and a comprehensive TaxFlow suite. The platform features a "quantum entanglement" AI analysis method where multiple AI agents cross-check each other for consensus-based signals, aiming to provide honest and practical financial insights. The project's ambition is to provide competitive intelligence, AI-powered résumé building, open-source intelligence with GitHub integration, and professional charting capabilities with AI scanning.
 
 # User Preferences
 
@@ -9,13 +9,11 @@ I prefer concise and direct communication. When making changes, prioritize funct
 # System Architecture
 
 ## UI/UX and Design System
-- **Theme**: Light/dark mode toggle via `next-themes` (`ThemeProvider` in App.tsx, `ThemeToggle` in Navbar). CSS variables in `index.css` (`:root` = light, `.dark` = dark). Dark theme: electric blue (`#00D4FF`), gold (`#FFD700`), purple (`#9c27b0`). Light theme: primary `#0099CC`. Stored in localStorage key `ew-theme`, default dark. Clerk appearance adapts via `useClerkAppearance()` hook. Nav/BottomNav use `--nav-bg`, `--nav-hover-bg`, `--nav-dropdown-bg`, `--bottomnav-bg` CSS variables.
+- **Theme**: Light/dark mode toggle (default dark) with electric blue, gold, and purple accents for dark mode; primary `#0099CC` for light mode. Utilizes `next-themes` and CSS variables.
 - **Typography**: JetBrains Mono for data displays and Inter for UI elements.
-- **Visuals**: Glassmorphism effects, blurred panels, gradient borders, custom scrollbars, and animations.
+- **Visuals**: Glassmorphism effects, blurred panels, gradient borders, custom scrollbars, and animations. Animated gradient orbs and a subtle dot grid overlay for background.
 - **Navigation**: Navbar with dropdown groups and a mobile-responsive bottom navigation bar.
 - **Components**: Utilizes shadcn/ui.
-- **Layout Background**: Animated gradient orbs and a subtle dot grid overlay.
-- **Core Features**: Competitive intelligence, AI-powered résumé builder, open-source intelligence with GitHub integration, and professional charting capabilities with AI scanning.
 
 ## Technical Implementations
 - **Monorepo**: pnpm workspace structure.
@@ -26,51 +24,42 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **Validation**: Zod.
 - **Build**: `esbuild`.
 - **Frontend**: React with Vite and Tailwind CSS.
-- **Payments**: Stripe for subscriptions and KYC verification. **Launch Promo**: All Pro features free until May 13, 2026 — controlled by `PROMO_END_DATE` in `api-server/src/lib/userDailyLimits.ts`. Promo bypasses signal/TaxGPT/alert limits server-side, hides UpgradePrompt client-side, and shows banner on Pricing page. Public endpoint: `GET /api/stripe/promo`.
+- **Payments**: Stripe for subscriptions and KYC verification.
 - **Data Management**: LocalStorage for client-side persistence.
-- **Occupation System**: `@workspace/occupations` package — 536 structured occupations across 26 categories with tax category mappings (W-2, 1099, Business Owner). Used in Profile, ProfileCompletionGate, coaching AI context.
-- **Security**: Helmet for HTTP security headers, global and AI-specific rate limiting.
-- **Freemium Gating**: High-value personalized features require sign-in (TaxGPT, Terminal, Tax Strategy, Receipts, Wealth Sim, Alternate Timeline, Habits, Life Outcomes, AI Coach). Browsable content remains public (Home, Dashboard, Stocks, Options, Charts, Technical Analysis, Market Overview, Screener, Vol Lab, Time Machine, Sector Flow, Community, Blog, Giveaway, Tax overview, Travel, Earn, Jobs, Gigs). Gating enforced via `ProtectedRoute` in App.tsx which redirects to Clerk sign-in.
-- **Schema Management**: Drizzle ORM schema is the source of truth. Dev DB synced via `push-force`. Post-merge script (`scripts/post-merge.sh`) runs `push-force` only in non-production environments; production requires explicit migration. All 11 feature tables (coaching, wealth simulation, feedback, conversations, paper trading) plus 18 user columns (referral, KYC, business owner) aligned.
-- **Performance**: Paginated endpoints, database indexing, AI request queuing, exponential backoff with jitter, circuit breaker patterns, image compression, and real-time metrics.
+- **Occupation System**: Structured occupations for tax category mappings and AI context.
+- **Security**: Helmet for HTTP security headers, global and AI-specific rate limiting, CSRF protection.
+- **Freemium Gating**: High-value features require sign-in, while browsable content remains public.
+- **Schema Management**: Drizzle ORM schema is the source of truth, with dev DB synced via `push-force`.
+- **Performance**: Paginated endpoints, database indexing, AI request queuing, exponential backoff with jitter, circuit breaker patterns, image compression, real-time metrics.
 
 ## Feature Specifications
-- **EntangleWealth Platform**:
-    - **AI Analysis**: "Quantum Entanglement Analysis" using 7 specialized AI agents for consensus-based stock signals.
-    - **Financial Tools**: Stock Explorer, Job Search, Résumé Builder, Gig Marketplace.
-    - **User Management**: Profile management, KYC verification, Stripe payments, gamification, and leaderboard engine.
-    - **Community**: Groups, Feed, Events, Jobs, Pricing.
-    - **TaxFlow Intelligence Platform**: Core data layer with IRS tax rates, 27 strategies, onboarding wizard (4-step: entity selection, business info with EIN + KYC verification, income profile with business trip deductions, goals with filing time), tax dashboard, strategy browser, document vault with AI analysis, TaxGPT, travel budget planner, and legal disclaimers. UserProfile includes `ein`, `businessTripDeductions[]`, and `kyc` fields. KYC PII is submitted to backend `/kyc/submit` and sensitive fields (ID number, DOB) are stripped from localStorage after submission.
-    - **Receipt Capture System** (`/receipts`): Protected page for expense tracking with dual upload (file upload + mobile camera capture via `capture="environment"`), AI-powered document analysis via `/api/analyze-document`, manual entry form with IRS category selection, mileage log, card/ledger view modes, category filtering, search, and CSV export. Linked from Travel wizard review step and Navbar Tools dropdown.
-    - **Accounting Integrations** (`/integrations`): Protected page to connect external accounting & tax software. Supports QuickBooks, Xero, FreshBooks, Wave, Sage, Zoho Books, H&R Block, and TurboTax. Backend stores connection state in `connected_accounts` table. API routes: GET `/api/integrations/accounting`, POST `.../connect`, POST `.../disconnect`, POST `.../sync`. Provider whitelist validation, OAuth 2.0 flow ready. Cross-linked from Receipts page and Navbar Tools dropdown.
-    - **Paper Trading**: $100K starting cash paper trading system. Users start at $0 portfolio value until they place trades. Buy/sell stocks at specified prices, track positions, P&L, and trade history. Reset to $100K available. Backend tables: `paper_portfolios`, `paper_trades`, `paper_positions`, `paper_options_trades`, `paper_options_positions`. **Options Trading**: Buy/sell calls/puts with strike, expiration, contracts, and premium. API routes: POST `/paper-trading/options-trade`, GET `/paper-trading/options-positions`. **Inline StockTradePanel** on Technical Analysis page with Stocks/Options tabs, replaces floating widget. **OptionsChain** has per-row buy/sell buttons with inline trade confirmation bar. Options Flow signals have "Trade" buttons that open the StockTradePanel for the signal's symbol.
-    - **Gamification System**: XP/Level/Tier progression (Bronze→Diamond), daily streak with multiplier (up to 3x), 12+ badges, daily/weekly challenges, leaderboard (weekly/monthly/all-time), EntangleCoin token rewards. **Daily Spin Wheel** with weighted XP rewards (100-1000 XP), streak shields, and 2x multiplier boosters. 24h cooldown enforced server-side. **Founder Status** for early users with permanent 1.5x XP multiplier. **Gamification Widget** on Dashboard showing level, XP, streak, badges, and daily spin trigger. Backend tables: `user_xp`, `xp_transactions`, `badges`, `user_badges`, `challenges`, `user_challenges`, `streaks`, `leaderboard_snapshots`, `daily_spins`, `founder_status`.
-    - **Market Analysis**: Technical Analysis (TradingView-inspired), Market Overview, Stock Screener, Dashboard (Bloomberg-style Command Center), Options Chain, "What If" Time Machine, Sector Flow Radar, Volatility Lab.
-    - **Alternate Timeline Mode** (`/alternate-timeline`): Dual-pane comparison interface for financial futures. Features: side-by-side "Current Path" vs "Better Path" with real-time sliders (income, savings rate, debt, investment rate, net worth, emergency fund), animated chart showing both paths, Decision Impact Layer (delta at 7 horizons: 30d/90d/180d/1yr/5yr/10yr/20yr), milestone markers (Emergency Fund Built, Debt-Free, Investment Compounding Phase, Financial Flexibility Achieved), psychological contrast engine with stability/stress/opportunity scores, Regret-Free Exploration Mode, identity-based progression (Aware→Experimenting→Building→Strategic), Snapshot Compare (save/annotate/load scenarios), XP rewards for simulations/saves/comparisons. Backend tables: `timelines`, `timeline_results`, `timeline_comparisons`, `user_identity_stages`. API: POST `/api/timeline/simulate`, POST `/api/timeline/save`, GET `/api/timeline/saved`, GET `/api/timeline/:id`, DELETE `/api/timeline/:id`, POST `/api/timeline/compare`, GET `/api/timeline/identity/me`.
-    - **Alerts & Notifications**: Real-time SSE-powered notification center, web push notifications (VAPID/service worker), and a full-stack alert engine with server-side evaluation. Push subscriptions stored in `push_subscriptions` table. Backend uses `web-push` package.
-    - **Terminal**: Bloomberg-style Analysis Terminal with multi-panel interface and command support.
-    - **Research/News**: Live news intelligence with scraping, sentiment analysis, and caching.
-    - **Legal**: Comprehensive legal pages (Terms, Privacy, Disclaimers, etc.).
-    - **Support System**: Help Center, ticket submission, system status page.
-    - **User Feedback System**: Lightweight floating feedback widget (persistent button → modal) on all pages for logged-in users. Rating 1-5 stars, category tag, optional comment. Submissions stored in `user_feedback` table. Users can view past submissions with admin responses in "My Feedback" section on Profile page.
-    - **Analytics Pipeline**: `trackEvent` uses `BASE_URL` prefix for correct proxy routing. Automatic page-view tracking on every route change via `usePageTracking` hook. Key feature interactions instrumented: terminal, gigs, volatility lab, sector flow, time machine, resume builder, job search. Analytics dashboard supports date-range filtering (7d/30d/90d/custom), auto-refresh toggle (30s interval), and a "User Feedback" panel (avg rating, satisfaction rate, trend chart, category breakdown, recent submissions).
-    - **Admin Tools**: Launch Readiness checks, Scalability Dashboard.
-    - **EntangleCoin Token System**: ERC-20 token wallet, transaction history, travel marketplace, reward system, and admin controls.
-    - **AI Marketing Command Center**: Admin-only platform for AI-generated marketing content across various social media and content types.
-    - **Content Calendar**: Admin-only tool for scheduling and tracking AI-generated content.
-    - **SEO Engine**: Admin-only tool for keyword tracking, blog post editing with AI generation, meta tag management, and backlink tracking.
-    - **GitHub Solution Finder**: Standalone GitHub intelligence platform using REST/GraphQL APIs and Claude AI analysis.
-    - **Mobile Design**: Fully responsive, mobile-first design with bottom navigation.
+- **AI Analysis**: "Quantum Entanglement Analysis" using 7 specialized AI agents for consensus-based stock signals.
+- **Financial Tools**: Stock Explorer, Job Search, Résumé Builder, Gig Marketplace, Market Analysis (Technical Analysis, Market Overview, Stock Screener, Dashboard, Options Chain, Time Machine, Sector Flow Radar, Volatility Lab), Paper Trading with options.
+- **User Management**: Profile management, KYC verification, Stripe payments, gamification, and leaderboard engine.
+- **Community**: Groups, Feed, Events, Jobs, Pricing.
+- **TaxFlow Intelligence Platform**: Core data layer with IRS tax rates, 27 strategies, onboarding wizard, tax dashboard, strategy browser, document vault with AI analysis, TaxGPT, travel budget planner. Includes Receipt Capture System and Accounting Integrations.
+- **Alternate Timeline Mode**: Dual-pane comparison interface for financial futures with real-time sliders, animated charts, and decision impact layers.
+- **Alerts & Notifications**: Real-time SSE-powered notification center, web push notifications, and a full-stack alert engine.
+- **Terminal**: Bloomberg-style Analysis Terminal with multi-panel interface and command support.
+- **Research/News**: Live news intelligence with scraping, sentiment analysis, and caching.
+- **Legal**: Comprehensive legal pages.
+- **Support System**: Help Center, ticket submission, system status page.
+- **User Feedback System**: Lightweight floating feedback widget for logged-in users.
+- **Analytics Pipeline**: `trackEvent` and page-view tracking, with key feature interactions instrumented.
+- **Admin Tools**: Launch Readiness checks, Scalability Dashboard, AI Marketing Command Center, Content Calendar, SEO Engine.
+- **EntangleCoin Token System**: ERC-20 token wallet, transaction history, reward system.
+- **GitHub Solution Finder**: Standalone GitHub intelligence platform using REST/GraphQL APIs and Claude AI analysis.
+- **Mobile Design**: Fully responsive, mobile-first design with bottom navigation.
 
 ## API Server
-- **Security**: Helmet, global and AI-specific rate limits, CSRF protection (blocks missing Origin on mutations), CORS restricted to known Replit/localhost origins.
-- **Authentication**: All AI endpoints (analyze, taxgpt, document-analyze), news/refresh, and Alpaca routes require `requireAuth` middleware. Centralized `requireAdmin` middleware for admin routes (KYC approve, token admin, support admin, analytics dashboard, status admin).
-- **Health Endpoint**: Public `/health` and `/healthz` return minimal `{status, timestamp}` only. Detailed operational data at `/health/detailed` behind auth.
-- **Integrations**: Stripe webhook endpoint, Zapier webhook integration for platform events.
+- **Security**: Helmet, global and AI-specific rate limits, CSRF protection, CORS restricted.
+- **Authentication**: `requireAuth` middleware for AI, news, and Alpaca routes; `requireAdmin` for admin routes.
+- **Health Endpoint**: Public `/health` and `/healthz`, detailed `/health/detailed` behind auth.
+- **Integrations**: Stripe webhook endpoint, Zapier webhook.
 - **Data Proxies**: Alpaca Markets API proxy with circuit breaker and exponential backoff.
-- **News Intelligence**: `/api/news` endpoint with RSS scraping, sentiment analysis, and caching. `/api/news/refresh` requires auth.
+- **News Intelligence**: `/api/news` endpoint with RSS scraping, sentiment analysis, caching.
 - **Performance**: Metrics middleware, AI request queuing, circuit breakers for external APIs, image compression.
-- **Routes**: Comprehensive API routes for all platform features including stock data, AI analysis, user management, KYC, payments, tax, gamification, token system, marketing, and support.
+- **Routes**: Comprehensive API routes for all platform features.
 
 # External Dependencies
 
@@ -80,7 +69,7 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **ORM**: Drizzle ORM
 - **Authentication**: Clerk
 - **Payments**: Stripe
-- **AI**: OpenAI (via Replit AI Integrations proxy), Anthropic Claude (via Replit AI Integrations proxy)
+- **AI**: OpenAI, Anthropic Claude
 - **Validation**: Zod
 - **Build**: esbuild
 - **Frontend**: React, Vite, Tailwind CSS, shadcn/ui, Clerk React, react-error-boundary
@@ -88,13 +77,4 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **Maps**: Leaflet.js with OpenStreetMap tiles and Nominatim geocoding
 - **Market Data**: Alpaca Markets API
 - **Client-side Routing**: wouter
-- **Error Monitoring**: Sentry (@sentry/react for frontend, @sentry/node for backend)
-
-# Security & Monitoring Notes
-
-- **Sentry**: Integrated for both frontend and backend. Frontend DSN in `VITE_SENTRY_DSN`, backend DSN in `SENTRY_DSN`. Source maps uploaded to Sentry on production builds (requires `SENTRY_AUTH_TOKEN`). Sensitive headers (Authorization, Cookie, x-csrf-token) and API keys are scrubbed from Sentry events before they are sent.
-- **Cookie Consent**: Analytics events only fire after explicit `accepted` consent (opt-in). Dismissing or clicking "Essential Only" = no analytics.
-- **Claude API Key**: Moved from `localStorage` (persistent) to `sessionStorage` (cleared on tab close) for the Charts page. The key is never sent to any backend.
-- **github-finder.html**: Removed from `public/` folder — it was an unauthenticated, public-facing tool.
-- **ErrorFallback**: Shows generic message in production, detailed error in development.
-- **Environment Variables Required**: `VITE_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `DATABASE_URL`, `SESSION_SECRET`, `ALPACA_API_KEY`, `ALPACA_API_SECRET`, `OPENAI_API_KEY` (or AI integrations), `VITE_SENTRY_DSN`, `SENTRY_DSN`. Optional: `SENTRY_AUTH_TOKEN` (for source map uploads), `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `RESEND_API_KEY`.
+- **Error Monitoring**: Sentry (@sentry/react, @sentry/node)

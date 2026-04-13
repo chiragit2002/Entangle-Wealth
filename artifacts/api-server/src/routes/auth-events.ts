@@ -21,6 +21,10 @@ const REQUIRES_AUTH: Set<AuthEventType> = new Set([
   "signup",
 ]);
 
+const failedEventWindow = new Map<string, { count: number; resetAt: number }>();
+const FAILED_EVENT_MAX = 10;
+const FAILED_EVENT_WINDOW_MS = 60_000;
+
 router.post("/auth/event", validateBody(AuthEventBodySchema), (req: Request, res: Response) => {
   const ip = req.ip || req.socket.remoteAddress || "unknown";
   const userAgent = req.headers["user-agent"];
@@ -36,6 +40,17 @@ router.post("/auth/event", validateBody(AuthEventBodySchema), (req: Request, res
   }
 
   if (eventType === "login_failed") {
+    const now = Date.now();
+    const bucket = failedEventWindow.get(ip);
+    if (bucket && now < bucket.resetAt) {
+      bucket.count++;
+      if (bucket.count > FAILED_EVENT_MAX) {
+        res.status(429).json({ error: "Too many failed login events" });
+        return;
+      }
+    } else {
+      failedEventWindow.set(ip, { count: 1, resetAt: now + FAILED_EVENT_WINDOW_MS });
+    }
     recordFailedAttempt(ip);
   }
 

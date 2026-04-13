@@ -4,7 +4,7 @@ import { sendZapierWebhook } from './lib/zapierWebhook';
 import { logger } from './lib/logger';
 import { db } from '@workspace/db';
 import { usersTable, paperPortfoliosTable, virtualCashPurchasesTable } from '@workspace/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 interface StripeCheckoutSession {
   metadata?: Record<string, string>;
@@ -106,29 +106,33 @@ export class WebhookHandlers {
             const sessionId = (event.data.object as any).id as string;
 
             try {
-              const alreadyProcessed = await db
-                .select({ id: virtualCashPurchasesTable.id })
-                .from(virtualCashPurchasesTable)
-                .where(eq(virtualCashPurchasesTable.stripeSessionId, sessionId));
+              await db.transaction(async (tx) => {
+                await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${sessionId}))`);
 
-              if (alreadyProcessed.length === 0) {
-                const [existingPortfolio] = await db
+                const alreadyProcessed = await tx
+                  .select({ id: virtualCashPurchasesTable.id })
+                  .from(virtualCashPurchasesTable)
+                  .where(eq(virtualCashPurchasesTable.stripeSessionId, sessionId));
+
+                if (alreadyProcessed.length > 0) return;
+
+                const [existingPortfolio] = await tx
                   .select()
                   .from(paperPortfoliosTable)
                   .where(eq(paperPortfoliosTable.userId, userId));
 
                 if (existingPortfolio) {
-                  await db
+                  await tx
                     .update(paperPortfoliosTable)
                     .set({ cashBalance: existingPortfolio.cashBalance + virtualAmount, updatedAt: new Date() })
                     .where(eq(paperPortfoliosTable.userId, userId));
                 } else {
-                  await db
+                  await tx
                     .insert(paperPortfoliosTable)
                     .values({ userId, cashBalance: 100000 + virtualAmount });
                 }
 
-                await db.insert(virtualCashPurchasesTable).values({
+                await tx.insert(virtualCashPurchasesTable).values({
                   userId,
                   stripeSessionId: sessionId,
                   amountPaidCents: session.amount_total || 0,
@@ -136,7 +140,7 @@ export class WebhookHandlers {
                 });
 
                 logger.info({ userId, virtualAmount, sessionId }, 'Virtual cash credited to paper trading account');
-              }
+              });
             } catch (err) {
               logger.error({ err, userId, virtualAmount, sessionId }, 'Failed to credit virtual cash');
             }

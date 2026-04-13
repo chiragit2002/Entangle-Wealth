@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, paperOptionsTradesTable, paperOptionsPositionsTable, dailySpinsTable, userXpTable, xpTransactionsTable, streaksTable, usersTable } from "@workspace/db/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { resolveUserId } from "../lib/resolveUserId";
 import { logger } from "../lib/logger";
@@ -172,6 +172,8 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
     const startingCash = await getStartingCash(dbUserId);
 
     const result = await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${dbUserId.toString()} || '_paper_trade'))`);
+
       const [portfolio] = await tx
         .select()
         .from(paperPortfoliosTable)
@@ -283,13 +285,13 @@ router.post("/paper-trading/reset", requireAuth, validateBody(z.object({}).stric
 });
 
 const OptionsTradeSchema = z.object({
-  symbol: z.string().min(1).max(10),
+  symbol: z.string().min(1).max(10).regex(/^[A-Za-z]{1,10}$/, "Symbol must be 1-10 letters"),
   optionType: z.enum(["CALL", "PUT"]),
-  strike: z.number().positive(),
-  expiration: z.string().min(1),
+  strike: z.number().positive().max(100_000),
+  expiration: z.string().min(1).max(20),
   side: z.enum(["buy", "sell"]),
-  contracts: z.number().int().positive().max(10000),
-  premium: z.number().positive(),
+  contracts: z.number().int().positive().max(10_000),
+  premium: z.number().positive().max(100_000),
 });
 
 router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTradeSchema), async (req, res) => {
@@ -307,6 +309,8 @@ router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTra
     const startingCash = await getStartingCash(dbUserId);
 
     const result = await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${dbUserId.toString()} || '_paper_trade'))`);
+
       const [portfolio] = await tx
         .select()
         .from(paperPortfoliosTable)

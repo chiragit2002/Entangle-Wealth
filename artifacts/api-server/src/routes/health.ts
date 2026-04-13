@@ -145,7 +145,7 @@ async function checkAlpaca(): Promise<DependencyCheck> {
   }
 }
 
-router.get("/health/dependencies", async (_req, res) => {
+router.get("/health/dependencies", requireAuth, async (_req, res) => {
   const [db, clerk, stripe, alpaca] = await Promise.all([
     checkDb(),
     checkClerk(),

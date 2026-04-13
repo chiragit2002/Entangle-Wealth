@@ -167,12 +167,12 @@ router.get("/storage/objects/*path", requireAuth, validateWildcardPath("path"), 
         .limit(1);
 
       const businessDocOwner = docOwner ? docOwner : await (async () => {
-        const allUsers = await db
-          .select({ clerkId: usersTable.clerkId, businessDocPaths: usersTable.businessDocPaths })
-          .from(usersTable);
-        return allUsers.find(u =>
-          Array.isArray(u.businessDocPaths) && (u.businessDocPaths as string[]).includes(objectPath)
-        ) || null;
+        const [match] = await db
+          .select({ clerkId: usersTable.clerkId })
+          .from(usersTable)
+          .where(sql`${usersTable.businessDocPaths}::jsonb @> ${JSON.stringify([objectPath])}::jsonb`)
+          .limit(1);
+        return match || null;
       })();
 
       const isOwner = docOwner?.clerkId === requestingUserId || businessDocOwner?.clerkId === requestingUserId;

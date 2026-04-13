@@ -19,7 +19,7 @@ import { usePageTracking } from "@/hooks/usePageTracking";
 import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
-import { Info } from "lucide-react";
+import { TerminalAuthShell } from "@/components/TerminalAuthShell";
 import { AuthErrorHandler } from "@/components/AuthErrorHandler";
 import { AuthTokenError } from "@/lib/authFetch";
 import { BootSequence } from "@/components/BootSequence";
@@ -131,31 +131,40 @@ function createQueryClient() {
 
 const clerkAppearanceDark = {
   variables: {
-    colorPrimary: "#00D4FF",
-    colorBackground: "#0a0a14",
+    colorPrimary: "#00FF41",
+    colorBackground: "#0D1321",
     colorText: "#ffffff",
-    colorTextSecondary: "rgba(255,255,255,0.5)",
-    colorInputBackground: "rgba(255,255,255,0.05)",
+    colorTextSecondary: "rgba(255,255,255,0.4)",
+    colorInputBackground: "#0A0E1A",
     colorInputText: "#ffffff",
-    borderRadius: "0.75rem",
-    fontFamily: "inherit",
+    borderRadius: "0.25rem",
+    fontFamily: "'JetBrains Mono', 'Fira Code', 'Courier New', monospace",
   },
   elements: {
-    card: "bg-[#0a0a14] border border-white/10 shadow-2xl shadow-[#00D4FF]/5",
-    headerTitle: "text-white",
-    headerSubtitle: "text-white/50",
-    socialButtonsBlockButton: "border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08] font-medium",
-    socialButtonsBlockButtonText: "text-white font-medium",
-    formFieldLabel: "text-white/70",
-    formFieldInput: "bg-white/[0.05] border-white/10 text-white placeholder:text-white/30",
-    formButtonPrimary: "bg-[#00D4FF] text-black font-bold hover:bg-[#00D4FF]/90",
-    footerActionLink: "text-[#00D4FF] hover:text-[#00D4FF]/80",
-    dividerLine: "bg-white/10",
-    dividerText: "text-white/30",
-    identityPreviewEditButton: "text-[#00D4FF]",
-    formFieldAction: "text-[#00D4FF]",
-    alert: "bg-red-500/10 border-red-500/20 text-red-300",
-    alertText: "text-red-300",
+    card: "!bg-[#0D1321] border border-[#1a3a2a] !shadow-none !rounded-[4px]",
+    headerTitle: "!text-[#00FF41] uppercase !tracking-[0.12em] !text-sm",
+    headerSubtitle: "!text-white/35 !text-xs !tracking-[0.04em]",
+    socialButtonsBlockButton: "!border-[#1a3a2a] !bg-[#0A0E1A] !text-[#00FF41]/80 hover:!bg-[#111827] !rounded-[4px] !font-normal !tracking-wide",
+    socialButtonsBlockButtonText: "!text-[#00FF41]/80 !font-normal !text-xs !tracking-wider",
+    socialButtonsBlockButtonArrow: "!text-[#00FF41]/60",
+    formFieldLabel: "!text-white/50 uppercase !text-[10px] !tracking-[0.1em]",
+    formFieldInput: "!bg-[#0A0E1A] !border-0 !border-b !border-b-[#1a3a2a] !text-white placeholder:!text-white/20 !rounded-none focus:!border-b-[#00FF41]",
+    formButtonPrimary: "!bg-[#00FF41] !text-black !font-bold hover:!bg-[#00FF41]/90 uppercase !tracking-[0.1em] !rounded-[4px]",
+    footerActionLink: "!text-[#00FF41]/60 hover:!text-[#00FF41]/80",
+    footerAction: "!text-white/30",
+    dividerLine: "!bg-[#1a3a2a]",
+    dividerText: "!text-white/20 !text-[10px] !tracking-[0.08em]",
+    identityPreviewEditButton: "!text-[#00FF41]/60",
+    formFieldAction: "!text-[#00FF41]/60",
+    alert: "!bg-red-500/10 !border-red-500/20 !text-red-300 !rounded-[4px]",
+    alertText: "!text-red-300",
+    logoBox: "hidden",
+    internal: "!bg-transparent",
+    rootBox: "!bg-transparent !shadow-none",
+    cardBox: "!bg-transparent !shadow-none",
+    badge: "hidden",
+    tagPrimaryButton: "hidden",
+    devModeNotice: "hidden",
   },
 };
 
@@ -201,71 +210,6 @@ function useFacebookOAuth() {
   return { signInWithFacebook };
 }
 
-function AuthPageShell({ children, reason }: { children: React.ReactNode; reason?: string | null }) {
-  return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <header className="w-full border-b border-border/60 sticky top-0 z-50" style={{ background: "var(--nav-bg)", backdropFilter: "blur(16px)" }}>
-        <div className="container mx-auto px-4 h-14 flex items-center">
-          <Link href="/" className="flex items-center gap-2">
-            <img src={logoImg} alt="EntangleWealth" className="w-8 h-8 rounded-lg" />
-            <span className="text-lg font-bold text-foreground tracking-tight">
-              Entangle<span className="text-primary">Wealth</span>
-            </span>
-          </Link>
-        </div>
-      </header>
-
-      <div className="flex-1 flex flex-col lg:flex-row">
-        <div className="hidden lg:flex lg:w-5/12 relative overflow-hidden items-center justify-center border-r border-border/40 bg-muted/30">
-          <div className="relative z-10 max-w-sm px-8">
-            <h2 className="text-2xl font-bold text-foreground mb-3">Smart Financial Decisions Start Here</h2>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-8">
-              AI-powered stock analysis, tax tools, and wealth simulation — built for families who want to grow their money wisely.
-            </p>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-primary" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-                </div>
-                <span className="text-muted-foreground text-sm">AI consensus signals from 7 specialized agents</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#FFD700]/10 flex items-center justify-center shrink-0">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                </div>
-                <span className="text-muted-foreground text-sm">TaxFlow intelligence with IRS deduction tracking</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#9c27b0]/10 flex items-center justify-center shrink-0">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9c27b0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                </div>
-                <span className="text-muted-foreground text-sm">Wealth simulator with alternate timeline projections</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-10">
-          {reason === "protected" && (
-            <div className="mb-4 flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm max-w-md w-full">
-              <Info className="w-4 h-4 shrink-0" />
-              <span>Sign in to access this feature</span>
-            </div>
-          )}
-          <div className="w-full max-w-md">
-            {children}
-          </div>
-          <p className="mt-6 text-xs text-muted-foreground text-center">
-            By continuing, you agree to our{" "}
-            <Link href="/terms" className="text-primary hover:underline">Terms</Link>
-            {" "}and{" "}
-            <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function useClerkAppearance() {
   const { resolvedTheme } = useTheme();
@@ -280,7 +224,7 @@ function SignInPage() {
   const clerkAppearance = useClerkAppearance();
 
   return (
-    <AuthPageShell reason={redirectReason}>
+    <TerminalAuthShell reason={redirectReason} mode="sign-in">
       <SignIn
         routing="path"
         path={`${basePath}/sign-in`}
@@ -296,7 +240,7 @@ function SignInPage() {
       >
         Continue with Facebook
       </button>
-    </AuthPageShell>
+    </TerminalAuthShell>
   );
 }
 
@@ -305,7 +249,7 @@ function SignUpPage() {
   const clerkAppearance = useClerkAppearance();
 
   return (
-    <AuthPageShell>
+    <TerminalAuthShell mode="sign-up">
       <SignUp
         routing="path"
         path={`${basePath}/sign-up`}
@@ -321,7 +265,7 @@ function SignUpPage() {
       >
         Continue with Facebook
       </button>
-    </AuthPageShell>
+    </TerminalAuthShell>
   );
 }
 
@@ -537,7 +481,8 @@ function ClerkProviderWithRoutes() {
 }
 
 function App() {
-  const [bootDone, setBootDone] = useState(false);
+  const isAuthPage = typeof window !== "undefined" && (window.location.pathname.includes("/sign-in") || window.location.pathname.includes("/sign-up"));
+  const [bootDone, setBootDone] = useState(isAuthPage);
 
   useEffect(() => {
     captureReferralCode();

@@ -551,6 +551,15 @@ async function tryListen(bindPort: number, retryCount = 0): Promise<ReturnType<t
   }
 }
 
+const openSockets = new Set<import("net").Socket>();
+
+function trackOpenSockets(srv: import("http").Server): void {
+  srv.on("connection", (socket: import("net").Socket) => {
+    openSockets.add(socket);
+    socket.once("close", () => openSockets.delete(socket));
+  });
+}
+
 let httpServer: ReturnType<typeof server.listen>;
 try {
   httpServer = await tryListen(port, 0);
@@ -592,15 +601,6 @@ startDripScheduler();
 await initStripe();
 
 let isShuttingDown = false;
-
-const openSockets = new Set<import("net").Socket>();
-
-function trackOpenSockets(srv: import("http").Server): void {
-  srv.on("connection", (socket: import("net").Socket) => {
-    openSockets.add(socket);
-    socket.once("close", () => openSockets.delete(socket));
-  });
-}
 
 async function gracefulShutdown(signal: string) {
   if (isShuttingDown) return;

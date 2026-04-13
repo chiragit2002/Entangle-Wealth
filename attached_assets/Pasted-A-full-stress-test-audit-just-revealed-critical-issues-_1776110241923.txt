@@ -1,0 +1,36 @@
+A full stress test audit just revealed critical issues that must be fixed before any real user touches this app. Execute every fix below in priority order:
+
+CRITICAL 1 — /api/news (5.9 second response — TIME BOMB):
+• Stop fetching full article bodies on every request — fetch headlines and metadata only
+• Move all RSS scraping to a background job that runs every 5–10 minutes and writes results to the database
+• The /api/news endpoint must ONLY read from the cache/database — never scrape live on a user request
+• If cache is empty on first load, return a terminal-style message: "> MARKET FEED INITIALIZING — CHECK BACK IN 60 SECONDS"
+• Target response time: under 300ms on all subsequent requests
+
+CRITICAL 2 — FAKE DATA MUST BE KILLED ENTIRELY:
+• Jobs page: Remove ALL fake companies (TechFlow Inc., DataBridge Corp, CloudNine Solutions, Nexus Digital) and fake salaries immediately. Replace with a proper empty state: "> NO JOB LISTINGS AVAILABLE — REAL LISTINGS COMING SOON" — remove the yellow disclaimer band, it looks amateur
+• Gigs page: Remove ALL system-generated fake gigs (Pressure Wash Driveway, Mobile Oil Change, Lawn Mowing) and the fake "system" user with fabricated 4.9 star ratings. This looks real to users and is a trust-destroying lie. Show empty state: "> NO GIGS POSTED YET — BE THE FIRST TO POST"
+• Community page: Remove ALL hardcoded stats ("2,847 members, 342 posts this week" — none of this exists). Remove fake group listings. Show: "> COMMUNITY LAUNCHING SOON — GROUPS WILL APPEAR HERE"
+• Hero stats: Remove MEMBERS_BASELINE = 4891 and all hardcoded numbers from viral.ts. Remove "1,247 signals" and "87% accuracy" — these are fabricated. Show real counts from the database only, even if they start at 0. Real zeroes are better than fake thousands.
+• Testimonials: Remove the testimonials section entirely until real users submit real ones
+
+CRITICAL 3 — /api/habits AUTH LEAK:
+• This endpoint must return 401 for any unauthenticated request — same as every other user-specific endpoint
+• Audit every single API route and confirm auth middleware is applied consistently — no exceptions
+
+HIGH 1 — /api/stocks/market-overview (404):
+• Either build the missing API route that returns real market data from Alpaca or Polygon.io
+• OR remove the Market Overview page from the nav entirely until the backend exists
+• Do not leave a dead page in the app
+
+HIGH 2 — Travel & Trip Planner (Potemkin page):
+• This feature has a full UI with zero working backend — no flight API, no booking, no deduction calculator
+• Either: wire it to a real flight API (Amadeus, Skyscanner, or equivalent) with real IRS deduction logic
+• OR: gate the entire page behind a "COMING SOON" terminal screen and remove it from main navigation
+• Do not leave a beautiful broken form visible to real users
+
+OVERALL RULE GOING FORWARD:
+• Data integrity score is currently 1/10 and trust score is 2/10 — this is the single biggest threat to this product
+• Every feature must show either REAL data or a CLEAR empty state — never fabricated content
+• No hardcoded baseline numbers anywhere in the codebase
+• No fake users, fake companies, fake ratings, or fake stats — ever

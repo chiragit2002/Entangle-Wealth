@@ -1028,3 +1028,20 @@
   box-shadow: 0 0 8px rgba(255, 195, 0, 0.3);
   animation: glow-pulse 2s ease-in-out infinite;
 }
+
+.cl-internal-b3fm6y,
+[class*="cl-internal"][class*="dev"],
+a[href*="clerk.com"][class*="cl-internal"],
+a[href*="accounts.dev"] {
+  display: none !important;
+}
+
+.cl-signIn-root .cl-footer,
+.cl-signUp-root .cl-footer {
+  background: transparent !important;
+}
+
+.cl-signIn-root .cl-footer > :last-child:not(:first-child),
+.cl-signUp-root .cl-footer > :last-child:not(:first-child) {
+  display: none !important;
+}

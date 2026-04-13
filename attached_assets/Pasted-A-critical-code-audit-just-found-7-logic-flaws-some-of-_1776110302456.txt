@@ -1,0 +1,42 @@
+A critical code audit just found 7 logic flaws — some of which involve taking real money without delivering the product. Fix all of them now in priority order:
+
+FIX 1 — SUBSCRIPTION NEVER ACTIVATES (REVENUE-CRITICAL):
+• In webhookHandlers.ts lines 143-152, the webhook handler only sends a Zapier notification — it NEVER writes to the database
+• Fix: After every successful Stripe checkout.session.completed event, immediately write the new subscription tier to usersTable.subscriptionTier in the database
+• Same fix required for customer.subscription.updated handler (lines 155-171) — it must also write the updated tier to the DB, not just ping Zapier
+• A user paying real money must have their account upgraded instantly and reliably
+• Add a verification check: after the DB write, read back the updated tier and log confirmation — if the write fails, throw an error and let Stripe retry the webhook
+• This is a legal and financial obligation — do not leave this broken for another hour
+
+FIX 2 — RACE CONDITION IN VIRTUAL CASH CREDITING (HIGH):
+• In webhookHandlers.ts lines 115-124, the cash balance update does a read-then-write with no transaction — two simultaneous webhooks can silently drop a credit
+• Fix: Replace the read-then-write pattern with a single atomic SQL increment: UPDATE users SET cashBalance = cashBalance + $amount WHERE id = $userId
+• Wrap the entire webhook cash crediting block in a database transaction
+• Apply the same atomic increment pattern to paperTrading.ts lines 190-193
+
+FIX 3 — SILENT ERROR SWALLOWING (HIGH):
+• webhookHandlers.ts lines 46-48, 61-63, 74-76: null returns on DB errors must be replaced with thrown errors so Stripe retries the webhook instead of silently doing nothing
+• Alerts.tsx: Remove all catch { /* ignore */ } blocks — at minimum log the error and show a terminal-style error state to the user: "> ALERT FETCH FAILED — RETRY"
+• StockTradePanel.tsx: Remove catch { data = {}; } on JSON parse errors — a failed trade must never show a success state. Show: "> ORDER FAILED — PLEASE RETRY"
+
+FIX 4 — PAPER TRADING BALANCE NOT ATOMIC (MEDIUM):
+• In paperTrading.ts lines 186-193, add SELECT ... FOR UPDATE to the balance read inside the existing Postgres transaction
+• This prevents two simultaneous buy orders from both reading the same stale balance and both succeeding when funds are insufficient
+
+FIX 5 — INPUT SANITIZER GAP ON AI ROUTES (MEDIUM):
+• The AI paths /api/taxgpt and /api/analyze use AI_DANGEROUS_PATTERNS which omit XSS event handler checks
+• Fix: Apply the full sanitization pattern set (same as all other routes) to all AI endpoints — no weaker rules for AI paths
+
+FIX 6 — ERROR MESSAGES LEAKING INTERNAL STATE (LOW-MEDIUM):
+• Paper trading route must not return exact cash balances in error messages to the client
+• Replace: "Insufficient funds. Available: $12345.67, Required: $50000.00"
+• With: "> INSUFFICIENT FUNDS — REDUCE ORDER SIZE OR ADD CAPITAL"
+• Strip all raw err.message strings from Sentry client responses — log full errors server-side only, never expose to client
+
+FIX 7 — DUPLICATE WEBHOOK PROCESSING (LOW):
+• In webhookHandlers.ts, stripeSync.processWebhook (line 88) and stripe.webhooks.constructEvent (line 95) are processing the same event twice
+• Audit whether stripeSync already handles DB sync — if yes, remove the redundant manual handler to prevent conflicting operations
+
+AFTER ALL FIXES:
+• Run a full end-to-end test: create a test Stripe checkout, complete payment, and confirm usersTable.subscriptionTier updates correctly in the database within 5 seconds
+• Log all webhook events with timestamps to a webhookLogs table so every payment event is permanently auditable

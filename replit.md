@@ -14,6 +14,7 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **Visuals**: Glassmorphism effects, blurred panels, gradient borders, custom scrollbars, and animations. Animated gradient orbs and a subtle dot grid overlay for background.
 - **Navigation**: Navbar with dropdown groups and a mobile-responsive bottom navigation bar.
 - **Components**: Utilizes shadcn/ui.
+- **Auth Pages**: Bloomberg Terminal-grade sign-in/sign-up using `TerminalAuthShell` component (`src/components/TerminalAuthShell.tsx`). Dark navy (#0A0E1A) background, live scrolling ticker tape, split layout: left = brand panel with market stats + terminal status lines, right = Clerk auth form. Green terminal accent (#00FF41), monospace font, no boot sequence on auth pages. Clerk appearance customized in `App.tsx` (`clerkAppearanceDark`).
 
 ## Technical Implementations
 - **Monorepo**: pnpm workspace structure.

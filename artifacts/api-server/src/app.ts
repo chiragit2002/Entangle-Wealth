@@ -13,6 +13,7 @@ import { authEventTracker } from "./middlewares/authEventTracker";
 import { metricsMiddleware } from "./middlewares/metricsMiddleware";
 import { globalErrorHandler } from "./middlewares/errorHandler";
 import { requestTimeoutMiddleware } from "./middlewares/requestTimeout";
+import { autoHealMiddleware } from "./middlewares/autoHeal";
 import {
   userApiLimiter,
   userAiLimiter,
@@ -134,6 +135,7 @@ app.use(
 
 app.use(metricsMiddleware);
 app.use(requestTimeoutMiddleware);
+app.use(autoHealMiddleware);
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 

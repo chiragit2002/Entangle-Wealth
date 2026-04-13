@@ -44,10 +44,12 @@ import insightsRouter from "./insights";
 import sentryRouter from "./sentry";
 import integrationsRouter from "./integrations";
 import taxflowRouter from "./taxflow";
+import auditRouter from "./audit";
 
 export function createRouter(app: Express): IRouter {
 const router: IRouter = Router();
 
+router.use(auditRouter);
 router.use(healthRouter);
 router.use(storageRouter);
 router.use(authEventsRouter);

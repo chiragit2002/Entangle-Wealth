@@ -194,6 +194,7 @@ const ADMIN_NAV_GROUP: NavGroup = {
     { href: "/admin/tickets", label: "Support Tickets", desc: "Manage tickets" },
     { href: "/launch", label: "Launch Readiness", desc: "Go/No-Go checklist" },
     { href: "/admin/monitoring", label: "Sentry Monitoring", desc: "Live error tracking" },
+    { href: "/admin/audit", label: "Audit Dashboard", desc: "Self-auditing system" },
   ],
 };
 
@@ -206,6 +207,7 @@ const ADMIN_MOBILE_SECTION = {
     { href: "/admin/tickets", label: "Support Tickets" },
     { href: "/launch", label: "Launch Readiness" },
     { href: "/admin/monitoring", label: "Sentry Monitoring" },
+    { href: "/admin/audit", label: "Audit Dashboard" },
   ],
 };
 

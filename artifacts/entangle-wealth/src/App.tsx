@@ -24,6 +24,8 @@ import { AuthErrorHandler } from "@/components/AuthErrorHandler";
 import { AuthTokenError } from "@/lib/authFetch";
 import { BootSequence } from "@/components/BootSequence";
 import { QuantumPageTransition } from "@/components/QuantumPageTransition";
+import { AuditErrorBoundary } from "@/components/AuditErrorBoundary";
+import { useUxTracker } from "@/hooks/useUxTracker";
 const MilestoneCelebrationModal = lazy(() =>
   import("@/components/viral/MilestoneCelebrationModal").then((m) => ({ default: m.MilestoneCelebrationModal }))
 );
@@ -97,6 +99,7 @@ const LifeOutcomes = lazy(() => import("@/pages/LifeOutcomes"));
 const AICoach = lazy(() => import("@/pages/AICoach"));
 const EvolutionDashboard = lazy(() => import("@/pages/EvolutionDashboard"));
 const AdminMonitoringPage = lazy(() => import("@/pages/AdminMonitoring"));
+const AdminAuditPage = lazy(() => import("@/pages/AdminAudit"));
 const CommandCenter = lazy(() => import("@/pages/CommandCenter"));
 
 const IS_DEV = import.meta.env.MODE !== "production";
@@ -369,6 +372,11 @@ function PageTracker() {
   return null;
 }
 
+function UxTrackerInit() {
+  useUxTracker();
+  return null;
+}
+
 function ClerkProviderWithRoutes() {
   const [, setLocation] = useLocation();
   const queryClient = useMemo(() => createQueryClient(), []);
@@ -385,9 +393,11 @@ function ClerkProviderWithRoutes() {
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
         <PageTracker />
+        <UxTrackerInit />
         <AuthErrorHandler />
         <TooltipProvider>
           <PopupQueueProvider>
+          <AuditErrorBoundary>
           <ProfileCompletionGate>
           <Switch>
             <Route path="/">{() => <LazyPage component={Home} />}</Route>
@@ -459,11 +469,13 @@ function ClerkProviderWithRoutes() {
             <Route path="/ai-coach">{() => <LazyProtected component={AICoach} />}</Route>
             <Route path="/admin/evolution">{() => <LazyProtected component={EvolutionDashboard} />}</Route>
             <Route path="/admin/monitoring">{() => <LazyProtected component={AdminMonitoringPage} />}</Route>
+            <Route path="/admin/audit">{() => <LazyProtected component={AdminAuditPage} />}</Route>
             <Route path="/command-center">{() => <LazyPage component={CommandCenter} />}</Route>
             <Route path="/__test">{() => <Suspense fallback={null}>{IS_DEV && TestFixture ? <TestFixture /> : null}</Suspense>}</Route>
             <Route component={NotFound} />
           </Switch>
           </ProfileCompletionGate>
+          </AuditErrorBoundary>
           <OnboardingProvider />
           <Suspense fallback={null}>
             <MilestoneCelebrationModal />

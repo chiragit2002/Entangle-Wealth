@@ -14,6 +14,7 @@ import { startAlertEvaluator, stopAlertEvaluator, closeAllSseConnections } from 
 import { startDigestScheduler, stopDigestScheduler } from "./lib/emailDigest";
 import { startDailyContentScheduler, stopDailyContentScheduler } from "./routes/dailyContent";
 import { startDripScheduler, stopDripScheduler } from "./lib/dripEmails";
+import { startApiHealthMonitor } from "./lib/apiHealthMonitor";
 import { pool } from "@workspace/db";
 
 globalThis.__dbLogger = logger;
@@ -598,6 +599,7 @@ startAlertEvaluator();
 startDigestScheduler();
 startDailyContentScheduler();
 startDripScheduler();
+startApiHealthMonitor();
 await initStripe();
 
 let isShuttingDown = false;

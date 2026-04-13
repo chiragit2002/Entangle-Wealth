@@ -287,14 +287,20 @@ async function checkOAuthProviders(): Promise<CheckResult> {
 router.get("/admin/launch-checks", requireAuth, async (req: Request, res: Response) => {
   try {
     const userId = (req as AuthenticatedRequest).userId;
-    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
 
     const userResult = await pool.query(
       'SELECT "subscriptionTier" FROM users WHERE "clerkId" = $1',
       [userId]
     );
     const tier = userResult.rows[0]?.subscriptionTier;
-    if (tier !== "admin") return res.status(403).json({ error: "Admin access required" });
+    if (tier !== "admin") {
+      res.status(403).json({ error: "Admin access required" });
+      return;
+    }
 
     const checks = await Promise.all([
       checkHealthEndpoint(),

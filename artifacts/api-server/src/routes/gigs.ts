@@ -95,7 +95,7 @@ const GigIdParamsSchema = z.object({
 
 router.delete("/gigs/:id", requireAuth, validateParams(GigIdParamsSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
-  const gigId = req.params.id;
+  const gigId = req.params.id as string;
 
   try {
     const [updated] = await db

@@ -33,7 +33,7 @@ router.get("/learn", (_req, res) => {
 });
 
 router.get("/learn/:slug", validateParams(SlugParamsSchema), (req, res) => {
-  const html = getTermHtml(req.params.slug);
+  const html = getTermHtml(req.params.slug as string);
   if (!html) {
     res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Term not found", "/learn"));
     return;
@@ -50,7 +50,7 @@ router.get("/indicators", (_req, res) => {
 });
 
 router.get("/indicators/:slug", validateParams(SlugParamsSchema), (req, res) => {
-  const html = getIndicatorHtml(req.params.slug);
+  const html = getIndicatorHtml(req.params.slug as string);
   if (!html) {
     res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Indicator not found", "/indicators"));
     return;
@@ -67,7 +67,7 @@ router.get("/strategies", (_req, res) => {
 });
 
 router.get("/strategies/:slug", validateParams(SlugParamsSchema), (req, res) => {
-  const html = getStrategyHtml(req.params.slug);
+  const html = getStrategyHtml(req.params.slug as string);
   if (!html) {
     res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Strategy not found", "/strategies"));
     return;
@@ -84,7 +84,7 @@ router.get("/patterns", (_req, res) => {
 });
 
 router.get("/patterns/:slug", validateParams(SlugParamsSchema), (req, res) => {
-  const html = getPatternHtml(req.params.slug);
+  const html = getPatternHtml(req.params.slug as string);
   if (!html) {
     res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Pattern not found", "/patterns"));
     return;
@@ -101,7 +101,7 @@ router.get("/sectors", (_req, res) => {
 });
 
 router.get("/sectors/:slug", validateParams(SlugParamsSchema), (req, res) => {
-  const html = getSectorHtml(req.params.slug);
+  const html = getSectorHtml(req.params.slug as string);
   if (!html) {
     res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Sector not found", "/sectors"));
     return;
@@ -118,7 +118,7 @@ router.get("/compare", (_req, res) => {
 });
 
 router.get("/compare/:slug", validateParams(SlugParamsSchema), (req, res) => {
-  const html = getComparisonHtml(req.params.slug);
+  const html = getComparisonHtml(req.params.slug as string);
   if (!html) {
     res.status(404).setHeader("Content-Type", HTML_CT).send(get404Html("Comparison not found", "/compare"));
     return;

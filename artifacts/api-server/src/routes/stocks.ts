@@ -119,16 +119,16 @@ router.get("/stocks/sectors", (_req, res) => {
 });
 
 router.get("/stocks/sectors/:sector", validateParams(SectorParamsSchema), (req, res) => {
-  const stocks = getStocksBySector(req.params.sector);
+  const stocks = getStocksBySector(req.params.sector as string);
   if (stocks.length === 0) {
     res.status(404).json({ error: "Sector not found" });
     return;
   }
-  res.json({ sector: req.params.sector, count: stocks.length, stocks: stocks.slice(0, 100) });
+  res.json({ sector: req.params.sector as string, count: stocks.length, stocks: stocks.slice(0, 100) });
 });
 
 router.get("/stocks/:symbol", validateParams(SymbolParamsSchema), (req, res) => {
-  const stock = getStockBySymbol(req.params.symbol);
+  const stock = getStockBySymbol(req.params.symbol as string);
   if (!stock) {
     res.status(404).json({ error: "Stock not found" });
     return;

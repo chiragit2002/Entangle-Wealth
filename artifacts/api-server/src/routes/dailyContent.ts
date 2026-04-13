@@ -380,7 +380,7 @@ const DailyContentIdParamsSchema = z.object({
 });
 
 router.patch("/daily-content/:id", requireAuth, requireAdmin, validateParams(DailyContentIdParamsSchema), validateBody(DailyContentPatchSchema), async (req, res) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { status, content } = req.body;
 
   try {
@@ -422,7 +422,7 @@ router.patch("/daily-content/:id", requireAuth, requireAdmin, validateParams(Dai
 });
 
 router.delete("/daily-content/:id", requireAuth, requireAdmin, validateParams(DailyContentIdParamsSchema), async (req, res) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
 
   try {
     const client = await pool.connect();

@@ -523,7 +523,7 @@ router.get("/taxflow/optimize/:symbol", requireAuth, async (req, res) => {
       return;
     }
 
-    const sym = req.params.symbol.toUpperCase();
+    const sym = (req.params.symbol as string).toUpperCase();
     const bracket = parseFloat(req.query.bracket as string) || 0.24;
     const method = ((req.query.method as string) || "FIFO").toUpperCase() as "FIFO" | "LIFO";
 
@@ -734,7 +734,7 @@ router.get("/taxflow/wash-check/:symbol", requireAuth, async (req, res) => {
       return;
     }
 
-    const sym = req.params.symbol.toUpperCase();
+    const sym = (req.params.symbol as string).toUpperCase();
     const trades = await getAllTrades(dbUserId);
     const now = new Date();
     const thirtyDays = 30 * 24 * 60 * 60 * 1000;

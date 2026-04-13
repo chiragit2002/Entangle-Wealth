@@ -195,7 +195,8 @@ router.patch("/feedback/admin/:id", requireAuth, requireAdmin, validateParams(In
       .returning({ id: userFeedbackTable.id });
 
     if (updated.length === 0) {
-      return res.status(404).json({ error: "Feedback entry not found" });
+      res.status(404).json({ error: "Feedback entry not found" });
+      return;
     }
 
     logger.info({ feedbackId, userId }, "Admin responded to feedback");

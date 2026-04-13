@@ -60,7 +60,7 @@ router.post("/stocks/:symbol/analyze", requireAuth, validateParams(StockSymbolPa
     return;
   }
 
-  const stock = getStockBySymbol(req.params.symbol);
+  const stock = getStockBySymbol(req.params.symbol as string);
   if (!stock) {
     res.status(404).json({ error: "Stock not found" });
     return;
@@ -180,7 +180,7 @@ router.get("/stocks/:symbol/analyze-stream", requireAuth, validateParams(StockSy
     return;
   }
 
-  const stock = getStockBySymbol(req.params.symbol);
+  const stock = getStockBySymbol(req.params.symbol as string);
   if (!stock) {
     res.status(404).json({ error: "Stock not found" });
     return;
@@ -290,7 +290,7 @@ router.post("/stocks/:symbol/quick-analyze", requireAuth, validateParams(StockSy
     return;
   }
 
-  const stock = getStockBySymbol(req.params.symbol);
+  const stock = getStockBySymbol(req.params.symbol as string);
   if (!stock) {
     res.status(404).json({ error: "Stock not found" });
     return;

@@ -101,7 +101,7 @@ router.get("/paper-trading/portfolio", requireAuth, async (req, res) => {
       optionsTrades,
     });
   } catch (err) {
-    logger.error("Paper trading portfolio error:", err);
+    logger.error({ err }, "Paper trading portfolio error");
     res.status(500).json({ error: "Failed to load portfolio" });
   }
 });
@@ -218,7 +218,7 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
     }
     res.json(result);
   } catch (err) {
-    logger.error("Paper trading error:", err);
+    logger.error({ err }, "Paper trading error");
     res.status(500).json({ error: "Trade execution failed" });
   }
 });
@@ -249,7 +249,7 @@ router.post("/paper-trading/reset", requireAuth, validateBody(z.object({}).stric
     const formattedBalance = startingCash.toLocaleString("en-US");
     res.json({ success: true, message: `Portfolio reset to $${formattedBalance}` });
   } catch (err) {
-    logger.error("Paper trading reset error:", err);
+    logger.error({ err }, "Paper trading reset error");
     res.status(500).json({ error: "Failed to reset portfolio" });
   }
 });
@@ -381,7 +381,7 @@ router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTra
     }
     res.json(result);
   } catch (err) {
-    logger.error("Options trade error:", err);
+    logger.error({ err }, "Options trade error");
     res.status(500).json({ error: "Options trade execution failed" });
   }
 });
@@ -412,7 +412,7 @@ router.get("/paper-trading/options-positions", requireAuth, async (req, res) => 
       trades,
     });
   } catch (err) {
-    logger.error("Options positions error:", err);
+    logger.error({ err }, "Options positions error");
     res.status(500).json({ error: "Failed to load options positions" });
   }
 });
@@ -442,7 +442,7 @@ router.get("/paper-trading/spin/status", requireAuth, async (req, res) => {
 
     res.json({ canSpin: true, nextSpinAt: null, todaySpin: null });
   } catch (err) {
-    logger.error("Spin status error:", err);
+    logger.error({ err }, "Spin status error");
     res.status(500).json({ error: "Failed to get spin status" });
   }
 });
@@ -469,7 +469,7 @@ router.get("/paper-trading/spin/history", requireAuth, async (req, res) => {
 
     res.json(history);
   } catch (err) {
-    logger.error("Spin history error:", err);
+    logger.error({ err }, "Spin history error");
     res.status(500).json({ error: "Failed to fetch spin history" });
   }
 });

@@ -258,7 +258,7 @@ const ServiceNameParamsSchema = z.object({
 
 router.patch("/status/admin/services/:name", requireAuth, requireAdmin, validateParams(ServiceNameParamsSchema), validateBody(ServiceStatusSchema), async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
-  const serviceName = decodeURIComponent(req.params.name);
+  const serviceName = decodeURIComponent(req.params.name as string);
   const { status } = req.body;
 
   try {

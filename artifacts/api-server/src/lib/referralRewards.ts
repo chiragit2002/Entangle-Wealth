@@ -271,7 +271,7 @@ async function applyStripeCouponIfEligible(referrerId: string, referralCount: nu
 
     const stripe = await getUncachableStripeClient();
     await stripe.subscriptions.update(user.stripeSubscriptionId, {
-      coupon: couponId,
+      discounts: [{ coupon: couponId }],
     });
     await db
       .update(usersTable)

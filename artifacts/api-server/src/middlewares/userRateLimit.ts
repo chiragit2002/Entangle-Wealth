@@ -98,7 +98,7 @@ export const userTradingLimiter = makeUserLimiter(60_000, 60, "trading");
 
 export const userKycLimiter = makeUserLimiter(60_000, 10, "kyc");
 
-function makeSpamGuard(windowMs: number, authenticatedMax: number, unauthenticatedMax: number, label: string) {
+export function makeSpamGuard(windowMs: number, authenticatedMax: number, unauthenticatedMax: number, label: string) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const auth = getAuth(req);
     const userId = auth?.userId;

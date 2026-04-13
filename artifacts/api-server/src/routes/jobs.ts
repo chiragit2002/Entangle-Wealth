@@ -7,6 +7,24 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { validateBody, validateQuery, validateParams, IntIdParamsSchema, z } from "../lib/validateRequest";
 import { logger } from "../lib/logger";
 
+interface JSearchJob {
+  job_id?: string;
+  job_title?: string;
+  employer_name?: string;
+  employer_logo?: string;
+  job_city?: string;
+  job_state?: string;
+  job_country?: string;
+  job_min_salary?: number;
+  job_max_salary?: number;
+  job_employment_type?: string;
+  job_description?: string;
+  job_apply_link?: string;
+  job_posted_at_datetime_utc?: string;
+  job_publisher?: string;
+  job_is_remote?: boolean;
+}
+
 const router = Router();
 
 const JobsSearchQuerySchema = z.object({
@@ -58,8 +76,8 @@ router.get("/jobs/search", requireAuth, validateQuery(JobsSearchQuerySchema), as
       return;
     }
 
-    const data = await response.json();
-    const jobs = (data.data || []).map((job: any) => ({
+    const data = await response.json() as { data?: JSearchJob[] };
+    const jobs = (data.data || []).map((job: JSearchJob) => ({
       id: job.job_id,
       title: job.job_title,
       company: job.employer_name,

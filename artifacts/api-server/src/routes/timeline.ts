@@ -234,7 +234,7 @@ async function updateIdentityStage(userId: string, field: "simulationsRun" | "sn
       [stage] = await db.insert(userIdentityStagesTable).values({ userId }).returning();
     }
 
-    const updates: Record<string, unknown> = { updatedAt: new Date() };
+    const updates: Partial<typeof userIdentityStagesTable.$inferInsert> = { updatedAt: new Date() };
     let sims = stage.simulationsRun;
     let snaps = stage.snapshotsSaved;
     let scens = stage.scenariosExplored;
@@ -247,7 +247,7 @@ async function updateIdentityStage(userId: string, field: "simulationsRun" | "sn
     const oldStage = stage.stage;
     updates.stage = newStage;
 
-    await db.update(userIdentityStagesTable).set(updates as Parameters<typeof db.update>[0]).where(eq(userIdentityStagesTable.userId, userId));
+    await db.update(userIdentityStagesTable).set(updates).where(eq(userIdentityStagesTable.userId, userId));
 
     if (newStage !== oldStage) {
       await awardXp(userId, 50, `stage_transition_${newStage.toLowerCase()}`, "timeline");

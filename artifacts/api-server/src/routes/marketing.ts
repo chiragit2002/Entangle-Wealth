@@ -208,6 +208,7 @@ router.post("/marketing/generate", requireAuth, requireAdmin, validateBody(Marke
       return;
     }
 
+    const platformConfig = PLATFORM_CONFIGS[agent];
     const toneInstruction = tone ? TONE_INSTRUCTIONS[tone] : TONE_INSTRUCTIONS.educational;
     const contextBlock = context ? `\n\nAdditional context from the user:\n${context}` : "";
     const abortSignal = req.timeoutAbortController?.signal;

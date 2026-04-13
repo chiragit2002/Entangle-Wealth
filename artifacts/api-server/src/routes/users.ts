@@ -301,7 +301,7 @@ router.get("/users/:userId/profile", validateParams(UserIdParamsSchema), async (
         isPublicProfile: usersTable.isPublicProfile,
       })
       .from(usersTable)
-      .where(eq(usersTable.id, req.params.userId));
+      .where(eq(usersTable.id, req.params.userId as string));
     if (!user || !user.isPublicProfile) {
       res.status(404).json({ error: "Profile not found" });
       return;

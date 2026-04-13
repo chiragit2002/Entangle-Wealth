@@ -200,7 +200,7 @@ router.get("/resumes/public/:userId", validateParams(PublicUserIdParamsSchema), 
     const [user] = await db
       .select({ isPublicProfile: usersTable.isPublicProfile })
       .from(usersTable)
-      .where(eq(usersTable.id, req.params.userId));
+      .where(eq(usersTable.id, req.params.userId as string));
 
     if (!user || !user.isPublicProfile) {
       res.status(404).json({ error: "Resume not found" });
@@ -208,7 +208,7 @@ router.get("/resumes/public/:userId", validateParams(PublicUserIdParamsSchema), 
     }
 
     const resumes = await db.select().from(resumesTable)
-      .where(eq(resumesTable.userId, req.params.userId));
+      .where(eq(resumesTable.userId, req.params.userId as string));
 
     if (resumes.length === 0) {
       res.status(404).json({ error: "Resume not found" });

@@ -18,7 +18,7 @@ import { startDripScheduler, stopDripScheduler } from "./lib/dripEmails";
 import { startApiHealthMonitor } from "./lib/apiHealthMonitor";
 import { pool } from "@workspace/db";
 
-globalThis.__dbLogger = logger;
+(globalThis as Record<string, unknown>).__dbLogger = logger;
 
 const REQUIRED_ENV_VARS = [
   "CLERK_SECRET_KEY",

@@ -85,22 +85,22 @@ function alpacaHeaders() {
   };
 }
 
-async function alpacaFetchRaw(url: string) {
+async function alpacaFetchRaw(url: string): Promise<Record<string, unknown>> {
   const res = await fetch(url, { headers: alpacaHeaders() });
   if (!res.ok) {
     const body = await res.text();
     logger.error({ status: res.status, body, url }, "Alpaca API error");
     throw new Error(`Alpaca ${res.status}: ${body}`);
   }
-  return res.json();
+  return res.json() as Promise<Record<string, unknown>>;
 }
 
-async function alpacaFetch(url: string, cacheKey?: string) {
-  return alpacaCircuit.execute(
+async function alpacaFetch(url: string, cacheKey?: string): Promise<Record<string, unknown>> {
+  return alpacaCircuit.execute<Record<string, unknown>>(
     () => retryWithBackoff(() => alpacaFetchRaw(url), { label: "alpaca", maxRetries: 4 }),
     cacheKey
       ? () => {
-          const cached = alpacaCache.get(cacheKey);
+          const cached = alpacaCache.get(cacheKey) as Record<string, unknown> | undefined;
           if (cached) return cached;
           throw new Error("Alpaca circuit open and no cached data available");
         }
@@ -110,7 +110,7 @@ async function alpacaFetch(url: string, cacheKey?: string) {
 
 router.get("/alpaca/snapshot/:symbol", validateParams(AlpacaSymbolParamsSchema), async (req, res) => {
   try {
-    const symbol = req.params.symbol.toUpperCase();
+    const symbol = (req.params.symbol as string).toUpperCase();
     const cacheKey = `snapshot:${symbol}`;
     const cached = alpacaCache.get(cacheKey);
     if (cached) {
@@ -156,7 +156,7 @@ router.get("/alpaca/snapshots", validateQuery(AlpacaSymbolsQuerySchema), async (
 
 router.get("/alpaca/bars/:symbol", validateParams(AlpacaBarsParamsSchema), validateQuery(AlpacaBarsQuerySchema), async (req, res) => {
   try {
-    const symbol = req.params.symbol.toUpperCase();
+    const symbol = (req.params.symbol as string).toUpperCase();
     const timeframe = (req.query.timeframe as string) || "1Day";
     const { limit } = req.query as unknown as { limit: number };
     const start = req.query.start as string | undefined;
@@ -176,7 +176,7 @@ router.get("/alpaca/bars/:symbol", validateParams(AlpacaBarsParamsSchema), valid
 
 router.get("/alpaca/quote/:symbol", validateParams(AlpacaSymbolParamsSchema), async (req, res) => {
   try {
-    const symbol = req.params.symbol.toUpperCase();
+    const symbol = (req.params.symbol as string).toUpperCase();
     const data = await alpacaFetch(
       `${ALPACA_DATA_URL}/v2/stocks/${symbol}/quotes/latest?feed=iex`
     );
@@ -189,7 +189,7 @@ router.get("/alpaca/quote/:symbol", validateParams(AlpacaSymbolParamsSchema), as
 
 router.get("/alpaca/trades/:symbol", validateParams(AlpacaSymbolParamsSchema), async (req, res) => {
   try {
-    const symbol = req.params.symbol.toUpperCase();
+    const symbol = (req.params.symbol as string).toUpperCase();
     const data = await alpacaFetch(
       `${ALPACA_DATA_URL}/v2/stocks/${symbol}/trades/latest?feed=iex`
     );
@@ -282,7 +282,7 @@ const AlpacaOrderSchema = z.object({
   limit_price: z.coerce.number().min(0).optional(),
 });
 
-async function alpacaPost(url: string, body: Record<string, unknown>) {
+async function alpacaPost(url: string, body: Record<string, unknown>): Promise<Record<string, unknown>> {
   const res = await fetch(url, {
     method: "POST",
     headers: { ...alpacaHeaders(), "Content-Type": "application/json" },
@@ -293,7 +293,7 @@ async function alpacaPost(url: string, body: Record<string, unknown>) {
     logger.error({ status: res.status, body: text, url }, "Alpaca POST error");
     throw new Error(`Alpaca ${res.status}: ${text}`);
   }
-  return res.json();
+  return res.json() as Promise<Record<string, unknown>>;
 }
 
 router.post("/alpaca/orders", requireAuth, async (req, res) => {

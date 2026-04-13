@@ -210,13 +210,14 @@ export async function fetchNews(params?: {
   search?: string;
   limit?: number;
   offset?: number;
+  signal?: AbortSignal;
 }): Promise<NewsResponse> {
   const sp = new URLSearchParams();
   if (params?.topic) sp.set("topic", params.topic);
   if (params?.search) sp.set("search", params.search);
   if (params?.limit) sp.set("limit", String(params.limit));
   if (params?.offset) sp.set("offset", String(params.offset));
-  const res = await fetch(`${API_BASE}/news?${sp.toString()}`);
+  const res = await fetch(`${API_BASE}/news?${sp.toString()}`, { signal: params?.signal });
   if (!res.ok) throw new Error("Failed to fetch news");
   return res.json();
 }

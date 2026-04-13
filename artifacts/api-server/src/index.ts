@@ -152,6 +152,76 @@ async function ensureEmailSubscribersTable() {
   }
 }
 
+async function ensureHabitsTables() {
+  try {
+    const client = await pool.connect();
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS habit_definitions (
+          id SERIAL PRIMARY KEY,
+          slug TEXT NOT NULL UNIQUE,
+          title TEXT NOT NULL,
+          description TEXT NOT NULL DEFAULT '',
+          category TEXT NOT NULL DEFAULT 'general',
+          xp_reward INTEGER NOT NULL DEFAULT 10,
+          icon TEXT NOT NULL DEFAULT '⚡',
+          difficulty TEXT NOT NULL DEFAULT 'easy',
+          linked_habit TEXT,
+          is_active BOOLEAN NOT NULL DEFAULT true,
+          created_at TIMESTAMPTZ DEFAULT now()
+        );
+        CREATE TABLE IF NOT EXISTS user_habits (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          habit_id INTEGER NOT NULL REFERENCES habit_definitions(id) ON DELETE CASCADE,
+          current_streak INTEGER NOT NULL DEFAULT 0,
+          longest_streak INTEGER NOT NULL DEFAULT 0,
+          total_completions INTEGER NOT NULL DEFAULT 0,
+          last_completed_at TIMESTAMPTZ,
+          created_at TIMESTAMPTZ DEFAULT now(),
+          updated_at TIMESTAMPTZ DEFAULT now(),
+          UNIQUE (user_id, habit_id)
+        );
+        CREATE TABLE IF NOT EXISTS daily_action_completions (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          habit_id INTEGER NOT NULL REFERENCES habit_definitions(id) ON DELETE CASCADE,
+          completed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+          xp_awarded INTEGER NOT NULL DEFAULT 0
+        );
+        CREATE INDEX IF NOT EXISTS idx_user_habits_user ON user_habits (user_id);
+        CREATE INDEX IF NOT EXISTS idx_daily_completions_user ON daily_action_completions (user_id);
+        CREATE INDEX IF NOT EXISTS idx_daily_completions_date ON daily_action_completions (completed_at);
+      `);
+
+      const { rows } = await client.query(`SELECT COUNT(*) FROM habit_definitions WHERE is_active = true`);
+      if (parseInt(rows[0].count) === 0) {
+        await client.query(`
+          INSERT INTO habit_definitions (slug, title, description, category, xp_reward, icon, difficulty) VALUES
+          ('track-spending', 'Track Daily Spending', 'Log every purchase you make today to build awareness of your spending habits.', 'Budgeting', 15, '💳', 'easy'),
+          ('no-impulse-buy', 'No Impulse Purchases', 'Avoid any unplanned purchases today. Sleep on it before buying.', 'Budgeting', 20, '🛑', 'medium'),
+          ('check-net-worth', 'Review Net Worth', 'Update and review your net worth statement including assets and liabilities.', 'Tracking', 10, '📊', 'easy'),
+          ('invest-today', 'Make an Investment', 'Contribute to your brokerage, IRA, or 401k — any amount counts.', 'Investing', 25, '📈', 'medium'),
+          ('read-finance', 'Read Financial Content', 'Spend at least 15 minutes reading finance news, books, or research.', 'Education', 10, '📚', 'easy'),
+          ('review-budget', 'Review Monthly Budget', 'Compare your actual spending to your budget and note any variances.', 'Budgeting', 15, '📋', 'easy'),
+          ('emergency-fund', 'Add to Emergency Fund', 'Transfer any amount to your emergency fund savings account.', 'Saving', 20, '🏦', 'medium'),
+          ('debt-payment', 'Extra Debt Payment', 'Make an extra payment on any debt beyond the minimum.', 'Debt', 25, '💪', 'medium'),
+          ('meal-prep', 'Cook Instead of Dining Out', 'Prepare your meals at home instead of eating out to save money.', 'Budgeting', 10, '🍽️', 'easy'),
+          ('automate-savings', 'Set Up Auto-Transfer', 'Schedule an automatic savings transfer or confirm your current automation is active.', 'Saving', 20, '🤖', 'medium')
+          ON CONFLICT (slug) DO NOTHING;
+        `);
+        logger.info("Seeded default habit definitions");
+      }
+
+      logger.info("Habits tables ensured");
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    logger.warn({ error: err }, "Failed to ensure habits tables (non-fatal)");
+  }
+}
+
 async function ensureTimelineTables() {
   try {
     const client = await pool.connect();
@@ -481,6 +551,7 @@ httpServer.on("error", (err: NodeJS.ErrnoException) => {
 ensureReferralBadgesExist().catch((err) =>
   logger.warn({ error: err }, "Failed to seed referral badges (non-fatal)")
 );
+await ensureHabitsTables();
 await ensureDailyContentTable();
 await ensureAlertTables();
 await ensurePaperTradingTables();

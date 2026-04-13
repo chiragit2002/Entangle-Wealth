@@ -88,6 +88,7 @@ export default function Pricing() {
   const { isSignedIn } = useUser();
   const { getToken } = useAuth();
   const [products, setProducts] = useState<StripeProduct[]>([]);
+  const [stripeAvailable, setStripeAvailable] = useState(true);
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
   const [referralCode, setReferralCode] = useState("");
 
@@ -95,9 +96,12 @@ export default function Pricing() {
 
   useEffect(() => {
     fetch("/api/stripe/products")
-      .then(res => res.ok ? res.json() : [])
-      .then(setProducts)
-      .catch(err => { if (import.meta.env.DEV) console.error('Failed to fetch Stripe products:', err); });
+      .then(res => {
+        if (!res.ok) { setStripeAvailable(false); return []; }
+        return res.json();
+      })
+      .then((data: StripeProduct[]) => { setProducts(data); if (data.length === 0) setStripeAvailable(false); })
+      .catch(() => { setStripeAvailable(false); });
   }, []);
 
   useEffect(() => {
@@ -130,10 +134,17 @@ export default function Pricing() {
 
     if (!matchedProduct) {
       trackEvent("upgrade_checkout_failed", { tier: plan.tier, reason: "product_not_found" });
-      toast({
-        title: "Setting up checkout",
-        description: "Stripe products are being configured. Please try again in a moment.",
-      });
+      if (!stripeAvailable) {
+        toast({
+          title: "Payment system temporarily unavailable",
+          description: "Please contact support@entanglewealth.com to get started.",
+        });
+      } else {
+        toast({
+          title: "Setting up checkout",
+          description: "Stripe products are being configured. Please try again in a moment.",
+        });
+      }
       return;
     }
 
@@ -180,6 +191,12 @@ export default function Pricing() {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-10 max-w-4xl">
+        {!stripeAvailable && (
+          <div className="mb-6 flex items-center gap-2 px-4 py-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-sm">
+            <span className="font-semibold">Payment system temporarily unavailable.</span>
+            <span className="text-amber-400/70">Plans are shown for reference. Email us at support@entanglewealth.com to get started.</span>
+          </div>
+        )}
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-3">
             Simple <span className="electric-text">Pricing</span>

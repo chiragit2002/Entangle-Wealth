@@ -30,6 +30,14 @@ const TIER_COLORS: Record<string, string> = {
 const periods = ["weekly", "monthly", "all-time"] as const;
 type Period = typeof periods[number];
 
+const DEMO_LEADERBOARD: LeaderboardEntry[] = [
+  { rank: 1, userId: "demo-1", totalXp: 12450, level: 11, tier: "Gold", monthlyXp: 3200, weeklyXp: 820, firstName: "Alex", lastName: "M", photoUrl: null, gainPercent: 18.4 },
+  { rank: 2, userId: "demo-2", totalXp: 9870, level: 10, tier: "Silver", monthlyXp: 2100, weeklyXp: 590, firstName: "Jordan", lastName: "K", photoUrl: null, gainPercent: 12.1 },
+  { rank: 3, userId: "demo-3", totalXp: 7340, level: 8, tier: "Silver", monthlyXp: 1800, weeklyXp: 430, firstName: "Sam", lastName: "R", photoUrl: null, gainPercent: 9.7 },
+  { rank: 4, userId: "demo-4", totalXp: 5200, level: 7, tier: "Bronze", monthlyXp: 1200, weeklyXp: 310, firstName: "Taylor", lastName: "B", photoUrl: null, gainPercent: 6.2 },
+  { rank: 5, userId: "demo-5", totalXp: 3100, level: 5, tier: "Bronze", monthlyXp: 800, weeklyXp: 190, firstName: "Morgan", lastName: "L", photoUrl: null, gainPercent: 3.8 },
+];
+
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1) return <Crown className="w-4 h-4 text-[#FFD700]" />;
   if (rank === 2) return <Medal className="w-4 h-4 text-white/60" />;
@@ -165,9 +173,37 @@ export default function Leaderboard() {
               <Flame className="w-6 h-6 text-primary animate-pulse" />
             </div>
           ) : leaderboard.length === 0 ? (
-            <div className="text-center py-16">
-              <Trophy className="w-10 h-10 mx-auto mb-3 text-white/10" />
-              <p className="text-sm text-white/30">No rankings yet. Start earning XP to appear here!</p>
+            <div>
+              {DEMO_LEADERBOARD.map((entry) => (
+                <div key={entry.userId} className="grid grid-cols-12 gap-2 px-4 py-3 hover:bg-white/[0.02] transition-colors items-center opacity-40">
+                  <div className="col-span-1">
+                    <RankBadge rank={entry.rank} />
+                  </div>
+                  <div className="col-span-5 flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-full bg-white/[0.05] flex items-center justify-center">
+                      <User className="w-3.5 h-3.5 text-white/20" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white/80 truncate">{entry.firstName}</p>
+                      <span className={`text-[10px] ${TIER_COLORS[entry.tier]}`}>{entry.tier}</span>
+                    </div>
+                  </div>
+                  <div className="col-span-2 text-right">
+                    <span className="text-sm font-mono text-white/50">Lv {entry.level}</span>
+                  </div>
+                  <div className="col-span-2 text-right">
+                    <span className={`text-sm font-mono font-semibold ${entry.gainPercent >= 0 ? "text-primary" : "text-red-400"}`}>
+                      {entry.gainPercent >= 0 ? "+" : ""}{Math.abs(entry.gainPercent)}%
+                    </span>
+                  </div>
+                  <div className="col-span-2 text-right">
+                    <span className="text-sm font-mono text-white/40">{entry.totalXp.toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+              <div className="text-center py-6 border-t border-white/[0.04]">
+                <p className="text-sm text-white/30">Be the first to earn real XP and claim your spot!</p>
+              </div>
             </div>
           ) : (
             <div className="divide-y divide-white/[0.04]">

@@ -52,8 +52,8 @@ router.get("/stripe/products", async (_req, res) => {
 
     res.json(result);
   } catch (error) {
-    logger.error({ err: error }, "Error fetching products");
-    res.status(500).json({ error: "Failed to fetch products" });
+    logger.warn({ err: error }, "Stripe products unavailable, returning empty list");
+    res.status(200).json([]);
   }
 });
 

@@ -145,7 +145,26 @@ export default function HabitsDashboard() {
     setLoading(true);
     setFetchError(false);
     try {
-      const token = isSignedIn ? await getToken() : null;
+      if (!isSignedIn) {
+        const res = await fetch(`${API_BASE}/habits`);
+        if (!res.ok) {
+          setFetchError(true);
+          return;
+        }
+        const data: Omit<Habit, "currentStreak" | "longestStreak" | "totalCompletions" | "lastCompletedAt" | "completedToday">[] = await res.json();
+        setHabits(data.map((h) => ({
+          ...h,
+          currentStreak: 0,
+          longestStreak: 0,
+          totalCompletions: 0,
+          lastCompletedAt: null,
+          completedToday: false,
+        })));
+        setSummary(null);
+        return;
+      }
+
+      const token = await getToken();
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
 

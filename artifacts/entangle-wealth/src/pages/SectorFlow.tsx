@@ -137,12 +137,40 @@ export default function SectorFlow() {
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<string>("");
 
+  const buildSimulatedSectors = (): SectorData[] => {
+    const seed = [
+      { name: "Technology", avgChange: 1.42, gainers: 8, losers: 1, neutral: 1, topSymbol: "NVDA", topChange: 3.2, worstSymbol: "INTC", worstChange: -0.8, volume: 2_400_000_000 },
+      { name: "Healthcare", avgChange: 0.61, gainers: 6, losers: 2, neutral: 2, topSymbol: "LLY", topChange: 2.1, worstSymbol: "MRNA", worstChange: -0.9, volume: 890_000_000 },
+      { name: "Financials", avgChange: 0.38, gainers: 5, losers: 3, neutral: 2, topSymbol: "GS", topChange: 1.4, worstSymbol: "SCHW", worstChange: -0.5, volume: 1_200_000_000 },
+      { name: "Consumer Cyclical", avgChange: -0.22, gainers: 4, losers: 5, neutral: 1, topSymbol: "AMZN", topChange: 0.9, worstSymbol: "RIVN", worstChange: -2.1, volume: 1_050_000_000 },
+      { name: "Energy", avgChange: -0.84, gainers: 2, losers: 7, neutral: 1, topSymbol: "COP", topChange: 0.3, worstSymbol: "HAL", worstChange: -2.4, volume: 780_000_000 },
+      { name: "Industrials", avgChange: 0.17, gainers: 5, losers: 4, neutral: 1, topSymbol: "CAT", topChange: 1.1, worstSymbol: "FDX", worstChange: -0.8, volume: 620_000_000 },
+      { name: "Comm Services", avgChange: 0.95, gainers: 7, losers: 2, neutral: 1, topSymbol: "NFLX", topChange: 2.8, worstSymbol: "ZM", worstChange: -0.6, volume: 940_000_000 },
+      { name: "Real Estate", avgChange: -0.31, gainers: 3, losers: 6, neutral: 1, topSymbol: "EQIX", topChange: 0.7, worstSymbol: "O", worstChange: -1.2, volume: 340_000_000 },
+    ];
+    return seed.map(s => ({
+      name: s.name,
+      avgChange: s.avgChange,
+      totalVolume: s.volume,
+      gainers: s.gainers,
+      losers: s.losers,
+      neutral: s.neutral,
+      momentum: s.avgChange > 0.3 ? "bullish" : s.avgChange < -0.3 ? "bearish" : "neutral",
+      topMover: { symbol: s.topSymbol, change: s.topChange },
+      worstMover: { symbol: s.worstSymbol, change: s.worstChange },
+      stocks: [],
+    })).sort((a, b) => b.avgChange - a.avgChange) as SectorData[];
+  };
+
   const loadData = useCallback(async () => {
-    setLoading(true);
     trackEvent("sector_flow_refreshed");
+    setSectors(buildSimulatedSectors());
+    setLastUpdate("simulated");
+    setLoading(false);
     try {
       const allSymbols = Object.values(SECTOR_STOCKS).flat();
-      const snapshots = await fetchAlpacaSnapshots(allSymbols);
+      const timeoutPromise = new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000));
+      const snapshots = await Promise.race([fetchAlpacaSnapshots(allSymbols), timeoutPromise]);
       const sectorResults: SectorData[] = [];
 
       for (const [sectorName, symbols] of Object.entries(SECTOR_STOCKS)) {
@@ -170,13 +198,12 @@ export default function SectorFlow() {
 
         sectorResults.push({ name: sectorName, avgChange, totalVolume, gainers, losers, neutral, momentum, topMover, worstMover, stocks });
       }
-      sectorResults.sort((a, b) => b.avgChange - a.avgChange);
-      setSectors(sectorResults);
-      setLastUpdate(new Date().toLocaleTimeString());
+      if (sectorResults.length > 0) {
+        sectorResults.sort((a, b) => b.avgChange - a.avgChange);
+        setSectors(sectorResults);
+        setLastUpdate(new Date().toLocaleTimeString());
+      }
     } catch {
-      setSectors([]);
-    } finally {
-      setLoading(false);
     }
   }, []);
 
@@ -199,7 +226,8 @@ export default function SectorFlow() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            {lastUpdate && <span className="live-dot text-[10px]">LIVE</span>}
+            {lastUpdate && lastUpdate !== "simulated" && <span className="live-dot text-[10px]">LIVE</span>}
+            {lastUpdate === "simulated" && <span className="text-[10px] text-white/40">SIMULATED DATA</span>}
             <Button variant="outline" size="sm" onClick={loadData} disabled={loading} className="border-primary/30 text-primary hover:bg-primary/10">
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             </Button>

@@ -390,6 +390,11 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
             </Button>
           )}
         </div>
+        {onClose && step === 1 && (
+          <button onClick={onClose} className="mt-3 w-full text-[11px] text-white/25 hover:text-white/50 transition-colors py-1 text-center">
+            Skip setup for now
+          </button>
+        )}
       </div>
     </div>
   );

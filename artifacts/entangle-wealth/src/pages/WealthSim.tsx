@@ -233,6 +233,7 @@ export default function WealthSim() {
   const { toast } = useToast();
 
   const [wizardStep, setWizardStep] = useState(0);
+  const [tryWithoutAccount, setTryWithoutAccount] = useState(false);
   const [profile, setProfile] = useState<SimProfile>(DEFAULT_PROFILE);
   const [projections, setProjections] = useState<ProjectionPoint[]>([]);
   const [comparing, setComparing] = useState<ProjectionPoint[]>([]);
@@ -270,9 +271,41 @@ export default function WealthSim() {
     }).catch(() => {});
   }, [isLoaded, isSignedIn, getToken]);
 
+  const calcLocalProjections = (p: SimProfile): ProjectionPoint[] => {
+    const monthlyRate = p.expectedReturnRate / 100 / 12;
+    const annualInflationRate = p.inflationRate / 100;
+    const results: ProjectionPoint[] = [];
+    let currentValue = p.currentSavings;
+    let totalContributions = p.currentSavings;
+    for (let year = 1; year <= p.timeHorizonYears; year++) {
+      for (let m = 0; m < 12; m++) {
+        currentValue = currentValue * (1 + monthlyRate) + p.monthlyInvestment;
+        totalContributions += p.monthlyInvestment;
+      }
+      const investmentGrowth = currentValue - totalContributions;
+      const inflationFactor = Math.pow(1 + annualInflationRate, year);
+      results.push({
+        year,
+        netWorth: Math.round(currentValue),
+        contributions: Math.round(totalContributions),
+        investmentGrowth: Math.round(Math.max(investmentGrowth, 0)),
+        realValue: Math.round(currentValue / inflationFactor),
+      });
+    }
+    return results;
+  };
+
   const runProjection = useCallback(async (p: SimProfile, save = false) => {
     setLoading(true);
     try {
+      if (!isSignedIn) {
+        const localProjections = calcLocalProjections(p);
+        setProjections(localProjections);
+        setSimulated(true);
+        setLoading(false);
+        return;
+      }
+
       const body = {
         currentSavings: p.currentSavings,
         monthlyInvestment: p.monthlyInvestment,
@@ -303,13 +336,19 @@ export default function WealthSim() {
         }
         const msRes = await authFetch("/simulation/milestones", getToken);
         if (msRes.ok) setMilestones(await msRes.json());
+      } else {
+        const localProjections = calcLocalProjections(p);
+        setProjections(localProjections);
+        setSimulated(true);
       }
     } catch {
-      toast({ title: "Projection failed", description: "Could not run simulation", variant: "destructive" });
+      const localProjections = calcLocalProjections(p);
+      setProjections(localProjections);
+      setSimulated(true);
     } finally {
       setLoading(false);
     }
-  }, [getToken, toast]);
+  }, [getToken, toast, isSignedIn]);
 
   const saveProfile = useCallback(async () => {
     if (!isSignedIn) return;
@@ -384,7 +423,7 @@ export default function WealthSim() {
     return <Layout><div className="min-h-screen bg-[#040408] flex items-center justify-center"><RefreshCw className="w-6 h-6 text-white/40 animate-spin" /></div></Layout>;
   }
 
-  if (!isSignedIn && wizardStep < 4) {
+  if (!isSignedIn && !tryWithoutAccount && wizardStep < 4) {
     return (
       <Layout>
         <div className="min-h-screen bg-[#040408] flex items-center justify-center p-4">
@@ -394,7 +433,7 @@ export default function WealthSim() {
             <p className="text-white/50 text-sm mb-6">Visualize how your financial decisions compound over time. Sign in to save your progress and earn XP.</p>
             <div className="flex gap-3 justify-center">
               <a href="/sign-in" className="px-5 py-2.5 bg-[#00D4FF] text-black font-bold font-mono text-[11px] uppercase tracking-widest rounded-sm hover:bg-[#00D4FF]/90 transition-colors">Sign In</a>
-              <button onClick={() => setWizardStep(1)} className="px-5 py-2.5 border border-white/10 text-white/60 font-mono text-[11px] uppercase tracking-widest rounded-sm hover:border-white/20 hover:text-white/80 transition-colors">Try Without Account</button>
+              <button onClick={() => { setTryWithoutAccount(true); setWizardStep(1); }} className="px-5 py-2.5 border border-white/10 text-white/60 font-mono text-[11px] uppercase tracking-widest rounded-sm hover:border-white/20 hover:text-white/80 transition-colors">Try Without Account</button>
             </div>
           </div>
         </div>

@@ -22,6 +22,8 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
   const [saving, setSaving] = useState(false);
 
   const persistComplete = useCallback(async (selectedGoal: string) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5_000);
     try {
       await authFetch("/onboarding/complete-welcome", getToken, {
         method: "POST",
@@ -31,8 +33,12 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
           financialFocus: selectedGoal,
           desiredOutcome: selectedGoal,
         }),
+        signal: controller.signal,
       });
-    } catch {}
+    } catch {
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }, [getToken]);
 
   const handleComplete = async () => {

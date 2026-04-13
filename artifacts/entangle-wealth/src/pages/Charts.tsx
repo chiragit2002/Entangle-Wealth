@@ -180,25 +180,10 @@ export default function Charts() {
 
   const loadChart = useCallback(async (sym: string, tf: string) => {
     const version = ++loadVersionRef.current;
-    setLoading(true);
     const tfConfig = TIMEFRAMES.find(t => t.label === tf) || TIMEFRAMES[6];
     const isDaily = tf === "1D" || tf === "1W" || tf === "1M";
-    try {
-      const res = await fetchBars(sym, { timeframe: tfConfig.tf, limit: tfConfig.limit });
-      if (version !== loadVersionRef.current) return;
-      if (res.bars && res.bars.length >= 5) {
-        const sd = barsToStockData(res.bars);
-        const ohlcv = res.bars.map((b: AlpacaBar) => ({
-          open: b.o, high: b.h, low: b.l, close: b.c, volume: b.v,
-        }));
-        setStockData({ ...sd, ohlcv } as StockData);
-        const mapped = res.bars.map((b: AlpacaBar) => ({
-          time: isDaily ? b.t.slice(0, 10) : String(Math.floor(new Date(b.t).getTime() / 1000)),
-          open: b.o, high: b.h, low: b.l, close: b.c, volume: b.v,
-        }));
-        setBars(mapped);
-      } else throw new Error("Insufficient data");
-    } catch {
+
+    const applyMock = () => {
       if (version !== loadVersionRef.current) return;
       const bp = 100 + Math.random() * 200;
       const sd = generateMockOHLCV(bp, 120);
@@ -212,9 +197,33 @@ export default function Charts() {
         };
       });
       setBars(mapped);
-    } finally {
-      if (version === loadVersionRef.current) setLoading(false);
-    }
+      setLoading(false);
+    };
+
+    applyMock();
+
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Chart load timeout")), 8_000)
+    );
+    Promise.race([
+      fetchBars(sym, { timeframe: tfConfig.tf, limit: tfConfig.limit }),
+      timeout,
+    ]).then((res) => {
+      if (version !== loadVersionRef.current) return;
+      if (res.bars && res.bars.length >= 5) {
+        const sd = barsToStockData(res.bars);
+        const ohlcv = res.bars.map((b: AlpacaBar) => ({
+          open: b.o, high: b.h, low: b.l, close: b.c, volume: b.v,
+        }));
+        setStockData({ ...sd, ohlcv } as StockData);
+        const mapped = res.bars.map((b: AlpacaBar) => ({
+          time: isDaily ? b.t.slice(0, 10) : String(Math.floor(new Date(b.t).getTime() / 1000)),
+          open: b.o, high: b.h, low: b.l, close: b.c, volume: b.v,
+        }));
+        setBars(mapped);
+      }
+    }).catch(() => {
+    });
   }, []);
 
   useEffect(() => { loadChart(symbol, timeframe); }, [symbol, timeframe, loadChart]);

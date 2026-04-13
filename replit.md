@@ -26,7 +26,7 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **Validation**: Zod.
 - **Build**: `esbuild`.
 - **Frontend**: React with Vite and Tailwind CSS.
-- **Payments**: Stripe for subscriptions and KYC verification.
+- **Payments**: Stripe for subscriptions and KYC verification. **Launch Promo**: All Pro features free until May 13, 2026 — controlled by `PROMO_END_DATE` in `api-server/src/lib/userDailyLimits.ts`. Promo bypasses signal/TaxGPT/alert limits server-side, hides UpgradePrompt client-side, and shows banner on Pricing page. Public endpoint: `GET /api/stripe/promo`.
 - **Data Management**: LocalStorage for client-side persistence.
 - **Occupation System**: `@workspace/occupations` package — 536 structured occupations across 26 categories with tax category mappings (W-2, 1099, Business Owner). Used in Profile, ProfileCompletionGate, coaching AI context.
 - **Security**: Helmet for HTTP security headers, global and AI-specific rate limiting.

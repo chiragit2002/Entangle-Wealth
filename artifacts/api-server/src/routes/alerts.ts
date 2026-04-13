@@ -8,6 +8,7 @@ import { logger } from "../lib/logger";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { CircuitBreaker, registerCircuit } from "../lib/circuitBreaker";
 import { sendZapierWebhook } from "../lib/zapierWebhook";
+import { isPromoActive } from "../lib/userDailyLimits";
 import { sendPushNotificationToUser } from "./push";
 import { getAuth } from "@clerk/express";
 import { validateBody, validateQuery, validateParams, PaginationQuerySchema, IntIdParamsSchema, z } from "../lib/validateRequest";
@@ -133,7 +134,7 @@ router.post("/alerts", requireAuth, validateBody(AlertCreateSchema), async (req:
       .from(alertsTable)
       .where(eq(alertsTable.userId, userId));
     const tier = await getUserTier(userId);
-    if (tier === "free" && (existingCount[0]?.c || 0) >= 20) {
+    if (tier === "free" && !isPromoActive() && (existingCount[0]?.c || 0) >= 20) {
       res.status(403).json({ error: "Free tier limited to 20 alert rules. Upgrade to Pro for unlimited." });
       return;
     }
@@ -531,7 +532,7 @@ async function evaluateAlerts() {
 
       if (triggered) {
         const tier = await getUserTier(alert.userId);
-        if (tier === "free") {
+        if (tier === "free" && !isPromoActive()) {
           const dailyCount = await getDailyAlertCount(alert.userId);
           if (dailyCount >= FREE_DAILY_LIMIT) continue;
         }

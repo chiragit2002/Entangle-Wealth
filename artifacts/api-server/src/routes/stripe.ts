@@ -8,12 +8,22 @@ import { getUncachableStripeClient, getStripePublishableKey } from "../stripeCli
 import { resolveUserId } from "../lib/resolveUserId";
 import { validateBody, z } from "../lib/validateRequest";
 import { logger } from "../lib/logger";
+import { isPromoActive, PROMO_END_ISO } from "../lib/userDailyLimits";
 
 const PriceIdSchema = z.object({
   priceId: z.string().regex(/^price_/, "Must be a valid Stripe price ID"),
 });
 
 const router = Router();
+
+router.get("/stripe/promo", async (_req, res) => {
+  const promo = isPromoActive();
+  res.json({
+    active: promo,
+    endsAt: PROMO_END_ISO,
+    message: promo ? "All Pro features are free during our launch promotion!" : null,
+  });
+});
 
 router.get("/stripe/config", async (_req, res) => {
   try {
@@ -117,9 +127,11 @@ router.get("/stripe/subscription", requireAuth, async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
 
   try {
+    const promo = isPromoActive();
+
     const [user] = await db.select().from(usersTable).where(eq(usersTable.clerkId, userId));
     if (!user || !user.stripeSubscriptionId) {
-      res.json({ active: false, tier: "free" });
+      res.json({ active: promo, tier: promo ? "promo" : "free", promo });
       return;
     }
 
@@ -127,10 +139,11 @@ router.get("/stripe/subscription", requireAuth, async (req, res) => {
     const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
 
     res.json({
-      active: subscription.status === "active",
-      tier: user.subscriptionTier || "free",
+      active: subscription.status === "active" || promo,
+      tier: user.subscriptionTier || (promo ? "promo" : "free"),
       status: subscription.status,
       currentPeriodEnd: (subscription as any).current_period_end ?? null,
+      promo,
     });
   } catch (error) {
     logger.error({ err: error }, "Subscription check error");

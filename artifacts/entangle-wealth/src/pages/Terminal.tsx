@@ -58,8 +58,8 @@ export default function Terminal() {
     if (localStorage.getItem(shownKey) === "true") return;
     authFetch("/stripe/subscription", getToken)
       .then(r => r.ok ? r.json() : null)
-      .then((data: { tier?: string } | null) => {
-        if (!data || data.tier === "pro" || data.tier === "enterprise") return;
+      .then((data: { tier?: string; promo?: boolean } | null) => {
+        if (!data || data.promo || data.tier === "pro" || data.tier === "enterprise" || data.tier === "promo") return;
         showUpgradePrompt({
           limitType: "terminal",
           limitLabel: "Bloomberg Terminal",

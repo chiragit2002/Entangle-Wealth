@@ -2,6 +2,13 @@ import { db } from "@workspace/db";
 import { usersTable, referralsTable } from "@workspace/db/schema";
 import { eq, and, count } from "drizzle-orm";
 
+export const PROMO_END_ISO = "2026-05-13T23:59:59Z";
+const PROMO_END_DATE = new Date(PROMO_END_ISO);
+
+export function isPromoActive(): boolean {
+  return Date.now() < PROMO_END_DATE.getTime();
+}
+
 const FREE_DAILY_SIGNALS = 3;
 const REFERRAL_BONUS_SIGNALS = 5;
 const FREE_DAILY_TAXGPT = 5;
@@ -17,6 +24,10 @@ function getDayKey(): number {
 }
 
 export async function checkSignalLimit(clerkId: string): Promise<{ allowed: boolean; remaining: number; maxAllowed: number; referralBonus: boolean }> {
+  if (isPromoActive()) {
+    return { allowed: true, remaining: 999, maxAllowed: 999, referralBonus: false };
+  }
+
   const [user] = await db
     .select({ subscriptionTier: usersTable.subscriptionTier })
     .from(usersTable)
@@ -58,6 +69,10 @@ export function incrementSignalCount(clerkId: string): void {
 }
 
 export async function checkTaxGptLimit(clerkId: string): Promise<{ allowed: boolean; remaining: number; maxAllowed: number; referralBonus: boolean }> {
+  if (isPromoActive()) {
+    return { allowed: true, remaining: 999, maxAllowed: 999, referralBonus: false };
+  }
+
   const [user] = await db
     .select({ subscriptionTier: usersTable.subscriptionTier })
     .from(usersTable)

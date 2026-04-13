@@ -189,7 +189,6 @@ export default function Alerts() {
           "All 6 alert types",
         ],
       });
-      return;
     }
 
     setCreating(true);

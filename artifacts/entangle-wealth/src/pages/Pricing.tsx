@@ -91,8 +91,16 @@ export default function Pricing() {
   const [stripeAvailable, setStripeAvailable] = useState(true);
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
   const [referralCode, setReferralCode] = useState("");
+  const [promo, setPromo] = useState<{ active: boolean; endsAt: string } | null>(null);
 
   useEffect(() => { trackEvent("upgrade_modal_shown"); }, []);
+
+  useEffect(() => {
+    fetch("/api/stripe/promo")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setPromo(data); })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/stripe/products")
@@ -197,14 +205,40 @@ export default function Pricing() {
             <span className="text-amber-400/70">Plans are shown for reference. Email us at support@entanglewealth.com to get started.</span>
           </div>
         )}
+        {promo?.active && (
+          <div className="mb-8 relative overflow-hidden rounded-2xl border border-[#00e676]/30 bg-gradient-to-r from-[#00e676]/10 via-[#00c8f8]/10 to-[#f5c842]/10 p-6 text-center">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#00e676]/5 to-transparent animate-pulse" />
+            <div className="relative z-10">
+              <div className="inline-flex items-center gap-2 bg-[#00e676]/20 rounded-full px-4 py-1.5 mb-3">
+                <Sparkles className="w-4 h-4 text-[#00e676]" />
+                <span className="text-sm font-black text-[#00e676] uppercase tracking-wider">Launch Promotion</span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-black text-foreground mb-2">
+                Everything is <span className="text-[#00e676]">100% free</span> right now
+              </h2>
+              <p className="text-muted-foreground text-sm md:text-base">
+                All Pro features are unlocked for everyone until{" "}
+                <span className="font-bold text-foreground">
+                  {new Date(promo.endsAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                </span>
+                . No credit card needed.
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-3">
             Simple <span className="electric-text">Pricing</span>
           </h1>
-          <p className="text-muted-foreground text-base md:text-lg">30 days free. No card. Cancel anytime.</p>
-          <div className="inline-block mt-4 bg-[rgba(0,230,118,0.1)] border border-[rgba(0,230,118,0.3)] rounded-full px-4 py-1.5 text-xs font-bold text-[#00e676]">
-            FREE TRIAL | NO CREDIT CARD NEEDED
-          </div>
+          <p className="text-muted-foreground text-base md:text-lg">
+            {promo?.active ? "All features unlocked during our launch promotion!" : "30 days free. No card. Cancel anytime."}
+          </p>
+          {!promo?.active && (
+            <div className="inline-block mt-4 bg-[rgba(0,230,118,0.1)] border border-[rgba(0,230,118,0.3)] rounded-full px-4 py-1.5 text-xs font-bold text-[#00e676]">
+              FREE TRIAL | NO CREDIT CARD NEEDED
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">

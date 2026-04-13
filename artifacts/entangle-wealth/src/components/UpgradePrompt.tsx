@@ -210,7 +210,15 @@ export function useUpgradePrompt() {
   const [promptConfig, setPromptConfig] = useState<UpgradePromptConfig | null>(null);
   const [daysSinceSignup, setDaysSinceSignup] = useState<number | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [promoActive, setPromoActive] = useState(false);
   const { getToken, isSignedIn } = useAuth();
+
+  useEffect(() => {
+    fetch("/api/stripe/promo")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.active) setPromoActive(true); })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -231,10 +239,11 @@ export function useUpgradePrompt() {
   }, [isSignedIn, getToken]);
 
   const showUpgradePrompt = useCallback((config: UpgradePromptConfig) => {
+    if (promoActive) return;
     if (!dataLoaded) return;
     if (daysSinceSignup !== null && daysSinceSignup < 3) return;
     setPromptConfig(config);
-  }, [dataLoaded, daysSinceSignup]);
+  }, [dataLoaded, daysSinceSignup, promoActive]);
 
   const closePrompt = useCallback(() => setPromptConfig(null), []);
 

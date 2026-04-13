@@ -29,14 +29,14 @@ export function CookieConsentBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-6 left-4 right-4 z-[100] animate-in slide-in-from-bottom-4 duration-500 pointer-events-none">
+    <div className="fixed left-4 right-4 z-[100] animate-in slide-in-from-bottom-4 duration-500 pointer-events-none bottom-[calc(84px+env(safe-area-inset-bottom,0px))] lg:bottom-6">
       <div className="max-w-xl mx-auto pointer-events-auto">
         <div
           className="rounded-2xl p-4 shadow-2xl shadow-black/60"
           style={{
-            background: "rgba(10,10,20,0.97)",
+            background: "var(--nav-dropdown-bg, rgba(10,10,20,0.97))",
             backdropFilter: "blur(24px)",
-            border: "1px solid rgba(255,255,255,0.08)",
+            border: "var(--nav-dropdown-border, 1px solid rgba(255,255,255,0.08))",
           }}
         >
           <div className="flex items-start gap-3">
@@ -44,8 +44,8 @@ export function CookieConsentBanner() {
               <Cookie className="w-4 h-4 text-[#FFD700]" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-semibold text-white mb-0.5">We use cookies</h3>
-              <p className="text-xs text-white/50 leading-relaxed">
+              <h3 className="text-sm font-semibold text-foreground mb-0.5">We use cookies</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 Essential cookies for auth & security, plus optional analytics to improve your experience.{" "}
                 <Link href="/cookies" className="text-primary hover:underline">Cookie Policy</Link>
               </p>
@@ -58,7 +58,7 @@ export function CookieConsentBanner() {
                 </button>
                 <button
                   onClick={handleDecline}
-                  className="px-4 py-1.5 text-xs font-semibold text-white/50 hover:text-white/80 transition-colors"
+                  className="px-4 py-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Essential Only
                 </button>
@@ -66,7 +66,7 @@ export function CookieConsentBanner() {
             </div>
             <button
               onClick={handleDecline}
-              className="shrink-0 text-white/25 hover:text-white/50 transition-colors"
+              className="shrink-0 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
               aria-label="Dismiss"
             >
               <X className="w-4 h-4" />

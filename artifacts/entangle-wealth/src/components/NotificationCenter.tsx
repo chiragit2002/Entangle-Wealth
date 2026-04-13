@@ -78,6 +78,7 @@ export default function NotificationCenter() {
   const [newAlert, setNewAlert] = useState({ symbol: "", type: "price_above", value: "" });
   const [loadingAlerts, setLoadingAlerts] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [alertError, setAlertError] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -237,8 +238,16 @@ export default function NotificationCenter() {
     setUnreadCount(0);
   }, []);
 
+  const [addingAlert, setAddingAlert] = useState(false);
+
   const addAlert = async () => {
     if (!newAlert.symbol.trim()) return;
+    if (!isSignedIn) {
+      window.location.href = "/sign-in?reason=protected";
+      return;
+    }
+    if (needsThreshold(newAlert.type) && (!newAlert.value || isNaN(parseFloat(newAlert.value)))) return;
+    setAddingAlert(true);
     try {
       const res = await authFetch("/alerts", getToken, {
         method: "POST",
@@ -251,9 +260,17 @@ export default function NotificationCenter() {
       });
       if (res.ok) {
         setNewAlert({ symbol: "", type: "price_above", value: "" });
+        setAlertError(null);
         fetchAlertRules();
+      } else {
+        const data = await res.json().catch(() => null);
+        setAlertError(data?.error || "Failed to create alert");
       }
-    } catch { /* ignore */ }
+    } catch {
+      setAlertError("Network error. Please try again.");
+    } finally {
+      setAddingAlert(false);
+    }
   };
 
   const toggleAlert = async (id: number) => {
@@ -294,7 +311,7 @@ export default function NotificationCenter() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div ref={dropdownRef} tabIndex={-1} role="dialog" aria-label="Notification Center" className="absolute right-0 top-full mt-2 w-[380px] max-w-[calc(100vw-32px)] bg-[#0d0d1a] border border-[rgba(0,212,255,0.15)] rounded-xl shadow-2xl shadow-black/50 z-50 overflow-hidden max-h-[520px] flex flex-col outline-none">
+          <div ref={dropdownRef} tabIndex={-1} role="dialog" aria-label="Notification Center" className="fixed right-2 left-2 top-14 sm:absolute sm:left-auto sm:top-full sm:mt-2 sm:right-0 sm:w-[380px] sm:max-w-[calc(100vw-32px)] bg-[var(--nav-dropdown-bg,#0d0d1a)] border border-[rgba(0,212,255,0.15)] rounded-xl shadow-2xl shadow-black/50 z-50 overflow-hidden max-h-[70vh] sm:max-h-[520px] flex flex-col outline-none">
             <div className="flex items-center justify-between p-3 border-b border-white/[0.06]">
               <div className="flex gap-1">
                 <button onClick={() => setTab("notifications")}
@@ -348,23 +365,32 @@ export default function NotificationCenter() {
                     <p className="text-[12px] font-bold text-primary mb-2">Quick Add Alert</p>
                     <div className="flex gap-2 mb-2">
                       <input placeholder="Symbol" value={newAlert.symbol}
-                        onChange={e => setNewAlert(p => ({ ...p, symbol: e.target.value.toUpperCase().replace(/[^A-Z0-9.]/g, "").slice(0, 10) }))}
+                        onChange={e => { setNewAlert(p => ({ ...p, symbol: e.target.value.toUpperCase().replace(/[^A-Z0-9.]/g, "").slice(0, 10) })); setAlertError(null); }}
                         maxLength={10}
-                        className="flex-1 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white focus:outline-none focus:border-primary/30 placeholder:text-white/40 min-w-0" />
+                        className="flex-1 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-foreground focus:outline-none focus:border-primary/30 placeholder:text-muted-foreground min-w-0" />
                       {needsThreshold(newAlert.type) && (
                         <input placeholder="Price" value={newAlert.value}
-                          onChange={e => setNewAlert(p => ({ ...p, value: e.target.value.replace(/[^0-9.]/g, "").slice(0, 20) }))}
+                          onChange={e => { setNewAlert(p => ({ ...p, value: e.target.value.replace(/[^0-9.]/g, "").slice(0, 20) })); setAlertError(null); }}
                           maxLength={20}
-                          className="w-[80px] bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white focus:outline-none focus:border-primary/30 placeholder:text-white/40" />
+                          className="w-[80px] bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-foreground focus:outline-none focus:border-primary/30 placeholder:text-muted-foreground" />
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <select value={newAlert.type} onChange={e => setNewAlert(p => ({ ...p, type: e.target.value }))}
-                        className="flex-1 bg-[#0d0d1a] border border-white/10 rounded-lg px-2 py-2 text-[11px] text-white focus:outline-none min-h-[36px] [&>option]:bg-[#0d0d1a] [&>option]:text-white">
+                      <select value={newAlert.type} onChange={e => { setNewAlert(p => ({ ...p, type: e.target.value })); setAlertError(null); }}
+                        className="flex-1 bg-[var(--nav-dropdown-bg,#0d0d1a)] border border-white/10 rounded-lg px-2 py-2 text-[11px] text-foreground focus:outline-none min-h-[44px] [&>option]:bg-[var(--nav-dropdown-bg,#0d0d1a)] [&>option]:text-foreground">
                         {ALERT_TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                       </select>
-                      <Button className="bg-primary/20 text-primary text-[11px] px-3 min-h-[36px]" onClick={addAlert}>Add</Button>
+                      <Button
+                        className="bg-primary/20 text-primary text-[11px] px-4 min-h-[44px] disabled:opacity-50"
+                        onClick={addAlert}
+                        disabled={addingAlert || !newAlert.symbol.trim()}
+                      >
+                        {addingAlert ? "..." : "Add"}
+                      </Button>
                     </div>
+                    {alertError && (
+                      <p className="text-[11px] text-red-400 mt-1.5">{alertError}</p>
+                    )}
                   </div>
 
                   {loadingAlerts ? (

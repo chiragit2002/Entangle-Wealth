@@ -374,27 +374,31 @@ router.post("/token/admin/distribute", requireAuth, requireAdmin, validateBody(A
       const user = topUsers[i];
       const txHash = `sim_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
-      await db.update(usersTable).set({
-        tokenBalance: sql`COALESCE(${usersTable.tokenBalance}, 0) + ${tokens}`,
-        updatedAt: new Date(),
-      }).where(eq(usersTable.id, user.id));
+      const dist = await db.transaction(async (tx) => {
+        await tx.update(usersTable).set({
+          tokenBalance: sql`COALESCE(${usersTable.tokenBalance}, 0) + ${tokens}`,
+          updatedAt: new Date(),
+        }).where(eq(usersTable.id, user.id));
 
-      const [dist] = await db.insert(rewardDistributionsTable).values({
-        month,
-        userId: user.id,
-        rank,
-        tokensAwarded: tokens,
-        portfolioGain: user.monthlyXp || 0,
-        txHash,
-      }).returning();
+        const [inserted] = await tx.insert(rewardDistributionsTable).values({
+          month,
+          userId: user.id,
+          rank,
+          tokensAwarded: tokens,
+          portfolioGain: user.monthlyXp || 0,
+          txHash,
+        }).returning();
 
-      await db.insert(tokenTransactionsTable).values({
-        userId: user.id,
-        type: "reward",
-        amount: tokens,
-        description: `Monthly reward — Rank #${rank} (${month}) — ${user.monthlyXp || 0} XP`,
-        txHash,
-        status: "completed",
+        await tx.insert(tokenTransactionsTable).values({
+          userId: user.id,
+          type: "reward",
+          amount: tokens,
+          description: `Monthly reward — Rank #${rank} (${month}) — ${user.monthlyXp || 0} XP`,
+          txHash,
+          status: "completed",
+        });
+
+        return inserted;
       });
 
       distributions.push(dist);

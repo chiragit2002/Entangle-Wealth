@@ -97,3 +97,35 @@ export const userAiLimiter = makeUserLimiter(60_000, 20, "ai");
 export const userTradingLimiter = makeUserLimiter(60_000, 60, "trading");
 
 export const userKycLimiter = makeUserLimiter(60_000, 10, "kyc");
+
+function makeSpamGuard(windowMs: number, authenticatedMax: number, unauthenticatedMax: number, label: string) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const auth = getAuth(req);
+    const userId = auth?.userId;
+    const ip = req.ip || req.socket.remoteAddress || "unknown";
+
+    if (userId) {
+      const key = `${label}:user:${userId}`;
+      const result = checkWindow(userWindows, key, windowMs, authenticatedMax);
+      if (!result.allowed) {
+        logger.warn({ userId, path: req.path, label }, "Spam guard rate limit exceeded (authenticated)");
+        res.setHeader("Retry-After", String(result.retryAfterSec));
+        res.status(429).json({ error: "Too many requests. Please slow down.", retryAfter: result.retryAfterSec });
+        return;
+      }
+    } else {
+      const key = `${label}:ip:${ip}`;
+      const result = checkWindow(ipWindows, key, windowMs, unauthenticatedMax);
+      if (!result.allowed) {
+        logger.warn({ ip, path: req.path, label }, "Spam guard rate limit exceeded (unauthenticated)");
+        res.setHeader("Retry-After", String(result.retryAfterSec));
+        res.status(429).json({ error: "Too many requests. Please slow down.", retryAfter: result.retryAfterSec });
+        return;
+      }
+    }
+
+    next();
+  };
+}
+
+export const unauthWriteSpamGuard = makeSpamGuard(60_000, 30, 5, "unauth-write");

@@ -17,7 +17,7 @@ const JobsSearchQuerySchema = z.object({
   page: z.coerce.number().int().min(1).optional().default(1),
 });
 
-router.get("/jobs/search", validateQuery(JobsSearchQuerySchema), async (req, res) => {
+router.get("/jobs/search", requireAuth, validateQuery(JobsSearchQuerySchema), async (req, res) => {
   const { q, location, type, remote } = req.query;
   const { page: pageNum } = req.query as unknown as { page: number };
 

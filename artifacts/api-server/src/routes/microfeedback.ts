@@ -6,6 +6,7 @@ import { pool } from "@workspace/db";
 import { getAuth } from "@clerk/express";
 import { logger } from "../lib/logger";
 import { validateBody, z } from "../lib/validateRequest";
+import { unauthWriteSpamGuard } from "../middlewares/userRateLimit";
 
 const router = Router();
 
@@ -16,7 +17,7 @@ const MicroFeedbackSchema = z.object({
   sessionId: z.string().max(200).optional(),
 });
 
-router.post("/micro-feedback", validateBody(MicroFeedbackSchema), async (req: Request, res: Response) => {
+router.post("/micro-feedback", unauthWriteSpamGuard, validateBody(MicroFeedbackSchema), async (req: Request, res: Response) => {
   try {
     const { userId } = getAuth(req);
     const { context, helpful, comment, sessionId } = req.body;

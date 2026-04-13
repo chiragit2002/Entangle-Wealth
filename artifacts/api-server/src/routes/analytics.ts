@@ -7,6 +7,7 @@ import { analyticsEventsTable } from "@workspace/db/schema";
 import { getAuth } from "@clerk/express";
 import { logger } from "../lib/logger";
 import { validateBody, validateQuery, z } from "../lib/validateRequest";
+import { unauthWriteSpamGuard } from "../middlewares/userRateLimit";
 
 const router = Router();
 
@@ -22,7 +23,7 @@ const DashboardQuerySchema = z.object({
   endDate: z.string().optional(),
 });
 
-router.post("/analytics/track", validateBody(AnalyticsTrackSchema), (req: Request, res: Response) => {
+router.post("/analytics/track", unauthWriteSpamGuard, validateBody(AnalyticsTrackSchema), (req: Request, res: Response) => {
   const { userId } = getAuth(req);
   const { event, properties, sessionId } = req.body;
 

@@ -157,39 +157,45 @@ router.post("/gamification/xp", requireAuth, validateBody(XpSchema), async (req,
       return;
     }
 
-    let [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
-    const multiplier = streak?.multiplier || 1.0;
-    const finalAmount = Math.min(applyMultiplier(baseAmount, multiplier), MAX_XP_PER_ACTION);
+    const result = await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(${userId})`);
 
-    await db.insert(xpTransactionsTable).values({ userId, amount: finalAmount, reason, category });
+      let [streak] = await tx.select().from(streaksTable).where(eq(streaksTable.userId, userId));
+      const multiplier = streak?.multiplier || 1.0;
+      const finalAmount = Math.min(applyMultiplier(baseAmount, multiplier), MAX_XP_PER_ACTION);
 
-    let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
-    if (!xpRow) {
-      [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
-    }
+      await tx.insert(xpTransactionsTable).values({ userId, amount: finalAmount, reason, category });
 
-    const newTotalXp = xpRow.totalXp + finalAmount;
-    const newLevel = calculateLevel(newTotalXp);
-    const newTier = calculateTier(newLevel, newTotalXp);
+      let [xpRow] = await tx.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+      if (!xpRow) {
+        [xpRow] = await tx.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
+      }
 
-    const [updated] = await db.update(userXpTable)
-      .set({
-        totalXp: newTotalXp,
-        level: newLevel,
-        tier: newTier,
-        monthlyXp: xpRow.monthlyXp + finalAmount,
-        weeklyXp: xpRow.weeklyXp + finalAmount,
-        updatedAt: new Date(),
-      })
-      .where(eq(userXpTable.userId, userId))
-      .returning();
+      const newTotalXp = xpRow.totalXp + finalAmount;
+      const newLevel = calculateLevel(newTotalXp);
+      const newTier = calculateTier(newLevel, newTotalXp);
+
+      const [updated] = await tx.update(userXpTable)
+        .set({
+          totalXp: newTotalXp,
+          level: newLevel,
+          tier: newTier,
+          monthlyXp: xpRow.monthlyXp + finalAmount,
+          weeklyXp: xpRow.weeklyXp + finalAmount,
+          updatedAt: new Date(),
+        })
+        .where(eq(userXpTable.userId, userId))
+        .returning();
+
+      return { updated, xpEarned: finalAmount, multiplier, prevLevel: xpRow.level, prevTier: xpRow.tier };
+    });
 
     res.json({
-      xp: updated,
-      xpEarned: finalAmount,
-      multiplier,
-      leveledUp: newLevel > xpRow.level,
-      tierChanged: newTier !== xpRow.tier,
+      xp: result.updated,
+      xpEarned: result.xpEarned,
+      multiplier: result.multiplier,
+      leveledUp: result.updated.level > result.prevLevel,
+      tierChanged: result.updated.tier !== result.prevTier,
     });
   } catch (error) {
     logger.error({ err: error }, "Error adding XP:");

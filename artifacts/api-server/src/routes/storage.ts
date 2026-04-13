@@ -40,8 +40,8 @@ const UPLOAD_ALLOC_TTL_HOURS = 1;
 async function recordUploadAllocation(objectPath: string, clerkId: string): Promise<void> {
   await db.execute(
     sql`INSERT INTO kyc_upload_allocations (object_path, clerk_id, expires_at)
-        VALUES (${objectPath}, ${clerkId}, NOW() + INTERVAL '${sql.raw(String(UPLOAD_ALLOC_TTL_HOURS))} hours')
-        ON CONFLICT (object_path) DO UPDATE SET clerk_id = ${clerkId}, expires_at = NOW() + INTERVAL '${sql.raw(String(UPLOAD_ALLOC_TTL_HOURS))} hours'`
+        VALUES (${objectPath}, ${clerkId}, NOW() + make_interval(hours => ${UPLOAD_ALLOC_TTL_HOURS}))
+        ON CONFLICT (object_path) DO UPDATE SET clerk_id = ${clerkId}, expires_at = NOW() + make_interval(hours => ${UPLOAD_ALLOC_TTL_HOURS})`
   );
 }
 

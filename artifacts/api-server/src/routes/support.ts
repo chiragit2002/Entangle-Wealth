@@ -221,7 +221,7 @@ router.patch("/support/admin/tickets/:id", requireAuth, requireAdmin, validatePa
   }
 });
 
-router.get("/status/services", async (_req: Request, res: Response) => {
+router.get("/status/services", requireAuth, async (_req: Request, res: Response) => {
   try {
     const result = await db.execute(sql`
       SELECT service_name, status, updated_at
@@ -235,7 +235,7 @@ router.get("/status/services", async (_req: Request, res: Response) => {
   }
 });
 
-router.get("/status/incidents", validateQuery(PaginationQuerySchema), async (req: Request, res: Response) => {
+router.get("/status/incidents", requireAuth, validateQuery(PaginationQuerySchema), async (req: Request, res: Response) => {
   try {
     const { limit, offset } = req.query as unknown as { limit: number; offset: number };
     const result = await db.execute(sql`

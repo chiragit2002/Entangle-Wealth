@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   AlertTriangle, Receipt, MessageCircle, TrendingUp, Shield, Download,
   ChevronDown, ChevronUp, Calculator, FileText, Lightbulb, Share2,
-  ShieldCheck, ShieldAlert, ChevronRight,
+  ShieldCheck, ShieldAlert, ChevronRight, BarChart2, Calendar,
 } from "lucide-react";
 import { ShareTaxCard } from "@/components/viral/ShareTaxCard";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ export default function Tax() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [categories, setCategories] = useState<DeductionCategory[]>(getDeductionCategories());
   const [expandEstimator, setExpandEstimator] = useState(false);
+  const [expandQuarterly, setExpandQuarterly] = useState(false);
   const [taxYear, setTaxYr] = useState(getTaxYear());
   const { getToken, isSignedIn } = useAuth();
 
@@ -142,6 +143,29 @@ export default function Tax() {
     };
   }, [profile, taxYear, strategies, planIds, rates]);
 
+  const QUARTERLY_DATES = [
+    { quarter: "Q1", due: `April 15, ${taxYear}`, period: `Jan 1 – Mar 31` },
+    { quarter: "Q2", due: `June 16, ${taxYear}`, period: `Apr 1 – May 31` },
+    { quarter: "Q3", due: `Sep 15, ${taxYear}`, period: `Jun 1 – Aug 31` },
+    { quarter: "Q4", due: `Jan 15, ${taxYear + 1}`, period: `Sep 1 – Dec 31` },
+  ];
+
+  const quarterlyCalc = useMemo(() => {
+    if (!profile) return null;
+    const gross = profile.grossRevenue;
+    const seTax = calculateSETax(gross, taxYear);
+    const seDeduct = seTax * 0.5;
+    const taxableIncome = Math.max(0, gross - seDeduct - rates.standardDeductionSingle);
+    const incomeTax = calculateIncomeTax(taxableIncome, taxYear);
+    const totalTax = seTax + incomeTax;
+    const quarterlyPayment = Math.ceil(totalTax / 4 / 100) * 100;
+    const priorYearTax = totalTax * 0.95;
+    const safeHarbor100 = Math.ceil(priorYearTax / 4);
+    const safeHarbor110 = Math.ceil(priorYearTax * 1.1 / 4);
+    const safeHarborRequired = gross > 150000 ? safeHarbor110 : safeHarbor100;
+    return { totalTax, quarterlyPayment, safeHarbor100, safeHarbor110, safeHarborRequired, seTax, incomeTax, gross };
+  }, [profile, taxYear, rates]);
+
   const complianceScore = useMemo(() => {
     let s = 40;
     if (profile) s += 15;
@@ -164,64 +188,179 @@ export default function Tax() {
   };
 
   const exportDeductionCSV = () => {
-    const lines = ["Category,Found,Documented,Gap"];
+    const lines: string[] = [];
+    lines.push(`ENTANGLEWEALTH | TAXFLOW — FULL TAX YEAR EXPORT`);
+    lines.push(`Tax Year: ${taxYear}`);
+    if (profile) lines.push(`Client: ${profile.name || profile.businessName} | ${ENTITY_SHORT_LABELS[profile.entityType]}`);
+    lines.push(`Generated: ${new Date().toLocaleDateString("en-US")}`);
+    lines.push(``);
+    lines.push(`DEDUCTION SUMMARY`);
+    lines.push(`Category,Found,Documented,Gap`);
     categories.forEach(c => {
       lines.push(`"${c.label}",${c.found},${c.documented},${c.found - c.documented}`);
     });
-    lines.push(`\nTotal,${totalFound},${totalDocumented},${totalGap}`);
+    lines.push(``);
+    lines.push(`Total Found,${totalFound}`);
+    lines.push(`Total Documented,${totalDocumented}`);
+    lines.push(`Undocumented Gap,${totalGap}`);
+    lines.push(`Compliance Score,${complianceScore}/100`);
+    if (estimator) {
+      lines.push(``);
+      lines.push(`TAX ESTIMATOR`);
+      lines.push(`Gross Revenue,${estimator.gross}`);
+      lines.push(`No Planning — SE Tax,${Math.round(estimator.seTaxNoPlan)}`);
+      lines.push(`No Planning — Income Tax,${Math.round(estimator.incomeTaxNoPlan)}`);
+      lines.push(`No Planning — Total,${Math.round(estimator.totalNoPlan)}`);
+      lines.push(`With Strategies — SE Tax,${Math.round(estimator.seTaxWithPlan)}`);
+      lines.push(`With Strategies — Income Tax,${Math.round(estimator.incomeTaxWithPlan)}`);
+      lines.push(`With Strategies — Total,${Math.round(estimator.totalWithPlan)}`);
+      lines.push(`Estimated Savings,${Math.round(Math.max(0, estimator.savings))}`);
+    }
+    if (quarterlyCalc) {
+      lines.push(``);
+      lines.push(`QUARTERLY ESTIMATED TAX PAYMENTS`);
+      lines.push(`Quarter,Due Date,Period,Payment Amount`);
+      QUARTERLY_DATES.forEach(q => {
+        lines.push(`${q.quarter},"${q.due}","${q.period}",${quarterlyCalc.quarterlyPayment}`);
+      });
+      lines.push(``);
+      lines.push(`Annual Tax Estimate,${Math.round(quarterlyCalc.totalTax)}`);
+      lines.push(`Safe Harbor 100%/quarter,${quarterlyCalc.safeHarbor100}`);
+      lines.push(`Safe Harbor 110%/quarter,${quarterlyCalc.safeHarbor110}`);
+    }
+    lines.push(``);
+    lines.push(`ACTIVE STRATEGIES`);
+    planIds.forEach(id => {
+      const s = ALL_STRATEGIES.find(st => st.id === id);
+      if (s) lines.push(`"${s.title}","${s.code}"`);
+    });
+    lines.push(``);
+    lines.push(`Disclaimer: Educational purposes only. Consult a licensed CPA for professional advice.`);
     const blob = new Blob([lines.join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `taxflow-deductions-${new Date().toISOString().split("T")[0]}.csv`;
+    a.download = `taxflow-full-export-${taxYear}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast({ title: "Exported", description: "Deduction summary CSV downloaded." });
+    toast({ title: "Exported", description: `Full ${taxYear} tax data CSV downloaded.` });
   };
 
-  const exportCPAReport = () => {
-    const lines: string[] = [];
-    lines.push("ENTANGLEWEALTH | TAXFLOW CPA REPORT");
-    lines.push(`Generated: ${new Date().toLocaleDateString("en-US")}`);
-    lines.push(`Tax Year: ${taxYear}`);
+  const exportCPAReport = async () => {
+    const { default: jsPDF } = await import("jspdf");
+    const doc = new jsPDF({ unit: "pt", format: "letter" });
+    const pageW = doc.internal.pageSize.getWidth();
+    const margin = 50;
+    let y = 60;
+    const LINE = 18;
+
+    const checkPage = () => { if (y > 700) { doc.addPage(); y = 60; } };
+
+    const heading = (text: string, size = 13) => {
+      checkPage();
+      doc.setFontSize(size);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 0, 0);
+      doc.text(text, margin, y);
+      y += LINE + 4;
+    };
+
+    const body = (text: string, rgb?: [number, number, number]) => {
+      checkPage();
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...(rgb ?? [40, 40, 40]));
+      doc.text(text, margin, y);
+      y += LINE;
+    };
+
+    const rule = () => {
+      checkPage();
+      doc.setDrawColor(220, 220, 220);
+      doc.line(margin, y, pageW - margin, y);
+      y += 10;
+    };
+
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 0, 0);
+    doc.text("EntangleWealth | TaxFlow — CPA Review Report", margin, y);
+    y += 24;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Tax Year: ${taxYear}   |   Generated: ${new Date().toLocaleDateString("en-US")}`, margin, y);
+    y += 28;
+    rule();
+
     if (profile) {
-      lines.push(`\nCLIENT PROFILE`);
-      lines.push(`Name: ${profile.name || profile.businessName}`);
-      lines.push(`Entity: ${ENTITY_SHORT_LABELS[profile.entityType]}`);
-      lines.push(`Industry: ${profile.industry}`);
-      lines.push(`State: ${profile.homeState}`);
-      lines.push(`Gross Revenue: ${formatDollar(profile.grossRevenue)}`);
+      heading("CLIENT PROFILE", 12);
+      body(`Name: ${profile.name || profile.businessName}`);
+      body(`Entity: ${ENTITY_SHORT_LABELS[profile.entityType]}   Industry: ${profile.industry || "N/A"}   State: ${profile.homeState}`);
+      body(`Gross Revenue: ${formatDollar(profile.grossRevenue)}`);
+      body(`Compliance Score: ${complianceScore}/100`);
+      y += 6;
+      rule();
     }
-    lines.push(`\nDEDUCTION SUMMARY`);
-    lines.push("Category,Found,Documented,Gap");
-    categories.forEach(c => lines.push(`${c.label},${formatDollar(c.found)},${formatDollar(c.documented)},${formatDollar(c.found - c.documented)}`));
-    lines.push(`\nTotal Found: ${formatDollar(totalFound)}`);
-    lines.push(`Total Documented: ${formatDollar(totalDocumented)}`);
-    lines.push(`Compliance Score: ${complianceScore}/100`);
-    if (estimator) {
-      lines.push(`\nTAX ESTIMATOR`);
-      lines.push(`No Planning Tax: ${formatDollar(estimator.totalNoPlan)}`);
-      lines.push(`With Strategies Tax: ${formatDollar(estimator.totalWithPlan)}`);
-      lines.push(`Estimated Savings: ${formatDollar(estimator.savings)}`);
-    }
-    lines.push(`\nACTIVE STRATEGIES`);
-    planIds.forEach(id => {
-      const s = ALL_STRATEGIES.find(st => st.id === id);
-      if (s) lines.push(`- ${s.title} (${s.code})`);
+
+    heading("DEDUCTION SUMMARY", 12);
+    categories.forEach(c => {
+      checkPage();
+      const gap = c.found - c.documented;
+      body(`${c.label}:  Found ${formatDollar(c.found)}  /  Documented ${formatDollar(c.documented)}  /  Gap ${formatDollar(gap)}`, gap > 0 ? [180, 100, 0] : undefined);
     });
-    lines.push(`\n\nDisclaimer: This report is for educational purposes only. Consult a licensed CPA for professional tax advice.`);
-    const blob = new Blob([lines.join("\n")], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `taxflow-cpa-report-${taxYear}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast({ title: "CPA Report Exported", description: "Full report downloaded." });
+    y += 4;
+    body(`Total Found: ${formatDollar(totalFound)}   Documented: ${formatDollar(totalDocumented)}   Gap: ${formatDollar(totalGap)}`, [0, 0, 0]);
+    body(`Potential Tax Savings: ${formatDollar(Math.round(potentialSavings))}`, [0, 140, 0]);
+    y += 8;
+    rule();
+
+    if (estimator) {
+      heading("TAX ESTIMATOR", 12);
+      body(`Gross Revenue: ${formatDollar(estimator.gross)}`);
+      body(`Without Planning — SE Tax: ${formatDollar(Math.round(estimator.seTaxNoPlan))}  Income Tax: ${formatDollar(Math.round(estimator.incomeTaxNoPlan))}  Total: ${formatDollar(Math.round(estimator.totalNoPlan))}`, [180, 0, 0]);
+      body(`With Strategies — SE Tax: ${formatDollar(Math.round(estimator.seTaxWithPlan))}  Income Tax: ${formatDollar(Math.round(estimator.incomeTaxWithPlan))}  Total: ${formatDollar(Math.round(estimator.totalWithPlan))}`, [0, 140, 0]);
+      body(`Estimated Savings: ${formatDollar(Math.round(Math.max(0, estimator.savings)))}`, [0, 140, 0]);
+      y += 8;
+      rule();
+    }
+
+    if (quarterlyCalc) {
+      heading("QUARTERLY ESTIMATED TAX PAYMENTS", 12);
+      body(`Annual Tax Estimate: ${formatDollar(Math.round(quarterlyCalc.totalTax))}`);
+      body(`Safe Harbor (100% prior year): ${formatDollar(quarterlyCalc.safeHarbor100)}/quarter`);
+      body(`Safe Harbor (110% prior year, AGI > $150K): ${formatDollar(quarterlyCalc.safeHarbor110)}/quarter`);
+      y += 4;
+      QUARTERLY_DATES.forEach(q => {
+        checkPage();
+        body(`${q.quarter} — Due ${q.due} (${q.period}):  ${formatDollar(quarterlyCalc.quarterlyPayment)}`);
+      });
+      y += 8;
+      rule();
+    }
+
+    heading("ACTIVE TAX STRATEGIES", 12);
+    if (planIds.length === 0) {
+      body("No strategies selected. Visit the Strategy Center to add strategies.");
+    } else {
+      planIds.forEach(id => {
+        const s = ALL_STRATEGIES.find(st => st.id === id);
+        if (s) { checkPage(); body(`• ${s.title} (${s.code})`); }
+      });
+    }
+    y += 16;
+
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(120, 120, 120);
+    const disclaimer = "DISCLAIMER: This report is for educational purposes only and does not constitute professional tax, legal, or financial advice. Consult a licensed CPA or tax professional for advice specific to your situation. Tax laws change frequently.";
+    const lines = doc.splitTextToSize(disclaimer, pageW - margin * 2);
+    doc.text(lines, margin, y);
+
+    doc.save(`taxflow-cpa-report-${taxYear}.pdf`);
+    toast({ title: "PDF Exported", description: `CPA report for ${taxYear} downloaded.` });
   };
 
   return (
@@ -495,12 +634,94 @@ export default function Tax() {
           )}
         </div>
 
+        <div className="mb-8">
+          <button
+            onClick={() => setExpandQuarterly(!expandQuarterly)}
+            className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4 w-full text-left"
+          >
+            <Calendar className="w-5 h-5 text-[#00FF41]" />
+            <h2 className="text-lg font-semibold flex-1">Quarterly Estimated Taxes</h2>
+            {expandQuarterly ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+          </button>
+
+          {expandQuarterly && quarterlyCalc && (
+            <div className="glass-panel rounded-xl p-5">
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="rounded-xl p-3 border border-[rgba(0,255,65,0.2)] bg-[rgba(0,255,65,0.05)] text-center">
+                  <p className="text-lg font-extrabold font-mono text-[#00FF41]">{formatDollar(Math.round(quarterlyCalc.totalTax))}</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">Annual Tax Estimate</p>
+                </div>
+                <div className="rounded-xl p-3 border border-[rgba(0,255,65,0.2)] bg-[rgba(0,255,65,0.05)] text-center">
+                  <p className="text-lg font-extrabold font-mono text-[#00FF41]">{formatDollar(quarterlyCalc.quarterlyPayment)}</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">Per Quarter</p>
+                </div>
+              </div>
+              <div className="space-y-2 mb-4">
+                {QUARTERLY_DATES.map((q, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                    <span className="font-black text-[#00FF41] text-sm w-7">{q.quarter}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-semibold">Due: {q.due}</p>
+                      <p className="text-[11px] text-muted-foreground">{q.period}</p>
+                    </div>
+                    <span className="font-mono font-bold text-[15px] text-[#00FF41]">{formatDollar(quarterlyCalc.quarterlyPayment)}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="rounded-xl p-3 border border-[rgba(255,184,0,0.2)] bg-[rgba(255,184,0,0.05)] mb-3">
+                <p className="text-[11px] font-bold text-[#ffb800] mb-2">Safe Harbor Thresholds</p>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[12px]">
+                    <span className="text-white/60">100% of prior year / quarter</span>
+                    <span className="font-mono text-[#ffb800]">{formatDollar(quarterlyCalc.safeHarbor100)}</span>
+                  </div>
+                  <div className="flex justify-between text-[12px]">
+                    <span className="text-white/60">110% of prior year / quarter (AGI &gt; $150K)</span>
+                    <span className="font-mono text-[#ffb800]">{formatDollar(quarterlyCalc.safeHarbor110)}</span>
+                  </div>
+                  <div className="flex justify-between text-[12px] font-bold border-t border-white/10 pt-1 mt-1">
+                    <span className="text-white">Your required safe harbor</span>
+                    <span className="font-mono text-[#ffb800]">{formatDollar(quarterlyCalc.safeHarborRequired)}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 p-3 rounded-xl border border-[#ff4757]/20 bg-[#ff4757]/5">
+                <AlertTriangle className="w-3.5 h-3.5 text-[#ff4757] shrink-0 mt-0.5" />
+                <p className="text-[11px] text-white/50">
+                  Underpayment penalty (~8% annualized) applies if you pay less than the safe harbor amount. Pay by each due date to stay penalty-free.
+                </p>
+              </div>
+            </div>
+          )}
+          {expandQuarterly && !quarterlyCalc && (
+            <div className="glass-panel rounded-xl p-5 text-center text-muted-foreground">
+              <p>Complete your profile to see quarterly tax estimates.</p>
+              <Button className="mt-3" onClick={() => setShowOnboarding(true)}>Set Up Profile</Button>
+            </div>
+          )}
+        </div>
+
+        <Link href="/tax-summary">
+          <div className="glass-panel rounded-xl p-4 mb-6 border border-[#00FF41]/20 hover:border-[#00FF41]/40 cursor-pointer transition-all group">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-[#00FF41]/10 border border-[#00FF41]/20 flex items-center justify-center flex-shrink-0">
+                <BarChart2 className="w-4 h-4 text-[#00FF41]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-[14px]">Tax Year Summary</p>
+                <p className="text-[11px] text-white/40">Realized gains, wash sale detection, and quarterly estimates for your paper trading</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-[#00FF41] flex-shrink-0" />
+            </div>
+          </div>
+        </Link>
+
         <div className="flex gap-2 mb-6">
-          <Button variant="outline" className="flex-1 border-[#FF8C00]/20 text-[#FF8C00] gap-2 text-[12px] min-h-[44px]" onClick={exportDeductionCSV}>
-            <Download className="w-4 h-4" /> Deduction CSV
+          <Button variant="outline" className="flex-1 border-[#00FF41]/20 text-[#00FF41] gap-2 text-[12px] min-h-[44px]" onClick={exportDeductionCSV}>
+            <Download className="w-4 h-4" /> Full CSV Export
           </Button>
-          <Button variant="outline" className="flex-1 border-[#FF8C00]/20 text-[#FF8C00] gap-2 text-[12px] min-h-[44px]" onClick={exportCPAReport}>
-            <FileText className="w-4 h-4" /> CPA Report
+          <Button variant="outline" className="flex-1 border-[#00FF41]/20 text-[#00FF41] gap-2 text-[12px] min-h-[44px]" onClick={exportCPAReport}>
+            <FileText className="w-4 h-4" /> PDF Report
           </Button>
         </div>
 

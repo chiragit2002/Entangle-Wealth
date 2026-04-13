@@ -70,6 +70,7 @@ const TravelMarketplace = lazy(() => import("@/pages/TravelMarketplace"));
 const RewardHistory = lazy(() => import("@/pages/RewardHistory"));
 const TokenAdmin = lazy(() => import("@/pages/TokenAdmin"));
 const TaxStrategy = lazy(() => import("@/pages/TaxStrategy"));
+const TaxYearSummary = lazy(() => import("@/pages/TaxYearSummary"));
 const MarketingCenter = lazy(() => import("@/pages/MarketingCenter"));
 const ContentCalendar = lazy(() => import("@/pages/ContentCalendar"));
 const RedditEngine = lazy(() => import("@/pages/RedditEngine"));
@@ -414,6 +415,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/integrations">{() => <LazyProtected component={Integrations} />}</Route>
             <Route path="/travel">{() => <LazyPage component={Travel} />}</Route>
             <Route path="/tax-strategy">{() => <LazyProtected component={TaxStrategy} />}</Route>
+            <Route path="/tax-summary">{() => <LazyProtected component={TaxYearSummary} />}</Route>
             <Route path="/taxgpt">{() => <LazyProtected component={TaxGPT} />}</Route>
             <Route path="/technical">{() => <LazyChart component={TechnicalAnalysis} />}</Route>
             <Route path="/charts">{() => <LazyChart component={Charts} />}</Route>

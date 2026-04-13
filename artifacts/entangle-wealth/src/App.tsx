@@ -98,6 +98,7 @@ const LifeOutcomes = lazy(() => import("@/pages/LifeOutcomes"));
 const AICoach = lazy(() => import("@/pages/AICoach"));
 const EvolutionDashboard = lazy(() => import("@/pages/EvolutionDashboard"));
 const AdminMonitoringPage = lazy(() => import("@/pages/AdminMonitoring"));
+const CommandCenter = lazy(() => import("@/pages/CommandCenter"));
 
 const IS_DEV = import.meta.env.MODE !== "production";
 const TestFixture = IS_DEV ? lazy(() => import("@/pages/TestFixture")) : null;
@@ -460,6 +461,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/ai-coach">{() => <LazyProtected component={AICoach} />}</Route>
             <Route path="/admin/evolution">{() => <LazyProtected component={EvolutionDashboard} />}</Route>
             <Route path="/admin/monitoring">{() => <LazyProtected component={AdminMonitoringPage} />}</Route>
+            <Route path="/command-center">{() => <LazyPage component={CommandCenter} />}</Route>
             <Route path="/__test">{() => <Suspense fallback={null}>{IS_DEV && TestFixture ? <TestFixture /> : null}</Suspense>}</Route>
             <Route component={NotFound} />
           </Switch>

@@ -17,7 +17,8 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: "Trade",
     items: [
-      { href: "/dashboard", label: "Dashboard", desc: "Command center" },
+      { href: "/command-center", label: "Command Center", desc: "Bloomberg-style workspace" },
+      { href: "/dashboard", label: "Dashboard", desc: "Overview" },
       { href: "/market-overview", label: "Markets", desc: "Live overview" },
       { href: "/charts", label: "Charts", desc: "TradingView Pro" },
       { href: "/options", label: "Options", desc: "Chain & Greeks" },
@@ -63,6 +64,7 @@ const MOBILE_SECTIONS = [
   {
     title: "Trade",
     links: [
+      { href: "/command-center", label: "Command Center" },
       { href: "/dashboard", label: "Dashboard" },
       { href: "/market-overview", label: "Markets" },
       { href: "/charts", label: "Charts" },

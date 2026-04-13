@@ -48,7 +48,6 @@ const TaxGPT = lazy(() => import("@/pages/TaxGPT"));
 const Resume = lazy(() => import("@/pages/Resume"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const TechnicalAnalysis = lazy(() => import("@/pages/TechnicalAnalysis"));
-const MarketOverview = lazy(() => import("@/pages/MarketOverview"));
 const Screener = lazy(() => import("@/pages/Screener"));
 const Terms = lazy(() => import("@/pages/Terms"));
 const Privacy = lazy(() => import("@/pages/Privacy"));
@@ -407,7 +406,6 @@ function ClerkProviderWithRoutes() {
             <Route path="/taxgpt">{() => <LazyProtected component={TaxGPT} />}</Route>
             <Route path="/technical">{() => <LazyChart component={TechnicalAnalysis} />}</Route>
             <Route path="/charts">{() => <LazyChart component={Charts} />}</Route>
-            <Route path="/market-overview">{() => <LazyChart component={MarketOverview} />}</Route>
             <Route path="/screener">{() => <LazyTable component={Screener} />}</Route>
             <Route path="/terminal">{() => <LazyProtected component={Terminal} />}</Route>
             <Route path="/about">{() => <LazyPage component={About} />}</Route>

@@ -382,15 +382,8 @@ const NewsQuerySchema = PaginationQuerySchema.extend({
 
 async function runBackgroundScrape() {
   try {
-    const prevItems = cachedItems;
-    const prevTime = cacheTime;
     cacheTime = 0;
-    cachedItems = [];
     await scrapeAllFeeds();
-    if (cachedItems.length === 0 && prevItems.length > 0) {
-      cachedItems = prevItems;
-      cacheTime = prevTime;
-    }
     logger.info({ count: cachedItems.length }, "Background news scrape completed");
   } catch (err) {
     logger.error({ err }, "Background news scrape failed");
@@ -486,7 +479,6 @@ router.get("/news/refresh", requireAuth, async (_req: Request, res: Response) =>
     }
     lastRefreshRequest = now;
     cacheTime = 0;
-    cachedItems = [];
     const items = await scrapeAllFeeds();
     res.json({ refreshed: true, count: items.length });
   } catch (err: unknown) {

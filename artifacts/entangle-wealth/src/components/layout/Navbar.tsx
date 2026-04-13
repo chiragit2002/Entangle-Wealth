@@ -41,6 +41,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/ai-coach", label: "AI Coach", desc: "Behavioral finance" },
       { href: "/alerts", label: "Alerts", desc: "Real-time alerts" },
       { href: "/tax", label: "TaxFlow", desc: "Tax dashboard" },
+      { href: "/travel", label: "Business Travel", desc: "IRS trip planner" },
     ],
   },
   {
@@ -84,6 +85,7 @@ const MOBILE_SECTIONS = [
       { href: "/ai-coach", label: "AI Coach" },
       { href: "/alerts", label: "Alerts" },
       { href: "/tax", label: "TaxFlow" },
+      { href: "/travel", label: "Business Travel" },
     ],
   },
   {

@@ -15,6 +15,8 @@ import PersonalTrip from "./travel/PersonalTrip";
 type TravelMode = "personal" | "business";
 type Step = 1 | 2 | 3 | 4;
 
+const DEFAULT_MODE: TravelMode = "business";
+
 interface TripForm {
   tripType: "roundtrip" | "oneway" | "multicity";
   from: string;
@@ -165,7 +167,7 @@ function formatDate(d: string): string {
 
 export default function Travel() {
   const { toast } = useToast();
-  const [travelMode, setTravelMode] = useState<TravelMode>("personal");
+  const [travelMode, setTravelMode] = useState<TravelMode>(DEFAULT_MODE);
   const [step, setStep] = useState<Step>(1);
   const [trip, setTrip] = useState<TripForm>({
     tripType: "roundtrip",
@@ -373,11 +375,11 @@ export default function Travel() {
             <Plane className="w-5 h-5 text-black" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Travel Budget Planner</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">Travel & Trip Planner</h1>
             <p className="text-[12px] text-muted-foreground">
               {travelMode === "personal"
                 ? "Plan your dream trip and track costs against your financial goals"
-                : "Tax-optimized trip planning powered by 80,000+ IRS pages"}
+                : "Book itineraries with IRS-compliant deduction tracking for business trips"}
             </p>
           </div>
         </div>

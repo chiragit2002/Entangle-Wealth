@@ -428,7 +428,9 @@ export default function MarketingCenter() {
           setAiQueueStatus(data.aiQueue);
         }
       }
-    } catch {}
+    } catch (err) {
+      console.error("[MarketingCenter] Failed to fetch queue status:", err);
+    }
   }, [getToken]);
 
   const checkAccess = useCallback(async () => {
@@ -438,7 +440,9 @@ export default function MarketingCenter() {
         setAuthorized(true);
         fetchQueueStatus();
       }
-    } catch {}
+    } catch (err) {
+      console.error("[MarketingCenter] Failed to check access:", err);
+    }
     setLoading(false);
   }, [getToken, fetchQueueStatus]);
 

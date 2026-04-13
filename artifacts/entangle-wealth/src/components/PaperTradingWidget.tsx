@@ -60,7 +60,9 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
         const data = await res.json();
         setPortfolio(data);
       }
-    } catch {}
+    } catch (err) {
+      console.error("[PaperTradingWidget] Failed to load portfolio:", err);
+    }
   }, [isSignedIn, getToken]);
 
   useEffect(() => { loadPortfolio(); }, [loadPortfolio]);

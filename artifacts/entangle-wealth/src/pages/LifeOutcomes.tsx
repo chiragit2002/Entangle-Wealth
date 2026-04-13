@@ -156,7 +156,7 @@ export default function LifeOutcomes() {
           }));
         }
       })
-      .catch(() => {});
+      .catch((err) => { console.error("[LifeOutcomes] Failed to load profile data:", err); });
   }, [isSignedIn, getToken]);
 
   const handleParamChange = useCallback((field: ParamKey, v: number) => {

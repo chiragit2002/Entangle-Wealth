@@ -49,11 +49,11 @@ export default function Tax() {
     authFetch("/viral/referral/code", getToken)
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data?.code) setReferralLink(`${window.location.origin}?ref=${data.code}`); })
-      .catch(() => {});
+      .catch((err) => { console.error("[Tax] Failed to load referral code:", err); });
     authFetch("/kyc/status", getToken)
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data?.kycStatus) setKycStatus(data.kycStatus); })
-      .catch(() => {});
+      .catch((err) => { console.error("[Tax] Failed to load KYC status:", err); });
   }, [isSignedIn, getToken]);
 
   useEffect(() => {

@@ -222,7 +222,8 @@ export default function Charts() {
         }));
         setBars(mapped);
       }
-    }).catch(() => {
+    }).catch((err) => {
+      console.error("[Charts] Failed to load chart data:", err);
     });
   }, []);
 
@@ -365,7 +366,9 @@ export default function Charts() {
       if (markers.length > 0 && typeof (candleSeries as any).setMarkers === "function") {
         (candleSeries as any).setMarkers(markers.sort((a: any, b: any) => (a.time > b.time ? 1 : -1)));
       }
-    } catch {}
+    } catch (err) {
+      console.error("[Charts] Failed to set candlestick pattern markers:", err);
+    }
 
     for (const d of drawings) {
       if (d.type === "hline" && d.data?.price) {

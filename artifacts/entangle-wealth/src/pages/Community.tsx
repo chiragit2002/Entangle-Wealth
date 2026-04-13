@@ -132,11 +132,11 @@ export default function Community() {
     authFetch("/viral/referral/code", getToken)
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data?.code) setReferralCode(data.code); })
-      .catch(() => {});
+      .catch((err) => { console.error("[Community] Failed to load referral code:", err); });
     authFetch("/viral/referral/milestones", getToken)
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data?.milestones) { const amb = data.milestones.find((m: { key: string; unlocked: boolean }) => m.key === "ambassador"); if (amb?.unlocked) setIsAmbassador(true); } })
-      .catch(() => {});
+      .catch((err) => { console.error("[Community] Failed to load referral milestones:", err); });
   }, [isSignedIn, getToken]);
   const [commFilter, setCommFilter] = useState("all");
   const [jobFilter, setJobFilter] = useState("all");

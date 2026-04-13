@@ -61,7 +61,9 @@ export function GamificationWidget() {
         const spinData = await spinRes.json();
         setCanSpin(spinData.canSpin);
       }
-    } catch {}
+    } catch (err) {
+      console.error("[GamificationWidget] Failed to load gamification data:", err);
+    }
   }, [isSignedIn, getToken]);
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -74,7 +76,10 @@ export function GamificationWidget() {
         toast({ title: "Streak Updated!", description: "Daily check-in recorded" });
         loadData();
       }
-    } catch {}
+    } catch (err) {
+      console.error("[GamificationWidget] Failed to check in:", err);
+      toast({ title: "Check-in failed", description: "Please try again later.", variant: "destructive" });
+    }
   }, [isSignedIn, getToken, toast, loadData]);
 
   const handleSpinReward = useCallback((reward: string) => {

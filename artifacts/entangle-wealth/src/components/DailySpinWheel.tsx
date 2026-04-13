@@ -44,7 +44,9 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
         setCanSpin(data.canSpin);
         setNextSpinAt(data.nextSpinAt);
       }
-    } catch {}
+    } catch (err) {
+      console.error("[DailySpinWheel] Failed to check spin status:", err);
+    }
   }, [getToken]);
 
   useEffect(() => {

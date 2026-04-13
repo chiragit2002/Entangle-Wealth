@@ -66,7 +66,9 @@ export default function Leaderboard() {
     try {
       const res = await fetch(`/api/gamification/leaderboard?period=${period}&limit=100`);
       if (res.ok) setLeaderboard(await res.json());
-    } catch {}
+    } catch (err) {
+      console.error("[Leaderboard] Failed to load leaderboard:", err);
+    }
     setLoading(false);
   };
 
@@ -74,7 +76,9 @@ export default function Leaderboard() {
     try {
       const res = await fetchAuth("/gamification/leaderboard/rank");
       if (res.ok) setMyRank(await res.json());
-    } catch {}
+    } catch (err) {
+      console.error("[Leaderboard] Failed to load my rank:", err);
+    }
   };
 
   return (

@@ -153,7 +153,9 @@ export default function Giveaway() {
         const data = await lbRes.json();
         setLeaderboard(data.leaderboard || []);
       }
-    } catch {}
+    } catch (err) {
+      console.error("[Giveaway] Failed to load public giveaway info:", err);
+    }
   }, []);
 
   const fetchMyData = useCallback(async () => {
@@ -174,7 +176,9 @@ export default function Giveaway() {
         const data = await codeRes.json();
         if (data.code) setReferralLink(`${window.location.origin}?ref=${data.code}`);
       }
-    } catch {}
+    } catch (err) {
+      console.error("[Giveaway] Failed to load my giveaway data:", err);
+    }
     setLoading(false);
   }, [isSignedIn, getToken]);
 

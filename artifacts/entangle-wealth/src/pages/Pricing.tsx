@@ -109,7 +109,7 @@ export default function Pricing() {
     authFetch("/viral/referral/code", getToken)
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data?.code) setReferralCode(data.code); })
-      .catch(() => {});
+      .catch((err) => { console.error("[Pricing] Failed to load referral code:", err); });
   }, [isSignedIn, getToken]);
 
   const fetchAuth = useCallback(

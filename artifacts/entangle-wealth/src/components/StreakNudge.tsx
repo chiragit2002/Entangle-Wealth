@@ -39,7 +39,7 @@ export function StreakNudge() {
           setShow(true);
         }
       })
-      .catch(() => {});
+      .catch((err) => { console.error("[StreakNudge] Failed to load streak data:", err); });
   }, [isLoaded, isSignedIn, getToken]);
 
   const dismiss = () => {
@@ -52,7 +52,9 @@ export function StreakNudge() {
   const checkin = async () => {
     try {
       await authFetch("/gamification/streak/checkin", getToken, { method: "POST" });
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("[StreakNudge] Failed to check in:", err);
+    }
     dismiss();
   };
 

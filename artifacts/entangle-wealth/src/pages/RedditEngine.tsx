@@ -122,7 +122,9 @@ export default function RedditEngine() {
     try {
       const res = await authFetch("/marketing/agents", getToken);
       if (res.ok) setAuthorized(true);
-    } catch {}
+    } catch (err) {
+      console.error("[RedditEngine] Failed to check access:", err);
+    }
     setLoading(false);
   }, [getToken]);
 

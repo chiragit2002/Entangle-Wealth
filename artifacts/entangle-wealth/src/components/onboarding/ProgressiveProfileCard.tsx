@@ -47,7 +47,7 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
           setVisible(true);
         }
       })
-      .catch(() => {});
+      .catch((err) => { console.error("[ProgressiveProfileCard] Failed to load onboarding data:", err); });
   }, [isSignedIn, getToken]);
 
   const dismiss = useCallback(() => {
@@ -69,7 +69,9 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
         body: JSON.stringify({ occupationId }),
       });
       trackEvent("progressive_profile_occupation_saved", { occupationId });
-    } catch {}
+    } catch (err) {
+      console.error("[ProgressiveProfileCard] Failed to save occupation:", err);
+    }
     setSaving(false);
     setStep("focus");
   }, [occupationId, getToken]);
@@ -88,7 +90,9 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
       });
       const occ = occupationId ? getOccupationById(occupationId) : undefined;
       trackEvent("progressive_profile_focus_saved", { focus, occupationName: occ?.name });
-    } catch {}
+    } catch (err) {
+      console.error("[ProgressiveProfileCard] Failed to save financial focus:", err);
+    }
     setSaving(false);
     setStep("done");
     setTimeout(() => setVisible(false), 1500);

@@ -155,7 +155,9 @@ export default function Achievements() {
       if (gamRes.status === "fulfilled" && gamRes.value.ok) {
         setGamification(await gamRes.value.json());
       }
-    } catch {}
+    } catch (err) {
+      console.error("[Achievements] Failed to load achievements data:", err);
+    }
   };
 
   const filteredBadges = badgeFilter === "All" ? badges : badges.filter(b => b.category === badgeFilter);

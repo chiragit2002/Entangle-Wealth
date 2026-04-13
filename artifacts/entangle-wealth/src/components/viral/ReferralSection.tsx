@@ -218,7 +218,9 @@ export function ReferralSection() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ keys }),
         });
-      } catch {}
+      } catch (err) {
+        console.error("[ReferralSection] Failed to mark milestones seen:", err);
+      }
     },
     [getToken]
   );
@@ -255,7 +257,9 @@ export function ReferralSection() {
           markNewMilestonesSeen(unseenKeys);
         }
       }
-    } catch {}
+    } catch (err) {
+      console.error("[ReferralSection] Failed to fetch referral data:", err);
+    }
   }, [getToken, isSignedIn, triggerCelebration, markNewMilestonesSeen]);
 
   useEffect(() => {

@@ -52,6 +52,7 @@ export function usePopupQueue(id: string, priority: number, active: boolean) {
       return () => unregisterPopup(id);
     } else {
       unregisterPopup(id);
+      return undefined;
     }
   }, [id, priority, active, registerPopup, unregisterPopup]);
 

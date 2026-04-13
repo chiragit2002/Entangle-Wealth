@@ -16,6 +16,28 @@ import { startDailyContentScheduler } from "./routes/dailyContent";
 import { startDripScheduler } from "./lib/dripEmails";
 import { pool } from "@workspace/db";
 
+const REQUIRED_ENV_VARS = [
+  "CLERK_SECRET_KEY",
+  "DATABASE_URL",
+  "STRIPE_SECRET_KEY",
+] as const;
+
+const OPTIONAL_WARNED_ENV_VARS = [
+  "ALPACA_API_KEY",
+  "ALPACA_API_SECRET",
+] as const;
+
+const missingRequired = REQUIRED_ENV_VARS.filter((v) => !process.env[v]);
+if (missingRequired.length > 0) {
+  console.error(`[STARTUP] FATAL: Missing required environment variables: ${missingRequired.join(", ")}`);
+  process.exit(1);
+}
+
+const missingOptional = OPTIONAL_WARNED_ENV_VARS.filter((v) => !process.env[v]);
+if (missingOptional.length > 0) {
+  console.warn(`[STARTUP] Missing optional environment variables (some features may be disabled): ${missingOptional.join(", ")}`);
+}
+
 async function ensureDailyContentTable() {
   try {
     const client = await pool.connect();

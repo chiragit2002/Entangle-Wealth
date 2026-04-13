@@ -270,7 +270,7 @@ export default function Profile() {
           if (amb?.unlocked) setIsAmbassador(true);
         }
       })
-      .catch(() => {});
+      .catch((err) => { console.error("[Profile] Failed to load referral milestones:", err); });
   }, [userLoaded]);
 
   const loadProfile = async () => {
@@ -350,14 +350,18 @@ export default function Profile() {
         const data = await rankRes.value.json();
         setMyRank(data.rank);
       }
-    } catch {}
+    } catch (err) {
+      console.error("[Profile] Failed to load gamification data:", err);
+    }
   };
 
   const loadTokenData = async () => {
     try {
       const res = await fetchAuth("/token/balance");
       if (res.ok) setTokenData(await res.json());
-    } catch {}
+    } catch (err) {
+      console.error("[Profile] Failed to load token balance:", err);
+    }
   };
 
   const saveProfile = async () => {

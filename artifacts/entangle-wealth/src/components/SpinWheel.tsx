@@ -101,7 +101,9 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
     try {
       const res = await authFetch("/gamification/spin/status", getToken);
       if (res.ok) setStatus(await res.json());
-    } catch {}
+    } catch (err) {
+      console.error("[SpinWheel] Failed to load spin status:", err);
+    }
   }, [isSignedIn, getToken]);
 
   const countdown = useCountdown(status?.nextSpinAt ?? null, loadStatus);
@@ -112,7 +114,9 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
       const res = await authFetch("/gamification/spin/history", getToken);
       if (res.ok) setHistory(await res.json());
       setHistoryLoaded(true);
-    } catch {}
+    } catch (err) {
+      console.error("[SpinWheel] Failed to load spin history:", err);
+    }
   }, [isSignedIn, getToken]);
 
   useEffect(() => { loadStatus(); }, [loadStatus]);

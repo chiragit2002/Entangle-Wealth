@@ -338,7 +338,9 @@ export default function DailyContent() {
       if (!res.ok) return;
       const data = await res.json();
       setHistory(data.batches || []);
-    } catch {}
+    } catch (err) {
+      console.error("[DailyContent] Failed to fetch history:", err);
+    }
   }, [getToken]);
 
   useEffect(() => {

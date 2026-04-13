@@ -49,7 +49,9 @@ export default function TokenWallet() {
         const txData = await txRes.value.json();
         setTransactions(Array.isArray(txData) ? txData : txData.items || []);
       }
-    } catch {}
+    } catch (err) {
+      console.error("[TokenWallet] Failed to load wallet data:", err);
+    }
     setLoading(false);
   }, [fetchAuth]);
 

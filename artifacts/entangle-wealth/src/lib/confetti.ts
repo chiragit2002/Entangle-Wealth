@@ -33,7 +33,7 @@ function getAudioContext(): AudioContext | null {
       _audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     }
     if (_audioCtx.state === "suspended") {
-      _audioCtx.resume().catch(() => {});
+      _audioCtx.resume().catch((err) => { console.warn("[confetti] Failed to resume AudioContext:", err); });
     }
     return _audioCtx;
   } catch {

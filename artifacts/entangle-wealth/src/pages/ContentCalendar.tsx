@@ -497,7 +497,9 @@ export default function ContentCalendar() {
     try {
       const res = await authFetch("/marketing/agents", getToken);
       if (res.ok) setAuthorized(true);
-    } catch {}
+    } catch (err) {
+      console.error("[ContentCalendar] Failed to check access:", err);
+    }
     setLoading(false);
   }, [getToken]);
 

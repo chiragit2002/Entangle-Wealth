@@ -332,7 +332,7 @@ export function pushAlertToUser(userId: string, data: Record<string, unknown>) {
     body: (data.message as string) || "A market alert has been triggered.",
     icon: "/icons/icon-192.png",
     url: "/alerts",
-  }).catch(() => {});
+  }).catch((err) => { logger.error({ err }, "Failed to send push notification for alert"); });
 }
 
 const ALPACA_DATA_URL = "https://data.alpaca.markets";

@@ -92,7 +92,7 @@ export function FinishSetupNudge() {
           setShow(true);
         }
       })
-      .catch(() => {});
+      .catch((err) => { console.error("[FinishSetupNudge] Failed to load onboarding checklist:", err); });
   }, [isLoaded, isSignedIn, getToken]);
 
   const dismiss = () => {

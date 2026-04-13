@@ -77,7 +77,9 @@ export function ActivityNudge() {
             }
           }
         }
-      } catch {}
+      } catch (err) {
+        console.error("[ActivityNudge] Failed to load activity data:", err);
+      }
     };
 
     fetchData();
@@ -93,7 +95,9 @@ export function ActivityNudge() {
   const checkin = async () => {
     try {
       await authFetch("/gamification/streak/checkin", getToken, { method: "POST" });
-    } catch {}
+    } catch (err) {
+      console.error("[ActivityNudge] Failed to check in:", err);
+    }
     dismiss();
   };
 

@@ -53,7 +53,9 @@ export default function RewardHistory() {
           const rewardsData = await myRes.value.json();
           setMyRewards(Array.isArray(rewardsData) ? rewardsData : rewardsData.items || []);
         }
-      } catch {}
+      } catch (err) {
+        console.error("[RewardHistory] Failed to load reward history:", err);
+      }
       setLoading(false);
     };
     load();

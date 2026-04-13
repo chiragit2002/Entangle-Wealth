@@ -58,7 +58,9 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
         const data = await res.json();
         setPurchases(data);
       }
-    } catch {}
+    } catch (err) {
+      console.error("[BuyCashStore] Failed to load purchases:", err);
+    }
   }, [isSignedIn, getToken]);
 
   useEffect(() => {

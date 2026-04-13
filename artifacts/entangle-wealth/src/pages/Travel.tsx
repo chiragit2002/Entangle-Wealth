@@ -6,8 +6,9 @@ import {
   MapPin, Clock, Download, CheckCircle2, FileText, Shield, Search,
   Building2, Briefcase, GraduationCap, Utensils, Car, Home, Wifi,
   Heart, DollarSign, Plus, Trash2, AlertTriangle, ChevronDown, ChevronUp,
-  Compass,
+  Compass, Camera,
 } from "lucide-react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PersonalTrip from "./travel/PersonalTrip";
@@ -54,11 +55,50 @@ interface ItineraryActivity {
 }
 
 const AIRPORTS = [
-  "New York (JFK)", "Los Angeles (LAX)", "Chicago (ORD)", "San Francisco (SFO)",
-  "Miami (MIA)", "Dallas (DFW)", "Seattle (SEA)", "Boston (BOS)", "Denver (DEN)",
-  "Atlanta (ATL)", "Houston (IAH)", "Washington (DCA)", "Las Vegas (LAS)",
-  "Phoenix (PHX)", "Orlando (MCO)", "Minneapolis (MSP)", "Detroit (DTW)",
-  "Philadelphia (PHL)", "San Diego (SAN)", "Tampa (TPA)",
+  "Atlanta (ATL)", "Anchorage (ANC)", "Albuquerque (ABQ)", "Austin (AUS)",
+  "Baltimore (BWI)", "Birmingham (BHM)", "Boise (BOI)", "Boston (BOS)", "Buffalo (BUF)",
+  "Burbank (BUR)", "Charleston (CHS)", "Charlotte (CLT)", "Chicago (ORD)", "Chicago Midway (MDW)",
+  "Cincinnati (CVG)", "Cleveland (CLE)", "Colorado Springs (COS)", "Columbus (CMH)",
+  "Dallas (DFW)", "Dallas Love Field (DAL)", "Denver (DEN)", "Des Moines (DSM)",
+  "Detroit (DTW)", "El Paso (ELP)", "Fort Lauderdale (FLL)", "Fort Myers (RSW)",
+  "Hartford (BDL)", "Honolulu (HNL)", "Houston (IAH)", "Houston Hobby (HOU)",
+  "Indianapolis (IND)", "Jacksonville (JAX)", "Kansas City (MCI)", "Knoxville (TYS)",
+  "Las Vegas (LAS)", "Long Beach (LGB)", "Los Angeles (LAX)", "Louisville (SDF)",
+  "Maui (OGG)", "Memphis (MEM)", "Miami (MIA)", "Milwaukee (MKE)",
+  "Minneapolis (MSP)", "Myrtle Beach (MYR)", "Nashville (BNA)", "New Orleans (MSY)",
+  "New York (JFK)", "New York LaGuardia (LGA)", "Newark (EWR)", "Norfolk (ORF)",
+  "Oakland (OAK)", "Oklahoma City (OKC)", "Omaha (OMA)", "Ontario (ONT)",
+  "Orange County (SNA)", "Orlando (MCO)", "Palm Beach (PBI)", "Palm Springs (PSP)",
+  "Philadelphia (PHL)", "Phoenix (PHX)", "Pittsburgh (PIT)", "Portland (PDX)",
+  "Providence (PVD)", "Raleigh-Durham (RDU)", "Reno (RNO)", "Richmond (RIC)",
+  "Sacramento (SMF)", "Salt Lake City (SLC)", "San Antonio (SAT)", "San Diego (SAN)",
+  "San Francisco (SFO)", "San Jose (SJC)", "San Juan (SJU)", "Santa Ana (SNA)",
+  "Savannah (SAV)", "Seattle (SEA)", "Spokane (GEG)", "St. Louis (STL)",
+  "Tampa (TPA)", "Tucson (TUS)", "Tulsa (TUL)", "Washington Dulles (IAD)",
+  "Washington Reagan (DCA)", "West Palm Beach (PBI)",
+  "Amsterdam (AMS)", "Athens (ATH)", "Auckland (AKL)", "Bangkok (BKK)",
+  "Barcelona (BCN)", "Beijing (PEK)", "Berlin (BER)", "Bogota (BOG)",
+  "Brussels (BRU)", "Buenos Aires (EZE)", "Cairo (CAI)", "Calgary (YYC)",
+  "Cancun (CUN)", "Cape Town (CPT)", "Cartagena (CTG)", "Casablanca (CMN)",
+  "Copenhagen (CPH)", "Delhi (DEL)", "Doha (DOH)", "Dubai (DXB)",
+  "Dublin (DUB)", "Dusseldorf (DUS)", "Edinburgh (EDI)", "Frankfurt (FRA)",
+  "Geneva (GVA)", "Glasgow (GLA)", "Grand Cayman (GCM)", "Guadalajara (GDL)",
+  "Guatemala City (GUA)", "Hamburg (HAM)", "Havana (HAV)", "Helsinki (HEL)",
+  "Ho Chi Minh City (SGN)", "Hong Kong (HKG)", "Istanbul (IST)", "Jakarta (CGK)",
+  "Johannesburg (JNB)", "Kingston (KIN)", "Kuala Lumpur (KUL)", "Lagos (LOS)",
+  "Lima (LIM)", "Lisbon (LIS)", "London Heathrow (LHR)", "London Gatwick (LGW)",
+  "Los Cabos (SJD)", "Madrid (MAD)", "Manchester (MAN)", "Manila (MNL)",
+  "Marrakech (RAK)", "Mauritius (MRU)", "Medellin (MDE)", "Melbourne (MEL)",
+  "Mexico City (MEX)", "Milan (MXP)", "Montego Bay (MBJ)", "Monterrey (MTY)",
+  "Montreal (YUL)", "Moscow (SVO)", "Mumbai (BOM)", "Munich (MUC)",
+  "Nairobi (NBO)", "Nassau (NAS)", "Nice (NCE)", "Osaka (KIX)",
+  "Oslo (OSL)", "Panama City (PTY)", "Paris CDG (CDG)", "Paris Orly (ORY)",
+  "Prague (PRG)", "Punta Cana (PUJ)", "Reykjavik (KEF)", "Rio de Janeiro (GIG)",
+  "Rome (FCO)", "San Jose Costa Rica (SJO)", "Santiago (SCL)", "Sao Paulo (GRU)",
+  "Seoul (ICN)", "Shanghai (PVG)", "Singapore (SIN)", "Stockholm (ARN)",
+  "Sydney (SYD)", "Taipei (TPE)", "Tel Aviv (TLV)", "Tokyo Haneda (HND)",
+  "Tokyo Narita (NRT)", "Toronto (YYZ)", "Vancouver (YVR)", "Venice (VCE)",
+  "Vienna (VIE)", "Warsaw (WAW)", "Zurich (ZRH)",
 ];
 
 const IRS_DEDUCTIONS: IRSDeduction[] = [
@@ -482,8 +522,8 @@ export default function Travel() {
                     aria-label="Departure city"
                   />
                   {fromSugg && trip.from.length > 0 && filteredFrom.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-[#0d0d1a] border border-white/10 rounded-xl overflow-hidden z-30 max-h-[200px] overflow-y-auto">
-                      {filteredFrom.slice(0, 5).map(a => (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-[#0d0d1a] border border-white/10 rounded-xl overflow-hidden z-30 max-h-[260px] overflow-y-auto">
+                      {filteredFrom.slice(0, 8).map(a => (
                         <button key={a} onClick={() => { setTrip(p => ({ ...p, from: a })); setFromSugg(false); }}
                           className="w-full text-left px-4 py-3 text-[13px] text-white/80 hover:bg-primary/10 transition-colors flex items-center gap-2 min-h-[44px]">
                           <Plane className="w-3 h-3 text-primary/40" /> {a}
@@ -516,8 +556,8 @@ export default function Travel() {
                     aria-label="Destination city"
                   />
                   {toSugg && trip.to.length > 0 && filteredTo.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-[#0d0d1a] border border-white/10 rounded-xl overflow-hidden z-30 max-h-[200px] overflow-y-auto">
-                      {filteredTo.slice(0, 5).map(a => (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-[#0d0d1a] border border-white/10 rounded-xl overflow-hidden z-30 max-h-[260px] overflow-y-auto">
+                      {filteredTo.slice(0, 8).map(a => (
                         <button key={a} onClick={() => { setTrip(p => ({ ...p, to: a })); setToSugg(false); }}
                           className="w-full text-left px-4 py-3 text-[13px] text-white/80 hover:bg-primary/10 transition-colors flex items-center gap-2 min-h-[44px]">
                           <Plane className="w-3 h-3 text-primary/40" /> {a}
@@ -936,6 +976,21 @@ export default function Travel() {
                 </div>
               )}
             </div>
+
+            <Link href="/receipts">
+              <div className="glass-panel rounded-2xl p-5 border border-primary/20 bg-primary/[0.03] cursor-pointer hover:border-primary/40 transition-all group">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:from-primary/30 group-hover:to-primary/10 transition-all flex-shrink-0">
+                    <Camera className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[15px] font-bold text-white mb-0.5">Capture Trip Receipts</h3>
+                    <p className="text-[12px] text-white/40">Upload photos of receipts for AI-powered categorization and IRS-compliant tracking. Scan meals, hotels, transport, and more.</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-primary transition-colors flex-shrink-0" />
+                </div>
+              </div>
+            </Link>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <Button className="bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold min-h-[48px] gap-2 text-[14px]" onClick={exportAll}>

@@ -3,7 +3,7 @@ import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import {
   Receipt, Upload, Trash2, Download, FileText, Search, Check, Edit2,
-  Car, Filter, ChevronDown, ChevronUp, Plus, Loader2, X,
+  Car, Filter, ChevronDown, ChevronUp, Plus, Loader2, X, Camera,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +41,7 @@ type DocTab = "documents" | "mileage";
 export default function Receipts() {
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
   const [documents, setDocuments] = useState<DocumentEntry[]>(() => getDocuments());
   const [mileage, setMileage] = useState<MileageEntry[]>(() => getMileageEntries());
@@ -330,35 +331,49 @@ export default function Receipts() {
 
         {docTab === "documents" && (
           <>
-            <div
-              ref={dropRef}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={() => fileRef.current?.click()}
-              className={`glass-panel rounded-xl p-6 mb-6 border-dashed border-2 text-center cursor-pointer transition-colors min-h-[120px] flex flex-col items-center justify-center ${
-                dragOver ? "border-[#00c8f8]/60 bg-[#00c8f8]/5" : "border-primary/20 hover:border-primary/40"
-              }`}
-              role="button"
-              tabIndex={0}
-              onKeyDown={e => { if (e.key === "Enter" || e.key === " ") fileRef.current?.click(); }}
-            >
-              {analyzing ? (
-                <>
-                  <Loader2 className="w-10 h-10 mb-2 text-[#9c27b0] animate-spin" />
-                  <p className="font-bold mb-1">Analyzing Document...</p>
-                  <p className="text-[13px] text-muted-foreground">AI is extracting details</p>
-                </>
-              ) : (
-                <>
-                  <Upload className="w-10 h-10 mb-2 text-primary/50" />
-                  <p className="font-bold mb-1">Drop a receipt here, or click to upload</p>
-                  <p className="text-[13px] text-white/30">PDF, JPG, PNG · max 10 MB</p>
-                </>
-              )}
-              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/jpg,application/pdf" multiple className="hidden"
-                onChange={e => handleFileUpload(e.target.files)} />
-            </div>
+            {analyzing ? (
+              <div className="glass-panel rounded-xl p-6 mb-6 border border-[#9c27b0]/30 text-center min-h-[120px] flex flex-col items-center justify-center">
+                <Loader2 className="w-10 h-10 mb-2 text-[#9c27b0] animate-spin" />
+                <p className="font-bold mb-1">Analyzing Document...</p>
+                <p className="text-[13px] text-muted-foreground">AI is extracting vendor, amount, category & IRS details</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                <div
+                  ref={dropRef}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileRef.current?.click()}
+                  className={`glass-panel rounded-xl p-6 border-dashed border-2 text-center cursor-pointer transition-colors min-h-[140px] flex flex-col items-center justify-center ${
+                    dragOver ? "border-[#00c8f8]/60 bg-[#00c8f8]/5" : "border-primary/20 hover:border-primary/40"
+                  }`}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={e => { if (e.key === "Enter" || e.key === " ") fileRef.current?.click(); }}
+                >
+                  <Upload className="w-8 h-8 mb-2 text-primary/50" />
+                  <p className="font-bold text-[14px] mb-1">Upload File</p>
+                  <p className="text-[12px] text-white/30">Drop or click · PDF, JPG, PNG</p>
+                  <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/jpg,application/pdf" multiple className="hidden"
+                    onChange={e => handleFileUpload(e.target.files)} />
+                </div>
+
+                <div
+                  onClick={() => cameraRef.current?.click()}
+                  className="glass-panel rounded-xl p-6 border-2 border-dashed border-secondary/20 hover:border-secondary/40 text-center cursor-pointer transition-colors min-h-[140px] flex flex-col items-center justify-center"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={e => { if (e.key === "Enter" || e.key === " ") cameraRef.current?.click(); }}
+                >
+                  <Camera className="w-8 h-8 mb-2 text-secondary/50" />
+                  <p className="font-bold text-[14px] mb-1">Snap Receipt</p>
+                  <p className="text-[12px] text-white/30">Use camera to capture receipt</p>
+                  <input ref={cameraRef} type="file" accept="image/jpeg,image/png,image/jpg" capture="environment" className="hidden"
+                    onChange={e => handleFileUpload(e.target.files)} />
+                </div>
+              </div>
+            )}
 
             <div className="glass-panel rounded-xl p-5 mb-6">
               <h3 className="text-sm font-bold text-primary mb-3">Manual Entry</h3>

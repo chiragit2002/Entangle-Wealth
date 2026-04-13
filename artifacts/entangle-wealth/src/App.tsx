@@ -92,6 +92,7 @@ const HabitsDashboard = lazy(() => import("@/pages/HabitsDashboard"));
 const LifeOutcomes = lazy(() => import("@/pages/LifeOutcomes"));
 const AICoach = lazy(() => import("@/pages/AICoach"));
 const EvolutionDashboard = lazy(() => import("@/pages/EvolutionDashboard"));
+const AdminMonitoringPage = lazy(() => import("@/pages/AdminMonitoring"));
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -406,6 +407,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/life-outcomes">{() => <LazyProtectedChart component={LifeOutcomes} />}</Route>
             <Route path="/ai-coach">{() => <LazyProtected component={AICoach} />}</Route>
             <Route path="/admin/evolution">{() => <LazyProtected component={EvolutionDashboard} />}</Route>
+            <Route path="/admin/monitoring">{() => <LazyProtected component={AdminMonitoringPage} />}</Route>
             <Route component={NotFound} />
           </Switch>
           </ProfileCompletionGate>

@@ -41,6 +41,7 @@ import { createSecurityRouter } from "./security";
 import funnelsRouter from "./funnels";
 import microfeedbackRouter from "./microfeedback";
 import insightsRouter from "./insights";
+import sentryRouter from "./sentry";
 
 export function createRouter(app: Express): IRouter {
 const router: IRouter = Router();
@@ -87,6 +88,7 @@ router.use(createSecurityRouter(app));
 router.use(funnelsRouter);
 router.use(microfeedbackRouter);
 router.use(insightsRouter);
+router.use(sentryRouter);
 
 return router;
 }

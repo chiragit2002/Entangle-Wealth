@@ -122,15 +122,7 @@ export function GamificationWidget() {
         </div>
 
         <div className="p-2 space-y-2">
-          <div className="grid grid-cols-4 gap-1.5">
-            <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
-              <p className="text-[7px] font-mono text-white/30">LEVEL</p>
-              <p className="text-[13px] font-mono font-bold text-[#00D4FF]">{data.xp.level}</p>
-            </div>
-            <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
-              <p className="text-[7px] font-mono text-white/30">TOTAL XP</p>
-              <p className="text-[10px] font-mono font-bold text-[#FFB800]">{data.xp.totalXp.toLocaleString()}</p>
-            </div>
+          <div className="grid grid-cols-2 gap-1.5">
             <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
               <p className="text-[7px] font-mono text-white/30">STREAK</p>
               <div className="flex items-center justify-center gap-0.5">
@@ -190,8 +182,7 @@ export function GamificationWidget() {
             </div>
           )}
 
-          <div className="flex items-center justify-between pt-0.5">
-            <span className="text-[8px] font-mono text-white/40">Weekly: +{data.xp.weeklyXp.toLocaleString()} XP</span>
+          <div className="flex items-center justify-end pt-0.5">
             <a href="/achievements" className="flex items-center gap-0.5 text-[8px] font-mono text-[#00D4FF]/50 hover:text-[#00D4FF] transition-colors">
               View All <ChevronRight className="w-2.5 h-2.5" />
             </a>

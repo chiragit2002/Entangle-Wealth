@@ -5,10 +5,10 @@ import { CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { trackEvent } from "@/lib/trackEvent";
 
 const GOAL_OPTIONS = [
-  { id: "investing", label: "Invest & grow wealth", desc: "Build long-term financial freedom" },
-  { id: "saving", label: "Save smarter", desc: "Emergency fund and short-term goals" },
-  { id: "tax", label: "Cut my tax bill", desc: "Keep more of what I earn" },
-  { id: "clarity", label: "Get financial clarity", desc: "See exactly where I stand" },
+  { id: "investing", label: "Invest & grow my wealth" },
+  { id: "saving", label: "Save smarter" },
+  { id: "tax", label: "Reduce my tax bill" },
+  { id: "clarity", label: "Get financial clarity" },
 ];
 
 interface WelcomeModalProps {
@@ -95,7 +95,6 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
               >
                 <div className="flex-1">
                   <p className="text-sm font-semibold">{opt.label}</p>
-                  <p className="text-[11px] text-white/50">{opt.desc}</p>
                 </div>
                 {goal === opt.id && <CheckCircle2 className="w-4 h-4 text-[#00FF41] shrink-0" aria-hidden="true" />}
               </button>

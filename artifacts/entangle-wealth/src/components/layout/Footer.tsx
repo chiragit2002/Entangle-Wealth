@@ -50,21 +50,13 @@ function FooterComponent() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-6 py-3 border-t border-[rgba(0,255,65,0.06)] flex flex-col gap-2">
-        <p className="text-[10px] text-muted-foreground/50 font-mono leading-relaxed">
-          Disclaimer: EntangleWealth is not a registered investment advisor. Information is for educational purposes only and should not be construed as financial advice. Trading involves significant risk. Consult a qualified financial professional before making investment decisions.
+      <div className="container mx-auto px-4 md:px-6 mt-8 pt-6 border-t border-border/40 flex flex-col gap-3">
+        <p className="text-xs text-muted-foreground/60 leading-relaxed text-justify">
+          EntangleWealth is not a registered investment advisor. Nothing here is financial advice. Trading involves risk — you could lose your entire investment. Past performance does not predict future results.
         </p>
-        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-1.5">
-          <p className="text-[10px] font-mono" style={{ color: "rgba(0,255,65,0.25)" }}>
-            &copy; {new Date().getFullYear()} ENTANGLEWEALTH LLC · ALL RIGHTS RESERVED
-          </p>
-          <div className="flex items-center gap-3 text-[10px] font-mono text-muted-foreground/30">
-            <Link href="/terms" className="hover:text-muted-foreground transition-colors">TERMS</Link>
-            <Link href="/privacy" className="hover:text-muted-foreground transition-colors">PRIVACY</Link>
-            <Link href="/disclaimer" className="hover:text-muted-foreground transition-colors">DISCLAIMER</Link>
-            <Link href="/cookies" className="hover:text-muted-foreground transition-colors">COOKIES</Link>
-          </div>
-        </div>
+        <p className="text-xs text-muted-foreground/50">
+          &copy; {new Date().getFullYear()} EntangleWealth LLC. All rights reserved.
+        </p>
       </div>
     </footer>
   );

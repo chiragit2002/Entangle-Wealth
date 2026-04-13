@@ -15,11 +15,11 @@ interface ChecklistItem {
 }
 
 const ITEMS: ChecklistItem[] = [
-  { id: "view_signal", label: "View a signal", desc: "See the AI buy/sell signals", href: "/dashboard" },
-  { id: "run_tax_scan", label: "Run a tax scan", desc: "Discover deductions", href: "/tax" },
-  { id: "set_alert", label: "Set a price alert", desc: "Get notified on price moves", href: "/alerts" },
-  { id: "join_community", label: "Join a community group", desc: "Connect with traders", href: "/community" },
-  { id: "enable_notifications", label: "Enable notifications", desc: "Never miss an update", href: "/profile" },
+  { id: "view_signal", label: "View a signal", href: "/dashboard" },
+  { id: "run_tax_scan", label: "Run a tax scan", href: "/tax" },
+  { id: "set_alert", label: "Set a price alert", href: "/alerts" },
+  { id: "join_community", label: "Join a community group", href: "/community" },
+  { id: "enable_notifications", label: "Enable notifications", href: "/profile" },
 ];
 
 const EVENTS_TO_CHECKLIST: Record<string, string> = {
@@ -201,9 +201,6 @@ export function GettingStartedChecklist() {
                       >
                         {item.label}
                       </span>
-                      {!done && item.desc && (
-                        <span className="text-[9px] text-white/25 group-hover:text-white/40 transition-colors">{item.desc}</span>
-                      )}
                     </div>
                     {!done && (
                       <ArrowRight className="w-3 h-3 text-white/10 group-hover:text-white/30 transition-colors shrink-0" aria-hidden="true" />

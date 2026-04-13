@@ -625,7 +625,7 @@ export default function Dashboard() {
       <div className="px-4 py-4 space-y-4 max-w-[1600px] mx-auto w-full">
 
         {/* Section 1: Hero — Portfolio + Key Metrics */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           {[
             {
               label: "Portfolio",
@@ -640,20 +640,6 @@ export default function Dashboard() {
               sub: "Theta today",
               color: "#FFB800",
               isPositive: true,
-            },
-            {
-              label: "VIX",
-              value: MARKET_INTERNALS.vix.current.toFixed(2),
-              sub: `${MARKET_INTERNALS.vix.change > 0 ? '+' : ''}${MARKET_INTERNALS.vix.change}% · ${MARKET_INTERNALS.vix.percentile}th %ile`,
-              color: MARKET_INTERNALS.vix.change > 0 ? "#ff4757" : "#00D4FF",
-              isPositive: MARKET_INTERNALS.vix.change <= 0,
-            },
-            {
-              label: "A/D Ratio",
-              value: MARKET_INTERNALS.advDecl.ratio.toFixed(2),
-              sub: `${MARKET_INTERNALS.advDecl.advancing} adv / ${MARKET_INTERNALS.advDecl.declining} dec`,
-              color: MARKET_INTERNALS.advDecl.ratio > 1 ? "#00D4FF" : "#ff4757",
-              isPositive: MARKET_INTERNALS.advDecl.ratio > 1,
             },
           ].map((stat) => (
             <div key={stat.label} className="bg-[#0A0E1A] border border-white/[0.06] rounded-xl px-4 py-4">

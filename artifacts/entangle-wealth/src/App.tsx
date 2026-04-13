@@ -19,8 +19,8 @@ import { trackEvent } from "@/lib/trackEvent";
 import { usePageTracking } from "@/hooks/usePageTracking";
 import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
-import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { TerminalAuthShell } from "@/components/TerminalAuthShell";
+import { Info } from "lucide-react";
 import { AuthErrorHandler } from "@/components/AuthErrorHandler";
 import { AuthTokenError } from "@/lib/authFetch";
 import { BootSequence } from "@/components/BootSequence";
@@ -482,7 +482,6 @@ function ClerkProviderWithRoutes() {
             <MilestoneCelebrationModal />
           </Suspense>
           <CookieConsentBanner />
-          <FeedbackWidget />
           <InstallPrompt />
           <NotificationPrompt />
           <Toaster />

@@ -652,7 +652,7 @@ export default function Home() {
             </h1>
 
             <p className="max-w-lg text-base md:text-lg text-white/60 leading-relaxed">
-              Your next move, in 60 seconds. No jargon.
+              Most people are one decision away from a completely different financial life. We tell you what that decision is — in plain English.
             </p>
 
             <MicroConversionFlow referralCode={referralCode || undefined} />
@@ -663,11 +663,7 @@ export default function Home() {
 
             <div className="flex flex-wrap items-center justify-center gap-5 pt-1">
               <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#00FF41]" />
-                Done in under 60 seconds
-              </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
-                <Lock className="w-3.5 h-3.5 text-[#00FF41]" />
+                <Lock className="w-3.5 h-3.5 text-[#00c8f8]" />
                 Your data stays yours
               </span>
               {stats.members > 0 && (
@@ -685,7 +681,7 @@ export default function Home() {
         {/* Your Edge */}
         <YourEdgeSection />
 
-        {/* Problem */}
+        {/* Problem + Solution */}
         <section className="py-16 lg:py-24 px-4 border-t border-white/5">
           <div className="container mx-auto max-w-2xl text-center space-y-6">
             <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00FF41]/60">
@@ -694,60 +690,28 @@ export default function Home() {
             <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
               The money guilt is real — and it compounds every month you wait.
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-              {[
-                {
-                  text: "You know you should act. You don't know where to start.",
-                },
-                {
-                  text: "Apps and articles offer advice that doesn't fit your situation.",
-                },
-                {
-                  text: "Thinking about money feels overwhelming, so you put it off.",
-                },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="bloomberg-panel p-5 text-sm text-white/60 leading-relaxed text-left"
-                >
-                  {item.text}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Solution */}
-        <section className="py-16 lg:py-24 px-4 border-t border-white/5">
-          <div className="container mx-auto max-w-2xl text-center space-y-6">
-            <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00FF41]/60">
-              Here's the difference
-            </p>
-            <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
-              Your situation. Specific guidance. Plain English.
-            </h2>
             <p className="text-base text-white/50 max-w-lg mx-auto leading-relaxed">
-              Answer a few questions. Get a clear next step. No expertise needed.
+              We look at your actual situation and tell you exactly what to do next. Specific. Actionable.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
               {[
                 {
                   title: "Clarity",
-                  desc: "See exactly where you stand.",
-                  color: "text-[#00FF41]",
-                  border: "border-[#00FF41]/20",
+                  desc: "Your full financial picture in one place. No more guessing.",
+                  color: "text-[#00c8f8]",
+                  border: "border-[#00c8f8]/20",
                 },
                 {
                   title: "Simplicity",
-                  desc: "No charts. No jargon. Just what to do.",
-                  color: "text-[#00FF41]",
-                  border: "border-[#00FF41]/20",
+                  desc: "Cut through the noise. Just the next right move — in plain language.",
+                  color: "text-[#00e676]",
+                  border: "border-[#00e676]/20",
                 },
                 {
                   title: "Confidence",
-                  desc: "Decide without second-guessing.",
-                  color: "text-[#FFB800]",
-                  border: "border-[#FFB800]/20",
+                  desc: "Act without second-guessing. Know why, not just what.",
+                  color: "text-[#f5c842]",
+                  border: "border-[#f5c842]/20",
                 },
               ].map((item) => (
                 <div
@@ -835,28 +799,28 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 text-left">
               {[
                 {
-                  icon: CheckCircle,
-                  color: "text-[#00FF41]",
-                  title: "No financial jargon",
-                  desc: "Guidance written for real people.",
-                },
-                {
                   icon: ShieldCheck,
-                  color: "text-[#00FF41]",
-                  title: "Your data stays yours",
-                  desc: "Encrypted and never sold.",
+                  color: "text-[#00c8f8]",
+                  title: "Your privacy is protected",
+                  desc: "Encrypted. Never sold. You're a person, not a product.",
                 },
                 {
                   icon: Lock,
-                  color: "text-[#FFB800]",
-                  title: "No pressure, no gotchas",
-                  desc: "Free to start. Upgrade only if you want more.",
+                  color: "text-[#f5c842]",
+                  title: "No pressure, no upsells",
+                  desc: "Start free. Upgrade only if you want more. No gotchas.",
                 },
                 {
                   icon: Heart,
                   color: "text-[#ff8888]",
-                  title: "Fewer money worries",
-                  desc: "We win when you feel clear about your finances.",
+                  title: "Designed for peace of mind",
+                  desc: "We measure success by how much calmer you feel about your finances.",
+                },
+                {
+                  icon: CheckCircle,
+                  color: "text-[#00e676]",
+                  title: "Plain language, always",
+                  desc: "Guidance written for real people — not finance professionals.",
                 },
               ].map((item) => (
                 <div key={item.title} className="bloomberg-panel p-5 flex gap-4">
@@ -869,9 +833,8 @@ export default function Home() {
               ))}
             </div>
             <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-sm text-white/30 font-medium">
-              {stats.accuracy > 0 && <><span>{stats.accuracy}% guidance accuracy</span><span>·</span></>}
-              {stats.members > 0 && <><span>{animatedMembers.toLocaleString()}+ members</span><span>·</span></>}
-              <span>Free forever tier</span>
+              {stats.accuracy > 0 && <><span>{stats.accuracy}% signal accuracy</span><span>·</span></>}
+              <span>{animatedMembers.toLocaleString()}+ members</span>
             </div>
           </div>
         </section>
@@ -924,14 +887,10 @@ export default function Home() {
             <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
               Know what to do next — in 60 seconds.
             </h2>
-            <p className="text-base text-white/50 max-w-md leading-relaxed">
-              Three questions. One specific recommendation. No card required.
-            </p>
-
             <MicroConversionFlow referralCode={referralCode || undefined} />
 
             <p className="text-[11px] text-white/25 max-w-xs leading-relaxed">
-              For guidance and education. Not a substitute for professional financial advice.
+              For guidance and education only. Not financial advice.
             </p>
           </div>
         </section>

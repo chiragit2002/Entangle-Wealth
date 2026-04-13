@@ -10,34 +10,30 @@ export default function About() {
             Built for people who <span className="electric-text">can't afford to get this wrong.</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            EntangleWealth runs multiple AI models simultaneously, cross-checks their outputs, and only surfaces signals when there's real agreement across the board. We built it for people who trade to take care of their families — not to chase dopamine.
+            EntangleWealth runs multiple AI models simultaneously, cross-checks their outputs, and only surfaces signals when there's real consensus. Built for people who trade to take care of their families — not to chase dopamine.
           </p>
         </div>
 
         <div className="flex flex-col gap-12 mb-16">
           <div>
-            <h2 className="text-2xl font-bold mb-4">Here's the honest truth about trading tools.</h2>
-            <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
-              <p>One analysis method can be wrong. Two can still be wrong. Cherry-picked chart patterns can tell you whatever story you want to believe. We got tired of that.</p>
-              <p>So we built something different: multiple independent analysis methods running on every ticker, every few seconds. Price action, volume, options flow, sentiment, risk modeling — all at once. When they disagree, we say nothing. When they converge, we tell you — with a confidence score and the specific reasoning, not just an arrow pointing up.</p>
-              <p>We don't predict the future. Nobody can, and anyone who claims otherwise is selling something. What we can do is show you where the data is piling up — and let you decide what to do with it.</p>
-            </div>
+            <h2 className="text-2xl font-bold mb-4">One analysis method can be wrong. Two can still be wrong.</h2>
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              So we run multiple independent methods on every ticker, every few seconds: price action, volume, options flow, sentiment, risk modeling — all at once. When they disagree, we say nothing. When they converge, we tell you — with a confidence score and specific reasoning, not just an arrow pointing up.
+            </p>
           </div>
 
           <div>
             <h2 className="text-2xl font-bold mb-4">The market isn't the only way to build wealth.</h2>
-            <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
-              <p>We also surface income opportunities beyond your brokerage account — gig work, freelance openings, and options income strategies like covered calls and cash-secured puts. Because the people we built this for don't have the luxury of putting everything in one basket.</p>
-              <p>The goal is to give you more angles, more information, and better tools than you'd have trying to piece it together alone at midnight with 14 browser tabs open.</p>
-            </div>
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              We surface income opportunities beyond your brokerage — gig work, freelance openings, and options income strategies like covered calls and cash-secured puts. More angles, more information, better tools than 14 browser tabs at midnight.
+            </p>
           </div>
 
           <div>
             <h2 className="text-2xl font-bold mb-4">What we won't do.</h2>
-            <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
-              <p>We won't promise you returns. We won't show you a highlight reel of winning trades and pretend the losses don't exist. We won't tell you this is easy, because it isn't.</p>
-              <p>Most retail traders lose money. That's a documented fact, not a disclaimer we hide in fine print. What we offer is better information, better analysis, and better risk management than going it alone. That's it. You still have to make the decisions.</p>
-            </div>
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              We won't promise you returns, show you a highlight reel of wins, or pretend this is easy — because it isn't. Most retail traders lose money. That's documented fact, not fine print. We offer better information, better analysis, and better risk management than going it alone. You still make the decisions.
+            </p>
           </div>
         </div>
 
@@ -47,48 +43,46 @@ export default function About() {
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
               <BarChart3 className="w-7 h-7 text-primary" />
               <h3 className="font-bold">Price Action</h3>
-              <p className="text-sm text-muted-foreground">Reads candlestick patterns, support and resistance levels, and market structure. Identifies breakouts, reversals, and continuation patterns.</p>
+              <p className="text-sm text-muted-foreground">Candlestick patterns, support/resistance, breakouts, reversals, and continuation setups.</p>
             </div>
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
               <Activity className="w-7 h-7 text-secondary" />
               <h3 className="font-bold">Volume Analysis</h3>
-              <p className="text-sm text-muted-foreground">Tracks where institutional money is actually flowing. Volume profiles, VWAP levels, and accumulation/distribution patterns.</p>
+              <p className="text-sm text-muted-foreground">Where institutional money is flowing — VWAP, volume profiles, accumulation/distribution.</p>
             </div>
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
               <Target className="w-7 h-7 text-primary" />
               <h3 className="font-bold">Options Flow</h3>
-              <p className="text-sm text-muted-foreground">Monitors large premium sweeps, block trades, and unusual open interest changes across all major exchanges.</p>
+              <p className="text-sm text-muted-foreground">Large premium sweeps, block trades, and unusual open interest across all major exchanges.</p>
             </div>
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
               <Shield className="w-7 h-7 text-green-400" />
               <h3 className="font-bold">Greeks Analysis</h3>
-              <p className="text-sm text-muted-foreground">Evaluates Delta, Gamma, Theta, and Vega on every options contract. Tracks dealer gamma exposure and IV rank.</p>
+              <p className="text-sm text-muted-foreground">Delta, Gamma, Theta, and Vega on every contract. Dealer gamma exposure and IV rank.</p>
             </div>
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
               <Users className="w-7 h-7 text-purple-400" />
               <h3 className="font-bold">Sentiment</h3>
-              <p className="text-sm text-muted-foreground">Gauges market mood from news flow, social data, and put/call ratios. Helps identify crowd extremes.</p>
+              <p className="text-sm text-muted-foreground">News flow, social data, and put/call ratios — helps identify crowd extremes.</p>
             </div>
             <div className="glass-panel p-6 rounded-xl flex flex-col gap-3">
               <AlertTriangle className="w-7 h-7 text-red-400" />
               <h3 className="font-bold">Risk Management</h3>
-              <p className="text-sm text-muted-foreground">Every signal includes position sizing guidance. Risk is capped at 2% per trade using Kelly Criterion. Capital preservation first.</p>
+              <p className="text-sm text-muted-foreground">Position sizing on every signal. Risk capped at 2% per trade via Kelly Criterion. Capital preservation first.</p>
             </div>
           </div>
         </div>
 
         <div className="mb-16">
           <h2 className="text-2xl font-bold mb-4">Why we built this.</h2>
-          <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
-            <p>Because the tools that actually work — the institutional-grade ones — have always been locked behind fees that would eat a working person's entire trading account before they ever placed a trade.</p>
-            <p>We wanted to build something a parent could open on their phone at lunch, get real information, and close it knowing what to do next. A trading signal. A covered call opportunity on shares they already own. A gig that pays out this week. Something useful, not just interesting.</p>
-            <p>That's the whole point. Help people make better decisions with the money they have — so they can take better care of the people who depend on them.</p>
-          </div>
+          <p className="text-muted-foreground text-lg leading-relaxed">
+            Because institutional-grade tools have always been locked behind fees that would eat a working person's entire trading account. We wanted to build something a parent could open on their phone at lunch, get real information, and close knowing what to do next. That's the whole point.
+          </p>
         </div>
 
         <div className="glass-panel rounded-xl p-8 text-center">
           <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            EntangleWealth is not a registered investment advisor. Nothing on this platform is financial advice. All analysis is algorithmic and informational. You are responsible for your own trading decisions. Past performance | ours or anyone else's | does not predict future results. Please only trade with capital you can afford to lose.
+            EntangleWealth is not a registered investment advisor. Nothing on this platform is financial advice. All analysis is algorithmic and informational. You are responsible for your own trading decisions. Past performance does not predict future results. Only trade with capital you can afford to lose.
           </p>
         </div>
       </div>

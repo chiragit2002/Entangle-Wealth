@@ -48,14 +48,12 @@ const plans = [
     color: "text-[#FFB800]",
     icon: Sparkles,
     features: [
-      { text: "Unlimited signals + full indicators", on: true },
-      { text: "RSI, MACD, Bollinger, Aroon & 50+ more", on: true },
+      { text: "Unlimited signals + 55+ indicators", on: true },
       { text: "Full options flow + Greeks", on: true },
       { text: "6 AI analysis agents", on: true },
-      { text: "TaxGPT unlimited", on: true },
-      { text: "Unlimited receipt scanning", on: true },
-      { text: "Travel itinerary builder", on: true },
+      { text: "TaxGPT + receipt scanning", on: true },
       { text: "Bloomberg-style terminal", on: true },
+      { text: "Travel itinerary builder", on: true },
       { text: "Resume builder + job finder", on: true },
       { text: "Compliance score dashboard", on: true },
     ],
@@ -215,14 +213,14 @@ export default function Pricing() {
                 <span className="text-sm font-black text-[#00FF41] uppercase tracking-wider">Launch Window — Limited Time</span>
               </div>
               <h2 className="text-2xl md:text-3xl font-black text-foreground mb-2">
-                Full Pro access. <span className="text-[#00FF41]">Zero cost.</span> Right now.
+                Full Pro access. <span className="text-[#00e676]">Zero cost.</span>
               </h2>
               <p className="text-muted-foreground text-sm md:text-base">
-                All Pro features unlocked until{" "}
+                Every Pro feature unlocked until{" "}
                 <span className="font-bold text-foreground">
                   {new Date(promo.endsAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                 </span>
-                . No credit card. No catch. Just use it.
+                . No card. No catch.
               </p>
             </div>
           </div>
@@ -233,13 +231,8 @@ export default function Pricing() {
             Institutional tools. <span className="electric-text">Not institutional prices.</span>
           </h1>
           <p className="text-muted-foreground text-base md:text-lg">
-            {promo?.active ? "All Pro features unlocked — no card needed." : "30 days free. No card. Cancel anytime."}
+            {promo?.active ? "Every Pro feature is unlocked. No card, no catch." : "30-day free trial. No credit card required."}
           </p>
-          {!promo?.active && (
-            <div className="inline-block mt-4 bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.3)] rounded-full px-4 py-1.5 text-xs font-bold text-[#00FF41]">
-              30-DAY FREE TRIAL | NO CREDIT CARD NEEDED
-            </div>
-          )}
         </div>
 
         {/* Value anchoring section — shown before pricing */}

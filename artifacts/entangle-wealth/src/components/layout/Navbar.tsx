@@ -17,43 +17,45 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: "Trade",
     items: [
-      { href: "/command-center", label: "Command Center", desc: "Bloomberg-style workspace" },
-      { href: "/dashboard", label: "Dashboard", desc: "Overview" },
-      { href: "/charts", label: "Charts", desc: "TradingView Pro" },
-      { href: "/options", label: "Options", desc: "Chain & Greeks" },
-      { href: "/screener", label: "Screener", desc: "Stock filter" },
+      { href: "/command-center", label: "Command Center" },
+      { href: "/dashboard", label: "Dashboard" },
+      { href: "/market-overview", label: "Markets" },
+      { href: "/charts", label: "Charts" },
+      { href: "/options", label: "Options" },
+      { href: "/screener", label: "Screener" },
     ],
   },
   {
     label: "Analyze",
     items: [
-      { href: "/technical", label: "Analysis", desc: "55+ indicators" },
-      { href: "/sector-flow", label: "Sector Analysis", desc: "Rotation radar" },
-      { href: "/volatility", label: "Volatility Analysis", desc: "Risk analytics" },
-      { href: "/stocks", label: "Stocks", desc: "5,000 NASDAQ" },
-      { href: "/research", label: "News", desc: "Market intel feeds" },
+      { href: "/technical", label: "Analysis" },
+      { href: "/sector-flow", label: "Sector Analysis" },
+      { href: "/volatility", label: "Volatility Analysis" },
+      { href: "/stocks", label: "Stocks" },
+      { href: "/research", label: "News" },
     ],
   },
   {
     label: "Tools",
     items: [
-      { href: "/time-machine", label: "Time Machine", desc: "What-if simulator" },
-      { href: "/wealth-sim", label: "Wealth Sim", desc: "Compound growth" },
-      { href: "/ai-coach", label: "AI Coach", desc: "Behavioral finance" },
-      { href: "/alerts", label: "Alerts", desc: "Real-time alerts" },
-      { href: "/tax", label: "TaxFlow", desc: "Tax dashboard" },
-      { href: "/receipts", label: "Receipt Capture", desc: "Scan & track receipts" },
-      { href: "/integrations", label: "Integrations", desc: "Connect accounting apps" },
+      { href: "/time-machine", label: "Time Machine" },
+      { href: "/wealth-sim", label: "Wealth Sim" },
+      { href: "/ai-coach", label: "AI Coach" },
+      { href: "/alerts", label: "Alerts" },
+      { href: "/tax", label: "TaxFlow" },
+      { href: "/travel", label: "Business Travel" },
+      { href: "/receipts", label: "Receipt Capture" },
+      { href: "/integrations", label: "Integrations" },
     ],
   },
   {
     label: "Community",
     items: [
-      { href: "/leaderboard", label: "Leaderboard", desc: "Top 100 traders" },
-      { href: "/achievements", label: "Achievements", desc: "Badges & challenges" },
-      { href: "/community", label: "Community", desc: "Groups & events" },
-      { href: "/wallet", label: "Rewards Balance", desc: "Tokens & rewards" },
-      { href: "/blog", label: "Blog", desc: "Insights & education" },
+      { href: "/leaderboard", label: "Leaderboard" },
+      { href: "/achievements", label: "Achievements" },
+      { href: "/community", label: "Community" },
+      { href: "/wallet", label: "Rewards Balance" },
+      { href: "/blog", label: "Blog" },
     ],
   },
 ];
@@ -175,7 +177,6 @@ function DropdownMenu({ group, isOpen, onToggle }: { group: NavGroup; isOpen: bo
                 }`}
               >
                 <span className="text-[11px] font-mono font-medium uppercase tracking-wide">{item.label}</span>
-                {item.desc && <span className="text-[10px] text-muted-foreground mt-0.5">{item.desc}</span>}
               </Link>
             ))}
           </div>
@@ -188,13 +189,13 @@ function DropdownMenu({ group, isOpen, onToggle }: { group: NavGroup; isOpen: bo
 const ADMIN_NAV_GROUP: NavGroup = {
   label: "Admin",
   items: [
-    { href: "/token-admin", label: "Token Admin", desc: "Token management" },
-    { href: "/marketing", label: "Marketing AI", desc: "9-agent command center" },
-    { href: "/analytics", label: "Analytics", desc: "Platform metrics" },
-    { href: "/admin/tickets", label: "Support Tickets", desc: "Manage tickets" },
-    { href: "/launch", label: "Launch Readiness", desc: "Go/No-Go checklist" },
-    { href: "/admin/monitoring", label: "Sentry Monitoring", desc: "Live error tracking" },
-    { href: "/admin/audit", label: "Audit Dashboard", desc: "Self-auditing system" },
+    { href: "/token-admin", label: "Token Admin" },
+    { href: "/marketing", label: "Marketing AI" },
+    { href: "/analytics", label: "Analytics" },
+    { href: "/admin/tickets", label: "Support Tickets" },
+    { href: "/launch", label: "Launch Readiness" },
+    { href: "/admin/monitoring", label: "Sentry Monitoring" },
+    { href: "/admin/audit", label: "Audit Dashboard" },
   ],
 };
 

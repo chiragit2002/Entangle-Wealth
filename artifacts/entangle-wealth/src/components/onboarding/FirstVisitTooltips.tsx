@@ -41,12 +41,6 @@ const TOOLTIPS: TooltipDef[] = [
     message: "Type commands here to analyze any stock. Try 'analyze AAPL' to get started.",
     position: "bottom",
   },
-  {
-    id: "market_ticker",
-    selector: "[data-tour='market-ticker']",
-    message: "Live market data streams across the top. Click any ticker for a quick analysis.",
-    position: "bottom",
-  },
 ];
 
 function getDismissed(): Set<string> {

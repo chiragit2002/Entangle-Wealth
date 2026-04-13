@@ -11,7 +11,7 @@ import { bruteForceGuard } from "./middlewares/bruteForce";
 import { csrfProtection } from "./middlewares/csrfProtection";
 import { authEventTracker } from "./middlewares/authEventTracker";
 import { metricsMiddleware } from "./middlewares/metricsMiddleware";
-import { globalErrorHandler } from "./middlewares/errorHandler";
+import { globalErrorHandler, track4xxMiddleware } from "./middlewares/errorHandler";
 import { requestTimeoutMiddleware } from "./middlewares/requestTimeout";
 import { autoHealMiddleware } from "./middlewares/autoHeal";
 import {
@@ -201,6 +201,7 @@ app.use("/api/stripe", bruteForceGuard);
 
 app.use(clerkMiddleware());
 app.use(authEventTracker);
+app.use(track4xxMiddleware);
 
 app.use((req, _res, next) => {
   const auth = getAuth(req);

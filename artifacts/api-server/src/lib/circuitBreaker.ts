@@ -42,15 +42,21 @@ export class CircuitBreaker {
       }
       return result;
     } catch (err) {
-      this.failureCount++;
-      this.lastFailureTime = Date.now();
+      const errStatus = (err as { status?: number; statusCode?: number }).status
+        ?? (err as { status?: number; statusCode?: number }).statusCode;
+      const isClientError = typeof errStatus === "number" && errStatus >= 400 && errStatus < 500;
 
-      if (this.failureCount >= this.failureThreshold && (this.state as CircuitState) !== "open") {
-        this.state = "open";
-        logger.error(
-          { circuit: this.name, failureCount: this.failureCount },
-          "Circuit breaker OPENED after consecutive failures"
-        );
+      if (!isClientError) {
+        this.failureCount++;
+        this.lastFailureTime = Date.now();
+
+        if (this.failureCount >= this.failureThreshold && (this.state as CircuitState) !== "open") {
+          this.state = "open";
+          logger.error(
+            { circuit: this.name, failureCount: this.failureCount },
+            "Circuit breaker OPENED after consecutive failures"
+          );
+        }
       }
 
       if (fallback) return fallback();
@@ -76,8 +82,9 @@ export class CircuitBreaker {
 
 export const alpacaCircuit = new CircuitBreaker({ name: "alpaca", failureThreshold: 5, resetTimeMs: 60_000 });
 export const anthropicCircuit = new CircuitBreaker({ name: "anthropic", failureThreshold: 5, resetTimeMs: 60_000 });
+export const stripeCircuit = new CircuitBreaker({ name: "stripe", failureThreshold: 5, resetTimeMs: 60_000 });
 
-const registeredCircuits: CircuitBreaker[] = [alpacaCircuit, anthropicCircuit];
+const registeredCircuits: CircuitBreaker[] = [alpacaCircuit, anthropicCircuit, stripeCircuit];
 
 export function registerCircuit(cb: CircuitBreaker): void {
   registeredCircuits.push(cb);

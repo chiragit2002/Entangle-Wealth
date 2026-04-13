@@ -365,16 +365,16 @@ router.post("/token/admin/distribute", requireAuth, requireAdmin, validateBody(A
       .orderBy(desc(userXpTable.monthlyXp), desc(userXpTable.totalXp))
       .limit(100);
 
-    const distributions = [];
-    for (let i = 0; i < topUsers.length; i++) {
-      const rank = i + 1;
-      const tokens = getRewardAmount(rank);
-      if (tokens <= 0) continue;
+    const distributions = await db.transaction(async (tx) => {
+      const results = [];
+      for (let i = 0; i < topUsers.length; i++) {
+        const rank = i + 1;
+        const tokens = getRewardAmount(rank);
+        if (tokens <= 0) continue;
 
-      const user = topUsers[i];
-      const txHash = `sim_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+        const user = topUsers[i];
+        const txHash = `sim_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
-      const dist = await db.transaction(async (tx) => {
         await tx.update(usersTable).set({
           tokenBalance: sql`COALESCE(${usersTable.tokenBalance}, 0) + ${tokens}`,
           updatedAt: new Date(),
@@ -398,11 +398,10 @@ router.post("/token/admin/distribute", requireAuth, requireAdmin, validateBody(A
           status: "completed",
         });
 
-        return inserted;
-      });
-
-      distributions.push(dist);
-    }
+        results.push(inserted);
+      }
+      return results;
+    });
 
     res.json({ distributed: distributions.length, month, distributions });
   } catch (error) {

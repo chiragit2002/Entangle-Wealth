@@ -11,6 +11,7 @@ import { getStripeSync } from "./stripeClient";
 import { trackConnections } from "./routes/health";
 import { ensureReferralBadgesExist } from "./lib/referralRewards";
 import { ensureBacktesterBadgesExist } from "./routes/gamification";
+import { ensureSupportTables } from "./lib/supportTables";
 import { ensureBacktesterBadgesExist as ensureTask126BadgesExist } from "./lib/backtesterBadges";
 import { startAlertEvaluator, stopAlertEvaluator, closeAllSseConnections } from "./routes/alerts";
 import { startDigestScheduler, stopDigestScheduler } from "./lib/emailDigest";
@@ -600,6 +601,7 @@ await ensurePaperTradingTables();
 await ensureGamificationTables();
 await ensureEmailSubscribersTable();
 await ensureTimelineTables();
+await ensureSupportTables();
 ensurePerformanceIndexes().catch((err) =>
   logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
 );

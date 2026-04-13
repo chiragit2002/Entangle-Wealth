@@ -10,7 +10,7 @@ import {
   streaksTable,
   founderStatusTable,
 } from "@workspace/db/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
@@ -192,31 +192,37 @@ function parseTimelineParams(body: unknown): { params: TimelineParams; error?: s
 
 async function awardXp(userId: string, amount: number, reason: string, category: string) {
   try {
-    const [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
-    const [founder] = await db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
-    const multiplier = (streak?.multiplier || 1.0) * (founder?.xpMultiplier || 1.0);
-    const finalAmount = Math.min(Math.round(amount * multiplier), 150);
+    await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_xp'))`);
 
-    await db.insert(xpTransactionsTable).values({ userId, amount: finalAmount, reason, category });
+      const [streak] = await tx.select().from(streaksTable).where(eq(streaksTable.userId, userId));
+      const [founder] = await tx.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
+      const multiplier = (streak?.multiplier || 1.0) * (founder?.xpMultiplier || 1.0);
+      const finalAmount = Math.min(Math.round(amount * multiplier), 150);
 
-    let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
-    if (!xpRow) {
-      [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
-    }
+      await tx.insert(xpTransactionsTable).values({ userId, amount: finalAmount, reason, category });
 
-    const newTotal = xpRow.totalXp + finalAmount;
-    const newLevel = calculateLevel(newTotal);
-    const newTier = calculateTier(newLevel, newTotal);
+      let [xpRow] = await tx.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+      if (!xpRow) {
+        [xpRow] = await tx.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
+      }
 
-    await db.update(userXpTable).set({
-      totalXp: newTotal,
-      level: newLevel,
-      tier: newTier,
-      monthlyXp: xpRow.monthlyXp + finalAmount,
-      weeklyXp: xpRow.weeklyXp + finalAmount,
-      updatedAt: new Date(),
-    }).where(eq(userXpTable.userId, userId));
-  } catch {}
+      const newTotal = xpRow.totalXp + finalAmount;
+      const newLevel = calculateLevel(newTotal);
+      const newTier = calculateTier(newLevel, newTotal);
+
+      await tx.update(userXpTable).set({
+        totalXp: sql`${userXpTable.totalXp} + ${finalAmount}`,
+        level: newLevel,
+        tier: newTier,
+        monthlyXp: sql`${userXpTable.monthlyXp} + ${finalAmount}`,
+        weeklyXp: sql`${userXpTable.weeklyXp} + ${finalAmount}`,
+        updatedAt: new Date(),
+      }).where(eq(userXpTable.userId, userId));
+    });
+  } catch (err) {
+    logger.error({ err, userId, reason }, "Failed to award XP");
+  }
 }
 
 function getIdentityStageFromCounts(simulations: number, snapshots: number, scenarios: number): string {

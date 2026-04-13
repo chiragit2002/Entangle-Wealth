@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import { initSentry } from "./lib/sentry";
+import { initSentry, Sentry } from "./lib/sentry";
 import { initInteractionSignals } from "./lib/interactionSignals";
 
 initSentry();
@@ -16,6 +16,9 @@ if ("serviceWorker" in navigator) {
       .catch((err) => {
         if (import.meta.env.DEV) {
           console.warn("[SW] Registration failed (non-fatal):", err);
+        } else {
+          console.error("[SW] Registration failed:", err);
+          Sentry.captureException(err, { tags: { context: "service_worker_registration" } });
         }
       });
   });

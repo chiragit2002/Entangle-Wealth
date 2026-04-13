@@ -9,6 +9,7 @@ import { resolveUserId } from "../lib/resolveUserId";
 import { validateBody, z } from "../lib/validateRequest";
 import { logger } from "../lib/logger";
 import { isPromoActive, PROMO_END_ISO } from "../lib/userDailyLimits";
+import { stripeCircuit } from "../lib/circuitBreaker";
 
 const PriceIdSchema = z.object({
   priceId: z.string().regex(/^price_/, "Must be a valid Stripe price ID"),
@@ -27,38 +28,40 @@ router.get("/stripe/promo", async (_req, res) => {
 
 router.get("/stripe/config", async (_req, res) => {
   try {
-    const publishableKey = await getStripePublishableKey();
+    const publishableKey = await stripeCircuit.execute(() => getStripePublishableKey());
     res.json({ publishableKey });
   } catch (error) {
     logger.error({ err: error }, "Error getting Stripe config");
-    res.status(500).json({ error: "Failed to get Stripe configuration" });
+    res.status(503).json({ error: "Stripe service temporarily unavailable" });
   }
 });
 
 router.get("/stripe/products", async (_req, res) => {
   try {
-    const stripe = await getUncachableStripeClient();
-    const products = await stripe.products.list({ active: true, limit: 10 });
-    const prices = await stripe.prices.list({ active: true, limit: 50 });
+    const result = await stripeCircuit.execute(async () => {
+      const stripe = await getUncachableStripeClient();
+      const products = await stripe.products.list({ active: true, limit: 10 });
+      const prices = await stripe.prices.list({ active: true, limit: 50 });
 
-    const result = products.data
-      .map((product) => {
-        const productPrices = prices.data.filter(
-          (p) => p.product === product.id
-        );
-        return productPrices.map((price) => ({
-          id: product.id,
-          name: product.name,
-          description: product.description,
-          metadata: product.metadata,
-          price_id: price.id,
-          unit_amount: price.unit_amount,
-          currency: price.currency,
-          recurring: price.recurring,
-        }));
-      })
-      .flat()
-      .sort((a, b) => (a.unit_amount || 0) - (b.unit_amount || 0));
+      return products.data
+        .map((product) => {
+          const productPrices = prices.data.filter(
+            (p) => p.product === product.id
+          );
+          return productPrices.map((price) => ({
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            metadata: product.metadata,
+            price_id: price.id,
+            unit_amount: price.unit_amount,
+            currency: price.currency,
+            recurring: price.recurring,
+          }));
+        })
+        .flat()
+        .sort((a, b) => (a.unit_amount || 0) - (b.unit_amount || 0));
+    });
 
     res.json(result);
   } catch (error) {
@@ -72,54 +75,60 @@ router.post("/stripe/create-checkout", requireAuth, validateBody(PriceIdSchema),
   const { priceId } = req.body;
 
   try {
-    const stripe = await getUncachableStripeClient();
-
-    const price = await stripe.prices.retrieve(priceId);
-    if (!price.active) {
-      res.status(400).json({ error: "Price is no longer available" });
-      return;
-    }
-    const product = await stripe.products.retrieve(price.product as string);
-    const tier = product.metadata?.tier;
-    if (!tier || !["pro", "enterprise"].includes(tier)) {
-      res.status(400).json({ error: "Invalid product" });
-      return;
-    }
-
     const [user] = await db.select().from(usersTable).where(eq(usersTable.clerkId, userId));
     if (!user) {
       res.status(404).json({ error: "User not found" });
       return;
     }
 
-    let customerId = user.stripeCustomerId;
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-        metadata: { userId: user.id },
-      });
-      customerId = customer.id;
-      await db.update(usersTable).set({ stripeCustomerId: customerId }).where(eq(usersTable.id, user.id));
-    }
-
     const domains = process.env.REPLIT_DOMAINS?.split(",") || [];
     const baseUrl = domains.length > 0 ? `https://${domains[0]}` : "http://localhost:3000";
 
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      payment_method_types: ["card"],
-      line_items: [{ price: priceId, quantity: 1 }],
-      mode: "subscription",
-      success_url: `${baseUrl}/profile?payment=success`,
-      cancel_url: `${baseUrl}/profile?payment=cancelled`,
-      metadata: { userId: user.id },
+    const sessionUrl = await stripeCircuit.execute(async () => {
+      const stripe = await getUncachableStripeClient();
+
+      const price = await stripe.prices.retrieve(priceId);
+      if (!price.active) throw Object.assign(new Error("Price is no longer available"), { status: 400 });
+
+      const product = await stripe.products.retrieve(price.product as string);
+      const tier = product.metadata?.tier;
+      if (!tier || !["pro", "enterprise"].includes(tier)) {
+        throw Object.assign(new Error("Invalid product"), { status: 400 });
+      }
+
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+          metadata: { userId: user.id },
+        });
+        customerId = customer.id;
+        await db.update(usersTable).set({ stripeCustomerId: customerId }).where(eq(usersTable.id, user.id));
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ["card"],
+        line_items: [{ price: priceId, quantity: 1 }],
+        mode: "subscription",
+        success_url: `${baseUrl}/profile?payment=success`,
+        cancel_url: `${baseUrl}/profile?payment=cancelled`,
+        metadata: { userId: user.id },
+      });
+
+      return session.url;
     });
 
-    res.json({ url: session.url });
+    res.json({ url: sessionUrl });
   } catch (error) {
+    const errObj = error as { status?: number; message?: string };
+    if (errObj.status === 400) {
+      res.status(400).json({ error: errObj.message || "Invalid request" });
+      return;
+    }
     logger.error({ err: error }, "Checkout error");
-    res.status(500).json({ error: "Failed to create checkout session" });
+    res.status(503).json({ error: "Payment service temporarily unavailable" });
   }
 });
 
@@ -135,50 +144,54 @@ router.get("/stripe/subscription", requireAuth, async (req, res) => {
       return;
     }
 
-    const stripe = await getUncachableStripeClient();
-    const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+    const subData = await stripeCircuit.execute(async () => {
+      const stripe = await getUncachableStripeClient();
+      return stripe.subscriptions.retrieve(user.stripeSubscriptionId!);
+    });
 
     res.json({
-      active: subscription.status === "active" || promo,
+      active: subData.status === "active" || promo,
       tier: user.subscriptionTier || (promo ? "promo" : "free"),
-      status: subscription.status,
-      currentPeriodEnd: (subscription as any).current_period_end ?? null,
+      status: subData.status,
+      currentPeriodEnd: (subData as any).current_period_end ?? null,
       promo,
     });
   } catch (error) {
     logger.error({ err: error }, "Subscription check error");
-    res.status(500).json({ error: "Failed to check subscription status" });
+    res.status(503).json({ error: "Payment service temporarily unavailable" });
   }
 });
 
 router.get("/stripe/virtual-cash-products", async (_req, res) => {
   try {
-    const stripe = await getUncachableStripeClient();
-    const products = await stripe.products.list({ active: true, limit: 50 });
-    const prices = await stripe.prices.list({ active: true, limit: 100 });
+    const virtualCashProducts = await stripeCircuit.execute(async () => {
+      const stripe = await getUncachableStripeClient();
+      const products = await stripe.products.list({ active: true, limit: 50 });
+      const prices = await stripe.prices.list({ active: true, limit: 100 });
 
-    const virtualCashProducts = products.data
-      .filter((p) => p.metadata?.type === "virtual_cash")
-      .map((product) => {
-        const price = prices.data.find((pr) => pr.product === product.id);
-        if (!price) return null;
-        return {
-          productId: product.id,
-          priceId: price.id,
-          name: product.name,
-          description: product.description,
-          virtualAmount: Number(product.metadata.virtualAmount),
-          unitAmount: price.unit_amount,
-          currency: price.currency,
-        };
-      })
-      .filter(Boolean)
-      .sort((a, b) => (a!.unitAmount || 0) - (b!.unitAmount || 0));
+      return products.data
+        .filter((p) => p.metadata?.type === "virtual_cash")
+        .map((product) => {
+          const price = prices.data.find((pr) => pr.product === product.id);
+          if (!price) return null;
+          return {
+            productId: product.id,
+            priceId: price.id,
+            name: product.name,
+            description: product.description,
+            virtualAmount: Number(product.metadata.virtualAmount),
+            unitAmount: price.unit_amount,
+            currency: price.currency,
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => (a!.unitAmount || 0) - (b!.unitAmount || 0));
+    });
 
     res.json(virtualCashProducts);
   } catch (error) {
     logger.error({ err: error }, "Error fetching virtual cash products");
-    res.status(500).json({ error: "Failed to fetch virtual cash products" });
+    res.status(503).json({ error: "Payment service temporarily unavailable" });
   }
 });
 
@@ -187,19 +200,6 @@ router.post("/stripe/create-virtual-cash-checkout", requireAuth, validateBody(Pr
   const { priceId } = req.body;
 
   try {
-    const stripe = await getUncachableStripeClient();
-
-    const price = await stripe.prices.retrieve(priceId);
-    if (!price.active) {
-      res.status(400).json({ error: "Price is no longer available" });
-      return;
-    }
-    const product = await stripe.products.retrieve(price.product as string);
-    if (product.metadata?.type !== "virtual_cash" || !product.metadata?.virtualAmount) {
-      res.status(400).json({ error: "Invalid product — not a virtual cash package" });
-      return;
-    }
-
     const [user] = await db.select().from(usersTable).where(eq(usersTable.clerkId, userId));
     if (!user) {
       res.status(404).json({ error: "User not found" });
@@ -211,38 +211,57 @@ router.post("/stripe/create-virtual-cash-checkout", requireAuth, validateBody(Pr
       return;
     }
 
-    let customerId = user.stripeCustomerId;
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-        metadata: { userId: user.id },
-      });
-      customerId = customer.id;
-      await db.update(usersTable).set({ stripeCustomerId: customerId }).where(eq(usersTable.id, user.id));
-    }
-
     const domains = process.env.REPLIT_DOMAINS?.split(",") || [];
     const baseUrl = domains.length > 0 ? `https://${domains[0]}` : "http://localhost:3000";
 
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      payment_method_types: ["card"],
-      line_items: [{ price: priceId, quantity: 1 }],
-      mode: "payment",
-      success_url: `${baseUrl}/?payment=success&type=virtual_cash`,
-      cancel_url: `${baseUrl}/?payment=cancelled`,
-      metadata: {
-        userId: user.id,
-        type: "virtual_cash",
-        virtualAmount: product.metadata.virtualAmount,
-      },
+    const sessionUrl = await stripeCircuit.execute(async () => {
+      const stripe = await getUncachableStripeClient();
+
+      const price = await stripe.prices.retrieve(priceId);
+      if (!price.active) throw Object.assign(new Error("Price is no longer available"), { status: 400 });
+
+      const product = await stripe.products.retrieve(price.product as string);
+      if (product.metadata?.type !== "virtual_cash" || !product.metadata?.virtualAmount) {
+        throw Object.assign(new Error("Invalid product — not a virtual cash package"), { status: 400 });
+      }
+
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+          metadata: { userId: user.id },
+        });
+        customerId = customer.id;
+        await db.update(usersTable).set({ stripeCustomerId: customerId }).where(eq(usersTable.id, user.id));
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ["card"],
+        line_items: [{ price: priceId, quantity: 1 }],
+        mode: "payment",
+        success_url: `${baseUrl}/?payment=success&type=virtual_cash`,
+        cancel_url: `${baseUrl}/?payment=cancelled`,
+        metadata: {
+          userId: user.id,
+          type: "virtual_cash",
+          virtualAmount: product.metadata.virtualAmount,
+        },
+      });
+
+      return session.url;
     });
 
-    res.json({ url: session.url });
+    res.json({ url: sessionUrl });
   } catch (error) {
+    const errObj = error as { status?: number; message?: string };
+    if (errObj.status === 400) {
+      res.status(400).json({ error: errObj.message || "Invalid request" });
+      return;
+    }
     logger.error({ err: error }, "Virtual cash checkout error");
-    res.status(500).json({ error: "Failed to create checkout session" });
+    res.status(503).json({ error: "Payment service temporarily unavailable" });
   }
 });
 
@@ -279,19 +298,22 @@ router.post("/stripe/create-portal", requireAuth, validateBody(z.object({}).stri
       return;
     }
 
-    const stripe = await getUncachableStripeClient();
     const domains = process.env.REPLIT_DOMAINS?.split(",") || [];
     const baseUrl = domains.length > 0 ? `https://${domains[0]}` : "http://localhost:3000";
 
-    const session = await stripe.billingPortal.sessions.create({
-      customer: user.stripeCustomerId,
-      return_url: `${baseUrl}/profile`,
+    const sessionUrl = await stripeCircuit.execute(async () => {
+      const stripe = await getUncachableStripeClient();
+      const session = await stripe.billingPortal.sessions.create({
+        customer: user.stripeCustomerId!,
+        return_url: `${baseUrl}/profile`,
+      });
+      return session.url;
     });
 
-    res.json({ url: session.url });
+    res.json({ url: sessionUrl });
   } catch (error) {
     logger.error({ err: error }, "Portal error");
-    res.status(500).json({ error: "Failed to create portal session" });
+    res.status(503).json({ error: "Payment service temporarily unavailable" });
   }
 });
 

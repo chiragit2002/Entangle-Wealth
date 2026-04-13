@@ -159,6 +159,7 @@ export default function Achievements() {
       }
     } catch (err) {
       console.error("[Achievements] Failed to load achievements data:", err);
+      toast({ title: "Could not load achievements", description: "Please refresh to try again.", variant: "destructive" });
     }
   };
 

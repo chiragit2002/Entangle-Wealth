@@ -309,7 +309,7 @@ router.post("/gamification/xp", requireAuth, validateBody(XpSchema), async (req,
     }
 
     const result = await db.transaction(async (tx) => {
-      await tx.execute(sql`SELECT pg_advisory_xact_lock(${userId})`);
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_xp'))`);
 
       let [streak] = await tx.select().from(streaksTable).where(eq(streaksTable.userId, userId));
       const multiplier = streak?.multiplier || 1.0;
@@ -328,11 +328,11 @@ router.post("/gamification/xp", requireAuth, validateBody(XpSchema), async (req,
 
       const [updated] = await tx.update(userXpTable)
         .set({
-          totalXp: newTotalXp,
+          totalXp: sql`${userXpTable.totalXp} + ${finalAmount}`,
           level: newLevel,
           tier: newTier,
-          monthlyXp: xpRow.monthlyXp + finalAmount,
-          weeklyXp: xpRow.weeklyXp + finalAmount,
+          monthlyXp: sql`${userXpTable.monthlyXp} + ${finalAmount}`,
+          weeklyXp: sql`${userXpTable.weeklyXp} + ${finalAmount}`,
           updatedAt: new Date(),
         })
         .where(eq(userXpTable.userId, userId))
@@ -532,33 +532,43 @@ router.post("/gamification/challenges/:challengeId/progress", requireAuth, valid
       return;
     }
 
-    let [userChallenge] = await db.select().from(userChallengesTable)
-      .where(and(eq(userChallengesTable.userId, userId), eq(userChallengesTable.challengeId, challengeId)));
+    const progressResult = await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_xp'))`);
 
-    if (!userChallenge) {
-      [userChallenge] = await db.insert(userChallengesTable)
-        .values({ userId, challengeId, progress: 0 })
+      let [userChallenge] = await tx.select().from(userChallengesTable)
+        .where(and(eq(userChallengesTable.userId, userId), eq(userChallengesTable.challengeId, challengeId)));
+
+      if (!userChallenge) {
+        [userChallenge] = await tx.insert(userChallengesTable)
+          .values({ userId, challengeId, progress: 0 })
+          .returning();
+      }
+
+      if (userChallenge.completed) {
+        return { alreadyCompleted: true as const, userChallenge };
+      }
+
+      const newProgress = Math.min(userChallenge.progress + increment, challenge.target);
+      const completed = newProgress >= challenge.target;
+
+      const [updated] = await tx.update(userChallengesTable)
+        .set({
+          progress: newProgress,
+          completed,
+          completedAt: completed ? new Date() : null,
+        })
+        .where(eq(userChallengesTable.id, userChallenge.id))
         .returning();
-    }
 
-    if (userChallenge.completed) {
-      res.json({ ...userChallenge, alreadyCompleted: true });
+      return { alreadyCompleted: false as const, updated, justCompleted: completed && !userChallenge.completed };
+    });
+
+    if (progressResult.alreadyCompleted) {
+      res.json({ ...progressResult.userChallenge, alreadyCompleted: true });
       return;
     }
 
-    const newProgress = Math.min(userChallenge.progress + increment, challenge.target);
-    const completed = newProgress >= challenge.target;
-
-    const [updated] = await db.update(userChallengesTable)
-      .set({
-        progress: newProgress,
-        completed,
-        completedAt: completed ? new Date() : null,
-      })
-      .where(eq(userChallengesTable.id, userChallenge.id))
-      .returning();
-
-    res.json({ ...updated, challenge, justCompleted: completed && !userChallenge.completed });
+    res.json({ ...progressResult.updated, challenge, justCompleted: progressResult.justCompleted });
   } catch (error) {
     logger.error({ err: error }, "Error updating challenge progress:");
     res.status(500).json({ error: "Failed to update progress" });
@@ -829,7 +839,7 @@ router.post("/gamification/spin", requireAuth, validateBody(z.object({}).strict(
     if (!userId) { res.status(404).json({ error: "User not found" }); return; }
 
     const spinResult = await db.transaction(async (tx) => {
-      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_daily_spin'))`);
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_xp'))`);
 
       const now = new Date();
       const today = now.toISOString().slice(0, 10);
@@ -889,9 +899,11 @@ router.post("/gamification/spin", requireAuth, validateBody(z.object({}).strict(
         const newLevel = calculateLevel(newTotalXp);
         const newTier = calculateTier(newLevel, newTotalXp);
         await tx.update(userXpTable).set({
-          totalXp: newTotalXp, level: newLevel, tier: newTier,
-          monthlyXp: xpRow.monthlyXp + baseXp,
-          weeklyXp: xpRow.weeklyXp + baseXp,
+          totalXp: sql`${userXpTable.totalXp} + ${baseXp}`,
+          level: newLevel,
+          tier: newTier,
+          monthlyXp: sql`${userXpTable.monthlyXp} + ${baseXp}`,
+          weeklyXp: sql`${userXpTable.weeklyXp} + ${baseXp}`,
           updatedAt: new Date(),
         }).where(eq(userXpTable.userId, userId));
         await tx.insert(xpTransactionsTable).values({ userId, amount: baseXp, reason: "daily_spin", category: "engagement" });
@@ -1021,70 +1033,90 @@ router.post("/gamification/claim-daily", requireAuth, validateBody(z.object({}).
     const userId = await resolveUserId(clerkId, req);
     if (!userId) { res.status(404).json({ error: "User not found" }); return; }
 
-    let [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
-    if (!streak) {
-      [streak] = await db.insert(streaksTable).values({ userId, currentStreak: 1, longestStreak: 1, lastActivityDate: now, multiplier: 1.0 }).returning();
-    }
+    const claimResult = await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_xp'))`);
 
-    const { newStreak: dailyNewStreak, alreadyActive: dailyAlreadyActive } = evaluateStreak(streak.lastActivityDate, streak.currentStreak, now);
+      let [streak] = await tx.select().from(streaksTable).where(eq(streaksTable.userId, userId));
+      if (!streak) {
+        [streak] = await tx.insert(streaksTable).values({ userId, currentStreak: 1, longestStreak: 1, lastActivityDate: now, multiplier: 1.0 }).returning();
+      }
 
-    if (dailyAlreadyActive) {
+      const { newStreak: dailyNewStreak, alreadyActive: dailyAlreadyActive } = evaluateStreak(streak.lastActivityDate, streak.currentStreak, now);
+
+      if (dailyAlreadyActive) {
+        return { alreadyClaimed: true as const };
+      }
+
+      let consumedDailyProtection = false;
+      let newStreak = dailyNewStreak;
+      if (newStreak < streak.currentStreak && streak.streakProtectionActive) {
+        newStreak = streak.currentStreak;
+        consumedDailyProtection = true;
+      }
+
+      const newMultiplier = Math.min(1.0 + (newStreak - 1) * 0.1, 3.0);
+      const newLongest = Math.max(streak.longestStreak, newStreak);
+
+      const [updatedStreak] = await tx.update(streaksTable)
+        .set({
+          currentStreak: newStreak,
+          longestStreak: newLongest,
+          lastActivityDate: now,
+          multiplier: newMultiplier,
+          streakProtectionActive: consumedDailyProtection ? false : streak.streakProtectionActive,
+          updatedAt: now,
+        })
+        .where(eq(streaksTable.userId, userId))
+        .returning();
+
+      let dailyXp = 25;
+      if (newStreak >= 7) dailyXp += 200;
+      else if (newStreak >= 3) dailyXp += 50;
+
+      const [[founderRow], [xpRowResult]] = await Promise.all([
+        tx.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId)),
+        tx.select().from(userXpTable).where(eq(userXpTable.userId, userId)),
+      ]);
+
+      if (founderRow) dailyXp = applyMultiplier(dailyXp, founderRow.xpMultiplier);
+
+      let xpRow = xpRowResult ?? null;
+      if (!xpRow) {
+        [xpRow] = await tx.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
+      }
+
+      const newTotalXp = xpRow.totalXp + dailyXp;
+      const newLevel = calculateLevel(newTotalXp);
+      const newTier = calculateTier(newLevel, newTotalXp);
+
+      const [updatedXp] = await tx.update(userXpTable)
+        .set({ totalXp: sql`${userXpTable.totalXp} + ${dailyXp}`, level: newLevel, tier: newTier, monthlyXp: sql`${userXpTable.monthlyXp} + ${dailyXp}`, weeklyXp: sql`${userXpTable.weeklyXp} + ${dailyXp}`, updatedAt: new Date() })
+        .where(eq(userXpTable.userId, userId))
+        .returning();
+
+      await tx.insert(xpTransactionsTable).values({ userId, amount: dailyXp, reason: "daily_checkin", category: "engagement" });
+
+      return {
+        alreadyClaimed: false as const,
+        xpEarned: dailyXp,
+        streak: updatedStreak,
+        xp: updatedXp,
+        leveledUp: newLevel > xpRow.level,
+        streakBonus: newStreak >= 7 ? 200 : newStreak >= 3 ? 50 : 0,
+      };
+    });
+
+    if (claimResult.alreadyClaimed) {
       res.status(409).json({ error: "Already claimed today", alreadyClaimed: true });
       return;
     }
 
-    let consumedDailyProtection = false;
-    let newStreak = dailyNewStreak;
-    if (newStreak < streak.currentStreak && streak.streakProtectionActive) {
-      newStreak = streak.currentStreak;
-      consumedDailyProtection = true;
-    }
-
-    const newMultiplier = Math.min(1.0 + (newStreak - 1) * 0.1, 3.0);
-    const newLongest = Math.max(streak.longestStreak, newStreak);
-
-    const [updatedStreak] = await db.update(streaksTable)
-      .set({
-        currentStreak: newStreak,
-        longestStreak: newLongest,
-        lastActivityDate: now,
-        multiplier: newMultiplier,
-        streakProtectionActive: consumedDailyProtection ? false : streak.streakProtectionActive,
-        updatedAt: now,
-      })
-      .where(eq(streaksTable.userId, userId))
-      .returning();
-
-    let dailyXp = 25;
-    if (newStreak >= 7) dailyXp += 200;
-    else if (newStreak >= 3) dailyXp += 50;
-
-    const { founder, xpRow: xpRowResult } = await loadUserGameState(userId);
-
-    if (founder) dailyXp = applyMultiplier(dailyXp, founder.xpMultiplier);
-
-    let xpRow = xpRowResult;
-    if (!xpRow) {
-      [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
-    }
-
-    const newTotalXp = xpRow.totalXp + dailyXp;
-    const newLevel = calculateLevel(newTotalXp);
-    const newTier = calculateTier(newLevel, newTotalXp);
-
-    const [updatedXp] = await db.update(userXpTable)
-      .set({ totalXp: newTotalXp, level: newLevel, tier: newTier, monthlyXp: xpRow.monthlyXp + dailyXp, weeklyXp: xpRow.weeklyXp + dailyXp, updatedAt: new Date() })
-      .where(eq(userXpTable.userId, userId))
-      .returning();
-
-    await db.insert(xpTransactionsTable).values({ userId, amount: dailyXp, reason: "daily_checkin", category: "engagement" });
-
     res.json({
-      xpEarned: dailyXp,
-      streak: updatedStreak,
-      xp: updatedXp,
-      leveledUp: newLevel > xpRow.level,
-      streakBonus: newStreak >= 7 ? 200 : newStreak >= 3 ? 50 : 0,
+      xpEarned: claimResult.xpEarned,
+      streak: claimResult.streak,
+      xp: claimResult.xp,
+      leveledUp: claimResult.leveledUp,
+      streakBonus: claimResult.streakBonus,
     });
     triggerGiveawaySync(userId, clerkId);
   } catch (error) {
@@ -1174,26 +1206,30 @@ router.post("/gamification/backtester/award-badges", requireAuth, validateBody(B
         .where(and(eq(userBadgesTable.userId, userId), eq(userBadgesTable.badgeId, badge.id)));
       if (existing) continue;
 
-      await db.insert(userBadgesTable).values({ userId, badgeId: badge.id }).onConflictDoNothing();
+      await db.transaction(async (tx) => {
+        await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_xp'))`);
+        await tx.insert(userBadgesTable).values({ userId, badgeId: badge.id }).onConflictDoNothing();
 
-      if (badge.xpReward > 0) {
-        const [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
-        if (xpRow) {
+        if (badge.xpReward > 0) {
+          let [xpRow] = await tx.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+          if (!xpRow) {
+            [xpRow] = await tx.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
+          }
           const newTotal = xpRow.totalXp + badge.xpReward;
-          await db.update(userXpTable).set({
-            totalXp: newTotal,
-            monthlyXp: xpRow.monthlyXp + badge.xpReward,
-            weeklyXp: xpRow.weeklyXp + badge.xpReward,
+          await tx.update(userXpTable).set({
+            totalXp: sql`${userXpTable.totalXp} + ${badge.xpReward}`,
+            monthlyXp: sql`${userXpTable.monthlyXp} + ${badge.xpReward}`,
+            weeklyXp: sql`${userXpTable.weeklyXp} + ${badge.xpReward}`,
             updatedAt: new Date(),
           }).where(eq(userXpTable.userId, userId));
-          await db.insert(xpTransactionsTable).values({
+          await tx.insert(xpTransactionsTable).values({
             userId,
             amount: badge.xpReward,
             reason: `badge_${badge.slug}`,
             category: "backtester",
           });
         }
-      }
+      });
 
       newlyEarned.push(badge.slug);
       notifications.push({ name: badge.name, description: badge.description, xpReward: badge.xpReward });

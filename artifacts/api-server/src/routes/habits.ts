@@ -19,41 +19,45 @@ import { logger } from "../lib/logger";
 const router = Router();
 
 async function awardHabitXp(userId: string, amount: number, habitSlug: string): Promise<number> {
-  const [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
-  const [founder] = await db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
-  const multiplier = (streak?.multiplier || 1.0) * (founder?.xpMultiplier || 1.0);
-  const finalAmount = Math.min(Math.round(amount * multiplier), 150);
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_xp'))`);
 
-  await db.insert(xpTransactionsTable).values({
-    userId,
-    amount: finalAmount,
-    reason: `habit_${habitSlug}`,
-    category: "habits",
+    const [streak] = await tx.select().from(streaksTable).where(eq(streaksTable.userId, userId));
+    const [founder] = await tx.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
+    const multiplier = (streak?.multiplier || 1.0) * (founder?.xpMultiplier || 1.0);
+    const finalAmount = Math.min(Math.round(amount * multiplier), 150);
+
+    await tx.insert(xpTransactionsTable).values({
+      userId,
+      amount: finalAmount,
+      reason: `habit_${habitSlug}`,
+      category: "habits",
+    });
+
+    let [xpRow] = await tx.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+    if (!xpRow) {
+      [xpRow] = await tx.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
+    }
+
+    const newTotal = xpRow.totalXp + finalAmount;
+    const newLevel = Math.floor(Math.sqrt(newTotal / 100)) + 1;
+    let newTier = "Bronze";
+    if (newLevel >= 40 && newTotal >= 50000) newTier = "Diamond";
+    else if (newLevel >= 30 && newTotal >= 25000) newTier = "Platinum";
+    else if (newLevel >= 20 && newTotal >= 10000) newTier = "Gold";
+    else if (newLevel >= 10 && newTotal >= 3000) newTier = "Silver";
+
+    await tx.update(userXpTable).set({
+      totalXp: sql`${userXpTable.totalXp} + ${finalAmount}`,
+      level: newLevel,
+      tier: newTier,
+      monthlyXp: sql`${userXpTable.monthlyXp} + ${finalAmount}`,
+      weeklyXp: sql`${userXpTable.weeklyXp} + ${finalAmount}`,
+      updatedAt: new Date(),
+    }).where(eq(userXpTable.userId, userId));
+
+    return finalAmount;
   });
-
-  let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
-  if (!xpRow) {
-    [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
-  }
-
-  const newTotal = xpRow.totalXp + finalAmount;
-  const newLevel = Math.floor(Math.sqrt(newTotal / 100)) + 1;
-  let newTier = "Bronze";
-  if (newLevel >= 40 && newTotal >= 50000) newTier = "Diamond";
-  else if (newLevel >= 30 && newTotal >= 25000) newTier = "Platinum";
-  else if (newLevel >= 20 && newTotal >= 10000) newTier = "Gold";
-  else if (newLevel >= 10 && newTotal >= 3000) newTier = "Silver";
-
-  await db.update(userXpTable).set({
-    totalXp: newTotal,
-    level: newLevel,
-    tier: newTier,
-    monthlyXp: xpRow.monthlyXp + finalAmount,
-    weeklyXp: xpRow.weeklyXp + finalAmount,
-    updatedAt: new Date(),
-  }).where(eq(userXpTable.userId, userId));
-
-  return finalAmount;
 }
 
 router.get("/habits", requireAuth, async (_req, res) => {

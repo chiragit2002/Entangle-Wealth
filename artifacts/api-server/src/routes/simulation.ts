@@ -8,7 +8,7 @@ import {
   userXpTable,
   xpTransactionsTable,
 } from "@workspace/db/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { resolveUserId } from "../lib/resolveUserId";
@@ -69,29 +69,32 @@ function calculateProjections(params: {
 async function awardXpIfEligible(userId: string, isFirstRun: boolean) {
   if (isFirstRun) {
     const amount = 100;
-    await db.insert(xpTransactionsTable).values({
-      userId,
-      amount,
-      reason: "first_simulation",
-      category: "simulation",
+    await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_xp'))`);
+      await tx.insert(xpTransactionsTable).values({
+        userId,
+        amount,
+        reason: "first_simulation",
+        category: "simulation",
+      });
+      let [xpRow] = await tx.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+      if (!xpRow) {
+        [xpRow] = await tx.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
+      }
+      const newTotalXp = xpRow.totalXp + amount;
+      const newLevel = calculateLevel(newTotalXp);
+      const newTier = calculateTier(newLevel, newTotalXp);
+      await tx.update(userXpTable)
+        .set({
+          totalXp: sql`${userXpTable.totalXp} + ${amount}`,
+          level: newLevel,
+          tier: newTier,
+          monthlyXp: sql`${userXpTable.monthlyXp} + ${amount}`,
+          weeklyXp: sql`${userXpTable.weeklyXp} + ${amount}`,
+          updatedAt: new Date(),
+        })
+        .where(eq(userXpTable.userId, userId));
     });
-    let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
-    if (!xpRow) {
-      [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
-    }
-    const newTotalXp = xpRow.totalXp + amount;
-    const newLevel = calculateLevel(newTotalXp);
-    const newTier = calculateTier(newLevel, newTotalXp);
-    await db.update(userXpTable)
-      .set({
-        totalXp: newTotalXp,
-        level: newLevel,
-        tier: newTier,
-        monthlyXp: xpRow.monthlyXp + amount,
-        weeklyXp: xpRow.weeklyXp + amount,
-        updatedAt: new Date(),
-      })
-      .where(eq(userXpTable.userId, userId));
     return amount;
   }
   return 0;
@@ -262,22 +265,25 @@ router.post("/simulation/project", requireAuth, validateBody(SimulationProjectSc
         });
 
         const xpForMilestone = Math.min(50 + Math.floor(Math.log10(milestone.threshold)) * 10, 100);
-        await db.insert(xpTransactionsTable).values({
-          userId,
-          amount: xpForMilestone,
-          reason: `milestone_${milestone.key}`,
-          category: "simulation",
+        await db.transaction(async (tx) => {
+          await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_xp'))`);
+          await tx.insert(xpTransactionsTable).values({
+            userId,
+            amount: xpForMilestone,
+            reason: `milestone_${milestone.key}`,
+            category: "simulation",
+          });
+          let [xpRow] = await tx.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+          if (!xpRow) {
+            [xpRow] = await tx.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
+          }
+          const newTotalXp = xpRow.totalXp + xpForMilestone;
+          const newLevel = calculateLevel(newTotalXp);
+          const newTier = calculateTier(newLevel, newTotalXp);
+          await tx.update(userXpTable)
+            .set({ totalXp: sql`${userXpTable.totalXp} + ${xpForMilestone}`, level: newLevel, tier: newTier, monthlyXp: sql`${userXpTable.monthlyXp} + ${xpForMilestone}`, weeklyXp: sql`${userXpTable.weeklyXp} + ${xpForMilestone}`, updatedAt: new Date() })
+            .where(eq(userXpTable.userId, userId));
         });
-        let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
-        if (!xpRow) {
-          [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
-        }
-        const newTotalXp = xpRow.totalXp + xpForMilestone;
-        const newLevel = calculateLevel(newTotalXp);
-        const newTier = calculateTier(newLevel, newTotalXp);
-        await db.update(userXpTable)
-          .set({ totalXp: newTotalXp, level: newLevel, tier: newTier, monthlyXp: xpRow.monthlyXp + xpForMilestone, weeklyXp: xpRow.weeklyXp + xpForMilestone, updatedAt: new Date() })
-          .where(eq(userXpTable.userId, userId));
 
         xpAwarded += xpForMilestone;
         newlyUnlocked.push(milestone);

@@ -155,8 +155,9 @@ export default function Giveaway() {
       }
     } catch (err) {
       console.error("[Giveaway] Failed to load public giveaway info:", err);
+      toast({ title: "Could not load giveaway info", description: "Please refresh to try again.", variant: "destructive" });
     }
-  }, []);
+  }, [toast]);
 
   const fetchMyData = useCallback(async () => {
     if (!isSignedIn) return;
@@ -178,9 +179,10 @@ export default function Giveaway() {
       }
     } catch (err) {
       console.error("[Giveaway] Failed to load my giveaway data:", err);
+      toast({ title: "Could not load your entries", description: "Please refresh to try again.", variant: "destructive" });
     }
     setLoading(false);
-  }, [isSignedIn, getToken]);
+  }, [isSignedIn, getToken, toast]);
 
   useEffect(() => {
     fetchPublicInfo();
@@ -194,7 +196,9 @@ export default function Giveaway() {
       setCopied(true);
       toast({ title: "Referral link copied!", description: "Share it to earn entries and your referral bonus share." });
       setTimeout(() => setCopied(false), 2000);
-    } catch {}
+    } catch {
+      toast({ title: "Could not copy link", description: "Please copy manually: " + referralLink, variant: "destructive" });
+    }
   }, [referralLink, toast]);
 
   const shareLink = useCallback(async () => {

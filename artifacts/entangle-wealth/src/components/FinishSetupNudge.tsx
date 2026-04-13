@@ -26,10 +26,10 @@ interface FinishSetupNudgeUIProps {
 export function FinishSetupNudgeUI({ incompleteItems, onDismiss }: FinishSetupNudgeUIProps) {
   return (
     <div className="col-span-12 mb-1.5" data-testid="finish-setup-nudge">
-      <div className="bg-gradient-to-r from-[#001a10] via-[#00FF4108] to-[#001a10] border border-[#00FF41]/15 rounded-sm px-3 py-2.5 animate-in slide-in-from-top-2 duration-300">
+      <div className="bg-gradient-to-r from-[#001a10] via-[#FF8C0008] to-[#001a10] border border-[#FF8C00]/15 rounded-sm px-3 py-2.5 animate-in slide-in-from-top-2 duration-300">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-2.5">
-            <Rocket className="w-4 h-4 text-[#00D4FF] mt-0.5 flex-shrink-0" />
+            <Rocket className="w-4 h-4 text-[#FF8C00] mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-[11px] font-bold text-white/70">
                 You left {incompleteItems.length} setup {incompleteItems.length === 1 ? "step" : "steps"} unfinished
@@ -40,7 +40,7 @@ export function FinishSetupNudgeUI({ incompleteItems, onDismiss }: FinishSetupNu
                   <Link
                     key={item.id}
                     href={item.href}
-                    className="flex items-center gap-1 px-2 py-1 bg-[#00D4FF]/10 border border-[#00D4FF]/20 rounded-sm text-[9px] font-mono text-[#00D4FF] hover:bg-[#00D4FF]/15 transition-colors"
+                    className="flex items-center gap-1 px-2 py-1 bg-[#FF8C00]/10 border border-[#FF8C00]/20 rounded-sm text-[9px] font-mono text-[#FF8C00] hover:bg-[#FF8C00]/15 transition-colors"
                   >
                     {item.label}
                     <ArrowRight className="w-2.5 h-2.5" />

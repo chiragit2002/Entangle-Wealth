@@ -140,7 +140,7 @@ const XpSchema = z.object({
   }).optional(),
 });
 
-const BACKTESTER_BADGES = [
+const BACKTESTER_SEED_BADGES = [
   {
     slug: "time-traveler",
     name: "Time Traveler",
@@ -205,7 +205,7 @@ const BACKTESTER_BADGES = [
 ];
 
 export async function ensureBacktesterBadgesExist(): Promise<void> {
-  for (const badge of BACKTESTER_BADGES) {
+  for (const badge of BACKTESTER_SEED_BADGES) {
     const [existing] = await db.select().from(badgesTable).where(eq(badgesTable.slug, badge.slug));
     if (!existing) {
       await db.insert(badgesTable).values({

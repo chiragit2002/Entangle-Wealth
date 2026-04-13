@@ -33,7 +33,7 @@ const SERVICE_ICONS: Record<string, typeof Server> = {
 };
 
 const STATUS_OPTIONS = [
-  { value: "operational", label: "Operational", color: "#00FF41", icon: CheckCircle2 },
+  { value: "operational", label: "Operational", color: "#FF8C00", icon: CheckCircle2 },
   { value: "degraded", label: "Degraded", color: "#FFB800", icon: AlertTriangle },
   { value: "outage", label: "Outage", color: "#ff3366", icon: XCircle },
 ];
@@ -213,7 +213,7 @@ export default function AdminStatus() {
                   <select
                     value={incidentForm.serviceName}
                     onChange={(e) => setIncidentForm((f) => ({ ...f, serviceName: e.target.value }))}
-                    className="w-full h-9 mt-1 px-3 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#00D4FF]/40 appearance-none"
+                    className="w-full h-9 mt-1 px-3 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#FF8C00]/40 appearance-none"
                   >
                     <option value="" className="bg-black">Select service...</option>
                     {services.map((s) => (
@@ -226,7 +226,7 @@ export default function AdminStatus() {
                   <select
                     value={incidentForm.severity}
                     onChange={(e) => setIncidentForm((f) => ({ ...f, severity: e.target.value }))}
-                    className="w-full h-9 mt-1 px-3 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#00D4FF]/40 appearance-none"
+                    className="w-full h-9 mt-1 px-3 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#FF8C00]/40 appearance-none"
                   >
                     <option value="minor" className="bg-black">Minor</option>
                     <option value="major" className="bg-black">Major</option>
@@ -241,7 +241,7 @@ export default function AdminStatus() {
                   onChange={(e) => setIncidentForm((f) => ({ ...f, title: e.target.value }))}
                   placeholder="Brief incident title"
                   maxLength={200}
-                  className="w-full h-9 mt-1 px-3 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/40"
+                  className="w-full h-9 mt-1 px-3 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8C00]/40"
                 />
               </div>
               <div>
@@ -252,7 +252,7 @@ export default function AdminStatus() {
                   placeholder="Details about the incident..."
                   rows={3}
                   maxLength={2000}
-                  className="w-full mt-1 px-3 py-2 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/40 resize-none"
+                  className="w-full mt-1 px-3 py-2 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8C00]/40 resize-none"
                 />
               </div>
               <div className="flex gap-2">
@@ -268,13 +268,13 @@ export default function AdminStatus() {
 
           {incidents.length === 0 ? (
             <div className="text-center py-12 bg-white/[0.01] border border-white/[0.06] rounded-xl">
-              <CheckCircle2 className="w-8 h-8 text-[#00FF41]/40 mx-auto mb-3" />
+              <CheckCircle2 className="w-8 h-8 text-[#FF8C00]/40 mx-auto mb-3" />
               <p className="text-white/30 text-sm">No recent incidents</p>
             </div>
           ) : (
             <div className="space-y-2">
               {incidents.map((inc) => {
-                const sevColor = inc.severity === "critical" ? "#ff3366" : inc.severity === "major" ? "#FFB800" : "#00D4FF";
+                const sevColor = inc.severity === "critical" ? "#ff3366" : inc.severity === "major" ? "#FFB800" : "#FF8C00";
                 return (
                   <div key={inc.id} className="px-4 py-3 bg-white/[0.02] border border-white/[0.06] rounded-xl flex items-center justify-between">
                     <div>
@@ -285,7 +285,7 @@ export default function AdminStatus() {
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border" style={{ color: sevColor, borderColor: `${sevColor}33`, backgroundColor: `${sevColor}10` }}>
                         {inc.severity}
                       </span>
-                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${inc.resolved_at ? "bg-[#00FF41]/10 text-[#00FF41] border border-[#00FF41]/20" : "bg-[#FFB800]/10 text-[#FFB800] border border-[#FFB800]/20"}`}>
+                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${inc.resolved_at ? "bg-[#FF8C00]/10 text-[#FF8C00] border border-[#FF8C00]/20" : "bg-[#FFB800]/10 text-[#FFB800] border border-[#FFB800]/20"}`}>
                         {inc.resolved_at ? "Resolved" : inc.status}
                       </span>
                     </div>

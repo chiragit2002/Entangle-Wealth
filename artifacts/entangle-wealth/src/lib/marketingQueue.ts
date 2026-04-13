@@ -32,9 +32,9 @@ export const PLATFORM_COLORS: Record<string, string> = {
   twitter: "#1DA1F2",
   linkedin: "#0A66C2",
   github: "#8B5CF6",
-  blog: "#00D4FF",
+  blog: "#FF8C00",
   email: "#FFB800",
-  community: "#00FF41",
+  community: "#FF8C00",
 };
 
 export const BEST_TIMES: Record<string, { days: string; time: string; timezone: string }> = {

@@ -80,9 +80,11 @@ class AIRequestQueue {
       queued: this.queue.length,
       maxConcurrent: this.maxConcurrent,
       maxWaiting: this.maxWaiting,
+      maxQueueDepth: this.maxWaiting,
       totalProcessed: this.totalProcessed,
       totalFailed: this.totalFailed,
       totalRejected: this.totalRejected,
+      utilizationPct: Math.round((this.activeCount / this.maxConcurrent) * 100),
     };
   }
 }

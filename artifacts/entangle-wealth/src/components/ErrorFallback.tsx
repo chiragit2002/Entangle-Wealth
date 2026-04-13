@@ -53,7 +53,7 @@ export default function ErrorFallback({ error, resetErrorBoundary }: ErrorFallba
             onClick={resetErrorBoundary}
             className="inline-flex items-center gap-2 px-6 py-3 font-mono font-semibold transition-all hover:opacity-90 active:scale-[0.97]"
             style={{
-              background: "#00FF41",
+              background: "#FF8C00",
               color: "#0A0E1A",
               borderRadius: 0,
             }}
@@ -64,7 +64,7 @@ export default function ErrorFallback({ error, resetErrorBoundary }: ErrorFallba
           <Link
             href="/"
             className="inline-flex items-center gap-2 px-6 py-3 font-mono font-semibold transition-colors hover:bg-white/5"
-            style={{ border: "1px solid rgba(0,255,65,0.15)", color: "rgba(255,255,255,0.55)", borderRadius: 0 }}
+            style={{ border: "1px solid rgba(255,140,0,0.15)", color: "rgba(255,255,255,0.55)", borderRadius: 0 }}
           >
             <Home className="w-4 h-4" />
             Return to Base

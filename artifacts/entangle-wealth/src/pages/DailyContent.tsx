@@ -61,12 +61,12 @@ const PLATFORM_META: Record<string, { label: string; icon: React.ReactNode; colo
     label: "LinkedIn",
     icon: <Linkedin className="w-4 h-4" />,
     color: "#0A66C2",
-    gradient: "from-blue-700/20 to-cyan-700/20",
+    gradient: "from-blue-700/20 to-amber-700/20",
   },
   engagement: {
     label: "Engagement",
     icon: <MessageCircle className="w-4 h-4" />,
-    color: "#00FF41",
+    color: "#FF8C00",
     gradient: "from-emerald-500/20 to-green-600/20",
   },
 };

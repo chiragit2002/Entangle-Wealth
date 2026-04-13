@@ -41,8 +41,8 @@ export const TRIP_STYLES = [
 ];
 
 export const MARKER_COLORS: Record<string, string> = {
-  hotel: "#00D4FF",
-  activity: "#00FF41",
+  hotel: "#FF8C00",
+  activity: "#FF8C00",
   restaurant: "#FFB800",
   transit: "#9c27b0",
 };

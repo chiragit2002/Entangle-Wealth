@@ -140,7 +140,7 @@ export function CityAutocomplete({
           ref={dropdownRef}
           id={id ? `${id}-listbox` : undefined}
           role="listbox"
-          className="absolute z-50 w-full mt-1 max-h-[240px] overflow-y-auto border border-[#00D4FF]/30 bg-[#0D1321] shadow-xl shadow-black/60"
+          className="absolute z-50 w-full mt-1 max-h-[240px] overflow-y-auto border border-[#FF8C00]/30 bg-[#0D1321] shadow-xl shadow-black/60"
           style={{ borderRadius: 4 }}
         >
           {suggestions.map((entry, idx) => (
@@ -157,18 +157,18 @@ export function CityAutocomplete({
               onMouseEnter={() => setHighlightedIndex(idx)}
               className={`flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors font-mono text-[11px] ${
                 highlightedIndex === idx
-                  ? "bg-[#00D4FF]/10 text-[#00FF41]"
-                  : "text-[#00FF41]/80 hover:bg-[#00D4FF]/5"
+                  ? "bg-[#FF8C00]/10 text-[#FF8C00]"
+                  : "text-[#FF8C00]/80 hover:bg-[#FF8C00]/5"
               }`}
-              style={{ borderBottom: idx < suggestions.length - 1 ? "1px solid rgba(0,212,255,0.08)" : undefined }}
+              style={{ borderBottom: idx < suggestions.length - 1 ? "1px solid rgba(255,140,0,0.08)" : undefined }}
             >
-              <MapPin className="w-3 h-3 text-[#00D4FF] flex-shrink-0" />
+              <MapPin className="w-3 h-3 text-[#FF8C00] flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <span className="font-bold">{entry.city}</span>
-                <span className="text-[#00FF41]/50">, {entry.state}, </span>
-                <span className="text-[#00D4FF]/60">{entry.country}</span>
+                <span className="text-[#FF8C00]/50">, {entry.state}, </span>
+                <span className="text-[#FF8C00]/60">{entry.country}</span>
               </div>
-              <span className="text-[8px] text-[#00D4FF]/40 flex-shrink-0">{entry.countryCode}</span>
+              <span className="text-[8px] text-[#FF8C00]/40 flex-shrink-0">{entry.countryCode}</span>
             </div>
           ))}
         </div>

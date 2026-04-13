@@ -170,7 +170,7 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
                 <Link
                   href="/profile"
                   onClick={onClose}
-                  className="inline-flex items-center gap-1 mt-1.5 text-[11px] font-semibold text-[#00FF41] hover:text-[#00a8d8] underline underline-offset-2 transition-colors"
+                  className="inline-flex items-center gap-1 mt-1.5 text-[11px] font-semibold text-[#FF8C00] hover:text-[#00a8d8] underline underline-offset-2 transition-colors"
                 >
                   Go to profile settings to verify identity
                 </Link>

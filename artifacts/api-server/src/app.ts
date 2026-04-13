@@ -25,6 +25,7 @@ import { createRouter } from "./routes";
 import seoRouter from "./routes/seo";
 import { logger } from "./lib/logger";
 import { getAuth } from "@clerk/express";
+import { standardTimeout, aiTimeout } from "./middlewares/requestTimeout";
 
 const app: Express = express();
 
@@ -101,7 +102,12 @@ const apiLimiter = rateLimit({
   standardHeaders: "draft-7",
   legacyHeaders: false,
   message: { error: "Too many requests, please try again later." },
-  skip: (req) => req.path.startsWith(CLERK_PROXY_PATH) || req.path === "/api/stripe/webhook" || req.path === "/api/alerts/stream",
+  skip: (req) =>
+    req.path.startsWith(CLERK_PROXY_PATH) ||
+    req.path === "/api/stripe/webhook" ||
+    req.path === "/api/alerts/stream" ||
+    req.path === "/api/health" ||
+    req.path.startsWith("/api/stress-test"),
 });
 app.use(apiLimiter);
 
@@ -206,16 +212,17 @@ app.use((req, _res, next) => {
   next();
 });
 
-app.use("/api/taxgpt", aiLimiter);
-app.use("/api/analyze-document", aiLimiter);
-app.use("/api/analyze", aiLimiter);
+app.use("/api/taxgpt", aiLimiter, aiTimeout);
+app.use("/api/analyze-document", aiLimiter, aiTimeout);
+app.use("/api/analyze", aiLimiter, aiTimeout);
+app.use("/api/coaching", aiTimeout);
 app.use("/api/marketing/generate", rateLimit({
   windowMs: 60 * 1000,
   limit: 5,
   standardHeaders: "draft-7",
   legacyHeaders: false,
   message: { error: "Marketing AI rate limit exceeded. Max 5 requests per minute." },
-}));
+}), aiTimeout);
 
 app.use("/api/taxgpt", userAiLimiter);
 app.use("/api/analyze-document", userAiLimiter);
@@ -223,6 +230,10 @@ app.use("/api/analyze", userAiLimiter);
 app.use("/api/paper-trading", userTradingLimiter);
 app.use("/api/kyc", userKycLimiter);
 app.use("/api", userApiLimiter);
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api/stress-test")) return next();
+  return standardTimeout(req, res, next);
+});
 
 app.use(seoRouter);
 app.use("/api", seoRouter);

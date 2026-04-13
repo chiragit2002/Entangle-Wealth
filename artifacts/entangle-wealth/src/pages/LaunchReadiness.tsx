@@ -111,7 +111,7 @@ const DNS_STEPS = [
 ];
 
 function StatusIcon({ status }: { status: "pass" | "fail" | "warn" | boolean }) {
-  if (status === "pass" || status === true) return <CheckCircle2 className="w-5 h-5 text-[#00FF41]" />;
+  if (status === "pass" || status === true) return <CheckCircle2 className="w-5 h-5 text-[#FF8C00]" />;
   if (status === "warn") return <AlertTriangle className="w-5 h-5 text-[#FFB800]" />;
   return <XCircle className="w-5 h-5 text-[#ff3366]" />;
 }
@@ -119,7 +119,7 @@ function StatusIcon({ status }: { status: "pass" | "fail" | "warn" | boolean }) 
 function ScoreRing({ score, ready }: { score: number; ready: boolean }) {
   const circumference = 2 * Math.PI * 45;
   const strokeDashoffset = circumference - (score / 100) * circumference;
-  const color = ready ? "#00FF41" : score >= 70 ? "#FFB800" : "#ff3366";
+  const color = ready ? "#FF8C00" : score >= 70 ? "#FFB800" : "#ff3366";
 
   return (
     <div className="relative w-32 h-32">
@@ -208,7 +208,7 @@ export default function LaunchReadiness() {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <RefreshCw className="w-8 h-8 text-[#00D4FF] animate-spin" />
+          <RefreshCw className="w-8 h-8 text-[#FF8C00] animate-spin" />
         </div>
       </Layout>
     );
@@ -232,8 +232,8 @@ export default function LaunchReadiness() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00D4FF]/20 to-[#9c27b0]/20 border border-[#00D4FF]/30 flex items-center justify-center">
-                <Rocket className="w-5 h-5 text-[#00D4FF]" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF8C00]/20 to-[#9c27b0]/20 border border-[#FF8C00]/30 flex items-center justify-center">
+                <Rocket className="w-5 h-5 text-[#FF8C00]" />
               </div>
               <h1 className="text-2xl font-bold text-white">Launch Readiness</h1>
             </div>
@@ -257,7 +257,7 @@ export default function LaunchReadiness() {
             </h2>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <div className="text-2xl font-bold font-mono text-[#00FF41]">{autoPassCount + manualPassCount}</div>
+                <div className="text-2xl font-bold font-mono text-[#FF8C00]">{autoPassCount + manualPassCount}</div>
                 <div className="text-xs text-white/50">Passing</div>
               </div>
               <div>
@@ -283,7 +283,7 @@ export default function LaunchReadiness() {
             className="w-full flex items-center justify-between bg-[#0A0E1A] border border-white/10 rounded-xl px-6 py-4 hover:bg-white/[0.02] transition"
           >
             <div className="flex items-center gap-3">
-              <Server className="w-5 h-5 text-[#00D4FF]" />
+              <Server className="w-5 h-5 text-[#FF8C00]" />
               <span className="text-lg font-semibold text-white">Automated Checks</span>
               <span className="text-xs text-white/50 bg-white/5 px-2 py-0.5 rounded-full">
                 {autoPassCount}/{autoChecks.length} passing
@@ -398,12 +398,12 @@ export default function LaunchReadiness() {
                 </div>
               ))}
               <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                <ExternalLink className="w-4 h-4 text-[#00D4FF]" />
+                <ExternalLink className="w-4 h-4 text-[#FF8C00]" />
                 <a
                   href="https://docs.replit.com/hosting/deployments/custom-domains"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-[#00D4FF] hover:underline"
+                  className="text-sm text-[#FF8C00] hover:underline"
                 >
                   Replit Custom Domain Documentation
                 </a>
@@ -441,7 +441,7 @@ export default function LaunchReadiness() {
                   <div key={v.name} className="flex items-center gap-4 px-4 py-3 hover:bg-white/[0.02] transition">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <code className="text-sm font-mono text-[#00D4FF]">{v.name}</code>
+                        <code className="text-sm font-mono text-[#FF8C00]">{v.name}</code>
                         <button
                           onClick={() => copyToClipboard(v.name, v.name)}
                           className="text-white/50 hover:text-white/60 transition"
@@ -449,7 +449,7 @@ export default function LaunchReadiness() {
                           <Copy className="w-3.5 h-3.5" />
                         </button>
                         {copiedVar === v.name && (
-                          <span className="text-[10px] text-[#00FF41]">Copied!</span>
+                          <span className="text-[10px] text-[#FF8C00]">Copied!</span>
                         )}
                       </div>
                       <p className="text-xs text-white/50 mt-0.5">{v.desc}</p>

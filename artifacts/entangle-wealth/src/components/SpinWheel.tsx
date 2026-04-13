@@ -15,15 +15,15 @@ interface Prize {
 }
 
 const PRIZES: Prize[] = [
-  { rewardType: "cash", label: "$1K", color: "#1a3a2a", textColor: "#00FF41" },
-  { rewardType: "xp", label: "+50 XP", color: "#1a1a3a", textColor: "#00D4FF" },
-  { rewardType: "cash", label: "$2K", color: "#1a2a3a", textColor: "#00D4FF" },
+  { rewardType: "cash", label: "$1K", color: "#1a3a2a", textColor: "#FF8C00" },
+  { rewardType: "xp", label: "+50 XP", color: "#1a1a3a", textColor: "#FF8C00" },
+  { rewardType: "cash", label: "$2K", color: "#1a2a3a", textColor: "#FF8C00" },
   { rewardType: "xp", label: "+100 XP", color: "#2a1a3a", textColor: "#a855f7" },
   { rewardType: "cash", label: "$3K", color: "#2a1a3a", textColor: "#a855f7" },
   { rewardType: "cash", label: "$4K", color: "#3a2a1a", textColor: "#f59e0b" },
   { rewardType: "xp", label: "+250 XP", color: "#1a1a2a", textColor: "#6366f1" },
-  { rewardType: "cash", label: "$5K", color: "#1a3a2a", textColor: "#00FF41" },
-  { rewardType: "cash", label: "$7.5K", color: "#1a2a3a", textColor: "#00D4FF" },
+  { rewardType: "cash", label: "$5K", color: "#1a3a2a", textColor: "#FF8C00" },
+  { rewardType: "cash", label: "$7.5K", color: "#1a2a3a", textColor: "#FF8C00" },
   { rewardType: "cash", label: "$10K", color: "#3a1a1a", textColor: "#ff3366" },
   { rewardType: "multiplier", label: "2x Boost", color: "#2a1a00", textColor: "#FFB800" },
   { rewardType: "cash", label: "$25K", color: "#2a1a1a", textColor: "#ff6b35" },
@@ -275,7 +275,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
             </div>
           )}
           {status?.canSpin && (
-            <span className="text-[9px] font-mono text-[#00FF41] animate-pulse">READY</span>
+            <span className="text-[9px] font-mono text-[#FF8C00] animate-pulse">READY</span>
           )}
         </div>
       </div>
@@ -370,18 +370,18 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
               className="mt-3 p-3 border rounded-sm text-center"
               style={{
                 backgroundColor: winResult.rewardType === "cash" ? "rgba(255,215,0,0.1)" :
-                  winResult.rewardType === "xp" ? "rgba(0,212,255,0.1)" :
+                  winResult.rewardType === "xp" ? "rgba(255,140,0,0.1)" :
                   winResult.rewardType === "multiplier" ? "rgba(255,215,0,0.1)" :
                   "rgba(255,51,102,0.1)",
                 borderColor: winResult.rewardType === "cash" ? "rgba(255,215,0,0.3)" :
-                  winResult.rewardType === "xp" ? "rgba(0,212,255,0.3)" :
+                  winResult.rewardType === "xp" ? "rgba(255,140,0,0.3)" :
                   winResult.rewardType === "multiplier" ? "rgba(255,215,0,0.3)" :
                   "rgba(255,51,102,0.3)",
               }}
             >
               <Trophy className="w-5 h-5 mx-auto mb-1" style={{
                 color: winResult.rewardType === "cash" ? "#FFB800" :
-                  winResult.rewardType === "xp" ? "#00D4FF" :
+                  winResult.rewardType === "xp" ? "#FF8C00" :
                   winResult.rewardType === "multiplier" ? "#FFB800" : "#ff3366"
               }} />
               <p className="text-[9px] font-mono text-white/50 mb-0.5">YOU WON</p>
@@ -393,7 +393,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
               )}
               {winResult.rewardType === "xp" && (
                 <>
-                  <p className="text-xl font-mono font-bold text-[#00D4FF]">+{winResult.xpAmount} XP</p>
+                  <p className="text-xl font-mono font-bold text-[#FF8C00]">+{winResult.xpAmount} XP</p>
                   <p className="text-[8px] font-mono text-white/30 mt-0.5">Added to your gamification profile</p>
                 </>
               )}
@@ -435,7 +435,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
                   <span className="text-[8px] font-mono text-white/30">{h.spinDate}</span>
                   <span className="text-[9px] font-mono font-bold"
                     style={{
-                      color: h.rewardType === "xp" ? "#00D4FF" :
+                      color: h.rewardType === "xp" ? "#FF8C00" :
                         h.rewardType === "multiplier" ? "#FFB800" :
                         h.rewardType === "streak_protection" ? "#ff3366" : "#FFB800"
                     }}>

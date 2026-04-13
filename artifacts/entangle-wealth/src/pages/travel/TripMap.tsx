@@ -124,7 +124,7 @@ export default function TripMap({ activities, destinations, highlightDay }: Prop
     const bounds: [number, number][] = [];
 
     visibleStops.forEach(stop => {
-      const color = MARKER_COLORS[stop.type] || "#00D4FF";
+      const color = MARKER_COLORS[stop.type] || "#FF8C00";
       const opacity = highlightDay !== null && stop.day !== highlightDay && stop.day !== 0 ? 0.4 : 1;
       const marker = L.marker([stop.lat, stop.lng], {
         icon: createIcon(color),
@@ -157,7 +157,7 @@ export default function TripMap({ activities, destinations, highlightDay }: Prop
       const destStops = stops.filter(s => s.day === 0);
       if (destStops.length > 1) {
         const coords: [number, number][] = destStops.map(s => [s.lat, s.lng]);
-        L.polyline(coords, { color: "#00D4FF", weight: 2, opacity: 0.4, dashArray: "8, 4" })
+        L.polyline(coords, { color: "#FF8C00", weight: 2, opacity: 0.4, dashArray: "8, 4" })
           .addTo(linesRef.current!);
       }
     }
@@ -168,7 +168,7 @@ export default function TripMap({ activities, destinations, highlightDay }: Prop
   }, [stops, highlightDay]);
 
   return (
-    <div className="relative rounded-sm overflow-hidden border border-[rgba(0,212,255,0.15)]">
+    <div className="relative rounded-sm overflow-hidden border border-[rgba(255,140,0,0.15)]">
       {loading && (
         <div className="absolute inset-0 z-[1000] bg-black/60 flex items-center justify-center">
           <div className="text-[13px] text-primary animate-pulse">Loading map data...</div>

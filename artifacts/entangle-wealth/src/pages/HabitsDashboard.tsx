@@ -34,9 +34,9 @@ const CATEGORY_COLORS: Record<string, string> = {
   investing: "border-purple-500/40 bg-purple-500/5",
   retirement: "border-amber-500/40 bg-amber-500/5",
   debt: "border-red-500/40 bg-red-500/5",
-  tracking: "border-cyan-500/40 bg-cyan-500/5",
+  tracking: "border-amber-1000/40 bg-amber-1000/5",
   planning: "border-indigo-500/40 bg-indigo-500/5",
-  education: "border-teal-500/40 bg-teal-500/5",
+  education: "border-amber-500/40 bg-amber-500/5",
   simulation: "border-violet-500/40 bg-violet-500/5",
   income: "border-orange-500/40 bg-orange-500/5",
 };
@@ -47,9 +47,9 @@ const CATEGORY_BADGE_COLORS: Record<string, string> = {
   investing: "bg-purple-500/20 text-purple-300",
   retirement: "bg-amber-500/20 text-amber-300",
   debt: "bg-red-500/20 text-red-300",
-  tracking: "bg-cyan-500/20 text-cyan-300",
+  tracking: "bg-amber-1000/20 text-amber-400",
   planning: "bg-indigo-500/20 text-indigo-300",
-  education: "bg-teal-500/20 text-teal-300",
+  education: "bg-amber-500/20 text-teal-300",
   simulation: "bg-violet-500/20 text-violet-300",
   income: "bg-orange-500/20 text-orange-300",
 };
@@ -78,7 +78,7 @@ interface HabitSummary {
   totalLifetimeCompletions: number;
 }
 
-function ProgressRing({ value, max, size = 56, strokeWidth = 5, color = "#00D4FF" }: {
+function ProgressRing({ value, max, size = 56, strokeWidth = 5, color = "#FF8C00" }: {
   value: number;
   max: number;
   size?: number;
@@ -118,7 +118,7 @@ function ProgressRing({ value, max, size = 56, strokeWidth = 5, color = "#00D4FF
 
 function StreakBadge({ streak }: { streak: number }) {
   if (streak === 0) return null;
-  const color = streak >= 30 ? "#FFB800" : streak >= 14 ? "#9c27b0" : streak >= 7 ? "#00D4FF" : "#ff6b35";
+  const color = streak >= 30 ? "#FFB800" : streak >= 14 ? "#9c27b0" : streak >= 7 ? "#FF8C00" : "#ff6b35";
   return (
     <span
       className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full"
@@ -269,7 +269,7 @@ export default function HabitsDashboard() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 flex flex-col items-center">
                 <div className="relative mb-2">
-                  <ProgressRing value={completedToday} max={totalToday} size={64} color="#00D4FF" />
+                  <ProgressRing value={completedToday} max={totalToday} size={64} color="#FF8C00" />
                   <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white">
                     {completedToday}/{totalToday}
                   </span>
@@ -287,7 +287,7 @@ export default function HabitsDashboard() {
 
               <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center gap-1">
                 <div className="flex items-center gap-1.5">
-                  <Calendar className="w-5 h-5 text-cyan-400" />
+                  <Calendar className="w-5 h-5 text-amber-500" />
                   <span className="text-2xl font-bold text-white">{summary.completedThisWeek}</span>
                 </div>
                 <p className="text-xs text-white/50">This Week</p>
@@ -310,7 +310,7 @@ export default function HabitsDashboard() {
                 onClick={() => setActiveCategory(cat)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all ${
                   activeCategory === cat
-                    ? "bg-[#00D4FF] text-black"
+                    ? "bg-[#FF8C00] text-black"
                     : "bg-white/[0.04] text-white/50 hover:text-white hover:bg-white/[0.08] border border-white/10"
                 }`}
               >
@@ -330,7 +330,7 @@ export default function HabitsDashboard() {
               <AlertTriangle className="w-10 h-10 text-red-400/60 mx-auto mb-3" />
               <p className="text-white/60 text-sm font-medium">Failed to load habits</p>
               <p className="text-white/30 text-xs mt-1 mb-4">There was a problem connecting to the server.</p>
-              <button onClick={fetchHabits} className="text-xs text-[#00D4FF] hover:underline">Try again</button>
+              <button onClick={fetchHabits} className="text-xs text-[#FF8C00] hover:underline">Try again</button>
             </div>
           ) : filteredHabits.length === 0 ? (
             <div className="text-center py-16 bg-white/[0.02] border border-white/[0.06] rounded-xl">
@@ -343,7 +343,7 @@ export default function HabitsDashboard() {
               ) : (
                 <>
                   <p className="text-white/50 text-sm font-medium">No habits in "{activeCategory}"</p>
-                  <button onClick={() => setActiveCategory("all")} className="mt-3 text-xs text-[#00D4FF] hover:underline">View all habits</button>
+                  <button onClick={() => setActiveCategory("all")} className="mt-3 text-xs text-[#FF8C00] hover:underline">View all habits</button>
                 </>
               )}
             </div>
@@ -382,7 +382,7 @@ export default function HabitsDashboard() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3 text-xs text-white/40">
                         <span className="flex items-center gap-1">
-                          <Zap className="w-3 h-3 text-[#00D4FF]" />
+                          <Zap className="w-3 h-3 text-[#FF8C00]" />
                           +{habit.xpReward} XP
                         </span>
                         {habit.totalCompletions > 0 && (
@@ -400,8 +400,8 @@ export default function HabitsDashboard() {
                           habit.completedToday
                             ? "bg-emerald-500/20 text-emerald-400 cursor-default"
                             : isCompleting
-                            ? "bg-[#00D4FF]/20 text-[#00D4FF] cursor-wait"
-                            : "bg-[#00D4FF] text-black hover:bg-[#00D4FF]/90 active:scale-95"
+                            ? "bg-[#FF8C00]/20 text-[#FF8C00] cursor-wait"
+                            : "bg-[#FF8C00] text-black hover:bg-[#FF8C00]/90 active:scale-95"
                         }`}
                       >
                         {habit.completedToday ? (
@@ -430,7 +430,7 @@ export default function HabitsDashboard() {
 
           {!isSignedIn && (
             <div className="text-center py-8 bg-white/[0.04] border border-white/10 rounded-xl">
-              <Zap className="w-8 h-8 text-[#00D4FF] mx-auto mb-3" />
+              <Zap className="w-8 h-8 text-[#FF8C00] mx-auto mb-3" />
               <h3 className="text-white font-semibold mb-1">Sign in to track your habits</h3>
               <p className="text-white/50 text-sm">Earn XP, build streaks, and connect your habits to your financial goals.</p>
             </div>
@@ -438,8 +438,8 @@ export default function HabitsDashboard() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
             <Link href="/life-outcomes">
-              <a className="group flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.04] hover:border-[#00D4FF]/40 hover:bg-[#00D4FF]/5 transition-all cursor-pointer">
-                <TrendingUp className="w-8 h-8 text-[#00D4FF] flex-shrink-0 group-hover:scale-110 transition-transform" />
+              <a className="group flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.04] hover:border-[#FF8C00]/40 hover:bg-[#FF8C00]/5 transition-all cursor-pointer">
+                <TrendingUp className="w-8 h-8 text-[#FF8C00] flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <div>
                   <p className="text-white font-medium text-sm">Life Outcomes</p>
                   <p className="text-white/50 text-xs">See your habit impact projected forward</p>

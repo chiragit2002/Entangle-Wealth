@@ -481,8 +481,8 @@ export default function Travel() {
   };
 
   const getScoreColor = (s: number) => {
-    if (s >= 80) return "#00FF41";
-    if (s >= 60) return "#FFB800";
+    if (s >= 80) return "#FF8C00";
+    if (s >= 60) return "#FFA500";
     return "#ff3366";
   };
 
@@ -493,7 +493,7 @@ export default function Travel() {
     <Layout>
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[#0099cc] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[#FF6600] flex items-center justify-center">
             <Plane className="w-5 h-5 text-black" />
           </div>
           <div>
@@ -546,9 +546,9 @@ export default function Travel() {
                     onClick={() => { if (isDone) setStep(s as Step); }}
                     className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
                       isActive
-                        ? "bg-gradient-to-br from-primary to-[#0099cc] text-black shadow-lg shadow-primary/20"
+                        ? "bg-gradient-to-br from-primary to-[#FF6600] text-black shadow-lg shadow-primary/20"
                         : isDone
-                        ? "bg-[#00FF41]/20 text-[#00FF41] border-2 border-[#00FF41]/40 cursor-pointer"
+                        ? "bg-[#FF8C00]/20 text-[#FF8C00] border-2 border-[#FF8C00]/40 cursor-pointer"
                         : "bg-white/5 text-white/30 border border-white/10"
                     }`}
                     aria-label={`Step ${s}: ${labels[i]}`}
@@ -557,13 +557,13 @@ export default function Travel() {
                     {isDone ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-4 h-4 md:w-5 md:h-5" />}
                   </button>
                   <span className={`text-[10px] md:text-[11px] mt-2 font-semibold text-center ${
-                    isActive ? "text-primary" : isDone ? "text-[#00FF41]" : "text-white/30"
+                    isActive ? "text-primary" : isDone ? "text-[#FF8C00]" : "text-white/30"
                   }`}>
                     {labels[i]}
                   </span>
                 </div>
                 {i < 3 && (
-                  <div className={`h-[2px] flex-1 mx-1 -mt-5 ${step > s ? "bg-[#00FF41]/40" : "bg-white/10"}`} />
+                  <div className={`h-[2px] flex-1 mx-1 -mt-5 ${step > s ? "bg-[#FF8C00]/40" : "bg-white/10"}`} />
                 )}
               </div>
             );
@@ -572,7 +572,7 @@ export default function Travel() {
 
         {step === 1 && (
           <div className="space-y-4">
-            <div className="glass-panel rounded-sm p-5 md:p-7 border border-[rgba(0,212,255,0.15)]">
+            <div className="glass-panel rounded-sm p-5 md:p-7 border border-[rgba(255,140,0,0.15)]">
               <div className="flex gap-1 mb-5">
                 {(["roundtrip", "oneway", "multicity"] as const).map(t => (
                   <button key={t} onClick={() => setTrip(p => ({ ...p, tripType: t }))}
@@ -740,7 +740,7 @@ export default function Travel() {
 
         {step === 2 && (
           <div className="space-y-4">
-            <div className="glass-panel rounded-sm p-5 border border-[rgba(0,212,255,0.15)]">
+            <div className="glass-panel rounded-sm p-5 border border-[rgba(255,140,0,0.15)]">
               <div className="flex items-center justify-between mb-1">
                 <h2 className="text-lg font-bold">Select IRS Deductions</h2>
                 <span className="text-[12px] text-primary font-semibold">{selectedDeductions.length} selected</span>
@@ -783,7 +783,7 @@ export default function Travel() {
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="text-[13px] md:text-[14px] font-bold">{d.title}</p>
                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                              d.pct === 100 ? "bg-[#00FF41]/15 text-[#00FF41]" : d.pct >= 50 ? "bg-[#FFB800]/15 text-[#FFB800]" : "bg-white/10 text-white/50"
+                              d.pct === 100 ? "bg-[#FF8C00]/15 text-[#FF8C00]" : d.pct >= 50 ? "bg-[#FFB800]/15 text-[#FFB800]" : "bg-white/10 text-white/50"
                             }`}>
                               {d.pct}%
                             </span>
@@ -830,12 +830,12 @@ export default function Travel() {
             </div>
 
             {selectedDeductions.length > 0 && (
-              <div className="glass-panel rounded-xl p-4 border border-[#00FF41]/15 bg-[#00FF41]/[0.02]">
-                <p className="text-[12px] font-bold text-[#00FF41] mb-2">Selected ({selectedDeductions.length})</p>
+              <div className="glass-panel rounded-xl p-4 border border-[#FF8C00]/15 bg-[#FF8C00]/[0.02]">
+                <p className="text-[12px] font-bold text-[#FF8C00] mb-2">Selected ({selectedDeductions.length})</p>
                 <div className="flex flex-wrap gap-2">
                   {selectedDeductions.map(d => (
                     <span key={d.id} className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-[11px] font-semibold flex items-center gap-1.5">
-                      {d.title.split(" ")[0]} <span className="text-[#00FF41]">{d.pct}%</span>
+                      {d.title.split(" ")[0]} <span className="text-[#FF8C00]">{d.pct}%</span>
                       <button onClick={() => toggleDeduction(d.id)} className="ml-1 text-white/30 hover:text-white/60">×</button>
                     </span>
                   ))}
@@ -847,7 +847,7 @@ export default function Travel() {
 
         {step === 3 && (
           <div className="space-y-4">
-            <div className="glass-panel rounded-sm p-5 border border-[rgba(0,212,255,0.15)]">
+            <div className="glass-panel rounded-sm p-5 border border-[rgba(255,140,0,0.15)]">
               <div className="flex items-center justify-between mb-1">
                 <h2 className="text-lg font-bold">Build Your Itinerary</h2>
                 <span className="text-[12px] text-primary font-semibold">{dayCount} day{dayCount > 1 ? "s" : ""}</span>
@@ -860,7 +860,7 @@ export default function Travel() {
                 <div className="text-center py-8">
                   <Calendar className="w-12 h-12 mx-auto mb-3 text-white/10" />
                   <p className="text-[14px] text-white/30 mb-4">No activities yet. Start from a template or add manually.</p>
-                  <Button className="bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold min-h-[44px]" onClick={seedDefaultItinerary}>
+                  <Button className="bg-gradient-to-r from-primary to-[#FF6600] text-black font-bold min-h-[44px]" onClick={seedDefaultItinerary}>
                     Generate Template Itinerary
                   </Button>
                 </div>
@@ -881,7 +881,7 @@ export default function Travel() {
                         <span className="text-[11px] text-white/30">{dateStr}</span>
                       </div>
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                        bizCount > 0 ? "bg-[#00FF41]/15 text-[#00FF41]" : "bg-white/5 text-white/30"
+                        bizCount > 0 ? "bg-[#FF8C00]/15 text-[#FF8C00]" : "bg-white/5 text-white/30"
                       }`}>
                         {bizCount > 0 ? `${bizCount} business` : "No activities"}
                       </span>
@@ -911,7 +911,7 @@ export default function Travel() {
                               {ACTIVITY_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                             </select>
                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold flex-shrink-0 ${
-                              a.deductible === "full" ? "bg-[#00FF41]/15 text-[#00FF41]" :
+                              a.deductible === "full" ? "bg-[#FF8C00]/15 text-[#FF8C00]" :
                               a.deductible === "partial" ? "bg-[#FFB800]/15 text-[#FFB800]" :
                               "bg-[#ff3366]/15 text-[#ff3366]"
                             }`}>
@@ -938,7 +938,7 @@ export default function Travel() {
 
         {step === 4 && (
           <div className="space-y-4">
-            <div className="glass-panel rounded-sm p-5 md:p-7 border border-[rgba(0,212,255,0.15)]">
+            <div className="glass-panel rounded-sm p-5 md:p-7 border border-[rgba(255,140,0,0.15)]">
               <div className="text-center mb-6">
                 <div className="relative w-[120px] h-[120px] mx-auto mb-3">
                   <svg width="120" height="120" viewBox="0 0 120 120" className="-rotate-90" role="img" aria-label={`Compliance score: ${complianceScore}`}>
@@ -959,8 +959,8 @@ export default function Travel() {
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                <div className="rounded-xl p-3 bg-[#00FF41]/[0.06] border border-[#00FF41]/15 text-center">
-                  <p className="text-[20px] font-black text-[#00FF41]">${estimatedSavings.toLocaleString()}</p>
+                <div className="rounded-xl p-3 bg-[#FF8C00]/[0.06] border border-[#FF8C00]/15 text-center">
+                  <p className="text-[20px] font-black text-[#FF8C00]">${estimatedSavings.toLocaleString()}</p>
                   <p className="text-[10px] text-white/30 mt-1">Est. Deductible</p>
                 </div>
                 <div className="rounded-xl p-3 bg-primary/[0.06] border border-primary/15 text-center">
@@ -1017,7 +1017,7 @@ export default function Travel() {
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <span className="text-[10px] text-white/30 font-mono">{d.irsRef}</span>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          d.pct === 100 ? "bg-[#00FF41]/15 text-[#00FF41]" : "bg-[#FFB800]/15 text-[#FFB800]"
+                          d.pct === 100 ? "bg-[#FF8C00]/15 text-[#FF8C00]" : "bg-[#FFB800]/15 text-[#FFB800]"
                         }`}>{d.pct}%</span>
                       </div>
                     </div>
@@ -1045,7 +1045,7 @@ export default function Travel() {
                                 <span className="text-[12px] text-white/70 truncate">{a.title || "Untitled"}</span>
                               </div>
                               <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold flex-shrink-0 ${
-                                a.deductible === "full" ? "bg-[#00FF41]/15 text-[#00FF41]" :
+                                a.deductible === "full" ? "bg-[#FF8C00]/15 text-[#FF8C00]" :
                                 a.deductible === "partial" ? "bg-[#FFB800]/15 text-[#FFB800]" :
                                 "bg-[#ff3366]/15 text-[#ff3366]"
                               }`}>{a.pct}%</span>
@@ -1075,10 +1075,10 @@ export default function Travel() {
             </Link>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Button className="bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold min-h-[48px] gap-2 text-[14px]" onClick={exportAll}>
+              <Button className="bg-gradient-to-r from-primary to-[#FF6600] text-black font-bold min-h-[48px] gap-2 text-[14px]" onClick={exportAll}>
                 <Download className="w-5 h-5" /> Download Full Report (CSV)
               </Button>
-              <Button variant="outline" className="border-[#00FF41]/30 text-[#00FF41] font-bold min-h-[48px] gap-2 text-[14px]" onClick={() => setCpaDialogOpen(true)}>
+              <Button variant="outline" className="border-[#FF8C00]/30 text-[#FF8C00] font-bold min-h-[48px] gap-2 text-[14px]" onClick={() => setCpaDialogOpen(true)}>
                 <Mail className="w-5 h-5" /> Send to CPA
               </Button>
             </div>
@@ -1087,7 +1087,7 @@ export default function Travel() {
               <DialogContent className="bg-[#0d0d1a] border-white/10 max-w-md">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2 text-white">
-                    <Mail className="w-5 h-5 text-[#00FF41]" /> Send Travel Plan to CPA
+                    <Mail className="w-5 h-5 text-[#FF8C00]" /> Send Travel Plan to CPA
                   </DialogTitle>
                   <DialogDescription className="text-white/50 text-[13px]">
                     Your full trip report including deductions, itinerary, and tax summary will be prepared for your CPA to review.
@@ -1122,7 +1122,7 @@ export default function Travel() {
                       <p>{trip.from} → {trip.to}</p>
                       <p>{formatDate(trip.departDate)}{trip.returnDate ? ` — ${formatDate(trip.returnDate)}` : ""} · {dayCount} day{dayCount > 1 ? "s" : ""}</p>
                       <p>{selectedDeductions.length} deduction{selectedDeductions.length !== 1 ? "s" : ""} · {activities.length} activit{activities.length !== 1 ? "ies" : "y"}</p>
-                      <p className="text-[#00FF41]/60 font-bold">Est. Deductible: ${estimatedSavings.toLocaleString()}</p>
+                      <p className="text-[#FF8C00]/60 font-bold">Est. Deductible: ${estimatedSavings.toLocaleString()}</p>
                     </div>
                   </div>
                 </div>
@@ -1130,13 +1130,12 @@ export default function Travel() {
                   <Button variant="outline" onClick={() => setCpaDialogOpen(false)} className="border-white/10 text-white/60 min-h-[44px]">
                     Cancel
                   </Button>
-                  <Button onClick={sendToCpa} className="bg-gradient-to-r from-[#00FF41] to-[#00cc66] text-black font-bold min-h-[44px] gap-2">
+                  <Button onClick={sendToCpa} className="bg-gradient-to-r from-[#FF8C00] to-[#FFA500] text-black font-bold min-h-[44px] gap-2">
                     <Send className="w-4 h-4" /> Prepare Email
                   </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-
             <div className="glass-panel rounded-xl p-4 border border-[rgba(255,215,0,0.15)] bg-[rgba(255,215,0,0.02)]">
               <div className="flex items-start gap-2.5">
                 <Shield className="w-4 h-4 text-secondary mt-0.5 flex-shrink-0" />
@@ -1154,15 +1153,15 @@ export default function Travel() {
           </Button>
           <div className="flex items-center gap-1">
             {[1,2,3,4].map(s => (
-              <div key={s} className={`w-2 h-2 rounded-full transition-all ${step === s ? "bg-primary w-6" : step > s ? "bg-[#00FF41]/40" : "bg-white/10"}`} />
+              <div key={s} className={`w-2 h-2 rounded-full transition-all ${step === s ? "bg-primary w-6" : step > s ? "bg-[#FF8C00]/40" : "bg-white/10"}`} />
             ))}
           </div>
           {step < 4 ? (
-            <Button className="bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold gap-1.5 min-h-[44px]" onClick={goNext}>
+            <Button className="bg-gradient-to-r from-primary to-[#FF6600] text-black font-bold gap-1.5 min-h-[44px]" onClick={goNext}>
               Continue <ChevronRight className="w-4 h-4" />
             </Button>
           ) : (
-            <Button className="bg-gradient-to-r from-[#00FF41] to-[#00cc66] text-black font-bold gap-1.5 min-h-[44px]" onClick={exportAll}>
+            <Button className="bg-gradient-to-r from-[#FF8C00] to-[#FFA500] text-black font-bold gap-1.5 min-h-[44px]" onClick={exportAll}>
               <Download className="w-4 h-4" /> Export
             </Button>
           )}

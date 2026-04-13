@@ -233,7 +233,7 @@ const TICKER_SYMBOLS = [
 function TickerTape() {
   const items = [...TICKER_SYMBOLS, ...TICKER_SYMBOLS];
   return (
-    <div className="ticker-tape border-b border-[rgba(0,255,65,0.10)] bg-[#080C18]" style={{ height: "22px", display: "flex", alignItems: "center" }}>
+    <div className="ticker-tape border-b border-[rgba(255,140,0,0.10)] bg-[#080C18]" style={{ height: "22px", display: "flex", alignItems: "center" }}>
       <div
         className="inline-flex items-center gap-6 animate-ticker"
         style={{ willChange: "transform" }}
@@ -242,12 +242,12 @@ function TickerTape() {
           const isUp = !item.change.startsWith("-");
           return (
             <span key={i} className="inline-flex items-center gap-1.5 text-[10px] font-mono whitespace-nowrap">
-              <span className="font-bold" style={{ color: "rgba(0,255,65,0.6)", letterSpacing: "0.08em" }}>{item.symbol}</span>
-              <span style={{ color: "rgba(0,255,65,0.45)" }}>{item.price}</span>
+              <span className="font-bold" style={{ color: "rgba(255,140,0,0.6)", letterSpacing: "0.08em" }}>{item.symbol}</span>
+              <span style={{ color: "rgba(255,140,0,0.45)" }}>{item.price}</span>
               <span className={isUp ? "ticker-item-up" : "ticker-item-down"} style={{ fontSize: "9px" }}>
                 {item.pct}
               </span>
-              <span style={{ color: "rgba(0,255,65,0.12)", marginLeft: 2 }}>|</span>
+              <span style={{ color: "rgba(255,140,0,0.12)", marginLeft: 2 }}>|</span>
             </span>
           );
         })}
@@ -284,7 +284,7 @@ function NavbarComponent() {
     <nav
       className="sticky top-0 z-50 w-full"
       aria-label="Main navigation"
-      style={{ background: "var(--nav-bg)", borderBottom: "1px solid rgba(0,255,65,0.12)" }}
+      style={{ background: "var(--nav-bg)", borderBottom: "1px solid rgba(255,140,0,0.12)" }}
     >
       <TickerTape />
       <div className="container mx-auto px-4 md:px-6 h-11 flex items-center justify-between">
@@ -294,8 +294,8 @@ function NavbarComponent() {
             alt="EntangleWealth logo"
             className="w-6 h-6 object-contain opacity-90"
           />
-          <span className="font-mono font-bold text-sm tracking-wider" style={{ color: "#00FF41" }}>
-            ENTANGLE<span style={{ color: "rgba(0,255,65,0.5)" }}>WEALTH</span>
+          <span className="font-mono font-bold text-sm tracking-wider" style={{ color: "#FF8C00" }}>
+            ENTANGLE<span style={{ color: "rgba(255,140,0,0.5)" }}>WEALTH</span>
           </span>
         </Link>
 
@@ -341,7 +341,7 @@ function NavbarComponent() {
               </Button>
             </Link>
             <Link href="/sign-up">
-              <Button size="sm" className="h-7 px-3 text-xs font-mono font-bold" style={{ background: "#00FF41", color: "#0A0E1A", borderRadius: 0 }}>
+              <Button size="sm" className="h-7 px-3 text-xs font-mono font-bold" style={{ background: "#FF8C00", color: "#0A0E1A", borderRadius: 0 }}>
                 GET ACCESS
               </Button>
             </Link>
@@ -363,7 +363,7 @@ function NavbarComponent() {
 
       {isMobileMenuOpen && (
         <div
-          className="lg:hidden absolute top-[55px] left-0 w-full border-b border-[rgba(0,255,65,0.12)] animate-in slide-in-from-top-2 duration-200 max-h-[calc(100dvh-3.5rem)] overflow-y-auto"
+          className="lg:hidden absolute top-[55px] left-0 w-full border-b border-[rgba(255,140,0,0.12)] animate-in slide-in-from-top-2 duration-200 max-h-[calc(100dvh-3.5rem)] overflow-y-auto"
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation menu"
@@ -372,7 +372,7 @@ function NavbarComponent() {
           <div className="p-4 space-y-4">
             {mobileSections.map((section) => (
               <div key={section.title}>
-                <div className="text-[9px] font-mono font-bold uppercase tracking-[0.15em] mb-2 px-1" style={{ color: "rgba(0,255,65,0.4)" }}>{section.title}</div>
+                <div className="text-[9px] font-mono font-bold uppercase tracking-[0.15em] mb-2 px-1" style={{ color: "rgba(255,140,0,0.4)" }}>{section.title}</div>
                 <div className="grid grid-cols-2 gap-1">
                   {section.links.map((link) => (
                     <Link
@@ -392,7 +392,7 @@ function NavbarComponent() {
               </div>
             ))}
 
-            <div className="pt-3 border-t border-[rgba(0,255,65,0.10)] space-y-1">
+            <div className="pt-3 border-t border-[rgba(255,140,0,0.10)] space-y-1">
               <Show when="signed-in">
                 <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
                   <span className="flex items-center gap-2 text-xs font-mono px-2 py-2 text-muted-foreground hover:bg-[var(--nav-hover-bg)] hover:text-foreground transition-colors duration-150">
@@ -415,7 +415,7 @@ function NavbarComponent() {
                     </Button>
                   </Link>
                   <Link href="/sign-up" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button className="w-full h-9 text-xs font-mono font-bold" style={{ background: "#00FF41", color: "#0A0E1A", borderRadius: 0 }}>
+                    <Button className="w-full h-9 text-xs font-mono font-bold" style={{ background: "#FF8C00", color: "#0A0E1A", borderRadius: 0 }}>
                       GET ACCESS
                     </Button>
                   </Link>

@@ -1,0 +1,36 @@
+HIGH PRIORITY FINANCIAL BUG — fix this now.
+
+THE PROBLEM:
+Two separate race conditions exist in the codebase that can cause silent financial inconsistencies:
+
+RACE CONDITION 1 — webhookHandlers.ts (lines 115-124):
+The virtual cash balance update does a read-then-write with no transaction:
+  read cashBalance → add virtualAmount → write back
+If two webhooks process simultaneously (Stripe retries are common), both read the same starting balance, both add their amount, and one credit gets permanently and silently lost. The user never knows they were shorted.
+
+RACE CONDITION 2 — paperTrading.ts (lines 186-193):
+Buy and sell operations read currentPortfolio.cashBalance, compute the new balance in application code, then write back. While this runs inside a Postgres transaction, it does not use SELECT ... FOR UPDATE — meaning two simultaneous buy orders for the same user can both read the same stale balance and both succeed even when the combined cost exceeds available funds. A user could go negative.
+
+THE FIX — 3 specific changes required:
+
+CHANGE 1 — webhookHandlers.ts cash crediting:
+• Replace the entire read-then-write pattern with a single atomic SQL increment:
+  UPDATE users SET cashBalance = cashBalance + $virtualAmount WHERE id = $userId
+• Wrap the full webhook cash crediting block in a database transaction
+• If the transaction fails, throw an error so Stripe retries — never swallow it silently
+• Add the result to the webhook_events log table created in the previous fix
+
+CHANGE 2 — paperTrading.ts balance reads:
+• Add SELECT ... FOR UPDATE to the cashBalance read inside the existing Postgres transaction
+• This locks the row for the duration of the transaction — no other concurrent transaction can read or write the same user's balance until this one commits
+• Test by simulating two simultaneous buy orders that together exceed the user's balance — confirm only one succeeds and the other returns: "> INSUFFICIENT FUNDS — ORDER REJECTED"
+
+CHANGE 3 — Add a balance_transactions audit table:
+• Create a balance_transactions table with: user_id, transaction_type (credit/debit/trade_buy/trade_sell), amount, balance_before, balance_after, timestamp, source (webhook/trade/manual)
+• Every single balance change — webhook credit, buy order, sell order — must write a row to this table atomically inside the same transaction
+• This creates an immutable ledger so any balance discrepancy can be traced and corrected
+
+VERIFICATION:
+• Simulate two simultaneous webhook credits for the same user — confirm both credits appear correctly in the balance, no credit is lost
+• Simulate two simultaneous buy orders that together exceed available funds — confirm only the first succeeds, second is rejected cleanly
+• Show me the balance_transactions table after both tests as proof the ledger is accurate

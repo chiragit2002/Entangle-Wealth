@@ -4,6 +4,9 @@ import type { Socket } from "node:net";
 import { getAuthEventStats } from "../lib/authEventLogger";
 import { requireAuth } from "../middlewares/requireAuth";
 import { pool, getPoolStats } from "@workspace/db";
+import { getAllCircuitStates } from "../lib/circuitBreaker";
+import { aiQueue } from "../lib/aiQueue";
+import { getRateLimiterStats } from "../middlewares/userRateLimit";
 
 const router: IRouter = Router();
 
@@ -23,12 +26,58 @@ export function trackConnections(server: Server): void {
   });
 }
 
+const POOL_WARN_THRESHOLD = 0.8;
+const QUEUE_WARN_THRESHOLD = 0.7;
+
+function getPoolStatsWithUtilization() {
+  const raw = getPoolStats();
+  return {
+    ...raw,
+    utilizationPct: raw.total ? Math.round(((raw.total - raw.idle) / raw.max) * 100) : 0,
+  };
+}
+
 router.get("/healthz", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 router.get("/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+  const poolStats = getPoolStatsWithUtilization();
+  const queueStatus = aiQueue.getStatus();
+  const circuits = getAllCircuitStates();
+
+  const poolUtilization = poolStats.utilizationPct / 100;
+  const queueUtilization = queueStatus.maxWaiting > 0 ? queueStatus.queued / queueStatus.maxWaiting : 0;
+  const anyCircuitOpen = circuits.some(c => c.state === "open");
+  const anyCircuitHalfOpen = circuits.some(c => c.state === "half-open");
+
+  const degraded =
+    poolUtilization >= POOL_WARN_THRESHOLD ||
+    queueUtilization >= QUEUE_WARN_THRESHOLD ||
+    anyCircuitOpen ||
+    anyCircuitHalfOpen ||
+    poolStats.waiting > 5;
+
+  const status = degraded ? "degraded" : "ok";
+
+  res.status(200).json({
+    status,
+    timestamp: new Date().toISOString(),
+    db: {
+      ...poolStats,
+      warning: poolUtilization >= POOL_WARN_THRESHOLD,
+    },
+    aiQueue: {
+      ...queueStatus,
+      warning: queueUtilization >= QUEUE_WARN_THRESHOLD,
+    },
+    circuits: circuits.map(c => ({
+      name: c.name,
+      state: c.state,
+      failureCount: c.failureCount,
+    })),
+    rateLimiter: getRateLimiterStats(),
+  });
 });
 
 router.get("/health/detailed", requireAuth, (_req, res) => {
@@ -39,7 +88,10 @@ router.get("/health/detailed", requireAuth, (_req, res) => {
   const minutes = Math.floor((uptimeSeconds % 3600) / 60);
   const seconds = uptimeSeconds % 60;
 
-  const poolStats = getPoolStats();
+  const poolStats = getPoolStatsWithUtilization();
+  const queueStatus = aiQueue.getStatus();
+  const circuits = getAllCircuitStates();
+
   res.json({
     status: "ok",
     uptime: {
@@ -59,6 +111,10 @@ router.get("/health/detailed", requireAuth, (_req, res) => {
     node: process.version,
     platform: process.platform,
     auth: getAuthEventStats(),
+    db: poolStats,
+    aiQueue: queueStatus,
+    circuits,
+    rateLimiter: getRateLimiterStats(),
     timestamp: new Date().toISOString(),
   });
 });

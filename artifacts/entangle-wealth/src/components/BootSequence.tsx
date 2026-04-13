@@ -99,7 +99,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.012) 2px, rgba(0,212,255,0.012) 4px)",
+            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,140,0,0.012) 2px, rgba(255,140,0,0.012) 4px)",
         }}
       />
       <div
@@ -107,8 +107,8 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
         style={{
           top: `${scanPos * 100}%`,
           background:
-            "linear-gradient(90deg, transparent, rgba(0,212,255,0.5), rgba(0,212,255,0.8), rgba(0,212,255,0.5), transparent)",
-          boxShadow: "0 0 20px rgba(0,212,255,0.6)",
+            "linear-gradient(90deg, transparent, rgba(255,140,0,0.5), rgba(255,140,0,0.8), rgba(255,140,0,0.5), transparent)",
+          boxShadow: "0 0 20px rgba(255,140,0,0.6)",
           transition: "none",
         }}
       />
@@ -118,8 +118,8 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
           <div
             className="w-20 h-20 rounded-2xl flex items-center justify-center relative"
             style={{
-              border: "1px solid rgba(0,212,255,0.4)",
-              boxShadow: "0 0 30px rgba(0,212,255,0.2), inset 0 0 20px rgba(0,212,255,0.05)",
+              border: "1px solid rgba(255,140,0,0.4)",
+              boxShadow: "0 0 30px rgba(255,140,0,0.2), inset 0 0 20px rgba(255,140,0,0.05)",
               animation: "bootLogoPulse 1.5s ease-in-out infinite",
             }}
           >
@@ -127,13 +127,13 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
             <div
               className="absolute inset-0 rounded-2xl pointer-events-none"
               style={{
-                background: "linear-gradient(135deg, rgba(0,212,255,0.15), transparent 60%)",
+                background: "linear-gradient(135deg, rgba(255,140,0,0.15), transparent 60%)",
               }}
             />
           </div>
 
           <div className="text-center">
-            <div className="text-[10px] tracking-[0.3em] uppercase text-[#00D4FF]/60 mb-1">
+            <div className="text-[10px] tracking-[0.3em] uppercase text-[#FF8C00]/60 mb-1">
               ENTANGLE WEALTH
             </div>
             <div className="text-[8px] tracking-[0.2em] uppercase text-white/20">
@@ -143,20 +143,20 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 
           <div
             className="w-80 max-w-full space-y-1 text-left bg-black/40 rounded-lg p-4"
-            style={{ border: "1px solid rgba(0,212,255,0.1)" }}
+            style={{ border: "1px solid rgba(255,140,0,0.1)" }}
           >
             {BOOT_LINES.slice(0, lineIndex + 1).map((line, i) => (
               <div
                 key={i}
                 className="flex items-center gap-2 text-[11px]"
                 style={{
-                  color: i === lineIndex ? "#00D4FF" : "rgba(255,255,255,0.35)",
+                  color: i === lineIndex ? "#FF8C00" : "rgba(255,255,255,0.35)",
                   animation: i === lineIndex ? "bootLineIn 0.15s ease-out" : "none",
                 }}
               >
                 <span
                   style={{
-                    color: i === lineIndex ? "#00FF88" : "rgba(0,212,255,0.3)",
+                    color: i === lineIndex ? "#00FF88" : "rgba(255,140,0,0.3)",
                   }}
                 >
                   {i === lineIndex ? ">" : "✓"}
@@ -166,7 +166,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
                   <span
                     style={{
                       animation: "bootBlink 0.8s step-end infinite",
-                      color: "#00D4FF",
+                      color: "#FF8C00",
                     }}
                   >
                     _
@@ -179,15 +179,15 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
           <div className="w-80 max-w-full">
             <div
               className="h-[2px] rounded-full overflow-hidden"
-              style={{ background: "rgba(0,212,255,0.1)" }}
+              style={{ background: "rgba(255,140,0,0.1)" }}
             >
               <div
                 className="h-full rounded-full"
                 style={{
                   width: `${((lineIndex + 1) / BOOT_LINES.length) * 100}%`,
-                  background: "linear-gradient(90deg, #00D4FF, #00FF88)",
+                  background: "linear-gradient(90deg, #FF8C00, #00FF88)",
                   transition: "width 0.25s ease-out",
-                  boxShadow: "0 0 8px rgba(0,212,255,0.6)",
+                  boxShadow: "0 0 8px rgba(255,140,0,0.6)",
                 }}
               />
             </div>
@@ -203,14 +203,14 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
           <div
             className="text-4xl font-extrabold tracking-tight"
             style={{
-              background: "linear-gradient(135deg, #00D4FF, #00FF88)",
+              background: "linear-gradient(135deg, #FF8C00, #00FF88)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
           >
             EntangleWealth
           </div>
-          <div className="text-[10px] tracking-[0.35em] uppercase text-[#00D4FF]/50">
+          <div className="text-[10px] tracking-[0.35em] uppercase text-[#FF8C00]/50">
             System Online
           </div>
         </div>
@@ -225,8 +225,8 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 
       <style>{`
         @keyframes bootLogoPulse {
-          0%, 100% { box-shadow: 0 0 30px rgba(0,212,255,0.2), inset 0 0 20px rgba(0,212,255,0.05); }
-          50% { box-shadow: 0 0 50px rgba(0,212,255,0.4), inset 0 0 30px rgba(0,212,255,0.1); }
+          0%, 100% { box-shadow: 0 0 30px rgba(255,140,0,0.2), inset 0 0 20px rgba(255,140,0,0.05); }
+          50% { box-shadow: 0 0 50px rgba(255,140,0,0.4), inset 0 0 30px rgba(255,140,0,0.1); }
         }
         @keyframes bootLineIn {
           from { opacity: 0; transform: translateX(-4px); }

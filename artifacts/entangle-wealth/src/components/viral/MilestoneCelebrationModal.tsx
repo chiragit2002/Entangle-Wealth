@@ -119,7 +119,7 @@ export function MilestoneCelebrationModal() {
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 px-4"
       onClick={(e) => { if (e.target === e.currentTarget) dismiss(); }}
     >
-      <div className="relative bg-[#0d0d1a] border border-[rgba(0,212,255,0.3)] rounded-sm p-6 w-full max-w-sm text-center shadow-[0_0_60px_rgba(0,212,255,0.15)] animate-in zoom-in-95 duration-300">
+      <div className="relative bg-[#0d0d1a] border border-[rgba(255,140,0,0.3)] rounded-sm p-6 w-full max-w-sm text-center shadow-[0_0_60px_rgba(255,140,0,0.15)] animate-in zoom-in-95 duration-300">
         <button
           onClick={dismiss}
           className="absolute top-3 right-3 text-[#555] hover:text-white p-2"
@@ -130,7 +130,7 @@ export function MilestoneCelebrationModal() {
 
         <div className="text-6xl mb-4 animate-bounce">{current.icon}</div>
 
-        <div className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[rgba(0,212,255,0.1)] text-primary border border-primary/30 mb-3">
+        <div className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[rgba(255,140,0,0.1)] text-primary border border-primary/30 mb-3">
           Milestone Unlocked!
         </div>
 

@@ -3,7 +3,7 @@ import { getStripeSync, getUncachableStripeClient } from './stripeClient';
 import { sendZapierWebhook } from './lib/zapierWebhook';
 import { logger } from './lib/logger';
 import { db } from '@workspace/db';
-import { usersTable, paperPortfoliosTable, virtualCashPurchasesTable, webhookEventsTable } from '@workspace/db/schema';
+import { usersTable, paperPortfoliosTable, virtualCashPurchasesTable, webhookEventsTable, balanceTransactionsTable } from '@workspace/db/schema';
 import { eq, sql } from 'drizzle-orm';
 
 async function resolveUserIdFromStripeCustomer(
@@ -121,20 +121,33 @@ export class WebhookHandlers {
             if (alreadyProcessed.length > 0) return;
 
             const [existingPortfolio] = await tx
-              .select()
+              .select({ cashBalance: paperPortfoliosTable.cashBalance })
               .from(paperPortfoliosTable)
               .where(eq(paperPortfoliosTable.userId, userId));
 
+            const balanceBefore = existingPortfolio?.cashBalance ?? 100000;
+
             if (existingPortfolio) {
-              await tx
-                .update(paperPortfoliosTable)
-                .set({ cashBalance: existingPortfolio.cashBalance + virtualAmount, updatedAt: new Date() })
-                .where(eq(paperPortfoliosTable.userId, userId));
+              await tx.execute(
+                sql`UPDATE paper_portfolios SET cash_balance = cash_balance + ${virtualAmount}, updated_at = NOW() WHERE user_id = ${userId}`
+              );
             } else {
               await tx
                 .insert(paperPortfoliosTable)
                 .values({ userId, cashBalance: 100000 + virtualAmount });
             }
+
+            const balanceAfter = balanceBefore + virtualAmount;
+
+            await tx.insert(balanceTransactionsTable).values({
+              userId,
+              transactionType: 'credit',
+              amount: virtualAmount,
+              balanceBefore,
+              balanceAfter,
+              source: 'webhook',
+              referenceId: sessionId,
+            });
 
             await tx.insert(virtualCashPurchasesTable).values({
               userId,
@@ -143,7 +156,7 @@ export class WebhookHandlers {
               virtualAmountCredited: virtualAmount,
             });
 
-            logger.info({ userId, virtualAmount, sessionId }, 'Virtual cash credited to paper trading account');
+            logger.info({ userId, virtualAmount, sessionId, balanceBefore, balanceAfter }, 'Virtual cash credited to paper trading account');
           });
 
           await logWebhookEvent({

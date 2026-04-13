@@ -48,11 +48,11 @@ const AGENT_CONFIGS: AgentConfig[] = [
   { id: "facebook", name: "Facebook", maxChars: 63206, icon: <Facebook className="w-5 h-5" />, color: "#1877F2", gradient: "from-blue-600/20 to-blue-800/20" },
   { id: "instagram", name: "Instagram", maxChars: 2200, icon: <Instagram className="w-5 h-5" />, color: "#E4405F", gradient: "from-pink-600/20 to-purple-600/20" },
   { id: "twitter", name: "Twitter/X", maxChars: 280, icon: <Twitter className="w-5 h-5" />, color: "#1DA1F2", gradient: "from-sky-500/20 to-blue-600/20" },
-  { id: "linkedin", name: "LinkedIn", maxChars: 3000, icon: <Linkedin className="w-5 h-5" />, color: "#0A66C2", gradient: "from-blue-700/20 to-cyan-700/20" },
+  { id: "linkedin", name: "LinkedIn", maxChars: 3000, icon: <Linkedin className="w-5 h-5" />, color: "#0A66C2", gradient: "from-blue-700/20 to-amber-700/20" },
   { id: "github", name: "GitHub", maxChars: 65536, icon: <Github className="w-5 h-5" />, color: "#8B5CF6", gradient: "from-purple-600/20 to-violet-700/20" },
-  { id: "blog", name: "Blog/SEO", maxChars: 50000, icon: <FileText className="w-5 h-5" />, color: "#00D4FF", gradient: "from-cyan-500/20 to-teal-600/20" },
+  { id: "blog", name: "Blog/SEO", maxChars: 50000, icon: <FileText className="w-5 h-5" />, color: "#FF8C00", gradient: "from-amber-1000/20 to-amber-600/20" },
   { id: "email", name: "Email Newsletter", maxChars: 50000, icon: <Mail className="w-5 h-5" />, color: "#FFB800", gradient: "from-yellow-500/20 to-amber-600/20" },
-  { id: "community", name: "Community Reply", maxChars: 5000, icon: <Users className="w-5 h-5" />, color: "#00FF41", gradient: "from-emerald-500/20 to-green-600/20" },
+  { id: "community", name: "Community Reply", maxChars: 5000, icon: <Users className="w-5 h-5" />, color: "#FF8C00", gradient: "from-emerald-500/20 to-green-600/20" },
 ];
 
 const TONES = [
@@ -536,7 +536,7 @@ export default function MarketingCenter() {
         {aiQueueStatus && (
           <div className="mb-4 p-3 rounded-lg border border-white/[0.06] bg-white/[0.02] flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">
-              <div className={`w-2 h-2 rounded-full ${aiQueueStatus.active > 0 ? "bg-[#00D4FF] animate-pulse" : "bg-[#00FF41]"}`} />
+              <div className={`w-2 h-2 rounded-full ${aiQueueStatus.active > 0 ? "bg-[#FF8C00] animate-pulse" : "bg-[#FF8C00]"}`} />
               <span className="text-white/60">AI Queue:</span>
             </div>
             <span className="text-white/80 font-mono">{aiQueueStatus.active}/{aiQueueStatus.maxConcurrent} active</span>
@@ -544,7 +544,7 @@ export default function MarketingCenter() {
               <span className="text-[#FFB800] font-mono">{aiQueueStatus.queued} waiting</span>
             )}
             <span className="text-white/50">|</span>
-            <span className="text-[#00FF41] font-mono">{aiQueueStatus.totalProcessed} processed</span>
+            <span className="text-[#FF8C00] font-mono">{aiQueueStatus.totalProcessed} processed</span>
             {aiQueueStatus.totalFailed > 0 && (
               <span className="text-[#ff3366] font-mono">{aiQueueStatus.totalFailed} failed</span>
             )}

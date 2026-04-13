@@ -31,8 +31,8 @@ interface SectorData {
 }
 
 const SECTOR_COLORS: Record<string, string> = {
-  Technology: "#00FF41",
-  Healthcare: "#00FF41",
+  Technology: "#FF8C00",
+  Healthcare: "#FF8C00",
   "Consumer Cyclical": "#FFB800",
   Financials: "#FFB800",
   Energy: "#ff4466",
@@ -81,7 +81,7 @@ function RadarChart({ sectors }: { sectors: SectorData[] }) {
           </g>
         );
       })}
-      <circle cx={center} cy={center} r={3} fill="#00FF41" opacity="0.8" />
+      <circle cx={center} cy={center} r={3} fill="#FF8C00" opacity="0.8" />
     </svg>
   );
 }
@@ -100,28 +100,28 @@ function FlowBar({ sector }: { sector: SectorData }) {
           <span className="text-sm font-bold">{sector.name}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          {sector.momentum === "bullish" ? <ArrowUpRight className="w-4 h-4 text-[#00FF41]" />
+          {sector.momentum === "bullish" ? <ArrowUpRight className="w-4 h-4 text-[#FF8C00]" />
             : sector.momentum === "bearish" ? <ArrowDownRight className="w-4 h-4 text-[#ff4466]" />
             : <Activity className="w-4 h-4 text-[#5a5a7a]" />}
-          <span className={`font-mono text-sm font-bold ${sector.avgChange >= 0 ? "text-[#00FF41]" : "text-[#ff4466]"}`}>
+          <span className={`font-mono text-sm font-bold ${sector.avgChange >= 0 ? "text-[#FF8C00]" : "text-[#ff4466]"}`}>
             {sector.avgChange >= 0 ? "+" : ""}{Math.abs(sector.avgChange).toFixed(2)}%
           </span>
         </div>
       </div>
       <div className="flex gap-1 h-2 rounded-full overflow-hidden mb-2">
-        <div className="bg-[#00FF41] rounded-l-full" style={{ width: `${gPct}%` }} />
+        <div className="bg-[#FF8C00] rounded-l-full" style={{ width: `${gPct}%` }} />
         <div className="bg-[#5a5a7a]" style={{ width: `${100 - gPct - lPct}%` }} />
         <div className="bg-[#ff4466] rounded-r-full" style={{ width: `${lPct}%` }} />
       </div>
       <div className="flex justify-between text-[9px] text-muted-foreground">
-        <span className="text-[#00FF41]">{sector.gainers} up</span>
+        <span className="text-[#FF8C00]">{sector.gainers} up</span>
         <span>Vol: {(sector.totalVolume / 1e6).toFixed(1)}M</span>
         <span className="text-[#ff4466]">{sector.losers} down</span>
       </div>
       <div className="flex justify-between mt-2 pt-2 border-t border-white/[0.04]">
         <div className="text-[10px]">
-          <span className="text-[#00FF41] font-mono font-bold">{sector.topMover.symbol}</span>
-          <span className="text-[#00FF41] ml-1">{sector.topMover.change >= 0 ? "+" : ""}{Math.abs(sector.topMover.change).toFixed(1)}%</span>
+          <span className="text-[#FF8C00] font-mono font-bold">{sector.topMover.symbol}</span>
+          <span className="text-[#FF8C00] ml-1">{sector.topMover.change >= 0 ? "+" : ""}{Math.abs(sector.topMover.change).toFixed(1)}%</span>
         </div>
         <div className="text-[10px]">
           <span className="text-[#ff4466] font-mono font-bold">{sector.worstMover.symbol}</span>
@@ -238,14 +238,14 @@ export default function SectorFlow() {
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className="mobile-card text-center">
               <Activity className="w-5 h-5 mx-auto text-primary mb-1" />
-              <div className={`text-lg font-bold ${overallMomentum === "Risk-On" ? "text-[#00FF41]" : overallMomentum === "Risk-Off" ? "text-[#ff4466]" : "text-[#FFB800]"}`}>
+              <div className={`text-lg font-bold ${overallMomentum === "Risk-On" ? "text-[#FF8C00]" : overallMomentum === "Risk-Off" ? "text-[#ff4466]" : "text-[#FFB800]"}`}>
                 {overallMomentum}
               </div>
               <div className="text-[9px] text-muted-foreground">Market Regime</div>
             </div>
             <div className="mobile-card text-center">
-              <TrendingUp className="w-5 h-5 mx-auto text-[#00FF41] mb-1" />
-              <div className="text-lg font-bold text-[#00FF41]">{bullishCount}</div>
+              <TrendingUp className="w-5 h-5 mx-auto text-[#FF8C00] mb-1" />
+              <div className="text-lg font-bold text-[#FF8C00]">{bullishCount}</div>
               <div className="text-[9px] text-muted-foreground">Bullish Sectors</div>
             </div>
             <div className="mobile-card text-center">

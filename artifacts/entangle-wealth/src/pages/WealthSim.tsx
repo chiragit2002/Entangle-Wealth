@@ -16,17 +16,17 @@ import {
 } from "lucide-react";
 
 const MILESTONES = [
-  { threshold: 10000, key: "net_worth_10k", label: "$10K", icon: "🌱", color: "#00FF41" },
-  { threshold: 50000, key: "net_worth_50k", label: "$50K", icon: "🌿", color: "#00D4FF" },
-  { threshold: 100000, key: "net_worth_100k", label: "$100K", icon: "💰", color: "#00D4FF" },
+  { threshold: 10000, key: "net_worth_10k", label: "$10K", icon: "🌱", color: "#FF8C00" },
+  { threshold: 50000, key: "net_worth_50k", label: "$50K", icon: "🌿", color: "#FF8C00" },
+  { threshold: 100000, key: "net_worth_100k", label: "$100K", icon: "💰", color: "#FF8C00" },
   { threshold: 250000, key: "net_worth_250k", label: "$250K", icon: "🚀", color: "#9c27b0" },
   { threshold: 500000, key: "net_worth_500k", label: "$500K", icon: "💎", color: "#FFB800" },
   { threshold: 1000000, key: "net_worth_1m", label: "$1M", icon: "👑", color: "#FFB800" },
 ];
 
 const RISK_PROFILES = {
-  conservative: { label: "Conservative", returnRate: 5, color: "#00FF41", desc: "Bonds & stable assets" },
-  moderate: { label: "Moderate", returnRate: 7, color: "#00D4FF", desc: "Balanced portfolio" },
+  conservative: { label: "Conservative", returnRate: 5, color: "#FF8C00", desc: "Bonds & stable assets" },
+  moderate: { label: "Moderate", returnRate: 7, color: "#FF8C00", desc: "Balanced portfolio" },
   aggressive: { label: "Aggressive", returnRate: 10, color: "#ff6b35", desc: "Growth-focused equities" },
 };
 
@@ -80,7 +80,7 @@ function formatFullCurrency(v: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(v);
 }
 
-function Slider({ label, value, min, max, step = 1, unit = "", onChange, color = "#00D4FF", tip }: {
+function Slider({ label, value, min, max, step = 1, unit = "", onChange, color = "#FF8C00", tip }: {
   label: string; value: number; min: number; max: number; step?: number; unit?: string;
   onChange: (v: number) => void; color?: string; tip?: string;
 }) {
@@ -178,7 +178,7 @@ function WizardStep({ step, title, subtitle, children, onNext, onBack, isLast = 
         <button
           onClick={onNext}
           disabled={!canProceed}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#00D4FF] text-black font-bold text-[11px] font-mono uppercase tracking-widest rounded-sm hover:bg-[#00D4FF]/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#FF8C00] text-black font-bold text-[11px] font-mono uppercase tracking-widest rounded-sm hover:bg-[#FF8C00]/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isLast ? (
             <><Sparkles className="w-3.5 h-3.5" /> Run Simulation</>
@@ -198,15 +198,15 @@ function HealthScoreBar({ profile }: { profile: SimProfile }) {
   const total = Math.round(savingsScore + investmentScore + expenseScore);
   const clampedScore = Math.min(Math.max(total, 0), 100);
 
-  const color = clampedScore >= 70 ? "#00FF41" : clampedScore >= 40 ? "#FFB800" : "#ff3366";
+  const color = clampedScore >= 70 ? "#FF8C00" : clampedScore >= 40 ? "#FFB800" : "#ff3366";
   const label = clampedScore >= 70 ? "Excellent" : clampedScore >= 40 ? "Good" : "Needs Work";
 
   return (
     <div className="bg-[#0a0a14] border border-white/[0.06] rounded-sm p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Target className="w-3.5 h-3.5 text-[#00D4FF]" />
-          <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#00D4FF]">Financial Health Score</span>
+          <Target className="w-3.5 h-3.5 text-[#FF8C00]" />
+          <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#FF8C00]">Financial Health Score</span>
         </div>
         <div className="flex items-baseline gap-1.5">
           <span className="text-2xl font-black font-mono" style={{ color }}>{clampedScore}</span>
@@ -463,11 +463,11 @@ export default function WealthSim() {
       <Layout>
         <div className="min-h-screen bg-[#040408] flex items-center justify-center p-4">
           <div className="text-center max-w-md">
-            <TrendingUp className="w-14 h-14 text-[#00D4FF] mx-auto mb-4" />
+            <TrendingUp className="w-14 h-14 text-[#FF8C00] mx-auto mb-4" />
             <h1 className="text-2xl font-black text-white font-mono mb-2">Wealth Simulation Engine</h1>
             <p className="text-white/50 text-sm mb-6">See how your decisions compound. Sign in to save progress and earn XP.</p>
             <div className="flex gap-3 justify-center">
-              <a href="/sign-in" className="px-5 py-2.5 bg-[#00D4FF] text-black font-bold font-mono text-[11px] uppercase tracking-widest rounded-sm hover:bg-[#00D4FF]/90 transition-colors">Sign In</a>
+              <a href="/sign-in" className="px-5 py-2.5 bg-[#FF8C00] text-black font-bold font-mono text-[11px] uppercase tracking-widest rounded-sm hover:bg-[#FF8C00]/90 transition-colors">Sign In</a>
               <button onClick={() => { setTryWithoutAccount(true); setWizardStep(1); }} className="px-5 py-2.5 border border-white/10 text-white/60 font-mono text-[11px] uppercase tracking-widest rounded-sm hover:border-white/20 hover:text-white/80 transition-colors">Try Without Account</button>
             </div>
           </div>
@@ -481,8 +481,8 @@ export default function WealthSim() {
       <div className="min-h-screen bg-[#040408]">
         <div className="bg-[#040408] border-b border-white/[0.06] px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <TrendingUp className="w-4 h-4 text-[#00D4FF]" />
-            <span className="text-[11px] font-mono font-bold text-[#00D4FF] tracking-wider">WEALTH SIMULATION ENGINE</span>
+            <TrendingUp className="w-4 h-4 text-[#FF8C00]" />
+            <span className="text-[11px] font-mono font-bold text-[#FF8C00] tracking-wider">WEALTH SIMULATION ENGINE</span>
             <div className="h-3 w-px bg-white/10" />
             <span className="text-[9px] font-mono text-white/25">All projections are simulations only | not financial advice</span>
           </div>
@@ -507,21 +507,21 @@ export default function WealthSim() {
                   { icon: <BarChart3 className="w-4 h-4" />, label: "Scenario Compare", desc: "What-if analysis side by side" },
                 ].map(f => (
                   <div key={f.label} className="bg-white/[0.02] border border-white/[0.05] rounded-sm p-3 text-left">
-                    <span className="text-[#00D4FF]">{f.icon}</span>
+                    <span className="text-[#FF8C00]">{f.icon}</span>
                     <p className="text-[10px] font-mono font-bold text-white/80 mt-2">{f.label}</p>
                     <p className="text-[9px] text-white/30 mt-0.5">{f.desc}</p>
                   </div>
                 ))}
               </div>
-              <button onClick={() => setWizardStep(1)} className="px-8 py-3 bg-[#00D4FF] text-black font-black font-mono text-sm uppercase tracking-widest rounded-sm hover:bg-[#00D4FF]/90 transition-colors flex items-center gap-2 mx-auto">
+              <button onClick={() => setWizardStep(1)} className="px-8 py-3 bg-[#FF8C00] text-black font-black font-mono text-sm uppercase tracking-widest rounded-sm hover:bg-[#FF8C00]/90 transition-colors flex items-center gap-2 mx-auto">
                 <Sparkles className="w-4 h-4" /> Start Simulation
               </button>
             </div>
 
             {simulated && projections.length > 0 && (
               <div className="bg-white/[0.02] border border-white/[0.06] rounded-sm p-3 flex items-center gap-3">
-                <CheckCircle className="w-4 h-4 text-[#00FF41] shrink-0" />
-                <span className="text-[11px] text-white/50">You have a saved simulation. <button onClick={() => setWizardStep(4)} className="text-[#00D4FF] hover:underline">Jump to results →</button></span>
+                <CheckCircle className="w-4 h-4 text-[#FF8C00] shrink-0" />
+                <span className="text-[11px] text-white/50">You have a saved simulation. <button onClick={() => setWizardStep(4)} className="text-[#FF8C00] hover:underline">Jump to results →</button></span>
               </div>
             )}
           </div>
@@ -538,13 +538,13 @@ export default function WealthSim() {
                   onNext={() => setWizardStep(2)}
                   onBack={() => setWizardStep(0)}
                 >
-                  <Slider label="Annual Income" value={profile.annualIncome} min={20000} max={500000} step={1000} unit="$" onChange={v => handleProfileChange("annualIncome", v)} color="#00D4FF" tip="Your gross annual income before taxes" />
+                  <Slider label="Annual Income" value={profile.annualIncome} min={20000} max={500000} step={1000} unit="$" onChange={v => handleProfileChange("annualIncome", v)} color="#FF8C00" tip="Your gross annual income before taxes" />
                   <Slider label="Monthly Expenses" value={profile.monthlyExpenses} min={500} max={20000} step={100} unit="$" onChange={v => handleProfileChange("monthlyExpenses", v)} color="#ff6b35" tip="Total monthly spending excluding savings/investments" />
-                  <Slider label="Current Savings" value={profile.currentSavings} min={0} max={500000} step={1000} unit="$" onChange={v => handleProfileChange("currentSavings", v)} color="#00FF41" tip="Your current savings/investment account balance" />
+                  <Slider label="Current Savings" value={profile.currentSavings} min={0} max={500000} step={1000} unit="$" onChange={v => handleProfileChange("currentSavings", v)} color="#FF8C00" tip="Your current savings/investment account balance" />
 
                   <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm p-3 text-[10px] font-mono space-y-1">
                     <div className="flex justify-between"><span className="text-white/50">Monthly Income</span><span className="text-white/70">{formatFullCurrency(profile.annualIncome / 12)}</span></div>
-                    <div className="flex justify-between"><span className="text-white/50">After Expenses</span><span className={profile.annualIncome / 12 - profile.monthlyExpenses > 0 ? "text-[#00FF41]" : "text-[#ff3366]"}>{formatFullCurrency(profile.annualIncome / 12 - profile.monthlyExpenses)}</span></div>
+                    <div className="flex justify-between"><span className="text-white/50">After Expenses</span><span className={profile.annualIncome / 12 - profile.monthlyExpenses > 0 ? "text-[#FF8C00]" : "text-[#ff3366]"}>{formatFullCurrency(profile.annualIncome / 12 - profile.monthlyExpenses)}</span></div>
                   </div>
                 </WizardStep>
               )}
@@ -556,8 +556,8 @@ export default function WealthSim() {
                   onNext={() => setWizardStep(3)}
                   onBack={() => setWizardStep(1)}
                 >
-                  <Slider label="Savings Rate" value={profile.savingsRate} min={1} max={80} unit="%" onChange={v => handleProfileChange("savingsRate", v)} color="#00FF41" tip="% of income automatically saved each month" />
-                  <Slider label="Monthly Investment" value={profile.monthlyInvestment} min={0} max={10000} step={50} unit="$" onChange={v => handleProfileChange("monthlyInvestment", v)} color="#00D4FF" tip="Fixed amount invested in markets each month" />
+                  <Slider label="Savings Rate" value={profile.savingsRate} min={1} max={80} unit="%" onChange={v => handleProfileChange("savingsRate", v)} color="#FF8C00" tip="% of income automatically saved each month" />
+                  <Slider label="Monthly Investment" value={profile.monthlyInvestment} min={0} max={10000} step={50} unit="$" onChange={v => handleProfileChange("monthlyInvestment", v)} color="#FF8C00" tip="Fixed amount invested in markets each month" />
 
                   <div className="space-y-2">
                     <span className="text-[10px] font-mono text-white/50 uppercase tracking-widest">Investment Allocation</span>
@@ -566,7 +566,7 @@ export default function WealthSim() {
                         <button
                           key={key}
                           onClick={() => { handleProfileChange("riskTolerance", key); handleProfileChange("expectedReturnRate", rp.returnRate); }}
-                          className={`p-2.5 rounded-sm border text-left transition-all ${profile.riskTolerance === key ? "border-[#00D4FF]/40 bg-[#00D4FF]/[0.06]" : "border-white/[0.06] hover:border-white/10"}`}
+                          className={`p-2.5 rounded-sm border text-left transition-all ${profile.riskTolerance === key ? "border-[#FF8C00]/40 bg-[#FF8C00]/[0.06]" : "border-white/[0.06] hover:border-white/10"}`}
                         >
                           <div className="text-[9px] font-mono font-bold mb-0.5" style={{ color: profile.riskTolerance === key ? rp.color : "rgba(255,255,255,0.5)" }}>{rp.label}</div>
                           <div className="text-[8px] font-mono text-white/25">{rp.returnRate}% avg. return</div>
@@ -576,8 +576,8 @@ export default function WealthSim() {
                   </div>
 
                   <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm p-3 text-[10px] font-mono space-y-1">
-                    <div className="flex justify-between"><span className="text-white/50">Auto-Saved Monthly</span><span className="text-[#00FF41]">{formatFullCurrency(profile.annualIncome / 12 * profile.savingsRate / 100)}</span></div>
-                    <div className="flex justify-between"><span className="text-white/50">Total Invested Monthly</span><span className="text-[#00D4FF]">{formatFullCurrency(profile.monthlyInvestment)}</span></div>
+                    <div className="flex justify-between"><span className="text-white/50">Auto-Saved Monthly</span><span className="text-[#FF8C00]">{formatFullCurrency(profile.annualIncome / 12 * profile.savingsRate / 100)}</span></div>
+                    <div className="flex justify-between"><span className="text-white/50">Total Invested Monthly</span><span className="text-[#FF8C00]">{formatFullCurrency(profile.monthlyInvestment)}</span></div>
                   </div>
 
                   {profile.savingsRate < 15 && (
@@ -617,14 +617,14 @@ export default function WealthSim() {
                 <div className="space-y-4">
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#00D4FF]">Adjust Parameters</span>
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#FF8C00]">Adjust Parameters</span>
                       <button onClick={() => setWizardStep(1)} className="text-[9px] font-mono text-white/30 hover:text-white/60 flex items-center gap-1 transition-colors">
                         <RefreshCw className="w-2.5 h-2.5" /> Restart
                       </button>
                     </div>
                     <div className="space-y-4">
-                      <Slider label="Savings Rate" value={profile.savingsRate} min={1} max={80} unit="%" onChange={v => handleProfileChange("savingsRate", v)} color="#00FF41" />
-                      <Slider label="Monthly Investment" value={profile.monthlyInvestment} min={0} max={10000} step={50} unit="$" onChange={v => handleProfileChange("monthlyInvestment", v)} color="#00D4FF" />
+                      <Slider label="Savings Rate" value={profile.savingsRate} min={1} max={80} unit="%" onChange={v => handleProfileChange("savingsRate", v)} color="#FF8C00" />
+                      <Slider label="Monthly Investment" value={profile.monthlyInvestment} min={0} max={10000} step={50} unit="$" onChange={v => handleProfileChange("monthlyInvestment", v)} color="#FF8C00" />
                       <Slider label="Annual Return" value={profile.expectedReturnRate} min={1} max={20} step={0.5} unit="%" onChange={v => handleProfileChange("expectedReturnRate", v)} color="#FFB800" />
                       <Slider label="Time Horizon" value={profile.timeHorizonYears} min={1} max={50} unit=" yrs" onChange={v => handleProfileChange("timeHorizonYears", v)} color="#9c27b0" />
                     </div>
@@ -636,7 +636,7 @@ export default function WealthSim() {
                     <button
                       onClick={() => runProjection(profile, true)}
                       disabled={loading}
-                      className="flex-1 py-2.5 bg-[#00D4FF] text-black font-bold text-[10px] font-mono uppercase tracking-widest rounded-sm hover:bg-[#00D4FF]/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-1.5"
+                      className="flex-1 py-2.5 bg-[#FF8C00] text-black font-bold text-[10px] font-mono uppercase tracking-widest rounded-sm hover:bg-[#FF8C00]/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-1.5"
                     >
                       {loading ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
                       {loading ? "Running..." : "Update"}
@@ -668,7 +668,7 @@ export default function WealthSim() {
               {wizardStep === 4 && (
                 <>
                   {newMilestones.length > 0 && (
-                    <div className="bg-gradient-to-r from-[#FFB800]/10 to-[#00D4FF]/10 border border-[#FFB800]/20 rounded-sm p-4 flex items-center gap-3">
+                    <div className="bg-gradient-to-r from-[#FFB800]/10 to-[#FF8C00]/10 border border-[#FFB800]/20 rounded-sm p-4 flex items-center gap-3">
                       <Sparkles className="w-5 h-5 text-[#FFB800] shrink-0" />
                       <div>
                         <p className="text-[11px] font-mono font-bold text-[#FFB800]">New Milestones Unlocked!</p>
@@ -679,8 +679,8 @@ export default function WealthSim() {
 
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { label: "Projected Net Worth", value: formatCurrency(finalNetWorth), color: "#00D4FF", icon: <TrendingUp className="w-3.5 h-3.5" />, sub: `in ${profile.timeHorizonYears} years` },
-                      { label: "Total Contributions", value: formatCurrency(finalContributions), color: "#00FF41", icon: <DollarSign className="w-3.5 h-3.5" />, sub: "money you put in" },
+                      { label: "Projected Net Worth", value: formatCurrency(finalNetWorth), color: "#FF8C00", icon: <TrendingUp className="w-3.5 h-3.5" />, sub: `in ${profile.timeHorizonYears} years` },
+                      { label: "Total Contributions", value: formatCurrency(finalContributions), color: "#FF8C00", icon: <DollarSign className="w-3.5 h-3.5" />, sub: "money you put in" },
                       { label: "Investment Growth", value: formatCurrency(finalGrowth), color: "#FFB800", icon: <ArrowUpRight className="w-3.5 h-3.5" />, sub: "compound returns" },
                       { label: "Real Value (2024 $)", value: formatCurrency(finalReal), color: "#9c27b0", icon: <Percent className="w-3.5 h-3.5" />, sub: "inflation-adjusted" },
                     ].map(card => (
@@ -698,8 +698,8 @@ export default function WealthSim() {
                   <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
                     <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.06]">
                       <div className="flex items-center gap-2">
-                        <BarChart3 className="w-3.5 h-3.5 text-[#00D4FF]" />
-                        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#00D4FF]">Net Worth Projection</span>
+                        <BarChart3 className="w-3.5 h-3.5 text-[#FF8C00]" />
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#FF8C00]">Net Worth Projection</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
@@ -715,12 +715,12 @@ export default function WealthSim() {
                         <AreaChart data={chartData} margin={{ top: 5, right: 5, bottom: 0, left: 0 }}>
                           <defs>
                             <linearGradient id="netWorthGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#00D4FF" stopOpacity={0.3} />
-                              <stop offset="95%" stopColor="#00D4FF" stopOpacity={0.02} />
+                              <stop offset="5%" stopColor="#FF8C00" stopOpacity={0.3} />
+                              <stop offset="95%" stopColor="#FF8C00" stopOpacity={0.02} />
                             </linearGradient>
                             <linearGradient id="contribGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#00FF41" stopOpacity={0.25} />
-                              <stop offset="95%" stopColor="#00FF41" stopOpacity={0.02} />
+                              <stop offset="5%" stopColor="#FF8C00" stopOpacity={0.25} />
+                              <stop offset="95%" stopColor="#FF8C00" stopOpacity={0.02} />
                             </linearGradient>
                             <linearGradient id="compareGrad" x1="0" y1="0" x2="0" y2="1">
                               <stop offset="5%" stopColor="#FFB800" stopOpacity={0.2} />
@@ -731,8 +731,8 @@ export default function WealthSim() {
                           <XAxis dataKey="year" tick={{ fontSize: 8, fill: "rgba(255,255,255,0.2)", fontFamily: "monospace" }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
                           <YAxis tick={{ fontSize: 8, fill: "rgba(255,255,255,0.2)", fontFamily: "monospace" }} tickLine={false} axisLine={false} tickFormatter={v => formatCurrency(v)} width={60} />
                           <Tooltip content={<CustomTooltip />} />
-                          <Area type="monotone" dataKey="Contributions" stroke="#00FF41" fill="url(#contribGrad)" strokeWidth={1.5} dot={false} />
-                          <Area type="monotone" dataKey="Net Worth" stroke="#00D4FF" fill="url(#netWorthGrad)" strokeWidth={2} dot={false} />
+                          <Area type="monotone" dataKey="Contributions" stroke="#FF8C00" fill="url(#contribGrad)" strokeWidth={1.5} dot={false} />
+                          <Area type="monotone" dataKey="Net Worth" stroke="#FF8C00" fill="url(#netWorthGrad)" strokeWidth={2} dot={false} />
                           {comparing.length > 0 && (
                             <Area type="monotone" dataKey="Optimized Path" stroke="#FFB800" fill="url(#compareGrad)" strokeWidth={1.5} dot={false} strokeDasharray="4 2" />
                           )}
@@ -765,12 +765,12 @@ export default function WealthSim() {
                           <XAxis dataKey="year" tick={{ fontSize: 8, fill: "rgba(255,255,255,0.2)", fontFamily: "monospace" }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
                           <YAxis tick={{ fontSize: 8, fill: "rgba(255,255,255,0.2)", fontFamily: "monospace" }} tickLine={false} axisLine={false} tickFormatter={v => formatCurrency(v)} width={60} />
                           <Tooltip content={<CustomTooltip />} />
-                          <Area type="monotone" dataKey="Contributions" stroke="#00FF41" fill="#00FF41" fillOpacity={0.15} strokeWidth={1.5} dot={false} stackId="1" />
+                          <Area type="monotone" dataKey="Contributions" stroke="#FF8C00" fill="#FF8C00" fillOpacity={0.15} strokeWidth={1.5} dot={false} stackId="1" />
                           <Area type="monotone" dataKey="Investment Growth" stroke="#FFB800" fill="url(#growthGrad)" strokeWidth={1.5} dot={false} stackId="1" />
                         </AreaChart>
                       </ResponsiveContainer>
                       <div className="flex items-center gap-4 mt-2 justify-center">
-                        <div className="flex items-center gap-1.5 text-[9px] font-mono text-white/40"><span className="w-2.5 h-2.5 rounded-sm inline-block bg-[#00FF41]/40" /> Contributions</div>
+                        <div className="flex items-center gap-1.5 text-[9px] font-mono text-white/40"><span className="w-2.5 h-2.5 rounded-sm inline-block bg-[#FF8C00]/40" /> Contributions</div>
                         <div className="flex items-center gap-1.5 text-[9px] font-mono text-white/40"><span className="w-2.5 h-2.5 rounded-sm inline-block bg-[#FFB800]/40" /> Investment Growth</div>
                       </div>
                     </div>
@@ -790,7 +790,7 @@ export default function WealthSim() {
                             const achieved = milestones.find(ms => ms.key === m.key)?.achieved ?? false;
                             const projected = !!year;
                             const icon = MILESTONES.find(x => x.key === m.key)?.icon ?? "🎯";
-                            const color = MILESTONES.find(x => x.key === m.key)?.color ?? "#00D4FF";
+                            const color = MILESTONES.find(x => x.key === m.key)?.color ?? "#FF8C00";
                             return (
                               <div key={m.key} className={`flex items-center gap-3 ml-2 ${!projected ? "opacity-40" : ""}`}>
                                 <div
@@ -802,7 +802,7 @@ export default function WealthSim() {
                                 <div className="flex-1 flex items-center justify-between">
                                   <div>
                                     <span className="text-[10px] font-mono font-bold" style={{ color: projected ? color : "rgba(255,255,255,0.3)" }}>{m.label}</span>
-                                    {achieved && <span className="ml-2 text-[8px] font-mono text-[#00FF41]">ACHIEVED</span>}
+                                    {achieved && <span className="ml-2 text-[8px] font-mono text-[#FF8C00]">ACHIEVED</span>}
                                   </div>
                                   <span className="text-[9px] font-mono text-white/30">{year ?? "Out of range"}</span>
                                 </div>
@@ -816,8 +816,8 @@ export default function WealthSim() {
 
                   <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <Zap className="w-3.5 h-3.5 text-[#00D4FF]" />
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#00D4FF]">Future Self Snapshot</span>
+                      <Zap className="w-3.5 h-3.5 text-[#FF8C00]" />
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#FF8C00]">Future Self Snapshot</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3 text-[10px] font-mono">
                       <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm p-3">
@@ -827,12 +827,12 @@ export default function WealthSim() {
                       </div>
                       <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm p-3">
                         <p className="text-white/30 mb-1">Future Self</p>
-                        <p className="text-lg font-black" style={{ color: "#00D4FF" }}>{formatCurrency(finalNetWorth)}</p>
+                        <p className="text-lg font-black" style={{ color: "#FF8C00" }}>{formatCurrency(finalNetWorth)}</p>
                         <p className="text-white/50 text-[8px] mt-0.5">In {profile.timeHorizonYears} years</p>
                       </div>
                       <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm p-3">
                         <p className="text-white/30 mb-1">Monthly 4% Rule Income</p>
-                        <p className="text-lg font-black text-[#00FF41]">{formatCurrency(monthlyIncomeNeeded)}</p>
+                        <p className="text-lg font-black text-[#FF8C00]">{formatCurrency(monthlyIncomeNeeded)}</p>
                         <p className="text-white/50 text-[8px] mt-0.5">Safe withdrawal rate</p>
                       </div>
                       <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm p-3">
@@ -843,10 +843,10 @@ export default function WealthSim() {
                     </div>
 
                     {profile.savingsRate < 20 && (
-                      <div className="mt-3 p-3 bg-[#00D4FF]/5 border border-[#00D4FF]/10 rounded-sm">
-                        <p className="text-[10px] font-mono text-[#00D4FF]/80">
+                      <div className="mt-3 p-3 bg-[#FF8C00]/5 border border-[#FF8C00]/10 rounded-sm">
+                        <p className="text-[10px] font-mono text-[#FF8C00]/80">
                           <span className="font-bold">💡 Insight:</span> Increasing your savings rate by 5% (to {Math.min(profile.savingsRate + 5, 80)}%) could add approximately{" "}
-                          <span className="font-bold text-[#00D4FF]">
+                          <span className="font-bold text-[#FF8C00]">
                             {formatCurrency(profile.annualIncome / 12 * 0.05 * profile.timeHorizonYears * 12 * (1 + profile.expectedReturnRate / 100))}
                           </span>{" "}
                           to your projected net worth.

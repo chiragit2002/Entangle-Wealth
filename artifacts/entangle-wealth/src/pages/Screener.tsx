@@ -226,7 +226,7 @@ export default function Screener() {
   );
 
   const sigBadge = (signal: string) => {
-    const c = signal === "STRONG_BUY" ? "bg-[#00FF41]/10 text-[#00FF41] border-[#00FF41]/20" :
+    const c = signal === "STRONG_BUY" ? "bg-[#FF8C00]/10 text-[#FF8C00] border-[#FF8C00]/20" :
       signal === "BUY" ? "bg-primary/10 text-primary border-primary/20" :
       signal === "SELL" ? "bg-[#FFB800]/10 text-[#FFB800] border-[#FFB800]/20" :
       signal === "STRONG_SELL" ? "bg-[#ff3366]/10 text-[#ff3366] border-[#ff3366]/20" :
@@ -243,7 +243,7 @@ export default function Screener() {
               <Filter className="w-4 h-4 text-primary" />
               <span className="text-[13px] font-bold">Stock Screener</span>
               <span className="text-[10px] text-white/50 font-mono">{filteredStocks.length} stocks</span>
-              {isLive && <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#00FF41]/10 text-[#00FF41] animate-pulse">LIVE</span>}
+              {isLive && <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#FF8C00]/10 text-[#FF8C00] animate-pulse">LIVE</span>}
             </div>
             <div className="flex items-center gap-2">
               <div className="relative">
@@ -331,7 +331,7 @@ export default function Screener() {
                         </div>
                       </div>
                       <span className="text-[13px] font-mono font-bold text-right">${stock.price.toFixed(2)}</span>
-                      <span className={`text-[12px] font-mono font-bold text-right ${stock.change >= 0 ? "text-[#00FF41]" : "text-[#ff3366]"}`}>
+                      <span className={`text-[12px] font-mono font-bold text-right ${stock.change >= 0 ? "text-[#FF8C00]" : "text-[#ff3366]"}`}>
                         {stock.change >= 0 ? "+" : ""}{Math.abs(stock.change).toFixed(2)}%
                       </span>
                       <span className="text-[10px] font-mono text-white/40 text-right">{stock.volume}</span>

@@ -8,10 +8,10 @@ import { BigWinOverlay } from "@/components/BigWinOverlay";
 import { motion, useMotionValue, animate, AnimatePresence } from "framer-motion";
 
 const WHEEL_SEGMENTS = [
-  { label: "+500 XP", color: "#00D4FF", icon: "⚡" },
+  { label: "+500 XP", color: "#FF8C00", icon: "⚡" },
   { label: "+250 XP", color: "#9c27b0", icon: "✨" },
   { label: "+1,000 XP", color: "#FFB800", icon: "🔥" },
-  { label: "2x XP", color: "#00FF41", icon: "⚡⚡" },
+  { label: "2x XP", color: "#FF8C00", icon: "⚡⚡" },
   { label: "Streak Shield", color: "#ff3366", icon: "🛡️" },
   { label: "+100 XP", color: "#6366f1", icon: "💫" },
   { label: "+750 XP", color: "#f59e0b", icon: "⭐" },
@@ -128,11 +128,11 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
     centerGrad.addColorStop(1, "#0A0E1A");
     ctx.fillStyle = centerGrad;
     ctx.fill();
-    ctx.strokeStyle = "#00D4FF";
+    ctx.strokeStyle = "#FF8C00";
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    ctx.fillStyle = "#00D4FF";
+    ctx.fillStyle = "#FF8C00";
     ctx.font = "bold 11px 'JetBrains Mono', monospace";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -209,7 +209,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
     <BigWinOverlay show={showBigWin} label="BIG WIN" onDone={() => setShowBigWin(false)} />
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 ">
       <div className="relative w-[360px] bg-[#0A0E1A] border border-white/[0.1] rounded-xl shadow-2xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#00D4FF]/5 via-transparent to-[#FFB800]/5 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FF8C00]/5 via-transparent to-[#FFB800]/5 pointer-events-none" />
 
         <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
@@ -228,7 +228,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
 
         <div className="relative flex flex-col items-center py-6 px-4">
           <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-[#00D4FF]/10 blur-xl" />
+            <div className="absolute inset-0 rounded-full bg-[#FF8C00]/10 blur-xl" />
             <motion.div
               style={{ rotate: rotationDeg, width: 280, height: 280 }}
               className={`relative cursor-pointer rounded-full ${!spinning && !canSpin ? "opacity-60" : ""}`}
@@ -255,7 +255,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
                   resultTier === "jackpot"
                     ? "bg-[#FFB800]/15 border border-[#FFB800]/40"
                     : resultTier === "large"
-                    ? "bg-[#00D4FF]/10 border border-[#00D4FF]/30"
+                    ? "bg-[#FF8C00]/10 border border-[#FF8C00]/30"
                     : "bg-[#FFB800]/10 border border-[#FFB800]/20"
                 }`}
               >
@@ -278,13 +278,13 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
             <div className="mt-4 text-center">
               {canSpin ? (
                 <div>
-                  <p className="text-sm font-mono text-[#00FF41] font-bold">Ready to spin!</p>
+                  <p className="text-sm font-mono text-[#FF8C00] font-bold">Ready to spin!</p>
                   <p className="text-[10px] font-mono text-white/30 mt-1">Tap the wheel to claim your daily reward</p>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 justify-center">
                   <Clock className="w-3.5 h-3.5 text-white/30" />
-                  <p className="text-xs font-mono text-white/40">Next spin in <span className="text-[#00D4FF] font-bold">{countdown}</span></p>
+                  <p className="text-xs font-mono text-white/40">Next spin in <span className="text-[#FF8C00] font-bold">{countdown}</span></p>
                 </div>
               )}
             </div>
@@ -308,7 +308,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
 
           <div className="grid grid-cols-3 gap-1.5">
             <div className="flex items-center gap-1.5 bg-white/[0.02] rounded px-2 py-1.5">
-              <Zap className="w-3 h-3 text-[#00D4FF]" />
+              <Zap className="w-3 h-3 text-[#FF8C00]" />
               <span className="text-[8px] font-mono text-white/40">XP Boosts</span>
             </div>
             <div className="flex items-center gap-1.5 bg-white/[0.02] rounded px-2 py-1.5">

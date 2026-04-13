@@ -11,12 +11,12 @@ const FOCUS_LABELS: Record<string, string> = {
 };
 
 const FOCUS_COLORS: Record<string, string> = {
-  saving: "text-[#00FF41]",
-  investing: "text-[#00FF41]",
+  saving: "text-[#FF8C00]",
+  investing: "text-[#FF8C00]",
   debt: "text-[#ff6b6b]",
   unsure: "text-[#b8b8cc]",
   tax: "text-[#FFB800]",
-  clarity: "text-[#00FF41]",
+  clarity: "text-[#FF8C00]",
 };
 
 interface Recommendation {
@@ -115,32 +115,32 @@ export function PersonalizedResultScreen({
       aria-modal="true"
       aria-labelledby="result-screen-title"
     >
-      <div className="bg-[#0a0a14] border border-white/[0.08] rounded-sm w-full max-w-md my-4 shadow-2xl shadow-[#00FF41]/5 animate-in fade-in zoom-in-95 duration-300">
+      <div className="bg-[#0a0a14] border border-white/[0.08] rounded-sm w-full max-w-md my-4 shadow-2xl shadow-[#FF8C00]/5 animate-in fade-in zoom-in-95 duration-300">
 
         {/* Header */}
         <div className="px-6 pt-7 pb-5 border-b border-white/[0.06]">
           <div className="flex items-center gap-2 mb-3">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#00FF41]/30 to-transparent" />
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00FF41]/[0.08] border border-[#00FF41]/20">
-              <Sparkles className="w-3 h-3 text-[#00FF41]" aria-hidden="true" />
-              <span className="text-[10px] font-bold tracking-widest uppercase text-[#00FF41]/80">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#FF8C00]/30 to-transparent" />
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FF8C00]/[0.08] border border-[#FF8C00]/20">
+              <Sparkles className="w-3 h-3 text-[#FF8C00]" aria-hidden="true" />
+              <span className="text-[10px] font-bold tracking-widest uppercase text-[#FF8C00]/80">
                 Your personalized plan
               </span>
             </div>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#00FF41]/30 to-transparent" />
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#FF8C00]/30 to-transparent" />
           </div>
           <h2 id="result-screen-title" className="text-xl font-bold text-white leading-snug">
             {firstName ? (
-              <>{firstName}, here's your <span className="text-[#00FF41]">next financial move</span></>
+              <>{firstName}, here's your <span className="text-[#FF8C00]">next financial move</span></>
             ) : (
-              <>Here's your <span className="text-[#00FF41]">next financial move</span></>
+              <>Here's your <span className="text-[#FF8C00]">next financial move</span></>
             )}
           </h2>
           {(focusLabel || occupationName) && (
             <div className="flex flex-wrap gap-1.5 mt-3">
               {occupationName && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/[0.04] border border-white/[0.08] text-white/50">
-                  <Briefcase className="w-2.5 h-2.5 text-[#00FF41]" aria-hidden="true" />
+                  <Briefcase className="w-2.5 h-2.5 text-[#FF8C00]" aria-hidden="true" />
                   {occupationName}
                 </span>
               )}
@@ -157,8 +157,8 @@ export function PersonalizedResultScreen({
         {/* Primary recommendation */}
         <div className="px-6 py-5 border-b border-white/[0.06]">
           <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#00FF41]/10 border border-[#00FF41]/20 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-[0_0_12px_rgba(0,255,65,0.1)]">
-              <CheckCircle2 className="w-5 h-5 text-[#00FF41]" aria-hidden="true" />
+            <div className="w-10 h-10 rounded-xl bg-[#FF8C00]/10 border border-[#FF8C00]/20 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-[0_0_12px_rgba(255,140,0,0.1)]">
+              <CheckCircle2 className="w-5 h-5 text-[#FF8C00]" aria-hidden="true" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30 mb-1.5">
@@ -181,7 +181,7 @@ export function PersonalizedResultScreen({
               return (
                 <div key={i} className="flex items-start gap-3">
                   <div className="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Icon className="w-3 h-3 text-[#00FF41]/50" aria-hidden="true" />
+                    <Icon className="w-3 h-3 text-[#FF8C00]/50" aria-hidden="true" />
                   </div>
                   <p className="text-[12px] text-white/45 leading-relaxed">{insight}</p>
                 </div>
@@ -194,7 +194,7 @@ export function PersonalizedResultScreen({
         <div className="px-6 pt-5 pb-6">
           <button
             onClick={handleCTA}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#00FF41] to-[#0099cc] text-black text-sm font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-[0_0_24px_rgba(0,255,65,0.2)] min-h-[48px]"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#FF8C00] to-[#0099cc] text-black text-sm font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-[0_0_24px_rgba(255,140,0,0.2)] min-h-[48px]"
           >
             Build my full plan
             <ArrowRight className="w-4 h-4" aria-hidden="true" />

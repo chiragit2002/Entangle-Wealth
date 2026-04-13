@@ -49,7 +49,7 @@ function QuantumVizBase() {
           <p className="text-xs text-muted-foreground/60 mb-4">
             6 independent analysis models cross-checking in real time. Signal fires only on consensus.
           </p>
-          <svg viewBox="0 0 400 320" className="w-full max-w-[400px] mx-auto" style={{ filter: "drop-shadow(0 0 10px rgba(0,212,255,0.1))" }}>
+          <svg viewBox="0 0 400 320" className="w-full max-w-[400px] mx-auto" style={{ filter: "drop-shadow(0 0 10px rgba(255,140,0,0.1))" }}>
             {connections.map(([a, b], i) => {
               const isActive = activeConnections.includes(i);
               return (
@@ -59,20 +59,20 @@ function QuantumVizBase() {
                   y1={nodePositions[a].y}
                   x2={nodePositions[b].x}
                   y2={nodePositions[b].y}
-                  stroke={isActive ? "#00D4FF" : "rgba(255,255,255,0.05)"}
+                  stroke={isActive ? "#FF8C00" : "rgba(255,255,255,0.05)"}
                   strokeWidth={isActive ? 1.5 : 0.5}
                   strokeDasharray={isActive ? "none" : "4 4"}
                   style={{
                     transition: "all 0.8s ease",
-                    filter: isActive ? "drop-shadow(0 0 4px rgba(0,212,255,0.6))" : "none"
+                    filter: isActive ? "drop-shadow(0 0 4px rgba(255,140,0,0.6))" : "none"
                   }}
                 />
               );
             })}
 
-            <circle cx={cx} cy={cy} r="35" fill="rgba(0,212,255,0.05)" stroke="rgba(0,212,255,0.2)" strokeWidth="1" />
-            <circle cx={cx} cy={cy} r="25" fill="rgba(0,212,255,0.08)" stroke="rgba(0,212,255,0.3)" strokeWidth="1" />
-            <text x={cx} y={cy - 6} textAnchor="middle" fill="#00D4FF" fontSize="18" fontFamily="JetBrains Mono" fontWeight="bold">
+            <circle cx={cx} cy={cy} r="35" fill="rgba(255,140,0,0.05)" stroke="rgba(255,140,0,0.2)" strokeWidth="1" />
+            <circle cx={cx} cy={cy} r="25" fill="rgba(255,140,0,0.08)" stroke="rgba(255,140,0,0.3)" strokeWidth="1" />
+            <text x={cx} y={cy - 6} textAnchor="middle" fill="#FF8C00" fontSize="18" fontFamily="JetBrains Mono" fontWeight="bold">
               {consensusValue}%
             </text>
             <text x={cx} y={cy + 10} textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="7" fontFamily="JetBrains Mono" style={{ textTransform: "uppercase" }}>
@@ -82,7 +82,7 @@ function QuantumVizBase() {
             {quantumNodes.map((node, i) => {
               const pos = nodePositions[i];
               const isPulsing = pulsingNode === i;
-              const color = node.status === "warning" ? "#FFB800" : "#00D4FF";
+              const color = node.status === "warning" ? "#FFB800" : "#FF8C00";
               return (
                 <g key={node.id}>
                   <circle

@@ -58,7 +58,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  trading: "text-[#00D4FF] bg-[#00D4FF]/10 border-[#00D4FF]/30",
+  trading: "text-[#FF8C00] bg-[#FF8C00]/10 border-[#FF8C00]/30",
   streak: "text-orange-400 bg-orange-400/10 border-orange-400/30",
   community: "text-purple-400 bg-purple-400/10 border-purple-400/30",
   milestone: "text-yellow-400 bg-yellow-400/10 border-yellow-400/30",
@@ -68,7 +68,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 const TIER_COLORS: Record<string, string> = {
-  Diamond: "from-cyan-400 to-blue-500",
+  Diamond: "from-amber-500 to-blue-500",
   Platinum: "from-purple-400 to-pink-500",
   Gold: "from-yellow-400 to-orange-500",
   Silver: "from-gray-300 to-gray-500",
@@ -277,7 +277,7 @@ export default function Achievements() {
                 >
                   {badge.earned && (
                     <div className="absolute top-2 right-2">
-                      <CheckCircle className="w-4 h-4 text-[#00FF41]" />
+                      <CheckCircle className="w-4 h-4 text-[#FF8C00]" />
                     </div>
                   )}
                   <div className={`w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center border ${
@@ -346,7 +346,7 @@ function ChallengeCard({ challenge }: { challenge: ChallengeData }) {
   const progressPercent = Math.min((challenge.progress / challenge.target) * 100, 100);
 
   return (
-    <div className={`glass-panel p-4 ${challenge.completed ? "border-[#00FF41]/20 bg-[#00FF41]/5" : ""}`}>
+    <div className={`glass-panel p-4 ${challenge.completed ? "border-[#FF8C00]/20 bg-[#FF8C00]/5" : ""}`}>
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
@@ -356,7 +356,7 @@ function ChallengeCard({ challenge }: { challenge: ChallengeData }) {
             }`}>
               {challenge.type}
             </span>
-            {challenge.completed && <CheckCircle className="w-4 h-4 text-[#00FF41]" />}
+            {challenge.completed && <CheckCircle className="w-4 h-4 text-[#FF8C00]" />}
           </div>
           <p className="text-xs text-muted-foreground">{challenge.description}</p>
         </div>
@@ -368,7 +368,7 @@ function ChallengeCard({ challenge }: { challenge: ChallengeData }) {
       <div className="flex items-center gap-3">
         <div className="flex-1 bg-white/5 rounded-full h-2">
           <div
-            className={`h-2 rounded-full transition-all ${challenge.completed ? "bg-[#00FF41]" : "bg-primary"}`}
+            className={`h-2 rounded-full transition-all ${challenge.completed ? "bg-[#FF8C00]" : "bg-primary"}`}
             style={{ width: `${progressPercent}%` }}
           />
         </div>

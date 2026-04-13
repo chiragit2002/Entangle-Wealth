@@ -99,7 +99,7 @@ export function AnniversaryGiveawayBanner() {
   return (
     <div className="relative overflow-hidden rounded-sm border border-[#FFB800]/30 bg-gradient-to-r from-[#0d0b00] via-[#0f0d02] to-[#0A0E1A] p-5 md:p-6 mb-6">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(245,200,66,0.08),transparent_60%)] pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(0,212,255,0.05),transparent_60%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(255,140,0,0.05),transparent_60%)] pointer-events-none" />
 
       <button
         onClick={() => setDismissed(true)}
@@ -134,7 +134,7 @@ export function AnniversaryGiveawayBanner() {
 
             <div className="flex flex-wrap items-center gap-3 mt-3">
               {myEntries !== null ? (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#00FF41]/10 border border-[#00FF41]/20 text-[11px] font-bold text-[#00FF41]">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FF8C00]/10 border border-[#FF8C00]/20 text-[11px] font-bold text-[#FF8C00]">
                   <Gift className="w-3 h-3" />
                   <span>{myEntries.toLocaleString()} entries</span>
                 </div>

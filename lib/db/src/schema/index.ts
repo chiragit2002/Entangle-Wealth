@@ -17,3 +17,4 @@ export * from "./messages";
 export * from "./connectedAccounts";
 export * from "./audit";
 export * from "./webhookEvents";
+export * from "./balanceTransactions";

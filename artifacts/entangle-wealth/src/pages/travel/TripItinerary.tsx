@@ -30,7 +30,7 @@ function formatDate(d: string, dayOffset: number): string {
 export default function TripItinerary({ activities, dayCount, startDate, onAdd, onUpdate, onRemove, highlightDay, onHighlightDay }: Props) {
   return (
     <div className="space-y-3">
-      <div className="glass-panel rounded-sm p-5 border border-[rgba(0,212,255,0.15)]">
+      <div className="glass-panel rounded-sm p-5 border border-[rgba(255,140,0,0.15)]">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-lg font-bold">Day-by-Day Itinerary</h2>
           <span className="text-[12px] text-primary font-semibold">{dayCount} day{dayCount > 1 ? "s" : ""}</span>
@@ -74,7 +74,7 @@ export default function TripItinerary({ activities, dayCount, startDate, onAdd, 
                     <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#FFB800]/15 text-[#FFB800] font-bold">Busy</span>
                   )}
                   {dayTotal > 0 && (
-                    <span className="text-[12px] font-mono font-bold text-[#00FF41]">${dayTotal.toLocaleString()}</span>
+                    <span className="text-[12px] font-mono font-bold text-[#FF8C00]">${dayTotal.toLocaleString()}</span>
                   )}
                 </div>
               </div>

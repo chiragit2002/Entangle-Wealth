@@ -3,7 +3,7 @@ import { logger } from "../lib/logger";
 
 const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
-const SKIP_PATHS = ["/api/stripe/webhook", "/api/__clerk"];
+const SKIP_PATHS = ["/api/stripe/webhook", "/api/__clerk", "/api/stress-test"];
 
 function getOrigin(req: Request): string | null {
   const origin = req.headers["origin"];

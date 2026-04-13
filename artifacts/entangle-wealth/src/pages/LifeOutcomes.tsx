@@ -25,8 +25,8 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
 
 const LIFESTYLE_TIERS: Record<string, { color: string; desc: string }> = {
   Affluent: { color: "#FFB800", desc: "Luxury lifestyle with full financial freedom" },
-  Comfortable: { color: "#00FF41", desc: "Great quality of life with financial security" },
-  Stable: { color: "#00D4FF", desc: "Financial stability with modest luxuries" },
+  Comfortable: { color: "#FF8C00", desc: "Great quality of life with financial security" },
+  Stable: { color: "#FF8C00", desc: "Financial stability with modest luxuries" },
   Modest: { color: "#9c27b0", desc: "Covering needs with limited discretionary spending" },
   Basic: { color: "#ff6b35", desc: "Meeting essential needs only" },
 };
@@ -203,7 +203,7 @@ export default function LifeOutcomes() {
               className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/[0.02] transition-colors"
             >
               <div className="flex items-center gap-2 font-semibold text-white">
-                <Target className="w-5 h-5 text-[#00D4FF]" />
+                <Target className="w-5 h-5 text-[#FF8C00]" />
                 Financial Parameters
               </div>
               {showParams ? <ChevronUp className="w-4 h-4 text-white/50" /> : <ChevronDown className="w-4 h-4 text-white/50" />}
@@ -229,7 +229,7 @@ export default function LifeOutcomes() {
                 <button
                   onClick={runProjection}
                   disabled={loading}
-                  className="w-full py-3 rounded-xl bg-[#00D4FF] text-black font-bold text-sm hover:bg-[#00D4FF]/90 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+                  className="w-full py-3 rounded-xl bg-[#FF8C00] text-black font-bold text-sm hover:bg-[#FF8C00]/90 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
                 >
                   {loading ? (
                     <><RefreshCw className="w-4 h-4 animate-spin" />Projecting...</>
@@ -253,14 +253,14 @@ export default function LifeOutcomes() {
                     <div
                       key={pathKey}
                       className={`border rounded-xl p-6 space-y-4 ${
-                        isOptimized ? "border-[#00D4FF]/30 bg-[#00D4FF]/5" : "border-white/10 bg-white/[0.04]"
+                        isOptimized ? "border-[#FF8C00]/30 bg-[#FF8C00]/5" : "border-white/10 bg-white/[0.04]"
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <h3 className="font-bold text-white">
                           {isOptimized ? "Optimized Path" : "Current Path"}
                         </h3>
-                        {isOptimized && <Zap className="w-5 h-5 text-[#00D4FF]" />}
+                        {isOptimized && <Zap className="w-5 h-5 text-[#FF8C00]" />}
                       </div>
 
                       <div className="space-y-3">
@@ -299,23 +299,23 @@ export default function LifeOutcomes() {
               </div>
 
               {(result.improvement.netWorthGain > 0 || result.improvement.retirementYearsEarlier) && (
-                <div className="border border-[#00FF41]/30 bg-[#00FF41]/5 rounded-xl p-6">
-                  <h3 className="font-bold text-[#00FF41] mb-4 flex items-center gap-2">
+                <div className="border border-[#FF8C00]/30 bg-[#FF8C00]/5 rounded-xl p-6">
+                  <h3 className="font-bold text-[#FF8C00] mb-4 flex items-center gap-2">
                     <TrendingUp className="w-5 h-5" />
                     Optimization Impact
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-[#00FF41]">{fmt(result.improvement.netWorthGain)}</p>
+                      <p className="text-2xl font-bold text-[#FF8C00]">{fmt(result.improvement.netWorthGain)}</p>
                       <p className="text-xs text-white/50 mt-1">Additional Net Worth</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-[#00FF41]">{fmt(result.improvement.passiveIncomeGain)}/yr</p>
+                      <p className="text-2xl font-bold text-[#FF8C00]">{fmt(result.improvement.passiveIncomeGain)}/yr</p>
                       <p className="text-xs text-white/50 mt-1">Additional Passive Income</p>
                     </div>
                     {result.improvement.retirementYearsEarlier !== null && (
                       <div className="text-center">
-                        <p className="text-2xl font-bold text-[#00FF41]">{result.improvement.retirementYearsEarlier} years</p>
+                        <p className="text-2xl font-bold text-[#FF8C00]">{result.improvement.retirementYearsEarlier} years</p>
                         <p className="text-xs text-white/50 mt-1">Earlier Financial Independence</p>
                       </div>
                     )}
@@ -333,8 +333,8 @@ export default function LifeOutcomes() {
                         <stop offset="95%" stopColor="#9c27b0" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="optimizedGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#00D4FF" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#00D4FF" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#FF8C00" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#FF8C00" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -358,7 +358,7 @@ export default function LifeOutcomes() {
                       type="monotone"
                       dataKey="optimizedPath"
                       name="Optimized Path"
-                      stroke="#00D4FF"
+                      stroke="#FF8C00"
                       strokeWidth={2}
                       fill="url(#optimizedGrad)"
                     />
@@ -373,9 +373,9 @@ export default function LifeOutcomes() {
                     {result.optimizedPath.retirementAge && result.optimizedPath.retirementAge !== result.currentPath.retirementAge && (
                       <ReferenceLine
                         x={result.optimizedPath.retirementAge}
-                        stroke="#00D4FF"
+                        stroke="#FF8C00"
                         strokeDasharray="4 4"
-                        label={{ value: `FI Age ${result.optimizedPath.retirementAge}`, fill: "#00D4FF", fontSize: 10 }}
+                        label={{ value: `FI Age ${result.optimizedPath.retirementAge}`, fill: "#FF8C00", fontSize: 10 }}
                       />
                     )}
                   </AreaChart>
@@ -388,8 +388,8 @@ export default function LifeOutcomes() {
                   return (
                     <div key={milestone.id} className="bg-white/[0.04] border border-white/10 rounded-xl p-5 space-y-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#00D4FF]/10 flex items-center justify-center">
-                          <IconComp className="w-5 h-5 text-[#00D4FF]" />
+                        <div className="w-10 h-10 rounded-xl bg-[#FF8C00]/10 flex items-center justify-center">
+                          <IconComp className="w-5 h-5 text-[#FF8C00]" />
                         </div>
                         <div>
                           <h4 className="font-semibold text-white text-sm">{milestone.label}</h4>
@@ -405,7 +405,7 @@ export default function LifeOutcomes() {
                         </div>
                         <div className="flex justify-between text-xs">
                           <span className="text-white/50">Optimized Path</span>
-                          <span className={milestone.optimizedPathAge ? "text-[#00D4FF]" : "text-red-400"}>
+                          <span className={milestone.optimizedPathAge ? "text-[#FF8C00]" : "text-red-400"}>
                             {milestone.optimizedPathAge ? `Age ${milestone.optimizedPathAge}` : "Not achieved"}
                           </span>
                         </div>
@@ -426,8 +426,8 @@ export default function LifeOutcomes() {
                   </a>
                 </Link>
                 <Link href="/ai-coach">
-                  <a className="group flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.04] hover:border-[#00D4FF]/40 hover:bg-[#00D4FF]/5 transition-all cursor-pointer">
-                    <Brain className="w-8 h-8 text-[#00D4FF] flex-shrink-0 group-hover:scale-110 transition-transform" />
+                  <a className="group flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.04] hover:border-[#FF8C00]/40 hover:bg-[#FF8C00]/5 transition-all cursor-pointer">
+                    <Brain className="w-8 h-8 text-[#FF8C00] flex-shrink-0 group-hover:scale-110 transition-transform" />
                     <div>
                       <p className="text-white font-medium text-sm">Ask Your Coach</p>
                       <p className="text-white/50 text-xs">Get guidance on reaching this outcome</p>

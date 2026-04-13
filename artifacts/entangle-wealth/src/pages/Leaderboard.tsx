@@ -20,7 +20,7 @@ interface LeaderboardEntry {
 }
 
 const TIER_COLORS: Record<string, string> = {
-  Diamond: "text-[#00D4FF]",
+  Diamond: "text-[#FF8C00]",
   Platinum: "text-white/70",
   Gold: "text-[#FFB800]",
   Silver: "text-white/50",

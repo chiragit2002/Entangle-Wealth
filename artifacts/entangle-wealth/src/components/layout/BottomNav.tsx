@@ -44,7 +44,7 @@ function BottomNavComponent() {
             aria-label="More navigation options"
             style={{
               background: "var(--bottomnav-bg)",
-              borderTop: "1px solid rgba(0,255,65,0.12)",
+              borderTop: "1px solid rgba(255,140,0,0.12)",
               boxShadow: "0 -4px 24px rgba(0,0,0,0.6)",
             }}
           >
@@ -77,7 +77,7 @@ function BottomNavComponent() {
         aria-label="Main navigation"
         style={{
           background: "var(--bottomnav-bg)",
-          borderTop: "1px solid rgba(0,255,65,0.12)",
+          borderTop: "1px solid rgba(255,140,0,0.12)",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >

@@ -69,10 +69,10 @@ interface ResumeData {
 }
 
 const TEMPLATES = [
-  { id: "quantum", name: "Quantum Dark", accent: "#00D4FF", gradient: "from-cyan-500 to-blue-600" },
+  { id: "quantum", name: "Quantum Dark", accent: "#FF8C00", gradient: "from-amber-1000 to-blue-600" },
   { id: "entangled", name: "Entangled Gold", accent: "#FFB800", gradient: "from-yellow-500 to-amber-600" },
-  { id: "professional", name: "Professional", accent: "#00D4FF", gradient: "from-blue-500 to-indigo-600" },
-  { id: "modern", name: "Modern Clean", accent: "#00FF41", gradient: "from-green-500 to-emerald-600" },
+  { id: "professional", name: "Professional", accent: "#FF8C00", gradient: "from-blue-500 to-indigo-600" },
+  { id: "modern", name: "Modern Clean", accent: "#FF8C00", gradient: "from-green-500 to-emerald-600" },
   { id: "minimal", name: "Minimal", accent: "#ffffff", gradient: "from-gray-400 to-gray-600" },
 ];
 
@@ -398,7 +398,7 @@ export default function Resume() {
                 <div className="relative w-10 h-10">
                   <svg className="w-10 h-10 -rotate-90" viewBox="0 0 36 36">
                     <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2.5" />
-                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#00D4FF" strokeWidth="2.5"
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#FF8C00" strokeWidth="2.5"
                       strokeDasharray={`${completionScore}, 100`}
                       strokeLinecap="round" />
                   </svg>

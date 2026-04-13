@@ -218,7 +218,7 @@ function InlineError({ message, retry }: { message: string; retry?: () => void }
       {retry && (
         <button
           onClick={retry}
-          className="ml-auto flex items-center gap-1 text-[#00FF41]/60 hover:text-[#00FF41] transition-colors"
+          className="ml-auto flex items-center gap-1 text-[#FF8C00]/60 hover:text-[#FF8C00] transition-colors"
         >
           <RefreshCw className="w-3 h-3" /> Retry
         </button>
@@ -294,7 +294,7 @@ function RecentSignupTicker({
   }
   const s = signups[idx];
   return (
-    <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#00FF41]/15 bg-[#00FF41]/5 text-[11px] font-medium text-[#00FF41]">
+    <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#FF8C00]/15 bg-[#FF8C00]/5 text-[11px] font-medium text-[#FF8C00]">
       <UserPlus className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
       <span>
         {s.name} just joined {s.timeLabel}
@@ -328,15 +328,15 @@ function GoalSelector({ onSelect }: { onSelect: (goal: string) => void }) {
           className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border text-left transition-all duration-200 text-sm font-medium
             ${
               selected === id
-                ? "border-[#00FF41] bg-[#00FF41]/10 text-white"
+                ? "border-[#FF8C00] bg-[#FF8C00]/10 text-white"
                 : "border-white/10 bg-white/[0.03] text-white/80 hover:border-white/20 hover:bg-white/[0.06]"
             }`}
         >
           <Icon
-            className={`w-4 h-4 flex-shrink-0 ${selected === id ? "text-[#00FF41]" : "text-white/40"}`}
+            className={`w-4 h-4 flex-shrink-0 ${selected === id ? "text-[#FF8C00]" : "text-white/40"}`}
           />
           <span>{label}</span>
-          {selected === id && <CheckCircle className="w-4 h-4 text-[#00FF41] ml-auto" />}
+          {selected === id && <CheckCircle className="w-4 h-4 text-[#FF8C00] ml-auto" />}
         </button>
       ))}
     </div>
@@ -381,7 +381,7 @@ function LanguageSelector() {
         onClick={() => setOpen(!open)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/70 hover:text-white text-xs font-medium transition-all"
       >
-        <Globe className="w-3.5 h-3.5 text-[#00FF41]" />
+        <Globe className="w-3.5 h-3.5 text-[#FF8C00]" />
         <span>{current.flag}</span>
         <span>{current.label}</span>
       </button>
@@ -398,13 +398,13 @@ function LanguageSelector() {
               }}
               className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
                 selected === lang.code
-                  ? "bg-[#00FF41]/10 text-[#00FF41]"
+                  ? "bg-[#FF8C00]/10 text-[#FF8C00]"
                   : "text-white/70 hover:bg-white/[0.06] hover:text-white"
               }`}
             >
               <span className="text-base">{lang.flag}</span>
               <span>{lang.label}</span>
-              {selected === lang.code && <CheckCircle className="w-3.5 h-3.5 ml-auto text-[#00FF41]" />}
+              {selected === lang.code && <CheckCircle className="w-3.5 h-3.5 ml-auto text-[#FF8C00]" />}
             </button>
           ))}
         </div>
@@ -417,8 +417,8 @@ const EDGE_INSIGHTS = [
   {
     id: "quantum",
     icon: Atom,
-    iconColor: "#00FF41",
-    borderColor: "rgba(0,255,65,0.25)",
+    iconColor: "#FF8C00",
+    borderColor: "rgba(255,140,0,0.25)",
     benefit: "Multi-model consensus — built to catch what single signals miss.",
     headline: "Quantum Consensus Engine",
     body: "6 AI agents cross-check every signal independently, then converge on a verdict. No single model bias — just collective precision your brokerage can't replicate.",
@@ -429,8 +429,8 @@ const EDGE_INSIGHTS = [
   {
     id: "timeline",
     icon: GitBranch,
-    iconColor: "#00FF41",
-    borderColor: "rgba(0,255,65,0.22)",
+    iconColor: "#FF8C00",
+    borderColor: "rgba(255,140,0,0.22)",
     benefit: "See how one decision today branches into radically different futures.",
     headline: "Alternate Timeline Simulator",
     body: "See how a single decision today — save $200 more/month, pay off debt early — branches into radically different futures. No other platform shows you your money's parallel lives.",
@@ -613,7 +613,7 @@ function YourEdgeSection() {
     <section className="py-16 lg:py-24 px-4 border-t border-white/5 relative overflow-hidden">
       <div className="container mx-auto max-w-5xl relative z-10">
         <div className="text-center mb-10">
-          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#00FF41]/70 mb-3">
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#FF8C00]/70 mb-3">
             <Atom className="w-3 h-3" aria-hidden="true" />
             Your Edge
           </span>
@@ -698,7 +698,7 @@ function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
           setStep("goal");
           trackEvent("hero_cta_clicked");
         }}
-        className="h-11 px-8 bg-[#00FF41] text-[#0A0E1A] font-mono font-bold hover:opacity-90 active:opacity-80 text-sm tracking-wider shadow-[0_0_20px_rgba(0,255,65,0.20)] transition-all duration-150"
+        className="h-11 px-8 bg-[#FF8C00] text-[#0A0E1A] font-mono font-bold hover:opacity-90 active:opacity-80 text-sm tracking-wider shadow-[0_0_20px_rgba(255,140,0,0.20)] transition-all duration-150"
       >
         See exactly where you stand — free
       </Button>
@@ -714,7 +714,7 @@ function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
   }
 
   return (
-    <div className="flex items-center gap-2 text-[#00FF41] text-sm font-medium animate-in fade-in duration-300">
+    <div className="flex items-center gap-2 text-[#FF8C00] text-sm font-medium animate-in fade-in duration-300">
       <CheckCircle className="w-5 h-5" />
       <span>Great — taking you there now...</span>
     </div>
@@ -763,7 +763,7 @@ export default function Home() {
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
               You shouldn't have to wonder
               <br />
-              <span className="text-[#00FF41]">if you're doing it right.</span>
+              <span className="text-[#FF8C00]">if you're doing it right.</span>
             </h1>
 
             <p className="max-w-lg text-base md:text-lg text-white/60 leading-relaxed">
@@ -778,7 +778,7 @@ export default function Home() {
 
             <div className="flex flex-wrap items-center justify-center gap-5 pt-1">
               <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
-                <Lock className="w-3.5 h-3.5 text-[#00c8f8]" />
+                <Lock className="w-3.5 h-3.5 text-[#FF8C00]" />
                 Your data stays yours
               </span>
               {stats.members > 0 && (
@@ -800,7 +800,7 @@ export default function Home() {
         <section className="py-16 lg:py-24 px-4">
           <RevealSection>
             <div className="container mx-auto max-w-2xl text-center space-y-6">
-              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00c8f8]/60">
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#FF8C00]/60">
                 You're not alone
               </p>
               <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
@@ -836,7 +836,7 @@ export default function Home() {
         <section className="py-16 lg:py-24 px-4">
           <RevealSection>
             <div className="container mx-auto max-w-2xl text-center space-y-6">
-              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00e676]/60">
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#FF8C00]/60">
                 Here's the difference
               </p>
               <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
@@ -851,14 +851,14 @@ export default function Home() {
                   {
                     title: "Clarity",
                     desc: "See your full financial picture in one place. No more guessing, no more avoidance.",
-                    color: "text-[#00c8f8]",
-                    border: "border-[#00c8f8]/20",
+                    color: "text-[#FF8C00]",
+                    border: "border-[#FF8C00]/20",
                   },
                   {
                     title: "Simplicity",
                     desc: "We cut through the noise so you don't have to. Just the next right move — in plain language.",
-                    color: "text-[#00e676]",
-                    border: "border-[#00e676]/20",
+                    color: "text-[#FF8C00]",
+                    border: "border-[#FF8C00]/20",
                   },
                   {
                     title: "Confidence",
@@ -900,15 +900,15 @@ export default function Home() {
                     num: "1",
                     title: "Tell us where you are",
                     desc: "No 47-question form. No linking accounts. Just the basics — enough to give you something real.",
-                    color: "text-[#00c8f8]",
-                    bg: "bg-[#00c8f8]/10",
+                    color: "text-[#FF8C00]",
+                    bg: "bg-[#FF8C00]/10",
                   },
                   {
                     num: "2",
                     title: "We do the heavy lifting",
                     desc: "Multiple AI models analyze your picture simultaneously. When they agree, we tell you — with confidence scores and clear reasoning.",
-                    color: "text-[#00e676]",
-                    bg: "bg-[#00e676]/10",
+                    color: "text-[#FF8C00]",
+                    bg: "bg-[#FF8C00]/10",
                   },
                   {
                     num: "3",
@@ -951,7 +951,7 @@ export default function Home() {
           <RevealSection>
             <div className="container mx-auto max-w-3xl">
               <div className="text-center mb-10">
-                <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00e676]/60 mb-3">
+                <p className="text-[11px] font-semibold tracking-widest uppercase text-[#FF8C00]/60 mb-3">
                   The shift
                 </p>
                 <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
@@ -983,8 +983,8 @@ export default function Home() {
                 </RevealSection>
 
                 <RevealSection delay={120}>
-                  <div className="glass-panel rounded-2xl p-6 border border-[#00e676]/20 h-full">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#00e676]/60 mb-5">After</p>
+                  <div className="glass-panel rounded-2xl p-6 border border-[#FF8C00]/20 h-full">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF8C00]/60 mb-5">After</p>
                     <div className="space-y-4">
                       {[
                         "A clear, specific action to take this week",
@@ -993,7 +993,7 @@ export default function Home() {
                         "A plan that fits your life — not someone else's",
                       ].map((text) => (
                         <div key={text} className="flex items-start gap-3">
-                          <CheckCircle className="w-4 h-4 text-[#00e676] flex-shrink-0 mt-0.5" />
+                          <CheckCircle className="w-4 h-4 text-[#FF8C00] flex-shrink-0 mt-0.5" />
                           <p className="text-sm text-white/70 leading-relaxed">{text}</p>
                         </div>
                       ))}
@@ -1004,7 +1004,7 @@ export default function Home() {
 
               <RevealSection delay={200}>
                 <div className="mt-6 flex items-center justify-center gap-3 px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                  <ArrowRight className="w-4 h-4 text-[#00c8f8] flex-shrink-0" />
+                  <ArrowRight className="w-4 h-4 text-[#FF8C00] flex-shrink-0" />
                   <p className="text-sm text-white/50 leading-relaxed">
                     Most members report feeling noticeably clearer within their first session.
                   </p>
@@ -1055,7 +1055,7 @@ export default function Home() {
                         </div>
                         <p className="text-sm text-white/70 leading-relaxed flex-1">"{t.message}"</p>
                         <div className="flex items-center gap-2 pt-3 border-t border-white/5">
-                          <div className="w-7 h-7 rounded-full bg-[#00c8f8]/20 flex items-center justify-center text-xs font-bold text-[#00c8f8]">
+                          <div className="w-7 h-7 rounded-full bg-[#FF8C00]/20 flex items-center justify-center text-xs font-bold text-[#FF8C00]">
                             {t.name.charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -1089,13 +1089,13 @@ export default function Home() {
                 {[
                   {
                     icon: CheckCircle,
-                    color: "text-[#00e676]",
+                    color: "text-[#FF8C00]",
                     title: "No confusing financial jargon",
                     desc: "Every piece of guidance is written for real people, not finance professionals.",
                   },
                   {
                     icon: ShieldCheck,
-                    color: "text-[#00c8f8]",
+                    color: "text-[#FF8C00]",
                     title: "Your privacy is protected",
                     desc: "Your data is encrypted and never sold. You're a person, not a product.",
                   },
@@ -1149,11 +1149,52 @@ export default function Home() {
           </RevealSection>
         </section>
 
+        {testimonialsState.data && testimonialsState.data.length > 0 && (
+        <section className="py-16 lg:py-24 px-4 border-t border-white/5">
+          <div className="container mx-auto max-w-3xl">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl md:text-4xl font-bold text-white mb-3">
+                What members are saying
+              </h2>
+              <p className="text-sm text-white/50">Real experiences from Entangled Wealth users.</p>
+            </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {testimonialsState.data.slice(0, 6).map((t) => (
+                  <div key={t.id} className="bloomberg-panel p-5 flex flex-col gap-3">
+                    <div className="flex gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-3.5 h-3.5 ${
+                            i < t.rating
+                              ? "text-[#FFB800] fill-[#FFB800]"
+                              : "text-white/10 fill-white/10"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-sm text-white/70 leading-relaxed flex-1">"{t.message}"</p>
+                    <div className="flex items-center gap-2 pt-3 border-t border-white/5">
+                      <div className="w-7 h-7 rounded-full bg-[#FF8C00]/20 flex items-center justify-center text-xs font-bold text-[#FF8C00]">
+                        {t.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-white">{t.name}</p>
+                        {t.role && <p className="text-[10px] text-white/30">{t.role}</p>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+          </div>
+        </section>
+        )}
         {/* Final CTA */}
         <section className="py-20 lg:py-28 px-4 border-t border-white/5">
           <RevealSection>
             <div className="container mx-auto max-w-2xl text-center flex flex-col items-center space-y-6">
-              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00c8f8]/60">
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#FF8C00]/60">
                 You came here unsure. Now you know your next step.
               </p>
               <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">

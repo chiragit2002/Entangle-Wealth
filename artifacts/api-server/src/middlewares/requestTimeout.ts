@@ -20,6 +20,8 @@ declare global {
   namespace Express {
     interface Request {
       timeoutAbortController?: AbortController;
+      abortSignal?: AbortSignal;
+      abortController?: AbortController;
     }
   }
 }
@@ -59,3 +61,40 @@ export function requestTimeoutMiddleware(req: Request, res: Response, next: Next
 
   next();
 }
+
+export function requestTimeout(timeoutMs: number) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const controller = new AbortController();
+    req.abortController = controller;
+    req.abortSignal = controller.signal;
+
+    let timedOut = false;
+
+    const timer = setTimeout(() => {
+      timedOut = true;
+      controller.abort(new Error(`Request timed out after ${timeoutMs}ms`));
+      if (!res.headersSent) {
+        logger.warn(
+          { method: req.method, path: req.path, timeoutMs },
+          "Request timed out"
+        );
+        res.status(503).json({
+          error: "Request timed out. Please try again.",
+          timeout: timeoutMs,
+        });
+      }
+    }, timeoutMs);
+
+    const cleanup = () => {
+      if (!timedOut) clearTimeout(timer);
+    };
+
+    res.on("finish", cleanup);
+    res.on("close", cleanup);
+
+    next();
+  };
+}
+
+export const standardTimeout = requestTimeout(10_000);
+export const aiTimeout = requestTimeout(30_000);

@@ -22,7 +22,7 @@ export default function LightweightChart({
   data,
   height = 400,
   showVolume = true,
-  upColor = "#00FF41",
+  upColor = "#FF8C00",
   downColor = "#ff3366",
 }: LightweightChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,8 +47,8 @@ export default function LightweightChart({
       },
       crosshair: {
         mode: CrosshairMode.Normal,
-        vertLine: { color: "rgba(0, 212, 255, 0.3)", width: 1, style: 2 },
-        horzLine: { color: "rgba(0, 212, 255, 0.3)", width: 1, style: 2 },
+        vertLine: { color: "rgba(255, 140, 0, 0.3)", width: 1, style: 2 },
+        horzLine: { color: "rgba(255, 140, 0, 0.3)", width: 1, style: 2 },
       },
       rightPriceScale: {
         borderColor: "rgba(255, 255, 255, 0.1)",

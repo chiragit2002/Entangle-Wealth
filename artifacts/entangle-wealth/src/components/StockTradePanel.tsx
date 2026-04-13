@@ -180,13 +180,13 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
     <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
         <div className="flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-[#00FF41]" />
+          <TrendingUp className="w-4 h-4 text-[#FF8C00]" />
           <span className="text-sm font-bold text-white">Trade {symbol}</span>
         </div>
         {portfolio && (
           <div className="flex items-center gap-3 text-[10px] font-mono">
-            <span className="text-white/40">Cash: <span className="text-[#00FF41] font-bold">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span></span>
-            <span className={`font-bold ${pnl >= 0 ? "text-[#00FF41]" : "text-[#ff3366]"}`}>
+            <span className="text-white/40">Cash: <span className="text-[#FF8C00] font-bold">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span></span>
+            <span className={`font-bold ${pnl >= 0 ? "text-[#FF8C00]" : "text-[#ff3366]"}`}>
               P&L: {pnl >= 0 ? "+" : ""}{pnlPct}%
             </span>
           </div>
@@ -198,7 +198,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
           onClick={() => setTab("stocks")}
           className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors ${
             tab === "stocks"
-              ? "text-[#00D4FF] border-b-2 border-[#00D4FF] bg-[#00D4FF]/[0.04]"
+              ? "text-[#FF8C00] border-b-2 border-[#FF8C00] bg-[#FF8C00]/[0.04]"
               : "text-white/40 hover:text-white/60"
           }`}
         >
@@ -209,7 +209,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
           onClick={() => setTab("options")}
           className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors ${
             tab === "options"
-              ? "text-[#00D4FF] border-b-2 border-[#00D4FF] bg-[#00D4FF]/[0.04]"
+              ? "text-[#FF8C00] border-b-2 border-[#FF8C00] bg-[#FF8C00]/[0.04]"
               : "text-white/40 hover:text-white/60"
           }`}
         >
@@ -224,7 +224,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
             onClick={() => setSide("buy")}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
               side === "buy"
-                ? "bg-[#00FF41]/15 text-[#00FF41] border border-[#00FF41]/30"
+                ? "bg-[#FF8C00]/15 text-[#FF8C00] border border-[#FF8C00]/30"
                 : "bg-white/[0.03] text-white/40 border border-white/[0.06] hover:border-white/10"
             }`}
           >
@@ -254,7 +254,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
                   onChange={e => setQty(e.target.value)}
                   placeholder="100"
                   type="number"
-                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/30"
+                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
                 />
               </div>
               <div>
@@ -265,7 +265,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
                   placeholder="0.00"
                   type="number"
                   step="0.01"
-                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/30"
+                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
                 />
               </div>
             </div>
@@ -277,7 +277,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
                 onClick={() => setOptionType("CALL")}
                 className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
                   optionType === "CALL"
-                    ? "bg-[#00FF41]/15 text-[#00FF41] border border-[#00FF41]/30"
+                    ? "bg-[#FF8C00]/15 text-[#FF8C00] border border-[#FF8C00]/30"
                     : "bg-white/[0.03] text-white/40 border border-white/[0.06]"
                 }`}
               >
@@ -304,7 +304,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
                   placeholder="Strike"
                   type="number"
                   step="0.01"
-                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/30"
+                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
                 />
               </div>
               <div>
@@ -312,7 +312,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
                 <select
                   value={expiration}
                   onChange={e => setExpiration(e.target.value)}
-                  className="w-full h-9 px-2 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#00D4FF]/30"
+                  className="w-full h-9 px-2 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#FF8C00]/30"
                 >
                   {EXPIRATIONS.map(exp => (
                     <option key={exp} value={exp} className="bg-[#0a0a16]">{exp}</option>
@@ -329,7 +329,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
                   onChange={e => setContracts(e.target.value)}
                   placeholder="1"
                   type="number"
-                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/30"
+                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
                 />
               </div>
               <div>
@@ -340,7 +340,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
                   placeholder="0.00"
                   type="number"
                   step="0.01"
-                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/30"
+                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
                 />
               </div>
             </div>
@@ -359,7 +359,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
           disabled={loading || !isSignedIn}
           className={`w-full py-2.5 text-sm font-bold rounded-lg transition-all disabled:opacity-40 ${
             side === "buy"
-              ? "bg-[#00FF41] text-black hover:bg-[#00FF41]/80"
+              ? "bg-[#FF8C00] text-black hover:bg-[#FF8C00]/80"
               : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"
           }`}
         >
@@ -380,7 +380,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
           {symbolPositions.map(p => (
             <div key={p.id} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <BarChart3 className="w-3 h-3 text-[#00D4FF]" />
+                <BarChart3 className="w-3 h-3 text-[#FF8C00]" />
                 <span className="text-xs font-mono font-bold text-white">{p.quantity} shares</span>
               </div>
               <span className="text-[10px] font-mono text-white/50">avg ${p.avgCost.toFixed(2)}</span>

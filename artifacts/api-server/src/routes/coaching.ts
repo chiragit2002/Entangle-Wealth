@@ -260,6 +260,10 @@ router.post("/coaching/chat", requireAuth, validateBody(CoachingChatSchema), asy
     });
   } catch (error) {
     logger.error({ err: error }, "Coaching chat error:");
+    if ((error as NodeJS.ErrnoException)?.code === "QUEUE_FULL") {
+      res.status(503).json({ error: "AI queue is full. Please try again later." });
+      return;
+    }
     res.status(500).json({ error: "Failed to get coaching response" });
   }
 });
@@ -317,6 +321,10 @@ router.get("/coaching/nudge", requireAuth, async (req, res) => {
     res.json({ nudge, context });
   } catch (error) {
     logger.error({ err: error }, "Nudge error:");
+    if ((error as NodeJS.ErrnoException)?.code === "QUEUE_FULL") {
+      res.status(503).json({ error: "AI queue is full. Please try again later." });
+      return;
+    }
     res.status(500).json({ error: "Failed to generate nudge" });
   }
 });
@@ -397,6 +405,10 @@ Respond in JSON format:
     res.json(newSummary);
   } catch (error) {
     logger.error({ err: error }, "Weekly summary error:");
+    if ((error as NodeJS.ErrnoException)?.code === "QUEUE_FULL") {
+      res.status(503).json({ error: "AI queue is full. Please try again later." });
+      return;
+    }
     res.status(500).json({ error: "Failed to generate weekly summary" });
   }
 });

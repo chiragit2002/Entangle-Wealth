@@ -26,7 +26,7 @@ export interface UserEntanglementContext {
   recentlyAnalyzedSignal?: string;
 }
 
-const ENTANGLEMENT_ACCENT = "#00c8f8";
+const ENTANGLEMENT_ACCENT = "#FF8C00";
 const TAX_ACCENT = "#f5c842";
 const CAREER_ACCENT = "#00e676";
 const SIM_ACCENT = "#a78bfa";

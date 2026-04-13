@@ -240,7 +240,7 @@ function generateAgentReviews(results: IndicatorResult[], symbol: string): Agent
       reasoning: `${bb ? `Bollinger Bands: ${bb.value}.` : ""} ${volatility.length} volatility indicators assessed.`,
       keyMetrics: [bb ? `Bollinger: ${bb.value}` : "", `Vol indicators: ${volatility.length}`, `Risk: ${volatility.filter(r => r.signal === "SELL" || r.signal === "STRONG_SELL").length > 3 ? "HIGH" : "MODERATE"}`].filter(Boolean),
     },
-    { name: "Volume Profiler", role: "OBV, CMF & Flow", color: "#00FF41",
+    { name: "Volume Profiler", role: "OBV, CMF & Flow", color: "#FF8C00",
       signal: volBuy > volume.length * 0.5 ? "BUY" : volBuy < volume.length * 0.3 ? "SELL" : "NEUTRAL",
       verdict: obv ? `OBV: ${obv.signal === "BUY" ? "accumulation" : obv.signal === "SELL" ? "distribution" : "neutral"}` : "Volume neutral",
       reasoning: `${obv ? `OBV: ${obv.value} (${obv.signal}).` : ""} ${volBuy}/${volume.length} volume bullish.`,
@@ -262,10 +262,10 @@ function generateAgentReviews(results: IndicatorResult[], symbol: string): Agent
 }
 
 function sigColor(s: IndicatorResult["signal"]) {
-  return s === "STRONG_BUY" ? "#00FF41" : s === "BUY" ? "#00d4ff" : s === "SELL" ? "#FFB800" : s === "STRONG_SELL" ? "#ff3366" : "#666";
+  return s === "STRONG_BUY" ? "#FF8C00" : s === "BUY" ? "#00d4ff" : s === "SELL" ? "#FFB800" : s === "STRONG_SELL" ? "#ff3366" : "#666";
 }
 function sigBg(s: IndicatorResult["signal"]) {
-  return s === "STRONG_BUY" ? "bg-[#00FF41]/10 text-[#00FF41] border-[#00FF41]/20" : s === "BUY" ? "bg-primary/10 text-primary border-primary/20" : s === "SELL" ? "bg-[#FFB800]/10 text-[#FFB800] border-[#FFB800]/20" : s === "STRONG_SELL" ? "bg-[#ff3366]/10 text-[#ff3366] border-[#ff3366]/20" : "bg-white/5 text-white/40 border-white/10";
+  return s === "STRONG_BUY" ? "bg-[#FF8C00]/10 text-[#FF8C00] border-[#FF8C00]/20" : s === "BUY" ? "bg-primary/10 text-primary border-primary/20" : s === "SELL" ? "bg-[#FFB800]/10 text-[#FFB800] border-[#FFB800]/20" : s === "STRONG_SELL" ? "bg-[#ff3366]/10 text-[#ff3366] border-[#ff3366]/20" : "bg-white/5 text-white/40 border-white/10";
 }
 
 export default function TechnicalAnalysis() {
@@ -749,7 +749,7 @@ export default function TechnicalAnalysis() {
                             </div>
                             <div className="flex items-center gap-2 mt-0.5">
                               <span className="text-[11px] text-white/50 font-mono">${w.price.toFixed(2)}</span>
-                              <span className={`text-[10px] font-mono font-bold ${w.change >= 0 ? "text-[#00FF41]" : "text-[#ff3366]"}`}>{w.change >= 0 ? "+" : ""}{Math.abs(w.change).toFixed(2)}%</span>
+                              <span className={`text-[10px] font-mono font-bold ${w.change >= 0 ? "text-[#FF8C00]" : "text-[#ff3366]"}`}>{w.change >= 0 ? "+" : ""}{Math.abs(w.change).toFixed(2)}%</span>
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-0.5">
@@ -824,9 +824,9 @@ export default function TechnicalAnalysis() {
                     </div>
 
                     <div className="flex gap-2 md:gap-3">
-                      <div className="text-center px-3 py-2 rounded-lg bg-[#00FF41]/[0.04] border border-[#00FF41]/10 min-w-[60px]">
-                        <p className="text-[18px] font-black text-[#00FF41] font-mono leading-none">{overall.buyCount}</p>
-                        <p className="text-[8px] text-[#00FF41]/40 font-bold mt-1">BUY</p>
+                      <div className="text-center px-3 py-2 rounded-lg bg-[#FF8C00]/[0.04] border border-[#FF8C00]/10 min-w-[60px]">
+                        <p className="text-[18px] font-black text-[#FF8C00] font-mono leading-none">{overall.buyCount}</p>
+                        <p className="text-[8px] text-[#FF8C00]/40 font-bold mt-1">BUY</p>
                       </div>
                       <div className="text-center px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] min-w-[60px]">
                         <p className="text-[18px] font-black text-white/30 font-mono leading-none">{overall.neutralCount}</p>
@@ -852,7 +852,7 @@ export default function TechnicalAnalysis() {
                             <span className="text-[10px] font-bold text-white/40">{cat.label}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[#00FF41] text-[11px] font-bold font-mono">{c.buy}↑</span>
+                            <span className="text-[#FF8C00] text-[11px] font-bold font-mono">{c.buy}↑</span>
                             <span className="text-[#ff3366] text-[11px] font-bold font-mono">{c.sell}↓</span>
                             <span className="text-white/10 text-[9px] font-mono ml-auto">{c.total}</span>
                           </div>

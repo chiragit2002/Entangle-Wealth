@@ -20,13 +20,13 @@ function QuantumLoader() {
   }, []);
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg" style={{ background: "rgba(0,212,255,0.04)", border: "1px solid rgba(0,212,255,0.08)" }}>
+    <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg" style={{ background: "rgba(255,140,0,0.04)", border: "1px solid rgba(255,140,0,0.08)" }}>
       <div className="relative flex items-center justify-center w-4 h-4 flex-shrink-0">
-        <div className="absolute inset-0 rounded-full border border-[#00D4FF]/30 animate-ping" />
-        <div className="w-2 h-2 rounded-full bg-[#00D4FF]/60" />
+        <div className="absolute inset-0 rounded-full border border-[#FF8C00]/30 animate-ping" />
+        <div className="w-2 h-2 rounded-full bg-[#FF8C00]/60" />
       </div>
       <span
-        className="text-xs font-mono text-[#00D4FF]/60 transition-all duration-300"
+        className="text-xs font-mono text-[#FF8C00]/60 transition-all duration-300"
         key={stageIndex}
         style={{ animation: "skeletonLineIn 0.3s ease-out" }}
       >

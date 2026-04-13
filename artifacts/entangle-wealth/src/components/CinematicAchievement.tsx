@@ -19,12 +19,12 @@ const TIER_CONFIG = {
     label: "Achievement Unlocked",
   },
   platinum: {
-    colors: ["#00D4FF", "#7B61FF", "#00FF88"],
-    glow: "rgba(0,212,255,0.4)",
+    colors: ["#FF8C00", "#7B61FF", "#00FF88"],
+    glow: "rgba(255,140,0,0.4)",
     label: "Milestone Reached",
   },
   diamond: {
-    colors: ["#00D4FF", "#FFFFFF", "#7B61FF", "#00FF88"],
+    colors: ["#FF8C00", "#FFFFFF", "#7B61FF", "#00FF88"],
     glow: "rgba(123,97,255,0.5)",
     label: "Legendary Achievement",
   },

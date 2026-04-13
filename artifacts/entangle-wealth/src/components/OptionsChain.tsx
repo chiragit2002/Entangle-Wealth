@@ -189,7 +189,7 @@ export function OptionsChain() {
         <div className="px-4 py-3 border-b border-white/[0.04] bg-white/[0.02]">
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
-              <span className={`text-xs font-bold ${tradeSelection.side === "buy" ? "text-[#00FF41]" : "text-[#ff3366]"}`}>
+              <span className={`text-xs font-bold ${tradeSelection.side === "buy" ? "text-[#FF8C00]" : "text-[#ff3366]"}`}>
                 {tradeSelection.side.toUpperCase()}
               </span>
               <span className="text-xs font-mono text-white">
@@ -204,7 +204,7 @@ export function OptionsChain() {
                 onChange={e => setContracts(e.target.value)}
                 type="number"
                 min="1"
-                className="w-16 h-7 px-2 text-[11px] font-mono bg-white/[0.04] border border-white/[0.1] rounded text-white focus:outline-none focus:border-[#00D4FF]/30 text-center"
+                className="w-16 h-7 px-2 text-[11px] font-mono bg-white/[0.04] border border-white/[0.1] rounded text-white focus:outline-none focus:border-[#FF8C00]/30 text-center"
               />
               <span className="text-[10px] text-white/30">contracts</span>
               <span className="text-[10px] font-mono text-white/50">
@@ -217,7 +217,7 @@ export function OptionsChain() {
                 disabled={tradeLoading || !isSignedIn}
                 className={`px-3 py-1 text-[10px] font-bold rounded transition-all disabled:opacity-40 ${
                   tradeSelection.side === "buy"
-                    ? "bg-[#00FF41] text-black hover:bg-[#00FF41]/80"
+                    ? "bg-[#FF8C00] text-black hover:bg-[#FF8C00]/80"
                     : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"
                 }`}
               >
@@ -280,11 +280,11 @@ export function OptionsChain() {
               const isCallSelected = tradeSelection?.optionType === "CALL" && tradeSelection?.strike === row.strike;
               const isPutSelected = tradeSelection?.optionType === "PUT" && tradeSelection?.strike === row.strike;
               return (
-                <tr key={row.strike} className={`border-b border-white/[0.015] hover:bg-white/[0.02] transition-colors ${isATM ? "bg-[#FFB800]/[0.03] border-[#FFB800]/10" : ""} ${isCallSelected || isPutSelected ? "bg-[#00D4FF]/[0.04]" : ""}`}>
+                <tr key={row.strike} className={`border-b border-white/[0.015] hover:bg-white/[0.02] transition-colors ${isATM ? "bg-[#FFB800]/[0.03] border-[#FFB800]/10" : ""} ${isCallSelected || isPutSelected ? "bg-[#FF8C00]/[0.04]" : ""}`}>
                   <td className="px-1 py-1">
                     <div className="flex gap-0.5">
-                      <button onClick={() => selectContract("CALL", row.strike, row.callAsk, "buy")} className="w-4 h-4 flex items-center justify-center rounded bg-[#00FF41]/10 hover:bg-[#00FF41]/25 transition-colors" title="Buy Call">
-                        <ArrowUpRight className="w-2.5 h-2.5 text-[#00FF41]" />
+                      <button onClick={() => selectContract("CALL", row.strike, row.callAsk, "buy")} className="w-4 h-4 flex items-center justify-center rounded bg-[#FF8C00]/10 hover:bg-[#FF8C00]/25 transition-colors" title="Buy Call">
+                        <ArrowUpRight className="w-2.5 h-2.5 text-[#FF8C00]" />
                       </button>
                       <button onClick={() => selectContract("CALL", row.strike, row.callBid, "sell")} className="w-4 h-4 flex items-center justify-center rounded bg-[#ff3366]/10 hover:bg-[#ff3366]/25 transition-colors" title="Sell Call">
                         <ArrowDownRight className="w-2.5 h-2.5 text-[#ff3366]" />
@@ -319,8 +319,8 @@ export function OptionsChain() {
                   </>}
                   <td className="px-1 py-1">
                     <div className="flex gap-0.5">
-                      <button onClick={() => selectContract("PUT", row.strike, row.putAsk, "buy")} className="w-4 h-4 flex items-center justify-center rounded bg-[#00FF41]/10 hover:bg-[#00FF41]/25 transition-colors" title="Buy Put">
-                        <ArrowUpRight className="w-2.5 h-2.5 text-[#00FF41]" />
+                      <button onClick={() => selectContract("PUT", row.strike, row.putAsk, "buy")} className="w-4 h-4 flex items-center justify-center rounded bg-[#FF8C00]/10 hover:bg-[#FF8C00]/25 transition-colors" title="Buy Put">
+                        <ArrowUpRight className="w-2.5 h-2.5 text-[#FF8C00]" />
                       </button>
                       <button onClick={() => selectContract("PUT", row.strike, row.putBid, "sell")} className="w-4 h-4 flex items-center justify-center rounded bg-[#ff3366]/10 hover:bg-[#ff3366]/25 transition-colors" title="Sell Put">
                         <ArrowDownRight className="w-2.5 h-2.5 text-[#ff3366]" />

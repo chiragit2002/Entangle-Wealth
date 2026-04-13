@@ -75,7 +75,7 @@ export default function PersonalTrip() {
 
   return (
     <div className="space-y-4">
-      <div className="glass-panel rounded-xl p-4 border border-[rgba(0,212,255,0.15)]">
+      <div className="glass-panel rounded-xl p-4 border border-[rgba(255,140,0,0.15)]">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="text-lg font-bold">

@@ -8,12 +8,17 @@ export const globalErrorHandler = (
   res: Response,
   _next: NextFunction
 ): void => {
-  const status =
-    typeof (err as { status?: number }).status === "number"
-      ? (err as { status: number }).status
-      : typeof (err as { statusCode?: number }).statusCode === "number"
-      ? (err as { statusCode: number }).statusCode
-      : 500;
+  const errObj = err as { status?: number; statusCode?: number; code?: string; message?: string };
+
+  const isQueueFull = errObj?.code === "QUEUE_FULL";
+
+  const status = isQueueFull
+    ? 503
+    : typeof errObj.status === "number"
+    ? errObj.status
+    : typeof errObj.statusCode === "number"
+    ? errObj.statusCode
+    : 500;
 
   logger.error(
     {
@@ -38,6 +43,8 @@ export const globalErrorHandler = (
   if (res.headersSent) return;
 
   res.status(status >= 400 && status < 600 ? status : 500).json({
-    error: "Internal server error",
+    error: isQueueFull
+      ? "AI queue is full. Please try again later."
+      : "Internal server error",
   });
 };

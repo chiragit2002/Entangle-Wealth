@@ -111,8 +111,8 @@ function JourneyChart({ data, investAmount }: { data: { date: string; value: num
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full max-w-4xl mx-auto" preserveAspectRatio="xMidYMid meet">
         <defs>
           <linearGradient id="journey-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={isProfit ? "#00FF41" : "#ff4466"} stopOpacity="0.3" />
-            <stop offset="100%" stopColor={isProfit ? "#00FF41" : "#ff4466"} stopOpacity="0.02" />
+            <stop offset="0%" stopColor={isProfit ? "#FF8C00" : "#ff4466"} stopOpacity="0.3" />
+            <stop offset="100%" stopColor={isProfit ? "#FF8C00" : "#ff4466"} stopOpacity="0.02" />
           </linearGradient>
         </defs>
         {yLines.map((tick, i) => (
@@ -124,12 +124,12 @@ function JourneyChart({ data, investAmount }: { data: { date: string; value: num
           </g>
         ))}
         <line x1={pad.left} y1={investY} x2={pad.left + plotW} y2={investY}
-          stroke="rgba(0,255,65,0.3)" strokeDasharray="6,4" strokeWidth="1" />
-        <text x={pad.left + plotW + 4} y={investY + 4} fill="rgba(0,255,65,0.5)" fontSize="9" fontFamily="JetBrains Mono">
+          stroke="rgba(255,140,0,0.3)" strokeDasharray="6,4" strokeWidth="1" />
+        <text x={pad.left + plotW + 4} y={investY + 4} fill="rgba(255,140,0,0.5)" fontSize="9" fontFamily="JetBrains Mono">
           Invested
         </text>
         <polygon points={areaPoints} fill="url(#journey-grad)" />
-        <polyline points={points.join(" ")} fill="none" stroke={isProfit ? "#00FF41" : "#ff4466"} strokeWidth="2" />
+        <polyline points={points.join(" ")} fill="none" stroke={isProfit ? "#FF8C00" : "#ff4466"} strokeWidth="2" />
         <text x={pad.left} y={h - 5} fill="rgba(255,255,255,0.3)" fontSize="9" fontFamily="JetBrains Mono">{data[0].date}</text>
         <text x={pad.left + plotW} y={h - 5} textAnchor="end" fill="rgba(255,255,255,0.3)" fontSize="9" fontFamily="JetBrains Mono">{lastPoint.date}</text>
       </svg>
@@ -298,10 +298,10 @@ export default function TimeMachine() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className={`text-2xl font-black font-mono ${result.totalReturn >= 0 ? "text-[#00FF41]" : "text-[#ff4466]"}`}>
+                  <div className={`text-2xl font-black font-mono ${result.totalReturn >= 0 ? "text-[#FF8C00]" : "text-[#ff4466]"}`}>
                     ${result.currentValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </div>
-                  <div className={`text-xs font-bold ${result.totalReturn >= 0 ? "text-[#00FF41]" : "text-[#ff4466]"}`}>
+                  <div className={`text-xs font-bold ${result.totalReturn >= 0 ? "text-[#FF8C00]" : "text-[#ff4466]"}`}>
                     {result.totalReturn >= 0 ? "+" : ""}${Math.abs(result.totalReturn).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                     {" "}({result.totalReturnPct >= 0 ? "+" : ""}{Math.abs(result.totalReturnPct).toFixed(1)}%)
                   </div>
@@ -312,21 +312,21 @@ export default function TimeMachine() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <StatCard icon={DollarSign} label="Invested" value={`$${result.investAmount.toLocaleString()}`}
-                sub={`${result.sharesOwned.toFixed(4)} shares @ $${result.startPrice.toFixed(2)}`} color="text-[#00FF41]" />
+                sub={`${result.sharesOwned.toFixed(4)} shares @ $${result.startPrice.toFixed(2)}`} color="text-[#FF8C00]" />
               <StatCard icon={result.totalReturn >= 0 ? TrendingUp : TrendingDown} label="Current Value"
                 value={`$${result.currentValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
                 sub={`@ $${result.endPrice.toFixed(2)} per share`}
-                color={result.totalReturn >= 0 ? "text-[#00FF41]" : "text-[#ff4466]"} />
+                color={result.totalReturn >= 0 ? "text-[#FF8C00]" : "text-[#ff4466]"} />
               <StatCard icon={Zap} label="Annualized" value={`${result.annualizedReturn >= 0 ? "+" : ""}${Math.abs(result.annualizedReturn).toFixed(1)}%`}
-                sub="Compound annual growth" color={result.annualizedReturn >= 0 ? "text-[#00FF41]" : "text-[#ff4466]"} />
+                sub="Compound annual growth" color={result.annualizedReturn >= 0 ? "text-[#FF8C00]" : "text-[#ff4466]"} />
               <StatCard icon={AlertTriangle} label="Max Drawdown" value={`${Math.abs(result.maxDrawdown).toFixed(1)}%`}
                 sub={result.maxDrawdownDate || "N/A"} color="text-[#ff4466]" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="mobile-card-glow">
-                <div className="flex items-center gap-2 mb-2"><Trophy className="w-4 h-4 text-[#00FF41]" /><span className="text-xs font-bold text-[#00FF41]">Best Day</span></div>
-                <div className="font-mono text-lg font-bold text-[#00FF41]">+{result.bestDay.pct.toFixed(2)}%</div>
+                <div className="flex items-center gap-2 mb-2"><Trophy className="w-4 h-4 text-[#FF8C00]" /><span className="text-xs font-bold text-[#FF8C00]">Best Day</span></div>
+                <div className="font-mono text-lg font-bold text-[#FF8C00]">+{result.bestDay.pct.toFixed(2)}%</div>
                 <div className="text-[10px] text-muted-foreground">{result.bestDay.date}</div>
               </div>
               <div className="mobile-card" style={{ borderColor: "rgba(255,68,102,0.12)" }}>

@@ -64,8 +64,8 @@ export function AmbientDashboard() {
         const alpha = p.alpha * (0.6 + 0.4 * Math.sin(p.pulse));
 
         ctx.globalAlpha = alpha;
-        ctx.fillStyle = "#00D4FF";
-        ctx.shadowColor = "#00D4FF";
+        ctx.fillStyle = "#FF8C00";
+        ctx.shadowColor = "#FF8C00";
         ctx.shadowBlur = 4;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
@@ -82,7 +82,7 @@ export function AmbientDashboard() {
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 120) {
             ctx.globalAlpha = (1 - dist / 120) * 0.08;
-            ctx.strokeStyle = "#00D4FF";
+            ctx.strokeStyle = "#FF8C00";
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);

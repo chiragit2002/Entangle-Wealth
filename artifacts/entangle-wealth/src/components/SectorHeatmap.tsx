@@ -6,15 +6,15 @@ function SectorHeatmapBase() {
   const maxWeight = Math.max(...sectorData.map(s => s.weight));
 
   const getHeatColor = (change: number) => {
-    if (change >= 2) return "rgba(0, 212, 255, 0.35)";
-    if (change >= 1) return "rgba(0, 212, 255, 0.2)";
-    if (change >= 0) return "rgba(0, 212, 255, 0.08)";
+    if (change >= 2) return "rgba(255, 140, 0, 0.35)";
+    if (change >= 1) return "rgba(255, 140, 0, 0.2)";
+    if (change >= 0) return "rgba(255, 140, 0, 0.08)";
     if (change >= -1) return "rgba(255, 68, 68, 0.12)";
     return "rgba(255, 68, 68, 0.25)";
   };
 
   const getBorderColor = (change: number) => {
-    if (change >= 1) return "rgba(0, 212, 255, 0.3)";
+    if (change >= 1) return "rgba(255, 140, 0, 0.3)";
     if (change >= 0) return "rgba(255, 255, 255, 0.08)";
     return "rgba(255, 68, 68, 0.2)";
   };
@@ -27,7 +27,7 @@ function SectorHeatmapBase() {
           <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Sector Performance</h4>
         </div>
         <div className="flex items-center gap-3 text-[9px] text-muted-foreground">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: "rgba(0,212,255,0.3)" }} /> Bullish</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: "rgba(255,140,0,0.3)" }} /> Bullish</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: "rgba(255,68,68,0.25)" }} /> Bearish</span>
         </div>
       </div>

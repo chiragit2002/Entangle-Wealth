@@ -83,7 +83,7 @@ interface DashboardData {
   };
 }
 
-const COLORS = ["#00D4FF", "#FFB800", "#00FF41", "#ff3366", "#9c27b0", "#ff9800", "#4caf50", "#2196f3"];
+const COLORS = ["#FF8C00", "#FFB800", "#FF8C00", "#ff3366", "#9c27b0", "#ff9800", "#4caf50", "#2196f3"];
 
 type DatePreset = "7d" | "30d" | "90d" | "custom";
 
@@ -96,7 +96,7 @@ function KPICard({
   value,
   icon: Icon,
   trend,
-  color = "#00D4FF",
+  color = "#FF8C00",
 }: {
   label: string;
   value: string | number;
@@ -121,7 +121,7 @@ function KPICard({
           <Icon className="w-5 h-5" style={{ color }} />
         </div>
         {trend && (
-          <div className={`flex items-center gap-1 text-xs font-medium ${trend === "up" ? "text-[#00FF41]" : trend === "down" ? "text-[#ff3366]" : "text-white/40"}`}>
+          <div className={`flex items-center gap-1 text-xs font-medium ${trend === "up" ? "text-[#FF8C00]" : trend === "down" ? "text-[#ff3366]" : "text-white/40"}`}>
             {trend === "up" ? <ArrowUpRight className="w-3 h-3" /> : trend === "down" ? <ArrowDownRight className="w-3 h-3" /> : null}
           </div>
         )}
@@ -272,7 +272,7 @@ export default function Analytics() {
     };
   }, [autoRefresh, fetchDashboard]);
 
-  const FUNNEL_COLORS = ["#00D4FF", "#FFB800", "#00FF41", "#9c27b0"];
+  const FUNNEL_COLORS = ["#FF8C00", "#FFB800", "#FF8C00", "#9c27b0"];
   const funnelData = data
     ? data.conversionFunnel.map((item, i) => ({
         name: item.stage,
@@ -296,7 +296,7 @@ export default function Analytics() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-              <BarChart3 className="w-8 h-8 text-[#00D4FF]" />
+              <BarChart3 className="w-8 h-8 text-[#FF8C00]" />
               Analytics Dashboard
             </h1>
             <p className="text-white/50 text-sm mt-1">Platform health metrics & user intelligence</p>
@@ -318,9 +318,9 @@ export default function Analytics() {
               onClick={() => setAutoRefresh(!autoRefresh)}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all"
               style={{
-                background: autoRefresh ? "rgba(0,255,65,0.1)" : "rgba(255,255,255,0.05)",
-                border: `1px solid ${autoRefresh ? "rgba(0,255,65,0.3)" : "rgba(255,255,255,0.1)"}`,
-                color: autoRefresh ? "#00FF41" : "rgba(255,255,255,0.5)",
+                background: autoRefresh ? "rgba(255,140,0,0.1)" : "rgba(255,255,255,0.05)",
+                border: `1px solid ${autoRefresh ? "rgba(255,140,0,0.3)" : "rgba(255,255,255,0.1)"}`,
+                color: autoRefresh ? "#FF8C00" : "rgba(255,255,255,0.5)",
               }}
             >
               <Timer className="w-3.5 h-3.5" />
@@ -331,9 +331,9 @@ export default function Analytics() {
               disabled={loading}
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
               style={{
-                background: "rgba(0,212,255,0.1)",
-                border: "1px solid rgba(0,212,255,0.3)",
-                color: "#00D4FF",
+                background: "rgba(255,140,0,0.1)",
+                border: "1px solid rgba(255,140,0,0.3)",
+                color: "#FF8C00",
               }}
             >
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
@@ -354,9 +354,9 @@ export default function Analytics() {
               onClick={() => setDatePreset(preset)}
               className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
               style={{
-                background: datePreset === preset ? "rgba(0,212,255,0.2)" : "rgba(255,255,255,0.05)",
-                border: `1px solid ${datePreset === preset ? "rgba(0,212,255,0.4)" : "rgba(255,255,255,0.08)"}`,
-                color: datePreset === preset ? "#00D4FF" : "rgba(255,255,255,0.5)",
+                background: datePreset === preset ? "rgba(255,140,0,0.2)" : "rgba(255,255,255,0.05)",
+                border: `1px solid ${datePreset === preset ? "rgba(255,140,0,0.4)" : "rgba(255,255,255,0.08)"}`,
+                color: datePreset === preset ? "#FF8C00" : "rgba(255,255,255,0.5)",
               }}
             >
               {preset === "7d" ? "Last 7 days" : preset === "30d" ? "Last 30 days" : preset === "90d" ? "Last 90 days" : "Custom"}
@@ -381,8 +381,8 @@ export default function Analytics() {
               />
               <button
                 onClick={fetchDashboard}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#00D4FF]"
-                style={{ background: "rgba(0,212,255,0.1)", border: "1px solid rgba(0,212,255,0.3)" }}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#FF8C00]"
+                style={{ background: "rgba(255,140,0,0.1)", border: "1px solid rgba(255,140,0,0.3)" }}
               >
                 Apply
               </button>
@@ -407,14 +407,14 @@ export default function Analytics() {
         {data && (
           <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <KPICard label="Total Users" value={data.kpi.totalUsers.toLocaleString()} icon={Users} color="#00D4FF" trend="up" />
-              <KPICard label="DAU (24h)" value={data.kpi.dau.toLocaleString()} icon={Activity} color="#00FF41" />
+              <KPICard label="Total Users" value={data.kpi.totalUsers.toLocaleString()} icon={Users} color="#FF8C00" trend="up" />
+              <KPICard label="DAU (24h)" value={data.kpi.dau.toLocaleString()} icon={Activity} color="#FF8C00" />
               <KPICard label="WAU (7d)" value={data.kpi.wau.toLocaleString()} icon={TrendingUp} color="#FFB800" />
               <KPICard label="MAU (30d)" value={data.kpi.mau.toLocaleString()} icon={Zap} color="#9c27b0" />
-              <KPICard label="MRR" value={`$${data.kpi.mrr.toLocaleString()}`} icon={BarChart3} color="#00FF41" trend="up" />
+              <KPICard label="MRR" value={`$${data.kpi.mrr.toLocaleString()}`} icon={BarChart3} color="#FF8C00" trend="up" />
               <KPICard label="ARR" value={`$${data.kpi.arr.toLocaleString()}`} icon={TrendingUp} color="#FFB800" />
               <KPICard label="Churn Rate" value={`${data.kpi.churnRate}%`} icon={ArrowDownRight} color="#ff3366" trend={data.kpi.churnRate > 5 ? "down" : "neutral"} />
-              <KPICard label="LTV" value={`$${data.kpi.ltv.toLocaleString()}`} icon={Target} color="#00D4FF" />
+              <KPICard label="LTV" value={`$${data.kpi.ltv.toLocaleString()}`} icon={Target} color="#FF8C00" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -440,7 +440,7 @@ export default function Analytics() {
                         }}
                         labelFormatter={(v) => new Date(v).toLocaleDateString()}
                       />
-                      <Line type="monotone" dataKey="count" stroke="#00D4FF" strokeWidth={2} dot={false} name="Signups" />
+                      <Line type="monotone" dataKey="count" stroke="#FF8C00" strokeWidth={2} dot={false} name="Signups" />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -468,7 +468,7 @@ export default function Analytics() {
                         }}
                         labelFormatter={(v) => new Date(v).toLocaleDateString()}
                       />
-                      <Bar dataKey="count" fill="#00D4FF" radius={[4, 4, 0, 0]} name="Events" />
+                      <Bar dataKey="count" fill="#FF8C00" radius={[4, 4, 0, 0]} name="Events" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -545,9 +545,9 @@ export default function Analytics() {
               <ChartCard title="Referral Funnel">
                 <div className="space-y-4">
                   {[
-                    { label: "Clicks", value: data.referralFunnel.clicks, color: "#00D4FF" },
+                    { label: "Clicks", value: data.referralFunnel.clicks, color: "#FF8C00" },
                     { label: "Signups", value: data.referralFunnel.signups, color: "#FFB800" },
-                    { label: "Conversions", value: data.referralFunnel.conversions, color: "#00FF41" },
+                    { label: "Conversions", value: data.referralFunnel.conversions, color: "#FF8C00" },
                   ].map((item) => {
                     const maxVal = data.referralFunnel.clicks || 1;
                     const pct = ((item.value / maxVal) * 100).toFixed(0);
@@ -598,7 +598,7 @@ export default function Analytics() {
                       />
                       <Bar
                         dataKey="count"
-                        fill="#00D4FF"
+                        fill="#FF8C00"
                         radius={[0, 4, 4, 0]}
                         name="Count"
                         cursor="pointer"
@@ -621,7 +621,7 @@ export default function Analytics() {
                         <div className="flex items-center gap-2">
                           <div className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
                           <span className="text-white/70">{item.platform}</span>
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono" style={{ background: "rgba(255,255,255,0.05)", color: item.status === "published" ? "#00FF41" : item.status === "draft" ? "#FFB800" : "#fff6" }}>{item.status}</span>
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono" style={{ background: "rgba(255,255,255,0.05)", color: item.status === "published" ? "#FF8C00" : item.status === "draft" ? "#FFB800" : "#fff6" }}>{item.status}</span>
                         </div>
                         <span className="text-white font-mono">{item.count.toLocaleString()}</span>
                       </div>
@@ -655,13 +655,13 @@ export default function Analytics() {
                   label="Total Feedback Submitted"
                   value={data.feedback.stats.totalCount.toLocaleString()}
                   icon={MessageSquare}
-                  color="#00D4FF"
+                  color="#FF8C00"
                 />
                 <KPICard
                   label="Satisfaction Rate (4-5★)"
                   value={data.feedback.stats.totalCount > 0 ? `${data.feedback.stats.satisfactionRate}%` : "—"}
                   icon={ThumbsUp}
-                  color="#00FF41"
+                  color="#FF8C00"
                   trend={data.feedback.stats.satisfactionRate >= 70 ? "up" : data.feedback.stats.satisfactionRate > 0 ? "down" : "neutral"}
                 />
               </div>
@@ -755,7 +755,7 @@ export default function Analytics() {
                             <p className="text-xs text-white/60 mt-1 line-clamp-2">{fb.comment}</p>
                           )}
                           {fb.admin_response && (
-                            <div className="mt-1.5 px-2 py-1 rounded text-[10px] text-[#00D4FF]" style={{ background: "rgba(0,212,255,0.05)", borderLeft: "2px solid rgba(0,212,255,0.3)" }}>
+                            <div className="mt-1.5 px-2 py-1 rounded text-[10px] text-[#FF8C00]" style={{ background: "rgba(255,140,0,0.05)", borderLeft: "2px solid rgba(255,140,0,0.3)" }}>
                               {fb.admin_response}
                             </div>
                           )}
@@ -789,7 +789,7 @@ export default function Analytics() {
         >
           <div
             className="w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-sm flex flex-col"
-            style={{ background: "rgba(8,8,20,0.98)", border: "1px solid rgba(0,212,255,0.25)" }}
+            style={{ background: "rgba(8,8,20,0.98)", border: "1px solid rgba(255,140,0,0.25)" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
@@ -834,7 +834,7 @@ export default function Analytics() {
                               contentStyle={{ background: "rgba(8,8,20,0.95)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "white", fontSize: "12px" }}
                               labelFormatter={(v: string) => new Date(v).toLocaleDateString()}
                             />
-                            <Line type="monotone" dataKey="count" stroke="#00D4FF" strokeWidth={2} dot={false} name="Events" />
+                            <Line type="monotone" dataKey="count" stroke="#FF8C00" strokeWidth={2} dot={false} name="Events" />
                             <Line type="monotone" dataKey="uniqueUsers" stroke="#FFB800" strokeWidth={2} dot={false} name="Unique Users" />
                           </LineChart>
                         </ResponsiveContainer>
@@ -861,7 +861,7 @@ export default function Analytics() {
                             {evt.properties && Object.keys(evt.properties).length > 0 && (
                               <div className="flex flex-wrap gap-2 mt-1">
                                 {Object.entries(evt.properties).map(([k, v]) => (
-                                  <span key={k} className="px-2 py-0.5 rounded font-mono" style={{ background: "rgba(0,212,255,0.08)", color: "#00D4FF" }}>
+                                  <span key={k} className="px-2 py-0.5 rounded font-mono" style={{ background: "rgba(255,140,0,0.08)", color: "#FF8C00" }}>
                                     {k}: {String(v)}
                                   </span>
                                 ))}

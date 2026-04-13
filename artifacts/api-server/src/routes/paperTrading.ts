@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, paperOptionsTradesTable, paperOptionsPositionsTable, dailySpinsTable, userXpTable, xpTransactionsTable, streaksTable, usersTable } from "@workspace/db/schema";
+import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, paperOptionsTradesTable, paperOptionsPositionsTable, dailySpinsTable, userXpTable, xpTransactionsTable, streaksTable, usersTable, balanceTransactionsTable } from "@workspace/db/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { resolveUserId } from "../lib/resolveUserId";
@@ -137,25 +137,41 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
     const result = await db.transaction(async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${dbUserId.toString()} || '_paper_trade'))`);
 
-      const [portfolio] = await tx
-        .select()
-        .from(paperPortfoliosTable)
-        .where(eq(paperPortfoliosTable.userId, dbUserId));
+      const lockedRows = await tx.execute(
+        sql`SELECT id, cash_balance, user_id FROM paper_portfolios WHERE user_id = ${dbUserId} FOR UPDATE`
+      );
+      const lockedPortfolio = (lockedRows as any).rows?.[0] ?? (lockedRows as any)[0] ?? null;
 
-      const currentPortfolio = portfolio || (await tx
-        .insert(paperPortfoliosTable)
-        .values({ userId: dbUserId, cashBalance: startingCash })
-        .returning())[0];
+      let currentCash: number;
+      if (lockedPortfolio) {
+        currentCash = Number(lockedPortfolio.cash_balance);
+      } else {
+        const [created] = await tx
+          .insert(paperPortfoliosTable)
+          .values({ userId: dbUserId, cashBalance: startingCash })
+          .returning();
+        currentCash = created.cashBalance;
+      }
 
       if (side === "buy") {
-        if (currentPortfolio.cashBalance < totalCost) {
-          return { error: `Insufficient funds. Available: $${currentPortfolio.cashBalance.toFixed(2)}, Required: $${totalCost.toFixed(2)}` };
+        if (currentCash < totalCost) {
+          return { error: `> INSUFFICIENT FUNDS — ORDER REJECTED. Available: $${currentCash.toFixed(2)}, Required: $${totalCost.toFixed(2)}` };
         }
 
-        await tx
-          .update(paperPortfoliosTable)
-          .set({ cashBalance: currentPortfolio.cashBalance - totalCost, updatedAt: new Date() })
-          .where(eq(paperPortfoliosTable.userId, dbUserId));
+        const newCash = currentCash - totalCost;
+        await tx.execute(
+          sql`UPDATE paper_portfolios SET cash_balance = cash_balance - ${totalCost}, updated_at = NOW() WHERE user_id = ${dbUserId}`
+        );
+
+        await tx.insert(balanceTransactionsTable).values({
+          userId: dbUserId,
+          transactionType: 'trade_buy',
+          amount: -totalCost,
+          balanceBefore: currentCash,
+          balanceAfter: newCash,
+          source: 'trade',
+          referenceId: `${side}_${upperSymbol}_${qty}`,
+        });
 
         const [existingPos] = await tx
           .select()
@@ -184,10 +200,20 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
           return { error: `Insufficient shares. You own ${existingPos?.quantity ?? 0} shares of ${upperSymbol}` };
         }
 
-        await tx
-          .update(paperPortfoliosTable)
-          .set({ cashBalance: currentPortfolio.cashBalance + totalCost, updatedAt: new Date() })
-          .where(eq(paperPortfoliosTable.userId, dbUserId));
+        const newCash = currentCash + totalCost;
+        await tx.execute(
+          sql`UPDATE paper_portfolios SET cash_balance = cash_balance + ${totalCost}, updated_at = NOW() WHERE user_id = ${dbUserId}`
+        );
+
+        await tx.insert(balanceTransactionsTable).values({
+          userId: dbUserId,
+          transactionType: 'trade_sell',
+          amount: totalCost,
+          balanceBefore: currentCash,
+          balanceAfter: newCash,
+          source: 'trade',
+          referenceId: `${side}_${upperSymbol}_${qty}`,
+        });
 
         const newQty = existingPos.quantity - qty;
         if (newQty === 0) {

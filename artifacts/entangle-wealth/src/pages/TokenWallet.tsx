@@ -189,7 +189,7 @@ export default function TokenWallet() {
           <div className="space-y-4">
             <div className="glass-panel p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Shield className="w-4 h-4 text-cyan-400" />
+                <Shield className="w-4 h-4 text-amber-500" />
                 <span className="text-xs text-muted-foreground uppercase tracking-wider">Network</span>
               </div>
               <p className="text-sm font-bold text-white">Ethereum (Sepolia Testnet)</p>

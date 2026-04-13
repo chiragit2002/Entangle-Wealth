@@ -29,7 +29,7 @@ const SERVICE_ICONS: Record<string, typeof Server> = {
 };
 
 const STATUS_CONFIG = {
-  operational: { label: "Operational", color: "#00FF41", icon: CheckCircle2, bg: "bg-[#00FF41]/10 border-[#00FF41]/20" },
+  operational: { label: "Operational", color: "#FF8C00", icon: CheckCircle2, bg: "bg-[#FF8C00]/10 border-[#FF8C00]/20" },
   degraded: { label: "Degraded", color: "#FFB800", icon: AlertTriangle, bg: "bg-[#FFB800]/10 border-[#FFB800]/20" },
   outage: { label: "Outage", color: "#ff3366", icon: XCircle, bg: "bg-[#ff3366]/10 border-[#ff3366]/20" },
 };
@@ -102,7 +102,7 @@ export default function Status() {
           <p className="text-white/30 text-xs mt-2 flex items-center justify-center gap-1.5">
             <Clock className="w-3 h-3" />
             Last checked: {lastRefresh.toLocaleTimeString()}
-            <button onClick={fetchData} disabled={loading} className="ml-2 text-[#00D4FF] hover:text-[#00D4FF]/80">
+            <button onClick={fetchData} disabled={loading} className="ml-2 text-[#FF8C00] hover:text-[#FF8C00]/80">
               <RefreshCw className={`w-3 h-3 ${loading ? "animate-spin" : ""}`} />
             </button>
           </p>
@@ -137,13 +137,13 @@ export default function Status() {
           <h2 className="text-lg font-bold text-white mb-4">Incident History (Last 30 Days)</h2>
           {incidents.length === 0 ? (
             <div className="text-center py-12 bg-white/[0.01] border border-white/[0.06] rounded-xl">
-              <CheckCircle2 className="w-8 h-8 text-[#00FF41]/40 mx-auto mb-3" />
+              <CheckCircle2 className="w-8 h-8 text-[#FF8C00]/40 mx-auto mb-3" />
               <p className="text-white/30 text-sm">No incidents in the last 30 days</p>
             </div>
           ) : (
             <div className="space-y-3">
               {incidents.map((inc) => {
-                const severityColor = inc.severity === "major" ? "#ff3366" : inc.severity === "minor" ? "#FFB800" : "#00D4FF";
+                const severityColor = inc.severity === "major" ? "#ff3366" : inc.severity === "minor" ? "#FFB800" : "#FF8C00";
                 return (
                   <div key={inc.id} className="px-5 py-4 bg-white/[0.02] border border-white/[0.06] rounded-xl">
                     <div className="flex items-start justify-between mb-2">
@@ -155,7 +155,7 @@ export default function Status() {
                         <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border" style={{ color: severityColor, borderColor: `${severityColor}33`, backgroundColor: `${severityColor}10` }}>
                           {inc.severity}
                         </span>
-                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${inc.resolved_at ? "bg-[#00FF41]/10 text-[#00FF41] border border-[#00FF41]/20" : "bg-[#FFB800]/10 text-[#FFB800] border border-[#FFB800]/20"}`}>
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${inc.resolved_at ? "bg-[#FF8C00]/10 text-[#FF8C00] border border-[#FF8C00]/20" : "bg-[#FFB800]/10 text-[#FFB800] border border-[#FFB800]/20"}`}>
                           {inc.resolved_at ? "Resolved" : inc.status}
                         </span>
                       </div>
@@ -173,7 +173,7 @@ export default function Status() {
         </div>
 
         <div className="mt-8 text-center">
-          <Link href="/help" className="text-xs text-white/50 hover:text-[#00D4FF] transition-colors">
+          <Link href="/help" className="text-xs text-white/50 hover:text-[#FF8C00] transition-colors">
             Need help? Visit the Help Center
           </Link>
         </div>

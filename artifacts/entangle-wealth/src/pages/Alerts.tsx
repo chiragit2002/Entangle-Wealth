@@ -46,9 +46,9 @@ interface AlertHistoryItem {
 }
 
 const ALERT_TYPE_OPTIONS = [
-  { value: "price_above", label: "Price Above", icon: TrendingUp, color: "#00FF41" },
+  { value: "price_above", label: "Price Above", icon: TrendingUp, color: "#FF8C00" },
   { value: "price_below", label: "Price Below", icon: TrendingDown, color: "#ff3366" },
-  { value: "rsi_oversold", label: "RSI Oversold (<30)", icon: Activity, color: "#00D4FF" },
+  { value: "rsi_oversold", label: "RSI Oversold (<30)", icon: Activity, color: "#FF8C00" },
   { value: "rsi_overbought", label: "RSI Overbought (>70)", icon: Activity, color: "#FFB800" },
   { value: "macd_crossover", label: "MACD Crossover", icon: Zap, color: "#9c27b0" },
   { value: "bollinger_breakout", label: "Bollinger Breakout", icon: AlertTriangle, color: "#ff6b35" },
@@ -59,7 +59,7 @@ function getAlertTypeLabel(type: string): string {
 }
 
 function getAlertTypeColor(type: string): string {
-  return ALERT_TYPE_OPTIONS.find(o => o.value === type)?.color || "#00D4FF";
+  return ALERT_TYPE_OPTIONS.find(o => o.value === type)?.color || "#FF8C00";
 }
 
 function formatTime(iso: string): string {
@@ -323,7 +323,7 @@ export default function Alerts() {
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight font-[family-name:var(--font-mono)]">
-              <span className="text-[#00D4FF]">Real-Time</span> Alerts
+              <span className="text-[#FF8C00]">Real-Time</span> Alerts
             </h1>
             <p className="text-white/50 text-sm mt-1">
               Configure price, RSI, MACD, and Bollinger alerts with live evaluation
@@ -338,7 +338,7 @@ export default function Alerts() {
               </div>
             )}
             {tier === "pro" && (
-              <div className="text-xs text-[#00FF41] bg-[#00FF41]/5 rounded-lg px-3 py-2 border border-[#00FF41]/20">
+              <div className="text-xs text-[#FF8C00] bg-[#FF8C00]/5 rounded-lg px-3 py-2 border border-[#FF8C00]/20">
                 Pro | Unlimited
               </div>
             )}
@@ -349,7 +349,7 @@ export default function Alerts() {
           <Button
             onClick={() => setTab("rules")}
             variant="ghost"
-            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "rules" ? "bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/20" : "text-white/40 hover:text-white/60"}`}
+            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "rules" ? "bg-[#FF8C00]/10 text-[#FF8C00] border border-[#FF8C00]/20" : "text-white/40 hover:text-white/60"}`}
           >
             <Settings className="w-4 h-4" /> Alert Rules
             <span className="text-xs bg-white/[0.06] px-2 py-0.5 rounded-full">{rules.length}</span>
@@ -357,7 +357,7 @@ export default function Alerts() {
           <Button
             onClick={() => setTab("history")}
             variant="ghost"
-            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "history" ? "bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/20" : "text-white/40 hover:text-white/60"}`}
+            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "history" ? "bg-[#FF8C00]/10 text-[#FF8C00] border border-[#FF8C00]/20" : "text-white/40 hover:text-white/60"}`}
           >
             <History className="w-4 h-4" /> Triggered History
             {history.filter(h => !h.read).length > 0 && (
@@ -380,14 +380,14 @@ export default function Alerts() {
               {!showForm ? (
                 <Button
                   onClick={() => setShowForm(true)}
-                  className="bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/20 hover:bg-[#00D4FF]/20"
+                  className="bg-[#FF8C00]/10 text-[#FF8C00] border border-[#FF8C00]/20 hover:bg-[#FF8C00]/20"
                 >
                   <Plus className="w-4 h-4 mr-2" /> New Alert Rule
                 </Button>
               ) : (
                 <Form {...alertForm}>
-                  <form onSubmit={createAlert} className="rounded-xl bg-white/[0.03] border border-[#00D4FF]/20 p-4">
-                    <p className="text-sm font-bold text-[#00D4FF] mb-1 font-[family-name:var(--font-mono)]">Create Alert Rule</p>
+                  <form onSubmit={createAlert} className="rounded-xl bg-white/[0.03] border border-[#FF8C00]/20 p-4">
+                    <p className="text-sm font-bold text-[#FF8C00] mb-1 font-[family-name:var(--font-mono)]">Create Alert Rule</p>
                     <p className="text-xs text-white/30 mb-4">Get notified instantly when your conditions are met — supports price levels and 4 technical indicators.</p>
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                       <FormField
@@ -404,7 +404,7 @@ export default function Alerts() {
                                 aria-label="Ticker symbol"
                                 aria-invalid={!!alertForm.formState.errors.symbol}
                                 onChange={e => field.onChange(e.target.value.toUpperCase().replace(/[^A-Z0-9./]/g, "").slice(0, 10))}
-                                className={`w-full bg-white/[0.05] border rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:outline-none font-[family-name:var(--font-mono)] ${alertForm.formState.errors.symbol ? "border-[#ff3366]/60" : "border-white/10 focus:border-[#00D4FF]/30"}`}
+                                className={`w-full bg-white/[0.05] border rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:outline-none font-[family-name:var(--font-mono)] ${alertForm.formState.errors.symbol ? "border-[#ff3366]/60" : "border-white/10 focus:border-[#FF8C00]/30"}`}
                               />
                             </FormControl>
                             <FormMessage className="text-[11px] text-[#ff3366]" />
@@ -445,7 +445,7 @@ export default function Alerts() {
                                   aria-label="Target price"
                                   aria-invalid={!!alertForm.formState.errors.threshold}
                                   onChange={e => field.onChange(e.target.value.replace(/[^0-9.]/g, ""))}
-                                  className={`w-full bg-white/[0.05] border rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:outline-none font-[family-name:var(--font-mono)] ${alertForm.formState.errors.threshold ? "border-[#ff3366]/60" : "border-white/10 focus:border-[#00D4FF]/30"}`}
+                                  className={`w-full bg-white/[0.05] border rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:outline-none font-[family-name:var(--font-mono)] ${alertForm.formState.errors.threshold ? "border-[#ff3366]/60" : "border-white/10 focus:border-[#FF8C00]/30"}`}
                                 />
                               </FormControl>
                               <FormMessage className="text-[11px] text-[#ff3366]" />
@@ -457,7 +457,7 @@ export default function Alerts() {
                         <Button
                           type="submit"
                           disabled={creating}
-                          className="flex-1 bg-[#00D4FF] text-black font-bold hover:bg-[#00D4FF]/80 gap-1"
+                          className="flex-1 bg-[#FF8C00] text-black font-bold hover:bg-[#FF8C00]/80 gap-1"
                         >
                           {creating ? <><RefreshCw className="w-3 h-3 animate-spin" /> Creating...</> : "Create"}
                         </Button>
@@ -481,7 +481,7 @@ export default function Alerts() {
                 <Bell className="w-12 h-12 mx-auto mb-3 text-white/10" />
                 <p className="text-white/30 text-sm font-semibold">No alert rules yet</p>
                 <p className="text-white/50 text-xs mt-1 max-w-xs mx-auto">Set up your first price alert to get notified when stocks hit your target levels.</p>
-                <Button onClick={() => setShowForm(true)} className="mt-4 bg-gradient-to-r from-[#00D4FF] to-[#0099cc] text-black text-xs font-bold hover:opacity-90">
+                <Button onClick={() => setShowForm(true)} className="mt-4 bg-gradient-to-r from-[#FF8C00] to-[#0099cc] text-black text-xs font-bold hover:opacity-90">
                   Create Your First Alert
                 </Button>
               </div>
@@ -499,7 +499,7 @@ export default function Alerts() {
                       {isEditing ? (
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
-                            <p className="text-sm font-bold text-[#00D4FF] font-[family-name:var(--font-mono)]">Edit: {rule.symbol}</p>
+                            <p className="text-sm font-bold text-[#FF8C00] font-[family-name:var(--font-mono)]">Edit: {rule.symbol}</p>
                             <Button onClick={() => setEditingId(null)} size="icon" variant="ghost" className="w-7 h-7 text-white/30 hover:text-white">
                               <X className="w-4 h-4" />
                             </Button>
@@ -518,11 +518,11 @@ export default function Alerts() {
                               placeholder="Threshold ($)"
                               value={editThreshold}
                               onChange={e => setEditThreshold(e.target.value.replace(/[^0-9.]/g, ""))}
-                              className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4FF]/30 font-[family-name:var(--font-mono)]"
+                              className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8C00]/30 font-[family-name:var(--font-mono)]"
                             />
                           )}
                           <div className="flex gap-2">
-                            <Button onClick={() => saveEdit(rule.id)} className="flex-1 bg-[#00D4FF] text-black font-bold text-xs">Save</Button>
+                            <Button onClick={() => saveEdit(rule.id)} className="flex-1 bg-[#FF8C00] text-black font-bold text-xs">Save</Button>
                             <Button onClick={() => setEditingId(null)} variant="ghost" className="text-white/50 text-xs">Cancel</Button>
                           </div>
                         </div>
@@ -547,7 +547,7 @@ export default function Alerts() {
                               onClick={() => startEdit(rule)}
                               size="icon"
                               variant="ghost"
-                              className="w-7 h-7 text-white/30 hover:text-[#00D4FF]"
+                              className="w-7 h-7 text-white/30 hover:text-[#FF8C00]"
                               aria-label="Edit alert"
                             >
                               <Pencil className="w-4 h-4" />
@@ -557,7 +557,7 @@ export default function Alerts() {
                               size="icon"
                               variant="ghost"
                               className="w-7 h-7"
-                              style={{ color: rule.enabled ? "#00FF41" : "rgba(255,255,255,0.3)" }}
+                              style={{ color: rule.enabled ? "#FF8C00" : "rgba(255,255,255,0.3)" }}
                               aria-label={rule.enabled ? "Disable alert" : "Enable alert"}
                             >
                               {rule.enabled ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
@@ -581,7 +581,7 @@ export default function Alerts() {
             )}
             {rules.length > 0 && rules.length < rulesTotal && (
               <div className="text-center mt-4">
-                <Button onClick={loadMoreRules} disabled={loadingMore} variant="ghost" className="text-[#00D4FF] text-xs gap-2">
+                <Button onClick={loadMoreRules} disabled={loadingMore} variant="ghost" className="text-[#FF8C00] text-xs gap-2">
                   {loadingMore ? <><RefreshCw className="w-3 h-3 animate-spin" /> Loading...</> : `Load More (${rules.length}/${rulesTotal})`}
                 </Button>
               </div>
@@ -594,7 +594,7 @@ export default function Alerts() {
                 <Button
                   onClick={markAllRead}
                   variant="ghost"
-                  className="text-[#00D4FF] text-xs"
+                  className="text-[#FF8C00] text-xs"
                 >
                   Mark all as read
                 </Button>
@@ -625,7 +625,7 @@ export default function Alerts() {
                             {h.symbol}
                           </span>
                           <span className="text-xs text-white/50">{getAlertTypeLabel(h.alertType)}</span>
-                          {!h.read && <div className="w-2 h-2 rounded-full bg-[#00D4FF]" />}
+                          {!h.read && <div className="w-2 h-2 rounded-full bg-[#FF8C00]" />}
                         </div>
                         <p className="text-xs text-white/50 mt-1">{h.message}</p>
                         <p className="text-[10px] text-white/50 mt-1 font-[family-name:var(--font-mono)]">
@@ -642,7 +642,7 @@ export default function Alerts() {
             )}
             {history.length > 0 && history.length < historyTotal && (
               <div className="text-center mt-4">
-                <Button onClick={loadMoreHistory} disabled={loadingMore} variant="ghost" className="text-[#00D4FF] text-xs gap-2">
+                <Button onClick={loadMoreHistory} disabled={loadingMore} variant="ghost" className="text-[#FF8C00] text-xs gap-2">
                   {loadingMore ? <><RefreshCw className="w-3 h-3 animate-spin" /> Loading...</> : `Load More (${history.length}/${historyTotal})`}
                 </Button>
               </div>
@@ -668,7 +668,7 @@ export default function Alerts() {
 
           <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-4">
             <div className="flex items-center gap-2 mb-3">
-              <Mail className="w-4 h-4 text-[#00D4FF]" />
+              <Mail className="w-4 h-4 text-[#FF8C00]" />
               <p className="text-xs font-bold text-white/30 font-[family-name:var(--font-mono)]">EMAIL DIGEST</p>
             </div>
             <p className="text-xs text-white/30 mb-3">Receive a summary of your triggered alerts via email</p>
@@ -682,14 +682,14 @@ export default function Alerts() {
                   key={opt.value}
                   onClick={() => updateDigestPref(opt.value)}
                   variant="ghost"
-                  className={`flex-1 h-auto py-2.5 rounded-lg text-xs font-semibold ${digestFrequency === opt.value ? "bg-[#00D4FF]/15 text-[#00D4FF] border border-[#00D4FF]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06] hover:text-white/50"}`}
+                  className={`flex-1 h-auto py-2.5 rounded-lg text-xs font-semibold ${digestFrequency === opt.value ? "bg-[#FF8C00]/15 text-[#FF8C00] border border-[#FF8C00]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06] hover:text-white/50"}`}
                 >
                   {opt.label}
                 </Button>
               ))}
             </div>
             {digestFrequency !== "off" && (
-              <p className="text-[10px] text-[#00FF41]/60 mt-2">
+              <p className="text-[10px] text-[#FF8C00]/60 mt-2">
                 {digestFrequency === "daily" ? "You'll receive a daily digest at 8:00 AM UTC" : "You'll receive a weekly digest every Monday at 8:00 AM UTC"}
               </p>
             )}

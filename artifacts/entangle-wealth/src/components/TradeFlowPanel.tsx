@@ -114,13 +114,13 @@ function StepIndicator({ currentStep }: StepIndicatorProps) {
                 isDone
                   ? "bg-[#00ff88] text-black"
                   : isActive
-                  ? "bg-[#00D4FF] text-black ring-2 ring-[#00D4FF]/30"
+                  ? "bg-[#FF8C00] text-black ring-2 ring-[#FF8C00]/30"
                   : "bg-white/[0.06] text-white/30"
               }`}>
                 {isDone ? "✓" : stepNum}
               </div>
               <span className={`text-[7px] font-mono mt-0.5 truncate max-w-[60px] text-center transition-colors ${
-                isActive ? "text-[#00D4FF]" : isDone ? "text-[#00ff88]" : "text-white/20"
+                isActive ? "text-[#FF8C00]" : isDone ? "text-[#00ff88]" : "text-white/20"
               }`}>
                 {label}
               </span>
@@ -332,15 +332,15 @@ export function TradeFlowPanel() {
 
   return (
     <div className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm overflow-hidden flex flex-col">
-      <div className="flex items-center justify-between px-3 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#00D4FF]">
+      <div className="flex items-center justify-between px-3 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FF8C00]">
         <div className="flex items-center gap-1.5">
-          <Activity className="w-3 h-3 text-[#00D4FF]" />
-          <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00D4FF]">TRADE FLOW</span>
+          <Activity className="w-3 h-3 text-[#FF8C00]" />
+          <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FF8C00]">TRADE FLOW</span>
           <span className="text-[8px] font-mono text-white/20 ml-1">6-STEP TERMINAL</span>
         </div>
         {selectedStock && (
           <div className="flex items-center gap-2 text-[9px] font-mono">
-            <span className="text-[#00D4FF] font-bold">{selectedStock.symbol}</span>
+            <span className="text-[#FF8C00] font-bold">{selectedStock.symbol}</span>
             <span className="text-white/40">${selectedStock.price.toFixed(2)}</span>
             <span className={selectedStock.isPositive ? "text-[#00ff88]" : "text-[#ff3366]"}>{selectedStock.change}</span>
             <button onClick={resetFlow} className="text-white/20 hover:text-white/40 transition-colors text-[8px] ml-2 border border-white/10 px-1 py-0.5 rounded-sm">
@@ -374,7 +374,7 @@ export function TradeFlowPanel() {
                       if (e.key === "Enter" && filteredTickers.length > 0) selectStock(filteredTickers[0].symbol);
                     }}
                     placeholder="Search ticker or company name..."
-                    className="w-full h-8 pl-7 pr-3 text-[11px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/25 focus:outline-none focus:border-[#00D4FF]/40"
+                    className="w-full h-8 pl-7 pr-3 text-[11px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/25 focus:outline-none focus:border-[#FF8C00]/40"
                     autoFocus
                   />
                 </div>
@@ -390,10 +390,10 @@ export function TradeFlowPanel() {
                         <button
                           key={t.symbol}
                           onClick={() => selectStock(t.symbol)}
-                          className="flex items-center justify-between px-2.5 py-2 bg-white/[0.02] hover:bg-[#00D4FF]/[0.06] border border-white/[0.04] hover:border-[#00D4FF]/20 rounded-sm transition-all group"
+                          className="flex items-center justify-between px-2.5 py-2 bg-white/[0.02] hover:bg-[#FF8C00]/[0.06] border border-white/[0.04] hover:border-[#FF8C00]/20 rounded-sm transition-all group"
                         >
                           <div className="text-left">
-                            <p className="text-[10px] font-mono font-bold text-white group-hover:text-[#00D4FF] transition-colors">{t.symbol}</p>
+                            <p className="text-[10px] font-mono font-bold text-white group-hover:text-[#FF8C00] transition-colors">{t.symbol}</p>
                             <p className="text-[8px] font-mono text-white/30 truncate max-w-[80px]">{t.name}</p>
                           </div>
                           {market && (
@@ -525,9 +525,9 @@ export function TradeFlowPanel() {
                         <span className="text-[#ff7f00] font-bold">{gamification.streak.currentStreak}d</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Zap className="w-2.5 h-2.5 text-[#00D4FF]" />
+                        <Zap className="w-2.5 h-2.5 text-[#FF8C00]" />
                         <span className="text-white/40">Multiplier:</span>
-                        <span className="text-[#00D4FF] font-bold">{gamification.streak.multiplier.toFixed(1)}x</span>
+                        <span className="text-[#FF8C00] font-bold">{gamification.streak.multiplier.toFixed(1)}x</span>
                       </div>
                     </div>
                     {challenges.length > 0 && (
@@ -556,7 +556,7 @@ export function TradeFlowPanel() {
                   <button onClick={() => setStep(1)} className="flex items-center gap-1 px-2 py-1.5 text-[9px] font-mono text-white/40 bg-white/[0.02] border border-white/[0.06] rounded-sm hover:text-white/60 transition-colors">
                     <ChevronLeft className="w-3 h-3" />Back
                   </button>
-                  <button onClick={() => setStep(3)} className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[9px] font-mono font-bold text-black bg-[#00D4FF] hover:bg-[#00D4FF]/80 rounded-sm transition-colors">
+                  <button onClick={() => setStep(3)} className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[9px] font-mono font-bold text-black bg-[#FF8C00] hover:bg-[#FF8C00]/80 rounded-sm transition-colors">
                     Set Order Details<ChevronRight className="w-3 h-3" />
                   </button>
                 </div>
@@ -566,7 +566,7 @@ export function TradeFlowPanel() {
             {step === 3 && selectedStock && (
               <div className="p-3 space-y-3">
                 <div className="flex items-center gap-2 text-[9px] font-mono text-white/40">
-                  <span className="text-[#00D4FF] font-bold">{selectedStock.symbol}</span>
+                  <span className="text-[#FF8C00] font-bold">{selectedStock.symbol}</span>
                   <span>${selectedStock.price.toFixed(2)}</span>
                 </div>
 
@@ -598,7 +598,7 @@ export function TradeFlowPanel() {
                         onClick={() => setOrderType(ot)}
                         className={`flex-1 py-1.5 text-[9px] font-mono font-bold rounded-sm transition-all ${
                           orderType === ot
-                            ? "bg-[#00D4FF]/15 text-[#00D4FF] border border-[#00D4FF]/40"
+                            ? "bg-[#FF8C00]/15 text-[#FF8C00] border border-[#FF8C00]/40"
                             : "bg-white/[0.02] text-white/30 border border-white/[0.06] hover:text-white/50"
                         }`}
                       >
@@ -616,7 +616,7 @@ export function TradeFlowPanel() {
                       value={quantity}
                       onChange={e => setQuantity(e.target.value)}
                       placeholder="100"
-                      className="w-full h-8 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/40"
+                      className="w-full h-8 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/40"
                     />
                   </div>
                   {orderType !== "Market" && (
@@ -630,7 +630,7 @@ export function TradeFlowPanel() {
                         value={limitPrice}
                         onChange={e => setLimitPrice(e.target.value)}
                         placeholder={selectedStock.price.toFixed(2)}
-                        className="w-full h-8 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00D4FF]/40"
+                        className="w-full h-8 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/40"
                       />
                     </div>
                   )}
@@ -648,7 +648,7 @@ export function TradeFlowPanel() {
                     </div>
                     <div className="flex justify-between text-[9px] font-mono border-t border-white/[0.04] pt-1 mt-1">
                       <span className="text-white/40">Estimated Total</span>
-                      <span className="text-[#00D4FF] font-bold text-[10px]">${estimatedCost.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                      <span className="text-[#FF8C00] font-bold text-[10px]">${estimatedCost.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                     </div>
                     <div className="flex justify-between text-[9px] font-mono">
                       <span className="text-white/40">Portfolio P&L Impact</span>
@@ -666,7 +666,7 @@ export function TradeFlowPanel() {
                   <button
                     onClick={() => setStep(4)}
                     disabled={!quantity || parseFloat(quantity) <= 0}
-                    className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[9px] font-mono font-bold text-black bg-[#00D4FF] hover:bg-[#00D4FF]/80 rounded-sm transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[9px] font-mono font-bold text-black bg-[#FF8C00] hover:bg-[#FF8C00]/80 rounded-sm transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     Review Tax Impact<ChevronRight className="w-3 h-3" />
                   </button>
@@ -736,10 +736,10 @@ export function TradeFlowPanel() {
                     </div>
                   </div>
                 ) : (
-                  <div className="border border-[#00D4FF]/20 rounded-sm p-2.5 bg-[#00D4FF]/[0.02]">
+                  <div className="border border-[#FF8C00]/20 rounded-sm p-2.5 bg-[#FF8C00]/[0.02]">
                     <div className="flex items-center gap-1.5 mb-2">
-                      <DollarSign className="w-3 h-3 text-[#00D4FF]" />
-                      <span className="text-[8px] font-mono text-[#00D4FF] font-bold uppercase">Buy Order — No Immediate Tax Event</span>
+                      <DollarSign className="w-3 h-3 text-[#FF8C00]" />
+                      <span className="text-[8px] font-mono text-[#FF8C00] font-bold uppercase">Buy Order — No Immediate Tax Event</span>
                     </div>
                     <p className="text-[8px] font-mono text-white/35 leading-relaxed">
                       Buying shares creates a cost basis. Capital gains tax is only triggered when you sell.
@@ -747,7 +747,7 @@ export function TradeFlowPanel() {
                     </p>
                     <div className="mt-2 pt-2 border-t border-white/[0.04] flex justify-between text-[9px] font-mono">
                       <span className="text-white/40">Cost Basis Created</span>
-                      <span className="text-[#00D4FF] font-bold">${estimatedCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                      <span className="text-[#FF8C00] font-bold">${estimatedCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                     </div>
                   </div>
                 )}
@@ -756,7 +756,7 @@ export function TradeFlowPanel() {
                   <button onClick={() => setStep(3)} className="flex items-center gap-1 px-2 py-1.5 text-[9px] font-mono text-white/40 bg-white/[0.02] border border-white/[0.06] rounded-sm hover:text-white/60 transition-colors">
                     <ChevronLeft className="w-3 h-3" />Back
                   </button>
-                  <button onClick={() => setStep(5)} className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[9px] font-mono font-bold text-black bg-[#00D4FF] hover:bg-[#00D4FF]/80 rounded-sm transition-colors">
+                  <button onClick={() => setStep(5)} className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[9px] font-mono font-bold text-black bg-[#FF8C00] hover:bg-[#FF8C00]/80 rounded-sm transition-colors">
                     Proceed to Execute<ChevronRight className="w-3 h-3" />
                   </button>
                 </div>
@@ -784,7 +784,7 @@ export function TradeFlowPanel() {
                       <span className="text-white/40">{label}</span>
                       <span className={`font-bold ${
                         label === "Side" ? (side === "buy" ? "text-[#00ff88]" : "text-[#ff3366]")
-                        : label === "Est. Cost" ? "text-[#00D4FF]"
+                        : label === "Est. Cost" ? "text-[#FF8C00]"
                         : "text-white"
                       }`}>{value}</span>
                     </div>
@@ -901,7 +901,7 @@ export function TradeFlowPanel() {
 
                 <button
                   onClick={resetFlow}
-                  className="w-full py-2 text-[9px] font-mono font-bold text-[#00D4FF] border border-[#00D4FF]/30 rounded-sm hover:bg-[#00D4FF]/[0.06] transition-colors"
+                  className="w-full py-2 text-[9px] font-mono font-bold text-[#FF8C00] border border-[#FF8C00]/30 rounded-sm hover:bg-[#FF8C00]/[0.06] transition-colors"
                 >
                   ▶ START NEW TRADE
                 </button>
@@ -929,8 +929,8 @@ export function TradeFlowPanel() {
               onClick={e => e.stopPropagation()}
             >
               <div className="flex items-center gap-2 mb-4">
-                <Activity className="w-3.5 h-3.5 text-[#00D4FF]" />
-                <span className="text-[11px] font-mono font-bold text-[#00D4FF] tracking-wider">CONFIRM ORDER</span>
+                <Activity className="w-3.5 h-3.5 text-[#FF8C00]" />
+                <span className="text-[11px] font-mono font-bold text-[#FF8C00] tracking-wider">CONFIRM ORDER</span>
               </div>
               <div className="space-y-1.5 mb-4">
                 {[
@@ -945,7 +945,7 @@ export function TradeFlowPanel() {
                     <span className="text-white/40">{label}</span>
                     <span className={`font-bold ${
                       label === "Action" ? (side === "buy" ? "text-[#00ff88]" : "text-[#ff3366]")
-                      : label === "Est. Total" ? "text-[#00D4FF]"
+                      : label === "Est. Total" ? "text-[#FF8C00]"
                       : "text-white"
                     }`}>{value}</span>
                   </div>

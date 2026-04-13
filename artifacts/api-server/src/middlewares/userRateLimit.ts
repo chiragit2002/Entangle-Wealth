@@ -1,14 +1,17 @@
 import { getAuth } from "@clerk/express";
 import type { Request, Response, NextFunction } from "express";
 import { logger } from "../lib/logger";
+import { LRUMap } from "../lib/lruMap";
 
 interface RateLimitEntry {
   count: number;
   resetAt: number;
 }
 
-const userWindows = new Map<string, RateLimitEntry>();
-const ipWindows = new Map<string, RateLimitEntry>();
+const MAX_WINDOW_ENTRIES = 10_000;
+
+const userWindows = new LRUMap<string, RateLimitEntry>(MAX_WINDOW_ENTRIES);
+const ipWindows = new LRUMap<string, RateLimitEntry>(MAX_WINDOW_ENTRIES);
 
 const CLEANUP_INTERVAL = 5 * 60 * 1000;
 setInterval(() => {
@@ -22,7 +25,7 @@ setInterval(() => {
 }, CLEANUP_INTERVAL);
 
 function checkWindow(
-  map: Map<string, RateLimitEntry>,
+  map: LRUMap<string, RateLimitEntry>,
   key: string,
   windowMs: number,
   max: number,
@@ -45,12 +48,17 @@ function checkWindow(
 
 const WEBHOOK_PATHS_STRIPPED = ["/stripe/webhook", "/webhooks/zapier"];
 const WEBHOOK_PATHS_FULL = ["/api/stripe/webhook", "/api/webhooks/zapier"];
+const EXEMPT_PATHS = ["/health", "/api/health", "/stress-test", "/api/stress-test"];
 
 function makeUserLimiter(windowMs: number, max: number, label: string) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const path = req.path || req.url || "";
     const allWebhookPaths = [...WEBHOOK_PATHS_STRIPPED, ...WEBHOOK_PATHS_FULL];
     if (allWebhookPaths.some(wp => path.startsWith(wp))) {
+      next();
+      return;
+    }
+    if (EXEMPT_PATHS.some(ep => path === ep || path.startsWith(ep + "/"))) {
       next();
       return;
     }
@@ -135,5 +143,8 @@ export function getRateLimiterStats() {
     userWindows: userWindows.size,
     ipWindows: ipWindows.size,
     totalTrackedKeys: userWindows.size + ipWindows.size,
+    userWindowsSize: userWindows.size,
+    ipWindowsSize: ipWindows.size,
+    maxEntries: MAX_WINDOW_ENTRIES,
   };
 }

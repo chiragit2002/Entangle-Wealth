@@ -86,8 +86,8 @@ function CandlestickChartBase({ data, symbol, height = 380 }: CandlestickChartPr
       },
       crosshair: {
         mode: CrosshairMode.Normal,
-        vertLine: { color: "rgba(0, 212, 255, 0.25)", width: 1, style: 2, labelBackgroundColor: "#0a0a16" },
-        horzLine: { color: "rgba(0, 212, 255, 0.25)", width: 1, style: 2, labelBackgroundColor: "#0a0a16" },
+        vertLine: { color: "rgba(255, 140, 0, 0.25)", width: 1, style: 2, labelBackgroundColor: "#0a0a16" },
+        horzLine: { color: "rgba(255, 140, 0, 0.25)", width: 1, style: 2, labelBackgroundColor: "#0a0a16" },
       },
       rightPriceScale: {
         borderColor: "rgba(255, 255, 255, 0.06)",
@@ -102,11 +102,11 @@ function CandlestickChartBase({ data, symbol, height = 380 }: CandlestickChartPr
     chartRef.current = chart;
 
     const candleSeries = chart.addSeries(CandlestickSeries, {
-      upColor: "#00FF41",
+      upColor: "#FF8C00",
       downColor: "#ff3366",
-      borderUpColor: "#00FF41",
+      borderUpColor: "#FF8C00",
       borderDownColor: "#ff3366",
-      wickUpColor: "#00FF41",
+      wickUpColor: "#FF8C00",
       wickDownColor: "#ff3366",
     });
 
@@ -180,7 +180,7 @@ function CandlestickChartBase({ data, symbol, height = 380 }: CandlestickChartPr
         </div>
         <div className="flex items-center gap-3">
           <span className="text-[11px] font-mono font-bold">${lastPrice.toFixed(2)}</span>
-          <span className={`text-[10px] font-mono font-bold ${isUp ? "text-[#00FF41]" : "text-[#ff3366]"}`}>
+          <span className={`text-[10px] font-mono font-bold ${isUp ? "text-[#FF8C00]" : "text-[#ff3366]"}`}>
             {isUp ? "+" : ""}{pctChange}%
           </span>
           <div className="flex items-center gap-2 text-[9px] text-white/40">

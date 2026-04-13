@@ -124,7 +124,7 @@ export default function Pricing() {
     }
 
     if (!isSignedIn) {
-      toast({ title: "Sign in required", description: "Please sign in to start your free trial." });
+      window.location.href = `/sign-in?reason=protected&redirect_url=${encodeURIComponent("/pricing")}`;
       return;
     }
 

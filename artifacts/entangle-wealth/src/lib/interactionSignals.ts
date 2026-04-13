@@ -56,7 +56,7 @@ function handleClick(e: MouseEvent) {
 
 function handlePointerEnter(e: PointerEvent) {
   const target = e.target as Element;
-  if (!target) return;
+  if (!target || !target.tagName) return;
 
   const tag = target.tagName.toLowerCase();
   const isInteractive = ["button", "a", "input", "select", "textarea"].includes(tag) ||

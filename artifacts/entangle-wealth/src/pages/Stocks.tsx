@@ -1,19 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+import { useListStocks, useGetTopMovers, useGetSectors } from "@workspace/api-client-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { StockAnalysisPanel } from "@/components/StockAnalysisPanel";
 import { MicroFeedback } from "@/components/MicroFeedback";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  fetchStocks,
-  fetchMovers,
-  fetchSectors,
-  formatMarketCap,
-  formatVolume,
-  type Stock,
-  type SectorSummary,
-} from "@/lib/api";
+import type { Stock, SectorSummary, ListStocksSortBy, ListStocksSortDir } from "@workspace/api-client-react";
+import { formatMarketCap, formatVolume } from "@/lib/api";
 import {
   Search,
   TrendingUp,
@@ -47,22 +41,14 @@ export default function Stocks() {
   const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
   const initialQuery = urlParams?.get("q") || "";
 
-  const [stocks, setStocks] = useState<Stock[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [query, setQuery] = useState(initialQuery);
   const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
   const [sectorFilter, setSectorFilter] = useState("");
   const [capFilter, setCapFilter] = useState("");
   const [sortBy, setSortBy] = useState("symbol");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
-  const [moversGainers, setMoversGainers] = useState<Stock[]>([]);
-  const [moversLosers, setMoversLosers] = useState<Stock[]>([]);
-  const [sectors, setSectors] = useState<SectorSummary[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
@@ -70,44 +56,36 @@ export default function Stocks() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  const loadStocks = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await fetchStocks({
-        q: debouncedQuery || undefined,
-        sector: sectorFilter || undefined,
-        capTier: capFilter || undefined,
-        page,
-        limit: 50,
-        sortBy,
-        sortDir,
-      });
-      setStocks(data.stocks);
-      setTotalCount(data.pagination.total);
-      setTotalPages(data.pagination.totalPages);
-    } catch {
-      setError("Failed to load stocks. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }, [debouncedQuery, sectorFilter, capFilter, page, sortBy, sortDir]);
-
-  useEffect(() => {
-    loadStocks();
-  }, [loadStocks]);
-
+  // Reset to page 1 when filters change
   useEffect(() => {
     setPage(1);
   }, [debouncedQuery, sectorFilter, capFilter]);
 
-  useEffect(() => {
-    fetchMovers().then((data) => {
-      setMoversGainers(data.gainers.slice(0, 5));
-      setMoversLosers(data.losers.slice(0, 5));
-    }).catch(err => { if (import.meta.env.DEV) console.error('Failed to fetch market movers:', err); });
-    fetchSectors().then((data) => setSectors(data.sectors)).catch(err => { if (import.meta.env.DEV) console.error('Failed to fetch sectors:', err); });
-  }, []);
+  const stocksQuery = useListStocks(
+    {
+      q: debouncedQuery || undefined,
+      sector: sectorFilter || undefined,
+      capTier: capFilter || undefined,
+      page,
+      limit: 50,
+      sortBy: sortBy as ListStocksSortBy,
+      sortDir: sortDir as ListStocksSortDir,
+    },
+    { query: { staleTime: 60_000, placeholderData: (prev: unknown) => prev } },
+  );
+
+  const moversQuery = useGetTopMovers({ query: { staleTime: 2 * 60_000 } });
+
+  const sectorsQuery = useGetSectors({ query: { staleTime: 5 * 60_000 } });
+
+  const stocks = stocksQuery.data?.stocks ?? [];
+  const totalCount = stocksQuery.data?.pagination.total ?? 0;
+  const totalPages = stocksQuery.data?.pagination.totalPages ?? 1;
+  const loading = stocksQuery.isLoading || stocksQuery.isFetching;
+  const error = stocksQuery.isError ? "Failed to load stocks. Please try again." : null;
+  const moversGainers = moversQuery.data?.gainers.slice(0, 5) ?? [];
+  const moversLosers = moversQuery.data?.losers.slice(0, 5) ?? [];
+  const sectors = sectorsQuery.data?.sectors ?? [];
 
   const handleSort = (field: string) => {
     if (sortBy === field) {
@@ -393,7 +371,7 @@ export default function Stocks() {
                           <tr>
                             <td className="p-8 text-center" colSpan={8}>
                               <p className="text-red-400 mb-2">{error}</p>
-                              <Button variant="outline" size="sm" onClick={loadStocks} className="border-primary/30 text-primary">
+                              <Button variant="outline" size="sm" onClick={() => stocksQuery.refetch()} className="border-primary/30 text-primary">
                                 Retry
                               </Button>
                             </td>

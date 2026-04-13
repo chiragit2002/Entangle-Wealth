@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@/components/layout/Layout";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -34,8 +35,6 @@ export default function Tax() {
   const [categories, setCategories] = useState<DeductionCategory[]>(getDeductionCategories());
   const [expandEstimator, setExpandEstimator] = useState(false);
   const [taxYear, setTaxYr] = useState(getTaxYear());
-  const [referralLink, setReferralLink] = useState("");
-  const [kycStatus, setKycStatus] = useState<string | null>(null);
   const { getToken, isSignedIn } = useAuth();
 
   useEffect(() => {
@@ -44,17 +43,32 @@ export default function Tax() {
     if (!isOnboardingDone()) setShowOnboarding(true);
   }, []);
 
-  useEffect(() => {
-    if (!isSignedIn) return;
-    authFetch("/viral/referral/code", getToken)
-      .then(res => res.ok ? res.json() : null)
-      .then(data => { if (data?.code) setReferralLink(`${window.location.origin}?ref=${data.code}`); })
-      .catch((err) => { console.error("[Tax] Failed to load referral code:", err); });
-    authFetch("/kyc/status", getToken)
-      .then(res => res.ok ? res.json() : null)
-      .then(data => { if (data?.kycStatus) setKycStatus(data.kycStatus); })
-      .catch((err) => { console.error("[Tax] Failed to load KYC status:", err); });
-  }, [isSignedIn, getToken]);
+  const referralQuery = useQuery({
+    queryKey: ["referral-code"],
+    queryFn: async () => {
+      const res = await authFetch("/viral/referral/code", getToken);
+      if (!res.ok) return null;
+      return res.json() as Promise<{ code: string } | null>;
+    },
+    enabled: !!isSignedIn,
+    staleTime: 10 * 60_000,
+  });
+
+  const kycQuery = useQuery({
+    queryKey: ["kyc-status"],
+    queryFn: async () => {
+      const res = await authFetch("/kyc/status", getToken);
+      if (!res.ok) return null;
+      return res.json() as Promise<{ kycStatus: string } | null>;
+    },
+    enabled: !!isSignedIn,
+    staleTime: 5 * 60_000,
+  });
+
+  const referralLink = referralQuery.data?.code
+    ? `${window.location.origin}?ref=${referralQuery.data.code}`
+    : "";
+  const kycStatus = kycQuery.data?.kycStatus ?? null;
 
   useEffect(() => {
     const handler = (e: Event) => setTaxYr((e as CustomEvent).detail);

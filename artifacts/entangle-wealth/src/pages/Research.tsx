@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+import { useListNews } from "@workspace/api-client-react";
+import type { NewsItem } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { Layout } from "@/components/layout/Layout";
-import { fetchNews, type NewsItem } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -154,51 +155,34 @@ function SkeletonCard() {
   );
 }
 
+function getFallback(topic: string, search: string): NewsItem[] {
+  return FALLBACK_ARTICLES
+    .filter(a => topic === "All" || a.topic === topic)
+    .filter(a => !search || a.title.toLowerCase().includes(search.toLowerCase()));
+}
+
 export default function Research() {
-  const [items, setItems] = useState<NewsItem[]>([]);
   const [topic, setTopic] = useState("All");
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(0);
-  const [topicCounts, setTopicCounts] = useState<Record<string, number>>({});
-  const [feedCount, setFeedCount] = useState(0);
 
-  const applyFallback = useCallback((topic: string, search: string) => {
-    const filtered = FALLBACK_ARTICLES
-      .filter(a => topic === "All" || a.topic === topic)
-      .filter(a => !search || a.title.toLowerCase().includes(search.toLowerCase()));
-    setItems(filtered);
-    setTotal(FALLBACK_ARTICLES.length);
-    setTopicCounts(FALLBACK_ARTICLES.reduce((acc: Record<string, number>, a) => { acc[a.topic] = (acc[a.topic] || 0) + 1; return acc; }, {}));
-    setFeedCount(0);
-  }, []);
-
-  const loadNews = useCallback(() => {
-    applyFallback(topic, search);
-    setLoading(false);
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
-    fetchNews({
+  const newsQuery = useListNews(
+    {
       topic: topic === "All" ? undefined : topic,
       search: search || undefined,
       limit: 50,
-      signal: controller.signal,
-    }).then((data) => {
-      clearTimeout(timeoutId);
-      if (data.items.length > 0) {
-        setItems(data.items);
-        setTotal(data.total);
-        setTopicCounts(data.topics);
-        setFeedCount(data.feedCount);
-      }
-    }).catch(() => {
-      clearTimeout(timeoutId);
-    });
-  }, [topic, search, applyFallback]);
+    },
+    { query: { staleTime: 2 * 60_000, placeholderData: (prev: unknown) => prev } },
+  );
 
-  useEffect(() => { loadNews(); }, [loadNews]);
+  const items: NewsItem[] = newsQuery.data?.items.length
+    ? newsQuery.data.items
+    : getFallback(topic, search);
+  const total = newsQuery.data?.total ?? FALLBACK_ARTICLES.length;
+  const topicCounts: Record<string, number> = newsQuery.data?.topics
+    ?? FALLBACK_ARTICLES.reduce((acc: Record<string, number>, a) => { acc[a.topic] = (acc[a.topic] || 0) + 1; return acc; }, {});
+  const feedCount = newsQuery.data?.feedCount ?? 0;
+  const loading = newsQuery.isLoading;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -222,7 +206,7 @@ export default function Research() {
           <Button
             variant="outline"
             size="sm"
-            onClick={loadNews}
+            onClick={() => newsQuery.refetch()}
             disabled={loading}
             className="border-primary/30 text-primary hover:bg-primary/10"
           >

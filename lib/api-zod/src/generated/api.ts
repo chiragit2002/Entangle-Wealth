@@ -35,3 +35,132 @@ export const RequestUploadUrlResponse = zod.object({
     })
     .optional(),
 });
+
+/**
+ * Returns paginated, filtered, and sorted stock list
+ * @summary List stocks
+ */
+export const listStocksQueryPageDefault = 1;
+export const listStocksQueryLimitDefault = 50;
+export const listStocksQuerySortByDefault = `symbol`;
+export const listStocksQuerySortDirDefault = `asc`;
+
+export const ListStocksQueryParams = zod.object({
+  q: zod.coerce.string().optional(),
+  sector: zod.coerce.string().optional(),
+  capTier: zod.coerce.string().optional(),
+  page: zod.coerce.number().default(listStocksQueryPageDefault),
+  limit: zod.coerce.number().default(listStocksQueryLimitDefault),
+  sortBy: zod
+    .enum(["symbol", "name", "price", "changePercent", "volume", "marketCap"])
+    .default(listStocksQuerySortByDefault),
+  sortDir: zod.enum(["asc", "desc"]).default(listStocksQuerySortDirDefault),
+});
+
+export const ListStocksResponse = zod.object({
+  stocks: zod.array(
+    zod.object({
+      symbol: zod.string(),
+      name: zod.string(),
+      sector: zod.string(),
+      capTier: zod.enum(["mega", "large", "mid", "small", "micro"]),
+      price: zod.number(),
+      change: zod.number(),
+      changePercent: zod.number(),
+      volume: zod.number(),
+      marketCap: zod.number(),
+      pe: zod.number().nullable(),
+      week52High: zod.number(),
+      week52Low: zod.number(),
+    }),
+  ),
+  pagination: zod.object({
+    page: zod.number(),
+    limit: zod.number(),
+    total: zod.number(),
+    totalPages: zod.number(),
+  }),
+});
+
+/**
+ * @summary Top gainers and losers
+ */
+export const GetTopMoversResponse = zod.object({
+  gainers: zod.array(
+    zod.object({
+      symbol: zod.string(),
+      name: zod.string(),
+      sector: zod.string(),
+      capTier: zod.enum(["mega", "large", "mid", "small", "micro"]),
+      price: zod.number(),
+      change: zod.number(),
+      changePercent: zod.number(),
+      volume: zod.number(),
+      marketCap: zod.number(),
+      pe: zod.number().nullable(),
+      week52High: zod.number(),
+      week52Low: zod.number(),
+    }),
+  ),
+  losers: zod.array(
+    zod.object({
+      symbol: zod.string(),
+      name: zod.string(),
+      sector: zod.string(),
+      capTier: zod.enum(["mega", "large", "mid", "small", "micro"]),
+      price: zod.number(),
+      change: zod.number(),
+      changePercent: zod.number(),
+      volume: zod.number(),
+      marketCap: zod.number(),
+      pe: zod.number().nullable(),
+      week52High: zod.number(),
+      week52Low: zod.number(),
+    }),
+  ),
+});
+
+/**
+ * @summary Sector summary
+ */
+export const GetSectorsResponse = zod.object({
+  sectors: zod.array(
+    zod.object({
+      sector: zod.string(),
+      count: zod.number(),
+      avgChange: zod.number(),
+    }),
+  ),
+});
+
+/**
+ * @summary Financial news feed
+ */
+export const ListNewsQueryParams = zod.object({
+  topic: zod.coerce.string().optional(),
+  search: zod.coerce.string().optional(),
+  limit: zod.coerce.number().optional(),
+  offset: zod.coerce.number().optional(),
+});
+
+export const ListNewsResponse = zod.object({
+  items: zod.array(
+    zod.object({
+      id: zod.string(),
+      topic: zod.string(),
+      title: zod.string(),
+      link: zod.string(),
+      source: zod.string(),
+      published: zod.string(),
+      publishedAt: zod.number(),
+      summary: zod.string(),
+      score: zod.number(),
+      sentiment: zod.enum(["positive", "negative", "neutral"]),
+      tickers: zod.array(zod.string()),
+    }),
+  ),
+  total: zod.number(),
+  topics: zod.record(zod.string(), zod.number()),
+  cachedAt: zod.number(),
+  feedCount: zod.number(),
+});

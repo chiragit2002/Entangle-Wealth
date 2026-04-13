@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { trackEvent } from "@/lib/trackEvent";
 import { useAuth, useUser } from "@clerk/react";
 import { Layout } from "@/components/layout/Layout";
@@ -192,8 +193,6 @@ export default function Gamification() {
   const { getToken, isSignedIn, isLoaded } = useAuth();
   const { user } = useUser();
   const { toast } = useToast();
-  const [status, setStatus] = useState<GamificationStatus | null>(null);
-  const [loading, setLoading] = useState(true);
   const [spinning, setSpinning] = useState(false);
   const [spinRotation, setSpinRotation] = useState(0);
   const [spinResult, setSpinResult] = useState<{ reward: string; rewardType: string } | null>(null);
@@ -202,23 +201,24 @@ export default function Gamification() {
   const [showBigWin, setShowBigWin] = useState(false);
   const [bigWinLabel, setBigWinLabel] = useState("BIG WIN");
   const spinRotationRef = useRef(0);
+  const queryClient = useQueryClient();
 
-  const fetchStatus = useCallback(async () => {
-    if (!isSignedIn) return;
-    try {
+  const statusQuery = useQuery({
+    queryKey: ["gamification-status"],
+    queryFn: async () => {
       const res = await authFetch("/gamification/status", getToken);
-      if (res.ok) {
-        const data = await res.json();
-        setStatus(data);
-      }
-    } catch { /* ignore */ } finally {
-      setLoading(false);
-    }
-  }, [isSignedIn, getToken]);
+      if (!res.ok) throw new Error("Failed to load gamification status");
+      return res.json() as Promise<GamificationStatus>;
+    },
+    enabled: !!isSignedIn && isLoaded,
+    staleTime: 30_000,
+  });
 
-  useEffect(() => {
-    if (isLoaded) fetchStatus();
-  }, [isLoaded, fetchStatus]);
+  const status = statusQuery.data ?? null;
+  const loading = statusQuery.isLoading;
+  const fetchStatus = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["gamification-status"] });
+  }, [queryClient]);
 
   const handleSpin = async () => {
     if (!status?.canSpin || spinning) return;

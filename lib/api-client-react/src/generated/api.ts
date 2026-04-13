@@ -18,8 +18,14 @@ import type {
 
 import type {
   HealthStatus,
+  ListNewsParams,
+  ListStocksParams,
+  MoversResponse,
+  NewsResponse,
   RequestUploadUrlBody,
   RequestUploadUrlResponse,
+  SectorsResponse,
+  StocksResponse,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -192,3 +198,342 @@ export const useRequestUploadUrl = <
 > => {
   return useMutation(getRequestUploadUrlMutationOptions(options));
 };
+
+/**
+ * Returns paginated, filtered, and sorted stock list
+ * @summary List stocks
+ */
+export const getListStocksUrl = (params?: ListStocksParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/stocks?${stringifiedParams}`
+    : `/api/stocks`;
+};
+
+export const listStocks = async (
+  params?: ListStocksParams,
+  options?: RequestInit,
+): Promise<StocksResponse> => {
+  return customFetch<StocksResponse>(getListStocksUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListStocksQueryKey = (params?: ListStocksParams) => {
+  return [`/api/stocks`, ...(params ? [params] : [])] as const;
+};
+
+export const getListStocksQueryOptions = <
+  TData = Awaited<ReturnType<typeof listStocks>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListStocksParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listStocks>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListStocksQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listStocks>>> = ({
+    signal,
+  }) => listStocks(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listStocks>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListStocksQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listStocks>>
+>;
+export type ListStocksQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List stocks
+ */
+
+export function useListStocks<
+  TData = Awaited<ReturnType<typeof listStocks>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListStocksParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listStocks>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListStocksQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Top gainers and losers
+ */
+export const getGetTopMoversUrl = () => {
+  return `/api/stocks/movers`;
+};
+
+export const getTopMovers = async (
+  options?: RequestInit,
+): Promise<MoversResponse> => {
+  return customFetch<MoversResponse>(getGetTopMoversUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetTopMoversQueryKey = () => {
+  return [`/api/stocks/movers`] as const;
+};
+
+export const getGetTopMoversQueryOptions = <
+  TData = Awaited<ReturnType<typeof getTopMovers>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getTopMovers>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetTopMoversQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getTopMovers>>> = ({
+    signal,
+  }) => getTopMovers({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getTopMovers>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetTopMoversQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getTopMovers>>
+>;
+export type GetTopMoversQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Top gainers and losers
+ */
+
+export function useGetTopMovers<
+  TData = Awaited<ReturnType<typeof getTopMovers>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getTopMovers>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetTopMoversQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Sector summary
+ */
+export const getGetSectorsUrl = () => {
+  return `/api/stocks/sectors`;
+};
+
+export const getSectors = async (
+  options?: RequestInit,
+): Promise<SectorsResponse> => {
+  return customFetch<SectorsResponse>(getGetSectorsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetSectorsQueryKey = () => {
+  return [`/api/stocks/sectors`] as const;
+};
+
+export const getGetSectorsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSectors>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getSectors>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSectorsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSectors>>> = ({
+    signal,
+  }) => getSectors({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSectors>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetSectorsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSectors>>
+>;
+export type GetSectorsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Sector summary
+ */
+
+export function useGetSectors<
+  TData = Awaited<ReturnType<typeof getSectors>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getSectors>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetSectorsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Financial news feed
+ */
+export const getListNewsUrl = (params?: ListNewsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/news?${stringifiedParams}`
+    : `/api/news`;
+};
+
+export const listNews = async (
+  params?: ListNewsParams,
+  options?: RequestInit,
+): Promise<NewsResponse> => {
+  return customFetch<NewsResponse>(getListNewsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListNewsQueryKey = (params?: ListNewsParams) => {
+  return [`/api/news`, ...(params ? [params] : [])] as const;
+};
+
+export const getListNewsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listNews>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListNewsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listNews>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListNewsQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listNews>>> = ({
+    signal,
+  }) => listNews(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listNews>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListNewsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listNews>>
+>;
+export type ListNewsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Financial news feed
+ */
+
+export function useListNews<
+  TData = Awaited<ReturnType<typeof listNews>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListNewsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listNews>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListNewsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}

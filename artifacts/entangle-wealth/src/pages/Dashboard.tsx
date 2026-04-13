@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { useAuth } from "@clerk/react";
@@ -328,7 +329,6 @@ type SecondaryTab = "signals" | "options" | "market" | "calendar";
 export default function Dashboard() {
   const { toast } = useToast();
   const { isSignedIn, getToken } = useAuth();
-  const [portfolio, setPortfolio] = useState<PaperPortfolio>(emptyPortfolio);
   const [tradeSymbol, setTradeSymbol] = useState("");
   const [tradeQty, setTradeQty] = useState("");
   const [tradePrice, setTradePrice] = useState("");
@@ -353,6 +353,24 @@ export default function Dashboard() {
   const [firstAnalysisSymbol, setFirstAnalysisSymbol] = useState("");
   const { isFirstAnalysis, markDone: markFirstAnalysisDone } = useFirstAnalysisWow();
 
+  const queryClient = useQueryClient();
+  const portfolioQuery = useQuery({
+    queryKey: ["paper-trading-portfolio"],
+    queryFn: async () => {
+      const res = await authFetch("/paper-trading/portfolio", getToken);
+      if (!res.ok) throw new Error("Failed to load portfolio");
+      return res.json() as Promise<PaperPortfolio>;
+    },
+    enabled: !!isSignedIn,
+    staleTime: 30_000,
+  });
+
+  const loadPortfolio = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["paper-trading-portfolio"] });
+  }, [queryClient]);
+
+  const portfolio = portfolioQuery.data ?? emptyPortfolio;
+
   const taxProfile = getActiveProfile();
   const entanglementCtx = useMemo<UserEntanglementContext>(() => {
     const pnl = portfolio.totalValue - 100_000;
@@ -373,19 +391,6 @@ export default function Dashboard() {
   );
 
   useEffect(() => { trackEvent("dashboard_viewed"); }, []);
-
-  const loadPortfolio = useCallback(async () => {
-    if (!isSignedIn) return;
-    try {
-      const res = await authFetch("/paper-trading/portfolio", getToken);
-      if (res.ok) {
-        const data = await res.json();
-        setPortfolio(data);
-      }
-    } catch { /* not signed in or auth error */ }
-  }, [isSignedIn, getToken]);
-
-  useEffect(() => { loadPortfolio(); }, [loadPortfolio]);
 
   const executeTrade = useCallback(async () => {
     if (!tradeSymbol.trim() || !tradeQty || !tradePrice) {

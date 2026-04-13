@@ -12,6 +12,10 @@ tags:
     description: Health operations
   - name: storage
     description: Object storage operations
+  - name: stocks
+    description: Stock market data
+  - name: news
+    description: Financial news feed
 paths:
   /healthz:
     get:
@@ -44,6 +48,107 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RequestUploadUrlResponse"
+  /stocks:
+    get:
+      operationId: listStocks
+      tags: [stocks]
+      summary: List stocks
+      description: Returns paginated, filtered, and sorted stock list
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: sector
+          in: query
+          schema:
+            type: string
+        - name: capTier
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [symbol, name, price, changePercent, volume, marketCap]
+            default: symbol
+        - name: sortDir
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+      responses:
+        "200":
+          description: Stock list with pagination
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StocksResponse"
+  /stocks/movers:
+    get:
+      operationId: getTopMovers
+      tags: [stocks]
+      summary: Top gainers and losers
+      responses:
+        "200":
+          description: Top movers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MoversResponse"
+  /stocks/sectors:
+    get:
+      operationId: getSectors
+      tags: [stocks]
+      summary: Sector summary
+      responses:
+        "200":
+          description: Sector summary list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SectorsResponse"
+  /news:
+    get:
+      operationId: listNews
+      tags: [news]
+      summary: Financial news feed
+      parameters:
+        - name: topic
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: News feed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsResponse"
 components:
   schemas:
     HealthStatus:
@@ -85,3 +190,144 @@ components:
       required:
         - uploadURL
         - objectPath
+    Stock:
+      type: object
+      properties:
+        symbol:
+          type: string
+        name:
+          type: string
+        sector:
+          type: string
+        capTier:
+          type: string
+          enum: [mega, large, mid, small, micro]
+        price:
+          type: number
+        change:
+          type: number
+        changePercent:
+          type: number
+        volume:
+          type: number
+        marketCap:
+          type: number
+        pe:
+          type: number
+          nullable: true
+        week52High:
+          type: number
+        week52Low:
+          type: number
+      required:
+        - symbol
+        - name
+        - sector
+        - capTier
+        - price
+        - change
+        - changePercent
+        - volume
+        - marketCap
+        - pe
+        - week52High
+        - week52Low
+    StocksPagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+      required: [page, limit, total, totalPages]
+    StocksResponse:
+      type: object
+      properties:
+        stocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stock"
+        pagination:
+          $ref: "#/components/schemas/StocksPagination"
+      required: [stocks, pagination]
+    MoversResponse:
+      type: object
+      properties:
+        gainers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stock"
+        losers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stock"
+      required: [gainers, losers]
+    SectorSummary:
+      type: object
+      properties:
+        sector:
+          type: string
+        count:
+          type: integer
+        avgChange:
+          type: number
+      required: [sector, count, avgChange]
+    SectorsResponse:
+      type: object
+      properties:
+        sectors:
+          type: array
+          items:
+            $ref: "#/components/schemas/SectorSummary"
+      required: [sectors]
+    NewsItem:
+      type: object
+      properties:
+        id:
+          type: string
+        topic:
+          type: string
+        title:
+          type: string
+        link:
+          type: string
+        source:
+          type: string
+        published:
+          type: string
+        publishedAt:
+          type: number
+        summary:
+          type: string
+        score:
+          type: number
+        sentiment:
+          type: string
+          enum: [positive, negative, neutral]
+        tickers:
+          type: array
+          items:
+            type: string
+      required: [id, topic, title, link, source, published, publishedAt, summary, score, sentiment, tickers]
+    NewsResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/NewsItem"
+        total:
+          type: integer
+        topics:
+          type: object
+          additionalProperties:
+            type: integer
+        cachedAt:
+          type: number
+        feedCount:
+          type: integer
+      required: [items, total, topics, cachedAt, feedCount]

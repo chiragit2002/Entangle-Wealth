@@ -33,17 +33,26 @@ export class TTLCache<T = unknown> {
     }
 
     this.hits++;
+    // LRU: move accessed entry to end of Map so it is evicted last
+    this.store.delete(key);
+    this.store.set(key, entry);
     return entry.data;
   }
 
   set(key: string, data: T, ttlMs?: number): void {
-    if (this.store.size >= this.maxEntries) {
+    const isNew = !this.store.has(key);
+
+    // LRU eviction: only needed when adding a brand-new key past capacity
+    if (isNew && this.store.size >= this.maxEntries) {
       const firstKey = this.store.keys().next().value;
       if (firstKey !== undefined) {
         this.store.delete(firstKey);
         this.evictions++;
       }
     }
+
+    // Delete existing entry first so the key moves to end of insertion order
+    if (!isNew) this.store.delete(key);
 
     this.store.set(key, {
       data,

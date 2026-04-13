@@ -614,22 +614,52 @@ export function generateAllStocks(): NasdaqStock[] {
 let _cachedStocks: NasdaqStock[] | null = null;
 let _symbolIndex: Map<string, NasdaqStock> | null = null;
 let _prefixIndex: Map<string, NasdaqStock[]> | null = null;
+// Pre-built lookup maps for O(1) filter access instead of O(n) array scan
+let _sectorIndex: Map<string, NasdaqStock[]> | null = null;
+let _capTierIndex: Map<string, NasdaqStock[]> | null = null;
+// Pre-sorted by changePercent for fast movers queries
+let _sortedByChange: NasdaqStock[] | null = null;
+// Pre-computed sector summary (static per server lifetime)
+let _sectorSummary: { sector: string; count: number; avgChange: number }[] | null = null;
+// Pre-sorted arrays keyed by "field:dir" for O(1) sort access on browse requests
+let _sortedIndex: Map<string, NasdaqStock[]> | null = null;
+
+const SORT_FIELDS = ["symbol", "name", "price", "changePercent", "volume", "marketCap"] as const;
+type SortField = typeof SORT_FIELDS[number];
 
 export function getAllStocks(): NasdaqStock[] {
   if (!_cachedStocks) {
     _cachedStocks = generateAllStocks();
-    _buildSearchIndex(_cachedStocks);
+    _buildIndexes(_cachedStocks);
   }
   return _cachedStocks;
 }
 
-function _buildSearchIndex(stocks: NasdaqStock[]): void {
+function _buildIndexes(stocks: NasdaqStock[]): void {
   _symbolIndex = new Map();
   _prefixIndex = new Map();
+  _sectorIndex = new Map();
+  _capTierIndex = new Map();
+
+  const sectorSummaryMap: Record<string, { count: number; totalChange: number }> = {};
 
   for (const stock of stocks) {
     _symbolIndex.set(stock.symbol, stock);
 
+    // Sector index
+    if (!_sectorIndex.has(stock.sector)) _sectorIndex.set(stock.sector, []);
+    _sectorIndex.get(stock.sector)!.push(stock);
+
+    // Cap tier index
+    if (!_capTierIndex.has(stock.capTier)) _capTierIndex.set(stock.capTier, []);
+    _capTierIndex.get(stock.capTier)!.push(stock);
+
+    // Sector summary accumulator
+    if (!sectorSummaryMap[stock.sector]) sectorSummaryMap[stock.sector] = { count: 0, totalChange: 0 };
+    sectorSummaryMap[stock.sector].count++;
+    sectorSummaryMap[stock.sector].totalChange += stock.changePercent;
+
+    // Prefix search index
     const symUpper = stock.symbol.toUpperCase();
     const nameUpper = stock.name.toUpperCase();
 
@@ -649,6 +679,58 @@ function _buildSearchIndex(stocks: NasdaqStock[]): void {
       }
     }
   }
+
+  // Pre-sort by changePercent for movers (static data, computed once)
+  _sortedByChange = [...stocks].sort((a, b) => b.changePercent - a.changePercent);
+
+  // Pre-sort for all sort fields/directions so browse requests never sort at query time
+  _sortedIndex = new Map();
+  for (const field of SORT_FIELDS) {
+    const asc = [...stocks].sort((a, b) => {
+      const av = a[field], bv = b[field];
+      return typeof av === "string" && typeof bv === "string"
+        ? av.localeCompare(bv)
+        : (av as number) - (bv as number);
+    });
+    _sortedIndex.set(`${field}:asc`, asc);
+    _sortedIndex.set(`${field}:desc`, [...asc].reverse());
+  }
+
+  // Pre-compute sector summary
+  _sectorSummary = Object.entries(sectorSummaryMap).map(([sector, data]) => ({
+    sector,
+    count: data.count,
+    avgChange: Math.round(data.totalChange / data.count * 100) / 100,
+  }));
+}
+
+/**
+ * Returns the pre-sorted full stock list for a given sort field and direction.
+ * Avoids any per-request sort — O(1) lookup into pre-built sorted arrays.
+ */
+export function getSortedStocks(sortBy: SortField = "symbol", sortDir: "asc" | "desc" = "asc"): NasdaqStock[] {
+  getAllStocks();
+  return _sortedIndex!.get(`${sortBy}:${sortDir}`) ?? _cachedStocks!;
+}
+
+/**
+ * Returns stocks filtered by sector and/or capTier using pre-built index maps.
+ * Avoids scanning the full 5,000-item array on every request.
+ */
+export function getFilteredStocks(sector?: string, capTier?: string): NasdaqStock[] {
+  // Ensure indexes are built
+  getAllStocks();
+
+  if (!sector && !capTier) return _cachedStocks!;
+
+  if (sector && capTier) {
+    const bySector = _sectorIndex!.get(sector) ?? [];
+    return bySector.filter(s => s.capTier === capTier);
+  }
+
+  if (sector) return _sectorIndex!.get(sector) ?? [];
+  if (capTier) return _capTierIndex!.get(capTier) ?? [];
+  return _cachedStocks!;
 }
 
 export function searchStocks(query: string, limit = 50): NasdaqStock[] {
@@ -683,16 +765,18 @@ export function searchStocks(query: string, limit = 50): NasdaqStock[] {
 }
 
 export function getStockBySymbol(symbol: string): NasdaqStock | undefined {
-  return getAllStocks().find(s => s.symbol === symbol.toUpperCase());
+  getAllStocks();
+  return _symbolIndex?.get(symbol.toUpperCase());
 }
 
 export function getStocksBySector(sector: string): NasdaqStock[] {
-  return getAllStocks().filter(s => s.sector === sector);
+  getAllStocks();
+  return _sectorIndex?.get(sector) ?? [];
 }
 
 export function getTopMovers(count = 20): { gainers: NasdaqStock[]; losers: NasdaqStock[] } {
-  const all = getAllStocks();
-  const sorted = [...all].sort((a, b) => b.changePercent - a.changePercent);
+  getAllStocks();
+  const sorted = _sortedByChange!;
   return {
     gainers: sorted.slice(0, count),
     losers: sorted.slice(-count).reverse(),
@@ -704,18 +788,6 @@ export function getAllSymbols(): Set<string> {
 }
 
 export function getSectorSummary(): { sector: string; count: number; avgChange: number }[] {
-  const all = getAllStocks();
-  const map: Record<string, { count: number; totalChange: number }> = {};
-
-  for (const stock of all) {
-    if (!map[stock.sector]) map[stock.sector] = { count: 0, totalChange: 0 };
-    map[stock.sector].count++;
-    map[stock.sector].totalChange += stock.changePercent;
-  }
-
-  return Object.entries(map).map(([sector, data]) => ({
-    sector,
-    count: data.count,
-    avgChange: Math.round(data.totalChange / data.count * 100) / 100,
-  }));
+  getAllStocks();
+  return _sectorSummary!;
 }

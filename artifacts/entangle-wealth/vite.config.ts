@@ -72,6 +72,36 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
     sourcemap: process.env.NODE_ENV === "production" ? "hidden" : false,
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-")) {
+            return "vendor-recharts";
+          }
+          if (id.includes("node_modules/lightweight-charts")) {
+            return "vendor-lightweight-charts";
+          }
+          if (id.includes("node_modules/lucide-react")) {
+            return "vendor-lucide";
+          }
+          if (id.includes("node_modules/jspdf") || id.includes("node_modules/html2canvas")) {
+            return "vendor-pdf";
+          }
+          if (id.includes("node_modules/@clerk")) {
+            return "vendor-clerk";
+          }
+          if (id.includes("node_modules/@sentry")) {
+            return "vendor-sentry";
+          }
+          if (id.includes("node_modules/@tanstack/react-query")) {
+            return "vendor-react-query";
+          }
+          if (id.includes("node_modules/react-dom") || id.includes("node_modules/react/")) {
+            return "vendor-react";
+          }
+        },
+      },
+    },
   },
   server: {
     port,

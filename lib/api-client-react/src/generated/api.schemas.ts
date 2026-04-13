@@ -26,3 +26,125 @@ export interface RequestUploadUrlResponse {
   objectPath: string;
   metadata?: RequestUploadUrlResponseMetadata;
 }
+
+export type StockCapTier = (typeof StockCapTier)[keyof typeof StockCapTier];
+
+export const StockCapTier = {
+  mega: "mega",
+  large: "large",
+  mid: "mid",
+  small: "small",
+  micro: "micro",
+} as const;
+
+export interface Stock {
+  symbol: string;
+  name: string;
+  sector: string;
+  capTier: StockCapTier;
+  price: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  marketCap: number;
+  pe: number | null;
+  week52High: number;
+  week52Low: number;
+}
+
+export interface StocksPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface StocksResponse {
+  stocks: Stock[];
+  pagination: StocksPagination;
+}
+
+export interface MoversResponse {
+  gainers: Stock[];
+  losers: Stock[];
+}
+
+export interface SectorSummary {
+  sector: string;
+  count: number;
+  avgChange: number;
+}
+
+export interface SectorsResponse {
+  sectors: SectorSummary[];
+}
+
+export type NewsItemSentiment =
+  (typeof NewsItemSentiment)[keyof typeof NewsItemSentiment];
+
+export const NewsItemSentiment = {
+  positive: "positive",
+  negative: "negative",
+  neutral: "neutral",
+} as const;
+
+export interface NewsItem {
+  id: string;
+  topic: string;
+  title: string;
+  link: string;
+  source: string;
+  published: string;
+  publishedAt: number;
+  summary: string;
+  score: number;
+  sentiment: NewsItemSentiment;
+  tickers: string[];
+}
+
+export type NewsResponseTopics = { [key: string]: number };
+
+export interface NewsResponse {
+  items: NewsItem[];
+  total: number;
+  topics: NewsResponseTopics;
+  cachedAt: number;
+  feedCount: number;
+}
+
+export type ListStocksParams = {
+  q?: string;
+  sector?: string;
+  capTier?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: ListStocksSortBy;
+  sortDir?: ListStocksSortDir;
+};
+
+export type ListStocksSortBy =
+  (typeof ListStocksSortBy)[keyof typeof ListStocksSortBy];
+
+export const ListStocksSortBy = {
+  symbol: "symbol",
+  name: "name",
+  price: "price",
+  changePercent: "changePercent",
+  volume: "volume",
+  marketCap: "marketCap",
+} as const;
+
+export type ListStocksSortDir =
+  (typeof ListStocksSortDir)[keyof typeof ListStocksSortDir];
+
+export const ListStocksSortDir = {
+  asc: "asc",
+  desc: "desc",
+} as const;
+
+export type ListNewsParams = {
+  topic?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+};

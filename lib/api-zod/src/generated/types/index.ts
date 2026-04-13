@@ -7,6 +7,21 @@
  */
 
 export * from "./healthStatus";
+export * from "./listNewsParams";
+export * from "./listStocksParams";
+export * from "./listStocksSortBy";
+export * from "./listStocksSortDir";
+export * from "./moversResponse";
+export * from "./newsItem";
+export * from "./newsItemSentiment";
+export * from "./newsResponse";
+export * from "./newsResponseTopics";
 export * from "./requestUploadUrlBody";
 export * from "./requestUploadUrlResponse";
 export * from "./requestUploadUrlResponseMetadata";
+export * from "./sectorsResponse";
+export * from "./sectorSummary";
+export * from "./stock";
+export * from "./stockCapTier";
+export * from "./stocksPagination";
+export * from "./stocksResponse";

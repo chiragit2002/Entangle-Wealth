@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, dailySpinsTable, userXpTable, xpTransactionsTable, streaksTable, usersTable } from "@workspace/db/schema";
+import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, paperOptionsTradesTable, paperOptionsPositionsTable, dailySpinsTable, userXpTable, xpTransactionsTable, streaksTable, usersTable } from "@workspace/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { resolveUserId } from "../lib/resolveUserId";
@@ -111,6 +111,20 @@ router.get("/paper-trading/portfolio", requireAuth, async (req, res) => {
     const activePositions = positions.filter(p => p.quantity > 0);
     const positionValue = activePositions.reduce((sum, p) => sum + (p.quantity * p.avgCost), 0);
 
+    const optionsPositions = await db
+      .select()
+      .from(paperOptionsPositionsTable)
+      .where(eq(paperOptionsPositionsTable.userId, dbUserId));
+    const activeOptionsPositions = optionsPositions.filter(p => p.contracts > 0);
+    const optionsValue = activeOptionsPositions.reduce((sum, p) => sum + (p.contracts * p.avgPremium * 100), 0);
+
+    const optionsTrades = await db
+      .select()
+      .from(paperOptionsTradesTable)
+      .where(eq(paperOptionsTradesTable.userId, dbUserId))
+      .orderBy(desc(paperOptionsTradesTable.createdAt))
+      .limit(20);
+
     const [userRow] = await db
       .select({ isEarlyAdopter: usersTable.isEarlyAdopter })
       .from(usersTable)
@@ -121,9 +135,11 @@ router.get("/paper-trading/portfolio", requireAuth, async (req, res) => {
       cashBalance: portfolio.cashBalance,
       positions: activePositions,
       trades,
-      portfolioValue: positionValue,
-      totalValue: portfolio.cashBalance + positionValue,
+      portfolioValue: positionValue + optionsValue,
+      totalValue: portfolio.cashBalance + positionValue + optionsValue,
       startingCash,
+      optionsPositions: activeOptionsPositions,
+      optionsTrades,
     });
   } catch (err) {
     logger.error("Paper trading portfolio error:", err);
@@ -251,6 +267,8 @@ router.post("/paper-trading/reset", requireAuth, validateBody(z.object({}).stric
 
     await db.delete(paperTradesTable).where(eq(paperTradesTable.userId, dbUserId));
     await db.delete(paperPositionsTable).where(eq(paperPositionsTable.userId, dbUserId));
+    await db.delete(paperOptionsTradesTable).where(eq(paperOptionsTradesTable.userId, dbUserId));
+    await db.delete(paperOptionsPositionsTable).where(eq(paperOptionsPositionsTable.userId, dbUserId));
     await db
       .update(paperPortfoliosTable)
       .set({ cashBalance: startingCash, updatedAt: new Date() })
@@ -261,6 +279,159 @@ router.post("/paper-trading/reset", requireAuth, validateBody(z.object({}).stric
   } catch (err) {
     logger.error("Paper trading reset error:", err);
     res.status(500).json({ error: "Failed to reset portfolio" });
+  }
+});
+
+const OptionsTradeSchema = z.object({
+  symbol: z.string().min(1).max(10),
+  optionType: z.enum(["CALL", "PUT"]),
+  strike: z.number().positive(),
+  expiration: z.string().min(1),
+  side: z.enum(["buy", "sell"]),
+  contracts: z.number().int().positive().max(10000),
+  premium: z.number().positive(),
+});
+
+router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTradeSchema), async (req, res) => {
+  try {
+    const clerkId = (req as AuthenticatedRequest).userId;
+    const dbUserId = await resolveUserId(clerkId, req);
+    if (!dbUserId) {
+      res.status(400).json({ error: "User not found. Please complete onboarding first." });
+      return;
+    }
+
+    const { symbol, optionType, strike, expiration, side, contracts, premium } = req.body;
+    const upperSymbol = symbol.toUpperCase();
+    const totalCost = contracts * premium * 100;
+    const startingCash = await getStartingCash(dbUserId);
+
+    const result = await db.transaction(async (tx) => {
+      const [portfolio] = await tx
+        .select()
+        .from(paperPortfoliosTable)
+        .where(eq(paperPortfoliosTable.userId, dbUserId));
+
+      const currentPortfolio = portfolio || (await tx
+        .insert(paperPortfoliosTable)
+        .values({ userId: dbUserId, cashBalance: startingCash })
+        .returning())[0];
+
+      if (side === "buy") {
+        if (currentPortfolio.cashBalance < totalCost) {
+          return { error: `Insufficient funds. Available: $${currentPortfolio.cashBalance.toFixed(2)}, Required: $${totalCost.toFixed(2)}` };
+        }
+
+        await tx
+          .update(paperPortfoliosTable)
+          .set({ cashBalance: currentPortfolio.cashBalance - totalCost, updatedAt: new Date() })
+          .where(eq(paperPortfoliosTable.userId, dbUserId));
+
+        const [existingPos] = await tx
+          .select()
+          .from(paperOptionsPositionsTable)
+          .where(and(
+            eq(paperOptionsPositionsTable.userId, dbUserId),
+            eq(paperOptionsPositionsTable.symbol, upperSymbol),
+            eq(paperOptionsPositionsTable.optionType, optionType),
+            eq(paperOptionsPositionsTable.strike, strike),
+            eq(paperOptionsPositionsTable.expiration, expiration)
+          ));
+
+        if (existingPos) {
+          const newContracts = existingPos.contracts + contracts;
+          const newAvgPremium = ((existingPos.contracts * existingPos.avgPremium) + (contracts * premium)) / newContracts;
+          await tx
+            .update(paperOptionsPositionsTable)
+            .set({ contracts: newContracts, avgPremium: newAvgPremium, updatedAt: new Date() })
+            .where(eq(paperOptionsPositionsTable.id, existingPos.id));
+        } else {
+          await tx
+            .insert(paperOptionsPositionsTable)
+            .values({ userId: dbUserId, symbol: upperSymbol, optionType, strike, expiration, contracts, avgPremium: premium });
+        }
+      } else {
+        const [existingPos] = await tx
+          .select()
+          .from(paperOptionsPositionsTable)
+          .where(and(
+            eq(paperOptionsPositionsTable.userId, dbUserId),
+            eq(paperOptionsPositionsTable.symbol, upperSymbol),
+            eq(paperOptionsPositionsTable.optionType, optionType),
+            eq(paperOptionsPositionsTable.strike, strike),
+            eq(paperOptionsPositionsTable.expiration, expiration)
+          ));
+
+        if (!existingPos || existingPos.contracts < contracts) {
+          return { error: `Insufficient contracts. You own ${existingPos?.contracts ?? 0} ${upperSymbol} ${strike} ${optionType} contracts` };
+        }
+
+        await tx
+          .update(paperPortfoliosTable)
+          .set({ cashBalance: currentPortfolio.cashBalance + totalCost, updatedAt: new Date() })
+          .where(eq(paperPortfoliosTable.userId, dbUserId));
+
+        const newContracts = existingPos.contracts - contracts;
+        await tx
+          .update(paperOptionsPositionsTable)
+          .set({ contracts: newContracts, updatedAt: new Date() })
+          .where(eq(paperOptionsPositionsTable.id, existingPos.id));
+      }
+
+      await tx.insert(paperOptionsTradesTable).values({
+        userId: dbUserId,
+        symbol: upperSymbol,
+        optionType,
+        strike,
+        expiration,
+        side,
+        contracts,
+        premium,
+        totalCost,
+      });
+
+      return { success: true, message: `${side.toUpperCase()} ${contracts} ${upperSymbol} $${strike} ${optionType} @ $${premium.toFixed(2)}` };
+    });
+
+    if (result.error) {
+      res.status(400).json({ error: result.error });
+      return;
+    }
+    res.json(result);
+  } catch (err) {
+    logger.error("Options trade error:", err);
+    res.status(500).json({ error: "Options trade execution failed" });
+  }
+});
+
+router.get("/paper-trading/options-positions", requireAuth, async (req, res) => {
+  try {
+    const clerkId = (req as AuthenticatedRequest).userId;
+    const dbUserId = await resolveUserId(clerkId, req);
+    if (!dbUserId) {
+      res.json({ positions: [], trades: [] });
+      return;
+    }
+
+    const positions = await db
+      .select()
+      .from(paperOptionsPositionsTable)
+      .where(eq(paperOptionsPositionsTable.userId, dbUserId));
+
+    const trades = await db
+      .select()
+      .from(paperOptionsTradesTable)
+      .where(eq(paperOptionsTradesTable.userId, dbUserId))
+      .orderBy(desc(paperOptionsTradesTable.createdAt))
+      .limit(50);
+
+    res.json({
+      positions: positions.filter(p => p.contracts > 0),
+      trades,
+    });
+  } catch (err) {
+    logger.error("Options positions error:", err);
+    res.status(500).json({ error: "Failed to load options positions" });
   }
 });
 

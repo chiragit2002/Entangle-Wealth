@@ -18,7 +18,7 @@ import { CandlestickChart } from "@/components/CandlestickChart";
 import { fetchBars, fetchSnapshot, barsToStockData, type AlpacaBar } from "@/lib/alpaca";
 import { trackEvent } from "@/lib/trackEvent";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
-import { PaperTradingWidget } from "@/components/PaperTradingWidget";
+import { StockTradePanel } from "@/components/StockTradePanel";
 
 type Category = "all" | "trend" | "momentum" | "volatility" | "volume";
 
@@ -617,6 +617,15 @@ export default function TechnicalAnalysis() {
                   </div>
                 )}
 
+                {activeSymbol && (
+                  <div className="mb-4">
+                    <StockTradePanel
+                      symbol={activeSymbol}
+                      currentPrice={stockData ? stockData.ohlcv[stockData.ohlcv.length - 1]?.close : undefined}
+                    />
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <button onClick={() => setAgentView(true)} className={`text-[12px] font-bold px-3 py-1.5 rounded-lg transition-colors ${agentView ? "bg-[#a855f7]/10 text-[#a855f7]" : "text-white/25 hover:text-white/40"}`}>
@@ -708,7 +717,6 @@ export default function TechnicalAnalysis() {
           </div>
         </div>
       </div>
-      <PaperTradingWidget variant="floating" initialSymbol={activeSymbol} />
       </PageErrorBoundary>
     </Layout>
   );

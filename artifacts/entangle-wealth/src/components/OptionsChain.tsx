@@ -1,5 +1,8 @@
-import { useState, useMemo } from "react";
-import { ChevronDown, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { useState, useMemo, useCallback } from "react";
+import { useAuth } from "@clerk/react";
+import { authFetch } from "@/lib/authFetch";
+import { useToast } from "@/hooks/use-toast";
+import { ArrowUpRight, ArrowDownRight, Loader2 } from "lucide-react";
 
 interface OptionContract {
   strike: number;
@@ -39,7 +42,7 @@ const CHAIN_SYMBOLS = [
   { symbol: "SPY", price: 524.85 },
 ];
 
-const EXPIRATIONS = ["Apr 11", "Apr 18", "Apr 25", "May 2", "May 16", "Jun 20", "Sep 19", "Dec 19", "Jan 2027"];
+const EXPIRATIONS = ["Apr 18", "Apr 25", "May 2", "May 16", "Jun 20", "Sep 19", "Dec 19", "Jan 2027"];
 
 function generateChain(price: number): OptionContract[] {
   const step = price > 500 ? 10 : price > 100 ? 5 : price > 50 ? 2.5 : 1;
@@ -88,19 +91,77 @@ function generateChain(price: number): OptionContract[] {
   });
 }
 
+interface TradeSelection {
+  symbol: string;
+  optionType: "CALL" | "PUT";
+  strike: number;
+  premium: number;
+  expiration: string;
+  side: "buy" | "sell";
+}
+
 export function OptionsChain() {
+  const { toast } = useToast();
+  const { isSignedIn, getToken } = useAuth();
   const [selectedSymbol, setSelectedSymbol] = useState(CHAIN_SYMBOLS[0]);
   const [selectedExp, setSelectedExp] = useState(EXPIRATIONS[0]);
-  const [showGreeks, setShowGreeks] = useState(true);
+  const [showGreeks, setShowGreeks] = useState(false);
+  const [tradeSelection, setTradeSelection] = useState<TradeSelection | null>(null);
+  const [contracts, setContracts] = useState("1");
+  const [tradeLoading, setTradeLoading] = useState(false);
 
   const chain = useMemo(() => generateChain(selectedSymbol.price), [selectedSymbol]);
   const totalCallVol = chain.reduce((s, c) => s + c.callVol, 0);
   const totalPutVol = chain.reduce((s, c) => s + c.putVol, 0);
   const pcRatio = totalCallVol ? (totalPutVol / totalCallVol).toFixed(2) : "N/A";
 
+  const selectContract = useCallback((optionType: "CALL" | "PUT", strike: number, premium: number, side: "buy" | "sell") => {
+    setTradeSelection({
+      symbol: selectedSymbol.symbol,
+      optionType,
+      strike,
+      premium,
+      expiration: selectedExp,
+      side,
+    });
+    setContracts("1");
+  }, [selectedSymbol, selectedExp]);
+
+  const executeTrade = useCallback(async () => {
+    if (!tradeSelection || !isSignedIn) return;
+    setTradeLoading(true);
+    try {
+      const res = await authFetch("/paper-trading/options-trade", getToken, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          symbol: tradeSelection.symbol,
+          optionType: tradeSelection.optionType,
+          strike: tradeSelection.strike,
+          expiration: tradeSelection.expiration,
+          side: tradeSelection.side,
+          contracts: Number(contracts),
+          premium: tradeSelection.premium,
+        }),
+      });
+      let data: { message?: string; error?: string };
+      try { data = await res.json(); } catch { data = {}; }
+      if (res.ok) {
+        toast({ title: "Options Trade Executed", description: data.message || "Trade placed successfully" });
+        setTradeSelection(null);
+      } else {
+        toast({ title: "Trade Failed", description: data.error || `Server error (${res.status})`, variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Trade Failed", description: "Network error. Please check your connection and try again.", variant: "destructive" });
+    } finally {
+      setTradeLoading(false);
+    }
+  }, [tradeSelection, contracts, isSignedIn, getToken, toast]);
+
   return (
     <div data-tour="options-chain" className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden mb-6">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.04]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 py-3 border-b border-white/[0.04] gap-2">
         <div className="flex items-center gap-3">
           <span className="text-[13px] font-bold">Options Chain</span>
           <select value={selectedSymbol.symbol} onChange={e => {
@@ -115,10 +176,8 @@ export function OptionsChain() {
           </select>
         </div>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-[10px] text-white/40">
-            <span>P/C Ratio: <span className="font-mono font-bold text-white/40">{pcRatio}</span></span>
-            <span>Call Vol: <span className="font-mono text-primary/50">{totalCallVol.toLocaleString()}</span></span>
-            <span>Put Vol: <span className="font-mono text-[#ff3366]/50">{totalPutVol.toLocaleString()}</span></span>
+          <div className="hidden sm:flex items-center gap-2 text-[10px] text-white/40">
+            <span>P/C: <span className="font-mono font-bold text-white/40">{pcRatio}</span></span>
           </div>
           <button onClick={() => setShowGreeks(!showGreeks)} className="text-[10px] text-white/50 hover:text-white/40 transition-colors">
             {showGreeks ? "Hide Greeks" : "Show Greeks"}
@@ -126,15 +185,67 @@ export function OptionsChain() {
         </div>
       </div>
 
+      {tradeSelection && (
+        <div className="px-4 py-3 border-b border-white/[0.04] bg-white/[0.02]">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className={`text-xs font-bold ${tradeSelection.side === "buy" ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
+                {tradeSelection.side.toUpperCase()}
+              </span>
+              <span className="text-xs font-mono text-white">
+                {tradeSelection.symbol} ${tradeSelection.strike} {tradeSelection.optionType}
+              </span>
+              <span className="text-[10px] text-white/40">@ ${tradeSelection.premium.toFixed(2)}</span>
+              <span className="text-[10px] text-white/30">exp {tradeSelection.expiration}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                value={contracts}
+                onChange={e => setContracts(e.target.value)}
+                type="number"
+                min="1"
+                className="w-16 h-7 px-2 text-[11px] font-mono bg-white/[0.04] border border-white/[0.1] rounded text-white focus:outline-none focus:border-[#00D4FF]/30 text-center"
+              />
+              <span className="text-[10px] text-white/30">contracts</span>
+              <span className="text-[10px] font-mono text-white/50">
+                = ${(Number(contracts) * tradeSelection.premium * 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={executeTrade}
+                disabled={tradeLoading || !isSignedIn}
+                className={`px-3 py-1 text-[10px] font-bold rounded transition-all disabled:opacity-40 ${
+                  tradeSelection.side === "buy"
+                    ? "bg-[#00ff88] text-black hover:bg-[#00ff88]/80"
+                    : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"
+                }`}
+              >
+                {tradeLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirm"}
+              </button>
+              <button
+                onClick={() => setTradeSelection(null)}
+                className="px-2 py-1 text-[10px] text-white/40 hover:text-white/60 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="w-full text-[10px] font-mono">
           <thead>
             <tr className="border-b border-white/[0.04]">
+              <th className="w-8 py-1.5 bg-primary/[0.02]"></th>
               <th colSpan={showGreeks ? 9 : 5} className="text-center py-1.5 text-primary/40 font-bold text-[9px] uppercase tracking-wider bg-primary/[0.02]">CALLS</th>
               <th className="text-center py-1.5 text-white/40 font-bold text-[9px] uppercase tracking-wider bg-white/[0.02]">STRIKE</th>
               <th colSpan={showGreeks ? 9 : 5} className="text-center py-1.5 text-[#ff3366]/40 font-bold text-[9px] uppercase tracking-wider bg-[#ff3366]/[0.02]">PUTS</th>
+              <th className="w-8 py-1.5 bg-[#ff3366]/[0.02]"></th>
             </tr>
             <tr className="border-b border-white/[0.04] text-white/40">
+              <th className="px-1 py-1.5 text-center text-[8px] font-normal">Trade</th>
               <th className="px-2 py-1.5 text-right font-normal">Bid</th>
               <th className="px-2 py-1.5 text-right font-normal">Ask</th>
               <th className="px-2 py-1.5 text-right font-normal">Last</th>
@@ -158,6 +269,7 @@ export function OptionsChain() {
                 <th className="px-2 py-1.5 text-right font-normal">Theta</th>
                 <th className="px-2 py-1.5 text-right font-normal">IV%</th>
               </>}
+              <th className="px-1 py-1.5 text-center text-[8px] font-normal">Trade</th>
             </tr>
           </thead>
           <tbody>
@@ -165,8 +277,20 @@ export function OptionsChain() {
               const isATM = row.itm === "atm";
               const callITM = row.itm === "call";
               const putITM = row.itm === "put";
+              const isCallSelected = tradeSelection?.optionType === "CALL" && tradeSelection?.strike === row.strike;
+              const isPutSelected = tradeSelection?.optionType === "PUT" && tradeSelection?.strike === row.strike;
               return (
-                <tr key={row.strike} className={`border-b border-white/[0.015] hover:bg-white/[0.015] transition-colors ${isATM ? "bg-[#ffd700]/[0.03] border-[#ffd700]/10" : ""}`}>
+                <tr key={row.strike} className={`border-b border-white/[0.015] hover:bg-white/[0.02] transition-colors ${isATM ? "bg-[#ffd700]/[0.03] border-[#ffd700]/10" : ""} ${isCallSelected || isPutSelected ? "bg-[#00D4FF]/[0.04]" : ""}`}>
+                  <td className="px-1 py-1">
+                    <div className="flex gap-0.5">
+                      <button onClick={() => selectContract("CALL", row.strike, row.callAsk, "buy")} className="w-4 h-4 flex items-center justify-center rounded bg-[#00ff88]/10 hover:bg-[#00ff88]/25 transition-colors" title="Buy Call">
+                        <ArrowUpRight className="w-2.5 h-2.5 text-[#00ff88]" />
+                      </button>
+                      <button onClick={() => selectContract("CALL", row.strike, row.callBid, "sell")} className="w-4 h-4 flex items-center justify-center rounded bg-[#ff3366]/10 hover:bg-[#ff3366]/25 transition-colors" title="Sell Call">
+                        <ArrowDownRight className="w-2.5 h-2.5 text-[#ff3366]" />
+                      </button>
+                    </div>
+                  </td>
                   <td className={`px-2 py-1.5 text-right ${callITM ? "text-primary/60 bg-primary/[0.02]" : "text-white/25"}`}>{row.callBid}</td>
                   <td className={`px-2 py-1.5 text-right ${callITM ? "text-primary/60 bg-primary/[0.02]" : "text-white/25"}`}>{row.callAsk}</td>
                   <td className={`px-2 py-1.5 text-right font-bold ${callITM ? "text-primary/70 bg-primary/[0.02]" : "text-white/35"}`}>{row.callLast}</td>
@@ -193,6 +317,16 @@ export function OptionsChain() {
                     <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-[#ff3366]/30`}>{Math.abs(row.putTheta).toFixed(3)}</td>
                     <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/40`}>{row.putIV}</td>
                   </>}
+                  <td className="px-1 py-1">
+                    <div className="flex gap-0.5">
+                      <button onClick={() => selectContract("PUT", row.strike, row.putAsk, "buy")} className="w-4 h-4 flex items-center justify-center rounded bg-[#00ff88]/10 hover:bg-[#00ff88]/25 transition-colors" title="Buy Put">
+                        <ArrowUpRight className="w-2.5 h-2.5 text-[#00ff88]" />
+                      </button>
+                      <button onClick={() => selectContract("PUT", row.strike, row.putBid, "sell")} className="w-4 h-4 flex items-center justify-center rounded bg-[#ff3366]/10 hover:bg-[#ff3366]/25 transition-colors" title="Sell Put">
+                        <ArrowDownRight className="w-2.5 h-2.5 text-[#ff3366]" />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               );
             })}

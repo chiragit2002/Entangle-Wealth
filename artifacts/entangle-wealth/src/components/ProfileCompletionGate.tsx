@@ -340,10 +340,10 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
 
   if (checking && isSignedIn && !shouldBypass) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center" role="status" aria-label="Loading">
+      <div className="min-h-screen bg-background flex items-center justify-center" role="status" aria-label="Loading">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-xs text-white/30 font-mono">Checking your profile...</p>
+          <p className="text-xs text-muted-foreground/50 font-mono">Checking your profile...</p>
         </div>
       </div>
     );
@@ -359,21 +359,21 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
   const canSave = profileDone && businessOwnerAnswered && !needsBusinessDocs;
 
   return (
-    <div className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="profile-gate-title">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0d0f18] p-8 my-4 shadow-2xl shadow-black/50 animate-in fade-in zoom-in-95 duration-300">
-        <div className="flex items-start justify-between gap-3 mb-2">
+    <div className="fixed inset-0 z-[200] bg-background/95 backdrop-blur-sm flex items-start sm:items-center justify-center overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="profile-gate-title">
+      <div className="w-full max-w-lg rounded-none sm:rounded-2xl border-0 sm:border border-border/40 bg-card p-6 sm:p-8 sm:my-6 min-h-screen sm:min-h-0 shadow-2xl animate-in fade-in duration-300">
+        <div className="flex items-start justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[#0099cc] flex items-center justify-center shrink-0">
-              <User className="w-5 h-5 text-black" aria-hidden="true" />
+            <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+              <User className="w-5 h-5 text-primary" aria-hidden="true" />
             </div>
             <div>
-              <h2 id="profile-gate-title" className="text-xl font-bold text-white">Finish setup to unlock your plan</h2>
-              <p className="text-xs text-white/50">Takes 30 seconds — personalizes everything</p>
+              <h2 id="profile-gate-title" className="text-lg font-bold text-foreground leading-tight">Finish setup to unlock your plan</h2>
+              <p className="text-xs text-muted-foreground">Takes 30 seconds — personalizes everything</p>
             </div>
           </div>
           <button
             onClick={handleRemindLater}
-            className="text-white/50 hover:text-white/50 transition-colors p-1 rounded-md hover:bg-white/[0.04] shrink-0 min-w-[32px] min-h-[32px] flex items-center justify-center"
+            className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-lg hover:bg-muted shrink-0"
             aria-label="Remind me later"
             title="Remind me later"
           >
@@ -381,12 +381,12 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
           </button>
         </div>
 
-        <div className="mb-6" aria-label={`Setup ${pct}% complete`}>
+        <div className="mb-5" aria-label={`Setup ${pct}% complete`}>
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs text-white/50">Setup progress</span>
+            <span className="text-xs text-muted-foreground font-medium">Setup progress</span>
             <span className="text-xs text-primary font-bold tabular-nums">{pct}%</span>
           </div>
-          <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
+          <div className="h-2 bg-muted rounded-full overflow-hidden" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
             <div
               className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
               style={{ width: `${pct}%` }}
@@ -394,11 +394,11 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="gate-firstName" className="text-[11px] text-white/50 mb-1 block">
-                First Name <span className="text-primary" aria-hidden="true">*</span>
+              <label htmlFor="gate-firstName" className="text-xs text-muted-foreground font-medium mb-1.5 block">
+                First Name <span className="text-destructive" aria-hidden="true">*</span>
               </label>
               <Input
                 id="gate-firstName"
@@ -406,21 +406,21 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
                 value={form.firstName}
                 onChange={e => handleFieldChange("firstName", e.target.value)}
                 onBlur={() => handleBlur("firstName")}
-                className={`bg-white/5 border-white/10 transition-colors ${errors.firstName ? "border-red-500/50 focus:border-red-500" : "focus:border-primary/50"}`}
+                className={`bg-muted/50 border-border h-10 transition-colors ${errors.firstName ? "border-destructive/50 focus:border-destructive" : "focus:border-primary/50"}`}
                 aria-invalid={!!errors.firstName}
                 aria-describedby={errors.firstName ? "gate-firstName-error" : undefined}
                 autoComplete="given-name"
               />
               {errors.firstName && (
-                <p id="gate-firstName-error" className="text-[10px] text-red-400 mt-1 flex items-center gap-1">
+                <p id="gate-firstName-error" className="text-[10px] text-destructive mt-1 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3 shrink-0" />
                   {errors.firstName}
                 </p>
               )}
             </div>
             <div>
-              <label htmlFor="gate-lastName" className="text-[11px] text-white/50 mb-1 block">
-                Last Name <span className="text-primary" aria-hidden="true">*</span>
+              <label htmlFor="gate-lastName" className="text-xs text-muted-foreground font-medium mb-1.5 block">
+                Last Name <span className="text-destructive" aria-hidden="true">*</span>
               </label>
               <Input
                 id="gate-lastName"
@@ -428,13 +428,13 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
                 value={form.lastName}
                 onChange={e => handleFieldChange("lastName", e.target.value)}
                 onBlur={() => handleBlur("lastName")}
-                className={`bg-white/5 border-white/10 transition-colors ${errors.lastName ? "border-red-500/50 focus:border-red-500" : "focus:border-primary/50"}`}
+                className={`bg-muted/50 border-border h-10 transition-colors ${errors.lastName ? "border-destructive/50 focus:border-destructive" : "focus:border-primary/50"}`}
                 aria-invalid={!!errors.lastName}
                 aria-describedby={errors.lastName ? "gate-lastName-error" : undefined}
                 autoComplete="family-name"
               />
               {errors.lastName && (
-                <p id="gate-lastName-error" className="text-[10px] text-red-400 mt-1 flex items-center gap-1">
+                <p id="gate-lastName-error" className="text-[10px] text-destructive mt-1 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3 shrink-0" />
                   {errors.lastName}
                 </p>
@@ -442,9 +442,9 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
             </div>
           </div>
           <div>
-            <label htmlFor="gate-occupation" className="text-[11px] text-white/50 mb-1 flex items-center gap-1">
+            <label htmlFor="gate-occupation" className="text-xs text-muted-foreground font-medium mb-1.5 flex items-center gap-1">
               <Briefcase className="w-3 h-3" aria-hidden="true" />
-              Occupation <span className="text-primary" aria-hidden="true">*</span>
+              Occupation <span className="text-destructive" aria-hidden="true">*</span>
             </label>
             <OccupationDropdown
               inputId="gate-occupation"
@@ -456,7 +456,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
               placeholder="Select your occupation..."
             />
             {errors.occupationId ? (
-              <p id="gate-occupation-error" className="text-[10px] text-red-400 mt-1 flex items-center gap-1">
+              <p id="gate-occupation-error" className="text-[10px] text-destructive mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3 shrink-0" />
                 {errors.occupationId}
               </p>
@@ -466,15 +466,15 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
                 {getOccupationById(form.occupationId)?.name}
               </p>
             ) : (
-              <p id="gate-occupation-hint" className="text-[10px] text-white/30 mt-1">
+              <p id="gate-occupation-hint" className="text-[10px] text-muted-foreground/60 mt-1">
                 Select your profession or role — used to personalize tax insights and recommendations.
               </p>
             )}
           </div>
           <div>
-            <label htmlFor="gate-location" className="text-[11px] text-white/50 mb-1 flex items-center gap-1">
+            <label htmlFor="gate-location" className="text-xs text-muted-foreground font-medium mb-1.5 flex items-center gap-1">
               <MapPin className="w-3 h-3" aria-hidden="true" />
-              Location <span className="text-primary" aria-hidden="true">*</span>
+              Location <span className="text-destructive" aria-hidden="true">*</span>
             </label>
             <Input
               id="gate-location"
@@ -482,32 +482,32 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
               value={form.location}
               onChange={e => handleFieldChange("location", e.target.value)}
               onBlur={() => handleBlur("location")}
-              className={`bg-white/5 border-white/10 transition-colors ${errors.location ? "border-red-500/50 focus:border-red-500" : "focus:border-primary/50"}`}
+              className={`bg-muted/50 border-border h-10 transition-colors ${errors.location ? "border-destructive/50 focus:border-destructive" : "focus:border-primary/50"}`}
               aria-invalid={!!errors.location}
               aria-describedby={errors.location ? "gate-location-error" : "gate-location-hint"}
               autoComplete="address-level2"
             />
             {errors.location ? (
-              <p id="gate-location-error" className="text-[10px] text-red-400 mt-1 flex items-center gap-1">
+              <p id="gate-location-error" className="text-[10px] text-destructive mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3 shrink-0" />
                 {errors.location}
               </p>
             ) : (
-              <p id="gate-location-hint" className="text-[10px] text-white/30 mt-1">
+              <p id="gate-location-hint" className="text-[10px] text-muted-foreground/60 mt-1">
                 Used to surface region-specific tax rules and local job opportunities.
               </p>
             )}
           </div>
 
-          <div className="border-t border-white/10 pt-3">
-            <label className="text-[11px] text-white/50 mb-2 block">
-              <span className="flex items-center gap-1"><Building2 className="w-3 h-3" /> Are you a business owner? <span className="text-primary">*</span></span>
+          <div className="border-t border-border pt-4">
+            <label className="text-xs text-muted-foreground font-medium mb-2.5 block">
+              <span className="flex items-center gap-1"><Building2 className="w-3 h-3" /> Are you a business owner? <span className="text-destructive">*</span></span>
             </label>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => { setIsBusinessOwner(true); setBusinessOwnerAnswered(true); }}
-                className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all border ${isBusinessOwner === true ? "bg-primary/15 text-primary border-primary/40" : "bg-white/[0.03] text-white/50 border-white/[0.06] hover:border-white/20"}`}
+                className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all border ${isBusinessOwner === true ? "bg-primary/15 text-primary border-primary/40" : "bg-muted/30 text-muted-foreground border-border hover:border-primary/30"}`}
                 aria-pressed={isBusinessOwner === true}
               >
                 Yes
@@ -515,7 +515,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
               <button
                 type="button"
                 onClick={() => { setIsBusinessOwner(false); setBusinessOwnerAnswered(true); setDocFiles([]); }}
-                className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all border ${isBusinessOwner === false ? "bg-white/10 text-white border-white/30" : "bg-white/[0.03] text-white/50 border-white/[0.06] hover:border-white/20"}`}
+                className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all border ${isBusinessOwner === false ? "bg-muted text-foreground border-border" : "bg-muted/30 text-muted-foreground border-border hover:border-primary/30"}`}
                 aria-pressed={isBusinessOwner === false}
               >
                 No
@@ -525,35 +525,35 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
 
           {isBusinessOwner === true && (
             <div className="border border-primary/20 rounded-xl p-4 bg-primary/[0.03]">
-              <p className="text-[11px] text-white/70 font-medium mb-1 flex items-center gap-1">
-                <FileText className="w-3 h-3 text-primary" /> Business Document Upload <span className="text-primary">*</span>
+              <p className="text-xs text-foreground/70 font-medium mb-1 flex items-center gap-1">
+                <FileText className="w-3 h-3 text-primary" /> Business Document Upload <span className="text-destructive">*</span>
               </p>
-              <p className="text-[10px] text-white/50 mb-3">Upload at least one: business license, EIN letter, or articles of incorporation. (JPG, PNG, WebP, or PDF · Max 10MB each)</p>
+              <p className="text-[10px] text-muted-foreground mb-3">Upload at least one: business license, EIN letter, or articles of incorporation. (JPG, PNG, WebP, or PDF · Max 10MB each)</p>
 
               {docFiles.length > 0 && (
                 <div className="space-y-2 mb-3">
                   {docFiles.map((doc, idx) => (
-                    <div key={idx} className="flex items-center gap-2 bg-white/5 rounded-lg p-2">
+                    <div key={idx} className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
                       {doc.preview ? (
-                        <img src={doc.preview} alt="" className="w-8 h-8 object-cover rounded border border-white/10" />
+                        <img src={doc.preview} alt="" className="w-8 h-8 object-cover rounded border border-border" />
                       ) : (
-                        <div className="w-8 h-8 rounded border border-white/10 bg-white/5 flex items-center justify-center">
-                          <FileText className="w-4 h-4 text-white/40" />
+                        <div className="w-8 h-8 rounded border border-border bg-muted flex items-center justify-center">
+                          <FileText className="w-4 h-4 text-muted-foreground" />
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] text-white/60 truncate">{doc.file.name}</p>
+                        <p className="text-[10px] text-muted-foreground truncate">{doc.file.name}</p>
                         <select
                           value={doc.type}
                           onChange={e => setDocFiles(prev => prev.map((d, i) => i === idx ? { ...d, type: e.target.value } : d))}
                           className="text-[10px] bg-transparent text-primary border-0 outline-none cursor-pointer"
                         >
                           {Object.entries(DOC_LABELS).map(([v, l]) => (
-                            <option key={v} value={v} className="bg-[#0d0f18] text-white">{l}</option>
+                            <option key={v} value={v} className="bg-card text-foreground">{l}</option>
                           ))}
                         </select>
                       </div>
-                      <button onClick={() => removeDoc(idx)} className="text-white/30 hover:text-white/70" aria-label={`Remove ${doc.file.name}`}>
+                      <button onClick={() => removeDoc(idx)} className="text-muted-foreground hover:text-foreground" aria-label={`Remove ${doc.file.name}`}>
                         <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -575,22 +575,22 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
                 onDragOver={e => { e.preventDefault(); setDragActive(true); }}
                 onDragLeave={() => setDragActive(false)}
                 onDrop={e => { e.preventDefault(); setDragActive(false); handleFileAdd(e.dataTransfer.files); }}
-                className={`w-full py-6 border border-dashed rounded-xl flex flex-col items-center gap-1.5 cursor-pointer transition-colors ${dragActive ? "border-primary/60 bg-primary/10" : "border-white/15 hover:border-primary/40 hover:bg-primary/5"}`}
+                className={`w-full py-6 border border-dashed rounded-xl flex flex-col items-center gap-1.5 cursor-pointer transition-colors ${dragActive ? "border-primary/60 bg-primary/10" : "border-border hover:border-primary/40 hover:bg-primary/5"}`}
                 role="button"
                 tabIndex={0}
                 onKeyDown={e => e.key === "Enter" || e.key === " " ? fileInputRef.current?.click() : undefined}
                 aria-label="Click or drag to upload business documents"
               >
-                <Upload className="w-5 h-5 text-white/30" aria-hidden="true" />
-                <span className="text-[11px] text-white/50">{dragActive ? "Drop files here" : "Click or drag to upload"}</span>
-                <span className="text-[10px] text-white/50">JPG, PNG, WebP, PDF · Max 10MB</span>
+                <Upload className="w-5 h-5 text-muted-foreground/50" aria-hidden="true" />
+                <span className="text-[11px] text-muted-foreground">{dragActive ? "Drop files here" : "Click or drag to upload"}</span>
+                <span className="text-[10px] text-muted-foreground/60">JPG, PNG, WebP, PDF · Max 10MB</span>
               </div>
             </div>
           )}
         </div>
 
         <Button
-          className="w-full mt-6 bg-primary text-black font-bold gap-1 h-12 text-sm hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
+          className="w-full mt-6 bg-primary text-primary-foreground font-bold gap-1 h-12 text-sm hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
           onClick={handleSave}
           disabled={saving || !businessOwnerAnswered}
           aria-busy={saving}
@@ -609,14 +609,14 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
         </Button>
 
         {!canSave && (
-          <p className="text-center text-xs text-white/30 mt-2" aria-live="polite">
+          <p className="text-center text-xs text-muted-foreground/50 mt-2" aria-live="polite">
             {!businessOwnerAnswered ? "Please answer all required questions to continue" : "All fields are required to continue"}
           </p>
         )}
 
         <button
           onClick={handleRemindLater}
-          className="w-full mt-3 text-center text-xs text-white/40 hover:text-white/40 transition-colors py-1"
+          className="w-full mt-3 text-center text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors py-1"
         >
           Remind me later
         </button>

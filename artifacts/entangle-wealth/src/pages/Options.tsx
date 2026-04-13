@@ -15,7 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
-import { PaperTradingWidget } from "@/components/PaperTradingWidget";
+import { StockTradePanel } from "@/components/StockTradePanel";
 
 type SortField = "time" | "symbol" | "strike" | "delta" | "gamma" | "theta" | "ivRank" | "strength";
 type SortDir = "asc" | "desc";
@@ -33,6 +33,7 @@ export default function Options() {
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [savedSignals, setSavedSignals] = useState<number[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedTradeSymbol, setSelectedTradeSymbol] = useState("");
 
   const [visibleCols, setVisibleCols] = useState({
     time: true, symbol: true, contract: true, delta: true, gamma: true, theta: true, ivRank: true, strength: true, strategy: true,
@@ -384,6 +385,17 @@ export default function Options() {
                                   ? "Moderate agreement across analysis methods. Worth monitoring."
                                   : "Limited agreement. Exercise caution | fewer methods confirm this signal."}
                               </p>
+                              <Button
+                                size="sm"
+                                className="w-full mt-3 bg-primary text-primary-foreground hover:bg-primary/90 font-bold gap-1"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedTradeSymbol(prev => prev === item.symbol ? "" : item.symbol);
+                                }}
+                              >
+                                <TrendingUp className="w-3.5 h-3.5" />
+                                {selectedTradeSymbol === item.symbol ? "Hide Trade Panel" : `Trade ${item.symbol}`}
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -396,11 +408,16 @@ export default function Options() {
           </div>
         )}
 
+        {selectedTradeSymbol && (
+          <div className="mt-6">
+            <StockTradePanel symbol={selectedTradeSymbol} />
+          </div>
+        )}
+
         <div className="mt-8 p-4 rounded-lg border border-white/5 bg-white/[0.01]">
           <p className="text-xs text-muted-foreground/60 text-center">Options trading carries substantial risk. The data shown above is for demonstration purposes. Signal strength is a composite score based on volume, premium size, and IV rank | it is not a recommendation to trade.</p>
         </div>
       </div>
-      <PaperTradingWidget variant="floating" />
     </Layout>
   );
 }

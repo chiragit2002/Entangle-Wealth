@@ -132,16 +132,20 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
   adRatio?: number;
 }) {
   const insights = useMemo(() => {
-    const consensus = consensusAccuracy ?? 87;
-    const vix = vixLevel ?? 14;
-    const adSignal = adRatio != null ? (adRatio > 1.2 ? "breadth is strongly positive" : adRatio < 0.8 ? "breadth is weakening" : "breadth is mixed") : "breadth is positive";
+    const hasConsensus = consensusAccuracy != null;
+    const hasVix = vixLevel != null;
+    const consensus = consensusAccuracy ?? 0;
+    const vix = vixLevel ?? 0;
+    const adSignal = adRatio != null ? (adRatio > 1.2 ? "breadth is strongly positive" : adRatio < 0.8 ? "breadth is weakening" : "breadth is mixed") : null;
     return [
       {
         id: "consensus",
         icon: Atom,
         color: "#00FF41",
-        text: `Quantum Consensus Engine is running at ${consensus}% accuracy — ${consensus >= 85 ? "6 of 6 agents agree on the current signal direction." : "agents are split; high-conviction trades are paused."}`,
-        subtext: `${consensus}% consensus accuracy`,
+        text: hasConsensus
+          ? `Quantum Consensus Engine — ${consensus >= 85 ? "6 of 6 agents agree on the current signal direction." : "agents are split; high-conviction trades are paused."}`
+          : "EXAMPLE SIGNAL — LIVE WHEN YOU CONNECT YOUR ACCOUNT: Quantum Consensus Engine cross-checks every signal across 6 independent AI agents.",
+        subtext: "Multi-model consensus",
         href: "/terminal",
         label: "View Terminal",
       },
@@ -149,8 +153,8 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
         id: "timeline",
         icon: GitBranch,
         color: "#00FF41",
-        text: "Alternate Timeline: increasing your savings rate by 3% today could mean $68k more in 10 years.",
-        subtext: "Avg $47k divergence revealed",
+        text: "EXAMPLE SIGNAL — LIVE WHEN YOU CONNECT YOUR ACCOUNT: Alternate Timeline — see how one savings decision today branches into radically different 10-year futures.",
+        subtext: "Alternate Timeline Simulator",
         href: "/alternate-timeline",
         label: "Explore Timelines",
       },
@@ -158,8 +162,10 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
         id: "taxgpt",
         icon: FileSearch,
         color: "#FFB800",
-        text: `Market ${adSignal} (VIX ${vix.toFixed(2)}) — a good time to review tax-loss harvesting opportunities with TaxGPT.`,
-        subtext: "$4,200 avg savings found",
+        text: hasVix && adSignal
+          ? `Market ${adSignal} (VIX ${vix.toFixed(2)}) — a good time to review tax-loss harvesting opportunities with TaxGPT.`
+          : "EXAMPLE SIGNAL — LIVE WHEN YOU CONNECT YOUR ACCOUNT: TaxGPT analyzes every trade for deductions and tax-loss harvesting opportunities in real time.",
+        subtext: "Analyzes trades for deductions",
         href: "/taxgpt",
         label: "Check Savings",
       },
@@ -167,7 +173,7 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
         id: "coach",
         icon: Brain,
         color: "#a78bfa",
-        text: "Your AI Coach has a personalized habit insight ready — based on your activity pattern this week.",
+        text: "EXAMPLE SIGNAL — LIVE WHEN YOU CONNECT YOUR ACCOUNT: Your AI Coach will surface personalized habit insights based on your activity pattern.",
         subtext: "Behavioral finance coaching",
         href: "/ai-coach",
         label: "Talk to Coach",
@@ -201,31 +207,21 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
     <div
       className="relative overflow-hidden rounded-xl"
       style={{
-        background: "linear-gradient(135deg, rgba(10,10,20,0.95), rgba(5,5,15,0.98))",
-        padding: "1px",
+        borderTop: `1px solid ${insight.color}25`,
+        borderRight: `1px solid ${insight.color}25`,
+        borderBottom: `1px solid ${insight.color}25`,
+        borderLeft: `3px solid ${insight.color}`,
+        background: "rgba(8,8,18,0.97)",
       }}
     >
       <div
-        className="absolute inset-0 rounded-xl"
-        style={{
-          background: `linear-gradient(135deg, ${insight.color}40 0%, transparent 50%, ${insight.color}20 100%)`,
-          animation: "pulse 3s ease-in-out infinite",
-        }}
-      />
-      <div
         className="relative rounded-xl px-4 py-3 flex items-center gap-3"
-        style={{
-          background: "rgba(8,8,18,0.97)",
-          border: `1px solid ${insight.color}30`,
-          boxShadow: `0 0 20px ${insight.color}15, inset 0 1px 0 ${insight.color}12`,
-        }}
       >
         <div
           className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
           style={{
             background: `${insight.color}12`,
             border: `1px solid ${insight.color}25`,
-            boxShadow: `0 0 10px ${insight.color}30`,
           }}
         >
           <Icon className="w-4 h-4" style={{ color: insight.color }} />
@@ -651,11 +647,7 @@ export default function Dashboard() {
         </div>
 
         {/* Edge Pulse */}
-        <EdgePulseCard
-          consensusAccuracy={87}
-          vixLevel={MARKET_INTERNALS.vix.current}
-          adRatio={MARKET_INTERNALS.advDecl.ratio}
-        />
+        <EdgePulseCard />
 
         {/* Wealth Signal Card trigger */}
         <div className="flex justify-end">

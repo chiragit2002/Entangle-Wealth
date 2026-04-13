@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Component, ReactNode } from "react";
+import { useState, useEffect, useRef, useCallback, Component, ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -357,9 +357,8 @@ const EDGE_INSIGHTS = [
     id: "quantum",
     icon: Atom,
     iconColor: "#00FF41",
-    glowColor: "rgba(0,255,65,0.18)",
     borderColor: "rgba(0,255,65,0.25)",
-    metric: "87% consensus accuracy",
+    benefit: "Multi-model consensus — built to catch what single signals miss.",
     headline: "Quantum Consensus Engine",
     body: "6 AI agents cross-check every signal independently, then converge on a verdict. No single model bias — just collective precision your brokerage can't replicate.",
     cta: "See It In Action",
@@ -370,9 +369,8 @@ const EDGE_INSIGHTS = [
     id: "timeline",
     icon: GitBranch,
     iconColor: "#00FF41",
-    glowColor: "rgba(0,255,65,0.15)",
     borderColor: "rgba(0,255,65,0.22)",
-    metric: "Avg $47k gap revealed at 10yr",
+    benefit: "See how one decision today branches into radically different futures.",
     headline: "Alternate Timeline Simulator",
     body: "See how a single decision today — save $200 more/month, pay off debt early — branches into radically different futures. No other platform shows you your money's parallel lives.",
     cta: "Explore Your Timelines",
@@ -383,9 +381,8 @@ const EDGE_INSIGHTS = [
     id: "taxgpt",
     icon: FileSearch,
     iconColor: "#FFB800",
-    glowColor: "rgba(245,200,66,0.13)",
     borderColor: "rgba(245,200,66,0.22)",
-    metric: "$4,200 avg tax savings found",
+    benefit: "Analyzes every trade for deductions in real time.",
     headline: "TaxGPT — Deductions You're Missing",
     body: "An AI trained on IRS publications scans your situation for overlooked deductions, audit risks, and tax strategies most CPAs don't surface in a 30-minute meeting.",
     cta: "Find Your Savings",
@@ -396,9 +393,8 @@ const EDGE_INSIGHTS = [
     id: "coach",
     icon: Brain,
     iconColor: "#a78bfa",
-    glowColor: "rgba(167,139,250,0.14)",
     borderColor: "rgba(167,139,250,0.22)",
-    metric: "63+ AI disciplines",
+    benefit: "63+ AI disciplines applied to your behavioral finance habits.",
     headline: "Behavioral Finance Coach",
     body: "Real-time nudges grounded in behavioral economics — the psychology of why you make money decisions, and how to make better ones. Not just analysis, but actual habit change.",
     cta: "Meet Your Coach",
@@ -411,27 +407,49 @@ function EdgeInsightCard({
   insight,
   active,
   onHover,
+  onFocus,
+  isSignedIn,
+  tabIndex,
 }: {
   insight: (typeof EDGE_INSIGHTS)[number];
   active: boolean;
   onHover: () => void;
+  onFocus: () => void;
+  isSignedIn: boolean;
+  tabIndex: number;
 }) {
   const Icon = insight.icon;
+  const [, navigate] = useLocation();
+  const ctaHref = isSignedIn
+    ? insight.ctaHref
+    : `/sign-up?feature=${encodeURIComponent(insight.ctaHref.replace(/^\//, ""))}`;
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      trackEvent("edge_cta_clicked", { insight: insight.id, signed_in: isSignedIn, via: "keyboard" });
+      navigate(ctaHref);
+    }
+  };
+
   return (
     <div
+      role="group"
+      aria-label={insight.headline}
       onMouseEnter={onHover}
-      className={`relative p-5 flex flex-col gap-3 cursor-default transition-all duration-300 group ${
+      onFocus={onFocus}
+      onKeyDown={handleKeyDown}
+      tabIndex={tabIndex}
+      className={`relative p-5 flex flex-col gap-3 cursor-default transition-all duration-300 group outline-none focus-visible:ring-2 focus-visible:ring-white/30 ${
         active ? "scale-[1.01]" : "opacity-80 hover:opacity-100"
       }`}
       style={{
-        background: active
-          ? `linear-gradient(135deg, ${insight.glowColor}, rgba(10,10,20,0.95))`
-          : "rgba(10,10,20,0.7)",
-        border: `1px solid ${active ? insight.borderColor : "rgba(255,255,255,0.07)"}`,
-        boxShadow: active
-          ? `0 0 32px ${insight.glowColor}, inset 0 1px 0 ${insight.borderColor}`
-          : "none",
-        transition: "all 0.35s ease",
+        background: "rgba(10,10,20,0.85)",
+        borderTop: `1px solid ${active ? insight.borderColor : "rgba(255,255,255,0.07)"}`,
+        borderRight: `1px solid ${active ? insight.borderColor : "rgba(255,255,255,0.07)"}`,
+        borderBottom: `1px solid ${active ? insight.borderColor : "rgba(255,255,255,0.07)"}`,
+        borderLeft: `3px solid ${active ? insight.iconColor : "rgba(255,255,255,0.07)"}`,
+        transition: "border-color 0.35s ease, opacity 0.35s ease, transform 0.35s ease",
       }}
     >
       <div className="flex items-start justify-between gap-3">
@@ -440,7 +458,6 @@ function EdgeInsightCard({
           style={{
             background: `${insight.iconColor}15`,
             border: `1px solid ${insight.iconColor}30`,
-            boxShadow: active ? `0 0 14px ${insight.iconColor}40` : "none",
           }}
         >
           <Icon
@@ -463,12 +480,12 @@ function EdgeInsightCard({
         </span>
       </div>
 
-      <div
-        className="text-lg font-bold tabular-nums"
+      <p
+        className="text-xs font-semibold leading-snug"
         style={{ color: insight.iconColor }}
       >
-        {insight.metric}
-      </div>
+        {insight.benefit}
+      </p>
 
       <div>
         <p className="text-sm font-bold text-white mb-1">{insight.headline}</p>
@@ -476,49 +493,67 @@ function EdgeInsightCard({
       </div>
 
       <Link
-        href={insight.ctaHref}
-        onClick={() => trackEvent("edge_cta_clicked", { insight: insight.id })}
+        href={ctaHref}
+        onClick={() => trackEvent("edge_cta_clicked", { insight: insight.id, signed_in: isSignedIn })}
+        aria-label={`${insight.cta} — ${insight.headline}`}
         className="mt-auto flex items-center gap-1.5 text-xs font-semibold transition-all duration-200 group-hover:gap-2"
         style={{ color: insight.iconColor }}
       >
         {insight.cta}
-        <ChevronRight className="w-3.5 h-3.5" />
+        <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
       </Link>
-
-      {active && (
-        <div
-          className="absolute inset-0 rounded-sm pointer-events-none"
-          style={{
-            background: `radial-gradient(ellipse at 0% 0%, ${insight.glowColor} 0%, transparent 70%)`,
-          }}
-        />
-      )}
     </div>
   );
 }
 
 function YourEdgeSection() {
   const [activeIdx, setActiveIdx] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { isSignedIn } = useAuth();
+  const gridRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
+  const startAutoRotate = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
       setActiveIdx((prev) => (prev + 1) % EDGE_INSIGHTS.length);
     }, 3800);
-    return () => clearInterval(interval);
   }, []);
+
+  const stopAutoRotate = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!paused) {
+      startAutoRotate();
+    } else {
+      stopAutoRotate();
+    }
+    return stopAutoRotate;
+  }, [paused, startAutoRotate, stopAutoRotate]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIdx((prev) => (prev + 1) % EDGE_INSIGHTS.length);
+      setPaused(true);
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIdx((prev) => (prev - 1 + EDGE_INSIGHTS.length) % EDGE_INSIGHTS.length);
+      setPaused(true);
+    }
+  };
 
   return (
     <section className="py-16 lg:py-24 px-4 border-t border-white/5 relative overflow-hidden">
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,255,65,0.05) 0%, transparent 70%)`,
-        }}
-      />
       <div className="container mx-auto max-w-5xl relative z-10">
         <div className="text-center mb-10">
           <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#00FF41]/70 mb-3">
-            <Atom className="w-3 h-3" />
+            <Atom className="w-3 h-3" aria-hidden="true" />
             Your Edge
           </span>
           <h2 className="text-2xl md:text-4xl font-bold text-white leading-tight">
@@ -529,24 +564,43 @@ function YourEdgeSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+        <div
+          ref={gridRef}
+          role="region"
+          aria-label="Edge feature highlights"
+          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onFocusCapture={() => setPaused(true)}
+          onBlurCapture={(e) => {
+            if (!gridRef.current?.contains(e.relatedTarget as Node)) {
+              setPaused(false);
+            }
+          }}
+          onKeyDown={handleKeyDown}
+        >
           {EDGE_INSIGHTS.map((insight, idx) => (
             <EdgeInsightCard
               key={insight.id}
               insight={insight}
               active={activeIdx === idx}
-              onHover={() => setActiveIdx(idx)}
+              onHover={() => { setActiveIdx(idx); setPaused(true); }}
+              onFocus={() => { setActiveIdx(idx); setPaused(true); }}
+              isSignedIn={!!isSignedIn}
+              tabIndex={0}
             />
           ))}
         </div>
 
-        <div className="flex items-center justify-center gap-2 mt-6">
-          {EDGE_INSIGHTS.map((_, idx) => (
+        <div className="flex items-center justify-center gap-2 mt-6" role="tablist" aria-label="Edge feature navigation">
+          {EDGE_INSIGHTS.map((insight, idx) => (
             <button
               key={idx}
-              onClick={() => setActiveIdx(idx)}
-              aria-label={`View insight ${idx + 1}`}
-              className="transition-all duration-300 rounded-full"
+              role="tab"
+              aria-selected={activeIdx === idx}
+              aria-label={`View ${insight.headline}`}
+              onClick={() => { setActiveIdx(idx); setPaused(true); }}
+              className="transition-all duration-300 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/40"
               style={{
                 width: activeIdx === idx ? "20px" : "6px",
                 height: "6px",
@@ -833,8 +887,19 @@ export default function Home() {
               ))}
             </div>
             <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-sm text-white/30 font-medium">
-              {stats.accuracy > 0 && <><span>{stats.accuracy}% signal accuracy</span><span>·</span></>}
-              <span>{animatedMembers.toLocaleString()}+ members</span>
+              {stats.accuracy > 0 && (
+                <>
+                  <span>{stats.accuracy}% signal accuracy</span>
+                  <span>·</span>
+                </>
+              )}
+              {stats.members > 0 && (
+                <>
+                  <span>{animatedMembers.toLocaleString()}+ members</span>
+                  <span>·</span>
+                </>
+              )}
+              <span>Free forever tier</span>
             </div>
           </div>
         </section>

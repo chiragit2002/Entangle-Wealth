@@ -16,6 +16,8 @@
     "typescript": "~5.9.2"
   },
   "dependencies": {
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0",
     "stripe": "20.0.0",
     "stripe-replit-sync": "1.0.0"
   }

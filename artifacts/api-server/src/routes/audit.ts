@@ -267,8 +267,6 @@ router.post("/audit/crawl", requireAuth, requireAdmin, async (req, res) => {
   }
 
   const triggeredBy = (req.body?.triggeredBy as string | undefined) ?? "api";
-  // interactive=true enables button clicks, form fills, dropdown triggers.
-  // Disabled by default to keep scheduled/automated runs non-mutating.
   const interactive = req.body?.interactive === true;
 
   const [run] = await db.insert(crawlRunsTable).values({
@@ -433,6 +431,31 @@ router.get("/audit/screenshots/:runId/diffs/:filename", requireAuth, requireAdmi
   res.setHeader("Content-Type", "image/png");
   res.setHeader("Cache-Control", "private, max-age=3600");
   fs.createReadStream(filePath).pipe(res);
+});
+
+router.post("/audit/test-error", async (req, res) => {
+  const { issueType = "test_error_injection", severity = "HIGH", message = "Test error injected by self-audit system" } = req.body || {};
+
+  await db.insert(auditLogTable).values({
+    pageUrl: "/audit/test",
+    issueType: String(issueType).slice(0, 100),
+    severity: ["LOW", "MEDIUM", "HIGH", "CRITICAL"].includes(String(severity)) ? String(severity) : "HIGH",
+    errorMessage: String(message).slice(0, 5000),
+    componentName: "SelfAuditTestInjection",
+    sessionId: `test-${Date.now()}`,
+  });
+
+  res.status(201).json({ ok: true, message: "Test error injected into audit_log", issueType, severity });
+});
+
+router.get("/audit/ux-signals-recent", requireAuth, requireAdmin, async (_req, res) => {
+  const rows = await db
+    .select()
+    .from(uxSignalsTable)
+    .orderBy(desc(uxSignalsTable.timestamp))
+    .limit(10);
+
+  res.json({ signals: rows, count: rows.length });
 });
 
 export default router;

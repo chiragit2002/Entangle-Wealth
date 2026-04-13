@@ -161,6 +161,12 @@ importers:
 
   .:
     dependencies:
+      pixelmatch:
+        specifier: ^7.1.0
+        version: 7.1.0
+      pngjs:
+        specifier: ^7.0.0
+        version: 7.0.0
       stripe:
         specifier: 20.0.0
         version: 20.0.0(@types/node@25.3.5)

@@ -10,11 +10,13 @@ import { runMigrations } from "stripe-replit-sync";
 import { getStripeSync } from "./stripeClient";
 import { trackConnections } from "./routes/health";
 import { ensureReferralBadgesExist } from "./lib/referralRewards";
-import { startAlertEvaluator } from "./routes/alerts";
-import { startDigestScheduler } from "./lib/emailDigest";
-import { startDailyContentScheduler } from "./routes/dailyContent";
-import { startDripScheduler } from "./lib/dripEmails";
+import { startAlertEvaluator, stopAlertEvaluator, closeAllSseConnections } from "./routes/alerts";
+import { startDigestScheduler, stopDigestScheduler } from "./lib/emailDigest";
+import { startDailyContentScheduler, stopDailyContentScheduler } from "./routes/dailyContent";
+import { startDripScheduler, stopDripScheduler } from "./lib/dripEmails";
 import { pool } from "@workspace/db";
+
+globalThis.__dbLogger = logger;
 
 const REQUIRED_ENV_VARS = [
   "CLERK_SECRET_KEY",
@@ -560,6 +562,7 @@ try {
     logger.info({ port: boundPort }, "Server listening");
   }
   trackConnections(httpServer);
+  trackOpenSockets(httpServer);
 } catch {
   process.exit(1);
   throw new Error("unreachable");
@@ -590,31 +593,68 @@ await initStripe();
 
 let isShuttingDown = false;
 
-function gracefulShutdown(signal: string) {
+const openSockets = new Set<import("net").Socket>();
+
+function trackOpenSockets(srv: import("http").Server): void {
+  srv.on("connection", (socket: import("net").Socket) => {
+    openSockets.add(socket);
+    socket.once("close", () => openSockets.delete(socket));
+  });
+}
+
+async function gracefulShutdown(signal: string) {
   if (isShuttingDown) return;
   isShuttingDown = true;
 
-  logger.info({ signal }, "Received shutdown signal, closing server...");
-  if (!httpServer) {
-    pool.end().catch(() => {}).finally(() => process.exit(0));
-    return;
-  }
-  httpServer.close(() => {
-    logger.info("HTTP server closed");
-    pool.end().then(() => {
-      logger.info("Database pool closed");
-      process.exit(0);
-    }).catch((err) => {
-      logger.error({ error: err }, "Error closing database pool");
-      process.exit(1);
-    });
-  });
+  logger.info({ signal }, "Received shutdown signal, starting graceful shutdown...");
 
-  const timer = setTimeout(() => {
+  const forceExitTimer = setTimeout(() => {
     logger.warn("Graceful shutdown timed out, forcing exit");
     process.exit(1);
-  }, 10_000);
-  timer.unref();
+  }, 30_000);
+  forceExitTimer.unref();
+
+  logger.info("Step 1/5: Stopping background schedulers...");
+  stopAlertEvaluator();
+  stopDigestScheduler();
+  stopDripScheduler();
+  stopDailyContentScheduler();
+  logger.info("Background schedulers stopped");
+
+  if (!httpServer) {
+    logger.info("No HTTP server, closing database pool...");
+    await pool.end().catch((err) => logger.error({ error: err }, "Error closing database pool"));
+    process.exit(0);
+    return;
+  }
+
+  logger.info("Step 2/5: Stopping acceptance of new requests...");
+  await new Promise<void>((resolve) => {
+    const drainTimeout = setTimeout(resolve, 10_000);
+    httpServer!.close(() => {
+      clearTimeout(drainTimeout);
+      resolve();
+    });
+  });
+  logger.info("Step 3/5: Active request drain complete (or 10s timeout elapsed)");
+
+  logger.info("Step 4/5: Closing SSE connections and lingering sockets...");
+  closeAllSseConnections();
+  for (const socket of openSockets) {
+    try { socket.destroy(); } catch { /* already gone */ }
+  }
+  openSockets.clear();
+  logger.info("SSE connections and lingering sockets closed");
+
+  logger.info("Step 5/5: Closing database pool...");
+  try {
+    await pool.end();
+    logger.info("Database pool closed");
+    process.exit(0);
+  } catch (err) {
+    logger.error({ error: err }, "Error closing database pool");
+    process.exit(1);
+  }
 }
 
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));

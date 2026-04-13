@@ -142,12 +142,15 @@ export async function runWeeklyDigest() {
 
 let dailyTimer: ReturnType<typeof setInterval> | null = null;
 let weeklyTimer: ReturnType<typeof setInterval> | null = null;
+let dailyStartupTimer: ReturnType<typeof setTimeout> | null = null;
+let weeklyStartupTimer: ReturnType<typeof setTimeout> | null = null;
 
 export function startDigestScheduler() {
   const now = new Date();
   const msUntil8am = getMillisUntilHour(8);
 
-  setTimeout(() => {
+  dailyStartupTimer = setTimeout(() => {
+    dailyStartupTimer = null;
     runDailyDigest().catch(err => logger.error({ err }, "Daily digest error"));
     dailyTimer = setInterval(() => {
       runDailyDigest().catch(err => logger.error({ err }, "Daily digest error"));
@@ -171,7 +174,8 @@ export function startDigestScheduler() {
   if (nextMonday8am <= now) nextMonday8am.setUTCDate(nextMonday8am.getUTCDate() + 7);
   const msUntilMonday8am = nextMonday8am.getTime() - now.getTime();
 
-  setTimeout(() => {
+  weeklyStartupTimer = setTimeout(() => {
+    weeklyStartupTimer = null;
     runWeeklyDigest().catch(err => logger.error({ err }, "Weekly digest error"));
     weeklyTimer = setInterval(() => {
       runWeeklyDigest().catch(err => logger.error({ err }, "Weekly digest error"));
@@ -185,6 +189,8 @@ export function startDigestScheduler() {
 }
 
 export function stopDigestScheduler() {
+  if (dailyStartupTimer) { clearTimeout(dailyStartupTimer); dailyStartupTimer = null; }
+  if (weeklyStartupTimer) { clearTimeout(weeklyStartupTimer); weeklyStartupTimer = null; }
   if (dailyTimer) { clearInterval(dailyTimer); dailyTimer = null; }
   if (weeklyTimer) { clearInterval(weeklyTimer); weeklyTimer = null; }
 }

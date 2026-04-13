@@ -10,6 +10,7 @@ import { eq } from "drizzle-orm";
 import { getOccupationById } from "@workspace/occupations";
 import { logger } from "../lib/logger";
 import { sanitizeAiOutput, appendDisclaimer } from "../middlewares/inputSanitizer";
+import { aiQueue, AIQueueOverflowError } from "../lib/aiQueue";
 
 let openai: any = null;
 try {
@@ -199,6 +200,10 @@ const TaxGptRequestSchema = z.object({
   }).optional(),
 });
 
+interface TaxGptCompletion {
+  choices: Array<{ message: { content: string | null } }>;
+}
+
 router.post("/taxgpt", requireAuth, validateBody(TaxGptRequestSchema), async (req, res) => {
   if (!checkRateLimit(req)) {
     res.status(429).json({ error: "Rate limit exceeded. Please wait before sending another question." });
@@ -279,26 +284,35 @@ router.post("/taxgpt", requireAuth, validateBody(TaxGptRequestSchema), async (re
       systemPrompt += `\nPersonalize your answers to this user's entity type and situation. Reference strategies specific to their entity type.`;
     }
 
-    const completion = await retryWithBackoff(
-      () =>
-        openai.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: sanitizedQuestion },
-          ],
-          max_tokens: 1500,
-          temperature: 0.3,
-        }),
-      { label: "openai-taxgpt", maxRetries: 4 }
+    const abortSignal = req.timeoutAbortController?.signal;
+    const completion = await aiQueue.enqueue<TaxGptCompletion>(() =>
+      retryWithBackoff(
+        () =>
+          openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: sanitizedQuestion },
+            ],
+            max_tokens: 1500,
+            temperature: 0.3,
+          }, { signal: abortSignal }) as Promise<TaxGptCompletion>,
+        { label: "openai-taxgpt", maxRetries: 4 }
+      )
     );
 
     const rawAnswer = completion.choices?.[0]?.message?.content || "I couldn't generate a response. Please try rephrasing your question.";
     const sanitizedAnswer = sanitizeAiOutput(rawAnswer);
     const answer = appendDisclaimer(sanitizedAnswer);
     incrementTaxGptCount(clerkId);
-    res.json({ answer });
+    if (!res.headersSent) res.json({ answer });
   } catch (error) {
+    if (res.headersSent) return;
+    if (error instanceof AIQueueOverflowError) {
+      res.set("Retry-After", String(error.retryAfterSeconds));
+      res.status(503).json({ error: "TaxGPT is at capacity. Please retry in 30 seconds.", retryAfter: error.retryAfterSeconds });
+      return;
+    }
     logger.error({ err: error }, "TaxGPT error:");
     res.status(500).json({ error: "Failed to generate response" });
   }

@@ -3,7 +3,7 @@ import type { Server } from "node:http";
 import type { Socket } from "node:net";
 import { getAuthEventStats } from "../lib/authEventLogger";
 import { requireAuth } from "../middlewares/requireAuth";
-import { pool } from "@workspace/db";
+import { pool, getPoolStats } from "@workspace/db";
 
 const router: IRouter = Router();
 
@@ -39,6 +39,7 @@ router.get("/health/detailed", requireAuth, (_req, res) => {
   const minutes = Math.floor((uptimeSeconds % 3600) / 60);
   const seconds = uptimeSeconds % 60;
 
+  const poolStats = getPoolStats();
   res.json({
     status: "ok",
     uptime: {
@@ -52,6 +53,9 @@ router.get("/health/detailed", requireAuth, (_req, res) => {
       external: `${Math.round(mem.external / 1024 / 1024)}MB`,
     },
     connections: activeConnections,
+    database: {
+      pool: poolStats,
+    },
     node: process.version,
     platform: process.platform,
     auth: getAuthEventStats(),

@@ -12,6 +12,7 @@ import { csrfProtection } from "./middlewares/csrfProtection";
 import { authEventTracker } from "./middlewares/authEventTracker";
 import { metricsMiddleware } from "./middlewares/metricsMiddleware";
 import { globalErrorHandler } from "./middlewares/errorHandler";
+import { requestTimeoutMiddleware } from "./middlewares/requestTimeout";
 import {
   userApiLimiter,
   userAiLimiter,
@@ -132,6 +133,7 @@ app.use(
 );
 
 app.use(metricsMiddleware);
+app.use(requestTimeoutMiddleware);
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 

@@ -7,6 +7,11 @@ import { checkSignalLimit, incrementSignalCount } from "../lib/userDailyLimits";
 import { logger } from "../lib/logger";
 import { validateParams, validateBody, z } from "../lib/validateRequest";
 import { sanitizeAiOutput, appendDisclaimer, deepSanitizeObject } from "../middlewares/inputSanitizer";
+import { aiQueue, AIQueueOverflowError } from "../lib/aiQueue";
+
+interface OpenAICompletion {
+  choices: Array<{ message: { content: string | null } }>;
+}
 
 const router = Router();
 
@@ -127,18 +132,21 @@ Run the following agents simultaneously and report their findings:
 
 Then synthesize with the Flash Council and deliver the consensus signal.`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-5-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      response_format: { type: "json_object" },
-    });
+    const abortSignal = req.timeoutAbortController?.signal;
+    const completion = await aiQueue.enqueue<OpenAICompletion>(() =>
+      openai.chat.completions.create({
+        model: "gpt-5-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        response_format: { type: "json_object" },
+      }, { signal: abortSignal }) as Promise<OpenAICompletion>
+    );
 
     const content = completion.choices[0]?.message?.content;
     if (!content) {
-      res.status(500).json({ error: "No analysis generated" });
+      if (!res.headersSent) res.status(500).json({ error: "No analysis generated" });
       return;
     }
 
@@ -146,8 +154,14 @@ Then synthesize with the Flash Council and deliver the consensus signal.`;
     const analysis = deepSanitizeObject(rawAnalysis);
     analysis.disclaimer = "This is AI-generated analysis for educational purposes only. Not financial advice. Always do your own research.";
     incrementSignalCount(clerkId);
-    res.json(analysis);
+    if (!res.headersSent) res.json(analysis);
   } catch (error: unknown) {
+    if (res.headersSent) return;
+    if (error instanceof AIQueueOverflowError) {
+      res.set("Retry-After", String(error.retryAfterSeconds));
+      res.status(503).json({ error: "AI analysis service is at capacity. Please retry in 30 seconds.", retryAfter: error.retryAfterSeconds });
+      return;
+    }
     logger.error({ err: error, symbol: req.params.symbol }, "Stock analysis error");
     res.status(500).json({ error: "Analysis failed. Please try again." });
   }
@@ -166,32 +180,41 @@ router.post("/stocks/:symbol/quick-analyze", requireAuth, validateParams(StockSy
   }
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-5-nano",
-      messages: [
-        {
-          role: "system",
-          content: `You are a financial analysis AI. Provide a brief stock analysis. Respond in JSON: {"signal": "BUY"|"SELL"|"NEUTRAL", "confidence": <0-100>, "summary": "<2 sentences>", "keyLevel": <price number>, "risk": "LOW"|"MEDIUM"|"HIGH", "disclaimer": "AI-generated analysis. Not financial advice."}`,
-        },
-        {
-          role: "user",
-          content: `Quick analysis: ${stock.symbol} (${stock.name}) at $${stock.price}, ${stock.changePercent > 0 ? "+" : ""}${stock.changePercent}%, sector: ${stock.sector}, P/E: ${stock.pe ?? "N/A"}, 52w range: $${stock.week52Low}-$${stock.week52High}`,
-        },
-      ],
-      response_format: { type: "json_object" },
-    });
+    const abortSignal = req.timeoutAbortController?.signal;
+    const completion = await aiQueue.enqueue<OpenAICompletion>(() =>
+      openai.chat.completions.create({
+        model: "gpt-5-nano",
+        messages: [
+          {
+            role: "system",
+            content: `You are a financial analysis AI. Provide a brief stock analysis. Respond in JSON: {"signal": "BUY"|"SELL"|"NEUTRAL", "confidence": <0-100>, "summary": "<2 sentences>", "keyLevel": <price number>, "risk": "LOW"|"MEDIUM"|"HIGH", "disclaimer": "AI-generated analysis. Not financial advice."}`,
+          },
+          {
+            role: "user",
+            content: `Quick analysis: ${stock.symbol} (${stock.name}) at $${stock.price}, ${stock.changePercent > 0 ? "+" : ""}${stock.changePercent}%, sector: ${stock.sector}, P/E: ${stock.pe ?? "N/A"}, 52w range: $${stock.week52Low}-$${stock.week52High}`,
+          },
+        ],
+        response_format: { type: "json_object" },
+      }, { signal: abortSignal }) as Promise<OpenAICompletion>
+    );
 
     const content = completion.choices[0]?.message?.content;
     if (!content) {
-      res.status(500).json({ error: "No analysis generated" });
+      if (!res.headersSent) res.status(500).json({ error: "No analysis generated" });
       return;
     }
 
     const rawQuickAnalysis = JSON.parse(content);
     const quickAnalysis = deepSanitizeObject(rawQuickAnalysis);
     quickAnalysis.disclaimer = "AI-generated analysis for educational purposes only. Not financial advice. Always do your own research.";
-    res.json(quickAnalysis);
+    if (!res.headersSent) res.json(quickAnalysis);
   } catch (error: unknown) {
+    if (res.headersSent) return;
+    if (error instanceof AIQueueOverflowError) {
+      res.set("Retry-After", String(error.retryAfterSeconds));
+      res.status(503).json({ error: "AI analysis service is at capacity. Please retry in 30 seconds.", retryAfter: error.retryAfterSeconds });
+      return;
+    }
     logger.error({ err: error, symbol: req.params.symbol }, "Quick stock analysis error");
     res.status(500).json({ error: "Quick analysis failed. Please try again." });
   }

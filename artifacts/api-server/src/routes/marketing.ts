@@ -5,7 +5,7 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
-import { aiQueue } from "../lib/aiQueue";
+import { aiQueue, AIQueueOverflowError } from "../lib/aiQueue";
 import { anthropicCircuit } from "../lib/circuitBreaker";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { validateBody, z } from "../lib/validateRequest";
@@ -210,6 +210,7 @@ router.post("/marketing/generate", requireAuth, requireAdmin, validateBody(Marke
 
     const toneInstruction = tone ? TONE_INSTRUCTIONS[tone] : TONE_INSTRUCTIONS.educational;
     const contextBlock = context ? `\n\nAdditional context from the user:\n${context}` : "";
+    const abortSignal = req.timeoutAbortController?.signal;
 
     const message = await aiQueue.enqueue(() =>
       anthropicCircuit.execute(() =>
@@ -225,7 +226,7 @@ router.post("/marketing/generate", requireAuth, requireAdmin, validateBody(Marke
                   content: `Create ${platformConfig.name} content about the following topic:\n\n${topic}${contextBlock}`,
                 },
               ],
-            }),
+            }, { signal: abortSignal }),
           { label: "anthropic-marketing", maxRetries: 4 }
         )
       )
@@ -235,21 +236,29 @@ router.post("/marketing/generate", requireAuth, requireAdmin, validateBody(Marke
     const content = block && block.type === "text" ? block.text : "";
 
     if (!content) {
-      res.status(500).json({ error: "AI returned empty content. Please try again." });
+      if (!res.headersSent) res.status(500).json({ error: "AI returned empty content. Please try again." });
       return;
     }
 
-    res.json({
-      agent,
-      platform: platformConfig.name,
-      content,
-      charCount: content.length,
-      maxChars: platformConfig.maxChars,
-      tone: tone || "educational",
-      generatedAt: new Date().toISOString()
-    });
-  } catch (err: any) {
-    logger.error({ err: err }, "Marketing generate error:");
+    if (!res.headersSent) {
+      res.json({
+        agent,
+        platform: platformConfig.name,
+        content,
+        charCount: content.length,
+        maxChars: platformConfig.maxChars,
+        tone: tone || "educational",
+        generatedAt: new Date().toISOString()
+      });
+    }
+  } catch (err: unknown) {
+    if (res.headersSent) return;
+    if (err instanceof AIQueueOverflowError) {
+      res.set("Retry-After", String(err.retryAfterSeconds));
+      res.status(503).json({ error: "AI content generation is at capacity. Please retry in 30 seconds.", retryAfter: err.retryAfterSeconds });
+      return;
+    }
+    logger.error({ err }, "Marketing generate error:");
     res.status(500).json({ error: "Failed to generate content" });
   }
 });

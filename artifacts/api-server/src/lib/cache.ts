@@ -9,6 +9,7 @@ export class TTLCache<T = unknown> {
   private maxEntries: number;
   private hits = 0;
   private misses = 0;
+  private evictions = 0;
   readonly label: string;
 
   constructor(defaultTTLMs: number = 60_000, maxEntries: number = 500, label = "cache") {
@@ -27,6 +28,7 @@ export class TTLCache<T = unknown> {
     if (Date.now() > entry.expiresAt) {
       this.store.delete(key);
       this.misses++;
+      this.evictions++;
       return undefined;
     }
 
@@ -37,7 +39,10 @@ export class TTLCache<T = unknown> {
   set(key: string, data: T, ttlMs?: number): void {
     if (this.store.size >= this.maxEntries) {
       const firstKey = this.store.keys().next().value;
-      if (firstKey !== undefined) this.store.delete(firstKey);
+      if (firstKey !== undefined) {
+        this.store.delete(firstKey);
+        this.evictions++;
+      }
     }
 
     this.store.set(key, {
@@ -62,14 +67,16 @@ export class TTLCache<T = unknown> {
     return this.store.size;
   }
 
-  getStats(): { label: string; size: number; hits: number; misses: number; hitRate: number } {
+  getStats(): { label: string; size: number; maxEntries: number; hits: number; misses: number; hitRate: number; evictions: number } {
     const total = this.hits + this.misses;
     return {
       label: this.label,
       size: this.store.size,
+      maxEntries: this.maxEntries,
       hits: this.hits,
       misses: this.misses,
       hitRate: total > 0 ? Math.round((this.hits / total) * 10000) / 100 : 0,
+      evictions: this.evictions,
     };
   }
 
@@ -79,6 +86,7 @@ export class TTLCache<T = unknown> {
     for (const [key, entry] of this.store) {
       if (now > entry.expiresAt) {
         this.store.delete(key);
+        this.evictions++;
         removed++;
       }
     }

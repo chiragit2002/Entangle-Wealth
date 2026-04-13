@@ -269,7 +269,56 @@ router.post("/alerts/mark-read", requireAuth, validateBody(AlertMarkReadSchema),
   }
 });
 
+const SSE_MAX_PER_USER = 3;
+const SSE_GLOBAL_MAX = 500;
+const SSE_WARN_THRESHOLD = 0.8;
+
 const sseClients = new Map<string, Set<Response>>();
+const sseGlobalQueue: Array<{ userId: string; res: Response }> = [];
+
+export function getSseConnectionStats() {
+  return {
+    global: sseGlobalQueue.length,
+    globalMax: SSE_GLOBAL_MAX,
+    users: sseClients.size,
+  };
+}
+
+export function closeAllSseConnections(): void {
+  let closed = 0;
+  for (const { res } of sseGlobalQueue) {
+    try {
+      res.write(`event: shutdown\ndata: ${JSON.stringify({ type: "shutdown", message: "Server is shutting down." })}\n\n`);
+      res.end();
+      closed++;
+    } catch { /* connection already gone */ }
+  }
+  sseGlobalQueue.length = 0;
+  sseClients.clear();
+  logger.info({ closed }, "Closed all SSE connections for shutdown");
+}
+
+function sseRemoveClient(userId: string, res: Response): void {
+  const clients = sseClients.get(userId);
+  if (clients && clients.has(res)) {
+    clients.delete(res);
+    if (clients.size === 0) sseClients.delete(userId);
+  }
+  const idx = sseGlobalQueue.findIndex((e) => e.res === res);
+  if (idx !== -1) sseGlobalQueue.splice(idx, 1);
+}
+
+function sseEvictOldestGlobal(): void {
+  const entry = sseGlobalQueue[0];
+  if (!entry) return;
+  const { userId, res } = entry;
+  try {
+    res.write(`event: evicted\ndata: ${JSON.stringify({ type: "evicted", message: "Connection evicted due to global SSE limit." })}\n\n`);
+    res.end();
+  } catch { /* connection already gone */ }
+  sseRemoveClient(userId, res);
+  logger.warn({ userId, global: sseGlobalQueue.length, max: SSE_GLOBAL_MAX }, "Evicted oldest global SSE connection (global limit)");
+}
 
 router.get("/alerts/stream", (req: Request, res: Response) => {
   const { userId } = getAuth(req);
@@ -288,6 +337,29 @@ router.get("/alerts/stream", (req: Request, res: Response) => {
     return;
   }
 
+  if (!sseClients.has(userId)) {
+    sseClients.set(userId, new Set());
+  }
+  const userClients = sseClients.get(userId)!;
+
+  if (userClients.size >= SSE_MAX_PER_USER) {
+    const oldest = userClients.values().next().value as Response;
+    try {
+      oldest.write(`event: evicted\ndata: ${JSON.stringify({ type: "evicted", message: "Connection evicted due to per-user limit." })}\n\n`);
+      oldest.end();
+    } catch { /* connection already gone */ }
+    sseRemoveClient(userId, oldest);
+    logger.warn({ userId, perUserMax: SSE_MAX_PER_USER }, "Evicted oldest SSE connection for user (per-user limit)");
+  }
+
+  if (sseGlobalQueue.length >= SSE_GLOBAL_MAX) {
+    sseEvictOldestGlobal();
+  }
+
+  if (sseGlobalQueue.length >= Math.floor(SSE_GLOBAL_MAX * SSE_WARN_THRESHOLD)) {
+    logger.warn({ global: sseGlobalQueue.length, max: SSE_GLOBAL_MAX }, "SSE global capacity approaching limit (>80%)");
+  }
+
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
@@ -298,10 +370,8 @@ router.get("/alerts/stream", (req: Request, res: Response) => {
   res.write("data: {\"type\":\"connected\"}\n\n");
   flushSseResponse(res);
 
-  if (!sseClients.has(userId)) {
-    sseClients.set(userId, new Set());
-  }
-  sseClients.get(userId)!.add(res);
+  userClients.add(res);
+  sseGlobalQueue.push({ userId, res });
 
   const heartbeat = setInterval(() => {
     res.write(": heartbeat\n\n");
@@ -309,11 +379,7 @@ router.get("/alerts/stream", (req: Request, res: Response) => {
 
   req.on("close", () => {
     clearInterval(heartbeat);
-    const clients = sseClients.get(userId);
-    if (clients) {
-      clients.delete(res);
-      if (clients.size === 0) sseClients.delete(userId);
-    }
+    sseRemoveClient(userId, res);
   });
 });
 

@@ -266,6 +266,14 @@ export function startDailyContentScheduler(): void {
   schedulerInterval = setInterval(checkAndGenerate, 60 * 60 * 1000);
 }
 
+export function stopDailyContentScheduler(): void {
+  if (schedulerInterval) {
+    clearInterval(schedulerInterval);
+    schedulerInterval = null;
+    logger.info("Daily content scheduler stopped");
+  }
+}
+
 router.get("/daily-content/today", requireAuth, requireAdmin, async (req, res) => {
   try {
     const today = getTodayDateString();

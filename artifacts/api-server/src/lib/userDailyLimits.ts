@@ -13,8 +13,10 @@ const FREE_DAILY_SIGNALS = 3;
 const REFERRAL_BONUS_SIGNALS = 5;
 const FREE_DAILY_TAXGPT = 5;
 
-const signalUsageMap = new Map<string, { count: number; resetAt: number }>();
-const taxgptUsageMap = new Map<string, { count: number; resetAt: number }>();
+import { BoundedRateLimitMap } from "./boundedMap";
+
+const signalUsageMap = new BoundedRateLimitMap(10_000, "signalUsage");
+const taxgptUsageMap = new BoundedRateLimitMap(10_000, "taxgptUsage");
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function getDayKey(): number {

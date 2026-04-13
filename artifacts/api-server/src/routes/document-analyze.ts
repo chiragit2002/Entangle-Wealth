@@ -3,13 +3,14 @@ import { requireAuth } from "../middlewares/requireAuth";
 import { validateBody, z } from "../lib/validateRequest";
 import { logger } from "../lib/logger";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
+import { LRUMap } from "../lib/lruMap";
 
 let openai: any = null;
 try {
   const mod = await import("@workspace/integrations-openai-ai-server");
   openai = mod.openai;
-} catch {
-  logger.warn("OpenAI not available for document analysis");
+} catch (err) {
+  logger.warn({ err }, "OpenAI not available for document analysis");
 }
 
 const router = Router();
@@ -17,7 +18,7 @@ const router = Router();
 const MAX_BASE64_BYTES = 5 * 1024 * 1024;
 const MAX_CONCURRENT_PER_USER = 2;
 
-const userConcurrency = new Map<string, number>();
+const userConcurrency = new LRUMap<string, number>(5_000);
 
 function acquireSlot(userId: string): boolean {
   const current = userConcurrency.get(userId) ?? 0;

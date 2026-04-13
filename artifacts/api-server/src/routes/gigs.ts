@@ -7,12 +7,13 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import crypto from "crypto";
 import { validateBody, validateParams, validateQuery, z } from "../lib/validateRequest";
 import { logger } from "../lib/logger";
+import { BoundedRateLimitMap } from "../lib/boundedMap";
 
 const router = Router();
 
 const PUBLIC_RATE_LIMIT_WINDOW_MS = 60_000;
 const PUBLIC_RATE_LIMIT_MAX = 30;
-const publicRateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const publicRateLimitMap = new BoundedRateLimitMap(5_000, "gigs-rateLimit");
 
 function checkPublicRateLimit(req: import("express").Request): boolean {
   const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown";

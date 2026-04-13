@@ -23,6 +23,7 @@ import { evaluateStreak } from "../lib/streakUtils";
 import { calculateLevel, calculateTier, xpForLevel, xpForNextLevel, applyMultiplier, TIER_THRESHOLDS } from "@workspace/xp";
 import { logger } from "../lib/logger";
 import { triggerGiveawaySync } from "../lib/giveawaySync";
+import { BoundedRateLimitMap, BoundedCooldownMap, BoundedTimestampMap } from "../lib/boundedMap";
 
 const ChallengeIdParamsSchema = z.object({
   challengeId: z.coerce.number().int().positive(),
@@ -45,7 +46,7 @@ const router = Router();
 
 const PUBLIC_LEADERBOARD_RATE_LIMIT_WINDOW_MS = 60_000;
 const PUBLIC_LEADERBOARD_RATE_LIMIT_MAX = 30;
-const leaderboardRateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const leaderboardRateLimitMap = new BoundedRateLimitMap(5_000, "leaderboard-rateLimit");
 
 function checkLeaderboardRateLimit(req: import("express").Request): boolean {
   const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown";
@@ -269,19 +270,10 @@ async function checkAndAwardBacktesterBadges(
 }
 
 const XP_COOLDOWN_MS = 60_000;
-const xpCooldownMap = new Map<string, Map<string, number>>();
+const xpCooldownMap = new BoundedCooldownMap(10_000, XP_COOLDOWN_MS * 5, "xp-cooldown");
 
 function checkXpCooldown(clerkId: string, reason: string): boolean {
-  const now = Date.now();
-  let userMap = xpCooldownMap.get(clerkId);
-  if (!userMap) {
-    userMap = new Map();
-    xpCooldownMap.set(clerkId, userMap);
-  }
-  const lastAt = userMap.get(reason) ?? 0;
-  if (now - lastAt < XP_COOLDOWN_MS) return false;
-  userMap.set(reason, now);
-  return true;
+  return xpCooldownMap.check(clerkId, reason, XP_COOLDOWN_MS);
 }
 
 router.post("/gamification/xp", requireAuth, validateBody(XpSchema), async (req, res) => {
@@ -498,7 +490,7 @@ router.get("/gamification/challenges/me", requireAuth, async (req, res) => {
 });
 
 const CHALLENGE_PROGRESS_COOLDOWN_MS = 5_000;
-const challengeProgressCooldownMap = new Map<string, number>();
+const challengeProgressCooldownMap = new BoundedTimestampMap(10_000, CHALLENGE_PROGRESS_COOLDOWN_MS * 5, "challenge-cooldown");
 
 function checkChallengeProgressCooldown(clerkId: string, challengeId: number): boolean {
   const key = `${clerkId}:${challengeId}`;
@@ -770,7 +762,7 @@ const SPIN_REWARDS = [
   { reward: "Streak Boost", rewardType: "streak_protection", rewardValue: 1, weight: 1 },
 ];
 
-const spinRateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const spinRateLimitMap = new BoundedRateLimitMap(5_000, "spin-rateLimit");
 const SPIN_RATE_LIMIT_WINDOW = 60_000;
 const SPIN_RATE_LIMIT_MAX = 5;
 

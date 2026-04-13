@@ -6,6 +6,7 @@ import { sendZapierWebhook } from "../lib/zapierWebhook";
 import { logger } from "../lib/logger";
 import { validateBody, z } from "../lib/validateRequest";
 import crypto from "crypto";
+import { BoundedRateLimitMap } from "../lib/boundedMap";
 
 const router = Router();
 
@@ -21,7 +22,7 @@ const REQUIRES_AUTH: Set<AuthEventType> = new Set([
   "signup",
 ]);
 
-const failedEventWindow = new Map<string, { count: number; resetAt: number }>();
+const failedEventWindow = new BoundedRateLimitMap(5_000, "authEvents-failedWindow");
 const FAILED_EVENT_MAX = 10;
 const FAILED_EVENT_WINDOW_MS = 60_000;
 

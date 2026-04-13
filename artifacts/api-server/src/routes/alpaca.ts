@@ -5,6 +5,7 @@ import { validateParams, validateQuery, z } from "../lib/validateRequest";
 import { TTLCache } from "../lib/cache";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { alpacaCircuit } from "../lib/circuitBreaker";
+import { BoundedRateLimitMap } from "../lib/boundedMap";
 
 const AlpacaSymbolParamsSchema = z.object({
   symbol: z.string().min(1).max(10).regex(/^[A-Za-z]+$/),
@@ -38,7 +39,7 @@ const router = Router();
 const ALPACA_DATA_URL = "https://data.alpaca.markets";
 const ALPACA_PAPER_URL = "https://paper-api.alpaca.markets";
 
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const rateLimitMap = new BoundedRateLimitMap(5_000, "alpaca-rateLimit");
 const RATE_LIMIT = 60;
 const RATE_WINDOW = 60_000;
 

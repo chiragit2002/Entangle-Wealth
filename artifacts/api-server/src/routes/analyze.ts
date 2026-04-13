@@ -8,6 +8,7 @@ import { logger } from "../lib/logger";
 import { validateParams, validateBody, z } from "../lib/validateRequest";
 import { sanitizeAiOutput, appendDisclaimer, deepSanitizeObject } from "../middlewares/inputSanitizer";
 import { aiQueue, AIQueueOverflowError } from "../lib/aiQueue";
+import { BoundedRateLimitMap } from "../lib/boundedMap";
 
 interface OpenAICompletion {
   choices: Array<{ message: { content: string | null } }>;
@@ -15,7 +16,7 @@ interface OpenAICompletion {
 
 const router = Router();
 
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const rateLimitMap = new BoundedRateLimitMap(5_000, "analyze-rateLimit");
 const RATE_LIMIT_WINDOW = 60_000;
 const RATE_LIMIT_MAX = 10;
 

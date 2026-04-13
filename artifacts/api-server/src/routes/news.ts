@@ -355,7 +355,9 @@ async function scrapeAllFeeds(): Promise<NewsItem[]> {
   return deduped;
 }
 
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+import { BoundedRateLimitMap } from "../lib/boundedMap";
+
+const rateLimitMap = new BoundedRateLimitMap(5_000, "news-rateLimit");
 
 function newsRateLimit(req: Request, res: Response, next: NextFunction) {
   const ip = req.ip || req.socket.remoteAddress || "unknown";

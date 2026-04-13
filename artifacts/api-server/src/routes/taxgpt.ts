@@ -22,7 +22,9 @@ try {
 
 const router = Router();
 
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+import { BoundedRateLimitMap } from "../lib/boundedMap";
+
+const rateLimitMap = new BoundedRateLimitMap(5_000, "taxgpt-rateLimit");
 const RATE_LIMIT_WINDOW = 60_000;
 const RATE_LIMIT_MAX = 10;
 

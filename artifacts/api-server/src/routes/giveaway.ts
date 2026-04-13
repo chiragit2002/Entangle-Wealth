@@ -167,7 +167,7 @@ router.get("/giveaway/my-entries", requireAuth, async (req, res) => {
 // User names are anonymized to "FirstName L." server-side; no full lastName, email, or photoUrl returned.
 void PUBLIC_ENDPOINT_POLICY[4];
 router.get("/giveaway/leaderboard", validateQuery(z.object({ limit: z.coerce.number().int().min(1).max(50).optional().default(20) })), async (req, res) => {
-  const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+  const { limit } = req.query as unknown as { limit: number };
   try {
     const leaderboard = await db
       .select({

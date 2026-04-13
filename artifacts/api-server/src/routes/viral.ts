@@ -259,8 +259,7 @@ router.get("/stats/hero", async (_req, res) => {
 void PUBLIC_ENDPOINT_POLICY[1];
 router.get("/stats/recent-signups", validateQuery(PaginationQuerySchema), async (req, res) => {
   try {
-    const limit = Math.min(Math.max(parseInt(String(req.query.limit)) || 10, 1), 50);
-    const offset = Math.max(parseInt(String(req.query.offset)) || 0, 0);
+    const { limit, offset } = req.query as unknown as { limit: number; offset: number };
     const recent = await db
       .select({
         firstName: usersTable.firstName,
@@ -315,8 +314,7 @@ router.post("/viral/testimonials", requireAuth, validateBody(TestimonialSchema),
 
 router.get("/viral/testimonials", validateQuery(PaginationQuerySchema), async (req, res) => {
   try {
-    const limit = Math.min(Math.max(parseInt(String(req.query.limit)) || 20, 1), 50);
-    const offset = Math.max(parseInt(String(req.query.offset)) || 0, 0);
+    const { limit, offset } = req.query as unknown as { limit: number; offset: number };
     const testimonials = await db
       .select()
       .from(testimonialsTable)

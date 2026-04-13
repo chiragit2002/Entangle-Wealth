@@ -75,7 +75,7 @@ router.post("/resumes", requireAuth, validateBody(ResumeCreateSchema), async (re
 
 router.get("/resumes/:id", requireAuth, validateParams(IntIdParamsSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
-  const resumeId = parseInt(req.params.id);
+  const resumeId = req.params.id as unknown as number;
 
   try {
     const [resume] = await db.select().from(resumesTable)
@@ -101,7 +101,7 @@ router.get("/resumes/:id", requireAuth, validateParams(IntIdParamsSchema), async
 
 router.put("/resumes/:id", requireAuth, validateParams(IntIdParamsSchema), validateBody(ResumeUpdateSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
-  const resumeId = parseInt(req.params.id);
+  const resumeId = req.params.id as unknown as number;
   const { title, template, summary, skills, certifications, experiences, education } = req.body;
 
   try {
@@ -168,7 +168,7 @@ router.put("/resumes/:id", requireAuth, validateParams(IntIdParamsSchema), valid
 
 router.delete("/resumes/:id", requireAuth, validateParams(IntIdParamsSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
-  const resumeId = parseInt(req.params.id);
+  const resumeId = req.params.id as unknown as number;
 
   try {
     const [resume] = await db.select().from(resumesTable)

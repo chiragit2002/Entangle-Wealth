@@ -132,7 +132,7 @@ const HabitCompleteParamsSchema = z.object({
 
 router.post("/habits/:habitId/complete", requireAuth, validateParams(HabitCompleteParamsSchema), validateBody(z.object({}).strict()), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
-  const habitId = parseInt(req.params.habitId);
+  const habitId = req.params.habitId as unknown as number;
 
   try {
     const userId = await resolveUserId(clerkId, req);
@@ -303,7 +303,7 @@ router.get("/habits/summary", requireAuth, async (req, res) => {
 
 router.get("/habits/history", requireAuth, validateQuery(z.object({ limit: z.coerce.number().int().min(1).max(50).optional().default(20) })), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
-  const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+  const { limit } = req.query as unknown as { limit: number };
   try {
     const userId = await resolveUserId(clerkId, req);
     if (!userId) {

@@ -128,7 +128,7 @@ const LifeOutcomesSchema = z.object({
   monthlyExpenses: z.number().nonnegative().max(10_000_000).optional(),
 });
 
-router.post("/life-outcomes/project", validateBody(LifeOutcomesSchema), async (req, res) => {
+router.post("/life-outcomes/project", requireAuth, validateBody(LifeOutcomesSchema), async (req, res) => {
   try {
     const {
       currentAge = 30,

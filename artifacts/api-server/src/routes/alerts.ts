@@ -64,8 +64,7 @@ router.get("/alerts", requireAuth, validateQuery(PaginationQuerySchema), async (
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
   try {
-    const limit = Math.min(Math.max(parseInt(String(req.query.limit)) || 50, 1), 50);
-    const offset = Math.max(parseInt(String(req.query.offset)) || 0, 0);
+    const { limit, offset } = req.query as unknown as { limit: number; offset: number };
 
     const [totalResult] = await db
       .select({ c: count() })
@@ -158,7 +157,7 @@ router.post("/alerts", requireAuth, validateBody(AlertCreateSchema), async (req:
 router.patch("/alerts/:id", requireAuth, validateParams(IntIdParamsSchema), validateBody(AlertPatchSchema), async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
-  const alertId = parseInt(req.params.id);
+  const alertId = req.params.id as unknown as number;
   const { enabled, threshold, alertType } = req.body;
   try {
     const patch: Record<string, unknown> = { updatedAt: new Date() };
@@ -181,7 +180,7 @@ router.patch("/alerts/:id", requireAuth, validateParams(IntIdParamsSchema), vali
 router.delete("/alerts/:id", requireAuth, validateParams(IntIdParamsSchema), async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
-  const alertId = parseInt(req.params.id);
+  const alertId = req.params.id as unknown as number;
   try {
     const [deleted] = await db
       .delete(alertsTable)
@@ -199,8 +198,7 @@ router.get("/alerts/history", requireAuth, validateQuery(PaginationQuerySchema),
   const userId = req.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
   try {
-    const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
-    const offset = parseInt(req.query.offset as string) || 0;
+    const { limit, offset } = req.query as unknown as { limit: number; offset: number };
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const rows = await db

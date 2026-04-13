@@ -149,8 +149,7 @@ router.get("/token/balance", requireAuth, async (req, res) => {
 
 router.get("/token/transactions", requireAuth, validateQuery(PaginationQuerySchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
-  const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
-  const offset = parseInt(req.query.offset as string) || 0;
+  const { limit, offset } = req.query as unknown as { limit: number; offset: number };
 
   try {
     const [user] = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.clerkId, userId));
@@ -174,8 +173,7 @@ router.get("/token/transactions", requireAuth, validateQuery(PaginationQuerySche
 
 router.get("/token/rewards", requireAuth, validateQuery(PaginationQuerySchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
-  const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
-  const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
+  const { limit, offset } = req.query as unknown as { limit: number; offset: number };
 
   try {
     const [user] = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.clerkId, userId));
@@ -197,13 +195,10 @@ router.get("/token/rewards", requireAuth, validateQuery(PaginationQuerySchema), 
   }
 });
 
-// Public endpoint — approved in publicEndpointPolicy.ts (PUBLIC_ENDPOINT_POLICY[5]).
-// User names are anonymized to "FirstName L." server-side; no full lastName, email, or photoUrl returned.
 void PUBLIC_ENDPOINT_POLICY[5];
-router.get("/token/rewards/history", validateQuery(PaginationQuerySchema), async (req, res) => {
+router.get("/token/rewards/history", requireAuth, validateQuery(PaginationQuerySchema), async (req, res) => {
   try {
-    const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
-    const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
+    const { limit, offset } = req.query as unknown as { limit: number; offset: number };
     const distributions = await db
       .select({
         month: rewardDistributionsTable.month,
@@ -244,8 +239,7 @@ router.get("/token/rewards/history", validateQuery(PaginationQuerySchema), async
 
 router.get("/token/bookings", requireAuth, validateQuery(PaginationQuerySchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
-  const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
-  const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
+  const { limit, offset } = req.query as unknown as { limit: number; offset: number };
 
   try {
     const [user] = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.clerkId, userId));

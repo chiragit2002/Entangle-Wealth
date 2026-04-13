@@ -351,7 +351,7 @@ Respond in JSON format:
 
 router.get("/coaching/history", requireAuth, validateQuery(z.object({ limit: z.coerce.number().int().min(1).max(50).optional().default(20) })), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
-  const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+  const { limit } = req.query as unknown as { limit: number };
   try {
     const userId = await resolveUserId(clerkId, req);
     if (!userId) {

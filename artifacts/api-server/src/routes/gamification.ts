@@ -42,6 +42,23 @@ const XpHistoryQuerySchema = z.object({
 
 const router = Router();
 
+const PUBLIC_LEADERBOARD_RATE_LIMIT_WINDOW_MS = 60_000;
+const PUBLIC_LEADERBOARD_RATE_LIMIT_MAX = 30;
+const leaderboardRateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkLeaderboardRateLimit(req: import("express").Request): boolean {
+  const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown";
+  const now = Date.now();
+  let entry = leaderboardRateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    entry = { count: 1, resetAt: now + PUBLIC_LEADERBOARD_RATE_LIMIT_WINDOW_MS };
+    leaderboardRateLimitMap.set(ip, entry);
+    return true;
+  }
+  entry.count++;
+  return entry.count <= PUBLIC_LEADERBOARD_RATE_LIMIT_MAX;
+}
+
 router.get("/gamification/me", requireAuth, async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   try {
@@ -100,6 +117,22 @@ const XpSchema = z.object({
   category: z.enum(["trading", "gig", "community", "engagement"]),
 });
 
+const XP_COOLDOWN_MS = 60_000;
+const xpCooldownMap = new Map<string, Map<string, number>>();
+
+function checkXpCooldown(clerkId: string, reason: string): boolean {
+  const now = Date.now();
+  let userMap = xpCooldownMap.get(clerkId);
+  if (!userMap) {
+    userMap = new Map();
+    xpCooldownMap.set(clerkId, userMap);
+  }
+  const lastAt = userMap.get(reason) ?? 0;
+  if (now - lastAt < XP_COOLDOWN_MS) return false;
+  userMap.set(reason, now);
+  return true;
+}
+
 router.post("/gamification/xp", requireAuth, validateBody(XpSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
   const { reason, category } = req.body;
@@ -107,6 +140,11 @@ router.post("/gamification/xp", requireAuth, validateBody(XpSchema), async (req,
   const categoryRewards = XP_REWARDS[category];
   if (!categoryRewards || !(reason in categoryRewards)) {
     res.status(400).json({ error: "Invalid category or reason" });
+    return;
+  }
+
+  if (!checkXpCooldown(clerkId, reason)) {
+    res.status(429).json({ error: "XP award cooldown active. Please wait before awarding XP for the same action." });
     return;
   }
 
@@ -292,11 +330,27 @@ router.get("/gamification/challenges/me", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/gamification/challenges/:challengeId/progress", requireAuth, validateParams(ChallengeIdParamsSchema), validateBody(z.object({ increment: z.coerce.number().int().min(1).max(100).optional().default(1) })), async (req, res) => {
+const CHALLENGE_PROGRESS_COOLDOWN_MS = 5_000;
+const challengeProgressCooldownMap = new Map<string, number>();
+
+function checkChallengeProgressCooldown(clerkId: string, challengeId: number): boolean {
+  const key = `${clerkId}:${challengeId}`;
+  const now = Date.now();
+  const lastAt = challengeProgressCooldownMap.get(key) ?? 0;
+  if (now - lastAt < CHALLENGE_PROGRESS_COOLDOWN_MS) return false;
+  challengeProgressCooldownMap.set(key, now);
+  return true;
+}
+
+router.post("/gamification/challenges/:challengeId/progress", requireAuth, validateParams(ChallengeIdParamsSchema), validateBody(z.object({ increment: z.coerce.number().int().min(1).max(1).optional().default(1) })), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
-  const challengeId = parseInt(req.params.challengeId);
-  const rawIncrement = parseInt(req.body.increment) || 1;
-  const increment = Math.min(Math.max(rawIncrement, 1), 1);
+  const challengeId = req.params.challengeId as unknown as number;
+  const increment = 1;
+
+  if (!checkChallengeProgressCooldown(clerkId, challengeId)) {
+    res.status(429).json({ error: "Too many progress updates. Please slow down." });
+    return;
+  }
 
   try {
     const userId = await resolveUserId(clerkId, req);
@@ -349,8 +403,12 @@ router.post("/gamification/challenges/:challengeId/progress", requireAuth, valid
 // is never returned. Accessing this policy object here ensures a compile-time reference to the docs.
 void PUBLIC_ENDPOINT_POLICY[0];
 router.get("/gamification/leaderboard", validateQuery(LeaderboardQuerySchema), async (req, res) => {
+  if (!checkLeaderboardRateLimit(req)) {
+    res.status(429).json({ error: "Too many requests. Please slow down." });
+    return;
+  }
   const period = (req.query.period as string) || "monthly";
-  const limit = Math.min(parseInt(req.query.limit as string) || 100, 100);
+  const { limit } = req.query as unknown as { limit: number };
 
   try {
     const leaderboard = await db
@@ -437,7 +495,7 @@ router.get("/gamification/leaderboard/rank", requireAuth, validateQuery(PeriodQu
 
 router.get("/gamification/xp/history", requireAuth, validateQuery(XpHistoryQuerySchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
-  const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+  const { limit } = req.query as unknown as { limit: number };
   try {
     const userId = await resolveUserId(clerkId, req);
     if (!userId) {
@@ -611,7 +669,7 @@ router.post("/gamification/spin", requireAuth, validateBody(z.object({}).strict(
     const userId = await resolveUserId(clerkId, req);
     if (!userId) { res.status(404).json({ error: "User not found" }); return; }
 
-    const result = await db.transaction(async (tx) => {
+    const spinResult = await db.transaction(async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_daily_spin'))`);
 
       const now = new Date();
@@ -625,7 +683,7 @@ router.post("/gamification/spin", requireAuth, validateBody(z.object({}).strict(
 
       if (lastSpin) {
         const nextSpinAt = new Date(new Date(now).setUTCHours(24, 0, 0, 0)).toISOString();
-        return { alreadySpun: true, nextSpinAt };
+        return { alreadySpun: true as const, nextSpinAt };
       }
 
       const picked = pickWeightedReward();
@@ -637,64 +695,62 @@ router.post("/gamification/spin", requireAuth, validateBody(z.object({}).strict(
         rewardValue: picked.rewardValue,
       }).onConflictDoNothing();
 
-      return { alreadySpun: false, picked, now };
+      const [founder] = await tx.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
+      const founderMultiplier = founder?.xpMultiplier || 1.0;
+
+      let [streak] = await tx.select().from(streaksTable).where(eq(streaksTable.userId, userId));
+      if (!streak) {
+        [streak] = await tx.insert(streaksTable).values({ userId, currentStreak: 0, longestStreak: 0, multiplier: 1.0 }).returning();
+      }
+
+      const { newStreak: spinNewStreak, alreadyActive: spinAlreadyActive } = evaluateStreak(streak.lastActivityDate, streak.currentStreak, now);
+
+      let newStreak = streak.currentStreak;
+      if (!spinAlreadyActive) {
+        newStreak = spinNewStreak;
+        const newMultiplier = Math.min(1.0 + (newStreak - 1) * 0.1, 3.0);
+        const newLongest = Math.max(streak.longestStreak, newStreak);
+        [streak] = await tx.update(streaksTable)
+          .set({ currentStreak: newStreak, longestStreak: newLongest, lastActivityDate: now, multiplier: newMultiplier, updatedAt: now })
+          .where(eq(streaksTable.userId, userId))
+          .returning();
+      }
+
+      let streakBonus = 0;
+      if (newStreak >= 7) streakBonus = 200;
+      else if (newStreak >= 3) streakBonus = 50;
+
+      if (picked.rewardType === "xp") {
+        let [xpRow] = await tx.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+        if (!xpRow) {
+          [xpRow] = await tx.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
+        }
+        const baseXp = applyMultiplier(picked.rewardValue, founderMultiplier) + streakBonus;
+        const newTotalXp = xpRow.totalXp + baseXp;
+        const newLevel = calculateLevel(newTotalXp);
+        const newTier = calculateTier(newLevel, newTotalXp);
+        await tx.update(userXpTable).set({
+          totalXp: newTotalXp, level: newLevel, tier: newTier,
+          monthlyXp: xpRow.monthlyXp + baseXp,
+          weeklyXp: xpRow.weeklyXp + baseXp,
+          updatedAt: new Date(),
+        }).where(eq(userXpTable.userId, userId));
+        await tx.insert(xpTransactionsTable).values({ userId, amount: baseXp, reason: "daily_spin", category: "engagement" });
+      } else if (picked.rewardType === "multiplier") {
+        await tx.update(streaksTable).set({ multiplier: Math.min(3.0, picked.rewardValue), updatedAt: new Date() }).where(eq(streaksTable.userId, userId));
+      } else if (picked.rewardType === "streak_protection") {
+        await tx.update(streaksTable).set({ longestStreak: Math.max(streak.longestStreak, newStreak + 1), updatedAt: new Date() }).where(eq(streaksTable.userId, userId));
+      }
+
+      return { alreadySpun: false as const, picked, founderMultiplier, streakBonus, newStreak };
     });
 
-    if (result.alreadySpun) {
-      res.status(429).json({ error: "Already spun today", nextSpinAt: result.nextSpinAt });
+    if (spinResult.alreadySpun) {
+      res.status(429).json({ error: "Already spun today", nextSpinAt: spinResult.nextSpinAt });
       return;
     }
 
-    const picked = result.picked!;
-    const now = result.now!;
-
-    const [founder] = await db.select().from(founderStatusTable).where(eq(founderStatusTable.userId, userId));
-    const founderMultiplier = founder?.xpMultiplier || 1.0;
-
-    let [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
-    if (!streak) {
-      [streak] = await db.insert(streaksTable).values({ userId, currentStreak: 0, longestStreak: 0, multiplier: 1.0 }).returning();
-    }
-
-    const { newStreak: spinNewStreak, alreadyActive: spinAlreadyActive } = evaluateStreak(streak.lastActivityDate, streak.currentStreak, now);
-
-    let newStreak = streak.currentStreak;
-    if (!spinAlreadyActive) {
-      newStreak = spinNewStreak;
-      const newMultiplier = Math.min(1.0 + (newStreak - 1) * 0.1, 3.0);
-      const newLongest = Math.max(streak.longestStreak, newStreak);
-      [streak] = await db.update(streaksTable)
-        .set({ currentStreak: newStreak, longestStreak: newLongest, lastActivityDate: now, multiplier: newMultiplier, updatedAt: now })
-        .where(eq(streaksTable.userId, userId))
-        .returning();
-    }
-
-    let streakBonus = 0;
-    if (newStreak >= 7) streakBonus = 200;
-    else if (newStreak >= 3) streakBonus = 50;
-
-    if (picked.rewardType === "xp") {
-      let [xpRow] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
-      if (!xpRow) {
-        [xpRow] = await db.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
-      }
-      const baseXp = applyMultiplier(picked.rewardValue, founderMultiplier) + streakBonus;
-      const newTotalXp = xpRow.totalXp + baseXp;
-      const newLevel = calculateLevel(newTotalXp);
-      const newTier = calculateTier(newLevel, newTotalXp);
-      await db.update(userXpTable).set({
-        totalXp: newTotalXp, level: newLevel, tier: newTier,
-        monthlyXp: xpRow.monthlyXp + baseXp,
-        weeklyXp: xpRow.weeklyXp + baseXp,
-        updatedAt: new Date(),
-      }).where(eq(userXpTable.userId, userId));
-      await db.insert(xpTransactionsTable).values({ userId, amount: baseXp, reason: "daily_spin", category: "engagement" });
-    } else if (picked.rewardType === "multiplier") {
-      await db.update(streaksTable).set({ multiplier: Math.min(3.0, picked.rewardValue), updatedAt: new Date() }).where(eq(streaksTable.userId, userId));
-    } else if (picked.rewardType === "streak_protection") {
-      await db.update(streaksTable).set({ longestStreak: Math.max(streak.longestStreak, newStreak + 1), updatedAt: new Date() }).where(eq(streaksTable.userId, userId));
-    }
-
+    const { picked, founderMultiplier, streakBonus, newStreak } = spinResult;
     const nextSpinAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
     res.json({ reward: picked.reward, rewardType: picked.rewardType, rewardValue: picked.rewardValue, founderMultiplier, streakBonus, newStreak, nextSpinAt });
   } catch (error) {

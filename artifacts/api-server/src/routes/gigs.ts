@@ -10,6 +10,23 @@ import { logger } from "../lib/logger";
 
 const router = Router();
 
+const PUBLIC_RATE_LIMIT_WINDOW_MS = 60_000;
+const PUBLIC_RATE_LIMIT_MAX = 30;
+const publicRateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkPublicRateLimit(req: import("express").Request): boolean {
+  const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown";
+  const now = Date.now();
+  let entry = publicRateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    entry = { count: 1, resetAt: now + PUBLIC_RATE_LIMIT_WINDOW_MS };
+    publicRateLimitMap.set(ip, entry);
+    return true;
+  }
+  entry.count++;
+  return entry.count <= PUBLIC_RATE_LIMIT_MAX;
+}
+
 const GigsQuerySchema = z.object({
   category: z.string().max(100).optional(),
   q: z.string().max(200).optional(),
@@ -27,6 +44,10 @@ const MOCK_GIGS = [
 ];
 
 router.get("/gigs", validateQuery(GigsQuerySchema), async (req, res) => {
+  if (!checkPublicRateLimit(req)) {
+    res.status(429).json({ error: "Too many requests. Please slow down." });
+    return;
+  }
   const { category, q } = req.query;
   try {
     const conditions = [eq(gigsTable.isActive, true)];

@@ -193,7 +193,7 @@ router.post("/users/sync", requireAuth, validateBody(UserSyncSchema), async (req
           .select()
           .from(usersTable)
           .where(eq(usersTable.referralCode, req.body.referredBy));
-        if (referrer) {
+        if (referrer && referrer.clerkId !== clerkId) {
           try {
             await db.insert(referralsTable).values({
               referrerId: referrer.clerkId,

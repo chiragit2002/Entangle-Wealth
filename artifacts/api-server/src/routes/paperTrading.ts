@@ -190,10 +190,14 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
           .where(eq(paperPortfoliosTable.userId, dbUserId));
 
         const newQty = existingPos.quantity - qty;
-        await tx
-          .update(paperPositionsTable)
-          .set({ quantity: newQty, updatedAt: new Date() })
-          .where(eq(paperPositionsTable.id, existingPos.id));
+        if (newQty === 0) {
+          await tx.delete(paperPositionsTable).where(eq(paperPositionsTable.id, existingPos.id));
+        } else {
+          await tx
+            .update(paperPositionsTable)
+            .set({ quantity: newQty, updatedAt: new Date() })
+            .where(eq(paperPositionsTable.id, existingPos.id));
+        }
       }
 
       await tx.insert(paperTradesTable).values({

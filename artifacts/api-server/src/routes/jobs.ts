@@ -18,8 +18,8 @@ const JobsSearchQuerySchema = z.object({
 });
 
 router.get("/jobs/search", validateQuery(JobsSearchQuerySchema), async (req, res) => {
-  const { q, location, type, remote, page } = req.query;
-  const pageNum = parseInt(page as string) || 1;
+  const { q, location, type, remote } = req.query;
+  const { page: pageNum } = req.query as unknown as { page: number };
 
   try {
     const query = (q as string) || "software developer";
@@ -195,7 +195,7 @@ router.post("/jobs/save", requireAuth, validateBody(SaveJobSchema), async (req, 
 
 router.delete("/jobs/saved/:id", requireAuth, validateParams(IntIdParamsSchema), async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;
-  const jobId = parseInt(req.params.id);
+  const jobId = req.params.id as unknown as number;
 
   try {
     await db.delete(savedJobsTable)

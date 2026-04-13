@@ -158,7 +158,7 @@ router.get("/alpaca/bars/:symbol", validateParams(AlpacaBarsParamsSchema), valid
   try {
     const symbol = req.params.symbol.toUpperCase();
     const timeframe = (req.query.timeframe as string) || "1Day";
-    const limit = Math.min(parseInt(req.query.limit as string) || 60, 1000);
+    const { limit } = req.query as unknown as { limit: number };
     const start = req.query.start as string | undefined;
     const end = req.query.end as string | undefined;
 
@@ -204,7 +204,7 @@ router.get("/alpaca/multibars", validateQuery(AlpacaMultiBarsQuerySchema), async
   try {
     const symbols = (req.query.symbols as string) || "";
     const timeframe = (req.query.timeframe as string) || "1Day";
-    const limit = Math.min(parseInt(req.query.limit as string) || 30, 200);
+    const { limit } = req.query as unknown as { limit: number };
     if (!symbols) {
       res.status(400).json({ error: "symbols query param required" });
       return;

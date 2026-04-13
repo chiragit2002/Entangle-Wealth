@@ -382,8 +382,7 @@ router.get("/news", validateQuery(NewsQuerySchema), async (req: Request, res: Re
   try {
     const topic = (req.query.topic as string) || "";
     const search = (req.query.search as string) || "";
-    const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
-    const offset = parseInt(req.query.offset as string) || 0;
+    const { limit, offset } = req.query as unknown as { limit: number; offset: number };
 
     const newsCacheKey = `news:${topic}:${search}:${limit}:${offset}`;
     const cached = newsCache.get(newsCacheKey);

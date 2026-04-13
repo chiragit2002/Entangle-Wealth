@@ -36,7 +36,7 @@ export function createSecurityRouter(app: Express) {
     requireAdmin,
     validateQuery(z.object({ limit: z.coerce.number().int().min(1).max(200).optional().default(50) })),
     (req, res) => {
-      const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
+      const { limit } = req.query as unknown as { limit: number };
       const alerts = getSecurityAlerts(limit);
       res.json({ alerts, total: alerts.length });
     }

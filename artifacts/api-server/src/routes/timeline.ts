@@ -376,8 +376,7 @@ router.get("/timeline/saved", requireAuth, async (req, res) => {
 
 router.get("/timeline/:id", requireAuth, validateParams(TimelineIdParamsSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
-  const timelineId = parseInt(req.params.id);
-  if (isNaN(timelineId)) { res.status(400).json({ error: "Invalid ID" }); return; }
+  const timelineId = req.params.id as unknown as number;
 
   try {
     const userId = await resolveUserId(clerkId, req);
@@ -399,8 +398,7 @@ router.get("/timeline/:id", requireAuth, validateParams(TimelineIdParamsSchema),
 
 router.delete("/timeline/:id", requireAuth, validateParams(TimelineIdParamsSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
-  const timelineId = parseInt(req.params.id);
-  if (isNaN(timelineId)) { res.status(400).json({ error: "Invalid ID" }); return; }
+  const timelineId = req.params.id as unknown as number;
 
   try {
     const userId = await resolveUserId(clerkId, req);

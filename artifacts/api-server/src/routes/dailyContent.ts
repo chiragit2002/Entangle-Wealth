@@ -7,7 +7,7 @@ import { aiQueue } from "../lib/aiQueue";
 import { anthropicCircuit } from "../lib/circuitBreaker";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { logger } from "../lib/logger";
-import { validateBody, validateParams, z } from "../lib/validateRequest";
+import { validateBody, validateParams, validateQuery, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -296,9 +296,9 @@ router.get("/daily-content/today", requireAuth, requireAdmin, async (req, res) =
   }
 });
 
-router.get("/daily-content/history", requireAuth, requireAdmin, async (req, res) => {
+router.get("/daily-content/history", requireAuth, requireAdmin, validateQuery(z.object({ limit: z.coerce.number().int().min(1).max(90).optional().default(30) })), async (req, res) => {
   try {
-    const limit = Math.min(parseInt((req.query.limit as string) || "30", 10), 90);
+    const { limit } = req.query as unknown as { limit: number };
     const client = await pool.connect();
     try {
       const result = await client.query(

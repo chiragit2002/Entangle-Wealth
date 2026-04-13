@@ -129,8 +129,7 @@ router.post("/support/tickets", requireAuth, imageCompressionMiddleware, validat
 
 router.get("/support/tickets", requireAuth, validateQuery(PaginationQuerySchema), async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
-  const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
-  const offset = parseInt(req.query.offset as string) || 0;
+  const { limit, offset } = req.query as unknown as { limit: number; offset: number };
 
   try {
     const result = await db.execute(sql`
@@ -160,8 +159,7 @@ const AdminTicketsQuerySchema = PaginationQuerySchema.extend({
 router.get("/support/admin/tickets", requireAuth, requireAdmin, validateQuery(AdminTicketsQuerySchema), async (req: Request, res: Response) => {
   try {
     const statusFilter = (req.query.status as string) || "";
-    const limit = Math.min(parseInt(req.query.limit as string) || 50, 50);
-    const offset = parseInt(req.query.offset as string) || 0;
+    const { limit, offset } = req.query as unknown as { limit: number; offset: number };
 
     let result;
     let totalResult;
@@ -199,7 +197,7 @@ router.get("/support/admin/tickets", requireAuth, requireAdmin, validateQuery(Ad
 
 router.patch("/support/admin/tickets/:id", requireAuth, requireAdmin, validateParams(IntIdParamsSchema), validateBody(TicketPatchSchema), async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
-  const ticketId = parseInt(req.params.id, 10);
+  const ticketId = req.params.id as unknown as number;
   const { status, adminNotes } = req.body;
 
   try {
@@ -239,8 +237,7 @@ router.get("/status/services", async (_req: Request, res: Response) => {
 
 router.get("/status/incidents", validateQuery(PaginationQuerySchema), async (req: Request, res: Response) => {
   try {
-    const limit = Math.min(Math.max(parseInt(String(req.query.limit)) || 50, 1), 50);
-    const offset = Math.max(parseInt(String(req.query.offset)) || 0, 0);
+    const { limit, offset } = req.query as unknown as { limit: number; offset: number };
     const result = await db.execute(sql`
       SELECT id, service_name, title, description, severity, status, created_at, resolved_at
       FROM status_incidents

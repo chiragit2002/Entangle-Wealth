@@ -6,7 +6,7 @@ import { db } from "@workspace/db";
 import { userFeedbackTable } from "@workspace/db/schema";
 import { sql, eq } from "drizzle-orm";
 import { logger } from "../lib/logger";
-import { validateBody, validateQuery, PaginationQuerySchema, z } from "../lib/validateRequest";
+import { validateBody, validateQuery, validateParams, IntIdParamsSchema, PaginationQuerySchema, z } from "../lib/validateRequest";
 
 const router = Router();
 
@@ -49,8 +49,7 @@ router.post("/feedback", requireAuth, validateBody(FeedbackCreateSchema), async 
 
 router.get("/feedback/mine", requireAuth, validateQuery(PaginationQuerySchema), async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
-  const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
-  const offset = parseInt(req.query.offset as string) || 0;
+  const { limit, offset } = req.query as unknown as { limit: number; offset: number };
 
   try {
     const result = await db.execute(sql`
@@ -74,8 +73,7 @@ router.get("/feedback/mine", requireAuth, validateQuery(PaginationQuerySchema), 
 });
 
 router.get("/feedback/admin", requireAuth, requireAdmin, validateQuery(FeedbackQuerySchema), async (req: Request, res: Response) => {
-  const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
-  const offset = parseInt(req.query.offset as string) || 0;
+  const { limit, offset } = req.query as unknown as { limit: number; offset: number };
   const category = req.query.category as string | undefined;
   const days = (req.query.days as number | undefined) || 30;
   const minRating = (req.query.minRating as number | undefined) || 1;
@@ -184,14 +182,10 @@ router.get("/feedback/admin", requireAuth, requireAdmin, validateQuery(FeedbackQ
   }
 });
 
-router.patch("/feedback/admin/:id", requireAuth, requireAdmin, validateBody(AdminFeedbackResponseSchema), async (req: Request, res: Response) => {
+router.patch("/feedback/admin/:id", requireAuth, requireAdmin, validateParams(IntIdParamsSchema), validateBody(AdminFeedbackResponseSchema), async (req: Request, res: Response) => {
   const { userId } = req as AuthenticatedRequest;
-  const feedbackId = parseInt(req.params.id, 10);
+  const feedbackId = req.params.id as unknown as number;
   const { adminResponse } = req.body;
-
-  if (isNaN(feedbackId)) {
-    return res.status(400).json({ error: "Invalid feedback ID" });
-  }
 
   try {
     const updated = await db

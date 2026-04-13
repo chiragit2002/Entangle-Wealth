@@ -36,8 +36,7 @@ router.get("/stocks", validateQuery(StocksQuerySchema), (req, res) => {
   const query = (req.query.q as string) || "";
   const sector = req.query.sector as string | undefined;
   const capTier = req.query.capTier as string | undefined;
-  const page = Math.max(1, parseInt(req.query.page as string) || 1);
-  const limit = Math.max(1, Math.min(parseInt(req.query.limit as string) || 50, 50));
+  const { page, limit } = req.query as unknown as { page: number; limit: number };
   const sortBy = (req.query.sortBy as string) || "symbol";
   const sortDir = (req.query.sortDir as string) === "desc" ? "desc" : "asc";
 

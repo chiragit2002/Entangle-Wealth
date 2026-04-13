@@ -19,6 +19,7 @@ import {
   GitBranch,
   Brain,
   FileSearch,
+  ArrowRight,
 } from "lucide-react";
 import { fetchWithRetry } from "@/lib/api";
 import { EmailCapture } from "@/components/EmailCapture";
@@ -147,6 +148,66 @@ function useAnimatedNumber(target: number, duration = 800): number {
     };
   }, [target, duration]);
   return displayed;
+}
+
+function useScrollReveal() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.12 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, visible };
+}
+
+function RevealSection({
+  children,
+  className = "",
+  delay = 0,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+}) {
+  const { ref, visible } = useScrollReveal();
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(28px)",
+        transition: `opacity 0.65s ease ${delay}ms, transform 0.65s ease ${delay}ms`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function SectionBridge({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex flex-col items-center py-6 px-4 select-none" aria-hidden="true">
+      <div className="w-px h-8 bg-gradient-to-b from-white/5 to-white/15" />
+      <p className="mt-3 text-[11px] font-semibold tracking-widest uppercase text-white/25 text-center max-w-xs">
+        {children}
+      </p>
+      <div className="mt-3 w-px h-8 bg-gradient-to-b from-white/15 to-white/5" />
+    </div>
+  );
 }
 
 function InlineError({ message, retry }: { message: string; retry?: () => void }) {
@@ -732,232 +793,383 @@ export default function Home() {
         {/* Social proof ticker */}
         <SocialProofTicker />
 
-        {/* Your Edge */}
-        <YourEdgeSection />
+        {/* Bridge: Hero → Problem */}
+        <SectionBridge>Sound familiar?</SectionBridge>
 
-        {/* Problem + Solution */}
-        <section className="py-16 lg:py-24 px-4 border-t border-white/5">
-          <div className="container mx-auto max-w-2xl text-center space-y-6">
-            <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00FF41]/60">
-              Sound familiar?
-            </p>
-            <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
-              The money guilt is real — and it compounds every month you wait.
-            </h2>
-            <p className="text-base text-white/50 max-w-lg mx-auto leading-relaxed">
-              We look at your actual situation and tell you exactly what to do next. Specific. Actionable.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-              {[
-                {
-                  title: "Clarity",
-                  desc: "Your full financial picture in one place. No more guessing.",
-                  color: "text-[#00c8f8]",
-                  border: "border-[#00c8f8]/20",
-                },
-                {
-                  title: "Simplicity",
-                  desc: "Cut through the noise. Just the next right move — in plain language.",
-                  color: "text-[#00e676]",
-                  border: "border-[#00e676]/20",
-                },
-                {
-                  title: "Confidence",
-                  desc: "Act without second-guessing. Know why, not just what.",
-                  color: "text-[#f5c842]",
-                  border: "border-[#f5c842]/20",
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className={`bloomberg-panel p-5 text-left border ${item.border}`}
-                >
-                  <p className={`text-base font-bold mb-2 ${item.color}`}>{item.title}</p>
-                  <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
-                </div>
-              ))}
+        {/* Problem */}
+        <section className="py-16 lg:py-24 px-4">
+          <RevealSection>
+            <div className="container mx-auto max-w-2xl text-center space-y-6">
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00c8f8]/60">
+                You're not alone
+              </p>
+              <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
+                The money guilt is real — and it compounds every month you wait.
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+                {[
+                  {
+                    text: "You've got income coming in, but you're still not sure if you're saving enough, investing right, or just bleeding money you can't account for.",
+                  },
+                  {
+                    text: "You've downloaded the apps, read the Reddit threads, watched the YouTube videos. You still don't know what to do with YOUR situation.",
+                  },
+                  {
+                    text: "You keep telling yourself you'll figure it out next month. Next month becomes next year. And the gap keeps growing.",
+                  },
+                ].map((item, i) => (
+                  <RevealSection key={i} delay={i * 80}>
+                    <div className="glass-panel rounded-2xl p-5 text-sm text-white/60 leading-relaxed text-left h-full">
+                      {item.text}
+                    </div>
+                  </RevealSection>
+                ))}
+              </div>
             </div>
-          </div>
+          </RevealSection>
         </section>
+
+        {/* Bridge: Problem → Solution */}
+        <SectionBridge>There's a better way</SectionBridge>
+
+        {/* Solution */}
+        <section className="py-16 lg:py-24 px-4">
+          <RevealSection>
+            <div className="container mx-auto max-w-2xl text-center space-y-6">
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00e676]/60">
+                Here's the difference
+              </p>
+              <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
+                Stop drowning in information. Start getting answers.
+              </h2>
+              <p className="text-base text-white/50 max-w-lg mx-auto leading-relaxed">
+                We look at your actual situation — not some hypothetical average person — and tell you
+                exactly what to do next. Specific. Actionable. No degree required.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+                {[
+                  {
+                    title: "Clarity",
+                    desc: "See your full financial picture in one place. No more guessing, no more avoidance.",
+                    color: "text-[#00c8f8]",
+                    border: "border-[#00c8f8]/20",
+                  },
+                  {
+                    title: "Simplicity",
+                    desc: "We cut through the noise so you don't have to. Just the next right move — in plain language.",
+                    color: "text-[#00e676]",
+                    border: "border-[#00e676]/20",
+                  },
+                  {
+                    title: "Confidence",
+                    desc: "Act without the second-guessing. Know why you're doing it, not just what to do.",
+                    color: "text-[#f5c842]",
+                    border: "border-[#f5c842]/20",
+                  },
+                ].map((item, i) => (
+                  <RevealSection key={item.title} delay={i * 80}>
+                    <div className={`glass-panel rounded-2xl p-5 text-left border ${item.border} h-full`}>
+                      <p className={`text-base font-bold mb-2 ${item.color}`}>{item.title}</p>
+                      <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
+                    </div>
+                  </RevealSection>
+                ))}
+              </div>
+            </div>
+          </RevealSection>
+        </section>
+
+        {/* Bridge: Solution → How It Works */}
+        <SectionBridge>Here's exactly how it works</SectionBridge>
 
         {/* How It Works */}
-        <section className="py-16 lg:py-24 px-4 border-t border-white/5">
-          <div className="container mx-auto max-w-3xl">
-            <div className="text-center mb-12">
-              <p className="text-[11px] font-semibold tracking-widest uppercase text-white/30 mb-3">
-                How it works
-              </p>
-              <h2 className="text-2xl md:text-4xl font-bold text-white">
-                Three steps to financial control
-              </h2>
+        <section className="py-16 lg:py-24 px-4">
+          <RevealSection>
+            <div className="container mx-auto max-w-3xl">
+              <div className="text-center mb-12">
+                <p className="text-[11px] font-semibold tracking-widest uppercase text-white/30 mb-3">
+                  How it works
+                </p>
+                <h2 className="text-2xl md:text-4xl font-bold text-white">
+                  Three steps. Finally, some answers.
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {[
+                  {
+                    num: "1",
+                    title: "Tell us where you are",
+                    desc: "No 47-question form. No linking accounts. Just the basics — enough to give you something real.",
+                    color: "text-[#00c8f8]",
+                    bg: "bg-[#00c8f8]/10",
+                  },
+                  {
+                    num: "2",
+                    title: "We do the heavy lifting",
+                    desc: "Multiple AI models analyze your picture simultaneously. When they agree, we tell you — with confidence scores and clear reasoning.",
+                    color: "text-[#00e676]",
+                    bg: "bg-[#00e676]/10",
+                  },
+                  {
+                    num: "3",
+                    title: "You move forward",
+                    desc: "Not 'consider your options.' An actual next step. The one thing that will make the biggest difference given your specific situation.",
+                    color: "text-[#f5c842]",
+                    bg: "bg-[#f5c842]/10",
+                  },
+                ].map((step, i) => (
+                  <RevealSection key={step.num} delay={i * 100}>
+                    <div className="glass-panel p-6 rounded-2xl flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300 h-full">
+                      <div
+                        className={`w-9 h-9 rounded-full flex items-center justify-center ${step.bg} ${step.color} text-base font-bold flex-shrink-0`}
+                      >
+                        {step.num}
+                      </div>
+                      <h3 className="text-base font-bold text-white mb-2">{step.title}</h3>
+                      <p className="text-sm text-white/50 leading-relaxed">{step.desc}</p>
+                    </div>
+                  </RevealSection>
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {[
-                {
-                  num: "1",
-                  title: "Tell us where you are",
-                  desc: "Three quick questions. No forms.",
-                  color: "text-[#00FF41]",
-                  bg: "bg-[#00FF41]/10",
-                },
-                {
-                  num: "2",
-                  title: "Get your next step",
-                  desc: "Specific guidance for your situation.",
-                  color: "text-[#00FF41]",
-                  bg: "bg-[#00FF41]/10",
-                },
-                {
-                  num: "3",
-                  title: "Act with clarity",
-                  desc: "Know exactly what to do — and why.",
-                  color: "text-[#FFB800]",
-                  bg: "bg-[#FFB800]/10",
-                },
-              ].map((step) => (
-                <div
-                  key={step.num}
-                  className="bloomberg-panel p-6 flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300"
-                >
-                  <div
-                    className={`w-9 h-9 rounded-full flex items-center justify-center ${step.bg} ${step.color} text-base font-bold flex-shrink-0`}
-                  >
-                    {step.num}
-                  </div>
-                  <h3 className="text-base font-bold text-white mb-2">{step.title}</h3>
-                  <p className="text-sm text-white/50 leading-relaxed">{step.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          </RevealSection>
         </section>
 
+        {/* Bridge: How It Works → Your Edge */}
+        <SectionBridge>See your edge</SectionBridge>
+
+        {/* Your Edge */}
+        <RevealSection>
+          <YourEdgeSection />
+        </RevealSection>
+
+        {/* Bridge: Your Edge → Transformation */}
+        <SectionBridge>What changes when you have clarity</SectionBridge>
+
+        {/* Transformation */}
+        <section className="py-16 lg:py-24 px-4">
+          <RevealSection>
+            <div className="container mx-auto max-w-3xl">
+              <div className="text-center mb-10">
+                <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00e676]/60 mb-3">
+                  The shift
+                </p>
+                <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
+                  From overwhelmed to in control
+                </h2>
+                <p className="mt-3 text-sm text-white/50 max-w-md mx-auto leading-relaxed">
+                  Here's what members tell us changes once they have a clear next step.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <RevealSection delay={0}>
+                  <div className="glass-panel rounded-2xl p-6 border border-white/[0.08] h-full">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-5">Before</p>
+                    <div className="space-y-4">
+                      {[
+                        "Avoiding bank statements because they spike anxiety",
+                        "Saving random amounts with no idea if it's enough",
+                        "Second-guessing every financial decision for weeks",
+                        "Feeling behind compared to everyone else",
+                      ].map((text) => (
+                        <div key={text} className="flex items-start gap-3">
+                          <div className="w-4 h-4 rounded-full border border-white/15 flex-shrink-0 mt-0.5" />
+                          <p className="text-sm text-white/40 leading-relaxed">{text}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </RevealSection>
+
+                <RevealSection delay={120}>
+                  <div className="glass-panel rounded-2xl p-6 border border-[#00e676]/20 h-full">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#00e676]/60 mb-5">After</p>
+                    <div className="space-y-4">
+                      {[
+                        "A clear, specific action to take this week",
+                        "Knowing exactly how much to save and where",
+                        "Decisions made with confidence, not guesswork",
+                        "A plan that fits your life — not someone else's",
+                      ].map((text) => (
+                        <div key={text} className="flex items-start gap-3">
+                          <CheckCircle className="w-4 h-4 text-[#00e676] flex-shrink-0 mt-0.5" />
+                          <p className="text-sm text-white/70 leading-relaxed">{text}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </RevealSection>
+              </div>
+
+              <RevealSection delay={200}>
+                <div className="mt-6 flex items-center justify-center gap-3 px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <ArrowRight className="w-4 h-4 text-[#00c8f8] flex-shrink-0" />
+                  <p className="text-sm text-white/50 leading-relaxed">
+                    Most members report feeling noticeably clearer within their first session.
+                  </p>
+                </div>
+              </RevealSection>
+            </div>
+          </RevealSection>
+        </section>
+
+        {/* Bridge: Transformation → Testimonials */}
+        <SectionBridge>Don't just take our word for it</SectionBridge>
+
+        {/* Testimonials */}
+        <section className="py-16 lg:py-24 px-4">
+          <RevealSection>
+            <div className="container mx-auto max-w-3xl">
+              <div className="text-center mb-10">
+                <h2 className="text-2xl md:text-4xl font-bold text-white mb-3">
+                  What members are saying
+                </h2>
+                <p className="text-sm text-white/50">Real experiences from Entangled Wealth users.</p>
+              </div>
+
+              {testimonialsState.error && (
+                <InlineError message="Couldn't load member reviews right now. Please refresh to try again." />
+              )}
+
+              {!testimonialsState.error && !testimonialsState.loading && testimonialsState.data === null && (
+                <p className="text-center text-sm text-white/30">No reviews yet — be the first!</p>
+              )}
+
+              {testimonialsState.data && testimonialsState.data.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {testimonialsState.data.slice(0, 6).map((t, i) => (
+                    <RevealSection key={t.id} delay={i * 60}>
+                      <div className="glass-panel rounded-xl p-5 flex flex-col gap-3 h-full">
+                        <div className="flex gap-0.5">
+                          {Array.from({ length: 5 }).map((_, j) => (
+                            <Star
+                              key={j}
+                              className={`w-3.5 h-3.5 ${
+                                j < t.rating
+                                  ? "text-[#FFD700] fill-[#FFD700]"
+                                  : "text-white/10 fill-white/10"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <p className="text-sm text-white/70 leading-relaxed flex-1">"{t.message}"</p>
+                        <div className="flex items-center gap-2 pt-3 border-t border-white/5">
+                          <div className="w-7 h-7 rounded-full bg-[#00c8f8]/20 flex items-center justify-center text-xs font-bold text-[#00c8f8]">
+                            {t.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-white">{t.name}</p>
+                            {t.role && <p className="text-[10px] text-white/30">{t.role}</p>}
+                          </div>
+                        </div>
+                      </div>
+                    </RevealSection>
+                  ))}
+                </div>
+              )}
+            </div>
+          </RevealSection>
+        </section>
+
+        {/* Bridge: Testimonials → Trust */}
+        <SectionBridge>Why we're different</SectionBridge>
+
+        {/* Trust */}
+        <section className="py-16 lg:py-24 px-4">
+          <RevealSection>
+            <div className="container mx-auto max-w-2xl text-center space-y-6">
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-white/30 mb-3">
+                Why people trust us
+              </p>
+              <h2 className="text-2xl md:text-4xl font-bold text-white">
+                Built to simplify, not overwhelm.
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 text-left">
+                {[
+                  {
+                    icon: CheckCircle,
+                    color: "text-[#00e676]",
+                    title: "No confusing financial jargon",
+                    desc: "Every piece of guidance is written for real people, not finance professionals.",
+                  },
+                  {
+                    icon: ShieldCheck,
+                    color: "text-[#00c8f8]",
+                    title: "Your privacy is protected",
+                    desc: "Your data is encrypted and never sold. You're a person, not a product.",
+                  },
+                  {
+                    icon: Lock,
+                    color: "text-[#f5c842]",
+                    title: "No pressure, no upsells",
+                    desc: "Start free and upgrade only if you want more. No gotchas, no dark patterns.",
+                  },
+                  {
+                    icon: Heart,
+                    color: "text-[#ff8888]",
+                    title: "Designed for your peace of mind",
+                    desc: "We measure success by how much clearer and calmer you feel about your finances.",
+                  },
+                ].map((item, i) => (
+                  <RevealSection key={item.title} delay={i * 70}>
+                    <div className="glass-panel rounded-2xl p-5 flex gap-4 h-full">
+                      <item.icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${item.color}`} />
+                      <div>
+                        <p className="text-sm font-semibold text-white mb-1">{item.title}</p>
+                        <p className="text-xs text-white/50 leading-relaxed">{item.desc}</p>
+                      </div>
+                    </div>
+                  </RevealSection>
+                ))}
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-sm text-white/30 font-medium">
+                <span>{stats.accuracy}% guidance accuracy</span>
+                <span>·</span>
+                <span>{animatedMembers.toLocaleString()}+ members</span>
+                <span>·</span>
+                <span>Free forever tier</span>
+              </div>
+            </div>
+          </RevealSection>
+        </section>
+
+        {/* Bridge: Trust → Email Capture */}
+        <SectionBridge>Stay in the loop</SectionBridge>
+
+        {/* Email Capture */}
         <EmailCapture />
 
         {/* Anniversary Giveaway */}
-        <section className="py-8 px-4 border-t border-white/5">
-          <div className="container mx-auto max-w-3xl">
-            <AnniversaryGiveawayBanner />
-          </div>
-        </section>
-
-        {/* Trust */}
-        <section className="py-16 lg:py-24 px-4 border-t border-white/5">
-          <div className="container mx-auto max-w-2xl text-center space-y-6">
-            <p className="text-[11px] font-semibold tracking-widest uppercase text-white/30 mb-3">
-              Why people trust us
-            </p>
-            <h2 className="text-2xl md:text-4xl font-bold text-white">
-              Built for clarity, not complexity.
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 text-left">
-              {[
-                {
-                  icon: ShieldCheck,
-                  color: "text-[#00c8f8]",
-                  title: "Your privacy is protected",
-                  desc: "Encrypted. Never sold. You're a person, not a product.",
-                },
-                {
-                  icon: Lock,
-                  color: "text-[#f5c842]",
-                  title: "No pressure, no upsells",
-                  desc: "Start free. Upgrade only if you want more. No gotchas.",
-                },
-                {
-                  icon: Heart,
-                  color: "text-[#ff8888]",
-                  title: "Designed for peace of mind",
-                  desc: "We measure success by how much calmer you feel about your finances.",
-                },
-                {
-                  icon: CheckCircle,
-                  color: "text-[#00e676]",
-                  title: "Plain language, always",
-                  desc: "Guidance written for real people — not finance professionals.",
-                },
-              ].map((item) => (
-                <div key={item.title} className="bloomberg-panel p-5 flex gap-4">
-                  <item.icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${item.color}`} />
-                  <div>
-                    <p className="text-sm font-semibold text-white mb-1">{item.title}</p>
-                    <p className="text-xs text-white/50 leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
+        <section className="py-8 px-4">
+          <RevealSection>
+            <div className="container mx-auto max-w-3xl">
+              <AnniversaryGiveawayBanner />
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-sm text-white/30 font-medium">
-              {stats.accuracy > 0 && (
-                <>
-                  <span>{stats.accuracy}% signal accuracy</span>
-                  <span>·</span>
-                </>
-              )}
-              {stats.members > 0 && (
-                <>
-                  <span>{animatedMembers.toLocaleString()}+ members</span>
-                  <span>·</span>
-                </>
-              )}
-              <span>Free forever tier</span>
-            </div>
-          </div>
+          </RevealSection>
         </section>
-
-        {testimonialsState.data && testimonialsState.data.length > 0 && (
-        <section className="py-16 lg:py-24 px-4 border-t border-white/5">
-          <div className="container mx-auto max-w-3xl">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl md:text-4xl font-bold text-white mb-3">
-                What members are saying
-              </h2>
-              <p className="text-sm text-white/50">Real experiences from Entangled Wealth users.</p>
-            </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {testimonialsState.data.slice(0, 6).map((t) => (
-                  <div key={t.id} className="bloomberg-panel p-5 flex flex-col gap-3">
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-3.5 h-3.5 ${
-                            i < t.rating
-                              ? "text-[#FFB800] fill-[#FFB800]"
-                              : "text-white/10 fill-white/10"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <p className="text-sm text-white/70 leading-relaxed flex-1">"{t.message}"</p>
-                    <div className="flex items-center gap-2 pt-3 border-t border-white/5">
-                      <div className="w-7 h-7 rounded-full bg-[#00FF41]/20 flex items-center justify-center text-xs font-bold text-[#00FF41]">
-                        {t.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-white">{t.name}</p>
-                        {t.role && <p className="text-[10px] text-white/30">{t.role}</p>}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-          </div>
-        </section>
-        )}
 
         {/* Final CTA */}
         <section className="py-20 lg:py-28 px-4 border-t border-white/5">
-          <div className="container mx-auto max-w-2xl text-center flex flex-col items-center space-y-6">
-            <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
-              Know what to do next — in 60 seconds.
-            </h2>
-            <MicroConversionFlow referralCode={referralCode || undefined} />
+          <RevealSection>
+            <div className="container mx-auto max-w-2xl text-center flex flex-col items-center space-y-6">
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00c8f8]/60">
+                You came here unsure. Now you know your next step.
+              </p>
+              <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
+                Stop guessing. Start knowing.
+              </h2>
+              <p className="text-base text-white/50 max-w-md leading-relaxed">
+                Answer three quick questions and get a clear, specific recommendation — no credit card, no commitment. In under 60 seconds.
+              </p>
 
-            <p className="text-[11px] text-white/25 max-w-xs leading-relaxed">
-              For guidance and education only. Not financial advice.
-            </p>
-          </div>
+              <MicroConversionFlow referralCode={referralCode || undefined} />
+
+              <p className="text-[11px] text-white/25 max-w-xs leading-relaxed">
+                For guidance and education. Not a substitute for professional financial advice.
+              </p>
+            </div>
+          </RevealSection>
         </section>
       </HomeErrorBoundary>
     </Layout>

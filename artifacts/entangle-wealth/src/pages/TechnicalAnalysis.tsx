@@ -7,9 +7,13 @@ import {
   Waves, ChevronDown, ChevronUp, Zap, Shield, Brain, Eye,
   Target, AlertTriangle, RefreshCw, Download, Loader2,
   Plus, X, Star, ArrowUpRight, ArrowDownRight, Bookmark, BookmarkCheck,
-  Bell, BellOff, ChevronRight,
+  Bell, BellOff, ChevronRight, FlaskConical, PlayCircle, History,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import {
   type IndicatorResult, type StockData,
   generateMockOHLCV, runAllIndicators, getOverallSignal,
@@ -277,6 +281,23 @@ export default function TechnicalAnalysis() {
   });
   const [showWatchlist, setShowWatchlist] = useState(true);
   const [agentView, setAgentView] = useState(true);
+  const [showStrategyLab, setShowStrategyLab] = useState(false);
+  const [streamingAgents, setStreamingAgents] = useState<Array<{
+    id: number; name: string; domain: string; signal: string; confidence: number; reasoning: string; keyMetric: string;
+  }>>([]);
+  const [streamStatus, setStreamStatus] = useState<"idle" | "streaming" | "done" | "error">("idle");
+  const [streamSummary, setStreamSummary] = useState<string>("");
+  const sseRef = useRef<EventSource | null>(null);
+  const [stratIndicator, setStratIndicator] = useState<"RSI" | "SMA" | "EMA" | "MACD">("RSI");
+  const [stratCondition, setStratCondition] = useState<"crossAbove" | "crossBelow" | "above" | "below">("below");
+  const [stratThreshold, setStratThreshold] = useState(30);
+  const [stratPeriod, setStratPeriod] = useState(14);
+  const [stratRunning, setStratRunning] = useState(false);
+  const [stratResult, setStratResult] = useState<{
+    trades: { entry: number; exit: number; pnl: number; entryIdx: number; exitIdx: number }[];
+    winRate: number; sharpe: number; maxDrawdown: number; totalReturn: number;
+    equityCurve: { bar: number; equity: number }[];
+  } | null>(null);
 
   useEffect(() => { trackEvent("signal_viewed"); }, []);
   const analyzeIdRef = useRef(0);
@@ -394,6 +415,175 @@ export default function TechnicalAnalysis() {
     URL.revokeObjectURL(url);
     toast({ title: "Exported", description: "Indicator report downloaded." });
   };
+
+  const runBacktest = useCallback(async () => {
+    if (!stockData) return;
+    setStratRunning(true);
+    setStratResult(null);
+    await new Promise(r => setTimeout(r, 300));
+
+    const { prices, highs, lows, closes } = stockData;
+    const data = closes.length > 10 ? closes : prices;
+    const n = data.length;
+
+    function calcRSIArr(arr: number[], period: number): number[] {
+      const out: number[] = Array(period).fill(50);
+      let gains = 0, losses = 0;
+      for (let i = 1; i <= period; i++) {
+        const d = arr[i] - arr[i - 1];
+        if (d > 0) gains += d; else losses -= d;
+      }
+      let ag = gains / period, al = losses / period;
+      for (let i = period; i < arr.length; i++) {
+        const d = arr[i] - arr[i - 1];
+        const g = Math.max(d, 0), l = Math.max(-d, 0);
+        ag = (ag * (period - 1) + g) / period;
+        al = (al * (period - 1) + l) / period;
+        out.push(al === 0 ? 100 : 100 - 100 / (1 + ag / al));
+      }
+      return out;
+    }
+
+    function calcSMAArr(arr: number[], period: number): number[] {
+      const out: number[] = [];
+      for (let i = 0; i < arr.length; i++) {
+        if (i < period - 1) { out.push(arr[i]); continue; }
+        const sl = arr.slice(i - period + 1, i + 1);
+        out.push(sl.reduce((a, b) => a + b, 0) / period);
+      }
+      return out;
+    }
+
+    function calcEMAArr(arr: number[], period: number): number[] {
+      const k = 2 / (period + 1);
+      const out: number[] = [arr[0]];
+      for (let i = 1; i < arr.length; i++) out.push(arr[i] * k + out[i - 1] * (1 - k));
+      return out;
+    }
+
+    let indicatorArr: number[];
+    if (stratIndicator === "RSI") indicatorArr = calcRSIArr(data, stratPeriod);
+    else if (stratIndicator === "SMA") indicatorArr = calcSMAArr(data, stratPeriod);
+    else if (stratIndicator === "EMA") indicatorArr = calcEMAArr(data, stratPeriod);
+    else {
+      const fast = calcEMAArr(data, 12);
+      const slow = calcEMAArr(data, 26);
+      indicatorArr = fast.map((v, i) => v - slow[i]);
+    }
+
+    const trades: { entry: number; exit: number; pnl: number; entryIdx: number; exitIdx: number }[] = [];
+    let inTrade = false;
+    let entryPrice = 0;
+    let entryIdx = 0;
+    const holding = 10;
+
+    for (let i = 1; i < n; i++) {
+      const ind = indicatorArr[i];
+      const prev = indicatorArr[i - 1];
+      const price = data[i];
+
+      const isBuy =
+        stratCondition === "below" ? ind < stratThreshold :
+        stratCondition === "above" ? ind > stratThreshold :
+        stratCondition === "crossAbove" ? ind >= stratThreshold && prev < stratThreshold :
+        ind <= stratThreshold && prev > stratThreshold;
+
+      const isSell =
+        stratCondition === "below" ? ind > stratThreshold + 10 :
+        stratCondition === "above" ? ind < stratThreshold - 10 :
+        stratCondition === "crossAbove" ? ind <= stratThreshold - 5 && prev > stratThreshold - 5 :
+        ind >= stratThreshold + 5 && prev < stratThreshold + 5;
+
+      if (!inTrade && isBuy && i > 0) {
+        inTrade = true;
+        entryPrice = price;
+        entryIdx = i;
+      } else if (inTrade && (isSell || (i - entryIdx >= holding))) {
+        const exitPrice = price;
+        const pnl = (exitPrice - entryPrice) / entryPrice * 100;
+        trades.push({ entry: entryPrice, exit: exitPrice, pnl, entryIdx, exitIdx: i });
+        inTrade = false;
+      }
+    }
+
+    if (trades.length === 0) {
+      setStratRunning(false);
+      setStratResult({ trades: [], winRate: 0, sharpe: 0, maxDrawdown: 0, totalReturn: 0, equityCurve: [{ bar: 0, equity: 10000 }] });
+      return;
+    }
+
+    const wins = trades.filter(t => t.pnl > 0).length;
+    const winRate = wins / trades.length;
+
+    let equity = 10000;
+    let peak = equity;
+    let maxDrawdown = 0;
+    const equityCurve: { bar: number; equity: number }[] = [{ bar: 0, equity: 10000 }];
+
+    for (let i = 0; i < trades.length; i++) {
+      equity = equity * (1 + trades[i].pnl / 100);
+      if (equity > peak) peak = equity;
+      const dd = (peak - equity) / peak * 100;
+      if (dd > maxDrawdown) maxDrawdown = dd;
+      equityCurve.push({ bar: trades[i].exitIdx, equity: Math.round(equity) });
+    }
+
+    const totalReturn = (equity - 10000) / 10000 * 100;
+    const rets = trades.map(t => t.pnl / 100);
+    const meanR = rets.reduce((a, b) => a + b, 0) / rets.length;
+    const stdR = Math.sqrt(rets.reduce((a, b) => a + Math.pow(b - meanR, 2), 0) / rets.length);
+    const sharpe = stdR === 0 ? 0 : (meanR / stdR) * Math.sqrt(252 / (n / trades.length));
+
+    setStratResult({ trades, winRate, sharpe, maxDrawdown, totalReturn, equityCurve });
+    setStratRunning(false);
+  }, [stockData, stratIndicator, stratCondition, stratThreshold, stratPeriod]);
+
+  const startFlashCouncilStream = useCallback(() => {
+    if (!activeSymbol || streamStatus === "streaming") return;
+    if (sseRef.current) { sseRef.current.close(); sseRef.current = null; }
+    setStreamingAgents([]);
+    setStreamSummary("");
+    setStreamStatus("streaming");
+
+    const url = `/api/stocks/${encodeURIComponent(activeSymbol)}/analyze-stream`;
+    const es = new EventSource(url);
+    sseRef.current = es;
+
+    es.addEventListener("agent", (e) => {
+      try {
+        const data = JSON.parse((e as MessageEvent).data);
+        setStreamingAgents(prev => [...prev, data.agent]);
+      } catch {}
+    });
+
+    es.addEventListener("complete", (e) => {
+      try {
+        const data = JSON.parse((e as MessageEvent).data);
+        setStreamSummary(data.flashCouncilSummary || "");
+      } catch {}
+      setStreamStatus("done");
+      es.close();
+      sseRef.current = null;
+    });
+
+    es.addEventListener("error", () => {
+      setStreamStatus("error");
+      es.close();
+      sseRef.current = null;
+    });
+  }, [activeSymbol, streamStatus]);
+
+  useEffect(() => {
+    return () => { sseRef.current?.close(); };
+  }, []);
+
+  useEffect(() => {
+    if (activeSymbol) {
+      setStreamingAgents([]);
+      setStreamSummary("");
+      setStreamStatus("idle");
+    }
+  }, [activeSymbol]);
 
   const categoryCounts = useMemo(() => {
     const c: Record<string, { buy: number; sell: number; total: number }> = {};
@@ -634,6 +824,15 @@ export default function TechnicalAnalysis() {
                     <button onClick={() => setAgentView(false)} className={`text-[12px] font-bold px-3 py-1.5 rounded-lg transition-colors ${!agentView ? "bg-primary/10 text-primary" : "text-white/25 hover:text-white/40"}`}>
                       <BarChart3 className="w-3.5 h-3.5 inline mr-1.5" />Indicators
                     </button>
+                    {agentView && (
+                      <button
+                        onClick={startFlashCouncilStream}
+                        disabled={streamStatus === "streaming"}
+                        className={`text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${streamStatus === "streaming" ? "bg-amber-400/10 text-amber-400" : "bg-primary/10 text-primary hover:bg-primary/20"}`}
+                      >
+                        {streamStatus === "streaming" ? <><Loader2 className="w-3 h-3 animate-spin" />Streaming...</> : <><Zap className="w-3 h-3" />Flash Council</>}
+                      </button>
+                    )}
                   </div>
                   {!agentView && (
                     <div className="flex gap-1">
@@ -646,6 +845,51 @@ export default function TechnicalAnalysis() {
                     </div>
                   )}
                 </div>
+
+                {agentView && streamingAgents.length > 0 && (
+                  <div className="mb-4 space-y-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                      <span className="text-[11px] font-bold text-amber-400/70">Flash Council — Live AI Feed</span>
+                      {streamStatus === "done" && <span className="text-[9px] text-white/30 ml-auto">Analysis complete</span>}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                      {streamingAgents.map((agent, i) => {
+                        const sigColor2 = agent.signal === "BULLISH" ? "#00ff88" : agent.signal === "BEARISH" ? "#ff3366" : "#666";
+                        const sigBg2 = agent.signal === "BULLISH" ? "bg-[#00ff88]/10 text-[#00ff88] border-[#00ff88]/20" : agent.signal === "BEARISH" ? "bg-[#ff3366]/10 text-[#ff3366] border-[#ff3366]/20" : "bg-white/5 text-white/40 border-white/10";
+                        return (
+                          <div key={i} className="bg-[#0a0a16] border border-white/[0.06] rounded-xl p-3.5 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-amber-400/60" />
+                                <span className="text-[12px] font-bold">{agent.name}</span>
+                              </div>
+                              <span className={`text-[9px] font-black px-2 py-0.5 rounded border ${sigBg2}`}>{agent.signal}</span>
+                            </div>
+                            <p className="text-[10px] text-primary/50 mb-1">{agent.domain}</p>
+                            <p className="text-[11px] text-white/50">{agent.reasoning}</p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <span className="text-[9px] font-mono text-white/30">{agent.keyMetric}</span>
+                              <span className="text-[9px] font-bold font-mono ml-auto" style={{ color: sigColor2 }}>{agent.confidence}% conf</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {streamStatus === "streaming" && (
+                        <div className="bg-[#0a0a16] border border-white/[0.04] rounded-xl p-3.5 flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
+                          <span className="text-[11px] text-white/30">Agent analyzing...</span>
+                        </div>
+                      )}
+                    </div>
+                    {streamSummary && (
+                      <div className="rounded-xl px-4 py-3" style={{ background: "rgba(250,190,60,0.04)", border: "1px solid rgba(250,190,60,0.15)" }}>
+                        <div className="text-[10px] text-amber-400/60 font-mono uppercase tracking-wider mb-1">Flash Council Consensus</div>
+                        <p className="text-[12px] text-white/70">{streamSummary}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {agentView ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mb-6">
@@ -705,6 +949,111 @@ export default function TechnicalAnalysis() {
                     </div>
                   </div>
                 )}
+
+                <div className="mb-6 rounded-2xl overflow-hidden" style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(168,85,247,0.25)" }}>
+                  <button
+                    onClick={() => setShowStrategyLab(v => !v)}
+                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/[0.02] transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <FlaskConical className="w-4 h-4 text-[#a855f7]" />
+                      <span className="font-bold text-sm text-[#a855f7]">Strategy Builder &amp; Backtester</span>
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#a855f7]/10 border border-[#a855f7]/20 text-[#a855f7] font-bold">LAB</span>
+                    </div>
+                    {showStrategyLab ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+                  </button>
+
+                  {showStrategyLab && (
+                    <div className="px-4 pb-5 space-y-4">
+                      <p className="text-xs text-white/50">Build an entry rule using a technical indicator and backtest it against {activeSymbol}'s price history. Results show win rate, Sharpe ratio, max drawdown, and equity curve.</p>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div>
+                          <label className="text-[10px] text-white/40 font-mono uppercase tracking-wider block mb-1">Indicator</label>
+                          <select value={stratIndicator} onChange={e => setStratIndicator(e.target.value as any)}
+                            className="w-full bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#a855f7]/40">
+                            <option value="RSI">RSI</option>
+                            <option value="SMA">SMA</option>
+                            <option value="EMA">EMA</option>
+                            <option value="MACD">MACD</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-white/40 font-mono uppercase tracking-wider block mb-1">Condition</label>
+                          <select value={stratCondition} onChange={e => setStratCondition(e.target.value as any)}
+                            className="w-full bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#a855f7]/40">
+                            <option value="below">Below threshold (BUY)</option>
+                            <option value="above">Above threshold (BUY)</option>
+                            <option value="crossAbove">Crosses above</option>
+                            <option value="crossBelow">Crosses below</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-white/40 font-mono uppercase tracking-wider block mb-1">Threshold</label>
+                          <input type="number" value={stratThreshold} onChange={e => setStratThreshold(Number(e.target.value))}
+                            className="w-full bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#a855f7]/40" />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-white/40 font-mono uppercase tracking-wider block mb-1">Period</label>
+                          <input type="number" value={stratPeriod} onChange={e => setStratPeriod(Math.max(2, Number(e.target.value)))} min={2} max={50}
+                            className="w-full bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#a855f7]/40" />
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl p-3 bg-[#a855f7]/5 border border-[#a855f7]/15 text-[11px] text-[#a855f7]/80 font-mono">
+                        Entry Rule: BUY when {stratIndicator}({stratPeriod}) {stratCondition === "below" ? `&lt; ${stratThreshold}` : stratCondition === "above" ? `&gt; ${stratThreshold}` : stratCondition === "crossAbove" ? `crosses above ${stratThreshold}` : `crosses below ${stratThreshold}`} · Exit: after 10 bars or reverse signal
+                      </div>
+
+                      <button
+                        onClick={runBacktest}
+                        disabled={stratRunning || !stockData}
+                        className="w-full py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-40"
+                        style={{ background: "rgba(168,85,247,0.8)", color: "white" }}
+                      >
+                        {stratRunning ? <><RefreshCw className="w-4 h-4 animate-spin" />Running backtest...</> : <><PlayCircle className="w-4 h-4" />Run Backtest on {activeSymbol}</>}
+                      </button>
+
+                      {stratResult && (
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {[
+                              { label: "Win Rate", value: `${(stratResult.winRate * 100).toFixed(1)}%`, color: stratResult.winRate > 0.5 ? "#00ff88" : "#ff3366" },
+                              { label: "Sharpe Ratio", value: stratResult.sharpe.toFixed(2), color: stratResult.sharpe > 1 ? "#00ff88" : stratResult.sharpe > 0 ? "#ffd700" : "#ff3366" },
+                              { label: "Max Drawdown", value: `-${stratResult.maxDrawdown.toFixed(1)}%`, color: stratResult.maxDrawdown < 10 ? "#00ff88" : stratResult.maxDrawdown < 25 ? "#ffd700" : "#ff3366" },
+                              { label: "Total Return", value: `${stratResult.totalReturn >= 0 ? "+" : ""}${stratResult.totalReturn.toFixed(1)}%`, color: stratResult.totalReturn >= 0 ? "#00ff88" : "#ff3366" },
+                            ].map(m => (
+                              <div key={m.label} className="text-center rounded-xl p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                <div className="text-[9px] text-white/40 font-mono uppercase tracking-wider">{m.label}</div>
+                                <div className="text-lg font-black font-mono mt-1" style={{ color: m.color }}>{m.value}</div>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="text-[10px] text-white/40 mb-1">Trades: {stratResult.trades.length} | Winners: {stratResult.trades.filter(t => t.pnl > 0).length} | Losers: {stratResult.trades.filter(t => t.pnl <= 0).length}</div>
+
+                          {stratResult.equityCurve.length > 1 && (
+                            <div className="h-40">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={stratResult.equityCurve} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                                  <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.04)" />
+                                  <XAxis dataKey="bar" tick={{ fontSize: 9, fill: "rgba(255,255,255,0.3)" }} />
+                                  <YAxis tick={{ fontSize: 9, fill: "rgba(255,255,255,0.3)" }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} width={44} />
+                                  <Tooltip contentStyle={{ background: "#0a0a18", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 11 }}
+                                    formatter={(val: number) => [`$${val.toLocaleString()}`, "Portfolio"]} />
+                                  <Line type="monotone" dataKey="equity" stroke="#a855f7" strokeWidth={2} dot={false} />
+                                </LineChart>
+                              </ResponsiveContainer>
+                            </div>
+                          )}
+
+                          <div className="rounded-lg bg-amber-400/5 border border-amber-400/15 p-2.5 text-[10px] text-amber-400/70">
+                            Backtest results are based on historical simulated data. Past performance does not guarantee future results.
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 <div className="rounded-lg bg-white/[0.01] border border-white/[0.04] p-3 flex items-start gap-2.5">
                   <AlertTriangle className="w-3.5 h-3.5 text-[#ffd700]/30 mt-0.5 flex-shrink-0" />

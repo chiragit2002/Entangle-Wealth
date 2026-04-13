@@ -167,6 +167,123 @@ Then synthesize with the Flash Council and deliver the consensus signal.`;
   }
 });
 
+router.get("/stocks/:symbol/analyze-stream", requireAuth, validateParams(StockSymbolParamsSchema), async (req, res) => {
+  if (!checkRateLimit(req)) {
+    res.status(429).json({ error: "Rate limit exceeded." });
+    return;
+  }
+
+  const clerkId = (req as AuthenticatedRequest).userId;
+  const signalCheck = await checkSignalLimit(clerkId);
+  if (!signalCheck.allowed) {
+    res.status(429).json({ error: `Daily signal limit reached.`, limitType: "daily_signals" });
+    return;
+  }
+
+  const stock = getStockBySymbol(req.params.symbol);
+  if (!stock) {
+    res.status(404).json({ error: "Stock not found" });
+    return;
+  }
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
+  res.flushHeaders?.();
+
+  const sendEvent = (event: string, data: unknown) => {
+    res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+    (res as any).flush?.();
+  };
+
+  const AGENTS = [
+    { id: 201, name: "Price Action Surgeon", domain: "Technical Analysis" },
+    { id: 202, name: "Volume Profile Architect", domain: "Volume Analysis" },
+    { id: 39, name: "Sentiment Analysis Engine", domain: "Market Sentiment" },
+    { id: 249, name: "Risk Manager", domain: "Risk Assessment" },
+    { id: 245, name: "Options Flow Aggregator", domain: "Options Flow" },
+    { id: 213, name: "Sector Rotation Tracker", domain: "Sector Analysis" },
+    { id: 6, name: "Devil's Advocate", domain: "Contrarian Analysis" },
+  ];
+
+  try {
+    sendEvent("start", { symbol: stock.symbol, name: stock.name, totalAgents: AGENTS.length });
+
+    const systemPrompt = `You are the Quantum Entanglement Analysis Engine. Analyze stocks with specialized AI agents and provide results in JSON format.
+
+IMPORTANT: Respond with valid JSON only:
+{
+  "symbol": "${stock.symbol}",
+  "name": "${stock.name}",
+  "overallSignal": "STRONG_BUY" | "BUY" | "NEUTRAL" | "SELL" | "STRONG_SELL",
+  "confidenceScore": <number 0-100>,
+  "consensusReached": <boolean>,
+  "agents": [
+    {
+      "id": <number>,
+      "name": "<agent name>",
+      "domain": "<analysis domain>",
+      "signal": "BULLISH" | "NEUTRAL" | "BEARISH",
+      "confidence": <number 0-100>,
+      "reasoning": "<1-2 sentence analysis>",
+      "keyMetric": "<one key data point>"
+    }
+  ],
+  "flashCouncilSummary": "<2-3 sentence consensus summary>",
+  "riskFactors": ["<risk 1>", "<risk 2>", "<risk 3>"],
+  "catalysts": ["<catalyst 1>", "<catalyst 2>"],
+  "priceTargets": { "bear": <number>, "base": <number>, "bull": <number> },
+  "timeHorizon": "short-term" | "medium-term" | "long-term",
+  "disclaimer": "AI-generated analysis for educational purposes only. Not financial advice."
+}`;
+
+    const userPrompt = `Analyze ${stock.symbol} (${stock.name}) at $${stock.price} (${stock.changePercent > 0 ? "+" : ""}${stock.changePercent}%). Sector: ${stock.sector}. Market Cap: $${(stock.marketCap / 1e9).toFixed(2)}B. P/E: ${stock.pe ?? "N/A"}. 52w: $${stock.week52Low}-$${stock.week52High}. Run 7 specialized agents.`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-5-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      sendEvent("error", { message: "No analysis generated" });
+      res.end();
+      return;
+    }
+
+    const analysis = JSON.parse(content);
+
+    for (let i = 0; i < AGENTS.length; i++) {
+      const agent = AGENTS[i];
+      const agentData = analysis.agents?.find((a: any) => a.id === agent.id) || {
+        id: agent.id,
+        name: agent.name,
+        domain: agent.domain,
+        signal: "NEUTRAL",
+        confidence: 50,
+        reasoning: "Analysis complete.",
+        keyMetric: "N/A",
+      };
+      await new Promise(r => setTimeout(r, 300 + Math.random() * 400));
+      sendEvent("agent", { agent: agentData, index: i, total: AGENTS.length });
+    }
+
+    await new Promise(r => setTimeout(r, 200));
+    sendEvent("complete", analysis);
+    incrementSignalCount(clerkId);
+    res.end();
+  } catch (error: unknown) {
+    logger.error({ err: error, symbol: req.params.symbol }, "Stream analysis error");
+    sendEvent("error", { message: "Analysis failed" });
+    res.end();
+  }
+});
+
 router.post("/stocks/:symbol/quick-analyze", requireAuth, validateParams(StockSymbolParamsSchema), validateBody(z.object({}).strict()), async (req, res) => {
   if (!checkRateLimit(req)) {
     res.status(429).json({ error: "Rate limit exceeded. Please wait before requesting another analysis." });

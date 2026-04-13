@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, paperOptionsTradesTable, paperOptionsPositionsTable, dailySpinsTable, usersTable } from "@workspace/db/schema";
+import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, paperOptionsTradesTable, paperOptionsPositionsTable, dailySpinsTable, userXpTable, xpTransactionsTable, streaksTable, usersTable } from "@workspace/db/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { resolveUserId } from "../lib/resolveUserId";
@@ -261,6 +261,7 @@ const OptionsTradeSchema = z.object({
   expiration: z.string().min(1).max(20),
   side: z.enum(["buy", "sell"]),
   contracts: z.number().int().positive().max(10_000),
+  premium: z.number().positive().max(100_000),
 });
 
 router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTradeSchema), async (req, res) => {

@@ -274,4 +274,104 @@ router.get("/alpaca/movers", async (req, res) => {
   }
 });
 
+const AlpacaOrderSchema = z.object({
+  symbol: z.string().min(1).max(10).regex(/^[A-Za-z]+$/),
+  qty: z.coerce.number().int().min(1).max(10000),
+  side: z.enum(["buy", "sell"]),
+  type: z.enum(["market", "limit"]).optional(),
+  limit_price: z.coerce.number().min(0).optional(),
+});
+
+async function alpacaPost(url: string, body: Record<string, unknown>) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { ...alpacaHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    logger.error({ status: res.status, body: text, url }, "Alpaca POST error");
+    throw new Error(`Alpaca ${res.status}: ${text}`);
+  }
+  return res.json();
+}
+
+router.post("/alpaca/orders", requireAuth, async (req, res) => {
+  const parsed = AlpacaOrderSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid order params", details: parsed.error.flatten() });
+    return;
+  }
+  const { symbol, qty, side, type = "market", limit_price } = parsed.data;
+  try {
+    const orderBody: Record<string, unknown> = {
+      symbol: symbol.toUpperCase(),
+      qty: qty.toString(),
+      side,
+      type,
+      time_in_force: "day",
+    };
+    if (type === "limit" && limit_price) {
+      orderBody.limit_price = limit_price.toFixed(2);
+    }
+    const data = await alpacaPost(`${ALPACA_PAPER_URL}/v2/orders`, orderBody);
+    res.json({
+      id: data.id,
+      symbol: data.symbol,
+      qty: data.qty,
+      side: data.side,
+      type: data.type,
+      status: data.status,
+      submitted_at: data.submitted_at,
+      filled_avg_price: data.filled_avg_price,
+    });
+  } catch (err: any) {
+    logger.error({ err }, "Alpaca order submit failed");
+    res.status(502).json({ error: err.message || "Failed to submit order" });
+  }
+});
+
+router.get("/alpaca/positions", requireAuth, async (req, res) => {
+  try {
+    const data = await alpacaFetch(`${ALPACA_PAPER_URL}/v2/positions`);
+    res.json(Array.isArray(data) ? data.map((p: any) => ({
+      symbol: p.symbol,
+      qty: p.qty,
+      market_value: p.market_value,
+      cost_basis: p.cost_basis,
+      unrealized_pl: p.unrealized_pl,
+      unrealized_plpc: p.unrealized_plpc,
+      current_price: p.current_price,
+      avg_entry_price: p.avg_entry_price,
+      side: p.side,
+    })) : []);
+  } catch (err: any) {
+    logger.error({ err }, "Alpaca positions fetch failed");
+    res.status(502).json({ error: "Failed to fetch positions" });
+  }
+});
+
+router.get("/alpaca/orders", requireAuth, async (req, res) => {
+  try {
+    const status = (req.query.status as string) || "all";
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+    const data = await alpacaFetch(`${ALPACA_PAPER_URL}/v2/orders?status=${status}&limit=${limit}&direction=desc`);
+    res.json(Array.isArray(data) ? data.map((o: any) => ({
+      id: o.id,
+      symbol: o.symbol,
+      qty: o.qty,
+      filled_qty: o.filled_qty,
+      side: o.side,
+      type: o.type,
+      status: o.status,
+      submitted_at: o.submitted_at,
+      filled_at: o.filled_at,
+      filled_avg_price: o.filled_avg_price,
+    })) : []);
+  } catch (err: any) {
+    logger.error({ err }, "Alpaca orders fetch failed");
+    res.status(502).json({ error: "Failed to fetch orders" });
+  }
+});
+
 export default router;

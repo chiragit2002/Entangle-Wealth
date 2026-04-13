@@ -3,14 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Legend,
+  LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, Legend, ReferenceLine,
 } from "recharts";
 import {
   GitBranch, Save, Trash2, RefreshCw, BookmarkCheck,
   TrendingUp, AlertTriangle, Star, Zap, Shield, Target,
   ChevronDown, ChevronUp, Info, CheckCircle2, Sparkles,
-  Flame, Compass, Clock, BarChart3,
+  Flame, Compass, Clock, BarChart3, Plus, X, Activity,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
@@ -600,6 +600,19 @@ export default function AlternateTimeline() {
   const [savingB, setSavingB] = useState(false);
   const [activeTab, setActiveTab] = useState<"A" | "B">("A");
 
+  const [showMonteCarlo, setShowMonteCarlo] = useState(false);
+  const [mcLoading, setMcLoading] = useState(false);
+  const [mcResult, setMcResult] = useState<{
+    p10: number[]; p50: number[]; p90: number[]; mean: number[]; years: number[];
+    narrative: string; horizonYears: number; lifeEvents: { year: number; cost: number; label: string }[];
+  } | null>(null);
+  const [mcHorizon, setMcHorizon] = useState(20);
+  const [lifeEvents, setLifeEvents] = useState<{ year: number; cost: number; label: string; id: number }[]>([]);
+  const [lifeEventYear, setLifeEventYear] = useState(5);
+  const [lifeEventCost, setLifeEventCost] = useState(30000);
+  const [lifeEventLabel, setLifeEventLabel] = useState("");
+  const [lifeEventCounter, setLifeEventCounter] = useState(0);
+
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchStage = useCallback(async () => {
@@ -712,6 +725,37 @@ export default function AlternateTimeline() {
       setLoading(false);
     }
   }, [isSignedIn, getToken, fetchStage, toast]);
+
+  const runMonteCarloSim = useCallback(async () => {
+    setMcLoading(true);
+    setMcResult(null);
+    try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (isSignedIn) {
+        const token = await getToken();
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+      }
+      const res = await fetch(`${API_BASE}/timeline/monte-carlo`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          ...paramsA,
+          simulations: 500,
+          horizonYears: mcHorizon,
+          lifeEvents: lifeEvents.map(({ year, cost, label }) => ({ year, cost, label })),
+        }),
+      });
+      if (res.ok) {
+        setMcResult(await res.json());
+      } else {
+        toast({ title: "Monte Carlo failed", description: "Simulation failed. Please try again.", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Monte Carlo failed", description: "Simulation failed. Please try again.", variant: "destructive" });
+    } finally {
+      setMcLoading(false);
+    }
+  }, [isSignedIn, getToken, paramsA, mcHorizon, lifeEvents, toast]);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -1227,6 +1271,157 @@ export default function AlternateTimeline() {
             </div>
           </div>
         )}
+
+        <div className="mt-6 rounded-2xl overflow-hidden" style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(0,200,248,0.2)" }}>
+          <button
+            onClick={() => setShowMonteCarlo(v => !v)}
+            className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/[0.02] transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-primary" />
+              <span className="font-bold text-sm text-primary">Monte Carlo Probability Cone</span>
+              <span className="text-[9px] px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold">500 SIMS</span>
+            </div>
+            {showMonteCarlo ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+          </button>
+
+          {showMonteCarlo && (
+            <div className="px-4 pb-5 space-y-4">
+              <p className="text-xs text-white/50">
+                Run 500 Monte Carlo simulations on your Current Path to model market uncertainty. Add life events as one-time wealth shocks to see how they affect outcomes.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[10px] text-white/40 font-mono uppercase tracking-wider block mb-1">Horizon (Years)</label>
+                  <div className="flex gap-1">
+                    {[10, 15, 20, 25, 30].map(y => (
+                      <button key={y} onClick={() => setMcHorizon(y)}
+                        className={`flex-1 py-1.5 rounded text-[10px] font-bold transition-all ${mcHorizon === y ? "bg-primary/20 text-primary border border-primary/30" : "bg-white/[0.03] text-white/40 border border-white/[0.06] hover:text-white"}`}>
+                        {y}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="md:col-span-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-[10px] text-white/40 font-mono uppercase tracking-wider">Life Events</label>
+                    <span className="text-[9px] text-white/30">{lifeEvents.length} added</span>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    <input
+                      value={lifeEventLabel}
+                      onChange={e => setLifeEventLabel(e.target.value)}
+                      placeholder="Label (e.g. Buy a home)"
+                      className="flex-1 min-w-[120px] bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/40"
+                    />
+                    <input type="number" value={lifeEventYear} onChange={e => setLifeEventYear(parseInt(e.target.value) || 0)}
+                      min={1} max={mcHorizon} placeholder="Year"
+                      className="w-16 bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/40" />
+                    <input type="number" value={lifeEventCost} onChange={e => setLifeEventCost(parseInt(e.target.value) || 0)}
+                      step={5000} placeholder="Cost $"
+                      className="w-24 bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/40" />
+                    <button
+                      onClick={() => {
+                        if (!lifeEventLabel || lifeEventCost <= 0) return;
+                        setLifeEvents(prev => [...prev, { year: lifeEventYear, cost: lifeEventCost, label: lifeEventLabel, id: lifeEventCounter }]);
+                        setLifeEventCounter(c => c + 1);
+                        setLifeEventLabel("");
+                      }}
+                      className="px-2.5 py-1.5 rounded bg-primary/10 border border-primary/20 text-primary text-[11px] font-bold hover:bg-primary/20 transition-all flex items-center gap-1"
+                    >
+                      <Plus className="w-3 h-3" /> Add
+                    </button>
+                  </div>
+                  {lifeEvents.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {lifeEvents.map(ev => (
+                        <span key={ev.id} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[10px]">
+                          Yr{ev.year} {ev.label} ${(ev.cost / 1000).toFixed(0)}k
+                          <button onClick={() => setLifeEvents(prev => prev.filter(e => e.id !== ev.id))} className="hover:text-red-400 ml-0.5">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <button
+                onClick={runMonteCarloSim}
+                disabled={mcLoading}
+                className="w-full py-2.5 rounded-xl bg-primary text-black font-bold text-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
+              >
+                {mcLoading ? <><RefreshCw className="w-4 h-4 animate-spin" />Running 500 simulations...</> : <><Activity className="w-4 h-4" />Run Monte Carlo Simulation</>}
+              </button>
+
+              {mcResult && (() => {
+                const chartData = mcResult.years.map((yr, i) => ({
+                  year: `Yr ${yr}`,
+                  p10: mcResult.p10[i],
+                  p50: mcResult.p50[i],
+                  p90: mcResult.p90[i],
+                  mean: mcResult.mean[i],
+                }));
+                const lastP50 = mcResult.p50[mcResult.p50.length - 1];
+                const lastP10 = mcResult.p10[mcResult.p10.length - 1];
+                const lastP90 = mcResult.p90[mcResult.p90.length - 1];
+                const fmtK = (v: number) => v >= 1e6 ? `$${(v / 1e6).toFixed(1)}M` : v >= 1e3 ? `$${(v / 1e3).toFixed(0)}k` : `$${v.toFixed(0)}`;
+                return (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="text-center rounded-xl p-3" style={{ background: "rgba(255,51,102,0.06)", border: "1px solid rgba(255,51,102,0.15)" }}>
+                        <div className="text-[9px] text-red-400/60 font-mono uppercase tracking-wider">Pessimistic (P10)</div>
+                        <div className="text-lg font-black text-red-400 font-mono mt-1">{fmtK(lastP10)}</div>
+                      </div>
+                      <div className="text-center rounded-xl p-3" style={{ background: "rgba(0,200,248,0.06)", border: "1px solid rgba(0,200,248,0.2)" }}>
+                        <div className="text-[9px] text-primary/60 font-mono uppercase tracking-wider">Median (P50)</div>
+                        <div className="text-lg font-black text-primary font-mono mt-1">{fmtK(lastP50)}</div>
+                      </div>
+                      <div className="text-center rounded-xl p-3" style={{ background: "rgba(0,255,136,0.06)", border: "1px solid rgba(0,255,136,0.15)" }}>
+                        <div className="text-[9px] text-emerald-400/60 font-mono uppercase tracking-wider">Optimistic (P90)</div>
+                        <div className="text-lg font-black text-emerald-400 font-mono mt-1">{fmtK(lastP90)}</div>
+                      </div>
+                    </div>
+
+                    <div className="h-60">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id="mcCone" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#00c8f8" stopOpacity={0.2} />
+                              <stop offset="95%" stopColor="#00c8f8" stopOpacity={0.02} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.04)" />
+                          <XAxis dataKey="year" tick={{ fontSize: 9, fill: "rgba(255,255,255,0.3)" }} />
+                          <YAxis tick={{ fontSize: 9, fill: "rgba(255,255,255,0.3)" }} tickFormatter={v => v >= 1e6 ? `${(v / 1e6).toFixed(1)}M` : `${(v / 1e3).toFixed(0)}k`} width={48} />
+                          <Tooltip
+                            contentStyle={{ background: "#0a0a18", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 11 }}
+                            formatter={(val: number, name: string) => [fmtK(val), name]}
+                          />
+                          <Area type="monotone" dataKey="p90" stroke="#00ff88" strokeWidth={1} fill="url(#mcCone)" fillOpacity={0.3} name="Optimistic (P90)" dot={false} strokeDasharray="3 3" />
+                          <Area type="monotone" dataKey="p50" stroke="#00c8f8" strokeWidth={2} fill="url(#mcCone)" fillOpacity={0} name="Median (P50)" dot={false} />
+                          <Area type="monotone" dataKey="p10" stroke="#ff3366" strokeWidth={1} fill="transparent" fillOpacity={0} name="Pessimistic (P10)" dot={false} strokeDasharray="3 3" />
+                          {mcResult.lifeEvents.map((ev, i) => (
+                            <ReferenceLine key={i} x={`Yr ${ev.year}`} stroke="#ffd700" strokeDasharray="4 2" strokeOpacity={0.6} label={{ value: ev.label, fontSize: 8, fill: "#ffd700" }} />
+                          ))}
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    <div className="rounded-xl px-4 py-3" style={{ background: "rgba(0,200,248,0.04)", border: "1px solid rgba(0,200,248,0.12)" }}>
+                      <div className="text-[10px] text-primary/60 font-mono uppercase tracking-wider mb-1.5">AI Narrative</div>
+                      <p className="text-[12px] text-white/70 leading-relaxed">{mcResult.narrative}</p>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+        </div>
 
         <div className="mt-4 rounded-xl px-4 py-3"
           style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>

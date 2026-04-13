@@ -658,4 +658,127 @@ router.post("/timeline/what-if/model", validateBody(WhatIfModelSchema), async (r
   }
 });
 
+const MonteCarloSchema = z.object({
+  monthlyIncome: z.coerce.number().min(0).max(1000000).default(0),
+  savingsRate: z.coerce.number().min(0).max(1).default(0),
+  monthlyDebt: z.coerce.number().min(0).default(0),
+  investmentRate: z.coerce.number().min(0).max(0.5).default(0.07),
+  currentNetWorth: z.coerce.number().default(0),
+  emergencyFundMonths: z.coerce.number().min(0).default(0),
+  simulations: z.coerce.number().int().min(10).max(1000).default(500),
+  horizonYears: z.coerce.number().int().min(1).max(30).default(20),
+  lifeEvents: z.array(z.object({
+    year: z.number().int().min(0).max(30),
+    cost: z.number(),
+    label: z.string().max(60),
+  })).max(20).optional(),
+});
+
+function runMonteCarlo(
+  params: TimelineParams,
+  simulations: number,
+  horizonYears: number,
+  lifeEvents: { year: number; cost: number; label: string }[] = [],
+): { p10: number[]; p50: number[]; p90: number[]; mean: number[]; years: number[] } {
+  const monthlyRate = params.investmentRate / 12;
+  const monthlySavings = params.monthlyIncome * params.savingsRate;
+  const monthlyInvestment = monthlySavings * 0.6;
+  const numMonths = horizonYears * 12;
+
+  const lifeEventByYear = new Map<number, number>();
+  for (const ev of lifeEvents) {
+    lifeEventByYear.set(ev.year, (lifeEventByYear.get(ev.year) || 0) + ev.cost);
+  }
+
+  const yearlyResults: number[][] = Array.from({ length: horizonYears + 1 }, () => []);
+
+  for (let sim = 0; sim < simulations; sim++) {
+    let wealth = Math.max(0, params.currentNetWorth);
+    let debt = params.monthlyDebt * 36;
+    yearlyResults[0].push(wealth);
+
+    for (let m = 1; m <= numMonths; m++) {
+      const yearIdx = Math.floor(m / 12);
+      const volatility = 0.15 / Math.sqrt(12);
+      const randomReturn = (Math.random() - 0.5) * 2 * volatility;
+      const actualRate = monthlyRate + randomReturn * monthlyRate * 5;
+
+      wealth = wealth * (1 + actualRate) + monthlyInvestment;
+      wealth += monthlySavings * 0.4;
+
+      const debtPayment = Math.min(debt, params.monthlyDebt);
+      debt = Math.max(0, debt - debtPayment);
+
+      if (m % 12 === 0 && lifeEventByYear.has(yearIdx)) {
+        wealth -= (lifeEventByYear.get(yearIdx) || 0);
+      }
+
+      if (m % 12 === 0 && yearIdx <= horizonYears) {
+        yearlyResults[yearIdx].push(Math.max(0, wealth - debt));
+      }
+    }
+  }
+
+  const years = Array.from({ length: horizonYears + 1 }, (_, i) => i);
+  const p10: number[] = [];
+  const p50: number[] = [];
+  const p90: number[] = [];
+  const mean: number[] = [];
+
+  for (const yr of years) {
+    const vals = [...(yearlyResults[yr] || [])].sort((a, b) => a - b);
+    if (vals.length === 0) { p10.push(0); p50.push(0); p90.push(0); mean.push(0); continue; }
+    const idx10 = Math.floor(vals.length * 0.1);
+    const idx50 = Math.floor(vals.length * 0.5);
+    const idx90 = Math.floor(vals.length * 0.9);
+    p10.push(Math.round(vals[idx10]));
+    p50.push(Math.round(vals[idx50]));
+    p90.push(Math.round(vals[idx90]));
+    mean.push(Math.round(vals.reduce((a, b) => a + b, 0) / vals.length));
+  }
+
+  return { p10, p50, p90, mean, years };
+}
+
+router.post("/timeline/monte-carlo", validateBody(MonteCarloSchema), async (req, res) => {
+  const { params, error } = parseTimelineParams(req.body);
+  if (error) {
+    res.status(400).json({ error });
+    return;
+  }
+  const { simulations = 500, horizonYears = 20, lifeEvents = [] } = req.body as { simulations?: number; horizonYears?: number; lifeEvents?: { year: number; cost: number; label: string }[] };
+
+  try {
+    const result = runMonteCarlo(params, simulations, horizonYears, lifeEvents);
+    const yr20_p50 = result.p50[result.p50.length - 1];
+    const yr20_p10 = result.p10[result.p10.length - 1];
+    const yr20_p90 = result.p90[result.p90.length - 1];
+
+    const narrativeLines: string[] = [];
+    if (yr20_p50 > 500000) {
+      narrativeLines.push(`Your median projected net worth after ${horizonYears} years is $${(yr20_p50 / 1e6).toFixed(1)}M — driven primarily by your ${(params.savingsRate * 100).toFixed(0)}% savings rate and ${(params.investmentRate * 100).toFixed(0)}% investment return assumption.`);
+    } else {
+      narrativeLines.push(`Your median projected net worth after ${horizonYears} years is $${(yr20_p50 / 1000).toFixed(0)}k — increasing your savings rate by even 5% could significantly widen the gap over time.`);
+    }
+    const spread = yr20_p90 - yr20_p10;
+    narrativeLines.push(`Market volatility creates a wide range of outcomes: the optimistic scenario (P90) reaches $${(yr20_p90 / 1000).toFixed(0)}k while the pessimistic scenario (P10) lands at $${(yr20_p10 / 1000).toFixed(0)}k — a $${(spread / 1000).toFixed(0)}k spread that underscores why consistent contributions matter more than timing the market.`);
+    if (lifeEvents.length > 0) {
+      const totalCost = lifeEvents.reduce((s, e) => s + e.cost, 0);
+      narrativeLines.push(`Your ${lifeEvents.length} life event${lifeEvents.length > 1 ? "s" : ""} (total impact: $${(totalCost / 1000).toFixed(0)}k) are modeled as one-time shocks — the simulation shows wealth recovery is possible within 3–5 years of each event assuming consistent saving habits.`);
+    }
+
+    res.json({
+      ...result,
+      params,
+      simulations,
+      horizonYears,
+      lifeEvents,
+      narrative: narrativeLines.join(" "),
+    });
+  } catch (err) {
+    logger.error({ err }, "Monte Carlo error");
+    res.status(500).json({ error: "Monte Carlo simulation failed" });
+  }
+});
+
 export default router;

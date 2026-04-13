@@ -18,7 +18,7 @@ interface Gig {
   price: string;
   category: string;
   contactName: string | null;
-  rating: string;
+  rating: string | null;
   completedJobs: number;
   createdAt: string;
 }
@@ -224,11 +224,13 @@ export default function Gigs() {
                 <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{gig.description}</p>
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <div className="flex items-center gap-3">
-                    <span className="flex items-center gap-1">
-                      <Star className="w-3.5 h-3.5 text-[#FFB800] fill-[#FFB800]" />
-                      {gig.rating}
-                    </span>
-                    <span>{gig.completedJobs} jobs</span>
+                    {gig.rating && (
+                      <span className="flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 text-[#FFB800] fill-[#FFB800]" />
+                        {gig.rating}
+                      </span>
+                    )}
+                    {(gig.completedJobs ?? 0) > 0 && <span>{gig.completedJobs} jobs</span>}
                   </div>
                   <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
                     {CATEGORY_EMOJIS[gig.category]} {gig.category}

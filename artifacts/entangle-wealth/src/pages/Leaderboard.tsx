@@ -17,9 +17,10 @@ interface LeaderboardEntry {
   lastName: string | null;
   photoUrl: string | null;
   gainPercent: number;
+  winStreak: number;
 }
 
-const TIER_COLORS: Record<string, string> = {
+const TRADER_TIER_COLORS: Record<string, string> = {
   Diamond: "text-[#FF8C00]",
   Platinum: "text-white/70",
   Gold: "text-[#FFB800]",
@@ -27,15 +28,61 @@ const TIER_COLORS: Record<string, string> = {
   Bronze: "text-orange-400",
 };
 
+const TRADER_TIER_BG: Record<string, string> = {
+  Diamond: "bg-[#00D4FF]/10 border-[#00D4FF]/30 text-[#00D4FF]",
+  Platinum: "bg-white/10 border-white/20 text-white/70",
+  Gold: "bg-[#FFB800]/10 border-[#FFB800]/30 text-[#FFB800]",
+  Silver: "bg-white/5 border-white/15 text-white/50",
+  Bronze: "bg-orange-400/10 border-orange-400/30 text-orange-400",
+};
+
+const RANK_TIER_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; icon: string }> = {
+  Legend: {
+    label: "LEGEND",
+    color: "text-[#FFB800]",
+    bg: "bg-[#FFB800]/10",
+    border: "border-[#FFB800]/40",
+    icon: "👑",
+  },
+  Elite: {
+    label: "ELITE",
+    color: "text-[#00D4FF]",
+    bg: "bg-[#00D4FF]/10",
+    border: "border-[#00D4FF]/30",
+    icon: "⚡",
+  },
+  Pro: {
+    label: "PRO",
+    color: "text-purple-400",
+    bg: "bg-purple-400/10",
+    border: "border-purple-400/30",
+    icon: "★",
+  },
+  Rookie: {
+    label: "ROOKIE",
+    color: "text-white/40",
+    bg: "bg-white/5",
+    border: "border-white/10",
+    icon: "◆",
+  },
+};
+
+function getRankTier(rank: number): keyof typeof RANK_TIER_CONFIG {
+  if (rank <= 5) return "Legend";
+  if (rank <= 20) return "Elite";
+  if (rank <= 50) return "Pro";
+  return "Rookie";
+}
+
 const periods = ["weekly", "monthly", "all-time"] as const;
 type Period = typeof periods[number];
 
 const DEMO_LEADERBOARD: LeaderboardEntry[] = [
-  { rank: 1, userId: "demo-1", totalXp: 12450, level: 11, tier: "Gold", monthlyXp: 3200, weeklyXp: 820, firstName: "Alex", lastName: "M", photoUrl: null, gainPercent: 18.4 },
-  { rank: 2, userId: "demo-2", totalXp: 9870, level: 10, tier: "Silver", monthlyXp: 2100, weeklyXp: 590, firstName: "Jordan", lastName: "K", photoUrl: null, gainPercent: 12.1 },
-  { rank: 3, userId: "demo-3", totalXp: 7340, level: 8, tier: "Silver", monthlyXp: 1800, weeklyXp: 430, firstName: "Sam", lastName: "R", photoUrl: null, gainPercent: 9.7 },
-  { rank: 4, userId: "demo-4", totalXp: 5200, level: 7, tier: "Bronze", monthlyXp: 1200, weeklyXp: 310, firstName: "Taylor", lastName: "B", photoUrl: null, gainPercent: 6.2 },
-  { rank: 5, userId: "demo-5", totalXp: 3100, level: 5, tier: "Bronze", monthlyXp: 800, weeklyXp: 190, firstName: "Morgan", lastName: "L", photoUrl: null, gainPercent: 3.8 },
+  { rank: 1, userId: "demo-1", totalXp: 12450, level: 11, tier: "Gold", monthlyXp: 3200, weeklyXp: 820, firstName: "Alex", lastName: "M", photoUrl: null, gainPercent: 18.4, winStreak: 21 },
+  { rank: 2, userId: "demo-2", totalXp: 9870, level: 10, tier: "Silver", monthlyXp: 2100, weeklyXp: 590, firstName: "Jordan", lastName: "K", photoUrl: null, gainPercent: 12.1, winStreak: 14 },
+  { rank: 3, userId: "demo-3", totalXp: 7340, level: 8, tier: "Silver", monthlyXp: 1800, weeklyXp: 430, firstName: "Sam", lastName: "R", photoUrl: null, gainPercent: 9.7, winStreak: 7 },
+  { rank: 4, userId: "demo-4", totalXp: 5200, level: 7, tier: "Bronze", monthlyXp: 1200, weeklyXp: 310, firstName: "Taylor", lastName: "B", photoUrl: null, gainPercent: 6.2, winStreak: 5 },
+  { rank: 5, userId: "demo-5", totalXp: 3100, level: 5, tier: "Bronze", monthlyXp: 800, weeklyXp: 190, firstName: "Morgan", lastName: "L", photoUrl: null, gainPercent: 3.8, winStreak: 3 },
 ];
 
 function RankBadge({ rank }: { rank: number }) {
@@ -43,6 +90,17 @@ function RankBadge({ rank }: { rank: number }) {
   if (rank === 2) return <Medal className="w-4 h-4 text-white/60" />;
   if (rank === 3) return <Medal className="w-4 h-4 text-orange-400" />;
   return <span className="text-xs font-mono font-bold text-white/30 w-4 text-center">{rank}</span>;
+}
+
+function RankTierPill({ rank }: { rank: number }) {
+  const tier = getRankTier(rank);
+  const config = RANK_TIER_CONFIG[tier];
+  return (
+    <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold border ${config.bg} ${config.border} ${config.color}`}>
+      <span>{config.icon}</span>
+      {config.label}
+    </span>
+  );
 }
 
 export default function Leaderboard() {
@@ -92,6 +150,21 @@ export default function Leaderboard() {
             <h1 className="text-3xl font-bold tracking-tight text-white">Leaderboard</h1>
           </div>
           <p className="text-white/50 text-sm">Top 100 traders ranked by performance</p>
+
+          {/* Rank Tier Legend */}
+          <div className="flex flex-wrap gap-2 mt-4">
+            {(["Legend", "Elite", "Pro", "Rookie"] as const).map(tier => {
+              const config = RANK_TIER_CONFIG[tier];
+              const ranges: Record<string, string> = { Legend: "Ranks 1–5", Elite: "Ranks 6–20", Pro: "Ranks 21–50", Rookie: "Ranks 51+" };
+              return (
+                <div key={tier} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono border ${config.bg} ${config.border}`}>
+                  <span>{config.icon}</span>
+                  <span className={`font-bold ${config.color}`}>{config.label}</span>
+                  <span className="text-white/30">{ranges[tier]}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Period Tabs */}
@@ -120,6 +193,7 @@ export default function Leaderboard() {
               <span className="text-sm text-white/50">Your ranking</span>
             </div>
             <div className="flex items-center gap-3">
+              <RankTierPill rank={myRank.rank} />
               <span className="text-2xl font-bold font-mono text-primary">#{myRank.rank}</span>
               <span className="text-xs text-white/30">of {myRank.totalUsers} traders</span>
             </div>
@@ -138,8 +212,11 @@ export default function Leaderboard() {
                   "border-orange-500/20"
                 }`}
               >
-                <div className="flex justify-center mb-3">
+                <div className="flex justify-center mb-2">
                   <RankBadge rank={entry.rank} />
+                </div>
+                <div className="flex justify-center mb-2">
+                  <RankTierPill rank={entry.rank} />
                 </div>
                 {entry.photoUrl ? (
                   <img src={entry.photoUrl} alt="" className="w-12 h-12 rounded-full mx-auto mb-2 border-2 border-white/10" />
@@ -149,13 +226,19 @@ export default function Leaderboard() {
                   </div>
                 )}
                 <p className="font-semibold text-sm text-white mb-0.5">{entry.firstName || "Trader"} {entry.lastName?.charAt(0) || ""}</p>
-                <span className={`text-[10px] font-semibold ${TIER_COLORS[entry.tier]}`}>{entry.tier} · Lv {entry.level}</span>
+                <span className={`text-[10px] font-semibold ${TRADER_TIER_COLORS[entry.tier]}`}>{entry.tier} · Lv {entry.level}</span>
                 <div className="flex items-center justify-center gap-1 mt-2">
                   <TrendingUp className={`w-3 h-3 ${entry.gainPercent >= 0 ? "text-primary" : "text-red-400"}`} />
                   <span className={`text-sm font-bold font-mono ${entry.gainPercent >= 0 ? "text-primary" : "text-red-400"}`}>
                     {entry.gainPercent >= 0 ? "+" : ""}{Math.abs(entry.gainPercent)}%
                   </span>
                 </div>
+                {entry.winStreak > 0 && (
+                  <div className="flex items-center justify-center gap-1 mt-1">
+                    <Flame className="w-3 h-3 text-orange-400" />
+                    <span className="text-[10px] font-mono text-orange-400">{entry.winStreak}d streak</span>
+                  </div>
+                )}
                 <p className="text-[10px] text-white/30 mt-1">{entry.totalXp.toLocaleString()} XP</p>
               </div>
             ))}
@@ -166,8 +249,11 @@ export default function Leaderboard() {
         <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-xl overflow-hidden" role="table" aria-label="Leaderboard rankings sorted by XP">
           <div role="row" className="grid grid-cols-12 gap-2 px-4 py-3 bg-white/[0.02] border-b border-white/[0.06] text-[10px] font-semibold text-white/30 uppercase tracking-wider">
             <div role="columnheader" aria-sort="ascending" className="col-span-1">#</div>
-            <div role="columnheader" className="col-span-5">Trader</div>
-            <div role="columnheader" className="col-span-2 text-right">Level</div>
+            <div role="columnheader" className="col-span-4">Trader</div>
+            <div role="columnheader" className="col-span-2 text-center">Rank</div>
+            <div role="columnheader" className="col-span-1 text-center">
+              <Flame className="w-3 h-3 inline" />
+            </div>
             <div role="columnheader" className="col-span-2 text-right">Gain</div>
             <div role="columnheader" aria-sort="descending" className="col-span-2 text-right">XP</div>
           </div>
@@ -183,17 +269,24 @@ export default function Leaderboard() {
                   <div className="col-span-1">
                     <RankBadge rank={entry.rank} />
                   </div>
-                  <div className="col-span-5 flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-full bg-white/[0.05] flex items-center justify-center">
+                  <div className="col-span-4 flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-white/[0.05] flex items-center justify-center flex-shrink-0">
                       <User className="w-3.5 h-3.5 text-white/20" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm font-medium text-white/80 truncate">{entry.firstName}</p>
-                      <span className={`text-[10px] ${TIER_COLORS[entry.tier]}`}>{entry.tier}</span>
+                      <span className={`text-[10px] ${TRADER_TIER_COLORS[entry.tier]}`}>{entry.tier} · Lv {entry.level}</span>
                     </div>
                   </div>
-                  <div className="col-span-2 text-right">
-                    <span className="text-sm font-mono text-white/50">Lv {entry.level}</span>
+                  <div className="col-span-2 flex justify-center">
+                    <RankTierPill rank={entry.rank} />
+                  </div>
+                  <div className="col-span-1 text-center">
+                    {entry.winStreak > 0 ? (
+                      <span className="text-[10px] font-mono text-orange-400 font-bold">{entry.winStreak}</span>
+                    ) : (
+                      <span className="text-[10px] text-white/20">—</span>
+                    )}
                   </div>
                   <div className="col-span-2 text-right">
                     <span className={`text-sm font-mono font-semibold ${entry.gainPercent >= 0 ? "text-primary" : "text-red-400"}`}>
@@ -216,21 +309,28 @@ export default function Leaderboard() {
                   <div className="col-span-1">
                     <RankBadge rank={entry.rank} />
                   </div>
-                  <div className="col-span-5 flex items-center gap-2.5">
+                  <div className="col-span-4 flex items-center gap-2">
                     {entry.photoUrl ? (
-                      <img src={entry.photoUrl} alt="" className="w-7 h-7 rounded-full" />
+                      <img src={entry.photoUrl} alt="" className="w-7 h-7 rounded-full flex-shrink-0" />
                     ) : (
-                      <div className="w-7 h-7 rounded-full bg-white/[0.05] flex items-center justify-center">
+                      <div className="w-7 h-7 rounded-full bg-white/[0.05] flex items-center justify-center flex-shrink-0">
                         <User className="w-3.5 h-3.5 text-white/40" />
                       </div>
                     )}
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm font-medium text-white/80 truncate">{entry.firstName || "Trader"} {entry.lastName?.charAt(0) || ""}</p>
-                      <span className={`text-[10px] ${TIER_COLORS[entry.tier]}`}>{entry.tier}</span>
+                      <span className={`text-[10px] ${TRADER_TIER_COLORS[entry.tier]}`}>{entry.tier} · Lv {entry.level}</span>
                     </div>
                   </div>
-                  <div className="col-span-2 text-right">
-                    <span className="text-sm font-mono text-white/50">Lv {entry.level}</span>
+                  <div className="col-span-2 flex justify-center">
+                    <RankTierPill rank={entry.rank} />
+                  </div>
+                  <div className="col-span-1 text-center">
+                    {entry.winStreak > 0 ? (
+                      <span className="text-[11px] font-mono text-orange-400 font-bold">{entry.winStreak}</span>
+                    ) : (
+                      <span className="text-[10px] text-white/20">—</span>
+                    )}
                   </div>
                   <div className="col-span-2 text-right">
                     <span className={`text-sm font-mono font-semibold ${entry.gainPercent >= 0 ? "text-primary" : "text-red-400"}`}>
@@ -238,7 +338,9 @@ export default function Leaderboard() {
                     </span>
                   </div>
                   <div className="col-span-2 text-right">
-                    <span className="text-sm font-mono text-white/40">{(period === "monthly" ? entry.monthlyXp : period === "weekly" ? entry.weeklyXp : entry.totalXp).toLocaleString()}</span>
+                    <span className="text-sm font-mono text-white/40">
+                      {(period === "monthly" ? entry.monthlyXp : period === "weekly" ? entry.weeklyXp : entry.totalXp).toLocaleString()}
+                    </span>
                   </div>
                 </div>
               ))}

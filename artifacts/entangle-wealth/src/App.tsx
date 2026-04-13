@@ -65,6 +65,7 @@ const CaseStudy = lazy(() => import("@/pages/CaseStudy"));
 const Charts = lazy(() => import("@/pages/Charts"));
 const Leaderboard = lazy(() => import("@/pages/Leaderboard"));
 const Achievements = lazy(() => import("@/pages/Achievements"));
+const TrophyCase = lazy(() => import("@/pages/TrophyCase"));
 const TokenWallet = lazy(() => import("@/pages/TokenWallet"));
 const TravelMarketplace = lazy(() => import("@/pages/TravelMarketplace"));
 const RewardHistory = lazy(() => import("@/pages/RewardHistory"));
@@ -434,6 +435,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/case-study">{() => <LazyPage component={CaseStudy} />}</Route>
             <Route path="/leaderboard">{() => <LazyProtected component={Leaderboard} />}</Route>
             <Route path="/achievements">{() => <LazyProtected component={Achievements} />}</Route>
+            <Route path="/trophy-case">{() => <LazyProtected component={TrophyCase} />}</Route>
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?" component={SignUpPage} />
             <Route path="/resume">{() => <LazyProtected component={Resume} />}</Route>

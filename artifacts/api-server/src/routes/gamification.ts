@@ -588,9 +588,11 @@ router.get("/gamification/leaderboard", validateQuery(LeaderboardQuerySchema), a
         weeklyXp: userXpTable.weeklyXp,
         firstName: usersTable.firstName,
         lastName: usersTable.lastName,
+        winStreak: streaksTable.currentStreak,
       })
       .from(userXpTable)
       .innerJoin(usersTable, eq(userXpTable.userId, usersTable.id))
+      .leftJoin(streaksTable, eq(userXpTable.userId, streaksTable.userId))
       .orderBy(
         period === "weekly" ? desc(userXpTable.weeklyXp) :
         period === "monthly" ? desc(userXpTable.monthlyXp) :
@@ -606,6 +608,7 @@ router.get("/gamification/leaderboard", validateQuery(LeaderboardQuerySchema), a
       return {
         rank: index + 1,
         ...rest,
+        winStreak: rest.winStreak ?? 0,
         displayName,
         gainPercent: parseFloat((Math.random() * 40 - 5).toFixed(2)),
       };

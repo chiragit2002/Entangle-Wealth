@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
-import { Award, Lock, CheckCircle, Target, Flame, Zap, Star, Trophy, TrendingUp, Users, Calendar, Gift } from "lucide-react";
+import { Award, Lock, CheckCircle, Target, Flame, Zap, Star, Trophy, TrendingUp, Users, Calendar, Gift, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DailySpinWheel } from "@/components/DailySpinWheel";
 import { XPBar } from "@/components/XPBar";
@@ -342,14 +342,63 @@ export default function Achievements() {
   );
 }
 
+function getDeadline(type: string): Date {
+  const now = new Date();
+  if (type === "daily") {
+    const midnight = new Date(now);
+    midnight.setUTCHours(24, 0, 0, 0);
+    return midnight;
+  }
+  const endOfWeek = new Date(now);
+  const daysUntilSunday = (7 - now.getUTCDay()) % 7 || 7;
+  endOfWeek.setUTCDate(now.getUTCDate() + daysUntilSunday);
+  endOfWeek.setUTCHours(0, 0, 0, 0);
+  return endOfWeek;
+}
+
+function getXpMultiplier(msLeft: number): { multiplier: number; label: string; urgent: boolean } {
+  const minutesLeft = msLeft / 60000;
+  if (minutesLeft <= 15) return { multiplier: 2, label: "2x XP", urgent: true };
+  if (minutesLeft <= 60) return { multiplier: 1.5, label: "1.5x XP", urgent: true };
+  return { multiplier: 1, label: "", urgent: false };
+}
+
+function useCountdown(deadline: Date) {
+  const [msLeft, setMsLeft] = useState(() => deadline.getTime() - Date.now());
+
+  useEffect(() => {
+    const update = () => setMsLeft(deadline.getTime() - Date.now());
+    update();
+    const t = setInterval(update, 1000);
+    return () => clearInterval(t);
+  }, [deadline.getTime()]);
+
+  return Math.max(msLeft, 0);
+}
+
+function formatTimeLeft(ms: number): string {
+  if (ms <= 0) return "Expired";
+  const totalSecs = Math.floor(ms / 1000);
+  const h = Math.floor(totalSecs / 3600);
+  const m = Math.floor((totalSecs % 3600) / 60);
+  const s = totalSecs % 60;
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
 function ChallengeCard({ challenge }: { challenge: ChallengeData }) {
   const progressPercent = Math.min((challenge.progress / challenge.target) * 100, 100);
+  const deadline = getDeadline(challenge.type);
+  const msLeft = useCountdown(deadline);
+  const { multiplier, label: multiplierLabel, urgent } = getXpMultiplier(msLeft);
+  const effectiveXp = Math.round(challenge.xpReward * multiplier);
 
   return (
-    <div className={`glass-panel p-4 ${challenge.completed ? "border-[#FF8C00]/20 bg-[#FF8C00]/5" : ""}`}>
+    <div className={`glass-panel p-4 ${challenge.completed ? "border-[#FF8C00]/20 bg-[#FF8C00]/5" : urgent ? "border-orange-500/30" : ""}`}>
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <h3 className="font-bold text-sm">{challenge.title}</h3>
             <span className={`text-[9px] px-1.5 py-0.5 rounded-full border ${
               challenge.type === "daily" ? "text-orange-400 bg-orange-400/10 border-orange-400/30" : "text-primary bg-primary/10 border-primary/30"
@@ -360,20 +409,40 @@ function ChallengeCard({ challenge }: { challenge: ChallengeData }) {
           </div>
           <p className="text-xs text-muted-foreground">{challenge.description}</p>
         </div>
-        <div className="flex items-center gap-1 ml-3">
-          <Zap className="w-3 h-3 text-yellow-400" />
-          <span className="text-xs font-mono font-bold text-yellow-400">{challenge.xpReward} XP</span>
+        <div className="flex flex-col items-end gap-1 ml-3 flex-shrink-0">
+          <div className="flex items-center gap-1">
+            <Zap className="w-3 h-3 text-yellow-400" />
+            <span className={`text-xs font-mono font-bold ${multiplier > 1 ? "text-orange-400" : "text-yellow-400"}`}>
+              {effectiveXp} XP
+            </span>
+          </div>
+          {multiplier > 1 && !challenge.completed && (
+            <span className="text-[9px] font-mono font-bold text-orange-400 bg-orange-400/10 border border-orange-400/30 px-1.5 py-0.5 rounded animate-pulse">
+              {multiplierLabel}
+            </span>
+          )}
         </div>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 mb-2">
         <div className="flex-1 bg-white/5 rounded-full h-2">
           <div
-            className={`h-2 rounded-full transition-all ${challenge.completed ? "bg-[#FF8C00]" : "bg-primary"}`}
+            className={`h-2 rounded-full transition-all ${challenge.completed ? "bg-[#FF8C00]" : urgent ? "bg-orange-400" : "bg-primary"}`}
             style={{ width: `${progressPercent}%` }}
           />
         </div>
         <span className="text-xs font-mono text-white/40">{challenge.progress}/{challenge.target}</span>
       </div>
+      {!challenge.completed && (
+        <div className="flex items-center gap-1.5">
+          <Clock className="w-3 h-3 text-white/30 flex-shrink-0" />
+          <span className={`text-[10px] font-mono ${urgent ? "text-orange-400 font-bold" : "text-white/30"}`}>
+            {formatTimeLeft(msLeft)} remaining
+          </span>
+          {urgent && multiplier > 1 && (
+            <span className="text-[9px] text-orange-400/70 font-mono">· bonus active!</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -53,6 +53,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/leaderboard", label: "Leaderboard" },
       { href: "/achievements", label: "Achievements" },
+      { href: "/trophy-case", label: "Trophy Case" },
       { href: "/community", label: "Community" },
       { href: "/wallet", label: "Rewards Balance" },
       { href: "/blog", label: "Blog" },
@@ -98,6 +99,7 @@ const MOBILE_SECTIONS = [
     links: [
       { href: "/leaderboard", label: "Leaderboard" },
       { href: "/achievements", label: "Achievements" },
+      { href: "/trophy-case", label: "Trophy Case" },
       { href: "/community", label: "Community" },
       { href: "/wallet", label: "Rewards Balance" },
       { href: "/blog", label: "Blog" },

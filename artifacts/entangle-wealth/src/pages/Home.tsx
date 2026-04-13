@@ -42,7 +42,7 @@ interface FetchState<T> {
 }
 
 function useHeroStats(): FetchState<HeroStats> & { defaultStats: HeroStats } {
-  const defaultStats: HeroStats = { members: 4891, signals: 1247, accuracy: 87 };
+  const defaultStats: HeroStats = { members: 0, signals: 0, accuracy: 0 };
   const [state, setState] = useState<FetchState<HeroStats>>({
     data: defaultStats,
     error: false,
@@ -865,16 +865,14 @@ export default function Home() {
               ))}
             </div>
             <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-sm text-white/30 font-medium">
-              <span>{stats.accuracy}% guidance accuracy</span>
-              <span>·</span>
-              <span>{animatedMembers.toLocaleString()}+ members</span>
-              <span>·</span>
+              {stats.accuracy > 0 && <><span>{stats.accuracy}% guidance accuracy</span><span>·</span></>}
+              {stats.members > 0 && <><span>{animatedMembers.toLocaleString()}+ members</span><span>·</span></>}
               <span>Free forever tier</span>
             </div>
           </div>
         </section>
 
-        {/* Testimonials */}
+        {testimonialsState.data && testimonialsState.data.length > 0 && (
         <section className="py-16 lg:py-24 px-4 border-t border-white/5">
           <div className="container mx-auto max-w-3xl">
             <div className="text-center mb-10">
@@ -884,15 +882,6 @@ export default function Home() {
               <p className="text-sm text-white/50">Real experiences from Entangled Wealth users.</p>
             </div>
 
-            {testimonialsState.error && (
-              <InlineError message="Couldn't load member reviews right now. Please refresh to try again." />
-            )}
-
-            {!testimonialsState.error && !testimonialsState.loading && testimonialsState.data === null && (
-              <p className="text-center text-sm text-white/30">No reviews yet — be the first!</p>
-            )}
-
-            {testimonialsState.data && testimonialsState.data.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {testimonialsState.data.slice(0, 6).map((t) => (
                   <div key={t.id} className="bloomberg-panel p-5 flex flex-col gap-3">
@@ -921,9 +910,9 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-            )}
           </div>
         </section>
+        )}
 
         {/* Final CTA */}
         <section className="py-20 lg:py-28 px-4 border-t border-white/5">

@@ -32,17 +32,6 @@ const GigsQuerySchema = z.object({
   q: z.string().max(200).optional(),
 });
 
-const MOCK_GIGS = [
-  { id: "mock-1", userId: "system", title: "Pressure Wash Driveway & Walkway", description: "Professional pressure washing. Before/after photos provided.", price: "$120", category: "outdoor", contactName: "Marcus J.", rating: "4.9", completedJobs: 47, isActive: true, createdAt: new Date() },
-  { id: "mock-2", userId: "system", title: "Full Car Detail Interior & Exterior", description: "Complete detail including vacuum, wipe down, exterior wash and wax.", price: "$85", category: "auto", contactName: "DeShawn T.", rating: "5.0", completedJobs: 83, isActive: true, createdAt: new Date() },
-  { id: "mock-3", userId: "system", title: "Lawn Mowing & Edging", description: "Mow, edge, and blow. Yards up to 1/4 acre. Same day available.", price: "$45", category: "outdoor", contactName: "Carlos R.", rating: "4.8", completedJobs: 124, isActive: true, createdAt: new Date() },
-  { id: "mock-4", userId: "system", title: "House Deep Clean Top to Bottom", description: "Full home deep clean. Bathrooms, kitchen, floors, baseboards.", price: "$150", category: "cleaning", contactName: "Tanya M.", rating: "4.9", completedJobs: 61, isActive: true, createdAt: new Date() },
-  { id: "mock-5", userId: "system", title: "Help Moving Furniture & Boxes", description: "Strong and reliable. Truck available for extra fee. No job too big.", price: "$35/hr", category: "moving", contactName: "Jerome B.", rating: "4.7", completedJobs: 38, isActive: true, createdAt: new Date() },
-  { id: "mock-6", userId: "system", title: "Shed & Garage Cleanout", description: "Full cleanout, haul away, sweep. Same week availability.", price: "$95", category: "cleaning", contactName: "Lisa K.", rating: "4.8", completedJobs: 29, isActive: true, createdAt: new Date() },
-  { id: "mock-7", userId: "system", title: "Mobile Oil Change", description: "I come to you. Most vehicles. Synthetic blend included.", price: "$65", category: "auto", contactName: "Andre W.", rating: "4.9", completedJobs: 56, isActive: true, createdAt: new Date() },
-  { id: "mock-8", userId: "system", title: "Junk Removal & Haul Away", description: "Same-day pickup. Furniture, appliances, yard waste. Free estimates.", price: "$80+", category: "moving", contactName: "Ray D.", rating: "4.6", completedJobs: 42, isActive: true, createdAt: new Date() },
-];
-
 router.get("/gigs", validateQuery(GigsQuerySchema), async (req, res) => {
   if (!checkPublicRateLimit(req)) {
     res.status(429).json({ error: "Too many requests. Please slow down." });
@@ -63,31 +52,10 @@ router.get("/gigs", validateQuery(GigsQuerySchema), async (req, res) => {
       .orderBy(desc(gigsTable.createdAt))
       .limit(50);
 
-    let allGigs = [...dbGigs];
-    if (allGigs.length < 4) {
-      let mockFiltered = MOCK_GIGS;
-      if (category && category !== "all") {
-        mockFiltered = mockFiltered.filter(g => g.category === category);
-      }
-      if (q) {
-        const query = String(q).toLowerCase();
-        mockFiltered = mockFiltered.filter(g => g.title.toLowerCase().includes(query));
-      }
-      allGigs = [...allGigs, ...mockFiltered];
-    }
-
-    res.json(allGigs);
+    res.json(dbGigs);
   } catch (error) {
     logger.error({ err: error }, "Error fetching gigs:");
-    let mockFiltered = MOCK_GIGS;
-    if (category && category !== "all") {
-      mockFiltered = mockFiltered.filter(g => g.category === category);
-    }
-    if (q) {
-      const query = String(q).toLowerCase();
-      mockFiltered = mockFiltered.filter(g => g.title.toLowerCase().includes(query));
-    }
-    res.json(mockFiltered);
+    res.status(500).json({ error: "Failed to fetch gigs" });
   }
 });
 

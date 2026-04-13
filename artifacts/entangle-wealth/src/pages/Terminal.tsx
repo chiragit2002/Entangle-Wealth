@@ -98,9 +98,8 @@ export default function Terminal() {
       if (e.key === "Escape") { setShowShortcuts(false); return; }
       if (e.key === "1") navigate("/dashboard");
       if (e.key === "2") navigate("/terminal");
-      if (e.key === "3") navigate("/market-overview");
-      if (e.key === "4") navigate("/technical");
-      if (e.key === "5") navigate("/stocks");
+      if (e.key === "3") navigate("/technical");
+      if (e.key === "4") navigate("/stocks");
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -162,8 +161,8 @@ export default function Terminal() {
             </div>
             <div className="space-y-1">
               {[
-                ["1", "Dashboard"], ["2", "Terminal"], ["3", "Market Overview"],
-                ["4", "Technical Analysis"], ["5", "Stock Explorer"],
+                ["1", "Dashboard"], ["2", "Terminal"], ["3", "Technical Analysis"],
+                ["4", "Stock Explorer"],
                 ["?", "Toggle shortcuts"], ["Esc", "Close"],
               ].map(([key, desc]) => (
                 <div key={key} className="flex items-center gap-3 py-1">

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { trackEvent } from "@/lib/trackEvent";
-import { Search, MapPin, Briefcase, Clock, ExternalLink, Bookmark, BookmarkCheck, Filter, Loader2 } from "lucide-react";
+import { Search, MapPin, Briefcase, Clock, ExternalLink, Bookmark, BookmarkCheck, Loader2 } from "lucide-react";
 import { useUser, useAuth } from "@clerk/react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -24,25 +24,19 @@ interface Job {
   isRemote: boolean;
 }
 
-const API_BASE = "/api";
-
-const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Freelance", "Gig"];
-
 export default function Jobs() {
   const { user } = useUser();
   const { getToken } = useAuth();
   const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [location, setLocation] = useState("");
-  const [jobType, setJobType] = useState("");
-  const [remoteOnly, setRemoteOnly] = useState(false);
+  const [jobType] = useState("");
+  const [remoteOnly] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [disclaimer, setDisclaimer] = useState("");
   const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
-  const [showFilters, setShowFilters] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
   const searchJobs = useCallback(async (resetPage = true) => {
@@ -56,7 +50,7 @@ export default function Jobs() {
       if (remoteOnly) params.set("remote", "true");
       params.set("page", String(searchPage));
 
-      const res = await fetch(`${API_BASE}/jobs/search?${params.toString()}`);
+      const res = await authFetch(`/jobs/search?${params.toString()}`, getToken);
       if (!res.ok) throw new Error("Search failed");
       const data = await res.json();
 
@@ -67,7 +61,6 @@ export default function Jobs() {
         setJobs(prev => [...prev, ...data.jobs]);
       }
       setHasMore(data.hasMore);
-      setDisclaimer(data.disclaimer || "");
       setHasSearched(true);
     } catch {
       toast({ title: "Search failed", description: "Please try again.", variant: "destructive" });
@@ -77,8 +70,8 @@ export default function Jobs() {
   }, [query, location, jobType, remoteOnly, page, toast]);
 
   useEffect(() => {
-    searchJobs(true);
-  }, []);
+    if (user) searchJobs(true);
+  }, [user]);
 
   const saveJob = async (job: Job) => {
     if (!user) {
@@ -156,49 +149,8 @@ export default function Jobs() {
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
               <span className="ml-2">Search</span>
             </Button>
-            <Button type="button" variant="outline" className="border-white/20" onClick={() => setShowFilters(!showFilters)}>
-              <Filter className="w-4 h-4" />
-            </Button>
           </form>
-
-          {showFilters && (
-            <div className="mt-4 pt-4 border-t border-white/10 flex flex-wrap gap-3 items-center">
-              <span className="text-sm text-muted-foreground">Job Type:</span>
-              {JOB_TYPES.map(type => (
-                <Button
-                  key={type}
-                  variant={jobType === type ? "default" : "outline"}
-                  size="sm"
-                  className={jobType === type ? "bg-primary text-primary-foreground" : "border-white/20 text-muted-foreground"}
-                  onClick={() => setJobType(jobType === type ? "" : type)}
-                >
-                  {type}
-                </Button>
-              ))}
-              <label className="flex items-center gap-2 text-sm ml-4">
-                <input
-                  type="checkbox"
-                  checked={remoteOnly}
-                  onChange={(e) => setRemoteOnly(e.target.checked)}
-                  className="accent-primary"
-                />
-                Remote only
-              </label>
-              {(jobType || remoteOnly) && (
-                <Button variant="ghost" size="sm" className="text-red-400" onClick={() => { setJobType(""); setRemoteOnly(false); }}>
-                  Clear filters
-                </Button>
-              )}
-            </div>
-          )}
         </div>
-
-        {disclaimer && (
-          <div className="text-xs text-yellow-400/70 mb-4 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-yellow-400/50" />
-            {disclaimer}
-          </div>
-        )}
 
         <div className="space-y-4">
           {jobs.map((job) => (
@@ -256,10 +208,13 @@ export default function Jobs() {
           )}
 
           {!loading && hasSearched && jobs.length === 0 && (
-            <div className="text-center py-16">
+            <div className="text-center py-16 border border-white/[0.06] rounded-lg bg-white/[0.02]">
               <Briefcase className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-              <p className="text-muted-foreground text-lg">No jobs found matching your search.</p>
-              <p className="text-muted-foreground/50 text-sm mt-1">Try adjusting your keywords or filters.</p>
+              <p className="text-muted-foreground text-lg font-medium">No job listings available</p>
+              <p className="text-muted-foreground/50 text-sm mt-2 max-w-md mx-auto">
+                Real-time job listings will appear here when a job search API is connected.
+                Save jobs you find elsewhere to track them in your profile.
+              </p>
             </div>
           )}
 

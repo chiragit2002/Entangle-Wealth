@@ -196,9 +196,12 @@ export default function Gigs() {
         {loading ? (
           <div className="flex justify-center py-16"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
         ) : gigs.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground">
+          <div className="text-center py-16 border border-white/[0.06] rounded-lg bg-white/[0.02]">
             <Wrench className="w-12 h-12 mx-auto mb-4 opacity-30" />
-            <p>No gigs found. Try a different category or be the first to post!</p>
+            <p className="text-muted-foreground text-lg font-medium">No gigs available yet</p>
+            <p className="text-muted-foreground/50 text-sm mt-2 max-w-md mx-auto">
+              Be the first to post a gig and offer your services to the community.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

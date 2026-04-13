@@ -214,20 +214,16 @@ router.get("/stats/user-count", async (_req, res) => {
   }
 });
 
-const ACCURACY_BASELINE = 87;
-const SIGNALS_BASELINE = 1247;
-const MEMBERS_BASELINE = 4891;
-
 // Public endpoint — approved in publicEndpointPolicy.ts (PUBLIC_ENDPOINT_POLICY[7]).
 // Only returns COUNT(*) aggregates — no individual user records are accessed.
 void PUBLIC_ENDPOINT_POLICY[7];
 router.get("/stats/hero", async (_req, res) => {
   try {
     const [memberResult] = await db.select({ count: count() }).from(usersTable);
-    const memberCount = Number(memberResult?.count || 0);
+    const members = Number(memberResult?.count || 0);
 
     const [signalResult] = await db.select({ count: count() }).from(alertHistoryTable);
-    const dbSignals = Number(signalResult?.count || 0);
+    const signals = Number(signalResult?.count || 0);
 
     const [correctResult] = await db
       .select({ count: count() })
@@ -235,15 +231,9 @@ router.get("/stats/hero", async (_req, res) => {
       .where(sql`alert_type IN ('price_above', 'price_below', 'volume_spike', 'percent_change')`);
     const dbCorrect = Number(correctResult?.count || 0);
 
-    const signals = dbSignals > 0 ? SIGNALS_BASELINE + dbSignals : SIGNALS_BASELINE;
-    const members = memberCount > 0 ? Math.max(memberCount, MEMBERS_BASELINE) : MEMBERS_BASELINE;
-
-    let accuracy: number;
-    if (dbSignals > 100) {
-      const rawAccuracy = Math.round((dbCorrect / dbSignals) * 100);
-      accuracy = Math.min(99, Math.max(70, Math.round(rawAccuracy * 0.15 + ACCURACY_BASELINE * 0.85)));
-    } else {
-      accuracy = ACCURACY_BASELINE;
+    let accuracy = 0;
+    if (signals > 10) {
+      accuracy = Math.round((dbCorrect / signals) * 100);
     }
 
     res.json({ members, signals, accuracy });

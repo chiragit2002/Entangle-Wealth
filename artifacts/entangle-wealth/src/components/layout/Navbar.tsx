@@ -19,7 +19,6 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/command-center", label: "Command Center", desc: "Bloomberg-style workspace" },
       { href: "/dashboard", label: "Dashboard", desc: "Overview" },
-      { href: "/market-overview", label: "Markets", desc: "Live overview" },
       { href: "/charts", label: "Charts", desc: "TradingView Pro" },
       { href: "/options", label: "Options", desc: "Chain & Greeks" },
       { href: "/screener", label: "Screener", desc: "Stock filter" },
@@ -43,7 +42,6 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/ai-coach", label: "AI Coach", desc: "Behavioral finance" },
       { href: "/alerts", label: "Alerts", desc: "Real-time alerts" },
       { href: "/tax", label: "TaxFlow", desc: "Tax dashboard" },
-      { href: "/travel", label: "Business Travel", desc: "IRS trip planner" },
       { href: "/receipts", label: "Receipt Capture", desc: "Scan & track receipts" },
       { href: "/integrations", label: "Integrations", desc: "Connect accounting apps" },
     ],
@@ -66,7 +64,6 @@ const MOBILE_SECTIONS = [
     links: [
       { href: "/command-center", label: "Command Center" },
       { href: "/dashboard", label: "Dashboard" },
-      { href: "/market-overview", label: "Markets" },
       { href: "/charts", label: "Charts" },
       { href: "/options", label: "Options" },
       { href: "/screener", label: "Screener" },
@@ -90,7 +87,6 @@ const MOBILE_SECTIONS = [
       { href: "/ai-coach", label: "AI Coach" },
       { href: "/alerts", label: "Alerts" },
       { href: "/tax", label: "TaxFlow" },
-      { href: "/travel", label: "Business Travel" },
       { href: "/receipts", label: "Receipt Capture" },
       { href: "/integrations", label: "Integrations" },
     ],

@@ -460,11 +460,10 @@ export default function Dashboard() {
       if (e.key === "Escape") { setShowShortcuts(false); setQuickAnalysis(null); return; }
       if (e.key === "1") navigate("/dashboard");
       if (e.key === "2") navigate("/terminal");
-      if (e.key === "3") navigate("/market-overview");
-      if (e.key === "4") navigate("/technical");
-      if (e.key === "5") navigate("/stocks");
-      if (e.key === "6") navigate("/screener");
-      if (e.key === "7") navigate("/options");
+      if (e.key === "3") navigate("/technical");
+      if (e.key === "4") navigate("/stocks");
+      if (e.key === "5") navigate("/screener");
+      if (e.key === "6") navigate("/options");
       if (e.key === "/") {
         e.preventDefault();
         document.querySelector<HTMLInputElement>('[data-cmd-search]')?.focus();

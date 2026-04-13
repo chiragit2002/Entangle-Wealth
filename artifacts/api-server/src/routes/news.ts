@@ -248,6 +248,8 @@ async function fetchArticleBody(url: string): Promise<string> {
 let cachedItems: NewsItem[] = [];
 let cacheTime = 0;
 const CACHE_TTL = 5 * 60 * 1000;
+const BG_SCRAPE_INTERVAL = 7 * 60 * 1000;
+let bgScrapeTimer: ReturnType<typeof setInterval> | null = null;
 
 async function parseFeed(topic: string, url: string): Promise<NewsItem[]> {
   try {
@@ -378,6 +380,32 @@ const NewsQuerySchema = PaginationQuerySchema.extend({
   search: z.string().max(200).optional().default(""),
 });
 
+async function runBackgroundScrape() {
+  try {
+    const prevItems = cachedItems;
+    const prevTime = cacheTime;
+    cacheTime = 0;
+    cachedItems = [];
+    await scrapeAllFeeds();
+    if (cachedItems.length === 0 && prevItems.length > 0) {
+      cachedItems = prevItems;
+      cacheTime = prevTime;
+    }
+    logger.info({ count: cachedItems.length }, "Background news scrape completed");
+  } catch (err) {
+    logger.error({ err }, "Background news scrape failed");
+  }
+}
+
+function startBackgroundScraper() {
+  if (bgScrapeTimer) return;
+  runBackgroundScrape();
+  bgScrapeTimer = setInterval(runBackgroundScrape, BG_SCRAPE_INTERVAL);
+  logger.info("News background scraper started (interval: 7 min)");
+}
+
+startBackgroundScraper();
+
 router.get("/news", validateQuery(NewsQuerySchema), async (req: Request, res: Response) => {
   try {
     const topic = (req.query.topic as string) || "";
@@ -391,7 +419,20 @@ router.get("/news", validateQuery(NewsQuerySchema), async (req: Request, res: Re
       return;
     }
 
-    const items = await scrapeAllFeeds();
+    const items = cachedItems;
+
+    if (items.length === 0) {
+      res.json({
+        items: [],
+        total: 0,
+        topics: {},
+        cachedAt: 0,
+        feedCount: FEEDS.length,
+        initializing: true,
+        message: "News intelligence is initializing. Feed data will be available shortly.",
+      });
+      return;
+    }
 
     let filtered = items;
 

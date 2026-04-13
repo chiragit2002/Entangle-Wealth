@@ -76,11 +76,11 @@ export default function BlogIndex() {
                   <p className="text-xs text-muted-foreground">55+ indicators with AI consensus signals</p>
                 </div>
               </Link>
-              <Link href="/market-overview">
+              <Link href="/screener">
                 <div className="group rounded-xl border border-white/[0.06] p-5 hover:border-primary/20 transition-all cursor-pointer text-left" style={{ background: "rgba(8,8,20,0.6)" }}>
                   <GraduationCap className="w-6 h-6 text-primary mb-3" />
-                  <p className="font-semibold text-white text-sm mb-1">Market Overview</p>
-                  <p className="text-xs text-muted-foreground">Live market data and sector analysis</p>
+                  <p className="font-semibold text-white text-sm mb-1">Stock Screener</p>
+                  <p className="text-xs text-muted-foreground">Filter and find your next trade</p>
                 </div>
               </Link>
             </div>

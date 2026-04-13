@@ -6,7 +6,7 @@ import { Home, ArrowLeft, Activity, TrendingUp, BarChart3, HelpCircle } from "lu
 
 const QUICK_LINKS = [
   { href: "/dashboard", label: "Command Center", icon: Activity, desc: "Back to mission control" },
-  { href: "/market-overview", label: "Market Pulse", icon: TrendingUp, desc: "Live quantum feed" },
+  { href: "/technical", label: "Technical Analysis", icon: TrendingUp, desc: "55+ indicators & AI signals" },
   { href: "/screener", label: "Signal Screener", icon: BarChart3, desc: "Find the next move" },
   { href: "/help", label: "Help Portal", icon: HelpCircle, desc: "Reach the support team" },
 ];

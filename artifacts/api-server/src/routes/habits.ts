@@ -56,7 +56,7 @@ async function awardHabitXp(userId: string, amount: number, habitSlug: string): 
   return finalAmount;
 }
 
-router.get("/habits", async (_req, res) => {
+router.get("/habits", requireAuth, async (_req, res) => {
   try {
     const habits = await db
       .select()

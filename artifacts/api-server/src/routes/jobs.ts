@@ -39,8 +39,7 @@ router.get("/jobs/search", requireAuth, validateQuery(JobsSearchQuerySchema), as
     const apiKey = process.env.JSEARCH_API_KEY || process.env.RAPIDAPI_KEY;
 
     if (!apiKey) {
-      const mockJobs = generateMockJobs(query, locationStr, pageNum);
-      res.json(mockJobs);
+      res.json({ jobs: [], page: pageNum, hasMore: false });
       return;
     }
 
@@ -55,8 +54,7 @@ router.get("/jobs/search", requireAuth, validateQuery(JobsSearchQuerySchema), as
     );
 
     if (!response.ok) {
-      const mockJobs = generateMockJobs(query, locationStr, pageNum);
-      res.json(mockJobs);
+      res.json({ jobs: [], page: pageNum, hasMore: false });
       return;
     }
 
@@ -82,62 +80,12 @@ router.get("/jobs/search", requireAuth, validateQuery(JobsSearchQuerySchema), as
       jobs,
       page: pageNum,
       hasMore: jobs.length >= 10,
-      disclaimer: "Job listings sourced from third-party providers. Verify details before applying.",
     });
   } catch (error) {
     logger.error({ err: error }, "Job search error:");
-    const mockJobs = generateMockJobs((q as string) || "developer", (location as string) || "", pageNum);
-    res.json(mockJobs);
+    res.json({ jobs: [], page: pageNum, hasMore: false });
   }
 });
-
-function generateMockJobs(query: string, location: string, page: number) {
-  const companies = [
-    "TechFlow Inc.", "DataBridge Corp", "CloudNine Solutions", "Nexus Digital",
-    "Apex Analytics", "Quantum Labs", "Vertex Systems", "Pulse Technologies",
-    "Synergy AI", "Cascade Networks", "Horizon Software", "Summit Platforms",
-    "Forge Technologies", "Atlas Computing", "Pioneer Data Systems",
-    "DigitalCraft", "ByteWave", "CoreStack", "MetaLogic", "NanoTech Solutions",
-  ];
-
-  const titles = [
-    `Senior ${query}`, `${query} Lead`, `Junior ${query}`, `${query} Engineer`,
-    `${query} Analyst`, `Staff ${query}`, `Principal ${query}`, `${query} Architect`,
-    `${query} Manager`, `Associate ${query}`,
-  ];
-
-  const locations = location
-    ? [location, `${location} (Remote)`, `${location} (Hybrid)`]
-    : ["New York, NY", "San Francisco, CA", "Austin, TX", "Remote", "Chicago, IL", "Seattle, WA", "Denver, CO", "Boston, MA", "Miami, FL", "Portland, OR"];
-
-  const types = ["Full-time", "Part-time", "Contract", "Freelance", "Gig"];
-
-  const jobs = Array.from({ length: 10 }, (_, i) => {
-    const idx = (page - 1) * 10 + i;
-    const seed = idx * 7919;
-    return {
-      id: `mock-${idx}-${seed}`,
-      title: titles[idx % titles.length],
-      company: companies[idx % companies.length],
-      location: locations[idx % locations.length],
-      salary: `$${60 + (seed % 120)}K - $${100 + (seed % 150)}K`,
-      jobType: types[idx % types.length],
-      description: `We are looking for a talented ${query} to join our team. You will work on cutting-edge projects, collaborate with cross-functional teams, and help drive innovation. This is a great opportunity for someone passionate about technology and making an impact.`,
-      applyUrl: null,
-      postedDate: new Date(Date.now() - (idx * 86400000)).toISOString(),
-      source: "EntangleWealth Jobs",
-      companyLogo: null,
-      isRemote: idx % 3 === 0,
-    };
-  });
-
-  return {
-    jobs,
-    page,
-    hasMore: page < 5,
-    disclaimer: "Demo job listings shown. Connect a job search API for real-time results.",
-  };
-}
 
 router.get("/jobs/saved", requireAuth, async (req, res) => {
   const userId = (req as AuthenticatedRequest).userId;

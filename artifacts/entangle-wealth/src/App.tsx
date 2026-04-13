@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, lazy, Suspense } from "react";
+import { useEffect, useRef, useMemo, lazy, Suspense, useState, useCallback } from "react";
 import { Switch, Route, Link, useLocation, Router as WouterRouter, Redirect, useSearch } from "wouter";
 import logoImg from "@assets/Gemini_Generated_Image_nso2qnso2qnso2qn_1775900950533.png";
 import { ClerkProvider, SignIn, SignUp, Show, useClerk } from "@clerk/react";
@@ -22,6 +22,8 @@ import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { Info } from "lucide-react";
 import { AuthErrorHandler } from "@/components/AuthErrorHandler";
 import { AuthTokenError } from "@/lib/authFetch";
+import { BootSequence } from "@/components/BootSequence";
+import { QuantumPageTransition } from "@/components/QuantumPageTransition";
 const MilestoneCelebrationModal = lazy(() =>
   import("@/components/viral/MilestoneCelebrationModal").then((m) => ({ default: m.MilestoneCelebrationModal }))
 );
@@ -535,8 +537,14 @@ function ClerkProviderWithRoutes() {
 }
 
 function App() {
+  const [bootDone, setBootDone] = useState(false);
+
   useEffect(() => {
     captureReferralCode();
+  }, []);
+
+  const handleBootComplete = useCallback(() => {
+    setBootDone(true);
   }, []);
 
   return (
@@ -547,7 +555,9 @@ function App() {
           SentryReact.captureException(error);
         });
       }}>
+        {!bootDone && <BootSequence onComplete={handleBootComplete} />}
         <WouterRouter base={basePath}>
+          <QuantumPageTransition />
           <ClerkProviderWithRoutes />
         </WouterRouter>
       </ErrorBoundary>

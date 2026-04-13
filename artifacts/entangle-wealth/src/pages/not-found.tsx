@@ -1,79 +1,211 @@
+import { useState, useEffect, useRef } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { Home, ArrowLeft, Search, Activity, TrendingUp, BarChart3, Shield, HelpCircle } from "lucide-react";
+import { Home, ArrowLeft, Activity, TrendingUp, BarChart3, HelpCircle } from "lucide-react";
 
 const QUICK_LINKS = [
-  { href: "/dashboard", label: "Dashboard", icon: Activity, desc: "Command center" },
-  { href: "/market-overview", label: "Markets", icon: TrendingUp, desc: "Live overview" },
-  { href: "/screener", label: "Screener", icon: BarChart3, desc: "Stock filter" },
-  { href: "/help", label: "Help Center", icon: HelpCircle, desc: "FAQ & support" },
+  { href: "/dashboard", label: "Command Center", icon: Activity, desc: "Back to mission control" },
+  { href: "/market-overview", label: "Market Pulse", icon: TrendingUp, desc: "Live quantum feed" },
+  { href: "/screener", label: "Signal Screener", icon: BarChart3, desc: "Find the next move" },
+  { href: "/help", label: "Help Portal", icon: HelpCircle, desc: "Reach the support team" },
 ];
 
+const WITTY_LINES = [
+  "Even quantum computers can't locate this timeline.",
+  "The particles that made this page have since entangled elsewhere.",
+  "Our agents searched 55+ dimensions. Nothing.",
+  "This URL exists in a parallel universe — not this one.",
+  "Signal lost. The data streams don't flow here.",
+];
+
+interface LostParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  alpha: number;
+  size: number;
+  color: string;
+}
+
 export default function NotFound() {
+  const [wittyLine] = useState(() => WITTY_LINES[Math.floor(Math.random() * WITTY_LINES.length)]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animRef = useRef<number | null>(null);
+  const particlesRef = useRef<LostParticle[]>([]);
+
+  const prefersReduced =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  useEffect(() => {
+    if (prefersReduced) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const spawn = () => ({
+      x: canvas.width / 2 + (Math.random() - 0.5) * 80,
+      y: canvas.height / 2 + (Math.random() - 0.5) * 80,
+      vx: (Math.random() - 0.5) * 1.5,
+      vy: (Math.random() - 0.5) * 1.5 - 0.3,
+      alpha: 0.8,
+      size: Math.random() * 3 + 1,
+      color: Math.random() > 0.5 ? "#00D4FF" : "#7B61FF",
+    });
+
+    particlesRef.current = Array.from({ length: 40 }, spawn);
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let tick = 0;
+    const animate = () => {
+      tick++;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (tick % 4 === 0 && particlesRef.current.length < 60) {
+        particlesRef.current.push(spawn());
+      }
+
+      for (let i = particlesRef.current.length - 1; i >= 0; i--) {
+        const p = particlesRef.current[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.004;
+        p.vx *= 0.999;
+        p.vy *= 0.999;
+
+        if (p.alpha <= 0) {
+          particlesRef.current.splice(i, 1);
+          continue;
+        }
+
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      ctx.globalAlpha = 1;
+      animRef.current = requestAnimationFrame(animate);
+    };
+
+    animRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+      window.removeEventListener("resize", resize);
+    };
+  }, [prefersReduced]);
+
   return (
     <Layout>
       <div className="flex-1 flex flex-col items-center justify-center py-20 px-4 text-center">
-        <div className="relative mb-8">
-          <div className="w-32 h-32 rounded-3xl flex items-center justify-center relative"
+        <div className="relative mb-10">
+          {!prefersReduced && (
+            <canvas
+              ref={canvasRef}
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              style={{ width: "200px", height: "160px", top: "-30px", left: "50%", transform: "translateX(-50%)" }}
+            />
+          )}
+
+          <div
+            className="relative w-36 h-36 rounded-3xl flex flex-col items-center justify-center mx-auto"
             style={{
-              background: "linear-gradient(135deg, rgba(0,212,255,0.08), rgba(156,39,176,0.08))",
-              border: "1px solid rgba(0,212,255,0.15)",
+              background: "linear-gradient(135deg, rgba(0,212,255,0.06), rgba(123,97,255,0.06))",
+              border: "1px solid rgba(0,212,255,0.18)",
+              boxShadow: "0 0 40px rgba(0,212,255,0.08)",
             }}
           >
-            <span className="text-6xl font-bold font-mono bg-gradient-to-br from-[#00D4FF] to-[#9c27b0] bg-clip-text text-transparent">
+            <span
+              className="text-5xl font-black font-mono"
+              style={{
+                background: "linear-gradient(135deg, #00D4FF, #7B61FF)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
               404
             </span>
-            <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[#ff3366] flex items-center justify-center">
-              <Search className="w-3 h-3 text-white" />
+            <div
+              className="text-[9px] tracking-[0.25em] uppercase mt-1"
+              style={{ color: "rgba(0,212,255,0.4)" }}
+            >
+              Timeline Lost
             </div>
           </div>
-          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-24 h-1 rounded-full"
-            style={{ background: "linear-gradient(90deg, transparent, rgba(0,212,255,0.3), transparent)" }}
-          />
         </div>
 
         <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-          Page Not Found
+          This timeline doesn't exist.
         </h1>
-        <p className="text-base text-white/50 mb-2 max-w-md">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <p className="text-sm text-white/30 mb-8 max-w-sm">
-          Check the URL or navigate to one of the pages below.
+        <p className="text-base text-white/45 mb-2 max-w-md leading-relaxed">{wittyLine}</p>
+        <p className="text-sm text-white/25 mb-10 max-w-sm">
+          Navigate back to a known dimension using the links below.
         </p>
 
         <div className="flex flex-wrap gap-3 justify-center mb-12">
           <Link href="/">
-            <Button className="bg-[#00D4FF] text-black hover:bg-[#00D4FF]/90 gap-2 font-semibold shadow-[0_0_20px_rgba(0,212,255,0.2)]">
-              <Home className="w-4 h-4" /> Go Home
+            <Button
+              className="bg-[#00D4FF] text-black hover:bg-[#00D4FF]/90 gap-2 font-semibold shadow-[0_0_24px_rgba(0,212,255,0.2)]"
+            >
+              <Home className="w-4 h-4" /> Return to Origin
             </Button>
           </Link>
           <Button
             variant="outline"
-            className="border-white/10 text-white/70 hover:bg-white/5 gap-2"
+            className="border-white/10 text-white/60 hover:bg-white/5 gap-2"
             onClick={() => window.history.back()}
           >
-            <ArrowLeft className="w-4 h-4" /> Go Back
+            <ArrowLeft className="w-4 h-4" /> Previous Dimension
           </Button>
         </div>
 
         <div className="w-full max-w-lg">
-          <div className="text-xs uppercase tracking-[0.15em] text-white/30 mb-4 font-semibold">
-            Popular Pages
+          <div className="text-[10px] uppercase tracking-[0.18em] text-white/25 mb-4 font-semibold">
+            Known Coordinates
           </div>
           <div className="grid grid-cols-2 gap-3">
             {QUICK_LINKS.map((link) => (
               <Link key={link.href} href={link.href}>
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-[#0a0a0f] border border-white/10 hover:border-[#00D4FF]/30 hover:bg-white/[0.02] transition-all cursor-pointer group">
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/5 group-hover:bg-[#00D4FF]/10 transition">
-                    <link.icon className="w-4 h-4 text-white/40 group-hover:text-[#00D4FF] transition" />
+                <div
+                  className="flex items-center gap-3 p-4 rounded-xl cursor-pointer group transition-all duration-200"
+                  style={{
+                    background: "rgba(10,10,20,0.9)",
+                    border: "1px solid rgba(255,255,255,0.07)",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLDivElement).style.border = "1px solid rgba(0,212,255,0.25)";
+                    (e.currentTarget as HTMLDivElement).style.background = "rgba(0,212,255,0.04)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLDivElement).style.border = "1px solid rgba(255,255,255,0.07)";
+                    (e.currentTarget as HTMLDivElement).style.background = "rgba(10,10,20,0.9)";
+                  }}
+                >
+                  <div
+                    className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors"
+                    style={{ background: "rgba(255,255,255,0.04)" }}
+                  >
+                    <link.icon className="w-4 h-4 text-white/40 group-hover:text-[#00D4FF] transition-colors" />
                   </div>
                   <div className="text-left">
-                    <div className="text-sm font-medium text-white group-hover:text-[#00D4FF] transition">
+                    <div className="text-sm font-medium text-white group-hover:text-[#00D4FF] transition-colors">
                       {link.label}
                     </div>
-                    <div className="text-[11px] text-white/30">{link.desc}</div>
+                    <div className="text-[11px] text-white/28">{link.desc}</div>
                   </div>
                 </div>
               </Link>
@@ -81,9 +213,10 @@ export default function NotFound() {
           </div>
         </div>
 
-        <div className="mt-12 flex items-center gap-2 text-xs text-white/40">
-          <Shield className="w-3.5 h-3.5" />
-          <span>EntangleWealth — Bloomberg-Parity Financial Intelligence</span>
+        <div className="mt-12 flex items-center gap-2 text-[11px] text-white/20 font-mono">
+          <span>SIGNAL://LOST</span>
+          <span className="opacity-50">·</span>
+          <span>EntangleWealth Quantum OS</span>
         </div>
       </div>
     </Layout>

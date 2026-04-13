@@ -2,6 +2,10 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useLocation, Link } from "wouter";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { useAuth } from "@clerk/react";
+import { AmbientDashboard } from "@/components/AmbientDashboard";
+import { WealthSignalCard } from "@/components/WealthSignalCard";
+import { CinematicAchievement, type AchievementCelebration } from "@/components/CinematicAchievement";
+import { FirstAnalysisWow, useFirstAnalysisWow } from "@/components/FirstAnalysisWow";
 import { Layout } from "@/components/layout/Layout";
 import { FlashCouncil } from "@/components/FlashCouncil";
 import { MarketTicker } from "@/components/MarketTicker";
@@ -340,6 +344,11 @@ export default function Dashboard() {
   const [, navigate] = useLocation();
   const qaIdRef = useRef(0);
   const qaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showWealthCard, setShowWealthCard] = useState(false);
+  const [achievement, setAchievement] = useState<AchievementCelebration | null>(null);
+  const [showFirstAnalysisWow, setShowFirstAnalysisWow] = useState(false);
+  const [firstAnalysisSymbol, setFirstAnalysisSymbol] = useState("");
+  const { isFirstAnalysis, markDone: markFirstAnalysisDone } = useFirstAnalysisWow();
 
   useEffect(() => { trackEvent("dashboard_viewed"); }, []);
 
@@ -452,6 +461,13 @@ export default function Dashboard() {
     const id = ++qaIdRef.current;
     setAnalyzingSymbol(sym);
     setShowSearchDropdown(false);
+
+    if (isFirstAnalysis) {
+      setFirstAnalysisSymbol(sym);
+      setShowFirstAnalysisWow(true);
+    }
+
+    const delay = isFirstAnalysis ? 4200 : 700;
     qaTimerRef.current = setTimeout(() => {
       if (qaIdRef.current !== id) return;
       const bp = 50 + Math.abs([...sym].reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0) % 900) + Math.random() * 5;
@@ -460,9 +476,11 @@ export default function Dashboard() {
       const sig = getOverallSignal(results);
       setQuickAnalysis({ symbol: sym, name: info?.name || sym, signal: sig.signal, confidence: sig.confidence, buyCount: sig.buyCount, sellCount: sig.sellCount });
       setAnalyzingSymbol("");
-      toast({ title: `${sym} Analysis Complete`, description: `${sig.signal.replace("_", " ")} — ${sig.confidence}% confidence` });
-    }, 700);
-  }, [toast]);
+      if (!isFirstAnalysis) {
+        toast({ title: `${sym} Analysis Complete`, description: `${sig.signal.replace("_", " ")} — ${sig.confidence}% confidence` });
+      }
+    }, delay);
+  }, [toast, isFirstAnalysis]);
 
   const todayOptionsIncome = optionsIncomeData[optionsIncomeData.length - 1].income;
 
@@ -617,6 +635,25 @@ export default function Dashboard() {
           vixLevel={MARKET_INTERNALS.vix.current}
           adRatio={MARKET_INTERNALS.advDecl.ratio}
         />
+
+        {/* Wealth Signal Card trigger */}
+        <div className="flex justify-end">
+          <button
+            onClick={() => {
+              setShowWealthCard(true);
+              setAchievement({ title: "Wealth Signal Generated", subtitle: "Your snapshot is ready to share.", tier: "platinum" });
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-semibold font-mono tracking-wider transition-all hover:opacity-90"
+            style={{
+              background: "rgba(0,212,255,0.08)",
+              border: "1px solid rgba(0,212,255,0.2)",
+              color: "rgba(0,212,255,0.8)",
+            }}
+          >
+            <Eye className="w-3 h-3" />
+            WEALTH SIGNAL
+          </button>
+        </div>
 
         {/* Quick Analysis result */}
         {(quickAnalysis || analyzingSymbol) && (
@@ -961,6 +998,39 @@ export default function Dashboard() {
 
       </div>
       </PageErrorBoundary>
+
+      {/* Ambient Dashboard Layer */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <AmbientDashboard />
+      </div>
+
+      {/* Wealth Signal Card */}
+      {showWealthCard && (
+        <WealthSignalCard
+          portfolioValue={portfolio.totalValue}
+          portfolioChange={parseFloat(pnlPct)}
+          onClose={() => setShowWealthCard(false)}
+        />
+      )}
+
+      {/* Cinematic Achievement */}
+      {achievement && (
+        <CinematicAchievement
+          achievement={achievement}
+          onComplete={() => setAchievement(null)}
+        />
+      )}
+
+      {/* First Analysis Wow Moment */}
+      {showFirstAnalysisWow && (
+        <FirstAnalysisWow
+          symbol={firstAnalysisSymbol}
+          onComplete={() => {
+            setShowFirstAnalysisWow(false);
+            markFirstAnalysisDone();
+          }}
+        />
+      )}
     </Layout>
   );
 }

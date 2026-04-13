@@ -43,9 +43,9 @@ function BottomNavComponent() {
             aria-modal="true"
             aria-label="More navigation options"
             style={{
-              background: "hsl(220 18% 8% / 0.97)",
+              background: "var(--bottomnav-bg)",
               backdropFilter: "blur(16px)",
-              boxShadow: "0 -8px 32px rgba(0,0,0,0.4)",
+              boxShadow: "0 -8px 32px rgba(0,0,0,0.15)",
             }}
           >
             <div className="p-3 grid grid-cols-3 gap-2">
@@ -59,7 +59,7 @@ function BottomNavComponent() {
                     onClick={() => setShowMore(false)}
                     aria-current={isActive ? "page" : undefined}
                     className={`flex flex-col items-center gap-1.5 py-3 rounded-xl transition-colors duration-150 min-h-[60px] justify-center ${
-                      isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground/70"
+                      isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-[var(--nav-hover-bg)] hover:text-foreground/70"
                     }`}
                   >
                     <Icon className="w-5 h-5" aria-hidden="true" />
@@ -76,7 +76,7 @@ function BottomNavComponent() {
         className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-border/50"
         aria-label="Main navigation"
         style={{
-          background: "hsl(220 20% 5% / 0.95)",
+          background: "var(--bottomnav-bg)",
           backdropFilter: "blur(16px)",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}

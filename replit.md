@@ -9,7 +9,7 @@ I prefer concise and direct communication. When making changes, prioritize funct
 # System Architecture
 
 ## UI/UX and Design System
-- **Theme**: Dark theme with black background, electric blue (`#00D4FF`), gold (`#FFD700`), and tertiary purple (`#9c27b0`) accents.
+- **Theme**: Light/dark mode toggle via `next-themes` (`ThemeProvider` in App.tsx, `ThemeToggle` in Navbar). CSS variables in `index.css` (`:root` = light, `.dark` = dark). Dark theme: electric blue (`#00D4FF`), gold (`#FFD700`), purple (`#9c27b0`). Light theme: primary `#0099CC`. Stored in localStorage key `ew-theme`, default dark. Clerk appearance adapts via `useClerkAppearance()` hook. Nav/BottomNav use `--nav-bg`, `--nav-hover-bg`, `--nav-dropdown-bg`, `--bottomnav-bg` CSS variables.
 - **Typography**: JetBrains Mono for data displays and Inter for UI elements.
 - **Visuals**: Glassmorphism effects, blurred panels, gradient borders, custom scrollbars, and animations.
 - **Navigation**: Navbar with dropdown groups and a mobile-responsive bottom navigation bar.

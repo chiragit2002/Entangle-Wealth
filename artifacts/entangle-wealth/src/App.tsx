@@ -4,6 +4,7 @@ import { ClerkProvider, SignIn, SignUp, Show, useClerk } from "@clerk/react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 import * as SentryReact from "@sentry/react";
+import { ThemeProvider, useTheme } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ErrorFallback from "@/components/ErrorFallback";
@@ -125,7 +126,7 @@ function createQueryClient() {
   });
 }
 
-const clerkAppearance = {
+const clerkAppearanceDark = {
   variables: {
     colorPrimary: "#00D4FF",
     colorBackground: "#0a0a14",
@@ -152,6 +153,36 @@ const clerkAppearance = {
     formFieldAction: "text-[#00D4FF]",
     alert: "bg-red-500/10 border-red-500/20 text-red-300",
     alertText: "text-red-300",
+  },
+};
+
+const clerkAppearanceLight = {
+  variables: {
+    colorPrimary: "#0099CC",
+    colorBackground: "#ffffff",
+    colorText: "#1a1a2e",
+    colorTextSecondary: "rgba(0,0,0,0.5)",
+    colorInputBackground: "rgba(0,0,0,0.03)",
+    colorInputText: "#1a1a2e",
+    borderRadius: "0.75rem",
+    fontFamily: "inherit",
+  },
+  elements: {
+    card: "bg-white border border-black/10 shadow-xl",
+    headerTitle: "text-gray-900",
+    headerSubtitle: "text-gray-500",
+    socialButtonsBlockButton: "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 font-medium",
+    socialButtonsBlockButtonText: "text-gray-700 font-medium",
+    formFieldLabel: "text-gray-600",
+    formFieldInput: "bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400",
+    formButtonPrimary: "bg-[#0099CC] text-white font-bold hover:bg-[#0099CC]/90",
+    footerActionLink: "text-[#0099CC] hover:text-[#0099CC]/80",
+    dividerLine: "bg-gray-200",
+    dividerText: "text-gray-400",
+    identityPreviewEditButton: "text-[#0099CC]",
+    formFieldAction: "text-[#0099CC]",
+    alert: "bg-red-50 border-red-200 text-red-600",
+    alertText: "text-red-600",
   },
 };
 
@@ -237,11 +268,17 @@ function AuthPageShell({ children, reason }: { children: React.ReactNode; reason
   );
 }
 
+function useClerkAppearance() {
+  const { resolvedTheme } = useTheme();
+  return resolvedTheme === "dark" ? clerkAppearanceDark : clerkAppearanceLight;
+}
+
 function SignInPage() {
   const searchString = useSearch();
   const params = new URLSearchParams(searchString);
   const redirectReason = params.get("reason");
   const { signInWithFacebook } = useFacebookOAuth();
+  const clerkAppearance = useClerkAppearance();
 
   return (
     <AuthPageShell reason={redirectReason}>
@@ -266,6 +303,7 @@ function SignInPage() {
 
 function SignUpPage() {
   const { signInWithFacebook } = useFacebookOAuth();
+  const clerkAppearance = useClerkAppearance();
 
   return (
     <AuthPageShell>
@@ -391,6 +429,7 @@ function PageTracker() {
 function ClerkProviderWithRoutes() {
   const [, setLocation] = useLocation();
   const queryClient = useMemo(() => createQueryClient(), []);
+  const clerkAppearance = useClerkAppearance();
 
   return (
     <ClerkProvider
@@ -398,6 +437,7 @@ function ClerkProviderWithRoutes() {
       proxyUrl={clerkProxyUrl}
       routerPush={(to) => setLocation(stripBase(to))}
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
+      appearance={clerkAppearance}
     >
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
@@ -503,16 +543,18 @@ function App() {
   }, []);
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback} onError={(error, info) => {
-      SentryReact.withScope((scope) => {
-        scope.setExtras({ componentStack: info.componentStack });
-        SentryReact.captureException(error);
-      });
-    }}>
-      <WouterRouter base={basePath}>
-        <ClerkProviderWithRoutes />
-      </WouterRouter>
-    </ErrorBoundary>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="ew-theme">
+      <ErrorBoundary FallbackComponent={ErrorFallback} onError={(error, info) => {
+        SentryReact.withScope((scope) => {
+          scope.setExtras({ componentStack: info.componentStack });
+          SentryReact.captureException(error);
+        });
+      }}>
+        <WouterRouter base={basePath}>
+          <ClerkProviderWithRoutes />
+        </WouterRouter>
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 }
 

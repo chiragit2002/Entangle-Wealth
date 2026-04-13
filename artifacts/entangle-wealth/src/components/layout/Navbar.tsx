@@ -5,6 +5,7 @@ import { useState, useRef, useEffect, useMemo, memo } from "react";
 import { useUser, useClerk, Show } from "@clerk/react";
 import { Button } from "@/components/ui/button";
 import NotificationCenter from "@/components/NotificationCenter";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 interface NavGroup {
@@ -143,7 +144,7 @@ function DropdownMenu({ group, isOpen, onToggle }: { group: NavGroup; isOpen: bo
         aria-expanded={isOpen}
         aria-controls={dropdownId}
         aria-haspopup="true"
-        className={`flex items-center gap-1 text-sm font-medium px-2.5 py-1.5 rounded-lg transition-colors duration-150 hover:text-foreground hover:bg-white/[0.04] ${
+        className={`flex items-center gap-1 text-sm font-medium px-2.5 py-1.5 rounded-lg transition-colors duration-150 hover:text-foreground hover:bg-[var(--nav-hover-bg)] ${
           isGroupActive ? "text-primary" : "text-muted-foreground"
         }`}
       >
@@ -157,9 +158,9 @@ function DropdownMenu({ group, isOpen, onToggle }: { group: NavGroup; isOpen: bo
           role="menu"
           className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 rounded-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
           style={{
-            background: "hsl(220 18% 8%)",
-            border: "1px solid hsl(220 15% 14%)",
-            boxShadow: "0 16px 40px rgba(0,0,0,0.5)",
+            background: "var(--nav-dropdown-bg)",
+            border: "var(--nav-dropdown-border)",
+            boxShadow: "var(--nav-dropdown-shadow)",
           }}
         >
           <div className="p-1.5">
@@ -172,7 +173,7 @@ function DropdownMenu({ group, isOpen, onToggle }: { group: NavGroup; isOpen: bo
                 className={`flex flex-col px-3 py-2.5 rounded-lg transition-colors duration-150 ${
                   location === item.href
                     ? "bg-primary/10 text-primary"
-                    : "text-foreground/70 hover:bg-white/[0.04] hover:text-foreground"
+                    : "text-foreground/70 hover:bg-[var(--nav-hover-bg)] hover:text-foreground"
                 }`}
               >
                 <span className="text-[13px] font-medium">{item.label}</span>
@@ -239,7 +240,7 @@ function NavbarComponent() {
       className="sticky top-0 z-50 w-full border-b border-border/60"
       aria-label="Main navigation"
       style={{
-        background: "hsl(220 20% 4% / 0.9)",
+        background: "var(--nav-bg)",
         backdropFilter: "blur(16px)",
       }}
     >
@@ -267,6 +268,7 @@ function NavbarComponent() {
         </div>
 
         <div className="hidden lg:flex items-center gap-1.5">
+          <ThemeToggle />
           <NotificationCenter />
 
           <Show when="signed-in">
@@ -304,9 +306,10 @@ function NavbarComponent() {
         </div>
 
         <div className="lg:hidden flex items-center gap-1">
+          <ThemeToggle />
           <NotificationCenter />
           <button
-            className="w-9 h-9 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/[0.04] transition-colors duration-150"
+            className="w-9 h-9 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-[var(--nav-hover-bg)] transition-colors duration-150"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
@@ -322,7 +325,7 @@ function NavbarComponent() {
           aria-modal="true"
           aria-label="Mobile navigation menu"
           style={{
-            background: "hsl(220 20% 5% / 0.98)",
+            background: "var(--nav-bg)",
             backdropFilter: "blur(16px)",
           }}
         >
@@ -339,7 +342,7 @@ function NavbarComponent() {
                       className={`text-sm font-medium px-3 py-2 rounded-lg transition-colors duration-150 ${
                         location === link.href
                           ? "bg-primary/10 text-primary"
-                          : "text-foreground/60 hover:bg-white/[0.04] hover:text-foreground"
+                          : "text-foreground/60 hover:bg-[var(--nav-hover-bg)] hover:text-foreground"
                       }`}
                     >
                       {link.label}
@@ -352,7 +355,7 @@ function NavbarComponent() {
             <div className="pt-4 border-t border-border/60 space-y-1">
               <Show when="signed-in">
                 <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
-                  <span className="flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg text-foreground/60 hover:bg-white/[0.04] hover:text-foreground transition-colors duration-150">
+                  <span className="flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg text-foreground/60 hover:bg-[var(--nav-hover-bg)] hover:text-foreground transition-colors duration-150">
                     <User className="w-4 h-4" /> Profile
                   </span>
                 </Link>

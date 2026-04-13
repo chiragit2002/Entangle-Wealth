@@ -194,6 +194,8 @@ export interface NewsResponse {
   topics: Record<string, number>;
   cachedAt: number;
   feedCount: number;
+  initializing?: boolean;
+  message?: string;
 }
 
 export interface AlpacaBar {

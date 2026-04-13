@@ -175,14 +175,15 @@ export default function Research() {
     { query: { staleTime: 2 * 60_000, placeholderData: (prev: unknown) => prev } },
   );
 
+  const isInitializing = newsQuery.data?.initializing === true;
   const items: NewsItem[] = newsQuery.data?.items.length
     ? newsQuery.data.items
-    : getFallback(topic, search);
-  const total = newsQuery.data?.total ?? FALLBACK_ARTICLES.length;
+    : isInitializing ? [] : getFallback(topic, search);
+  const total = newsQuery.data?.total ?? (isInitializing ? 0 : FALLBACK_ARTICLES.length);
   const topicCounts: Record<string, number> = newsQuery.data?.topics
-    ?? FALLBACK_ARTICLES.reduce((acc: Record<string, number>, a) => { acc[a.topic] = (acc[a.topic] || 0) + 1; return acc; }, {});
+    ?? (isInitializing ? {} : FALLBACK_ARTICLES.reduce((acc: Record<string, number>, a) => { acc[a.topic] = (acc[a.topic] || 0) + 1; return acc; }, {}));
   const feedCount = newsQuery.data?.feedCount ?? 0;
-  const loading = newsQuery.isLoading;
+  const loading = newsQuery.isLoading || isInitializing;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

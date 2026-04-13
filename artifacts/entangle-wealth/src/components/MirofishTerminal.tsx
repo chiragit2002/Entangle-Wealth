@@ -631,7 +631,9 @@ export function MirofishTerminal() {
       addOutput(rawInput, `[NEWS] Fetching live intelligence${topicArg ? ` for ${topicArg}` : ""}...`);
       try {
         const data = await fetchNews({ topic: topicArg || undefined, limit: 8 });
-        if (data.items.length === 0) {
+        if (data.initializing) {
+          appendOutput("[NEWS] Intelligence feeds initializing. Data will be available shortly.");
+        } else if (data.items.length === 0) {
           appendOutput("[NEWS] No articles found. Try: NEWS Microelectronics");
         } else {
           const lines = data.items.map((item: NewsItem, i: number) => {

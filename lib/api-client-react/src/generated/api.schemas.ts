@@ -110,6 +110,8 @@ export interface NewsResponse {
   topics: NewsResponseTopics;
   cachedAt: number;
   feedCount: number;
+  initializing?: boolean;
+  message?: string;
 }
 
 export type ListStocksParams = {

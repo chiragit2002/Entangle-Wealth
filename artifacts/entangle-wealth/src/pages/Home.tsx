@@ -236,9 +236,9 @@ function RecentSignupTicker({
 }
 
 const GOAL_OPTIONS = [
-  { id: "clarity", label: "I want to know exactly where I stand", icon: Lightbulb },
-  { id: "invest", label: "I want my money working harder", icon: TrendingUp },
-  { id: "stress", label: "I want less stress about money", icon: Heart },
+  { id: "clarity", label: "I'm flying blind — I need to see the full picture", icon: Lightbulb },
+  { id: "invest", label: "My money is just sitting there. That has to stop.", icon: TrendingUp },
+  { id: "stress", label: "Money stress is taking up too much of my head", icon: Heart },
 ];
 
 function GoalSelector({ onSelect }: { onSelect: (goal: string) => void }) {
@@ -252,7 +252,7 @@ function GoalSelector({ onSelect }: { onSelect: (goal: string) => void }) {
 
   return (
     <div className="w-full max-w-sm mx-auto space-y-3">
-      <p className="text-sm text-white/70 mb-4">What brings you here?</p>
+      <p className="text-sm text-white/70 mb-4">What's actually going on for you right now?</p>
       {GOAL_OPTIONS.map(({ id, label, icon: Icon }) => (
         <button
           key={id}
@@ -367,7 +367,7 @@ function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
         }}
         className="h-12 px-8 bg-gradient-to-r from-[#00c8f8] to-[#0088cc] text-black font-bold hover:opacity-90 active:scale-[0.97] text-base rounded-full shadow-[0_0_24px_rgba(0,200,248,0.25)] transition-all duration-150"
       >
-        Get clarity — it's free
+        See exactly where you stand — free
       </Button>
     );
   }
@@ -428,13 +428,13 @@ export default function Home() {
             <RecentSignupTicker signups={signupsState.data} error={signupsState.error} loading={signupsState.loading} />
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
-              Stop guessing what to do
+              You shouldn't have to wonder
               <br />
-              <span className="text-[#00c8f8]">with your money.</span>
+              <span className="text-[#00c8f8]">if you're doing it right.</span>
             </h1>
 
             <p className="max-w-lg text-base md:text-lg text-white/60 leading-relaxed">
-              Get a clear next step based on your situation — in under 60 seconds. No jargon, no charts to decode.
+              Most people are one decision away from a completely different financial life. We tell you what that decision is — in plain English, in under 60 seconds.
             </p>
 
             <MicroConversionFlow referralCode={referralCode || undefined} />
@@ -446,11 +446,11 @@ export default function Home() {
             <div className="flex flex-wrap items-center justify-center gap-5 pt-1">
               <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#00e676]" />
-                Takes less than 60 seconds
+                Done in under 60 seconds
               </span>
               <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
                 <Lock className="w-3.5 h-3.5 text-[#00c8f8]" />
-                Private by default
+                Your data stays yours
               </span>
               {stats.members > 0 && (
                 <span className="text-[11px] text-white/30 font-medium">
@@ -468,18 +468,18 @@ export default function Home() {
               Sound familiar?
             </p>
             <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
-              Most people feel lost with money — and it's not their fault.
+              The money guilt is real — and it compounds every month you wait.
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
               {[
                 {
-                  text: "You know you should be doing something with your money. You just don't know what.",
+                  text: "You've got income coming in, but you're still not sure if you're saving enough, investing right, or just bleeding money you can't account for.",
                 },
                 {
-                  text: "You've tried apps and articles, but the advice is confusing, conflicting, or just not for you.",
+                  text: "You've downloaded the apps, read the Reddit threads, watched the YouTube videos. You still don't know what to do with YOUR situation.",
                 },
                 {
-                  text: "Every time you think about it, you feel overwhelmed — so you put it off again.",
+                  text: "You keep telling yourself you'll figure it out next month. Next month becomes next year. And the gap keeps growing.",
                 },
               ].map((item, i) => (
                 <div
@@ -500,29 +500,29 @@ export default function Home() {
               Here's the difference
             </p>
             <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
-              Entangled Wealth makes the complicated simple.
+              Stop drowning in information. Start getting answers.
             </h2>
             <p className="text-base text-white/50 max-w-lg mx-auto leading-relaxed">
-              We take your financial picture, apply smart analysis behind the scenes, and give you
-              clear, actionable guidance — in plain English. No expertise required.
+              We look at your actual situation — not some hypothetical average person — and tell you
+              exactly what to do next. Specific. Actionable. No degree required.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
               {[
                 {
                   title: "Clarity",
-                  desc: "Know exactly where you stand and what to focus on next.",
+                  desc: "See your full financial picture in one place. No more guessing, no more avoidance.",
                   color: "text-[#00c8f8]",
                   border: "border-[#00c8f8]/20",
                 },
                 {
                   title: "Simplicity",
-                  desc: "No charts, no jargon. Just the guidance you need.",
+                  desc: "We cut through the noise so you don't have to. Just the next right move — in plain language.",
                   color: "text-[#00e676]",
                   border: "border-[#00e676]/20",
                 },
                 {
                   title: "Confidence",
-                  desc: "Make financial decisions without the second-guessing.",
+                  desc: "Act without the second-guessing. Know why you're doing it, not just what to do.",
                   color: "text-[#f5c842]",
                   border: "border-[#f5c842]/20",
                 },
@@ -547,29 +547,29 @@ export default function Home() {
                 How it works
               </p>
               <h2 className="text-2xl md:text-4xl font-bold text-white">
-                Three steps to feeling in control
+                Three steps. Finally, some answers.
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {[
                 {
                   num: "1",
-                  title: "Understand your situation",
-                  desc: "Tell us a bit about where you are financially. No forms, no complexity — just the basics.",
+                  title: "Tell us where you are",
+                  desc: "No 47-question form. No linking accounts. Just the basics — enough to give you something real.",
                   color: "text-[#00c8f8]",
                   bg: "bg-[#00c8f8]/10",
                 },
                 {
                   num: "2",
-                  title: "Get clear guidance",
-                  desc: "We analyze your picture and give you simple, specific next steps — no financial degree needed.",
+                  title: "We do the heavy lifting",
+                  desc: "Multiple AI models analyze your picture simultaneously. When they agree, we tell you — with confidence scores and clear reasoning.",
                   color: "text-[#00e676]",
                   bg: "bg-[#00e676]/10",
                 },
                 {
                   num: "3",
-                  title: "Make better decisions",
-                  desc: "Act with confidence. Whether you're saving, investing, or just getting organized — you'll know what to do.",
+                  title: "You move forward",
+                  desc: "Not 'consider your options.' An actual next step. The one thing that will make the biggest difference given your specific situation.",
                   color: "text-[#f5c842]",
                   bg: "bg-[#f5c842]/10",
                 },

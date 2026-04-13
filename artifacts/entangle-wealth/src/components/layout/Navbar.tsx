@@ -299,7 +299,7 @@ function NavbarComponent() {
             </Link>
             <Link href="/sign-up">
               <Button size="sm" className="h-8 px-3 text-xs font-semibold">
-                Get clarity — it's free
+                See where you stand — free
               </Button>
             </Link>
           </Show>
@@ -375,7 +375,7 @@ function NavbarComponent() {
                   </Link>
                   <Link href="/sign-up" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button className="w-full h-10 text-sm font-semibold">
-                      Get clarity — free
+                      See where you stand — free
                     </Button>
                   </Link>
                 </div>

@@ -211,17 +211,17 @@ export default function Pricing() {
             <div className="relative z-10">
               <div className="inline-flex items-center gap-2 bg-[#00e676]/20 rounded-full px-4 py-1.5 mb-3">
                 <Sparkles className="w-4 h-4 text-[#00e676]" />
-                <span className="text-sm font-black text-[#00e676] uppercase tracking-wider">Launch Promotion</span>
+                <span className="text-sm font-black text-[#00e676] uppercase tracking-wider">Launch Window — Limited Time</span>
               </div>
               <h2 className="text-2xl md:text-3xl font-black text-foreground mb-2">
-                Everything is <span className="text-[#00e676]">100% free</span> right now
+                Full Pro access. <span className="text-[#00e676]">Zero cost.</span> Right now.
               </h2>
               <p className="text-muted-foreground text-sm md:text-base">
-                All Pro features are unlocked for everyone until{" "}
+                Every Pro feature is unlocked until{" "}
                 <span className="font-bold text-foreground">
                   {new Date(promo.endsAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                 </span>
-                . No credit card needed.
+                . No credit card. No catch. Just use it.
               </p>
             </div>
           </div>
@@ -229,14 +229,14 @@ export default function Pricing() {
 
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-3">
-            Simple <span className="electric-text">Pricing</span>
+            Institutional tools. <span className="electric-text">Not institutional prices.</span>
           </h1>
           <p className="text-muted-foreground text-base md:text-lg">
-            {promo?.active ? "All features unlocked during our launch promotion!" : "30 days free. No card. Cancel anytime."}
+            {promo?.active ? "Every Pro feature unlocked — no card, no commitment, no catch." : "Try everything free for 30 days. No card required. Cancel in one click."}
           </p>
           {!promo?.active && (
             <div className="inline-block mt-4 bg-[rgba(0,230,118,0.1)] border border-[rgba(0,230,118,0.3)] rounded-full px-4 py-1.5 text-xs font-bold text-[#00e676]">
-              FREE TRIAL | NO CREDIT CARD NEEDED
+              30-DAY FREE TRIAL | NO CREDIT CARD NEEDED
             </div>
           )}
         </div>
@@ -304,15 +304,15 @@ export default function Pricing() {
         </div>
 
         <div className="mobile-card-glow text-center p-6 md:p-8">
-          <div className="text-2xl font-black tracking-tight mb-2">Referral Program</div>
+          <div className="text-2xl font-black tracking-tight mb-2">Get paid to share it.</div>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f5c842]/10 border border-[#f5c842]/25 text-[#f5c842] text-xs font-bold mb-3">
-            🏆 $36,000 Anniversary Bonus Pool | Invite friends, earn your share
+            🏆 $36,000 Anniversary Bonus Pool — Your slice is waiting
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed mb-1">
-            Earn <strong className="text-[#f5c842]">20% monthly</strong> for every person you refer. For life. Build your own income stream.
+            Earn <strong className="text-[#f5c842]">20% monthly</strong> for every person you refer — for life. That adds up faster than you'd think.
           </p>
           <p className="text-xs text-white/50 mb-4">
-            Plus: every referral earns you 5 entries into the $50K anniversary drawing and a share of the $36K referral bonus pool.
+            Every referral also gets you 5 entries into the $50K anniversary drawing and a share of the $36K bonus pool. Real money, not just points.
           </p>
           <Button
             onClick={async () => {

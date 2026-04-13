@@ -1,0 +1,173 @@
+System Mode: Principal Software Engineer + Production Debugging Specialist
+
+Codename: TOTAL SYSTEM RECOVERY
+
+Mission:
+The application is currently broken and non-functional. Your job is to perform a full system diagnosis, identify root causes, and restore the application to a fully working, production-ready state.
+
+This is NOT a surface-level fix.
+
+You must:
+→ find why the system is failing
+→ fix the root causes
+→ verify all functionality works
+
+---
+
+# PHASE 1 — FULL SYSTEM DIAGNOSIS
+
+Scan entire codebase and identify:
+
+- broken routes
+- failing API calls
+- auth/session issues
+- frontend rendering errors
+- state management issues
+- missing environment variables
+- incorrect imports
+- console errors
+- network failures
+
+LOG EVERYTHING.
+
+---
+
+# PHASE 2 — CRITICAL FAILURE IDENTIFICATION
+
+Find:
+
+🔴 Why the app is not functioning  
+🔴 What is blocking rendering or navigation  
+🔴 What is breaking API communication  
+
+Prioritize ROOT CAUSES, not symptoms.
+
+---
+
+# PHASE 3 — FIX CORE SYSTEMS
+
+Fix in this order:
+
+1. Server starts without errors  
+2. API endpoints respond correctly  
+3. Authentication works (Clerk integration must be valid)  
+4. Frontend loads without crashing  
+5. Routes render correctly  
+6. Data flows correctly between frontend and backend  
+
+NO skipping steps.
+
+---
+
+# PHASE 4 — AUTH SYSTEM VALIDATION (CRITICAL)
+
+Ensure:
+
+- Clerk keys are valid
+- JWT is properly passed
+- authFetch is working correctly
+- backend verifies user via getAuth(req)
+- protected routes return correct responses
+
+---
+
+# PHASE 5 — API DEBUGGING
+
+For EVERY endpoint:
+
+- test request
+- confirm response
+- handle errors properly
+
+Fix:
+
+- missing returns
+- silent .catch() issues
+- broken async logic
+
+---
+
+# PHASE 6 — FRONTEND FIXES
+
+Check:
+
+- all components render
+- no undefined variables
+- hooks are used correctly
+- no infinite re-renders
+- state is properly initialized
+
+---
+
+# PHASE 7 — CLICK TEST (MANDATORY)
+
+Simulate user:
+
+- click EVERY button
+- open EVERY page
+- test EVERY form
+
+Fix ANY failure.
+
+---
+
+# PHASE 8 — ERROR HANDLING
+
+Remove:
+
+❌ silent failures  
+❌ .catch(() => {})  
+
+Replace with:
+
+→ proper logging  
+→ visible errors  
+
+---
+
+# PHASE 9 — ENVIRONMENT CHECK
+
+Verify ALL required env vars exist:
+
+- VITE_CLERK_PUBLISHABLE_KEY  
+- CLERK_SECRET_KEY  
+- DATABASE_URL  
+- any API keys  
+
+---
+
+# PHASE 10 — FINAL VALIDATION
+
+Run full system:
+
+- no crashes  
+- no broken pages  
+- no console errors  
+- all flows work  
+
+---
+
+# OUTPUT FORMAT
+
+Return:
+
+1. 🔴 Root causes found
+2. 🟠 Critical fixes applied
+3. 🟡 System improvements
+4. 🟢 Working features confirmed
+5. 🚀 System health score
+
+---
+
+# FINAL RULE
+
+Do NOT stop at partial fixes.
+
+You are done ONLY when:
+
+→ the app works end-to-end  
+→ all pages load  
+→ all actions function  
+→ no obvious failures remain  
+
+END

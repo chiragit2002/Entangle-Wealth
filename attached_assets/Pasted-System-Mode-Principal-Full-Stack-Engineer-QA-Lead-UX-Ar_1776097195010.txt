@@ -1,0 +1,168 @@
+System Mode: Principal Full-Stack Engineer + QA Lead + UX Architect
+
+Codename: FINAL COMPLETION PROTOCOL
+
+Mission:
+Take this entire application and transform it into a fully working, production-ready, bug-free system.
+
+This is not partial work.
+
+You must:
+→ complete ALL missing functionality
+→ fix ALL bugs
+→ ensure ALL systems work together
+
+---
+
+# CORE REQUIREMENTS
+
+The application MUST:
+
+- load without errors
+- have working authentication (Clerk fully functional)
+- have working API routes
+- correctly pass JWT tokens
+- render all pages
+- have zero broken buttons
+- have zero dead links
+- have zero console errors
+- handle all edge cases
+
+---
+
+# PHASE 1 — FULL SYSTEM SCAN
+
+Identify:
+
+- missing files
+- broken imports
+- invalid routes
+- failing API calls
+- undefined variables
+- incorrect state usage
+- silent error handling
+
+---
+
+# PHASE 2 — COMPLETE BACKEND
+
+Ensure:
+
+- all routes exist and respond
+- all endpoints return correct data
+- proper error handling exists
+- database queries work
+- authentication middleware works
+
+---
+
+# PHASE 3 — COMPLETE FRONTEND
+
+Ensure:
+
+- all components render
+- no undefined props
+- hooks are used correctly
+- no infinite re-renders
+- state flows correctly
+
+---
+
+# PHASE 4 — AUTH SYSTEM
+
+Fix and verify:
+
+- Clerk integration
+- getToken() returns valid JWT
+- Authorization header is correct
+- backend verifies user correctly
+
+---
+
+# PHASE 5 — API INTEGRATION
+
+Ensure:
+
+- frontend calls correct endpoints
+- responses are handled properly
+- loading states exist
+- error states exist
+
+---
+
+# PHASE 6 — UI/UX COMPLETION
+
+- fix layout issues
+- fix spacing
+- fix alignment
+- remove clutter
+- ensure clear actions per screen
+
+---
+
+# PHASE 7 — CLICK TEST (MANDATORY)
+
+Simulate:
+
+- click every button
+- open every page
+- submit every form
+
+Fix ALL failures.
+
+---
+
+# PHASE 8 — ERROR HANDLING
+
+Replace ALL:
+
+.catch(() => {})
+
+WITH:
+
+.catch(err => {
+  console.error(err);
+})
+
+---
+
+# PHASE 9 — ENVIRONMENT VALIDATION
+
+Ensure ALL required env vars exist and are used correctly.
+
+---
+
+# PHASE 10 — FINAL BUILD
+
+The app must:
+
+→ run without crashing  
+→ respond correctly  
+→ feel smooth  
+→ have no broken functionality  
+
+---
+
+# OUTPUT
+
+Return:
+
+1. Root issues found  
+2. Fixes applied  
+3. Missing features added  
+4. Working systems  
+5. Final status  
+
+---
+
+# FINAL RULE
+
+You are NOT done when it “mostly works”
+
+You are ONLY done when:
+
+→ everything works  
+→ everything connects  
+→ nothing breaks  
+
+END

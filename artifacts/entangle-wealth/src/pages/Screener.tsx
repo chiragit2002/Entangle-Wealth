@@ -226,9 +226,9 @@ export default function Screener() {
   );
 
   const sigBadge = (signal: string) => {
-    const c = signal === "STRONG_BUY" ? "bg-[#00ff88]/10 text-[#00ff88] border-[#00ff88]/20" :
+    const c = signal === "STRONG_BUY" ? "bg-[#00FF41]/10 text-[#00FF41] border-[#00FF41]/20" :
       signal === "BUY" ? "bg-primary/10 text-primary border-primary/20" :
-      signal === "SELL" ? "bg-[#ffd700]/10 text-[#ffd700] border-[#ffd700]/20" :
+      signal === "SELL" ? "bg-[#FFB800]/10 text-[#FFB800] border-[#FFB800]/20" :
       signal === "STRONG_SELL" ? "bg-[#ff3366]/10 text-[#ff3366] border-[#ff3366]/20" :
       "bg-white/5 text-white/30 border-white/10";
     return <span className={`text-[8px] font-black px-1.5 py-0.5 rounded border ${c}`}>{signal.replace("_", " ")}</span>;
@@ -243,7 +243,7 @@ export default function Screener() {
               <Filter className="w-4 h-4 text-primary" />
               <span className="text-[13px] font-bold">Stock Screener</span>
               <span className="text-[10px] text-white/50 font-mono">{filteredStocks.length} stocks</span>
-              {isLive && <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#00ff88]/10 text-[#00ff88] animate-pulse">LIVE</span>}
+              {isLive && <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#00FF41]/10 text-[#00FF41] animate-pulse">LIVE</span>}
             </div>
             <div className="flex items-center gap-2">
               <div className="relative">
@@ -331,7 +331,7 @@ export default function Screener() {
                         </div>
                       </div>
                       <span className="text-[13px] font-mono font-bold text-right">${stock.price.toFixed(2)}</span>
-                      <span className={`text-[12px] font-mono font-bold text-right ${stock.change >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
+                      <span className={`text-[12px] font-mono font-bold text-right ${stock.change >= 0 ? "text-[#00FF41]" : "text-[#ff3366]"}`}>
                         {stock.change >= 0 ? "+" : ""}{Math.abs(stock.change).toFixed(2)}%
                       </span>
                       <span className="text-[10px] font-mono text-white/40 text-right">{stock.volume}</span>
@@ -356,7 +356,7 @@ export default function Screener() {
                         if (inWL) next.delete(stock.symbol); else next.add(stock.symbol);
                         setWatchlist(next);
                         toast({ title: inWL ? "Removed" : "Added", description: `${stock.symbol} ${inWL ? "removed from" : "added to"} watchlist` });
-                      }} className={`p-1 rounded transition-colors ${inWL ? "text-[#ffd700]" : "text-white/40 group-hover:text-white/40 hover:!text-white/60"}`}>
+                      }} className={`p-1 rounded transition-colors ${inWL ? "text-[#FFB800]" : "text-white/40 group-hover:text-white/40 hover:!text-white/60"}`}>
                         {inWL ? <BookmarkCheck className="w-3 h-3" /> : <Bookmark className="w-3 h-3" />}
                       </button>
                     </div>

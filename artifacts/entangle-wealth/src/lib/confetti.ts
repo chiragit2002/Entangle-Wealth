@@ -208,7 +208,7 @@ function fireMedium(): void {
     particleCount: 80,
     spread: 65,
     origin: { y: 0.6 },
-    colors: ["#00ff88", "#00D4FF", "#00cc6a", "#00b8cc", "#00e07a"],
+    colors: ["#00FF41", "#00D4FF", "#00cc6a", "#00b8cc", "#00e07a"],
     ticks: 150,
     gravity: 1.0,
   });
@@ -219,20 +219,20 @@ function fireMedium(): void {
       angle: 60,
       spread: 55,
       origin: { x: 0, y: 0.65 },
-      colors: ["#00ff88", "#00D4FF"],
+      colors: ["#00FF41", "#00D4FF"],
     });
     confetti({
       particleCount: 40,
       angle: 120,
       spread: 55,
       origin: { x: 1, y: 0.65 },
-      colors: ["#00ff88", "#00D4FF"],
+      colors: ["#00FF41", "#00D4FF"],
     });
   }, 150);
 }
 
 function fireLarge(): void {
-  const colors = ["#FFD700", "#FFA500", "#FF8C00", "#FFEC6E", "#FFC832"];
+  const colors = ["#FFB800", "#FFA500", "#FF8C00", "#FFEC6E", "#FFC832"];
 
   confetti({
     particleCount: 120,
@@ -275,10 +275,10 @@ function fireLarge(): void {
 function fireJackpot(): void {
   const rainbowColors = [
     "#FF0000", "#FF7F00", "#FFFF00", "#00FF00",
-    "#0000FF", "#8B00FF", "#FF69B4", "#FFD700",
+    "#0000FF", "#8B00FF", "#FF69B4", "#FFB800",
     "#00D4FF", "#FF3366",
   ];
-  const goldColors = ["#FFD700", "#FFA500", "#FFEC6E", "#FFC832"];
+  const goldColors = ["#FFB800", "#FFA500", "#FFEC6E", "#FFC832"];
 
   const burst = () => {
     confetti({

@@ -17,7 +17,7 @@ function formatDollar(n: number): string {
   return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
-const RISK_COLORS = { low: "#00e676", medium: "#ffb800", high: "#ff4757" };
+const RISK_COLORS = { low: "#00FF41", medium: "#ffb800", high: "#ff4757" };
 const RISK_LABELS = { low: "LOW RISK", medium: "MEDIUM RISK", high: "HIGH RISK" };
 
 const ENTITY_FILTERS = [
@@ -109,7 +109,7 @@ export default function TaxStrategy() {
             <button key={f.value} onClick={() => setEntityFilter(f.value)}
               className={`px-3 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all min-h-[32px] ${
                 entityFilter === f.value
-                  ? "bg-[#00c8f8]/15 text-[#00c8f8] border border-[#00c8f8]/30"
+                  ? "bg-[#00FF41]/15 text-[#00FF41] border border-[#00FF41]/30"
                   : "text-white/40 hover:text-white/60 border border-transparent"
               }`}>
               {f.label}
@@ -151,7 +151,7 @@ export default function TaxStrategy() {
                     <div className="min-w-0 flex-1">
                       <h3 className="font-bold text-[15px] text-white">{strategy.title}</h3>
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        <span className="text-[11px] text-[#00c8f8] font-mono">{strategy.code}</span>
+                        <span className="text-[11px] text-[#00FF41] font-mono">{strategy.code}</span>
                         <span className="text-[11px] text-white/30">·</span>
                         <span className="text-[11px] text-white/50">{strategy.category}</span>
                       </div>
@@ -168,7 +168,7 @@ export default function TaxStrategy() {
                   </div>
                   <p className="text-[12px] text-white/50">{strategy.maxBenefit}</p>
                   {estimated !== null && estimated > 0 && (
-                    <p className="text-[13px] font-mono font-bold text-[#00e676] mt-1">
+                    <p className="text-[13px] font-mono font-bold text-[#00FF41] mt-1">
                       Est. deduction: {formatDollar(Math.round(estimated))}
                     </p>
                   )}
@@ -177,19 +177,19 @@ export default function TaxStrategy() {
                 {isExpanded && (
                   <div className="px-4 pb-4 border-t border-white/5 pt-4">
                     <div className="mb-3">
-                      <p className="text-[11px] text-[#00c8f8] font-semibold mb-1 uppercase">How It Works</p>
+                      <p className="text-[11px] text-[#00FF41] font-semibold mb-1 uppercase">How It Works</p>
                       <p className="text-[13px] text-white/70 whitespace-pre-line">{strategy.how}</p>
                     </div>
                     <div className="mb-3">
-                      <p className="text-[11px] text-[#00c8f8] font-semibold mb-1 uppercase">Who's Eligible</p>
+                      <p className="text-[11px] text-[#00FF41] font-semibold mb-1 uppercase">Who's Eligible</p>
                       <p className="text-[13px] text-white/70">{strategy.eligible}</p>
                     </div>
                     <div className="mb-3">
-                      <p className="text-[11px] text-[#00c8f8] font-semibold mb-1 uppercase">Required Documentation</p>
+                      <p className="text-[11px] text-[#00FF41] font-semibold mb-1 uppercase">Required Documentation</p>
                       <ul className="space-y-1">
                         {strategy.documentation.map((doc, i) => (
                           <li key={i} className="text-[12px] text-white/60 flex items-start gap-2">
-                            <span className="text-[#00c8f8] mt-0.5">•</span> {doc}
+                            <span className="text-[#00FF41] mt-0.5">•</span> {doc}
                           </li>
                         ))}
                       </ul>
@@ -221,8 +221,8 @@ export default function TaxStrategy() {
                         onClick={(e) => { e.stopPropagation(); togglePlan(strategy.id); }}
                         className={`gap-1 text-[12px] min-h-[36px] ${
                           inPlan
-                            ? "bg-[#00e676]/15 text-[#00e676] border border-[#00e676]/30 hover:bg-[#00e676]/25"
-                            : "bg-gradient-to-r from-[#00c8f8] to-[#0099cc] text-black font-bold"
+                            ? "bg-[#00FF41]/15 text-[#00FF41] border border-[#00FF41]/30 hover:bg-[#00FF41]/25"
+                            : "bg-gradient-to-r from-[#00FF41] to-[#0099cc] text-black font-bold"
                         }`}
                         variant={inPlan ? "outline" : "default"}
                       >

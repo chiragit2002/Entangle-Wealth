@@ -115,11 +115,11 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
       return (
         <button
           onClick={() => setIsMinimized(false)}
-          className="fixed bottom-4 right-4 z-50 flex items-center gap-2 px-3 py-2 bg-[#0a0a0f] border border-[#00ff88]/30 rounded-lg shadow-lg shadow-black/50 hover:border-[#00ff88]/50 transition-colors"
+          className="fixed bottom-4 right-4 z-50 flex items-center gap-2 px-3 py-2 bg-[#0A0E1A] border border-[#00FF41]/30 rounded-lg shadow-lg shadow-black/50 hover:border-[#00FF41]/50 transition-colors"
         >
-          <TrendingUp className="w-3.5 h-3.5 text-[#00ff88]" />
-          <span className="text-[10px] font-mono font-bold text-[#00ff88]">PAPER TRADE</span>
-          <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>
+          <TrendingUp className="w-3.5 h-3.5 text-[#00FF41]" />
+          <span className="text-[10px] font-mono font-bold text-[#00FF41]">PAPER TRADE</span>
+          <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00FF41]' : 'text-[#ff3366]'}`}>
             {pnl >= 0 ? '+' : ''}{pnlPct}%
           </span>
         </button>
@@ -129,15 +129,15 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
     return (
       <>
         {showCashStore && <BuyCashStore onClose={() => setShowCashStore(false)} onPurchaseSuccess={loadPortfolio} />}
-        <div className="fixed bottom-4 right-4 z-50 w-[320px] bg-[#0a0a0f] border border-white/[0.08] rounded-lg shadow-2xl shadow-black/60 overflow-hidden">
+        <div className="fixed bottom-4 right-4 z-50 w-[320px] bg-[#0A0E1A] border border-white/[0.08] rounded-lg shadow-2xl shadow-black/60 overflow-hidden">
         <div className="flex items-center justify-between px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] cursor-pointer" onClick={() => setIsExpanded(v => !v)}>
           <div className="flex items-center gap-1.5">
-            <TrendingUp className="w-3 h-3 text-[#00ff88]" />
-            <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00ff88]">PAPER TRADING</span>
+            <TrendingUp className="w-3 h-3 text-[#00FF41]" />
+            <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00FF41]">PAPER TRADING</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-[9px] font-mono text-white/30">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-            <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>
+            <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00FF41]' : 'text-[#ff3366]'}`}>
               {pnl >= 0 ? '+' : ''}{pnlPct}%
             </span>
             <button onClick={(e) => { e.stopPropagation(); setIsMinimized(true); }} className="text-white/50 hover:text-white/50 transition-colors">
@@ -150,7 +150,7 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
           <div className="grid grid-cols-4 gap-1.5">
             <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
               <p className="text-[7px] font-mono text-white/30">CASH</p>
-              <p className="text-[10px] font-mono font-bold text-[#00ff88]">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+              <p className="text-[10px] font-mono font-bold text-[#00FF41]">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
             </div>
             <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
               <p className="text-[7px] font-mono text-white/30">POSITIONS</p>
@@ -162,12 +162,12 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
             </div>
             <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
               <p className="text-[7px] font-mono text-white/30">P&L</p>
-              <p className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>{pnl >= 0 ? '+' : ''}${pnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+              <p className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00FF41]' : 'text-[#ff3366]'}`}>{pnl >= 0 ? '+' : ''}${pnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
             </div>
           </div>
 
           <div className="flex gap-1">
-            <button onClick={() => setTradeSide("buy")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00ff88]/20 text-[#00ff88] border border-[#00ff88]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>BUY</button>
+            <button onClick={() => setTradeSide("buy")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00FF41]/20 text-[#00FF41] border border-[#00FF41]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>BUY</button>
             <button onClick={() => setTradeSide("sell")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "sell" ? "bg-[#ff3366]/20 text-[#ff3366] border border-[#ff3366]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>SELL</button>
           </div>
 
@@ -178,7 +178,7 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
           </div>
 
           <div className="flex gap-1">
-            <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} className={`flex-1 h-7 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00ff88] text-black hover:bg-[#00ff88]/80" : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"} disabled:opacity-40`}>
+            <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} className={`flex-1 h-7 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00FF41] text-black hover:bg-[#00FF41]/80" : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"} disabled:opacity-40`}>
               {tradeLoading ? "EXECUTING..." : `${tradeSide.toUpperCase()} ORDER`}
             </button>
             <button onClick={resetPortfolio} disabled={!isSignedIn} className="px-2 h-7 text-[9px] font-mono font-bold text-white/30 bg-white/[0.03] border border-white/[0.06] rounded-sm hover:text-white/50 transition-colors disabled:opacity-40">
@@ -188,13 +188,13 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
 
           <button
             onClick={() => setShowCashStore(true)}
-            className="w-full flex items-center justify-center gap-1 h-6 text-[9px] font-mono font-bold text-[#00ff88]/60 bg-[#00ff88]/[0.04] border border-[#00ff88]/[0.15] rounded-sm hover:text-[#00ff88] hover:bg-[#00ff88]/[0.08] transition-colors"
+            className="w-full flex items-center justify-center gap-1 h-6 text-[9px] font-mono font-bold text-[#00FF41]/60 bg-[#00FF41]/[0.04] border border-[#00FF41]/[0.15] rounded-sm hover:text-[#00FF41] hover:bg-[#00FF41]/[0.08] transition-colors"
           >
             <PlusCircle className="w-3 h-3" />
             ADD FUNDS
           </button>
 
-          {!isSignedIn && <p className="text-[9px] font-mono text-[#FFD700] text-center">Sign in to start paper trading</p>}
+          {!isSignedIn && <p className="text-[9px] font-mono text-[#FFB800] text-center">Sign in to start paper trading</p>}
 
           {isExpanded && portfolio.positions.length > 0 && (
             <div className="border-t border-white/[0.06] pt-1.5 max-h-[150px] overflow-y-auto">
@@ -214,7 +214,7 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
               <p className="text-[8px] font-mono text-white/25 mb-1">RECENT TRADES</p>
               {portfolio.trades.slice(0, 5).map(t => (
                 <div key={t.id} className="flex items-center justify-between py-0.5">
-                  <span className={`text-[9px] font-mono font-bold ${t.side === 'buy' ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>{t.side.toUpperCase()}</span>
+                  <span className={`text-[9px] font-mono font-bold ${t.side === 'buy' ? 'text-[#00FF41]' : 'text-[#ff3366]'}`}>{t.side.toUpperCase()}</span>
                   <span className="text-[10px] font-mono text-[#00D4FF]">{t.symbol}</span>
                   <span className="text-[9px] font-mono text-white/40">{t.quantity} @ ${t.price.toFixed(2)}</span>
                 </div>
@@ -237,20 +237,20 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
   return (
     <>
       {showCashStore && <BuyCashStore onClose={() => setShowCashStore(false)} onPurchaseSuccess={loadPortfolio} />}
-      <div className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm overflow-hidden">
-      <div className="flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#00ff88]">
+      <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
+      <div className="flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#00FF41]">
         <div className="flex items-center gap-1.5">
-          <TrendingUp className="w-3 h-3 text-[#00ff88]" />
-          <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00ff88]">PAPER TRADING</span>
+          <TrendingUp className="w-3 h-3 text-[#00FF41]" />
+          <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00FF41]">PAPER TRADING</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[9px] font-mono text-white/30">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })} CASH</span>
-          <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>
+          <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00FF41]' : 'text-[#ff3366]'}`}>
             {pnl >= 0 ? '+' : ''}{pnlPct}%
           </span>
           <button
             onClick={() => setShowCashStore(true)}
-            className="flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-mono font-bold text-[#00ff88]/60 border border-[#00ff88]/20 rounded-sm hover:text-[#00ff88] hover:border-[#00ff88]/40 transition-colors"
+            className="flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-mono font-bold text-[#00FF41]/60 border border-[#00FF41]/20 rounded-sm hover:text-[#00FF41] hover:border-[#00FF41]/40 transition-colors"
           >
             <PlusCircle className="w-2.5 h-2.5" />
             ADD FUNDS
@@ -261,7 +261,7 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
         <div className="grid grid-cols-4 gap-1.5">
           <div className="bg-white/[0.03] rounded-sm p-2 text-center">
             <p className="text-[8px] font-mono text-white/30">CASH</p>
-            <p className="text-[11px] font-mono font-bold text-[#00ff88]">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+            <p className="text-[11px] font-mono font-bold text-[#00FF41]">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
           </div>
           <div className="bg-white/[0.03] rounded-sm p-2 text-center">
             <p className="text-[8px] font-mono text-white/30">POSITIONS</p>
@@ -273,12 +273,12 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
           </div>
           <div className="bg-white/[0.03] rounded-sm p-2 text-center">
             <p className="text-[8px] font-mono text-white/30">P&L</p>
-            <p className={`text-[11px] font-mono font-bold ${pnl >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>{pnl >= 0 ? '+' : ''}${pnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+            <p className={`text-[11px] font-mono font-bold ${pnl >= 0 ? 'text-[#00FF41]' : 'text-[#ff3366]'}`}>{pnl >= 0 ? '+' : ''}${pnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
           </div>
         </div>
 
         <div className="flex gap-1">
-          <button onClick={() => setTradeSide("buy")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00ff88]/20 text-[#00ff88] border border-[#00ff88]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>BUY</button>
+          <button onClick={() => setTradeSide("buy")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00FF41]/20 text-[#00FF41] border border-[#00FF41]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>BUY</button>
           <button onClick={() => setTradeSide("sell")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "sell" ? "bg-[#ff3366]/20 text-[#ff3366] border border-[#ff3366]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>SELL</button>
         </div>
 
@@ -289,7 +289,7 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
         </div>
 
         <div className="flex gap-1">
-          <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} className={`flex-1 h-7 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00ff88] text-black hover:bg-[#00ff88]/80" : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"} disabled:opacity-40`}>
+          <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} className={`flex-1 h-7 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00FF41] text-black hover:bg-[#00FF41]/80" : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"} disabled:opacity-40`}>
             {tradeLoading ? "EXECUTING..." : `${tradeSide.toUpperCase()} ORDER`}
           </button>
           <button onClick={resetPortfolio} disabled={!isSignedIn} className="px-2 h-7 text-[9px] font-mono font-bold text-white/30 bg-white/[0.03] border border-white/[0.06] rounded-sm hover:text-white/50 transition-colors disabled:opacity-40">
@@ -299,13 +299,13 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
 
         <button
           onClick={() => setShowCashStore(true)}
-          className="w-full flex items-center justify-center gap-1.5 h-7 text-[9px] font-mono font-bold text-[#00ff88]/60 bg-[#00ff88]/[0.04] border border-[#00ff88]/[0.15] rounded-sm hover:text-[#00ff88] hover:bg-[#00ff88]/[0.08] transition-colors"
+          className="w-full flex items-center justify-center gap-1.5 h-7 text-[9px] font-mono font-bold text-[#00FF41]/60 bg-[#00FF41]/[0.04] border border-[#00FF41]/[0.15] rounded-sm hover:text-[#00FF41] hover:bg-[#00FF41]/[0.08] transition-colors"
         >
           <PlusCircle className="w-3.5 h-3.5" />
           ADD FUNDS
         </button>
 
-        {!isSignedIn && <p className="text-[9px] font-mono text-[#FFD700] text-center">Sign in to start paper trading</p>}
+        {!isSignedIn && <p className="text-[9px] font-mono text-[#FFB800] text-center">Sign in to start paper trading</p>}
 
         {portfolio.positions.length > 0 && (
           <div className="border-t border-white/[0.06] pt-1.5">

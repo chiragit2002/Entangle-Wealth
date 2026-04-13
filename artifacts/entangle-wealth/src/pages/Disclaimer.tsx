@@ -46,7 +46,7 @@ export default function Disclaimer() {
           {/* ATTORNEY REVIEW: Verify past performance disclaimer language */}
           <section>
             <h2 className="text-xl font-bold text-white mb-3">3. Past Performance</h2>
-            <div className="bg-[#FFD700]/5 border border-[#FFD700]/20 rounded-xl p-5">
+            <div className="bg-[#FFB800]/5 border border-[#FFB800]/20 rounded-xl p-5">
               <p className="text-white/80"><strong className="text-white">Past performance is not indicative of future results.</strong> Any performance data, backtesting results, or historical analysis shown on this platform does not guarantee future returns. Market conditions change constantly, and strategies that worked in the past may not work in the future.</p>
               <p className="mt-3 text-white/80">Hypothetical or simulated performance results have inherent limitations. Unlike actual trading records, simulated results do not represent actual trading. Simulated trading programs are generally designed with the benefit of hindsight.</p>
             </div>

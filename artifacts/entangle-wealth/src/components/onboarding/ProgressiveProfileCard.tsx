@@ -102,8 +102,8 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
 
   if (step === "done") {
     return (
-      <div className={`bg-[#001a0f] border border-[#00e676]/20 rounded-xl p-4 flex items-center gap-3 animate-in fade-in duration-200 ${className}`}>
-        <CheckCircle2 className="w-5 h-5 text-[#00e676] shrink-0" />
+      <div className={`bg-[#001a0f] border border-[#00FF41]/20 rounded-xl p-4 flex items-center gap-3 animate-in fade-in duration-200 ${className}`}>
+        <CheckCircle2 className="w-5 h-5 text-[#00FF41] shrink-0" />
         <p className="text-sm text-white/70">Profile updated — your experience is now more personalized.</p>
       </div>
     );
@@ -114,9 +114,9 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
           {step === "occupation" ? (
-            <Briefcase className="w-4 h-4 text-[#00c8f8]" />
+            <Briefcase className="w-4 h-4 text-[#00FF41]" />
           ) : (
-            <Target className="w-4 h-4 text-[#00e676]" />
+            <Target className="w-4 h-4 text-[#00FF41]" />
           )}
           <p className="text-xs font-bold text-white/70">
             {step === "occupation"
@@ -150,7 +150,7 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
             <button
               onClick={saveOccupation}
               disabled={saving}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#00c8f8]/10 border border-[#00c8f8]/20 text-[#00c8f8] text-[11px] font-bold hover:bg-[#00c8f8]/20 transition-colors disabled:opacity-50"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#00FF41]/10 border border-[#00FF41]/20 text-[#00FF41] text-[11px] font-bold hover:bg-[#00FF41]/20 transition-colors disabled:opacity-50"
             >
               {occupationId ? "Save" : "Skip"} <ChevronRight className="w-3 h-3" />
             </button>
@@ -168,7 +168,7 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
                 aria-pressed={focus === opt.id}
                 className={`px-3 py-2 rounded-lg border text-[11px] font-semibold text-left transition-all ${
                   focus === opt.id
-                    ? "border-[#00e676]/50 bg-[#00e676]/8 text-white"
+                    ? "border-[#00FF41]/50 bg-[#00FF41]/8 text-white"
                     : "border-white/8 bg-white/[0.02] text-white/60 hover:border-white/15"
                 }`}
               >
@@ -186,7 +186,7 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
             <button
               onClick={saveFocus}
               disabled={saving}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#00e676]/10 border border-[#00e676]/20 text-[#00e676] text-[11px] font-bold hover:bg-[#00e676]/20 transition-colors disabled:opacity-50"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#00FF41]/10 border border-[#00FF41]/20 text-[#00FF41] text-[11px] font-bold hover:bg-[#00FF41]/20 transition-colors disabled:opacity-50"
             >
               {focus ? "Save" : "Skip"} <ChevronRight className="w-3 h-3" />
             </button>

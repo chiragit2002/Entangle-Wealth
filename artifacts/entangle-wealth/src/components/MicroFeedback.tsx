@@ -71,7 +71,7 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2 text-sm text-white/70">
             {helpful ? (
-              <ThumbsUp className="w-4 h-4 text-[#00ff88]" />
+              <ThumbsUp className="w-4 h-4 text-[#00FF41]" />
             ) : (
               <ThumbsDown className="w-4 h-4 text-[#ff3366]" />
             )}
@@ -115,7 +115,7 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
       <span className="text-xs text-white/50">{label}</span>
       <button
         onClick={() => handleVote(true)}
-        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-[#00ff88] hover:bg-[#00ff88]/10 border border-white/10 hover:border-[#00ff88]/30 transition-all"
+        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-[#00FF41] hover:bg-[#00FF41]/10 border border-white/10 hover:border-[#00FF41]/30 transition-all"
         aria-label="Helpful"
       >
         <ThumbsUp className="w-3.5 h-3.5" />

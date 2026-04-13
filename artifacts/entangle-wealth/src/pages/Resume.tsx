@@ -70,9 +70,9 @@ interface ResumeData {
 
 const TEMPLATES = [
   { id: "quantum", name: "Quantum Dark", accent: "#00D4FF", gradient: "from-cyan-500 to-blue-600" },
-  { id: "entangled", name: "Entangled Gold", accent: "#FFD700", gradient: "from-yellow-500 to-amber-600" },
+  { id: "entangled", name: "Entangled Gold", accent: "#FFB800", gradient: "from-yellow-500 to-amber-600" },
   { id: "professional", name: "Professional", accent: "#00D4FF", gradient: "from-blue-500 to-indigo-600" },
-  { id: "modern", name: "Modern Clean", accent: "#00e676", gradient: "from-green-500 to-emerald-600" },
+  { id: "modern", name: "Modern Clean", accent: "#00FF41", gradient: "from-green-500 to-emerald-600" },
   { id: "minimal", name: "Minimal", accent: "#ffffff", gradient: "from-gray-400 to-gray-600" },
 ];
 

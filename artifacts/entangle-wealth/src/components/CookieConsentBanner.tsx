@@ -32,7 +32,7 @@ export function CookieConsentBanner() {
     <div className="fixed left-4 right-4 z-[100] animate-in slide-in-from-bottom-4 duration-500 pointer-events-none bottom-[calc(84px+env(safe-area-inset-bottom,0px))] lg:bottom-6">
       <div className="max-w-xl mx-auto pointer-events-auto">
         <div
-          className="rounded-2xl p-4 shadow-2xl shadow-black/60"
+          className="rounded-sm p-4 shadow-2xl shadow-black/60"
           style={{
             background: "var(--nav-dropdown-bg, rgba(10,10,20,0.97))",
             backdropFilter: "blur(24px)",
@@ -40,8 +40,8 @@ export function CookieConsentBanner() {
           }}
         >
           <div className="flex items-start gap-3">
-            <div className="shrink-0 w-8 h-8 rounded-lg bg-[#FFD700]/10 flex items-center justify-center mt-0.5">
-              <Cookie className="w-4 h-4 text-[#FFD700]" />
+            <div className="shrink-0 w-8 h-8 rounded-lg bg-[#FFB800]/10 flex items-center justify-center mt-0.5">
+              <Cookie className="w-4 h-4 text-[#FFB800]" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-semibold text-foreground mb-0.5">We use cookies</h3>

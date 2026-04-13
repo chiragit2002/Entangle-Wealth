@@ -66,7 +66,7 @@ const PLATFORM_META: Record<string, { label: string; icon: React.ReactNode; colo
   engagement: {
     label: "Engagement",
     icon: <MessageCircle className="w-4 h-4" />,
-    color: "#00ff88",
+    color: "#00FF41",
     gradient: "from-emerald-500/20 to-green-600/20",
   },
 };
@@ -461,7 +461,7 @@ export default function DailyContent() {
     return (
       <Layout>
         <div className="flex flex-col items-center justify-center py-32 text-center px-4">
-          <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
+          <div className="w-16 h-16 rounded-sm bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
             <Shield className="w-8 h-8 text-red-400" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
@@ -564,7 +564,7 @@ export default function DailyContent() {
 
             {today && !today.batchExists && !generating && (
               <div className="text-center py-16 space-y-4">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto border border-primary/20">
+                <div className="w-16 h-16 rounded-sm bg-primary/10 flex items-center justify-center mx-auto border border-primary/20">
                   <Sparkles className="w-8 h-8 text-primary" />
                 </div>
                 <div>

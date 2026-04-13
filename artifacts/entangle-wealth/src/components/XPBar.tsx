@@ -6,9 +6,9 @@ const TIER_NAMES = TIER_THRESHOLDS.map(t => t.tier);
 const TIER_GRADIENTS: Record<string, { start: string; end: string; glow: string }> = {
   Bronze: { start: "#cd7f32", end: "#a0522d", glow: "rgba(205,127,50,0.5)" },
   Silver: { start: "#c0c0c0", end: "#a8a8a8", glow: "rgba(192,192,192,0.4)" },
-  Gold: { start: "#FFD700", end: "#FFA500", glow: "rgba(255,215,0,0.55)" },
+  Gold: { start: "#FFB800", end: "#FFA500", glow: "rgba(255,215,0,0.55)" },
   Platinum: { start: "#e5e4e2", end: "#b8b6b0", glow: "rgba(229,228,226,0.4)" },
-  Diamond: { start: "#00D4FF", end: "#0099FF", glow: "rgba(0,212,255,0.6)" },
+  Diamond: { start: "#00FF41", end: "#00CC33", glow: "rgba(0,255,65,0.6)" },
 };
 
 interface XPBarProps {

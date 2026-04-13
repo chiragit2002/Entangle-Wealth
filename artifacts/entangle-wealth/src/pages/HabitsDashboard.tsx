@@ -118,7 +118,7 @@ function ProgressRing({ value, max, size = 56, strokeWidth = 5, color = "#00D4FF
 
 function StreakBadge({ streak }: { streak: number }) {
   if (streak === 0) return null;
-  const color = streak >= 30 ? "#FFD700" : streak >= 14 ? "#9c27b0" : streak >= 7 ? "#00D4FF" : "#ff6b35";
+  const color = streak >= 30 ? "#FFB800" : streak >= 14 ? "#9c27b0" : streak >= 7 ? "#00D4FF" : "#ff6b35";
   return (
     <span
       className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full"

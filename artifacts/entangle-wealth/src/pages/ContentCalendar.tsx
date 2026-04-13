@@ -401,7 +401,7 @@ function ExportModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 " onClick={onClose}>
       <div
         className="w-full max-w-md rounded-xl border border-white/[0.08] p-5 space-y-4"
         style={{ background: "rgba(8,8,20,0.98)" }}
@@ -565,7 +565,7 @@ export default function ContentCalendar() {
     return (
       <Layout>
         <div className="flex flex-col items-center justify-center py-32 text-center px-4">
-          <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
+          <div className="w-16 h-16 rounded-sm bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
             <Shield className="w-8 h-8 text-red-400" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>

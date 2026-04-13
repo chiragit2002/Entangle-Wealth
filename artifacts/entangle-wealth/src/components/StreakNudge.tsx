@@ -66,7 +66,7 @@ export function StreakNudge() {
         <div className="flex items-center gap-2.5">
           <div className="relative">
             <Flame className="w-5 h-5 text-orange-400" />
-            <span className="absolute -top-1 -right-1 text-[8px] font-black font-mono text-[#f5c842] bg-[#0a0a0f] rounded-full w-3.5 h-3.5 flex items-center justify-center leading-none">
+            <span className="absolute -top-1 -right-1 text-[8px] font-black font-mono text-[#FFB800] bg-[#0A0E1A] rounded-full w-3.5 h-3.5 flex items-center justify-center leading-none">
               {streak > 9 ? "!" : streak}
             </span>
           </div>

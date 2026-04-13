@@ -399,8 +399,8 @@ export default function Travel() {
   };
 
   const getScoreColor = (s: number) => {
-    if (s >= 80) return "#00ff88";
-    if (s >= 60) return "#ffd700";
+    if (s >= 80) return "#00FF41";
+    if (s >= 60) return "#FFB800";
     return "#ff3366";
   };
 
@@ -466,7 +466,7 @@ export default function Travel() {
                       isActive
                         ? "bg-gradient-to-br from-primary to-[#0099cc] text-black shadow-lg shadow-primary/20"
                         : isDone
-                        ? "bg-[#00ff88]/20 text-[#00ff88] border-2 border-[#00ff88]/40 cursor-pointer"
+                        ? "bg-[#00FF41]/20 text-[#00FF41] border-2 border-[#00FF41]/40 cursor-pointer"
                         : "bg-white/5 text-white/30 border border-white/10"
                     }`}
                     aria-label={`Step ${s}: ${labels[i]}`}
@@ -475,13 +475,13 @@ export default function Travel() {
                     {isDone ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-4 h-4 md:w-5 md:h-5" />}
                   </button>
                   <span className={`text-[10px] md:text-[11px] mt-2 font-semibold text-center ${
-                    isActive ? "text-primary" : isDone ? "text-[#00ff88]" : "text-white/30"
+                    isActive ? "text-primary" : isDone ? "text-[#00FF41]" : "text-white/30"
                   }`}>
                     {labels[i]}
                   </span>
                 </div>
                 {i < 3 && (
-                  <div className={`h-[2px] flex-1 mx-1 -mt-5 ${step > s ? "bg-[#00ff88]/40" : "bg-white/10"}`} />
+                  <div className={`h-[2px] flex-1 mx-1 -mt-5 ${step > s ? "bg-[#00FF41]/40" : "bg-white/10"}`} />
                 )}
               </div>
             );
@@ -490,7 +490,7 @@ export default function Travel() {
 
         {step === 1 && (
           <div className="space-y-4">
-            <div className="glass-panel rounded-2xl p-5 md:p-7 border border-[rgba(0,212,255,0.15)]">
+            <div className="glass-panel rounded-sm p-5 md:p-7 border border-[rgba(0,212,255,0.15)]">
               <div className="flex gap-1 mb-5">
                 {(["roundtrip", "oneway", "multicity"] as const).map(t => (
                   <button key={t} onClick={() => setTrip(p => ({ ...p, tripType: t }))}
@@ -658,7 +658,7 @@ export default function Travel() {
 
         {step === 2 && (
           <div className="space-y-4">
-            <div className="glass-panel rounded-2xl p-5 border border-[rgba(0,212,255,0.15)]">
+            <div className="glass-panel rounded-sm p-5 border border-[rgba(0,212,255,0.15)]">
               <div className="flex items-center justify-between mb-1">
                 <h2 className="text-lg font-bold">Select IRS Deductions</h2>
                 <span className="text-[12px] text-primary font-semibold">{selectedDeductions.length} selected</span>
@@ -701,7 +701,7 @@ export default function Travel() {
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="text-[13px] md:text-[14px] font-bold">{d.title}</p>
                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                              d.pct === 100 ? "bg-[#00ff88]/15 text-[#00ff88]" : d.pct >= 50 ? "bg-[#ffd700]/15 text-[#ffd700]" : "bg-white/10 text-white/50"
+                              d.pct === 100 ? "bg-[#00FF41]/15 text-[#00FF41]" : d.pct >= 50 ? "bg-[#FFB800]/15 text-[#FFB800]" : "bg-white/10 text-white/50"
                             }`}>
                               {d.pct}%
                             </span>
@@ -733,7 +733,7 @@ export default function Travel() {
                             <div className="space-y-1.5">
                               {d.conditions.map((c, i) => (
                                 <div key={i} className="flex items-start gap-2">
-                                  <AlertTriangle className="w-3 h-3 text-[#ffd700]/50 mt-0.5 flex-shrink-0" />
+                                  <AlertTriangle className="w-3 h-3 text-[#FFB800]/50 mt-0.5 flex-shrink-0" />
                                   <span className="text-[11px] text-white/50">{c}</span>
                                 </div>
                               ))}
@@ -748,12 +748,12 @@ export default function Travel() {
             </div>
 
             {selectedDeductions.length > 0 && (
-              <div className="glass-panel rounded-xl p-4 border border-[#00ff88]/15 bg-[#00ff88]/[0.02]">
-                <p className="text-[12px] font-bold text-[#00ff88] mb-2">Selected ({selectedDeductions.length})</p>
+              <div className="glass-panel rounded-xl p-4 border border-[#00FF41]/15 bg-[#00FF41]/[0.02]">
+                <p className="text-[12px] font-bold text-[#00FF41] mb-2">Selected ({selectedDeductions.length})</p>
                 <div className="flex flex-wrap gap-2">
                   {selectedDeductions.map(d => (
                     <span key={d.id} className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-[11px] font-semibold flex items-center gap-1.5">
-                      {d.title.split(" ")[0]} <span className="text-[#00ff88]">{d.pct}%</span>
+                      {d.title.split(" ")[0]} <span className="text-[#00FF41]">{d.pct}%</span>
                       <button onClick={() => toggleDeduction(d.id)} className="ml-1 text-white/30 hover:text-white/60">×</button>
                     </span>
                   ))}
@@ -765,7 +765,7 @@ export default function Travel() {
 
         {step === 3 && (
           <div className="space-y-4">
-            <div className="glass-panel rounded-2xl p-5 border border-[rgba(0,212,255,0.15)]">
+            <div className="glass-panel rounded-sm p-5 border border-[rgba(0,212,255,0.15)]">
               <div className="flex items-center justify-between mb-1">
                 <h2 className="text-lg font-bold">Build Your Itinerary</h2>
                 <span className="text-[12px] text-primary font-semibold">{dayCount} day{dayCount > 1 ? "s" : ""}</span>
@@ -799,7 +799,7 @@ export default function Travel() {
                         <span className="text-[11px] text-white/30">{dateStr}</span>
                       </div>
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                        bizCount > 0 ? "bg-[#00ff88]/15 text-[#00ff88]" : "bg-white/5 text-white/30"
+                        bizCount > 0 ? "bg-[#00FF41]/15 text-[#00FF41]" : "bg-white/5 text-white/30"
                       }`}>
                         {bizCount > 0 ? `${bizCount} business` : "No activities"}
                       </span>
@@ -829,8 +829,8 @@ export default function Travel() {
                               {ACTIVITY_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                             </select>
                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold flex-shrink-0 ${
-                              a.deductible === "full" ? "bg-[#00ff88]/15 text-[#00ff88]" :
-                              a.deductible === "partial" ? "bg-[#ffd700]/15 text-[#ffd700]" :
+                              a.deductible === "full" ? "bg-[#00FF41]/15 text-[#00FF41]" :
+                              a.deductible === "partial" ? "bg-[#FFB800]/15 text-[#FFB800]" :
                               "bg-[#ff3366]/15 text-[#ff3366]"
                             }`}>
                               {a.pct}%
@@ -856,7 +856,7 @@ export default function Travel() {
 
         {step === 4 && (
           <div className="space-y-4">
-            <div className="glass-panel rounded-2xl p-5 md:p-7 border border-[rgba(0,212,255,0.15)]">
+            <div className="glass-panel rounded-sm p-5 md:p-7 border border-[rgba(0,212,255,0.15)]">
               <div className="text-center mb-6">
                 <div className="relative w-[120px] h-[120px] mx-auto mb-3">
                   <svg width="120" height="120" viewBox="0 0 120 120" className="-rotate-90" role="img" aria-label={`Compliance score: ${complianceScore}`}>
@@ -877,8 +877,8 @@ export default function Travel() {
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                <div className="rounded-xl p-3 bg-[#00ff88]/[0.06] border border-[#00ff88]/15 text-center">
-                  <p className="text-[20px] font-black text-[#00ff88]">${estimatedSavings.toLocaleString()}</p>
+                <div className="rounded-xl p-3 bg-[#00FF41]/[0.06] border border-[#00FF41]/15 text-center">
+                  <p className="text-[20px] font-black text-[#00FF41]">${estimatedSavings.toLocaleString()}</p>
                   <p className="text-[10px] text-white/30 mt-1">Est. Deductible</p>
                 </div>
                 <div className="rounded-xl p-3 bg-primary/[0.06] border border-primary/15 text-center">
@@ -935,7 +935,7 @@ export default function Travel() {
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <span className="text-[10px] text-white/30 font-mono">{d.irsRef}</span>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          d.pct === 100 ? "bg-[#00ff88]/15 text-[#00ff88]" : "bg-[#ffd700]/15 text-[#ffd700]"
+                          d.pct === 100 ? "bg-[#00FF41]/15 text-[#00FF41]" : "bg-[#FFB800]/15 text-[#FFB800]"
                         }`}>{d.pct}%</span>
                       </div>
                     </div>
@@ -963,8 +963,8 @@ export default function Travel() {
                                 <span className="text-[12px] text-white/70 truncate">{a.title || "Untitled"}</span>
                               </div>
                               <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold flex-shrink-0 ${
-                                a.deductible === "full" ? "bg-[#00ff88]/15 text-[#00ff88]" :
-                                a.deductible === "partial" ? "bg-[#ffd700]/15 text-[#ffd700]" :
+                                a.deductible === "full" ? "bg-[#00FF41]/15 text-[#00FF41]" :
+                                a.deductible === "partial" ? "bg-[#FFB800]/15 text-[#FFB800]" :
                                 "bg-[#ff3366]/15 text-[#ff3366]"
                               }`}>{a.pct}%</span>
                             </div>
@@ -978,7 +978,7 @@ export default function Travel() {
             </div>
 
             <Link href="/receipts">
-              <div className="glass-panel rounded-2xl p-5 border border-primary/20 bg-primary/[0.03] cursor-pointer hover:border-primary/40 transition-all group">
+              <div className="glass-panel rounded-sm p-5 border border-primary/20 bg-primary/[0.03] cursor-pointer hover:border-primary/40 transition-all group">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:from-primary/30 group-hover:to-primary/10 transition-all flex-shrink-0">
                     <Camera className="w-6 h-6 text-primary" />
@@ -996,7 +996,7 @@ export default function Travel() {
               <Button className="bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold min-h-[48px] gap-2 text-[14px]" onClick={exportAll}>
                 <Download className="w-5 h-5" /> Download Full Report (CSV)
               </Button>
-              <Button variant="outline" className="border-[#00ff88]/30 text-[#00ff88] font-bold min-h-[48px] gap-2 text-[14px]" onClick={() => {
+              <Button variant="outline" className="border-[#00FF41]/30 text-[#00FF41] font-bold min-h-[48px] gap-2 text-[14px]" onClick={() => {
                 toast({ title: "Sent to CPA", description: "In a future update, this will email the report directly to your CPA." });
               }}>
                 <FileText className="w-5 h-5" /> Send to CPA
@@ -1020,7 +1020,7 @@ export default function Travel() {
           </Button>
           <div className="flex items-center gap-1">
             {[1,2,3,4].map(s => (
-              <div key={s} className={`w-2 h-2 rounded-full transition-all ${step === s ? "bg-primary w-6" : step > s ? "bg-[#00ff88]/40" : "bg-white/10"}`} />
+              <div key={s} className={`w-2 h-2 rounded-full transition-all ${step === s ? "bg-primary w-6" : step > s ? "bg-[#00FF41]/40" : "bg-white/10"}`} />
             ))}
           </div>
           {step < 4 ? (
@@ -1028,7 +1028,7 @@ export default function Travel() {
               Continue <ChevronRight className="w-4 h-4" />
             </Button>
           ) : (
-            <Button className="bg-gradient-to-r from-[#00ff88] to-[#00cc66] text-black font-bold gap-1.5 min-h-[44px]" onClick={exportAll}>
+            <Button className="bg-gradient-to-r from-[#00FF41] to-[#00cc66] text-black font-bold gap-1.5 min-h-[44px]" onClick={exportAll}>
               <Download className="w-4 h-4" /> Export
             </Button>
           )}

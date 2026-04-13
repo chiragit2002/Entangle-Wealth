@@ -54,7 +54,7 @@ export default function BlogIndex() {
           </div>
         ) : (
           <div className="text-center py-16 max-w-2xl mx-auto">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
+            <div className="w-16 h-16 rounded-sm bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
               <BookOpen className="w-8 h-8 text-primary" />
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">Articles Coming Soon</h2>

@@ -12,8 +12,8 @@ interface Props {
 const CATEGORIES = [
   { key: "flights", label: "Flights", color: "#00D4FF" },
   { key: "accommodation", label: "Accommodation", color: "#9c27b0" },
-  { key: "food", label: "Food & Dining", color: "#FFD700" },
-  { key: "activities", label: "Activities", color: "#00ff88" },
+  { key: "food", label: "Food & Dining", color: "#FFB800" },
+  { key: "activities", label: "Activities", color: "#00FF41" },
   { key: "transport", label: "Local Transport", color: "#ff6b6b" },
 ];
 
@@ -54,7 +54,7 @@ export default function BudgetSummary({ form, activities, dayCount }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="glass-panel rounded-2xl p-5 md:p-7 border border-[rgba(0,212,255,0.15)]">
+      <div className="glass-panel rounded-sm p-5 md:p-7 border border-[rgba(0,212,255,0.15)]">
         <div className="flex items-center gap-2 mb-1">
           <DollarSign className="w-5 h-5 text-primary" />
           <h2 className="text-lg font-bold">Budget Summary</h2>
@@ -64,7 +64,7 @@ export default function BudgetSummary({ form, activities, dayCount }: Props) {
           {hasManualCosts && " Includes your manually entered costs."}
         </p>
 
-        <div className="rounded-xl bg-gradient-to-br from-primary/[0.08] to-[#00ff88]/[0.04] border border-primary/20 p-5 mb-5 text-center">
+        <div className="rounded-xl bg-gradient-to-br from-primary/[0.08] to-[#00FF41]/[0.04] border border-primary/20 p-5 mb-5 text-center">
           <p className="text-[11px] uppercase tracking-wider text-white/30 font-semibold mb-1">Estimated Trip Total</p>
           <p className="text-[36px] font-black text-primary font-mono">${tripTotal.toLocaleString()}</p>
           <p className="text-[12px] text-white/50 mt-1">{form.budgetLevel.charAt(0).toUpperCase() + form.budgetLevel.slice(1)} · {form.travelers} traveler{form.travelers > 1 ? "s" : ""} · {dayCount} day{dayCount > 1 ? "s" : ""}</p>
@@ -96,7 +96,7 @@ export default function BudgetSummary({ form, activities, dayCount }: Props) {
         </div>
       </div>
 
-      <div className="glass-panel rounded-2xl p-5 md:p-7 border border-[rgba(255,215,0,0.15)] bg-[rgba(255,215,0,0.02)]">
+      <div className="glass-panel rounded-sm p-5 md:p-7 border border-[rgba(255,215,0,0.15)] bg-[rgba(255,215,0,0.02)]">
         <div className="flex items-center gap-2 mb-1">
           <PiggyBank className="w-5 h-5 text-secondary" />
           <h2 className="text-lg font-bold">Trip Cost vs. Savings</h2>
@@ -134,9 +134,9 @@ export default function BudgetSummary({ form, activities, dayCount }: Props) {
             <p className="text-[24px] font-black text-primary font-mono">{costAsPercent}%</p>
             <p className="text-[10px] text-white/30 mt-1">of monthly income</p>
           </div>
-          <div className="rounded-xl p-4 bg-[#00ff88]/[0.06] border border-[#00ff88]/15 text-center">
-            <PiggyBank className="w-5 h-5 text-[#00ff88] mx-auto mb-2" />
-            <p className="text-[24px] font-black text-[#00ff88] font-mono">
+          <div className="rounded-xl p-4 bg-[#00FF41]/[0.06] border border-[#00FF41]/15 text-center">
+            <PiggyBank className="w-5 h-5 text-[#00FF41] mx-auto mb-2" />
+            <p className="text-[24px] font-black text-[#00FF41] font-mono">
               {monthsToFund > 0 ? `${monthsToFund} mo` : "—"}
             </p>
             <p className="text-[10px] text-white/30 mt-1">

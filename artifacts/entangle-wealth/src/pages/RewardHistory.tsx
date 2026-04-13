@@ -24,7 +24,7 @@ interface MyReward {
 }
 
 const REWARD_TIERS = [
-  { label: "#1", tokens: "5,000 ENTGL", color: "#FFD700", icon: Crown },
+  { label: "#1", tokens: "5,000 ENTGL", color: "#FFB800", icon: Crown },
   { label: "#2-3", tokens: "3,000 ENTGL", color: "#C0C0C0", icon: Medal },
   { label: "#4-10", tokens: "1,500 ENTGL", color: "#CD7F32", icon: Medal },
   { label: "#11-25", tokens: "750 ENTGL", color: "#00D4FF", icon: Trophy },

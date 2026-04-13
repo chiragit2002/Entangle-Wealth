@@ -168,7 +168,7 @@ export default function TripMap({ activities, destinations, highlightDay }: Prop
   }, [stops, highlightDay]);
 
   return (
-    <div className="relative rounded-2xl overflow-hidden border border-[rgba(0,212,255,0.15)]">
+    <div className="relative rounded-sm overflow-hidden border border-[rgba(0,212,255,0.15)]">
       {loading && (
         <div className="absolute inset-0 z-[1000] bg-black/60 flex items-center justify-center">
           <div className="text-[13px] text-primary animate-pulse">Loading map data...</div>

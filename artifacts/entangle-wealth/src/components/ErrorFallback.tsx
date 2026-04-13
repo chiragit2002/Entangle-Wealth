@@ -8,26 +8,19 @@ interface ErrorFallbackProps {
 
 export default function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
   return (
-    <div className="min-h-screen bg-[#010108] text-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#0A0E1A] text-white flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center space-y-8">
         <div className="relative">
           <div
-            className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto"
+            className="w-20 h-20 flex items-center justify-center mx-auto"
             style={{
               background: "rgba(255,71,87,0.08)",
               border: "1px solid rgba(255,71,87,0.25)",
-              boxShadow: "0 0 40px rgba(255,71,87,0.08)",
+              borderRadius: 0,
             }}
           >
             <Radio className="w-9 h-9 text-red-400" style={{ animation: "signalPulse 2s ease-in-out infinite" }} />
           </div>
-
-          <div
-            className="absolute -inset-4 rounded-3xl pointer-events-none"
-            style={{
-              background: "radial-gradient(circle at center, rgba(255,71,87,0.04), transparent 70%)",
-            }}
-          />
         </div>
 
         <div>
@@ -44,7 +37,7 @@ export default function ErrorFallback({ error, resetErrorBoundary }: ErrorFallba
 
         {import.meta.env.DEV && (
           <div
-            className="p-4 rounded-xl text-left font-mono"
+            className="p-4 text-left font-mono"
             style={{
               background: "rgba(255,71,87,0.05)",
               border: "1px solid rgba(255,71,87,0.15)",
@@ -58,10 +51,11 @@ export default function ErrorFallback({ error, resetErrorBoundary }: ErrorFallba
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={resetErrorBoundary}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all hover:opacity-90 active:scale-[0.97]"
+            className="inline-flex items-center gap-2 px-6 py-3 font-mono font-semibold transition-all hover:opacity-90 active:scale-[0.97]"
             style={{
-              background: "linear-gradient(135deg, #00D4FF, #0099CC)",
-              color: "#000",
+              background: "#00FF41",
+              color: "#0A0E1A",
+              borderRadius: 0,
             }}
           >
             <RefreshCw className="w-4 h-4" />
@@ -69,8 +63,8 @@ export default function ErrorFallback({ error, resetErrorBoundary }: ErrorFallba
           </button>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-colors hover:bg-white/5"
-            style={{ border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.55)" }}
+            className="inline-flex items-center gap-2 px-6 py-3 font-mono font-semibold transition-colors hover:bg-white/5"
+            style={{ border: "1px solid rgba(0,255,65,0.15)", color: "rgba(255,255,255,0.55)", borderRadius: 0 }}
           >
             <Home className="w-4 h-4" />
             Return to Base

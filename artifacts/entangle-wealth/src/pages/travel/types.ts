@@ -42,7 +42,7 @@ export const TRIP_STYLES = [
 
 export const MARKER_COLORS: Record<string, string> = {
   hotel: "#00D4FF",
-  activity: "#00ff88",
-  restaurant: "#FFD700",
+  activity: "#00FF41",
+  restaurant: "#FFB800",
   transit: "#9c27b0",
 };

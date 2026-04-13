@@ -116,13 +116,13 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70  p-4"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       role="dialog"
       aria-modal="true"
       aria-label="Upgrade to Pro"
     >
-      <div className="relative bg-[#0a0a14] border border-[#f5c842]/20 rounded-2xl p-6 max-w-sm w-full shadow-2xl shadow-black/60 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-[#0a0a14] border border-[#FFB800]/20 rounded-sm p-6 max-w-sm w-full shadow-2xl shadow-black/60 animate-in fade-in zoom-in-95 duration-200">
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-white/40 hover:text-white/50 transition-colors"
@@ -132,8 +132,8 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
         </button>
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-[#f5c842]/10 flex items-center justify-center flex-shrink-0">
-            <Lock className="w-5 h-5 text-[#f5c842]" />
+          <div className="w-10 h-10 rounded-xl bg-[#FFB800]/10 flex items-center justify-center flex-shrink-0">
+            <Lock className="w-5 h-5 text-[#FFB800]" />
           </div>
           <div>
             <p className="text-sm font-black text-white leading-tight">{copy.headline}</p>
@@ -148,13 +148,13 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
         <p className="text-xs text-white/50 mb-5 leading-relaxed">{copy.sub}</p>
 
         <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 mb-5">
-          <p className="text-[10px] font-bold text-[#f5c842] uppercase tracking-widest mb-2">
+          <p className="text-[10px] font-bold text-[#FFB800] uppercase tracking-widest mb-2">
             Pro unlocks
           </p>
           <ul className="space-y-1.5">
             {config.unlocks.map((unlock) => (
               <li key={unlock} className="flex items-center gap-2">
-                <Zap className="w-3 h-3 text-[#f5c842] flex-shrink-0" />
+                <Zap className="w-3 h-3 text-[#FFB800] flex-shrink-0" />
                 <span className="text-[11px] text-white/60">{unlock}</span>
               </li>
             ))}
@@ -170,7 +170,7 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
                 <Link
                   href="/profile"
                   onClick={onClose}
-                  className="inline-flex items-center gap-1 mt-1.5 text-[11px] font-semibold text-[#00c8f8] hover:text-[#00a8d8] underline underline-offset-2 transition-colors"
+                  className="inline-flex items-center gap-1 mt-1.5 text-[11px] font-semibold text-[#00FF41] hover:text-[#00a8d8] underline underline-offset-2 transition-colors"
                 >
                   Go to profile settings to verify identity
                 </Link>
@@ -186,7 +186,7 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
         <Button
           onClick={handleUpgrade}
           disabled={loading}
-          className="w-full h-11 bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black font-bold text-sm hover:opacity-90 transition-opacity"
+          className="w-full h-11 bg-gradient-to-r from-[#FFB800] to-[#cc9900] text-black font-bold text-sm hover:opacity-90 transition-opacity"
         >
           {loading ? (
             <><Loader2 className="w-4 h-4 animate-spin mr-2" />Starting checkout...</>

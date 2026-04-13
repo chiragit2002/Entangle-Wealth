@@ -10,8 +10,8 @@ import { motion, useMotionValue, animate, AnimatePresence } from "framer-motion"
 const WHEEL_SEGMENTS = [
   { label: "+500 XP", color: "#00D4FF", icon: "⚡" },
   { label: "+250 XP", color: "#9c27b0", icon: "✨" },
-  { label: "+1,000 XP", color: "#FFD700", icon: "🔥" },
-  { label: "2x XP", color: "#00ff88", icon: "⚡⚡" },
+  { label: "+1,000 XP", color: "#FFB800", icon: "🔥" },
+  { label: "2x XP", color: "#00FF41", icon: "⚡⚡" },
   { label: "Streak Shield", color: "#ff3366", icon: "🛡️" },
   { label: "+100 XP", color: "#6366f1", icon: "💫" },
   { label: "+750 XP", color: "#f59e0b", icon: "⭐" },
@@ -125,7 +125,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
     ctx.arc(cx, cy, 28, 0, 2 * Math.PI);
     const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 28);
     centerGrad.addColorStop(0, "#1a1a2e");
-    centerGrad.addColorStop(1, "#0a0a0f");
+    centerGrad.addColorStop(1, "#0A0E1A");
     ctx.fillStyle = centerGrad;
     ctx.fill();
     ctx.strokeStyle = "#00D4FF";
@@ -143,9 +143,9 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
     ctx.lineTo(cx + 10, 8);
     ctx.lineTo(cx, 22);
     ctx.closePath();
-    ctx.fillStyle = "#FFD700";
+    ctx.fillStyle = "#FFB800";
     ctx.fill();
-    ctx.strokeStyle = "#0a0a0f";
+    ctx.strokeStyle = "#0A0E1A";
     ctx.lineWidth = 1.5;
     ctx.stroke();
   }, []);
@@ -207,14 +207,14 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
   return (
     <>
     <BigWinOverlay show={showBigWin} label="BIG WIN" onDone={() => setShowBigWin(false)} />
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="relative w-[360px] bg-[#0a0a0f] border border-white/[0.1] rounded-xl shadow-2xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#00D4FF]/5 via-transparent to-[#FFD700]/5 pointer-events-none" />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 ">
+      <div className="relative w-[360px] bg-[#0A0E1A] border border-white/[0.1] rounded-xl shadow-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#00D4FF]/5 via-transparent to-[#FFB800]/5 pointer-events-none" />
 
         <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
-            <Gift className="w-4 h-4 text-[#FFD700]" />
-            <span className="text-sm font-bold font-mono text-[#FFD700] tracking-wider">DAILY SPIN</span>
+            <Gift className="w-4 h-4 text-[#FFB800]" />
+            <span className="text-sm font-bold font-mono text-[#FFB800] tracking-wider">DAILY SPIN</span>
           </div>
           <motion.button
             onClick={onClose}
@@ -253,14 +253,14 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 className={`mt-4 w-full p-3 rounded-lg text-center ${
                   resultTier === "jackpot"
-                    ? "bg-[#FFD700]/15 border border-[#FFD700]/40"
+                    ? "bg-[#FFB800]/15 border border-[#FFB800]/40"
                     : resultTier === "large"
                     ? "bg-[#00D4FF]/10 border border-[#00D4FF]/30"
-                    : "bg-[#FFD700]/10 border border-[#FFD700]/20"
+                    : "bg-[#FFB800]/10 border border-[#FFB800]/20"
                 }`}
               >
-                <p className="text-[10px] font-mono text-[#FFD700]/60 uppercase tracking-widest">YOU WON</p>
-                <p className="text-lg font-bold font-mono text-[#FFD700] mt-1">{result.reward}</p>
+                <p className="text-[10px] font-mono text-[#FFB800]/60 uppercase tracking-widest">YOU WON</p>
+                <p className="text-lg font-bold font-mono text-[#FFB800] mt-1">{result.reward}</p>
                 {result.rewardType === "xp" && (
                   <p className="text-[10px] font-mono text-white/30 mt-1">+{result.rewardValue} XP added to your account</p>
                 )}
@@ -278,7 +278,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
             <div className="mt-4 text-center">
               {canSpin ? (
                 <div>
-                  <p className="text-sm font-mono text-[#00ff88] font-bold">Ready to spin!</p>
+                  <p className="text-sm font-mono text-[#00FF41] font-bold">Ready to spin!</p>
                   <p className="text-[10px] font-mono text-white/30 mt-1">Tap the wheel to claim your daily reward</p>
                 </div>
               ) : (
@@ -299,7 +299,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
             whileTap={canSpin && !spinning ? { scale: 0.97 } : {}}
             className={`w-full py-2.5 mb-3 rounded-lg text-[11px] font-bold font-mono tracking-wider transition-colors disabled:opacity-40 ${
               canSpin && !spinning
-                ? "bg-gradient-to-r from-[#FFD700] to-[#f59e0b] text-black shadow-lg shadow-[#FFD700]/20"
+                ? "bg-gradient-to-r from-[#FFB800] to-[#f59e0b] text-black shadow-lg shadow-[#FFB800]/20"
                 : "bg-white/[0.05] text-white/30 border border-white/[0.08]"
             }`}
           >
@@ -316,7 +316,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
               <span className="text-[8px] font-mono text-white/40">Streak Shield</span>
             </div>
             <div className="flex items-center gap-1.5 bg-white/[0.02] rounded px-2 py-1.5">
-              <Star className="w-3 h-3 text-[#FFD700]" />
+              <Star className="w-3 h-3 text-[#FFB800]" />
               <span className="text-[8px] font-mono text-white/40">Multipliers</span>
             </div>
           </div>

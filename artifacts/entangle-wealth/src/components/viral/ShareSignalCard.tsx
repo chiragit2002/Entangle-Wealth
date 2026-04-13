@@ -60,7 +60,7 @@ export function ShareSignalCard({ data, referralLink }: Props) {
     ctx.font = "bold 48px sans-serif";
     ctx.fillText(data.symbol, 30, 120);
 
-    ctx.fillStyle = data.change.startsWith("+") ? "#00ff88" : "#ff3366";
+    ctx.fillStyle = data.change.startsWith("+") ? "#00FF41" : "#ff3366";
     ctx.font = "bold 20px sans-serif";
     ctx.fillText(data.change, 30, 150);
 
@@ -68,7 +68,7 @@ export function ShareSignalCard({ data, referralLink }: Props) {
     ctx.font = "16px sans-serif";
     ctx.fillText(data.price, 200, 150);
 
-    const sigColor = data.signal.toLowerCase() === "buy" ? "#00ff88" : data.signal.toLowerCase() === "sell" ? "#ff3366" : "#ffd700";
+    const sigColor = data.signal.toLowerCase() === "buy" ? "#00FF41" : data.signal.toLowerCase() === "sell" ? "#ff3366" : "#FFB800";
     ctx.fillStyle = sigColor + "22";
     ctx.beginPath();
     ctx.roundRect(30, 180, 120, 44, 12);
@@ -89,7 +89,7 @@ export function ShareSignalCard({ data, referralLink }: Props) {
     ctx.fillStyle = "rgba(255,255,255,0.4)";
     ctx.font = "11px sans-serif";
     ctx.fillText("TARGET", 350, 195);
-    ctx.fillStyle = "#00ff88";
+    ctx.fillStyle = "#00FF41";
     ctx.font = "bold 28px sans-serif";
     ctx.fillText(data.target, 350, 225);
 
@@ -162,7 +162,7 @@ export function ShareSignalCard({ data, referralLink }: Props) {
         <Button
           size="sm"
           variant="outline"
-          className="border-[#00ff88]/30 text-[#00ff88] gap-1 text-xs"
+          className="border-[#00FF41]/30 text-[#00FF41] gap-1 text-xs"
           onClick={handleShare}
         >
           <Share2 className="w-3.5 h-3.5" /> Share

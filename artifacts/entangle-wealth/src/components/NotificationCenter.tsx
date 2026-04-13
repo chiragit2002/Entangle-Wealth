@@ -33,10 +33,10 @@ const ALERT_TYPE_OPTIONS = [
 
 function getNotifIcon(type: AppNotification["type"]) {
   switch (type) {
-    case "price_above": return <TrendingUp className="w-4 h-4 text-[#00ff88]" />;
+    case "price_above": return <TrendingUp className="w-4 h-4 text-[#00FF41]" />;
     case "price_below": return <TrendingDown className="w-4 h-4 text-[#ff3366]" />;
     case "rsi_oversold": return <Activity className="w-4 h-4 text-[#00D4FF]" />;
-    case "rsi_overbought": return <Activity className="w-4 h-4 text-[#ffd700]" />;
+    case "rsi_overbought": return <Activity className="w-4 h-4 text-[#FFB800]" />;
     case "macd_crossover": return <Zap className="w-4 h-4 text-[#9c27b0]" />;
     case "bollinger_breakout": return <AlertTriangle className="w-4 h-4 text-[#ff6b35]" />;
     case "system": return <Bell className="w-4 h-4 text-white/50" />;
@@ -45,10 +45,10 @@ function getNotifIcon(type: AppNotification["type"]) {
 
 function getNotifBorder(type: AppNotification["type"]) {
   switch (type) {
-    case "price_above": return "border-l-[#00ff88]";
+    case "price_above": return "border-l-[#00FF41]";
     case "price_below": return "border-l-[#ff3366]";
     case "rsi_oversold": return "border-l-[#00D4FF]";
-    case "rsi_overbought": return "border-l-[#ffd700]";
+    case "rsi_overbought": return "border-l-[#FFB800]";
     case "macd_crossover": return "border-l-[#9c27b0]";
     case "bollinger_breakout": return "border-l-[#ff6b35]";
     case "system": return "border-l-white/20";
@@ -412,7 +412,7 @@ export default function NotificationCenter() {
                               {a.threshold != null ? ` @ $${a.threshold.toFixed(2)}` : ""}
                             </p>
                           </div>
-                          <button onClick={() => toggleAlert(a.id)} className={`p-1.5 rounded ${a.enabled ? "text-[#00ff88]" : "text-white/40"}`}>
+                          <button onClick={() => toggleAlert(a.id)} className={`p-1.5 rounded ${a.enabled ? "text-[#00FF41]" : "text-white/40"}`}>
                             <Check className="w-3.5 h-3.5" />
                           </button>
                           <button onClick={() => removeAlert(a.id)} className="p-1.5 text-white/40 hover:text-[#ff3366]">

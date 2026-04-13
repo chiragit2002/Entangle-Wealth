@@ -52,7 +52,7 @@ export function TestimonialForm() {
   return (
     <div className="glass-panel rounded-xl p-5">
       <h3 className="text-base font-bold mb-3 flex items-center gap-2">
-        <Star className="w-5 h-5 text-[#FFD700]" /> Share Your Experience
+        <Star className="w-5 h-5 text-[#FFB800]" /> Share Your Experience
       </h3>
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
@@ -90,7 +90,7 @@ export function TestimonialForm() {
                 className="p-1 transition-transform hover:scale-110"
               >
                 <Star
-                  className={`w-5 h-5 ${s <= rating ? "text-[#FFD700] fill-[#FFD700]" : "text-white/40"}`}
+                  className={`w-5 h-5 ${s <= rating ? "text-[#FFB800] fill-[#FFB800]" : "text-white/40"}`}
                 />
               </button>
             ))}

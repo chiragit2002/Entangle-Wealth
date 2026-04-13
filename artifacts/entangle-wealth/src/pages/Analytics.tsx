@@ -83,7 +83,7 @@ interface DashboardData {
   };
 }
 
-const COLORS = ["#00D4FF", "#FFD700", "#00ff88", "#ff3366", "#9c27b0", "#ff9800", "#4caf50", "#2196f3"];
+const COLORS = ["#00D4FF", "#FFB800", "#00FF41", "#ff3366", "#9c27b0", "#ff9800", "#4caf50", "#2196f3"];
 
 type DatePreset = "7d" | "30d" | "90d" | "custom";
 
@@ -121,7 +121,7 @@ function KPICard({
           <Icon className="w-5 h-5" style={{ color }} />
         </div>
         {trend && (
-          <div className={`flex items-center gap-1 text-xs font-medium ${trend === "up" ? "text-[#00ff88]" : trend === "down" ? "text-[#ff3366]" : "text-white/40"}`}>
+          <div className={`flex items-center gap-1 text-xs font-medium ${trend === "up" ? "text-[#00FF41]" : trend === "down" ? "text-[#ff3366]" : "text-white/40"}`}>
             {trend === "up" ? <ArrowUpRight className="w-3 h-3" /> : trend === "down" ? <ArrowDownRight className="w-3 h-3" /> : null}
           </div>
         )}
@@ -153,7 +153,7 @@ function StarDisplay({ rating }: { rating: number }) {
       {[1, 2, 3, 4, 5].map((s) => (
         <Star
           key={s}
-          className={`w-3 h-3 ${s <= Math.round(rating) ? "text-[#FFD700] fill-[#FFD700]" : "text-white/40"}`}
+          className={`w-3 h-3 ${s <= Math.round(rating) ? "text-[#FFB800] fill-[#FFB800]" : "text-white/40"}`}
         />
       ))}
     </div>
@@ -272,7 +272,7 @@ export default function Analytics() {
     };
   }, [autoRefresh, fetchDashboard]);
 
-  const FUNNEL_COLORS = ["#00D4FF", "#FFD700", "#00ff88", "#9c27b0"];
+  const FUNNEL_COLORS = ["#00D4FF", "#FFB800", "#00FF41", "#9c27b0"];
   const funnelData = data
     ? data.conversionFunnel.map((item, i) => ({
         name: item.stage,
@@ -308,7 +308,7 @@ export default function Analytics() {
               style={{
                 background: "rgba(255,215,0,0.1)",
                 border: "1px solid rgba(255,215,0,0.3)",
-                color: "#FFD700",
+                color: "#FFB800",
               }}
             >
               <ExternalLink className="w-3.5 h-3.5" />
@@ -318,9 +318,9 @@ export default function Analytics() {
               onClick={() => setAutoRefresh(!autoRefresh)}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all"
               style={{
-                background: autoRefresh ? "rgba(0,255,136,0.1)" : "rgba(255,255,255,0.05)",
-                border: `1px solid ${autoRefresh ? "rgba(0,255,136,0.3)" : "rgba(255,255,255,0.1)"}`,
-                color: autoRefresh ? "#00ff88" : "rgba(255,255,255,0.5)",
+                background: autoRefresh ? "rgba(0,255,65,0.1)" : "rgba(255,255,255,0.05)",
+                border: `1px solid ${autoRefresh ? "rgba(0,255,65,0.3)" : "rgba(255,255,255,0.1)"}`,
+                color: autoRefresh ? "#00FF41" : "rgba(255,255,255,0.5)",
               }}
             >
               <Timer className="w-3.5 h-3.5" />
@@ -408,11 +408,11 @@ export default function Analytics() {
           <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               <KPICard label="Total Users" value={data.kpi.totalUsers.toLocaleString()} icon={Users} color="#00D4FF" trend="up" />
-              <KPICard label="DAU (24h)" value={data.kpi.dau.toLocaleString()} icon={Activity} color="#00ff88" />
-              <KPICard label="WAU (7d)" value={data.kpi.wau.toLocaleString()} icon={TrendingUp} color="#FFD700" />
+              <KPICard label="DAU (24h)" value={data.kpi.dau.toLocaleString()} icon={Activity} color="#00FF41" />
+              <KPICard label="WAU (7d)" value={data.kpi.wau.toLocaleString()} icon={TrendingUp} color="#FFB800" />
               <KPICard label="MAU (30d)" value={data.kpi.mau.toLocaleString()} icon={Zap} color="#9c27b0" />
-              <KPICard label="MRR" value={`$${data.kpi.mrr.toLocaleString()}`} icon={BarChart3} color="#00ff88" trend="up" />
-              <KPICard label="ARR" value={`$${data.kpi.arr.toLocaleString()}`} icon={TrendingUp} color="#FFD700" />
+              <KPICard label="MRR" value={`$${data.kpi.mrr.toLocaleString()}`} icon={BarChart3} color="#00FF41" trend="up" />
+              <KPICard label="ARR" value={`$${data.kpi.arr.toLocaleString()}`} icon={TrendingUp} color="#FFB800" />
               <KPICard label="Churn Rate" value={`${data.kpi.churnRate}%`} icon={ArrowDownRight} color="#ff3366" trend={data.kpi.churnRate > 5 ? "down" : "neutral"} />
               <KPICard label="LTV" value={`$${data.kpi.ltv.toLocaleString()}`} icon={Target} color="#00D4FF" />
             </div>
@@ -546,8 +546,8 @@ export default function Analytics() {
                 <div className="space-y-4">
                   {[
                     { label: "Clicks", value: data.referralFunnel.clicks, color: "#00D4FF" },
-                    { label: "Signups", value: data.referralFunnel.signups, color: "#FFD700" },
-                    { label: "Conversions", value: data.referralFunnel.conversions, color: "#00ff88" },
+                    { label: "Signups", value: data.referralFunnel.signups, color: "#FFB800" },
+                    { label: "Conversions", value: data.referralFunnel.conversions, color: "#00FF41" },
                   ].map((item) => {
                     const maxVal = data.referralFunnel.clicks || 1;
                     const pct = ((item.value / maxVal) * 100).toFixed(0);
@@ -621,7 +621,7 @@ export default function Analytics() {
                         <div className="flex items-center gap-2">
                           <div className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
                           <span className="text-white/70">{item.platform}</span>
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono" style={{ background: "rgba(255,255,255,0.05)", color: item.status === "published" ? "#00ff88" : item.status === "draft" ? "#FFD700" : "#fff6" }}>{item.status}</span>
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono" style={{ background: "rgba(255,255,255,0.05)", color: item.status === "published" ? "#00FF41" : item.status === "draft" ? "#FFB800" : "#fff6" }}>{item.status}</span>
                         </div>
                         <span className="text-white font-mono">{item.count.toLocaleString()}</span>
                       </div>
@@ -641,7 +641,7 @@ export default function Analytics() {
             {/* User Feedback Section */}
             <div className="mb-8">
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <MessageSquare className="w-6 h-6 text-[#FFD700]" />
+                <MessageSquare className="w-6 h-6 text-[#FFB800]" />
                 User Feedback
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -649,7 +649,7 @@ export default function Analytics() {
                   label="Avg Satisfaction Rating"
                   value={data.feedback.stats.avgRating > 0 ? `${data.feedback.stats.avgRating} / 5` : "—"}
                   icon={Star}
-                  color="#FFD700"
+                  color="#FFB800"
                 />
                 <KPICard
                   label="Total Feedback Submitted"
@@ -661,7 +661,7 @@ export default function Analytics() {
                   label="Satisfaction Rate (4-5★)"
                   value={data.feedback.stats.totalCount > 0 ? `${data.feedback.stats.satisfactionRate}%` : "—"}
                   icon={ThumbsUp}
-                  color="#00ff88"
+                  color="#00FF41"
                   trend={data.feedback.stats.satisfactionRate >= 70 ? "up" : data.feedback.stats.satisfactionRate > 0 ? "down" : "neutral"}
                 />
               </div>
@@ -690,7 +690,7 @@ export default function Analytics() {
                             }}
                             labelFormatter={(v) => new Date(v).toLocaleDateString()}
                           />
-                          <Line type="monotone" dataKey="avgRating" stroke="#FFD700" strokeWidth={2} dot={false} name="Avg Rating" />
+                          <Line type="monotone" dataKey="avgRating" stroke="#FFB800" strokeWidth={2} dot={false} name="Avg Rating" />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
@@ -716,7 +716,7 @@ export default function Analytics() {
                               <span className="text-white/60 capitalize">{cat.category}</span>
                               <span className="text-white font-mono flex items-center gap-2">
                                 {cat.count}
-                                <span className="text-[#FFD700]">★{cat.avgRating}</span>
+                                <span className="text-[#FFB800]">★{cat.avgRating}</span>
                               </span>
                             </div>
                             <div className="h-3 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
@@ -788,7 +788,7 @@ export default function Analytics() {
           onClick={closeDrilldown}
         >
           <div
-            className="w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-2xl flex flex-col"
+            className="w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-sm flex flex-col"
             style={{ background: "rgba(8,8,20,0.98)", border: "1px solid rgba(0,212,255,0.25)" }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -835,7 +835,7 @@ export default function Analytics() {
                               labelFormatter={(v: string) => new Date(v).toLocaleDateString()}
                             />
                             <Line type="monotone" dataKey="count" stroke="#00D4FF" strokeWidth={2} dot={false} name="Events" />
-                            <Line type="monotone" dataKey="uniqueUsers" stroke="#FFD700" strokeWidth={2} dot={false} name="Unique Users" />
+                            <Line type="monotone" dataKey="uniqueUsers" stroke="#FFB800" strokeWidth={2} dot={false} name="Unique Users" />
                           </LineChart>
                         </ResponsiveContainer>
                       </div>

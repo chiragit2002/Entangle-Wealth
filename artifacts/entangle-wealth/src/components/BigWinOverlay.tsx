@@ -49,7 +49,7 @@ export function BigWinOverlay({ show, label = "BIG WIN", onDone }: BigWinOverlay
             <motion.div
               className="px-8 py-3 rounded-xl text-center"
               style={{
-                background: "linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF6347 100%)",
+                background: "linear-gradient(135deg, #FFB800 0%, #FFA500 50%, #FF6347 100%)",
                 boxShadow: "0 0 40px rgba(255,215,0,0.7), 0 0 80px rgba(255,165,0,0.4)",
               }}
               animate={{
@@ -63,7 +63,7 @@ export function BigWinOverlay({ show, label = "BIG WIN", onDone }: BigWinOverlay
             >
               <span
                 className="text-3xl font-black tracking-widest uppercase"
-                style={{ color: "#0a0a0f", textShadow: "0 1px 2px rgba(0,0,0,0.3)", fontFamily: "var(--font-mono, monospace)" }}
+                style={{ color: "#0A0E1A", textShadow: "0 1px 2px rgba(0,0,0,0.3)", fontFamily: "var(--font-mono, monospace)" }}
               >
                 {label}
               </span>

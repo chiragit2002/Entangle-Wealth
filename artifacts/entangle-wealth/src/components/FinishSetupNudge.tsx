@@ -26,7 +26,7 @@ interface FinishSetupNudgeUIProps {
 export function FinishSetupNudgeUI({ incompleteItems, onDismiss }: FinishSetupNudgeUIProps) {
   return (
     <div className="col-span-12 mb-1.5" data-testid="finish-setup-nudge">
-      <div className="bg-gradient-to-r from-[#001a10] via-[#00ff8808] to-[#001a10] border border-[#00ff88]/15 rounded-sm px-3 py-2.5 animate-in slide-in-from-top-2 duration-300">
+      <div className="bg-gradient-to-r from-[#001a10] via-[#00FF4108] to-[#001a10] border border-[#00FF41]/15 rounded-sm px-3 py-2.5 animate-in slide-in-from-top-2 duration-300">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-2.5">
             <Rocket className="w-4 h-4 text-[#00D4FF] mt-0.5 flex-shrink-0" />

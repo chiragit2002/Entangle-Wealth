@@ -130,7 +130,7 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
       {
         id: "consensus",
         icon: Atom,
-        color: "#00c8f8",
+        color: "#00FF41",
         text: `Quantum Consensus Engine is running at ${consensus}% accuracy — ${consensus >= 85 ? "6 of 6 agents agree on the current signal direction." : "agents are split; high-conviction trades are paused."}`,
         subtext: `${consensus}% consensus accuracy`,
         href: "/terminal",
@@ -139,7 +139,7 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
       {
         id: "timeline",
         icon: GitBranch,
-        color: "#00e676",
+        color: "#00FF41",
         text: "Alternate Timeline: increasing your savings rate by 3% today could mean $68k more in 10 years.",
         subtext: "Avg $47k divergence revealed",
         href: "/alternate-timeline",
@@ -148,7 +148,7 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
       {
         id: "taxgpt",
         icon: FileSearch,
-        color: "#f5c842",
+        color: "#FFB800",
         text: `Market ${adSignal} (VIX ${vix.toFixed(2)}) — a good time to review tax-loss harvesting opportunities with TaxGPT.`,
         subtext: "$4,200 avg savings found",
         href: "/taxgpt",
@@ -290,7 +290,7 @@ const emptyPortfolio: PaperPortfolio = {
 
 function Panel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`glass-panel rounded-xl overflow-hidden ${className}`}>
+    <div className={`bloomberg-panel overflow-hidden ${className}`}>
       {children}
     </div>
   );
@@ -540,10 +540,10 @@ export default function Dashboard() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <span className={`relative flex h-2 w-2`}>
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isMarketOpen ? 'bg-[#00D4FF]' : 'bg-[#FFD700]'} opacity-60`} />
-              <span className={`relative inline-flex rounded-full h-2 w-2 ${isMarketOpen ? 'bg-[#00D4FF]' : 'bg-[#FFD700]'}`} />
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isMarketOpen ? 'bg-[#00D4FF]' : 'bg-[#FFB800]'} opacity-60`} />
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${isMarketOpen ? 'bg-[#00D4FF]' : 'bg-[#FFB800]'}`} />
             </span>
-            <span className={`text-[10px] font-mono font-semibold tracking-wider ${isMarketOpen ? 'text-[#00D4FF]' : 'text-[#FFD700]'}`}>
+            <span className={`text-[10px] font-mono font-semibold tracking-wider ${isMarketOpen ? 'text-[#00D4FF]' : 'text-[#FFB800]'}`}>
               {isMarketOpen ? "Market Open" : "Market Closed"}
             </span>
           </div>
@@ -563,7 +563,7 @@ export default function Dashboard() {
               className="w-44 h-7 pl-7 pr-2 text-xs bg-white/[0.04] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-primary/40 transition-colors"
             />
             {showSearchDropdown && searchResults.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-[#0a0a14] border border-white/10 rounded-xl z-50 shadow-2xl overflow-hidden">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-[#0A0E1A] border border-white/10 rounded-xl z-50 shadow-2xl overflow-hidden">
                 {searchResults.map(s => (
                   <Button key={s.symbol} onClick={() => { setSearchQuery(s.symbol); runQuickAnalysis(s.symbol); }}
                     variant="ghost"
@@ -586,8 +586,8 @@ export default function Dashboard() {
       </div>
 
       {showShortcuts && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowShortcuts(false)} role="dialog" aria-modal="true" aria-labelledby="shortcuts-dialog-title">
-          <div className="bg-[#0a0a14] border border-white/10 rounded-2xl p-6 max-w-sm w-full mx-4" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 " onClick={() => setShowShortcuts(false)} role="dialog" aria-modal="true" aria-labelledby="shortcuts-dialog-title">
+          <div className="bg-[#0A0E1A] border border-white/10 rounded-sm p-6 max-w-sm w-full mx-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <span id="shortcuts-dialog-title" className="text-sm font-bold text-white">Keyboard Shortcuts</span>
               <Button onClick={() => setShowShortcuts(false)} aria-label="Close" size="icon" variant="ghost" className="w-7 h-7 text-white/30 hover:text-white/60"><X className="w-4 h-4" /></Button>
@@ -630,7 +630,7 @@ export default function Dashboard() {
               label: "Options Income",
               value: `+$${todayOptionsIncome}`,
               sub: "Theta today",
-              color: "#FFD700",
+              color: "#FFB800",
               isPositive: true,
             },
             {
@@ -648,7 +648,7 @@ export default function Dashboard() {
               isPositive: MARKET_INTERNALS.advDecl.ratio > 1,
             },
           ].map((stat) => (
-            <div key={stat.label} className="bg-[#0a0a0f] border border-white/[0.06] rounded-xl px-4 py-4">
+            <div key={stat.label} className="bg-[#0A0E1A] border border-white/[0.06] rounded-xl px-4 py-4">
               <p className="text-xs font-medium text-white/50 mb-1.5">{stat.label}</p>
               <p className="text-2xl font-bold tabular-nums" style={{ color: stat.color }}>{stat.value}</p>
               <p className="text-xs text-white/35 mt-1">{stat.sub}</p>
@@ -698,7 +698,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div className="flex items-center gap-6">
                     <div className="text-center">
-                      <p className={`text-3xl font-bold ${quickAnalysis.signal.includes("BUY") ? "text-[#00D4FF]" : quickAnalysis.signal.includes("SELL") ? "text-red-400" : "text-[#FFD700]"}`}>{quickAnalysis.confidence}%</p>
+                      <p className={`text-3xl font-bold ${quickAnalysis.signal.includes("BUY") ? "text-[#00D4FF]" : quickAnalysis.signal.includes("SELL") ? "text-red-400" : "text-[#FFB800]"}`}>{quickAnalysis.confidence}%</p>
                       <p className="text-xs text-white/35 mt-0.5">Confidence</p>
                     </div>
                     <div className="h-10 w-px bg-white/10" />
@@ -708,7 +708,7 @@ export default function Dashboard() {
                         <span className="text-sm text-white/30">{quickAnalysis.name}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-lg ${quickAnalysis.signal.includes("BUY") ? "bg-primary/10 text-primary" : quickAnalysis.signal.includes("SELL") ? "bg-red-400/10 text-red-400" : "bg-[#FFD700]/10 text-[#FFD700]"}`}>
+                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-lg ${quickAnalysis.signal.includes("BUY") ? "bg-primary/10 text-primary" : quickAnalysis.signal.includes("SELL") ? "bg-red-400/10 text-red-400" : "bg-[#FFB800]/10 text-[#FFB800]"}`}>
                           {quickAnalysis.signal.replace("_", " ")}
                         </span>
                         <span className="text-xs text-primary/70">{quickAnalysis.buyCount} buy signals</span>
@@ -808,7 +808,7 @@ export default function Dashboard() {
                         ))}
                       </div>
                     )}
-                    {!isSignedIn && <p className="text-xs text-[#FFD700] text-center">Sign in to start paper trading</p>}
+                    {!isSignedIn && <p className="text-xs text-[#FFB800] text-center">Sign in to start paper trading</p>}
                   </div>
                 ) : (
                   <div>
@@ -833,7 +833,7 @@ export default function Dashboard() {
                           <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
                           <XAxis dataKey="time" tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} />
                           <YAxis tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(1)}k`} domain={['dataMin - 500', 'dataMax + 500']} width={48} />
-                          <Tooltip contentStyle={{ background: '#0a0a0f', border: '1px solid rgba(0,212,255,0.15)', borderRadius: 12, color: '#fff', fontSize: 12 }} formatter={(value: number) => [`$${value.toLocaleString()}`, '']} />
+                          <Tooltip contentStyle={{ background: '#0A0E1A', border: '1px solid rgba(0,212,255,0.15)', borderRadius: 12, color: '#fff', fontSize: 12 }} formatter={(value: number) => [`$${value.toLocaleString()}`, '']} />
                           <Area type="monotone" dataKey="value" stroke={pnl >= 0 ? "#00D4FF" : "#ff4757"} strokeWidth={2} fill="url(#pgGrad)" />
                         </AreaChart>
                       </ResponsiveContainer>
@@ -862,7 +862,7 @@ export default function Dashboard() {
                 <div className="flex gap-1">
                   {(["crypto", "forex", "commodities", "bonds"] as const).map(tab => (
                     <Button key={tab} onClick={() => setActiveAssetTab(tab)} variant="ghost" size="sm"
-                      className={`px-2 py-0.5 h-auto text-xs font-semibold rounded-lg ${activeAssetTab === tab ? 'bg-[#FFD700]/15 text-[#FFD700]' : 'text-white/30 hover:text-white/60'}`}>
+                      className={`px-2 py-0.5 h-auto text-xs font-semibold rounded-lg ${activeAssetTab === tab ? 'bg-[#FFB800]/15 text-[#FFB800]' : 'text-white/30 hover:text-white/60'}`}>
                       {tab === "commodities" ? "Cmdty" : tab.charAt(0).toUpperCase() + tab.slice(1)}
                     </Button>
                   ))}
@@ -924,10 +924,10 @@ export default function Dashboard() {
                           <span className="text-white/50">{alert.confidence}%</span>
                         </div>
                         <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full ${alert.type === 'BUY' ? 'bg-primary' : alert.type === 'SELL' ? 'bg-red-400' : 'bg-[#FFD700]'}`} style={{ width: `${alert.confidence}%` }} />
+                          <div className={`h-full rounded-full ${alert.type === 'BUY' ? 'bg-primary' : alert.type === 'SELL' ? 'bg-red-400' : 'bg-[#FFB800]'}`} style={{ width: `${alert.confidence}%` }} />
                         </div>
                       </div>
-                      <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-lg ${alert.type === 'BUY' ? 'bg-primary/10 text-primary' : alert.type === 'SELL' ? 'bg-red-400/10 text-red-400' : 'bg-[#FFD700]/10 text-[#FFD700]'}`}>
+                      <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-lg ${alert.type === 'BUY' ? 'bg-primary/10 text-primary' : alert.type === 'SELL' ? 'bg-red-400/10 text-red-400' : 'bg-[#FFB800]/10 text-[#FFB800]'}`}>
                         {alert.type}
                       </span>
                       {expandedSignal === alert.id ? <ChevronUp className="w-4 h-4 text-white/25" /> : <ChevronDown className="w-4 h-4 text-white/25" />}
@@ -963,7 +963,7 @@ export default function Dashboard() {
                     <span className={`px-2 py-0.5 text-xs font-semibold rounded-lg ${a.type === 'CALL' ? 'bg-primary/10 text-primary' : 'bg-red-400/10 text-red-400'}`}>{a.type}</span>
                     <span className="text-xs text-white/50">${a.strike}</span>
                     <span className="text-xs text-white/30">{new Date(a.exp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                    <span className="text-sm font-semibold text-[#FFD700]">{a.premium}</span>
+                    <span className="text-sm font-semibold text-[#FFB800]">{a.premium}</span>
                     <span className="text-xs text-white/30 ml-auto hidden md:inline truncate max-w-[200px]">{a.flowType}</span>
                   </div>
                 ))}
@@ -975,8 +975,8 @@ export default function Dashboard() {
                     <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
                     <XAxis dataKey="day" tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} width={40} />
-                    <Tooltip contentStyle={{ background: '#0a0a0f', border: '1px solid rgba(255,215,0,0.15)', borderRadius: 12, color: '#fff', fontSize: 11 }} />
-                    <Bar dataKey="income" fill="#FFD700" radius={[4, 4, 0, 0]} />
+                    <Tooltip contentStyle={{ background: '#0A0E1A', border: '1px solid rgba(255,215,0,0.15)', borderRadius: 12, color: '#fff', fontSize: 11 }} />
+                    <Bar dataKey="income" fill="#FFB800" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -1009,7 +1009,7 @@ export default function Dashboard() {
                     <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${e.type === 'CALL' ? 'bg-primary/10 text-primary' : 'bg-red-400/10 text-red-400'}`}>{e.type}</span>
                     <span className="text-[10px] text-white/50">${e.strike}</span>
                     <span className={`text-[10px] font-mono font-semibold ml-auto ${e.delta > 0 ? 'text-primary' : 'text-red-400'}`}>Δ {e.delta > 0 ? '+' : ''}{Math.abs(e.delta)}</span>
-                    <span className={`text-[10px] font-semibold ${e.ivRank >= 70 ? 'text-[#FFD700]' : 'text-white/30'}`}>IV {e.ivRank}%</span>
+                    <span className={`text-[10px] font-semibold ${e.ivRank >= 70 ? 'text-[#FFB800]' : 'text-white/30'}`}>IV {e.ivRank}%</span>
                   </div>
                 ))}
               </div>

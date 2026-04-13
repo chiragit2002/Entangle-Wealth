@@ -161,7 +161,7 @@ export default function Help() {
 
         <div
           id="submit-ticket"
-          className="mt-16 text-center bg-white/[0.02] border border-white/[0.06] rounded-2xl p-8"
+          className="mt-16 text-center bg-white/[0.02] border border-white/[0.06] rounded-sm p-8"
         >
           <MessageSquarePlus className="w-10 h-10 text-[#00D4FF] mx-auto mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">

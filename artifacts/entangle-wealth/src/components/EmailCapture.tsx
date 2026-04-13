@@ -45,8 +45,8 @@ export function EmailCapture() {
   return (
     <section className="py-12 lg:py-16 border-t border-white/[0.06]">
       <div className="container mx-auto px-4 max-w-2xl">
-        <div className="relative bg-[#0d0d1a] border border-[rgba(0,212,255,0.15)] rounded-2xl p-8">
-          <div className="absolute inset-0 bg-gradient-to-br from-[rgba(0,212,255,0.03)] to-transparent rounded-2xl pointer-events-none" />
+        <div className="relative bg-[#0d0d1a] border border-[rgba(0,212,255,0.15)] rounded-sm p-8">
+          <div className="absolute inset-0 bg-gradient-to-br from-[rgba(0,212,255,0.03)] to-transparent rounded-sm pointer-events-none" />
 
           <div className="relative z-10">
             <div className="flex items-center justify-center gap-2 mb-4">
@@ -58,8 +58,8 @@ export function EmailCapture() {
 
             {status === "success" ? (
               <div className="text-center py-6">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#00e676]/10 border border-[#00e676]/20 mb-4">
-                  <Check className="w-6 h-6 text-[#00e676]" />
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#00FF41]/10 border border-[#00FF41]/20 mb-4">
+                  <Check className="w-6 h-6 text-[#00FF41]" />
                 </div>
                 <p className="text-white font-semibold text-lg mb-1">You're subscribed.</p>
                 <p className="text-muted-foreground text-sm">{message}</p>

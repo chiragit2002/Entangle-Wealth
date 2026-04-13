@@ -27,7 +27,7 @@ interface GiveawayInfo {
 function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center min-w-[40px]">
-      <span className="text-xl md:text-2xl font-black font-mono text-[#f5c842] tabular-nums leading-none">
+      <span className="text-xl md:text-2xl font-black font-mono text-[#FFB800] tabular-nums leading-none">
         {String(value).padStart(2, "0")}
       </span>
       <span className="text-[9px] text-white/40 uppercase tracking-wider mt-0.5">{label}</span>
@@ -36,7 +36,7 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
 }
 
 function Divider() {
-  return <span className="text-lg font-black text-[#f5c842]/50 self-start mt-0.5">:</span>;
+  return <span className="text-lg font-black text-[#FFB800]/50 self-start mt-0.5">:</span>;
 }
 
 export function AnniversaryGiveawayBanner() {
@@ -97,7 +97,7 @@ export function AnniversaryGiveawayBanner() {
   if (dismissed) return null;
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-[#f5c842]/30 bg-gradient-to-r from-[#0d0b00] via-[#0f0d02] to-[#0a0a0f] p-5 md:p-6 mb-6">
+    <div className="relative overflow-hidden rounded-sm border border-[#FFB800]/30 bg-gradient-to-r from-[#0d0b00] via-[#0f0d02] to-[#0A0E1A] p-5 md:p-6 mb-6">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(245,200,66,0.08),transparent_60%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(0,212,255,0.05),transparent_60%)] pointer-events-none" />
 
@@ -111,12 +111,12 @@ export function AnniversaryGiveawayBanner() {
 
       <div className="relative z-10">
         <div className="flex items-center gap-2 mb-3">
-          <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#f5c842]/15 border border-[#f5c842]/30">
-            <Trophy className="w-3.5 h-3.5 text-[#f5c842]" />
+          <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#FFB800]/15 border border-[#FFB800]/30">
+            <Trophy className="w-3.5 h-3.5 text-[#FFB800]" />
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#f5c842]">1-Year Anniversary</span>
-            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-[#f5c842]/15 text-[#f5c842] text-[9px] font-bold border border-[#f5c842]/20 animate-pulse">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#FFB800]">1-Year Anniversary</span>
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-[#FFB800]/15 text-[#FFB800] text-[9px] font-bold border border-[#FFB800]/20 animate-pulse">
               LIVE
             </span>
           </div>
@@ -125,7 +125,7 @@ export function AnniversaryGiveawayBanner() {
         <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
           <div className="flex-1">
             <h2 className="text-xl md:text-3xl font-black tracking-tight text-white mb-1">
-              $50,000 Grand Prize <span className="text-[#f5c842]">Giveaway</span>
+              $50,000 Grand Prize <span className="text-[#FFB800]">Giveaway</span>
             </h2>
             <p className="text-xs md:text-sm text-white/60 max-w-md leading-relaxed">
               EntangleWealth's 1-year anniversary celebration. Every trade, streak, login, and referral earns you entries.
@@ -134,7 +134,7 @@ export function AnniversaryGiveawayBanner() {
 
             <div className="flex flex-wrap items-center gap-3 mt-3">
               {myEntries !== null ? (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#00ff88]/10 border border-[#00ff88]/20 text-[11px] font-bold text-[#00ff88]">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#00FF41]/10 border border-[#00FF41]/20 text-[11px] font-bold text-[#00FF41]">
                   <Gift className="w-3 h-3" />
                   <span>{myEntries.toLocaleString()} entries</span>
                 </div>
@@ -167,8 +167,8 @@ export function AnniversaryGiveawayBanner() {
                 </div>
               </div>
             ) : (
-              <div className="text-center px-4 py-2 rounded-xl bg-[#f5c842]/10 border border-[#f5c842]/30">
-                <p className="text-sm font-bold text-[#f5c842]">Drawing has occurred!</p>
+              <div className="text-center px-4 py-2 rounded-xl bg-[#FFB800]/10 border border-[#FFB800]/30">
+                <p className="text-sm font-bold text-[#FFB800]">Drawing has occurred!</p>
                 <p className="text-[10px] text-white/50">Winner announced on our 1 year anniversary</p>
               </div>
             )}
@@ -176,7 +176,7 @@ export function AnniversaryGiveawayBanner() {
             <Link href="/giveaway">
               <Button
                 size="sm"
-                className="bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black font-bold hover:opacity-90 gap-1.5 text-xs h-9"
+                className="bg-gradient-to-r from-[#FFB800] to-[#cc9900] text-black font-bold hover:opacity-90 gap-1.5 text-xs h-9"
               >
                 View Full Details <ChevronRight className="w-3.5 h-3.5" />
               </Button>

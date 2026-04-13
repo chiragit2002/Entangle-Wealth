@@ -120,7 +120,7 @@ function MyFeedback() {
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
                   {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className={`w-3.5 h-3.5 ${s <= fb.rating ? "text-[#FFD700] fill-[#FFD700]" : "text-white/40"}`} />
+                    <Star key={s} className={`w-3.5 h-3.5 ${s <= fb.rating ? "text-[#FFB800] fill-[#FFB800]" : "text-white/40"}`} />
                   ))}
                 </div>
                 <span className="text-xs px-2 py-0.5 rounded-full capitalize text-white/50" style={{ background: "rgba(255,255,255,0.05)" }}>
@@ -129,7 +129,7 @@ function MyFeedback() {
               </div>
               <div className="flex items-center gap-1.5 text-[10px] text-white/30">
                 {fb.admin_response ? (
-                  <><CheckCircle className="w-3 h-3 text-[#00ff88]" /><span className="text-[#00ff88]">Responded</span></>
+                  <><CheckCircle className="w-3 h-3 text-[#00FF41]" /><span className="text-[#00FF41]">Responded</span></>
                 ) : (
                   <><Clock className="w-3 h-3" /><span>Pending</span></>
                 )}
@@ -703,7 +703,7 @@ export default function Profile() {
                 </Button>
               )}
               <Button
-                className={editing ? "bg-[#00c8f8] text-black font-bold hover:bg-[#00c8f8]/90 active:scale-[0.97] transition-all duration-150 gap-2" : "border-white/20 gap-2"}
+                className={editing ? "bg-[#00FF41] text-black font-bold hover:bg-[#00FF41]/90 active:scale-[0.97] transition-all duration-150 gap-2" : "border-white/20 gap-2"}
                 variant={editing ? "default" : "outline"}
                 onClick={() => editing ? saveProfile() : setEditing(true)}
                 disabled={saving}
@@ -1049,9 +1049,9 @@ export default function Profile() {
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-primary" /> Investment Progress</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
-              <DollarSign className="w-5 h-5 text-[#00ff88] mx-auto mb-1" />
+              <DollarSign className="w-5 h-5 text-[#00FF41] mx-auto mb-1" />
               <p className="text-[10px] text-muted-foreground uppercase">This Month</p>
-              <p className="text-xl font-bold font-mono text-[#00ff88]">$1,247</p>
+              <p className="text-xl font-bold font-mono text-[#00FF41]">$1,247</p>
             </div>
             <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
               <Zap className="w-5 h-5 text-primary mx-auto mb-1" />
@@ -1096,9 +1096,9 @@ export default function Profile() {
                   <p className="text-[9px] text-muted-foreground">{gamification.streak.multiplier.toFixed(1)}x multi</p>
                 </div>
                 <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
-                  <Trophy className="w-5 h-5 text-[#FFD700] mx-auto mb-1" />
+                  <Trophy className="w-5 h-5 text-[#FFB800] mx-auto mb-1" />
                   <p className="text-[10px] text-muted-foreground uppercase">Rank</p>
-                  <p className="text-xl font-bold font-mono text-[#FFD700]">{myRank ? `#${myRank}` : "--"}</p>
+                  <p className="text-xl font-bold font-mono text-[#FFB800]">{myRank ? `#${myRank}` : "--"}</p>
                 </div>
               </div>
               <div className="mb-4">
@@ -1143,7 +1143,7 @@ export default function Profile() {
                   </Button>
                 </Link>
                 <Link href="/giveaway">
-                  <Button variant="outline" size="sm" className="border-[#f5c842]/40 text-[#f5c842] gap-1 active:scale-[0.97] transition-all duration-150">
+                  <Button variant="outline" size="sm" className="border-[#FFB800]/40 text-[#FFB800] gap-1 active:scale-[0.97] transition-all duration-150">
                     <Star className="w-3.5 h-3.5" /> Anniversary Giveaway
                   </Button>
                 </Link>
@@ -1155,10 +1155,10 @@ export default function Profile() {
               >
                 <div className="flex-shrink-0 text-2xl">🎉</div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#f5c842]">$50,000 Anniversary Giveaway</p>
+                  <p className="text-sm font-semibold text-[#FFB800]">$50,000 Anniversary Giveaway</p>
                   <p className="text-xs text-white/50 mt-0.5">Your XP, trades, streak & referrals earn entries. Plus share in the <span className="text-[#00d4ff] font-medium">$36K referral bonus pool</span>.</p>
                 </div>
-                <div className="text-[#f5c842] text-lg">→</div>
+                <div className="text-[#FFB800] text-lg">→</div>
               </div>
             </>
           ) : (

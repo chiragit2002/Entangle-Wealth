@@ -15,7 +15,7 @@ export function FearGreedGauge() {
   };
 
   return (
-    <div className="glass-panel rounded-2xl p-5 flex flex-col">
+    <div className="glass-panel rounded-sm p-5 flex flex-col">
       <div className="flex items-center gap-2 mb-3">
         <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
         <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Fear & Greed Index</h4>

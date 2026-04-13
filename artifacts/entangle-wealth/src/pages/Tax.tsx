@@ -152,7 +152,7 @@ export default function Tax() {
     return Math.min(s, 100);
   }, [profile, totalDocumented, totalGap, totalFound, planIds]);
 
-  const scoreColor = complianceScore >= 80 ? "#00e676" : complianceScore >= 60 ? "#ffd700" : "#ff4757";
+  const scoreColor = complianceScore >= 80 ? "#00FF41" : complianceScore >= 60 ? "#FFB800" : "#ff4757";
   const scoreLabel = complianceScore >= 80 ? "GOOD" : complianceScore >= 60 ? "FAIR" : "NEEDS WORK";
   const circumference = 2 * Math.PI * 60;
   const offset = circumference - (complianceScore / 100) * circumference;
@@ -293,7 +293,7 @@ export default function Tax() {
         </div>
 
         {profile && (
-          <div className="glass-panel rounded-xl p-4 mb-6 border-l-4 border-l-[#00c8f8]">
+          <div className="glass-panel rounded-xl p-4 mb-6 border-l-4 border-l-[#00FF41]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-bold text-[15px]">{profile.name || profile.businessName}</p>
@@ -303,13 +303,13 @@ export default function Tax() {
               </div>
               <div className="text-right">
                 <p className="text-[11px] text-muted-foreground">Revenue</p>
-                <p className="font-mono font-bold text-[#00e676]">{formatDollar(profile.grossRevenue)}</p>
+                <p className="font-mono font-bold text-[#00FF41]">{formatDollar(profile.grossRevenue)}</p>
               </div>
             </div>
           </div>
         )}
 
-        <div data-tour="tax-metrics" className="glass-panel rounded-2xl p-6 sm:p-8 text-center mb-8">
+        <div data-tour="tax-metrics" className="glass-panel rounded-sm p-6 sm:p-8 text-center mb-8">
           <p className="text-[13px] text-muted-foreground uppercase tracking-wider mb-4">Compliance Score</p>
           <div className="relative w-[140px] h-[140px] mx-auto mb-4">
             <svg width="140" height="140" viewBox="0 0 140 140" className="-rotate-90" aria-label={`Compliance score: ${complianceScore} out of 100`} role="img">
@@ -323,20 +323,20 @@ export default function Tax() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 mt-4">
-            <div className="rounded-xl p-3 border border-[rgba(0,230,118,0.2)] bg-[rgba(0,230,118,0.05)] text-center">
-              <p className="text-lg font-extrabold font-mono text-[#00e676]">{formatDollar(totalFound)}</p>
+            <div className="rounded-xl p-3 border border-[rgba(0,255,65,0.2)] bg-[rgba(0,255,65,0.05)] text-center">
+              <p className="text-lg font-extrabold font-mono text-[#00FF41]">{formatDollar(totalFound)}</p>
               <p className="text-[11px] text-muted-foreground mt-1">Deductions Found</p>
             </div>
             <div className="rounded-xl p-3 border border-[rgba(255,184,0,0.2)] bg-[rgba(255,184,0,0.05)] text-center">
               <p className="text-lg font-extrabold font-mono text-[#ffb800]">{formatDollar(totalGap)}</p>
               <p className="text-[11px] text-muted-foreground mt-1">Gap (Undocumented)</p>
             </div>
-            <div className="rounded-xl p-3 border border-[rgba(0,200,248,0.2)] bg-[rgba(0,200,248,0.05)] text-center">
-              <p className="text-lg font-extrabold font-mono text-[#00c8f8]">{formatDollar(totalDocumented)}</p>
+            <div className="rounded-xl p-3 border border-[rgba(0,255,65,0.2)] bg-[rgba(0,255,65,0.05)] text-center">
+              <p className="text-lg font-extrabold font-mono text-[#00FF41]">{formatDollar(totalDocumented)}</p>
               <p className="text-[11px] text-muted-foreground mt-1">Documented</p>
             </div>
-            <div className="rounded-xl p-3 border border-[rgba(0,230,118,0.2)] bg-[rgba(0,230,118,0.05)] text-center">
-              <p className="text-lg font-extrabold font-mono text-[#00e676]">{formatDollar(Math.round(potentialSavings))}</p>
+            <div className="rounded-xl p-3 border border-[rgba(0,255,65,0.2)] bg-[rgba(0,255,65,0.05)] text-center">
+              <p className="text-lg font-extrabold font-mono text-[#00FF41]">{formatDollar(Math.round(potentialSavings))}</p>
               <p className="text-[11px] text-muted-foreground mt-1">Potential Savings</p>
             </div>
           </div>
@@ -344,14 +344,14 @@ export default function Tax() {
 
         <div className="flex gap-2 mb-6">
           <div className="flex-1 h-3 bg-white/[0.06] rounded-full overflow-hidden">
-            <div className="h-full rounded-full bg-[#00e676]" style={{ width: `${totalFound > 0 ? (totalDocumented / totalFound) * 100 : 0}%` }} />
+            <div className="h-full rounded-full bg-[#00FF41]" style={{ width: `${totalFound > 0 ? (totalDocumented / totalFound) * 100 : 0}%` }} />
           </div>
           <span className="text-[11px] text-muted-foreground font-mono">{totalFound > 0 ? Math.round((totalDocumented / totalFound) * 100) : 0}%</span>
         </div>
 
         <div className="flex gap-3 mb-8 overflow-x-auto pb-2">
           <Link href="/taxgpt">
-            <Button className="bg-[#00c8f8] text-black font-bold gap-2 whitespace-nowrap min-h-[44px] hover:bg-[#00c8f8]/90 active:scale-[0.97] transition-all">
+            <Button className="bg-[#00FF41] text-black font-bold gap-2 whitespace-nowrap min-h-[44px] hover:bg-[#00FF41]/90 active:scale-[0.97] transition-all">
               <MessageCircle className="w-4 h-4" /> Get my tax answers
             </Button>
           </Link>
@@ -368,7 +368,7 @@ export default function Tax() {
         </div>
 
         <div className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4">
-          <TrendingUp className="w-5 h-5 text-[#00c8f8]" />
+          <TrendingUp className="w-5 h-5 text-[#00FF41]" />
           <h2 className="text-lg font-semibold">Deduction Category Breakdown</h2>
         </div>
 
@@ -381,17 +381,17 @@ export default function Tax() {
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[13px] font-semibold text-white/80">{c.label}</span>
                   <div className="flex items-center gap-3 text-[11px] font-mono">
-                    <span className="text-[#00e676] font-bold">{formatDollar(c.found)}</span>
+                    <span className="text-[#00FF41] font-bold">{formatDollar(c.found)}</span>
                     <span className="text-white/30">/</span>
-                    <span className="text-[#00c8f8]">{formatDollar(c.documented)}</span>
+                    <span className="text-[#00FF41]">{formatDollar(c.documented)}</span>
                     {gap > 0 && <span className="text-[#ffb800]">⚠ {formatDollar(gap)}</span>}
-                    {gap === 0 && c.found > 0 && <span className="text-[#00e676]">✓</span>}
+                    {gap === 0 && c.found > 0 && <span className="text-[#00FF41]">✓</span>}
                   </div>
                 </div>
                 <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
                   <div className="h-full rounded-full" style={{
                     width: `${Math.min(100, pct)}%`,
-                    backgroundColor: pct >= 100 ? "#00e676" : pct >= 50 ? "#00c8f8" : "#ffb800",
+                    backgroundColor: pct >= 100 ? "#00FF41" : pct >= 50 ? "#00FF41" : "#ffb800",
                   }} />
                 </div>
               </div>
@@ -418,17 +418,17 @@ export default function Tax() {
                     </span>
                   </div>
                   <p className="text-[13px] text-muted-foreground mb-2">{opp.how.slice(0, 120)}...</p>
-                  <p className="text-[13px] font-mono font-bold text-[#00e676] mb-3">
+                  <p className="text-[13px] font-mono font-bold text-[#00FF41] mb-3">
                     Est. savings: {formatDollar(Math.round(opp.estimated * marginalRate))}
                   </p>
                   <div className="flex gap-2">
                     <Link href="/tax-strategy">
-                      <Button size="sm" variant="outline" className="border-[#00c8f8]/30 text-[#00c8f8] text-[12px] min-h-[36px]">
+                      <Button size="sm" variant="outline" className="border-[#00FF41]/30 text-[#00FF41] text-[12px] min-h-[36px]">
                         Learn More
                       </Button>
                     </Link>
                     <Link href="/taxgpt">
-                      <Button size="sm" variant="outline" className="border-[#00e676]/30 text-[#00e676] text-[12px] min-h-[36px]">
+                      <Button size="sm" variant="outline" className="border-[#00FF41]/30 text-[#00FF41] text-[12px] min-h-[36px]">
                         Ask TaxGPT
                       </Button>
                     </Link>
@@ -444,7 +444,7 @@ export default function Tax() {
             onClick={() => setExpandEstimator(!expandEstimator)}
             className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4 w-full text-left"
           >
-            <Calculator className="w-5 h-5 text-[#00c8f8]" />
+            <Calculator className="w-5 h-5 text-[#00FF41]" />
             <h2 className="text-lg font-semibold flex-1">Tax Estimator</h2>
             {expandEstimator ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
           </button>
@@ -454,7 +454,7 @@ export default function Tax() {
               <div className="grid grid-cols-3 gap-2 text-[12px] mb-4">
                 <div className="font-semibold text-white/50"></div>
                 <div className="font-semibold text-center text-[#ff4757]">No Planning</div>
-                <div className="font-semibold text-center text-[#00e676]">With Strategies</div>
+                <div className="font-semibold text-center text-[#00FF41]">With Strategies</div>
               </div>
               {[
                 ["Gross Revenue", formatDollar(estimator.gross), formatDollar(estimator.gross)],
@@ -465,12 +465,12 @@ export default function Tax() {
                 <div key={i} className={`grid grid-cols-3 gap-2 text-[13px] py-2 ${i === 3 ? "border-t border-white/10 font-bold" : ""}`}>
                   <div className="text-white/60">{label}</div>
                   <div className="text-center font-mono text-[#ff4757]">{noPlan}</div>
-                  <div className="text-center font-mono text-[#00e676]">{withPlan}</div>
+                  <div className="text-center font-mono text-[#00FF41]">{withPlan}</div>
                 </div>
               ))}
-              <div className="mt-4 p-4 rounded-xl bg-[rgba(0,230,118,0.08)] border border-[rgba(0,230,118,0.2)] text-center">
+              <div className="mt-4 p-4 rounded-xl bg-[rgba(0,255,65,0.08)] border border-[rgba(0,255,65,0.2)] text-center">
                 <p className="text-[11px] text-muted-foreground uppercase mb-1">Total Estimated Savings</p>
-                <p className="text-2xl font-black font-mono text-[#00e676]">{formatDollar(Math.round(Math.max(0, estimator.savings)))}</p>
+                <p className="text-2xl font-black font-mono text-[#00FF41]">{formatDollar(Math.round(Math.max(0, estimator.savings)))}</p>
               </div>
               {estimator.savings > 0 && (
                 <div className="mt-4 pt-4 border-t border-white/10">
@@ -496,10 +496,10 @@ export default function Tax() {
         </div>
 
         <div className="flex gap-2 mb-6">
-          <Button variant="outline" className="flex-1 border-[#00c8f8]/20 text-[#00c8f8] gap-2 text-[12px] min-h-[44px]" onClick={exportDeductionCSV}>
+          <Button variant="outline" className="flex-1 border-[#00FF41]/20 text-[#00FF41] gap-2 text-[12px] min-h-[44px]" onClick={exportDeductionCSV}>
             <Download className="w-4 h-4" /> Deduction CSV
           </Button>
-          <Button variant="outline" className="flex-1 border-[#00e676]/20 text-[#00e676] gap-2 text-[12px] min-h-[44px]" onClick={exportCPAReport}>
+          <Button variant="outline" className="flex-1 border-[#00FF41]/20 text-[#00FF41] gap-2 text-[12px] min-h-[44px]" onClick={exportCPAReport}>
             <FileText className="w-4 h-4" /> CPA Report
           </Button>
         </div>

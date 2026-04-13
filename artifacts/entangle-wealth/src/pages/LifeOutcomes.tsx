@@ -24,8 +24,8 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 const LIFESTYLE_TIERS: Record<string, { color: string; desc: string }> = {
-  Affluent: { color: "#FFD700", desc: "Luxury lifestyle with full financial freedom" },
-  Comfortable: { color: "#00ff88", desc: "Great quality of life with financial security" },
+  Affluent: { color: "#FFB800", desc: "Luxury lifestyle with full financial freedom" },
+  Comfortable: { color: "#00FF41", desc: "Great quality of life with financial security" },
   Stable: { color: "#00D4FF", desc: "Financial stability with modest luxuries" },
   Modest: { color: "#9c27b0", desc: "Covering needs with limited discretionary spending" },
   Basic: { color: "#ff6b35", desc: "Meeting essential needs only" },
@@ -299,23 +299,23 @@ export default function LifeOutcomes() {
               </div>
 
               {(result.improvement.netWorthGain > 0 || result.improvement.retirementYearsEarlier) && (
-                <div className="border border-[#00ff88]/30 bg-[#00ff88]/5 rounded-xl p-6">
-                  <h3 className="font-bold text-[#00ff88] mb-4 flex items-center gap-2">
+                <div className="border border-[#00FF41]/30 bg-[#00FF41]/5 rounded-xl p-6">
+                  <h3 className="font-bold text-[#00FF41] mb-4 flex items-center gap-2">
                     <TrendingUp className="w-5 h-5" />
                     Optimization Impact
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-[#00ff88]">{fmt(result.improvement.netWorthGain)}</p>
+                      <p className="text-2xl font-bold text-[#00FF41]">{fmt(result.improvement.netWorthGain)}</p>
                       <p className="text-xs text-white/50 mt-1">Additional Net Worth</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-[#00ff88]">{fmt(result.improvement.passiveIncomeGain)}/yr</p>
+                      <p className="text-2xl font-bold text-[#00FF41]">{fmt(result.improvement.passiveIncomeGain)}/yr</p>
                       <p className="text-xs text-white/50 mt-1">Additional Passive Income</p>
                     </div>
                     {result.improvement.retirementYearsEarlier !== null && (
                       <div className="text-center">
-                        <p className="text-2xl font-bold text-[#00ff88]">{result.improvement.retirementYearsEarlier} years</p>
+                        <p className="text-2xl font-bold text-[#00FF41]">{result.improvement.retirementYearsEarlier} years</p>
                         <p className="text-xs text-white/50 mt-1">Earlier Financial Independence</p>
                       </div>
                     )}

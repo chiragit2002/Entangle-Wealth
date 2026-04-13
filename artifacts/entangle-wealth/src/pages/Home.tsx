@@ -156,7 +156,7 @@ function InlineError({ message, retry }: { message: string; retry?: () => void }
       {retry && (
         <button
           onClick={retry}
-          className="ml-auto flex items-center gap-1 text-[#00c8f8]/60 hover:text-[#00c8f8] transition-colors"
+          className="ml-auto flex items-center gap-1 text-[#00FF41]/60 hover:text-[#00FF41] transition-colors"
         >
           <RefreshCw className="w-3 h-3" /> Retry
         </button>
@@ -232,7 +232,7 @@ function RecentSignupTicker({
   }
   const s = signups[idx];
   return (
-    <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#00ff88]/15 bg-[#00ff88]/5 text-[11px] font-medium text-[#00ff88]">
+    <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#00FF41]/15 bg-[#00FF41]/5 text-[11px] font-medium text-[#00FF41]">
       <UserPlus className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
       <span>
         {s.name} just joined {s.timeLabel}
@@ -266,15 +266,15 @@ function GoalSelector({ onSelect }: { onSelect: (goal: string) => void }) {
           className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border text-left transition-all duration-200 text-sm font-medium
             ${
               selected === id
-                ? "border-[#00c8f8] bg-[#00c8f8]/10 text-white"
+                ? "border-[#00FF41] bg-[#00FF41]/10 text-white"
                 : "border-white/10 bg-white/[0.03] text-white/80 hover:border-white/20 hover:bg-white/[0.06]"
             }`}
         >
           <Icon
-            className={`w-4 h-4 flex-shrink-0 ${selected === id ? "text-[#00c8f8]" : "text-white/40"}`}
+            className={`w-4 h-4 flex-shrink-0 ${selected === id ? "text-[#00FF41]" : "text-white/40"}`}
           />
           <span>{label}</span>
-          {selected === id && <CheckCircle className="w-4 h-4 text-[#00c8f8] ml-auto" />}
+          {selected === id && <CheckCircle className="w-4 h-4 text-[#00FF41] ml-auto" />}
         </button>
       ))}
     </div>
@@ -319,12 +319,12 @@ function LanguageSelector() {
         onClick={() => setOpen(!open)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/70 hover:text-white text-xs font-medium transition-all"
       >
-        <Globe className="w-3.5 h-3.5 text-[#00c8f8]" />
+        <Globe className="w-3.5 h-3.5 text-[#00FF41]" />
         <span>{current.flag}</span>
         <span>{current.label}</span>
       </button>
       {open && (
-        <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 z-50 w-44 bg-[#0a0a0f] border border-white/10 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
+        <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 z-50 w-44 bg-[#0A0E1A] border border-white/10 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
           {LANGUAGES.map((lang) => (
             <button
               key={lang.code}
@@ -336,13 +336,13 @@ function LanguageSelector() {
               }}
               className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
                 selected === lang.code
-                  ? "bg-[#00c8f8]/10 text-[#00c8f8]"
+                  ? "bg-[#00FF41]/10 text-[#00FF41]"
                   : "text-white/70 hover:bg-white/[0.06] hover:text-white"
               }`}
             >
               <span className="text-base">{lang.flag}</span>
               <span>{lang.label}</span>
-              {selected === lang.code && <CheckCircle className="w-3.5 h-3.5 ml-auto text-[#00c8f8]" />}
+              {selected === lang.code && <CheckCircle className="w-3.5 h-3.5 ml-auto text-[#00FF41]" />}
             </button>
           ))}
         </div>
@@ -355,9 +355,9 @@ const EDGE_INSIGHTS = [
   {
     id: "quantum",
     icon: Atom,
-    iconColor: "#00c8f8",
-    glowColor: "rgba(0,200,248,0.18)",
-    borderColor: "rgba(0,200,248,0.25)",
+    iconColor: "#00FF41",
+    glowColor: "rgba(0,255,65,0.18)",
+    borderColor: "rgba(0,255,65,0.25)",
     metric: "87% consensus accuracy",
     headline: "Quantum Consensus Engine",
     body: "6 AI agents cross-check every signal independently, then converge on a verdict. No single model bias — just collective precision your brokerage can't replicate.",
@@ -368,9 +368,9 @@ const EDGE_INSIGHTS = [
   {
     id: "timeline",
     icon: GitBranch,
-    iconColor: "#00e676",
-    glowColor: "rgba(0,230,118,0.15)",
-    borderColor: "rgba(0,230,118,0.22)",
+    iconColor: "#00FF41",
+    glowColor: "rgba(0,255,65,0.15)",
+    borderColor: "rgba(0,255,65,0.22)",
     metric: "Avg $47k gap revealed at 10yr",
     headline: "Alternate Timeline Simulator",
     body: "See how a single decision today — save $200 more/month, pay off debt early — branches into radically different futures. No other platform shows you your money's parallel lives.",
@@ -381,7 +381,7 @@ const EDGE_INSIGHTS = [
   {
     id: "taxgpt",
     icon: FileSearch,
-    iconColor: "#f5c842",
+    iconColor: "#FFB800",
     glowColor: "rgba(245,200,66,0.13)",
     borderColor: "rgba(245,200,66,0.22)",
     metric: "$4,200 avg tax savings found",
@@ -419,7 +419,7 @@ function EdgeInsightCard({
   return (
     <div
       onMouseEnter={onHover}
-      className={`relative rounded-2xl p-5 flex flex-col gap-3 cursor-default transition-all duration-300 group ${
+      className={`relative p-5 flex flex-col gap-3 cursor-default transition-all duration-300 group ${
         active ? "scale-[1.01]" : "opacity-80 hover:opacity-100"
       }`}
       style={{
@@ -486,7 +486,7 @@ function EdgeInsightCard({
 
       {active && (
         <div
-          className="absolute inset-0 rounded-2xl pointer-events-none"
+          className="absolute inset-0 rounded-sm pointer-events-none"
           style={{
             background: `radial-gradient(ellipse at 0% 0%, ${insight.glowColor} 0%, transparent 70%)`,
           }}
@@ -511,12 +511,12 @@ function YourEdgeSection() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,200,248,0.05) 0%, transparent 70%)`,
+          background: `radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,255,65,0.05) 0%, transparent 70%)`,
         }}
       />
       <div className="container mx-auto max-w-5xl relative z-10">
         <div className="text-center mb-10">
-          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#00c8f8]/70 mb-3">
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#00FF41]/70 mb-3">
             <Atom className="w-3 h-3" />
             Your Edge
           </span>
@@ -582,7 +582,7 @@ function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
           setStep("goal");
           trackEvent("hero_cta_clicked");
         }}
-        className="h-12 px-8 bg-gradient-to-r from-[#00c8f8] to-[#0088cc] text-black font-bold hover:opacity-90 active:scale-[0.97] text-base rounded-full shadow-[0_0_24px_rgba(0,200,248,0.25)] transition-all duration-150"
+        className="h-11 px-8 bg-[#00FF41] text-[#0A0E1A] font-mono font-bold hover:opacity-90 active:opacity-80 text-sm tracking-wider shadow-[0_0_20px_rgba(0,255,65,0.20)] transition-all duration-150"
       >
         See exactly where you stand — free
       </Button>
@@ -598,7 +598,7 @@ function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
   }
 
   return (
-    <div className="flex items-center gap-2 text-[#00e676] text-sm font-medium animate-in fade-in duration-300">
+    <div className="flex items-center gap-2 text-[#00FF41] text-sm font-medium animate-in fade-in duration-300">
       <CheckCircle className="w-5 h-5" />
       <span>Great — taking you there now...</span>
     </div>
@@ -647,7 +647,7 @@ export default function Home() {
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
               You shouldn't have to wonder
               <br />
-              <span className="text-[#00c8f8]">if you're doing it right.</span>
+              <span className="text-[#00FF41]">if you're doing it right.</span>
             </h1>
 
             <p className="max-w-lg text-base md:text-lg text-white/60 leading-relaxed">
@@ -662,11 +662,11 @@ export default function Home() {
 
             <div className="flex flex-wrap items-center justify-center gap-5 pt-1">
               <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#00e676]" />
+                <ShieldCheck className="w-3.5 h-3.5 text-[#00FF41]" />
                 Done in under 60 seconds
               </span>
               <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
-                <Lock className="w-3.5 h-3.5 text-[#00c8f8]" />
+                <Lock className="w-3.5 h-3.5 text-[#00FF41]" />
                 Your data stays yours
               </span>
               {stats.members > 0 && (
@@ -684,7 +684,7 @@ export default function Home() {
         {/* Problem */}
         <section className="py-16 lg:py-24 px-4 border-t border-white/5">
           <div className="container mx-auto max-w-2xl text-center space-y-6">
-            <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00c8f8]/60">
+            <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00FF41]/60">
               Sound familiar?
             </p>
             <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
@@ -704,7 +704,7 @@ export default function Home() {
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="glass-panel rounded-2xl p-5 text-sm text-white/60 leading-relaxed text-left"
+                  className="bloomberg-panel p-5 text-sm text-white/60 leading-relaxed text-left"
                 >
                   {item.text}
                 </div>
@@ -716,7 +716,7 @@ export default function Home() {
         {/* Solution */}
         <section className="py-16 lg:py-24 px-4 border-t border-white/5">
           <div className="container mx-auto max-w-2xl text-center space-y-6">
-            <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00e676]/60">
+            <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00FF41]/60">
               Here's the difference
             </p>
             <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
@@ -730,25 +730,25 @@ export default function Home() {
                 {
                   title: "Clarity",
                   desc: "See exactly where you stand.",
-                  color: "text-[#00c8f8]",
-                  border: "border-[#00c8f8]/20",
+                  color: "text-[#00FF41]",
+                  border: "border-[#00FF41]/20",
                 },
                 {
                   title: "Simplicity",
                   desc: "No charts. No jargon. Just what to do.",
-                  color: "text-[#00e676]",
-                  border: "border-[#00e676]/20",
+                  color: "text-[#00FF41]",
+                  border: "border-[#00FF41]/20",
                 },
                 {
                   title: "Confidence",
                   desc: "Decide without second-guessing.",
-                  color: "text-[#f5c842]",
-                  border: "border-[#f5c842]/20",
+                  color: "text-[#FFB800]",
+                  border: "border-[#FFB800]/20",
                 },
               ].map((item) => (
                 <div
                   key={item.title}
-                  className={`glass-panel rounded-2xl p-5 text-left border ${item.border}`}
+                  className={`bloomberg-panel p-5 text-left border ${item.border}`}
                 >
                   <p className={`text-base font-bold mb-2 ${item.color}`}>{item.title}</p>
                   <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
@@ -775,27 +775,27 @@ export default function Home() {
                   num: "1",
                   title: "Tell us where you are",
                   desc: "Three quick questions. No forms.",
-                  color: "text-[#00c8f8]",
-                  bg: "bg-[#00c8f8]/10",
+                  color: "text-[#00FF41]",
+                  bg: "bg-[#00FF41]/10",
                 },
                 {
                   num: "2",
                   title: "Get your next step",
                   desc: "Specific guidance for your situation.",
-                  color: "text-[#00e676]",
-                  bg: "bg-[#00e676]/10",
+                  color: "text-[#00FF41]",
+                  bg: "bg-[#00FF41]/10",
                 },
                 {
                   num: "3",
                   title: "Act with clarity",
                   desc: "Know exactly what to do — and why.",
-                  color: "text-[#f5c842]",
-                  bg: "bg-[#f5c842]/10",
+                  color: "text-[#FFB800]",
+                  bg: "bg-[#FFB800]/10",
                 },
               ].map((step) => (
                 <div
                   key={step.num}
-                  className="glass-panel p-6 rounded-2xl flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300"
+                  className="bloomberg-panel p-6 flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300"
                 >
                   <div
                     className={`w-9 h-9 rounded-full flex items-center justify-center ${step.bg} ${step.color} text-base font-bold flex-shrink-0`}
@@ -832,19 +832,19 @@ export default function Home() {
               {[
                 {
                   icon: CheckCircle,
-                  color: "text-[#00e676]",
+                  color: "text-[#00FF41]",
                   title: "No financial jargon",
                   desc: "Guidance written for real people.",
                 },
                 {
                   icon: ShieldCheck,
-                  color: "text-[#00c8f8]",
+                  color: "text-[#00FF41]",
                   title: "Your data stays yours",
                   desc: "Encrypted and never sold.",
                 },
                 {
                   icon: Lock,
-                  color: "text-[#f5c842]",
+                  color: "text-[#FFB800]",
                   title: "No pressure, no gotchas",
                   desc: "Free to start. Upgrade only if you want more.",
                 },
@@ -855,7 +855,7 @@ export default function Home() {
                   desc: "We win when you feel clear about your finances.",
                 },
               ].map((item) => (
-                <div key={item.title} className="glass-panel rounded-2xl p-5 flex gap-4">
+                <div key={item.title} className="bloomberg-panel p-5 flex gap-4">
                   <item.icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${item.color}`} />
                   <div>
                     <p className="text-sm font-semibold text-white mb-1">{item.title}</p>
@@ -895,14 +895,14 @@ export default function Home() {
             {testimonialsState.data && testimonialsState.data.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {testimonialsState.data.slice(0, 6).map((t) => (
-                  <div key={t.id} className="glass-panel rounded-xl p-5 flex flex-col gap-3">
+                  <div key={t.id} className="bloomberg-panel p-5 flex flex-col gap-3">
                     <div className="flex gap-0.5">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star
                           key={i}
                           className={`w-3.5 h-3.5 ${
                             i < t.rating
-                              ? "text-[#FFD700] fill-[#FFD700]"
+                              ? "text-[#FFB800] fill-[#FFB800]"
                               : "text-white/10 fill-white/10"
                           }`}
                         />
@@ -910,7 +910,7 @@ export default function Home() {
                     </div>
                     <p className="text-sm text-white/70 leading-relaxed flex-1">"{t.message}"</p>
                     <div className="flex items-center gap-2 pt-3 border-t border-white/5">
-                      <div className="w-7 h-7 rounded-full bg-[#00c8f8]/20 flex items-center justify-center text-xs font-bold text-[#00c8f8]">
+                      <div className="w-7 h-7 rounded-full bg-[#00FF41]/20 flex items-center justify-center text-xs font-bold text-[#00FF41]">
                         {t.name.charAt(0).toUpperCase()}
                       </div>
                       <div>

@@ -102,11 +102,11 @@ function CandlestickChartBase({ data, symbol, height = 380 }: CandlestickChartPr
     chartRef.current = chart;
 
     const candleSeries = chart.addSeries(CandlestickSeries, {
-      upColor: "#00ff88",
+      upColor: "#00FF41",
       downColor: "#ff3366",
-      borderUpColor: "#00ff88",
+      borderUpColor: "#00FF41",
       borderDownColor: "#ff3366",
-      wickUpColor: "#00ff88",
+      wickUpColor: "#00FF41",
       wickDownColor: "#ff3366",
     });
 
@@ -136,7 +136,7 @@ function CandlestickChartBase({ data, symbol, height = 380 }: CandlestickChartPr
 
     if (sma20Data.length >= 2) {
       const sma20Series = chart.addSeries(LineSeries, {
-        color: "#ffd700",
+        color: "#FFB800",
         lineWidth: 1,
         priceLineVisible: false,
         lastValueVisible: false,
@@ -180,11 +180,11 @@ function CandlestickChartBase({ data, symbol, height = 380 }: CandlestickChartPr
         </div>
         <div className="flex items-center gap-3">
           <span className="text-[11px] font-mono font-bold">${lastPrice.toFixed(2)}</span>
-          <span className={`text-[10px] font-mono font-bold ${isUp ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
+          <span className={`text-[10px] font-mono font-bold ${isUp ? "text-[#00FF41]" : "text-[#ff3366]"}`}>
             {isUp ? "+" : ""}{pctChange}%
           </span>
           <div className="flex items-center gap-2 text-[9px] text-white/40">
-            <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-[#ffd700] inline-block rounded" />SMA20</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-[#FFB800] inline-block rounded" />SMA20</span>
             <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-[#a855f7] inline-block rounded" />SMA50</span>
           </div>
         </div>

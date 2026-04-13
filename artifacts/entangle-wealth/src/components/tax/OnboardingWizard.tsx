@@ -41,7 +41,7 @@ function YesNoButtons({ value, onChange }: YesNoButtonsProps) {
         onClick={() => onChange(true)}
         className={`px-5 py-1.5 rounded-full text-[12px] font-bold transition-all ${
           value
-            ? "bg-[#00e676]/15 text-[#00e676] border border-[#00e676]/40"
+            ? "bg-[#00FF41]/15 text-[#00FF41] border border-[#00FF41]/40"
             : "bg-white/5 text-white/40 border border-white/10 hover:border-white/20"
         }`}
       >
@@ -130,7 +130,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)" }}>
-      <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#0d0f18] p-6 relative max-h-[90vh] overflow-y-auto">
+      <div className="w-full max-w-lg rounded-sm border border-white/10 bg-[#0d0f18] p-6 relative max-h-[90vh] overflow-y-auto">
         {onClose && (
           <button onClick={onClose} className="absolute top-4 right-4 text-white/40 hover:text-white p-1">
             <X className="w-5 h-5" />
@@ -138,7 +138,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
         )}
 
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00c8f8] to-[#0099cc] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00FF41] to-[#0099cc] flex items-center justify-center">
             <span className="text-black font-bold text-sm">⚛</span>
           </div>
           <div>
@@ -149,14 +149,14 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
 
         <div className="flex gap-1 mb-6">
           {Array.from({ length: totalSteps }, (_, i) => i + 1).map(s => (
-            <div key={s} className={`h-1 flex-1 rounded-full ${s <= step ? "bg-[#00c8f8]" : "bg-white/10"}`} />
+            <div key={s} className={`h-1 flex-1 rounded-full ${s <= step ? "bg-[#00FF41]" : "bg-white/10"}`} />
           ))}
         </div>
 
         {step === 1 && (
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Building2 className="w-5 h-5 text-[#00c8f8]" />
+              <Building2 className="w-5 h-5 text-[#00FF41]" />
               <h3 className="font-semibold text-white">What describes you best?</h3>
             </div>
             <p className="text-[11px] text-white/50 mb-4">Select your primary business structure — this determines which tax strategies and deductions apply to you.</p>
@@ -168,7 +168,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                   aria-pressed={hasSelectedEntity && profile.entityType === key}
                   className={`w-full text-left p-3 rounded-xl border text-[13px] transition-all min-h-[44px] ${
                     hasSelectedEntity && profile.entityType === key
-                      ? "border-[#00c8f8]/50 bg-[#00c8f8]/10 text-[#00c8f8]"
+                      ? "border-[#00FF41]/50 bg-[#00FF41]/10 text-[#00FF41]"
                       : "border-white/10 text-white/60 hover:border-white/20"
                   }`}
                 >
@@ -182,7 +182,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
         {step === 2 && (
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Building2 className="w-5 h-5 text-[#00c8f8]" />
+              <Building2 className="w-5 h-5 text-[#00FF41]" />
               <h3 className="font-semibold text-white">Business Information</h3>
             </div>
             <div className="space-y-3">
@@ -233,7 +233,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
         {step === 3 && (
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <DollarSign className="w-5 h-5 text-[#00c8f8]" />
+              <DollarSign className="w-5 h-5 text-[#00FF41]" />
               <h3 className="font-semibold text-white">Income Profile</h3>
             </div>
             <div className="space-y-3">
@@ -276,7 +276,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                   <button
                     type="button"
                     onClick={addTrip}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#00c8f8]/10 text-[#00c8f8] text-[12px] font-semibold hover:bg-[#00c8f8]/20 transition-all"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#00FF41]/10 text-[#00FF41] text-[12px] font-semibold hover:bg-[#00FF41]/20 transition-all"
                   >
                     <Plus className="w-3.5 h-3.5" /> Add Trip
                   </button>
@@ -327,7 +327,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
         {step === 4 && (
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Target className="w-5 h-5 text-[#00c8f8]" />
+              <Target className="w-5 h-5 text-[#00FF41]" />
               <h3 className="font-semibold text-white">Your Goals</h3>
             </div>
             <div className="space-y-3">
@@ -342,7 +342,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                     <button key={val} onClick={() => update({ primaryGoal: val })}
                       className={`w-full text-left p-3 rounded-xl border text-[13px] transition-all min-h-[44px] ${
                         profile.primaryGoal === val
-                          ? "border-[#00c8f8]/50 bg-[#00c8f8]/10 text-[#00c8f8]"
+                          ? "border-[#00FF41]/50 bg-[#00FF41]/10 text-[#00FF41]"
                           : "border-white/10 text-white/60 hover:border-white/20"
                       }`}>
                       {label}
@@ -361,7 +361,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                     <button key={val} onClick={() => update({ filingTime: val })}
                       className={`flex-1 p-3 rounded-xl border text-[13px] font-semibold transition-all min-h-[44px] ${
                         profile.filingTime === val
-                          ? "border-[#00c8f8]/50 bg-[#00c8f8]/10 text-[#00c8f8]"
+                          ? "border-[#00FF41]/50 bg-[#00FF41]/10 text-[#00FF41]"
                           : "border-white/10 text-white/60 hover:border-white/20"
                       }`}>
                       {label}
@@ -381,11 +381,11 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
           )}
           <div className="flex-1" />
           {step < totalSteps ? (
-            <Button onClick={() => setStep(s => s + 1)} disabled={!canNext()} className="bg-gradient-to-r from-[#00c8f8] to-[#0099cc] text-black font-bold gap-1 min-h-[44px]">
+            <Button onClick={() => setStep(s => s + 1)} disabled={!canNext()} className="bg-gradient-to-r from-[#00FF41] to-[#0099cc] text-black font-bold gap-1 min-h-[44px]">
               Continue <ChevronRight className="w-4 h-4" />
             </Button>
           ) : (
-            <Button onClick={finish} disabled={!canNext()} className="bg-gradient-to-r from-[#00e676] to-[#00c853] text-black font-bold gap-1 min-h-[44px]">
+            <Button onClick={finish} disabled={!canNext()} className="bg-gradient-to-r from-[#00FF41] to-[#00c853] text-black font-bold gap-1 min-h-[44px]">
               Complete Setup <ChevronRight className="w-4 h-4" />
             </Button>
           )}

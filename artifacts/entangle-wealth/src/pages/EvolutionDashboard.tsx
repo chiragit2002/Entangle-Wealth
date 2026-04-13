@@ -90,7 +90,7 @@ const SENTRY_URL = "https://sentry.io/organizations/";
 function SeverityBadge({ severity }: { severity: "critical" | "warning" | "info" }) {
   const styles = {
     critical: { bg: "rgba(255,51,102,0.15)", border: "rgba(255,51,102,0.3)", text: "#ff3366" },
-    warning: { bg: "rgba(255,215,0,0.15)", border: "rgba(255,215,0,0.3)", text: "#FFD700" },
+    warning: { bg: "rgba(255,215,0,0.15)", border: "rgba(255,215,0,0.3)", text: "#FFB800" },
     info: { bg: "rgba(0,212,255,0.15)", border: "rgba(0,212,255,0.3)", text: "#00D4FF" },
   };
   const s = styles[severity];
@@ -113,7 +113,7 @@ function CategoryIcon({ category }: { category: InsightItem["category"] }) {
     hesitation: Activity,
   };
   const colors: Record<InsightItem["category"], string> = {
-    funnel: "#FFD700",
+    funnel: "#FFB800",
     rage_clicks: "#ff3366",
     satisfaction: "#ff9800",
     performance: "#9c27b0",
@@ -162,7 +162,7 @@ function InsightCard({ insight }: { insight: InsightItem }) {
 }
 
 function HealthScoreGauge({ score }: { score: number }) {
-  const color = score >= 80 ? "#00ff88" : score >= 60 ? "#FFD700" : "#ff3366";
+  const color = score >= 80 ? "#00FF41" : score >= 60 ? "#FFB800" : "#ff3366";
   const label = score >= 80 ? "Healthy" : score >= 60 ? "Needs Attention" : "Critical";
   return (
     <div className="flex flex-col items-center">
@@ -209,7 +209,7 @@ function FunnelViz({ funnel }: { funnel: FunnelData }) {
                     {i + 1}
                   </span>
                   <span className="text-white/70">{step.label}</span>
-                  {isDropOff && <AlertTriangle className="w-3 h-3 text-[#FFD700]" />}
+                  {isDropOff && <AlertTriangle className="w-3 h-3 text-[#FFB800]" />}
                 </div>
                 <div className="flex items-center gap-2 text-right">
                   <span className="text-white font-mono">{step.count.toLocaleString()}</span>
@@ -226,8 +226,8 @@ function FunnelViz({ funnel }: { funnel: FunnelData }) {
                   style={{
                     width: `${pct}%`,
                     background: isDropOff
-                      ? "linear-gradient(90deg, #FFD700, #ff9800)"
-                      : "linear-gradient(90deg, #00D4FF, #00ff88)",
+                      ? "linear-gradient(90deg, #FFB800, #ff9800)"
+                      : "linear-gradient(90deg, #00D4FF, #00FF41)",
                     opacity: 0.7,
                   }}
                 />
@@ -240,7 +240,7 @@ function FunnelViz({ funnel }: { funnel: FunnelData }) {
         <span className="text-white/50">Overall conversion</span>
         <span
           className="font-mono font-bold"
-          style={{ color: funnel.overallConversion >= 50 ? "#00ff88" : funnel.overallConversion >= 20 ? "#FFD700" : "#ff3366" }}
+          style={{ color: funnel.overallConversion >= 50 ? "#00FF41" : funnel.overallConversion >= 20 ? "#FFB800" : "#ff3366" }}
         >
           {funnel.overallConversion}%
         </span>
@@ -315,7 +315,7 @@ export default function EvolutionDashboard() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-              <Zap className="w-8 h-8 text-[#FFD700]" />
+              <Zap className="w-8 h-8 text-[#FFB800]" />
               Evolution Dashboard
             </h1>
             <p className="text-white/50 text-sm mt-1">UX intelligence, friction signals & system health</p>
@@ -361,12 +361,12 @@ export default function EvolutionDashboard() {
                 <div className="mt-2 text-xs text-white/30">{insightsSummary.warning} warnings · {insightsSummary.info} info</div>
               </div>
               <div className="rounded-xl border p-5" style={{ background: "rgba(255,215,0,0.05)", borderColor: "rgba(255,215,0,0.15)" }}>
-                <div className="text-3xl font-bold font-mono text-[#FFD700]">{insightsSummary.rageClickTotal}</div>
+                <div className="text-3xl font-bold font-mono text-[#FFB800]">{insightsSummary.rageClickTotal}</div>
                 <div className="text-xs text-white/50 mt-1">Rage Clicks (7d)</div>
                 <div className="mt-2 text-xs text-white/30">{insightsSummary.totalEvents7d.toLocaleString()} total events</div>
               </div>
-              <div className="rounded-xl border p-5" style={{ background: "rgba(0,255,136,0.05)", borderColor: "rgba(0,255,136,0.15)" }}>
-                <div className="text-3xl font-bold font-mono text-[#00ff88]">{insightsSummary.avgSatisfaction}%</div>
+              <div className="rounded-xl border p-5" style={{ background: "rgba(0,255,65,0.05)", borderColor: "rgba(0,255,65,0.15)" }}>
+                <div className="text-3xl font-bold font-mono text-[#00FF41]">{insightsSummary.avgSatisfaction}%</div>
                 <div className="text-xs text-white/50 mt-1">Avg Satisfaction</div>
                 <div className="mt-2 text-xs text-white/30">Micro-feedback score</div>
               </div>
@@ -385,7 +385,7 @@ export default function EvolutionDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div>
             <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <TrendingDown className="w-5 h-5 text-[#FFD700]" />
+              <TrendingDown className="w-5 h-5 text-[#FFB800]" />
               Funnel Analysis
             </h2>
             {loading && funnels.length === 0 ? (
@@ -424,7 +424,7 @@ export default function EvolutionDashboard() {
               </div>
             ) : insights.length === 0 ? (
               <div className="rounded-xl border p-8 text-center" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}>
-                <CheckCircle className="w-8 h-8 mx-auto mb-2 text-[#00ff88]" />
+                <CheckCircle className="w-8 h-8 mx-auto mb-2 text-[#00FF41]" />
                 <p className="text-white/50 text-sm">No friction patterns detected</p>
                 <p className="text-white/30 text-xs mt-1">The system will surface issues as data accumulates</p>
               </div>
@@ -441,7 +441,7 @@ export default function EvolutionDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div className="rounded-xl border p-5" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}>
             <h2 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wider flex items-center gap-2">
-              <Gauge className="w-4 h-4 text-[#00ff88]" />
+              <Gauge className="w-4 h-4 text-[#00FF41]" />
               Feature Satisfaction Scores
             </h2>
             {feedbackChartData.length > 0 ? (
@@ -477,8 +477,8 @@ export default function EvolutionDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-white/50">{f.total} responses</span>
                       <div className="flex items-center gap-1">
-                        <ThumbsUp className="w-3 h-3 text-[#00ff88]" />
-                        <span className="text-[#00ff88] font-mono">{f.helpfulCount}</span>
+                        <ThumbsUp className="w-3 h-3 text-[#00FF41]" />
+                        <span className="text-[#00FF41] font-mono">{f.helpfulCount}</span>
                         <ThumbsDown className="w-3 h-3 text-[#ff3366] ml-1" />
                         <span className="text-[#ff3366] font-mono">{f.unhelpfulCount}</span>
                       </div>
@@ -500,7 +500,7 @@ export default function EvolutionDashboard() {
                   <div key={i} className="rounded-lg border p-3" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.05)" }}>
                     <div className="flex items-center gap-2 mb-1">
                       {c.helpful ? (
-                        <ThumbsUp className="w-3 h-3 text-[#00ff88] flex-shrink-0" />
+                        <ThumbsUp className="w-3 h-3 text-[#00FF41] flex-shrink-0" />
                       ) : (
                         <ThumbsDown className="w-3 h-3 text-[#ff3366] flex-shrink-0" />
                       )}
@@ -536,8 +536,8 @@ export default function EvolutionDashboard() {
               <div className="text-xs text-white/50">Session Replay Sampling</div>
               <div className="text-[10px] text-white/25 mt-1">1 in 10 sessions recorded</div>
             </div>
-            <div className="rounded-lg border p-4 text-center" style={{ background: "rgba(0,255,136,0.05)", borderColor: "rgba(0,255,136,0.15)" }}>
-              <div className="text-2xl font-bold font-mono text-[#00ff88] mb-1">100%</div>
+            <div className="rounded-lg border p-4 text-center" style={{ background: "rgba(0,255,65,0.05)", borderColor: "rgba(0,255,65,0.15)" }}>
+              <div className="text-2xl font-bold font-mono text-[#00FF41] mb-1">100%</div>
               <div className="text-xs text-white/50">Error Session Capture</div>
               <div className="text-[10px] text-white/25 mt-1">All error sessions recorded</div>
             </div>

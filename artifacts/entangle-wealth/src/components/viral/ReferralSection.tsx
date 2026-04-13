@@ -32,7 +32,7 @@ const TIERS = [
     name: "Singularity",
     benefit: "Shape the future of finance",
     detail: "Permanent Ambassador status + share of the $36K pool",
-    color: "#f5c842",
+    color: "#FFB800",
     glow: "rgba(245,200,66,0.35)",
   },
 ];
@@ -308,7 +308,7 @@ export function ReferralSection() {
   const celebratingCount = celebratingTierKey !== null;
 
   return (
-    <div className="referral-section glass-panel rounded-2xl p-6 overflow-hidden relative">
+    <div className="referral-section glass-panel rounded-sm p-6 overflow-hidden relative">
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -471,13 +471,13 @@ export function ReferralSection() {
             }}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
-              <circle cx="8" cy="8" r="7" stroke="#f5c842" strokeWidth="1.2" />
-              <path d="M8 4v4l2.5 1.5" stroke="#f5c842" strokeWidth="1.4" strokeLinecap="round" />
+              <circle cx="8" cy="8" r="7" stroke="#FFB800" strokeWidth="1.2" />
+              <path d="M8 4v4l2.5 1.5" stroke="#FFB800" strokeWidth="1.4" strokeLinecap="round" />
             </svg>
-            <p className="text-[11px] text-[#f5c842]/80 leading-tight">
+            <p className="text-[11px] text-[#FFB800]/80 leading-tight">
               Reach Singularity and earn your share of the{" "}
               <Link href="/giveaway">
-                <span className="text-[#f5c842] font-bold cursor-pointer hover:underline">
+                <span className="text-[#FFB800] font-bold cursor-pointer hover:underline">
                   $36,000 referral bonus pool
                 </span>
               </Link>{" "}
@@ -492,7 +492,7 @@ export function ReferralSection() {
           className="referral-share-btn w-full relative overflow-hidden rounded-xl py-4 font-bold text-sm text-black transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed mb-3"
           style={{
             background: code
-              ? "linear-gradient(135deg, #00d4ff 0%, #0099cc 50%, #00ff88 100%)"
+              ? "linear-gradient(135deg, #00d4ff 0%, #0099cc 50%, #00FF41 100%)"
               : "rgba(255,255,255,0.1)",
             backgroundSize: "200% 100%",
           }}
@@ -515,7 +515,7 @@ export function ReferralSection() {
               title="Copy link"
             >
               {copied ? (
-                <Check className="w-4 h-4 text-[#00ff88]" />
+                <Check className="w-4 h-4 text-[#00FF41]" />
               ) : (
                 <Copy className="w-4 h-4" />
               )}

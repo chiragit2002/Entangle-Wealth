@@ -37,7 +37,7 @@ export function DecisionImpactLayer({ compareResult, selectedHorizon }: {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="rounded-2xl p-4 space-y-3"
+      className="rounded-sm p-4 space-y-3"
       style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(255,255,255,0.08)" }}
       aria-label="Decision Impact Layer"
     >
@@ -49,14 +49,14 @@ export function DecisionImpactLayer({ compareResult, selectedHorizon }: {
 
       <div className="flex items-center gap-3" aria-hidden="true">
         <div className="flex items-center gap-1.5 flex-1">
-          <div className="w-2 h-2 rounded-full bg-[#00c8f8]" />
+          <div className="w-2 h-2 rounded-full bg-[#00FF41]" />
           <div className="text-[9px] text-white/40 font-mono">Current Path</div>
         </div>
         <div className="flex-1 relative h-2 flex items-center">
           <div className="absolute inset-0 flex items-center">
             <motion.div
               className="h-px w-full"
-              style={{ background: isPositive ? "linear-gradient(to right, #00c8f8, #00e676)" : "linear-gradient(to right, #00c8f8, #ef4444)" }}
+              style={{ background: isPositive ? "linear-gradient(to right, #00FF41, #00FF41)" : "linear-gradient(to right, #00FF41, #ef4444)" }}
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: 0.7, ease: "easeOut" }}
@@ -74,12 +74,12 @@ export function DecisionImpactLayer({ compareResult, selectedHorizon }: {
         </div>
         <div className="flex items-center gap-1.5 flex-1 justify-end">
           <div className="text-[9px] text-white/40 font-mono">Better Path</div>
-          <div className="w-2 h-2 rounded-full bg-[#00e676]" />
+          <div className="w-2 h-2 rounded-full bg-[#00FF41]" />
         </div>
       </div>
 
       <div className="flex items-center justify-between rounded-xl px-4 py-3"
-        style={{ background: isPositive ? "rgba(0,230,118,0.06)" : "rgba(239,68,68,0.06)", border: `1px solid ${isPositive ? "rgba(0,230,118,0.15)" : "rgba(239,68,68,0.15)"}` }}>
+        style={{ background: isPositive ? "rgba(0,255,65,0.06)" : "rgba(239,68,68,0.06)", border: `1px solid ${isPositive ? "rgba(0,255,65,0.15)" : "rgba(239,68,68,0.15)"}` }}>
         <div className="text-xs text-white/50 font-mono">Path difference @ {selectedHorizon}</div>
         <motion.div
           key={selectedDelta}

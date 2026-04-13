@@ -46,14 +46,14 @@ interface MetricsData {
 }
 
 function CircuitStateIcon({ state }: { state: string }) {
-  if (state === "closed") return <CheckCircle2 className="w-5 h-5 text-[#00ff88]" />;
-  if (state === "half-open") return <AlertTriangle className="w-5 h-5 text-[#FFD700]" />;
+  if (state === "closed") return <CheckCircle2 className="w-5 h-5 text-[#00FF41]" />;
+  if (state === "half-open") return <AlertTriangle className="w-5 h-5 text-[#FFB800]" />;
   return <XCircle className="w-5 h-5 text-[#ff3366]" />;
 }
 
 function MetricCard({ icon: Icon, label, value, sub }: { icon: typeof Activity; label: string; value: string; sub?: string }) {
   return (
-    <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
+    <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-4">
       <div className="flex items-center gap-2 mb-2">
         <Icon className="w-4 h-4 text-[#00D4FF]" />
         <span className="text-sm text-white/60">{label}</span>
@@ -209,7 +209,7 @@ export default function AdminScalability() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6 mb-8">
-                <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-6">
+                <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6">
                   <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
                     <Shield className="w-5 h-5 text-[#00D4FF]" />
                     Circuit Breakers
@@ -230,9 +230,9 @@ export default function AdminScalability() {
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
                             circuit.state === "closed"
-                              ? "bg-[#00ff88]/10 text-[#00ff88]"
+                              ? "bg-[#00FF41]/10 text-[#00FF41]"
                               : circuit.state === "half-open"
-                              ? "bg-[#FFD700]/10 text-[#FFD700]"
+                              ? "bg-[#FFB800]/10 text-[#FFB800]"
                               : "bg-[#ff3366]/10 text-[#ff3366]"
                           }`}
                         >
@@ -243,7 +243,7 @@ export default function AdminScalability() {
                   </div>
                 </div>
 
-                <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-6">
+                <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6">
                   <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
                     <Cpu className="w-5 h-5 text-[#00D4FF]" />
                     AI Request Queue
@@ -258,7 +258,7 @@ export default function AdminScalability() {
                       </div>
                       <div className="p-3 bg-white/5 rounded-lg">
                         <div className="text-xs text-white/50">Queued</div>
-                        <div className="text-2xl font-mono text-[#FFD700]">{metrics.aiQueue.queued}</div>
+                        <div className="text-2xl font-mono text-[#FFB800]">{metrics.aiQueue.queued}</div>
                       </div>
                     </div>
                     <div className="flex justify-between text-sm text-white/60">
@@ -278,7 +278,7 @@ export default function AdminScalability() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6 mb-8">
-                <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-6">
+                <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6">
                   <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
                     <Server className="w-5 h-5 text-[#00D4FF]" />
                     Cache Status
@@ -291,16 +291,16 @@ export default function AdminScalability() {
                           <span className="font-mono text-[#00D4FF]">{c.size} entries</span>
                         </div>
                         <div className="flex items-center gap-4 text-xs text-white/40">
-                          <span>Hits: <span className="text-[#00ff88] font-mono">{c.hits}</span></span>
+                          <span>Hits: <span className="text-[#00FF41] font-mono">{c.hits}</span></span>
                           <span>Misses: <span className="text-[#ff3366] font-mono">{c.misses}</span></span>
-                          <span>Hit Rate: <span className="text-[#FFD700] font-mono">{c.hitRate}%</span></span>
+                          <span>Hit Rate: <span className="text-[#FFB800] font-mono">{c.hitRate}%</span></span>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-6">
+                <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6">
                   <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
                     <CheckCircle2 className="w-5 h-5 text-[#00D4FF]" />
                     Health Checklist ({passCount}/{checklist.length})
@@ -309,7 +309,7 @@ export default function AdminScalability() {
                     {checklist.map((item, i) => (
                       <div key={i} className="flex items-start gap-3 p-2">
                         {item.ok ? (
-                          <CheckCircle2 className="w-4 h-4 text-[#00ff88] mt-0.5 flex-shrink-0" />
+                          <CheckCircle2 className="w-4 h-4 text-[#00FF41] mt-0.5 flex-shrink-0" />
                         ) : (
                           <XCircle className="w-4 h-4 text-[#ff3366] mt-0.5 flex-shrink-0" />
                         )}

@@ -179,7 +179,7 @@ export default function Achievements() {
           </div>
           <Button
             onClick={() => setShowSpinWheel(true)}
-            className="bg-gradient-to-r from-[#FFD700] to-[#f59e0b] text-black font-bold hover:opacity-90 gap-2"
+            className="bg-gradient-to-r from-[#FFB800] to-[#f59e0b] text-black font-bold hover:opacity-90 gap-2"
           >
             <Gift className="w-4 h-4" />
             Daily Spin
@@ -275,7 +275,7 @@ export default function Achievements() {
                 >
                   {badge.earned && (
                     <div className="absolute top-2 right-2">
-                      <CheckCircle className="w-4 h-4 text-[#00ff88]" />
+                      <CheckCircle className="w-4 h-4 text-[#00FF41]" />
                     </div>
                   )}
                   <div className={`w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center border ${
@@ -344,7 +344,7 @@ function ChallengeCard({ challenge }: { challenge: ChallengeData }) {
   const progressPercent = Math.min((challenge.progress / challenge.target) * 100, 100);
 
   return (
-    <div className={`glass-panel p-4 ${challenge.completed ? "border-[#00ff88]/20 bg-[#00ff88]/5" : ""}`}>
+    <div className={`glass-panel p-4 ${challenge.completed ? "border-[#00FF41]/20 bg-[#00FF41]/5" : ""}`}>
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
@@ -354,7 +354,7 @@ function ChallengeCard({ challenge }: { challenge: ChallengeData }) {
             }`}>
               {challenge.type}
             </span>
-            {challenge.completed && <CheckCircle className="w-4 h-4 text-[#00ff88]" />}
+            {challenge.completed && <CheckCircle className="w-4 h-4 text-[#00FF41]" />}
           </div>
           <p className="text-xs text-muted-foreground">{challenge.description}</p>
         </div>
@@ -366,7 +366,7 @@ function ChallengeCard({ challenge }: { challenge: ChallengeData }) {
       <div className="flex items-center gap-3">
         <div className="flex-1 bg-white/5 rounded-full h-2">
           <div
-            className={`h-2 rounded-full transition-all ${challenge.completed ? "bg-[#00ff88]" : "bg-primary"}`}
+            className={`h-2 rounded-full transition-all ${challenge.completed ? "bg-[#00FF41]" : "bg-primary"}`}
             style={{ width: `${progressPercent}%` }}
           />
         </div>

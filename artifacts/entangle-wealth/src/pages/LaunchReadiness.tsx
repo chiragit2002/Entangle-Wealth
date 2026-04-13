@@ -111,15 +111,15 @@ const DNS_STEPS = [
 ];
 
 function StatusIcon({ status }: { status: "pass" | "fail" | "warn" | boolean }) {
-  if (status === "pass" || status === true) return <CheckCircle2 className="w-5 h-5 text-[#00ff88]" />;
-  if (status === "warn") return <AlertTriangle className="w-5 h-5 text-[#FFD700]" />;
+  if (status === "pass" || status === true) return <CheckCircle2 className="w-5 h-5 text-[#00FF41]" />;
+  if (status === "warn") return <AlertTriangle className="w-5 h-5 text-[#FFB800]" />;
   return <XCircle className="w-5 h-5 text-[#ff3366]" />;
 }
 
 function ScoreRing({ score, ready }: { score: number; ready: boolean }) {
   const circumference = 2 * Math.PI * 45;
   const strokeDashoffset = circumference - (score / 100) * circumference;
-  const color = ready ? "#00ff88" : score >= 70 ? "#FFD700" : "#ff3366";
+  const color = ready ? "#00FF41" : score >= 70 ? "#FFB800" : "#ff3366";
 
   return (
     <div className="relative w-32 h-32">
@@ -249,7 +249,7 @@ export default function LaunchReadiness() {
           </button>
         </div>
 
-        <div className="flex flex-col md:flex-row items-center gap-8 bg-[#0a0a0f] border border-white/10 rounded-2xl p-8">
+        <div className="flex flex-col md:flex-row items-center gap-8 bg-[#0A0E1A] border border-white/10 rounded-sm p-8">
           <ScoreRing score={overallScore} ready={isReady} />
           <div className="flex-1 space-y-3">
             <h2 className="text-xl font-bold text-white">
@@ -257,11 +257,11 @@ export default function LaunchReadiness() {
             </h2>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <div className="text-2xl font-bold font-mono text-[#00ff88]">{autoPassCount + manualPassCount}</div>
+                <div className="text-2xl font-bold font-mono text-[#00FF41]">{autoPassCount + manualPassCount}</div>
                 <div className="text-xs text-white/50">Passing</div>
               </div>
               <div>
-                <div className="text-2xl font-bold font-mono text-[#FFD700]">{data?.summary.warnings || 0}</div>
+                <div className="text-2xl font-bold font-mono text-[#FFB800]">{data?.summary.warnings || 0}</div>
                 <div className="text-xs text-white/50">Warnings</div>
               </div>
               <div>
@@ -280,7 +280,7 @@ export default function LaunchReadiness() {
         <div className="space-y-4">
           <button
             onClick={() => toggleSection("checks")}
-            className="w-full flex items-center justify-between bg-[#0a0a0f] border border-white/10 rounded-xl px-6 py-4 hover:bg-white/[0.02] transition"
+            className="w-full flex items-center justify-between bg-[#0A0E1A] border border-white/10 rounded-xl px-6 py-4 hover:bg-white/[0.02] transition"
           >
             <div className="flex items-center gap-3">
               <Server className="w-5 h-5 text-[#00D4FF]" />
@@ -303,7 +303,7 @@ export default function LaunchReadiness() {
                 return (
                   <div
                     key={check.id}
-                    className="flex items-start gap-3 bg-[#0a0a0f] border border-white/10 rounded-xl p-4"
+                    className="flex items-start gap-3 bg-[#0A0E1A] border border-white/10 rounded-xl p-4"
                   >
                     <StatusIcon status={check.status} />
                     <div className="flex-1 min-w-0">
@@ -324,10 +324,10 @@ export default function LaunchReadiness() {
         <div className="space-y-4">
           <button
             onClick={() => toggleSection("manual")}
-            className="w-full flex items-center justify-between bg-[#0a0a0f] border border-white/10 rounded-xl px-6 py-4 hover:bg-white/[0.02] transition"
+            className="w-full flex items-center justify-between bg-[#0A0E1A] border border-white/10 rounded-xl px-6 py-4 hover:bg-white/[0.02] transition"
           >
             <div className="flex items-center gap-3">
-              <CheckCircle2 className="w-5 h-5 text-[#FFD700]" />
+              <CheckCircle2 className="w-5 h-5 text-[#FFB800]" />
               <span className="text-lg font-semibold text-white">Manual Checks</span>
               <span className="text-xs text-white/50 bg-white/5 px-2 py-0.5 rounded-full">
                 {manualPassCount}/{manualChecks.length} confirmed
@@ -348,7 +348,7 @@ export default function LaunchReadiness() {
                   <button
                     key={check.id}
                     onClick={() => toggleManualCheck(check.id)}
-                    className="flex items-start gap-3 bg-[#0a0a0f] border border-white/10 rounded-xl p-4 text-left hover:bg-white/[0.02] transition w-full"
+                    className="flex items-start gap-3 bg-[#0A0E1A] border border-white/10 rounded-xl p-4 text-left hover:bg-white/[0.02] transition w-full"
                   >
                     <StatusIcon status={check.checked} />
                     <div className="flex-1 min-w-0">
@@ -369,7 +369,7 @@ export default function LaunchReadiness() {
         <div className="space-y-4">
           <button
             onClick={() => toggleSection("domain")}
-            className="w-full flex items-center justify-between bg-[#0a0a0f] border border-white/10 rounded-xl px-6 py-4 hover:bg-white/[0.02] transition"
+            className="w-full flex items-center justify-between bg-[#0A0E1A] border border-white/10 rounded-xl px-6 py-4 hover:bg-white/[0.02] transition"
           >
             <div className="flex items-center gap-3">
               <Globe className="w-5 h-5 text-[#9c27b0]" />
@@ -383,7 +383,7 @@ export default function LaunchReadiness() {
           </button>
 
           {expandedSection === "domain" && (
-            <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-6 space-y-6">
+            <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6 space-y-6">
               {DNS_STEPS.map((step) => (
                 <div key={step.step} className="flex gap-4">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#9c27b0]/20 border border-[#9c27b0]/30 flex items-center justify-center">
@@ -415,10 +415,10 @@ export default function LaunchReadiness() {
         <div className="space-y-4">
           <button
             onClick={() => toggleSection("env")}
-            className="w-full flex items-center justify-between bg-[#0a0a0f] border border-white/10 rounded-xl px-6 py-4 hover:bg-white/[0.02] transition"
+            className="w-full flex items-center justify-between bg-[#0A0E1A] border border-white/10 rounded-xl px-6 py-4 hover:bg-white/[0.02] transition"
           >
             <div className="flex items-center gap-3">
-              <Key className="w-5 h-5 text-[#FFD700]" />
+              <Key className="w-5 h-5 text-[#FFB800]" />
               <span className="text-lg font-semibold text-white">Production Environment Config</span>
             </div>
             {expandedSection === "env" ? (
@@ -429,7 +429,7 @@ export default function LaunchReadiness() {
           </button>
 
           {expandedSection === "env" && (
-            <div className="bg-[#0a0a0f] border border-white/10 rounded-xl overflow-hidden">
+            <div className="bg-[#0A0E1A] border border-white/10 rounded-xl overflow-hidden">
               <div className="p-4 border-b border-white/5">
                 <p className="text-xs text-white/50">
                   These environment variables must be updated when switching from development to production.
@@ -449,7 +449,7 @@ export default function LaunchReadiness() {
                           <Copy className="w-3.5 h-3.5" />
                         </button>
                         {copiedVar === v.name && (
-                          <span className="text-[10px] text-[#00ff88]">Copied!</span>
+                          <span className="text-[10px] text-[#00FF41]">Copied!</span>
                         )}
                       </div>
                       <p className="text-xs text-white/50 mt-0.5">{v.desc}</p>

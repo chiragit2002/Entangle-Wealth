@@ -110,7 +110,7 @@ export function ActivityNudge() {
           <div className="flex items-center gap-3">
             <div className="relative flex-shrink-0">
               <Flame className="w-5 h-5 text-orange-400" />
-              <span className="absolute -top-1 -right-1 text-[8px] font-black font-mono text-[#f5c842] bg-[#0a0a0f] rounded-full w-3.5 h-3.5 flex items-center justify-center leading-none">
+              <span className="absolute -top-1 -right-1 text-[8px] font-black font-mono text-[#FFB800] bg-[#0A0E1A] rounded-full w-3.5 h-3.5 flex items-center justify-center leading-none">
                 {streak > 9 ? "!" : streak}
               </span>
             </div>
@@ -142,7 +142,7 @@ export function ActivityNudge() {
 
   return (
     <div className="col-span-12 mb-1.5">
-      <div className="bg-gradient-to-r from-[#001a10] via-[#00ff8808] to-[#001a10] border border-[#00ff88]/15 rounded-lg px-4 py-3 flex items-start justify-between gap-3 animate-in slide-in-from-top-2 duration-300">
+      <div className="bg-gradient-to-r from-[#001a10] via-[#00FF4108] to-[#001a10] border border-[#00FF41]/15 rounded-lg px-4 py-3 flex items-start justify-between gap-3 animate-in slide-in-from-top-2 duration-300">
         <div className="flex-1 min-w-0">
           <p className="text-[12px] font-semibold text-white/70 mb-1.5">
             {incompleteItems.length} setup {incompleteItems.length === 1 ? "step" : "steps"} remaining

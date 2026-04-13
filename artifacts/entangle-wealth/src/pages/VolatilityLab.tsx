@@ -127,7 +127,7 @@ function TermStructureChart({ data }: { data: { period: string; vol: number }[] 
         const x = 20 + i * (barW + gap);
         const barH = (d.vol / maxVol) * (h - 20);
         const y = h - barH;
-        const color = d.vol < 15 ? "#00e676" : d.vol < 25 ? "#00c8f8" : d.vol < 40 ? "#f5c842" : "#ff4466";
+        const color = d.vol < 15 ? "#00FF41" : d.vol < 25 ? "#00FF41" : d.vol < 40 ? "#FFB800" : "#ff4466";
         return (
           <g key={d.period}>
             <rect x={x} y={y} width={barW} height={barH} rx="4" fill={color} opacity="0.3" />
@@ -160,7 +160,7 @@ function DistributionChart({ data }: { data: { bucket: string; count: number }[]
         const y = h - barH;
         const isNeg = d.bucket.startsWith("-") || d.bucket.startsWith("<");
         const isPos = d.bucket.startsWith("+") || d.bucket.startsWith(">");
-        const color = isNeg ? "#ff4466" : isPos ? "#00e676" : "#5a5a7a";
+        const color = isNeg ? "#ff4466" : isPos ? "#00FF41" : "#5a5a7a";
         return (
           <g key={d.bucket}>
             <rect x={x} y={y} width={barW} height={Math.max(barH, 1)} rx="3" fill={color} opacity="0.4" />
@@ -176,7 +176,7 @@ function DistributionChart({ data }: { data: { bucket: string; count: number }[]
 }
 
 function VolGauge({ vol, label }: { vol: number; label: string }) {
-  const color = vol < 15 ? "#00e676" : vol < 25 ? "#00c8f8" : vol < 40 ? "#f5c842" : "#ff4466";
+  const color = vol < 15 ? "#00FF41" : vol < 25 ? "#00FF41" : vol < 40 ? "#FFB800" : "#ff4466";
   return (
     <div className="mobile-card text-center">
       <div className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold mb-1">{label}</div>
@@ -220,9 +220,9 @@ export default function VolatilityLab() {
   }, [symbol]);
 
   const regimeColor =
-    result?.regime === "low" ? "text-[#00e676]" :
-    result?.regime === "normal" ? "text-[#00c8f8]" :
-    result?.regime === "elevated" ? "text-[#f5c842]" : "text-[#ff4466]";
+    result?.regime === "low" ? "text-[#00FF41]" :
+    result?.regime === "normal" ? "text-[#00FF41]" :
+    result?.regime === "elevated" ? "text-[#FFB800]" : "text-[#ff4466]";
 
   return (
     <Layout>
@@ -271,8 +271,8 @@ export default function VolatilityLab() {
                 <span className="text-muted-foreground ml-2">@ ${result.currentPrice.toFixed(2)}</span>
               </div>
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${
-                result.regime === "low" ? "bg-[rgba(0,230,118,0.1)]" :
-                result.regime === "normal" ? "bg-[rgba(0,200,248,0.1)]" :
+                result.regime === "low" ? "bg-[rgba(0,255,65,0.1)]" :
+                result.regime === "normal" ? "bg-[rgba(0,255,65,0.1)]" :
                 result.regime === "elevated" ? "bg-[rgba(245,200,66,0.1)]" : "bg-[rgba(255,68,102,0.1)]"
               }`}>
                 <Activity className={`w-4 h-4 ${regimeColor}`} />
@@ -308,25 +308,25 @@ export default function VolatilityLab() {
                 <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground uppercase tracking-wider mb-1">
                   <Shield className="w-3 h-3 text-primary" /> Sharpe Ratio
                 </div>
-                <div className={`font-mono text-lg font-bold ${result.sharpeProxy > 0 ? "text-[#00e676]" : "text-[#ff4466]"}`}>
+                <div className={`font-mono text-lg font-bold ${result.sharpeProxy > 0 ? "text-[#00FF41]" : "text-[#ff4466]"}`}>
                   {result.sharpeProxy.toFixed(2)}
                 </div>
                 <div className="text-[9px] text-muted-foreground">Risk-adj return (5% rf)</div>
               </div>
               <div className="mobile-card">
                 <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground uppercase tracking-wider mb-1">
-                  <Target className="w-3 h-3 text-[#f5c842]" /> Sortino
+                  <Target className="w-3 h-3 text-[#FFB800]" /> Sortino
                 </div>
-                <div className={`font-mono text-lg font-bold ${result.sortino > 0 ? "text-[#00e676]" : "text-[#ff4466]"}`}>
+                <div className={`font-mono text-lg font-bold ${result.sortino > 0 ? "text-[#00FF41]" : "text-[#ff4466]"}`}>
                   {result.sortino.toFixed(2)}
                 </div>
                 <div className="text-[9px] text-muted-foreground">Downside risk ratio</div>
               </div>
               <div className="mobile-card">
                 <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground uppercase tracking-wider mb-1">
-                  <TrendingUp className="w-3 h-3 text-[#00e676]" /> Best Day
+                  <TrendingUp className="w-3 h-3 text-[#00FF41]" /> Best Day
                 </div>
-                <div className="font-mono text-lg font-bold text-[#00e676]">+{result.maxDailyGain.toFixed(2)}%</div>
+                <div className="font-mono text-lg font-bold text-[#00FF41]">+{result.maxDailyGain.toFixed(2)}%</div>
               </div>
               <div className="mobile-card">
                 <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground uppercase tracking-wider mb-1">
@@ -346,9 +346,9 @@ export default function VolatilityLab() {
               </div>
               <div className="mobile-card">
                 <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground uppercase tracking-wider mb-1">
-                  <BarChart3 className="w-3 h-3 text-[#00c8f8]" /> Calmar Ratio
+                  <BarChart3 className="w-3 h-3 text-[#00FF41]" /> Calmar Ratio
                 </div>
-                <div className={`font-mono text-lg font-bold ${result.calmar > 0 ? "text-[#00e676]" : "text-[#ff4466]"}`}>
+                <div className={`font-mono text-lg font-bold ${result.calmar > 0 ? "text-[#00FF41]" : "text-[#ff4466]"}`}>
                   {result.calmar.toFixed(2)}
                 </div>
                 <div className="text-[9px] text-muted-foreground">Return / max drawdown</div>

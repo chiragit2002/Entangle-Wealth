@@ -167,7 +167,7 @@ export function GettingStartedChecklist() {
           <div className="px-4 pb-1">
             <div className="h-1 bg-white/5 rounded-full overflow-hidden" role="progressbar" aria-valuenow={progressPct} aria-valuemin={0} aria-valuemax={100} aria-label={`${Math.round(progressPct)}% complete`}>
               <div
-                className="h-full bg-gradient-to-r from-[#00D4FF] to-[#00ff88] transition-all duration-500 ease-out rounded-full"
+                className="h-full bg-gradient-to-r from-[#00D4FF] to-[#00FF41] transition-all duration-500 ease-out rounded-full"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
@@ -189,7 +189,7 @@ export function GettingStartedChecklist() {
                     aria-disabled={done}
                   >
                     {done ? (
-                      <CheckCircle2 className="w-4 h-4 text-[#00ff88] shrink-0" aria-hidden="true" />
+                      <CheckCircle2 className="w-4 h-4 text-[#00FF41] shrink-0" aria-hidden="true" />
                     ) : (
                       <Circle className="w-4 h-4 text-white/40 shrink-0 group-hover:text-white/40 transition-colors" aria-hidden="true" />
                     )}

@@ -105,7 +105,7 @@ export function PLSimulator() {
               labelFormatter={(label) => `Price: $${label}`}
             />
             <ReferenceLine y={0} stroke="rgba(255,255,255,0.15)" strokeDasharray="3 3" />
-            <ReferenceLine x={breakeven} stroke="#FFD700" strokeDasharray="3 3" label={{ value: `BE: $${breakeven.toFixed(0)}`, fill: "#FFD700", fontSize: 9 }} />
+            <ReferenceLine x={breakeven} stroke="#FFB800" strokeDasharray="3 3" label={{ value: `BE: $${breakeven.toFixed(0)}`, fill: "#FFB800", fontSize: 9 }} />
             <Area type="monotone" dataKey="pnl" stroke="#00D4FF" strokeWidth={2} fill="url(#plProfit)" />
           </AreaChart>
         </ResponsiveContainer>

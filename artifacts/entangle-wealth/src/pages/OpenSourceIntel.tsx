@@ -235,7 +235,7 @@ const LIBRARY_DATA: Library[] = [
 
 const PRIORITY_CONFIG = {
   critical: { color: "#ff3366", bg: "bg-red-500/10", border: "border-red-500/30", label: "CRITICAL", icon: Zap },
-  high: { color: "#FFD700", bg: "bg-yellow-500/10", border: "border-yellow-500/30", label: "HIGH", icon: TrendingUp },
+  high: { color: "#FFB800", bg: "bg-yellow-500/10", border: "border-yellow-500/30", label: "HIGH", icon: TrendingUp },
   medium: { color: "#00D4FF", bg: "bg-cyan-500/10", border: "border-cyan-500/30", label: "MEDIUM", icon: Star },
   "nice-to-have": { color: "#9c27b0", bg: "bg-purple-500/10", border: "border-purple-500/30", label: "EXPLORE", icon: Eye },
 };

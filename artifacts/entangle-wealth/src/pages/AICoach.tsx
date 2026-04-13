@@ -184,7 +184,7 @@ export default function AICoach() {
         <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#00D4FF]/20 to-purple-500/20 border border-[#00D4FF]/30 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-sm bg-gradient-to-br from-[#00D4FF]/20 to-purple-500/20 border border-[#00D4FF]/30 flex items-center justify-center">
                 <Brain className="w-6 h-6 text-[#00D4FF]" />
               </div>
               <div>
@@ -317,7 +317,7 @@ export default function AICoach() {
                     )}
                   </div>
                   <div
-                    className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                    className={`max-w-[80%] rounded-sm px-4 py-3 text-sm leading-relaxed ${
                       msg.role === "assistant"
                         ? "bg-white/[0.06] text-white/80 border border-white/[0.08] rounded-tl-sm"
                         : "bg-[#00D4FF]/15 text-white border border-[#00D4FF]/20 rounded-tr-sm"
@@ -333,7 +333,7 @@ export default function AICoach() {
                   <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#00D4FF]/20 to-purple-500/20 border border-[#00D4FF]/30 flex items-center justify-center flex-shrink-0">
                     <Brain className="w-4 h-4 text-[#00D4FF]" />
                   </div>
-                  <div className="bg-white/[0.06] border border-white/[0.08] rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2">
+                  <div className="bg-white/[0.06] border border-white/[0.08] rounded-sm rounded-tl-sm px-4 py-3 flex items-center gap-2">
                     <div className="flex gap-1">
                       {[0, 1, 2].map(i => (
                         <div

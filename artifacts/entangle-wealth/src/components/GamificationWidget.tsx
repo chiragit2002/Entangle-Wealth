@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 const TIER_COLORS: Record<string, string> = {
   Bronze: "#cd7f32",
   Silver: "#c0c0c0",
-  Gold: "#FFD700",
+  Gold: "#FFB800",
   Platinum: "#e5e4e2",
   Diamond: "#00D4FF",
 };
@@ -90,11 +90,11 @@ export function GamificationWidget() {
 
   if (!isSignedIn || !data) {
     return (
-      <div className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm overflow-hidden">
-        <div className="flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FFD700]">
+      <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
+        <div className="flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FFB800]">
           <div className="flex items-center gap-1.5">
-            <Trophy className="w-3 h-3 text-[#FFD700]" />
-            <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FFD700]">PROGRESSION</span>
+            <Trophy className="w-3 h-3 text-[#FFB800]" />
+            <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FFB800]">PROGRESSION</span>
           </div>
         </div>
         <div className="p-3 flex flex-col items-center justify-center h-[140px]">
@@ -110,11 +110,11 @@ export function GamificationWidget() {
 
   return (
     <>
-      <div className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm overflow-hidden">
-        <div className="flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FFD700]">
+      <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
+        <div className="flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FFB800]">
           <div className="flex items-center gap-1.5">
-            <Trophy className="w-3 h-3 text-[#FFD700]" />
-            <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FFD700]">PROGRESSION</span>
+            <Trophy className="w-3 h-3 text-[#FFB800]" />
+            <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FFB800]">PROGRESSION</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-[9px] font-mono" style={{ color: tierColor }}>{tierIcon} {data.xp.tier}</span>
@@ -129,7 +129,7 @@ export function GamificationWidget() {
             </div>
             <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
               <p className="text-[7px] font-mono text-white/30">TOTAL XP</p>
-              <p className="text-[10px] font-mono font-bold text-[#FFD700]">{data.xp.totalXp.toLocaleString()}</p>
+              <p className="text-[10px] font-mono font-bold text-[#FFB800]">{data.xp.totalXp.toLocaleString()}</p>
             </div>
             <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
               <p className="text-[7px] font-mono text-white/30">STREAK</p>
@@ -140,7 +140,7 @@ export function GamificationWidget() {
             </div>
             <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
               <p className="text-[7px] font-mono text-white/30">MULTIPLIER</p>
-              <p className="text-[11px] font-mono font-bold text-[#00ff88]">{data.streak.multiplier.toFixed(1)}x</p>
+              <p className="text-[11px] font-mono font-bold text-[#00FF41]">{data.streak.multiplier.toFixed(1)}x</p>
             </div>
           </div>
 
@@ -155,7 +155,7 @@ export function GamificationWidget() {
           <div className="flex gap-1">
             <button
               onClick={handleCheckin}
-              className="flex-1 flex items-center justify-center gap-1 h-7 text-[9px] font-mono font-bold rounded-sm bg-[#00ff88]/10 text-[#00ff88] border border-[#00ff88]/20 hover:bg-[#00ff88]/20 transition-colors"
+              className="flex-1 flex items-center justify-center gap-1 h-7 text-[9px] font-mono font-bold rounded-sm bg-[#00FF41]/10 text-[#00FF41] border border-[#00FF41]/20 hover:bg-[#00FF41]/20 transition-colors"
             >
               <Flame className="w-3 h-3" />
               CHECK IN
@@ -164,7 +164,7 @@ export function GamificationWidget() {
               onClick={() => setShowSpinWheel(true)}
               className={`flex-1 flex items-center justify-center gap-1 h-7 text-[9px] font-mono font-bold rounded-sm transition-colors ${
                 canSpin
-                  ? "bg-[#FFD700]/15 text-[#FFD700] border border-[#FFD700]/30 hover:bg-[#FFD700]/25 animate-pulse"
+                  ? "bg-[#FFB800]/15 text-[#FFB800] border border-[#FFB800]/30 hover:bg-[#FFB800]/25 animate-pulse"
                   : "bg-white/[0.03] text-white/30 border border-white/[0.06]"
               }`}
             >

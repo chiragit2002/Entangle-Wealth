@@ -46,7 +46,7 @@ interface LeaderboardEntry {
 function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center bg-white/[0.04] border border-white/10 rounded-xl px-3 py-2.5 min-w-[64px]">
-      <span className="text-3xl md:text-4xl font-black font-mono text-[#f5c842] tabular-nums leading-none">
+      <span className="text-3xl md:text-4xl font-black font-mono text-[#FFB800] tabular-nums leading-none">
         {String(value).padStart(2, "0")}
       </span>
       <span className="text-[9px] text-white/40 uppercase tracking-wider mt-1">{label}</span>
@@ -80,9 +80,9 @@ function useCountdown(targetDate: Date) {
 const HOW_TO_EARN = [
   {
     icon: TrendingUp,
-    color: "text-[#00c8f8]",
-    bg: "bg-[#00c8f8]/10",
-    border: "border-[#00c8f8]/20",
+    color: "text-[#00FF41]",
+    bg: "bg-[#00FF41]/10",
+    border: "border-[#00FF41]/20",
     title: "Trade & Use Signals",
     desc: "Every 500 XP earned through trading, running analysis, or using signals = 1 entry. Up to 50 entries.",
     entryKey: "tradeEntries",
@@ -98,18 +98,18 @@ const HOW_TO_EARN = [
   },
   {
     icon: Zap,
-    color: "text-[#00ff88]",
-    bg: "bg-[#00ff88]/10",
-    border: "border-[#00ff88]/20",
+    color: "text-[#00FF41]",
+    bg: "bg-[#00FF41]/10",
+    border: "border-[#00FF41]/20",
     title: "Daily Logins",
     desc: "Staying active on the platform earns you login entries. Every 100 XP = 1 entry, up to 30.",
     entryKey: "loginEntries",
   },
   {
     icon: Star,
-    color: "text-[#f5c842]",
-    bg: "bg-[#f5c842]/10",
-    border: "border-[#f5c842]/20",
+    color: "text-[#FFB800]",
+    bg: "bg-[#FFB800]/10",
+    border: "border-[#FFB800]/20",
     title: "Level Up",
     desc: "Every 5 levels you reach unlocks additional entries. Higher level = more entries in the pool.",
     entryKey: "xpMilestoneEntries",
@@ -215,15 +215,15 @@ export default function Giveaway() {
       <div className="container mx-auto px-4 py-8 max-w-5xl">
 
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#f5c842]/30 bg-[#f5c842]/5 text-[11px] font-mono text-[#f5c842] mb-5">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#FFB800]/30 bg-[#FFB800]/5 text-[11px] font-mono text-[#FFB800] mb-5">
             <Trophy className="w-3.5 h-3.5" />
             <span>1-Year Anniversary Celebration</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#f5c842] animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FFB800] animate-pulse" />
           </div>
 
           <h1 className="text-3xl md:text-6xl font-black tracking-tight text-white mb-4">
             $50,000<br />
-            <span className="bg-gradient-to-r from-[#f5c842] to-[#cc9900] bg-clip-text text-transparent">Anniversary Giveaway</span>
+            <span className="bg-gradient-to-r from-[#FFB800] to-[#cc9900] bg-clip-text text-transparent">Anniversary Giveaway</span>
           </h1>
           <p className="text-white/60 text-sm md:text-base max-w-xl mx-auto leading-relaxed">
             Every action — trading, streaks, referrals — earns you
@@ -232,21 +232,21 @@ export default function Giveaway() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-          <div className="col-span-1 md:col-span-2 glass-panel rounded-2xl p-6 flex flex-col gap-4">
+          <div className="col-span-1 md:col-span-2 glass-panel rounded-sm p-6 flex flex-col gap-4">
             <p className="text-[10px] text-white/50 uppercase tracking-widest font-mono">Drawing countdown</p>
             {countdown.passed ? (
               <div className="text-center py-4">
-                <p className="text-2xl font-black text-[#f5c842]">Drawing has occurred!</p>
+                <p className="text-2xl font-black text-[#FFB800]">Drawing has occurred!</p>
                 <p className="text-sm text-white/50 mt-1">Winner will be announced shortly.</p>
               </div>
             ) : (
               <div className="flex items-center gap-2 flex-wrap">
                 <CountdownUnit value={countdown.days} label="Days" />
-                <span className="text-2xl font-black text-[#f5c842]/50">:</span>
+                <span className="text-2xl font-black text-[#FFB800]/50">:</span>
                 <CountdownUnit value={countdown.hours} label="Hours" />
-                <span className="text-2xl font-black text-[#f5c842]/50">:</span>
+                <span className="text-2xl font-black text-[#FFB800]/50">:</span>
                 <CountdownUnit value={countdown.minutes} label="Min" />
-                <span className="text-2xl font-black text-[#f5c842]/50">:</span>
+                <span className="text-2xl font-black text-[#FFB800]/50">:</span>
                 <CountdownUnit value={countdown.seconds} label="Sec" />
               </div>
             )}
@@ -254,15 +254,15 @@ export default function Giveaway() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <div className="glass-panel rounded-2xl p-5 flex flex-col gap-1 border border-[#f5c842]/15">
+            <div className="glass-panel rounded-sm p-5 flex flex-col gap-1 border border-[#FFB800]/15">
               <div className="flex items-center gap-2 mb-1">
-                <Trophy className="w-4 h-4 text-[#f5c842]" />
-                <span className="text-xs font-bold uppercase tracking-wider text-[#f5c842]">Grand Prize</span>
+                <Trophy className="w-4 h-4 text-[#FFB800]" />
+                <span className="text-xs font-bold uppercase tracking-wider text-[#FFB800]">Grand Prize</span>
               </div>
               <p className="text-3xl font-black text-white">${PRIZE_POOL.toLocaleString()}</p>
               <p className="text-[10px] text-white/50">1 grand prize winner</p>
             </div>
-            <div className="glass-panel rounded-2xl p-5 flex flex-col gap-1 border border-[#00d4ff]/15">
+            <div className="glass-panel rounded-sm p-5 flex flex-col gap-1 border border-[#00d4ff]/15">
               <div className="flex items-center gap-2 mb-1">
                 <Users className="w-4 h-4 text-[#00d4ff]" />
                 <span className="text-xs font-bold uppercase tracking-wider text-[#00d4ff]">Referral Pool</span>
@@ -274,10 +274,10 @@ export default function Giveaway() {
         </div>
 
         {isSignedIn && entries && (
-          <div className="glass-panel rounded-2xl p-6 mb-8 border border-[#00ff88]/15">
+          <div className="glass-panel rounded-sm p-6 mb-8 border border-[#00FF41]/15">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-bold flex items-center gap-2">
-                <Gift className="w-4 h-4 text-[#00ff88]" />
+                <Gift className="w-4 h-4 text-[#00FF41]" />
                 Your Entries
               </h2>
               {loading && <span className="text-[10px] text-white/30 animate-pulse">Updating...</span>}
@@ -285,11 +285,11 @@ export default function Giveaway() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
               <div className="bg-white/[0.03] rounded-xl p-3 text-center border border-white/5">
-                <p className="text-2xl font-black font-mono text-[#f5c842]">{entries.totalEntries}</p>
+                <p className="text-2xl font-black font-mono text-[#FFB800]">{entries.totalEntries}</p>
                 <p className="text-[9px] uppercase tracking-wider text-white/40 mt-0.5">Total Entries</p>
               </div>
               <div className="bg-white/[0.03] rounded-xl p-3 text-center border border-white/5">
-                <p className="text-2xl font-black font-mono text-[#00ff88]">{odds}</p>
+                <p className="text-2xl font-black font-mono text-[#00FF41]">{odds}</p>
                 <p className="text-[9px] uppercase tracking-wider text-white/40 mt-0.5">Win Odds</p>
               </div>
               <div className="bg-white/[0.03] rounded-xl p-3 text-center border border-white/5">
@@ -329,7 +329,7 @@ export default function Giveaway() {
                   <Button size="sm" variant="outline" className="border-[#c084fc]/30 text-[#c084fc] shrink-0" onClick={copyLink}>
                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   </Button>
-                  <Button size="sm" variant="outline" className="border-[#00ff88]/30 text-[#00ff88] shrink-0" onClick={shareLink}>
+                  <Button size="sm" variant="outline" className="border-[#00FF41]/30 text-[#00FF41] shrink-0" onClick={shareLink}>
                     <Share2 className="w-4 h-4" />
                   </Button>
                 </div>
@@ -340,14 +340,14 @@ export default function Giveaway() {
         )}
 
         {!isSignedIn && (
-          <div className="glass-panel rounded-2xl p-8 mb-8 text-center border border-[#f5c842]/20">
-            <Trophy className="w-10 h-10 text-[#f5c842] mx-auto mb-3" />
+          <div className="glass-panel rounded-sm p-8 mb-8 text-center border border-[#FFB800]/20">
+            <Trophy className="w-10 h-10 text-[#FFB800] mx-auto mb-3" />
             <h3 className="text-xl font-bold mb-2">Sign up to enter</h3>
             <p className="text-sm text-white/50 mb-4 max-w-sm mx-auto">
               Create your free account and start earning entries through trading, streaks, and referrals.
             </p>
             <Link href="/sign-up">
-              <Button className="bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black font-bold hover:opacity-90 h-12 px-8">
+              <Button className="bg-gradient-to-r from-[#FFB800] to-[#cc9900] text-black font-bold hover:opacity-90 h-12 px-8">
                 Start Free | Enter Now →
               </Button>
             </Link>
@@ -356,7 +356,7 @@ export default function Giveaway() {
 
         <div className="mb-10">
           <h2 className="text-xl font-bold mb-5 flex items-center gap-2">
-            <Zap className="w-5 h-5 text-[#00ff88]" />
+            <Zap className="w-5 h-5 text-[#00FF41]" />
             How to Earn Entries
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -374,7 +374,7 @@ export default function Giveaway() {
 
         <div className="mb-10">
           <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
-            <Crown className="w-5 h-5 text-[#f5c842]" />
+            <Crown className="w-5 h-5 text-[#FFB800]" />
             Entry Leaderboard
           </h2>
           <p className="text-xs text-white/50 mb-5">Top participants ranked by total entries. More entries = better odds.</p>
@@ -398,21 +398,21 @@ export default function Giveaway() {
                 </thead>
                 <tbody>
                   {leaderboard.map((entry, idx) => (
-                    <tr key={entry.rank} className={`border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors ${idx === 0 ? "bg-[#f5c842]/[0.03]" : ""}`}>
+                    <tr key={entry.rank} className={`border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors ${idx === 0 ? "bg-[#FFB800]/[0.03]" : ""}`}>
                       <td className="py-3 px-4">
-                        <span className={`font-mono font-bold text-sm ${idx === 0 ? "text-[#f5c842]" : idx === 1 ? "text-white/60" : idx === 2 ? "text-[#cd7f32]" : "text-white/30"}`}>
+                        <span className={`font-mono font-bold text-sm ${idx === 0 ? "text-[#FFB800]" : idx === 1 ? "text-white/60" : idx === 2 ? "text-[#cd7f32]" : "text-white/30"}`}>
                           #{entry.rank}
                         </span>
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${idx === 0 ? "bg-[#f5c842]/20 text-[#f5c842]" : "bg-white/5 text-white/40"}`}>
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${idx === 0 ? "bg-[#FFB800]/20 text-[#FFB800]" : "bg-white/5 text-white/40"}`}>
                             {entry.name.charAt(0).toUpperCase()}
                           </div>
                           <span className="text-sm font-medium">{entry.name}</span>
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-right font-mono font-bold text-[#00ff88]">{entry.totalEntries.toLocaleString()}</td>
+                      <td className="py-3 px-4 text-right font-mono font-bold text-[#00FF41]">{entry.totalEntries.toLocaleString()}</td>
                       <td className="py-3 px-4 text-right text-white/50 hidden md:table-cell">{entry.convertedReferrals}</td>
                       <td className="py-3 px-4 text-right text-white/50 hidden md:table-cell text-xs">{entry.odds}</td>
                       <td className="py-3 px-4 text-right font-mono font-bold text-[#c084fc] text-sm">
@@ -431,7 +431,7 @@ export default function Giveaway() {
             <Gift className="w-5 h-5 text-[#00d4ff]" />
             $36,000 Referral Bonus Pool
           </h2>
-          <div className="glass-panel rounded-2xl p-6 border border-[#00d4ff]/15">
+          <div className="glass-panel rounded-sm p-6 border border-[#00d4ff]/15">
             <p className="text-sm text-white/60 leading-relaxed mb-4">
               On top of the $50K grand prize drawing, there's a separate <strong className="text-[#00d4ff]">$36,000 referral bonus pool</strong> split
               among everyone who successfully brings friends onto the platform. The more friends you convert, the bigger your
@@ -440,8 +440,8 @@ export default function Giveaway() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
                 { icon: Users, color: "text-[#c084fc]", val: "1–5 refs", bonus: "~$360–$1,800", label: "Starter share" },
-                { icon: Star, color: "text-[#f5c842]", val: "10–25 refs", bonus: "~$3,600–$9,000", label: "Active referrer" },
-                { icon: Crown, color: "text-[#00ff88]", val: "50+ refs", bonus: "$18,000+", label: "Super referrer" },
+                { icon: Star, color: "text-[#FFB800]", val: "10–25 refs", bonus: "~$3,600–$9,000", label: "Active referrer" },
+                { icon: Crown, color: "text-[#00FF41]", val: "50+ refs", bonus: "$18,000+", label: "Super referrer" },
               ].map((t) => (
                 <div key={t.label} className="bg-white/[0.03] rounded-xl p-4 border border-white/5 text-center">
                   <t.icon className={`w-5 h-5 ${t.color} mx-auto mb-2`} />
@@ -457,7 +457,7 @@ export default function Giveaway() {
           </div>
         </div>
 
-        <div className="glass-panel rounded-2xl p-6 mb-8">
+        <div className="glass-panel rounded-sm p-6 mb-8">
           <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
             <Target className="w-4 h-4 text-primary" />
             Rules Summary
@@ -485,7 +485,7 @@ export default function Giveaway() {
 
         <div className="text-center pb-4">
           <Link href="/sign-up">
-            <Button className="bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black font-bold hover:opacity-90 h-12 px-10 text-base">
+            <Button className="bg-gradient-to-r from-[#FFB800] to-[#cc9900] text-black font-bold hover:opacity-90 h-12 px-10 text-base">
               Enter Now | It's Free →
             </Button>
           </Link>

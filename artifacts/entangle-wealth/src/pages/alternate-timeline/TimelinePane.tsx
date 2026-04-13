@@ -160,7 +160,7 @@ export function TimelinePane({
 
   return (
     <div
-      className="rounded-2xl p-4 flex flex-col gap-4 flex-1 min-w-0"
+      className="rounded-sm p-4 flex flex-col gap-4 flex-1 min-w-0"
       style={{
         background: paneBg,
         border: `1px solid ${borderStyle}`,

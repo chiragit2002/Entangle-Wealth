@@ -227,7 +227,7 @@ function generateAgentReviews(results: IndicatorResult[], symbol: string): Agent
       reasoning: `${supertrend ? `Supertrend: ${supertrend.signal} at ${supertrend.value}.` : ""} ${adx ? `ADX: ${adx.value} (${Number(adx.value) > 25 ? "trending" : "ranging"}).` : ""} ${trendBuy}/${trend.length} trend indicators bullish.`,
       keyMetrics: [`MA Consensus: ${trendBuy}/${trend.length}`, supertrend ? `Supertrend: ${supertrend.signal}` : "", adx ? `ADX: ${adx.value}` : ""].filter(Boolean),
     },
-    { name: "Momentum Surgeon", role: "RSI, MACD & Oscillators", color: "#ffd700",
+    { name: "Momentum Surgeon", role: "RSI, MACD & Oscillators", color: "#FFB800",
       signal: momBuy > momentum.length * 0.5 ? "BUY" : momBuy < momentum.length * 0.3 ? "SELL" : "NEUTRAL",
       verdict: rsi ? `RSI ${rsi.value} | ${Number(rsi.value) > 70 ? "overbought" : Number(rsi.value) < 30 ? "oversold" : "neutral"}` : `Momentum ${momBuy > momentum.length * 0.5 ? "bullish" : "bearish"}`,
       reasoning: `${rsi ? `RSI(14): ${rsi.value}.` : ""} ${macd ? `MACD: ${macd.value} (${macd.signal}).` : ""} ${momBuy}/${momentum.length} momentum bullish.`,
@@ -239,7 +239,7 @@ function generateAgentReviews(results: IndicatorResult[], symbol: string): Agent
       reasoning: `${bb ? `Bollinger Bands: ${bb.value}.` : ""} ${volatility.length} volatility indicators assessed.`,
       keyMetrics: [bb ? `Bollinger: ${bb.value}` : "", `Vol indicators: ${volatility.length}`, `Risk: ${volatility.filter(r => r.signal === "SELL" || r.signal === "STRONG_SELL").length > 3 ? "HIGH" : "MODERATE"}`].filter(Boolean),
     },
-    { name: "Volume Profiler", role: "OBV, CMF & Flow", color: "#00ff88",
+    { name: "Volume Profiler", role: "OBV, CMF & Flow", color: "#00FF41",
       signal: volBuy > volume.length * 0.5 ? "BUY" : volBuy < volume.length * 0.3 ? "SELL" : "NEUTRAL",
       verdict: obv ? `OBV: ${obv.signal === "BUY" ? "accumulation" : obv.signal === "SELL" ? "distribution" : "neutral"}` : "Volume neutral",
       reasoning: `${obv ? `OBV: ${obv.value} (${obv.signal}).` : ""} ${volBuy}/${volume.length} volume bullish.`,
@@ -261,10 +261,10 @@ function generateAgentReviews(results: IndicatorResult[], symbol: string): Agent
 }
 
 function sigColor(s: IndicatorResult["signal"]) {
-  return s === "STRONG_BUY" ? "#00ff88" : s === "BUY" ? "#00d4ff" : s === "SELL" ? "#ffd700" : s === "STRONG_SELL" ? "#ff3366" : "#666";
+  return s === "STRONG_BUY" ? "#00FF41" : s === "BUY" ? "#00d4ff" : s === "SELL" ? "#FFB800" : s === "STRONG_SELL" ? "#ff3366" : "#666";
 }
 function sigBg(s: IndicatorResult["signal"]) {
-  return s === "STRONG_BUY" ? "bg-[#00ff88]/10 text-[#00ff88] border-[#00ff88]/20" : s === "BUY" ? "bg-primary/10 text-primary border-primary/20" : s === "SELL" ? "bg-[#ffd700]/10 text-[#ffd700] border-[#ffd700]/20" : s === "STRONG_SELL" ? "bg-[#ff3366]/10 text-[#ff3366] border-[#ff3366]/20" : "bg-white/5 text-white/40 border-white/10";
+  return s === "STRONG_BUY" ? "bg-[#00FF41]/10 text-[#00FF41] border-[#00FF41]/20" : s === "BUY" ? "bg-primary/10 text-primary border-primary/20" : s === "SELL" ? "bg-[#FFB800]/10 text-[#FFB800] border-[#FFB800]/20" : s === "STRONG_SELL" ? "bg-[#ff3366]/10 text-[#ff3366] border-[#ff3366]/20" : "bg-white/5 text-white/40 border-white/10";
 }
 
 export default function TechnicalAnalysis() {
@@ -631,7 +631,7 @@ export default function TechnicalAnalysis() {
                         </div>
                         <span className="text-[9px] text-white/40 px-2 py-0.5 rounded border border-white/[0.06]">{s.sector}</span>
                         <button onClick={e => { e.stopPropagation(); addToWatchlist(s.symbol); }}
-                          className={`p-1.5 rounded-lg transition-colors ${isInWatchlist(s.symbol) ? "text-[#ffd700]" : "text-white/40 hover:text-white/40"}`}>
+                          className={`p-1.5 rounded-lg transition-colors ${isInWatchlist(s.symbol) ? "text-[#FFB800]" : "text-white/40 hover:text-white/40"}`}>
                           {isInWatchlist(s.symbol) ? <BookmarkCheck className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
                         </button>
                       </div>
@@ -662,7 +662,7 @@ export default function TechnicalAnalysis() {
                 <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden">
                   <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/[0.04]">
                     <div className="flex items-center gap-2">
-                      <Star className="w-3.5 h-3.5 text-[#ffd700]/60" />
+                      <Star className="w-3.5 h-3.5 text-[#FFB800]/60" />
                       <span className="text-[11px] font-bold text-white/60 uppercase tracking-wider">Watchlist</span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -688,7 +688,7 @@ export default function TechnicalAnalysis() {
                             </div>
                             <div className="flex items-center gap-2 mt-0.5">
                               <span className="text-[11px] text-white/50 font-mono">${w.price.toFixed(2)}</span>
-                              <span className={`text-[10px] font-mono font-bold ${w.change >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>{w.change >= 0 ? "+" : ""}{Math.abs(w.change).toFixed(2)}%</span>
+                              <span className={`text-[10px] font-mono font-bold ${w.change >= 0 ? "text-[#00FF41]" : "text-[#ff3366]"}`}>{w.change >= 0 ? "+" : ""}{Math.abs(w.change).toFixed(2)}%</span>
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-0.5">
@@ -717,7 +717,7 @@ export default function TechnicalAnalysis() {
 
             {!loading && !activeSymbol && (
               <div className="py-16 text-center">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#a855f7]/10 to-primary/10 border border-white/[0.06] flex items-center justify-center mx-auto mb-5">
+                <div className="w-20 h-20 rounded-sm bg-gradient-to-br from-[#a855f7]/10 to-primary/10 border border-white/[0.06] flex items-center justify-center mx-auto mb-5">
                   <BarChart3 className="w-10 h-10 text-white/40" />
                 </div>
                 <h2 className="text-xl font-bold text-white/40 mb-2">Search any stock to begin</h2>
@@ -749,7 +749,7 @@ export default function TechnicalAnalysis() {
                           <h2 className="text-xl font-black font-mono">{activeSymbol}</h2>
                           {stockInfo && <span className="text-[11px] text-white/25">{stockInfo.name}</span>}
                           <button onClick={() => isInWatchlist(activeSymbol) ? removeFromWatchlist(activeSymbol) : addToWatchlist(activeSymbol)}
-                            className={`p-1.5 rounded-lg transition-colors ml-1 ${isInWatchlist(activeSymbol) ? "text-[#ffd700]" : "text-white/40 hover:text-white/30"}`} title={isInWatchlist(activeSymbol) ? "Remove from watchlist" : "Add to watchlist"}>
+                            className={`p-1.5 rounded-lg transition-colors ml-1 ${isInWatchlist(activeSymbol) ? "text-[#FFB800]" : "text-white/40 hover:text-white/30"}`} title={isInWatchlist(activeSymbol) ? "Remove from watchlist" : "Add to watchlist"}>
                             {isInWatchlist(activeSymbol) ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                           </button>
                         </div>
@@ -763,9 +763,9 @@ export default function TechnicalAnalysis() {
                     </div>
 
                     <div className="flex gap-2 md:gap-3">
-                      <div className="text-center px-3 py-2 rounded-lg bg-[#00ff88]/[0.04] border border-[#00ff88]/10 min-w-[60px]">
-                        <p className="text-[18px] font-black text-[#00ff88] font-mono leading-none">{overall.buyCount}</p>
-                        <p className="text-[8px] text-[#00ff88]/40 font-bold mt-1">BUY</p>
+                      <div className="text-center px-3 py-2 rounded-lg bg-[#00FF41]/[0.04] border border-[#00FF41]/10 min-w-[60px]">
+                        <p className="text-[18px] font-black text-[#00FF41] font-mono leading-none">{overall.buyCount}</p>
+                        <p className="text-[8px] text-[#00FF41]/40 font-bold mt-1">BUY</p>
                       </div>
                       <div className="text-center px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] min-w-[60px]">
                         <p className="text-[18px] font-black text-white/30 font-mono leading-none">{overall.neutralCount}</p>
@@ -791,7 +791,7 @@ export default function TechnicalAnalysis() {
                             <span className="text-[10px] font-bold text-white/40">{cat.label}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[#00ff88] text-[11px] font-bold font-mono">{c.buy}↑</span>
+                            <span className="text-[#00FF41] text-[11px] font-bold font-mono">{c.buy}↑</span>
                             <span className="text-[#ff3366] text-[11px] font-bold font-mono">{c.sell}↓</span>
                             <span className="text-white/10 text-[9px] font-mono ml-auto">{c.total}</span>
                           </div>
@@ -1056,7 +1056,7 @@ export default function TechnicalAnalysis() {
                 </div>
 
                 <div className="rounded-lg bg-white/[0.01] border border-white/[0.04] p-3 flex items-start gap-2.5">
-                  <AlertTriangle className="w-3.5 h-3.5 text-[#ffd700]/30 mt-0.5 flex-shrink-0" />
+                  <AlertTriangle className="w-3.5 h-3.5 text-[#FFB800]/30 mt-0.5 flex-shrink-0" />
                   <p className="text-[10px] text-white/50 leading-relaxed">
                     Technical indicators use simulated data and should not be the sole basis for investment decisions. Past performance does not guarantee future results. Always do your own research.
                   </p>

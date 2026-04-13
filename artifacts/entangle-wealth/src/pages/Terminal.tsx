@@ -18,8 +18,8 @@ import { authFetch } from "@/lib/authFetch";
 import { MicroFeedback } from "@/components/MicroFeedback";
 
 function PanelHeader({ title, icon, color = "cyan", rightContent }: { title: string; icon?: React.ReactNode; color?: string; rightContent?: React.ReactNode }) {
-  const borderColor = color === "cyan" ? "border-l-[#00D4FF]" : color === "gold" ? "border-l-[#FFD700]" : color === "green" ? "border-l-[#00ff88]" : color === "red" ? "border-l-[#ff3366]" : color === "purple" ? "border-l-[#9c27b0]" : "border-l-white/20";
-  const textColor = color === "cyan" ? "text-[#00D4FF]" : color === "gold" ? "text-[#FFD700]" : color === "green" ? "text-[#00ff88]" : color === "red" ? "text-[#ff3366]" : color === "purple" ? "text-[#9c27b0]" : "text-white/60";
+  const borderColor = color === "cyan" ? "border-l-[#00D4FF]" : color === "gold" ? "border-l-[#FFB800]" : color === "green" ? "border-l-[#00FF41]" : color === "red" ? "border-l-[#ff3366]" : color === "purple" ? "border-l-[#9c27b0]" : "border-l-white/20";
+  const textColor = color === "cyan" ? "text-[#00D4FF]" : color === "gold" ? "text-[#FFB800]" : color === "green" ? "text-[#00FF41]" : color === "red" ? "text-[#ff3366]" : color === "purple" ? "text-[#9c27b0]" : "text-white/60";
   return (
     <div className={`flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 ${borderColor}`}>
       <div className="flex items-center gap-1.5">
@@ -33,7 +33,7 @@ function PanelHeader({ title, icon, color = "cyan", rightContent }: { title: str
 
 function BloombergPanel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-[#0a0a0f] border border-white/[0.06] rounded-sm overflow-hidden ${className}`}>
+    <div className={`bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden ${className}`}>
       {children}
     </div>
   );
@@ -130,10 +130,10 @@ export default function Terminal() {
           <div className="h-3 w-px bg-white/10" />
           <div className="flex items-center gap-1.5">
             <span className={`relative flex h-2 w-2`}>
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isMarketOpen ? 'bg-[#00ff88]' : 'bg-[#FFD700]'} opacity-75`} />
-              <span className={`relative inline-flex rounded-full h-2 w-2 ${isMarketOpen ? 'bg-[#00ff88]' : 'bg-[#FFD700]'}`} />
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isMarketOpen ? 'bg-[#00FF41]' : 'bg-[#FFB800]'} opacity-75`} />
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${isMarketOpen ? 'bg-[#00FF41]' : 'bg-[#FFB800]'}`} />
             </span>
-            <span className={`text-[9px] font-mono font-bold uppercase tracking-wider ${isMarketOpen ? 'text-[#00ff88]' : 'text-[#FFD700]'}`}>
+            <span className={`text-[9px] font-mono font-bold uppercase tracking-wider ${isMarketOpen ? 'text-[#00FF41]' : 'text-[#FFB800]'}`}>
               {isMarketOpen ? "MARKET OPEN" : "MARKET CLOSED"}
             </span>
           </div>
@@ -153,7 +153,7 @@ export default function Terminal() {
       </div>
 
       {showShortcuts && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowShortcuts(false)} role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 " onClick={() => setShowShortcuts(false)} role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
           <div className="bg-[#0a0a14] border border-white/10 rounded-sm p-6 max-w-md w-full" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <span className="text-[12px] font-mono font-bold text-[#00D4FF] tracking-wider">KEYBOARD SHORTCUTS</span>
@@ -231,7 +231,7 @@ export default function Terminal() {
           </BloombergPanel>
         </div>
 
-        <div className="flex items-center justify-between px-2 py-1 bg-[#0a0a0f] border border-white/[0.04] rounded-sm">
+        <div className="flex items-center justify-between px-2 py-1 bg-[#0A0E1A] border border-white/[0.04] rounded-sm">
           <div className="flex items-center gap-4 text-[8px] font-mono text-white/40">
             <span>ENTANGLEWEALTH TERMINAL v3.0</span>
             <span>·</span>

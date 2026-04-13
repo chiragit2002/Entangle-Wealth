@@ -38,7 +38,7 @@ function QuantumVizBase() {
   }
 
   return (
-    <div className="glass-panel rounded-2xl p-6 relative overflow-hidden">
+    <div className="glass-panel rounded-sm p-6 relative overflow-hidden">
       <div className="absolute inset-0 scan-line pointer-events-none" />
       <div className="flex flex-col lg:flex-row items-center gap-6">
         <div className="flex-1 min-w-0">
@@ -82,7 +82,7 @@ function QuantumVizBase() {
             {quantumNodes.map((node, i) => {
               const pos = nodePositions[i];
               const isPulsing = pulsingNode === i;
-              const color = node.status === "warning" ? "#FFD700" : "#00D4FF";
+              const color = node.status === "warning" ? "#FFB800" : "#00D4FF";
               return (
                 <g key={node.id}>
                   <circle

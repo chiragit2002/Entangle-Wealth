@@ -96,7 +96,7 @@ function ChartSection({
   const maxVal = allVals.length > 0 ? Math.max(...allVals) : 100;
 
   return (
-    <div className="rounded-2xl p-4 space-y-4"
+    <div className="rounded-sm p-4 space-y-4"
       style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(255,255,255,0.06)" }}>
       <div className="flex items-center gap-2">
         <TrendingUp className="w-4 h-4 text-primary" aria-hidden="true" />
@@ -121,8 +121,8 @@ function ChartSection({
             />
             <Legend wrapperStyle={{ fontSize: 11, fontFamily: "JetBrains Mono" }} />
             <DivergenceBands compareResult={compareResult} />
-            {resultA && <Line type="monotone" dataKey="Current Path" stroke="#00c8f8" strokeWidth={2} dot={{ r: 3, fill: "#00c8f8" }} connectNulls animationDuration={800} />}
-            {resultB && <Line type="monotone" dataKey="Better Path" stroke="#00e676" strokeWidth={2} dot={{ r: 3, fill: "#00e676" }} connectNulls animationDuration={800} />}
+            {resultA && <Line type="monotone" dataKey="Current Path" stroke="#00FF41" strokeWidth={2} dot={{ r: 3, fill: "#00FF41" }} connectNulls animationDuration={800} />}
+            {resultB && <Line type="monotone" dataKey="Better Path" stroke="#00FF41" strokeWidth={2} dot={{ r: 3, fill: "#00FF41" }} connectNulls animationDuration={800} />}
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -185,7 +185,7 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
         Feedback Layers
       </div>
 
-      <div className="rounded-2xl px-4 py-3 flex items-center gap-3"
+      <div className="rounded-sm px-4 py-3 flex items-center gap-3"
         aria-label="Immediate feedback: slider changes update instantly"
         style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(255,255,255,0.06)" }}>
         <Zap className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
@@ -201,7 +201,7 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-2xl p-4 space-y-3"
+        <div className="rounded-sm p-4 space-y-3"
           style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(255,255,255,0.08)" }}>
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-blue-400" aria-hidden="true" />
@@ -237,7 +237,7 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
           </div>
         </div>
 
-        <div className="rounded-2xl p-4 space-y-3"
+        <div className="rounded-sm p-4 space-y-3"
           style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(255,255,255,0.08)" }}>
           <div className="flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-amber-400" aria-hidden="true" />
@@ -265,7 +265,7 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
                 <Line
                   type="monotone"
                   dataKey="gap"
-                  stroke={((d20?.deltaNetWorth || 0) >= 0) ? "#00e676" : "#ef4444"}
+                  stroke={((d20?.deltaNetWorth || 0) >= 0) ? "#00FF41" : "#ef4444"}
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   animationDuration={900}
@@ -304,7 +304,7 @@ function IdentityBadge({ stage }: { stage: Stage }) {
           <div
             key={s}
             className={`h-1.5 rounded-full transition-all duration-500 ${i <= idx ? "w-6" : "w-2 opacity-20"}`}
-            style={{ backgroundColor: i <= idx ? "#00c8f8" : "#555" }}
+            style={{ backgroundColor: i <= idx ? "#00FF41" : "#555" }}
           />
         ))}
       </div>
@@ -348,7 +348,7 @@ function EnhancedSnapshotCompare({
     return row;
   });
 
-  const COLORS = ["#00c8f8", "#00e676", "#f59e0b", "#a78bfa", "#f87171"];
+  const COLORS = ["#00FF41", "#00FF41", "#f59e0b", "#a78bfa", "#f87171"];
 
   const generateAnnotation = (tl: SavedTimeline): string => {
     const r5 = tl.results.find(r => r.horizon === "5yr");
@@ -415,8 +415,8 @@ function EnhancedSnapshotCompare({
                   onClick={() => toggleSelect(tl.id)}
                   className="w-4 h-4 rounded border mt-0.5 shrink-0 transition-all flex items-center justify-center"
                   style={{
-                    borderColor: isSelected ? (color || "#00c8f8") : "rgba(255,255,255,0.2)",
-                    background: isSelected ? (color || "#00c8f8") + "20" : "transparent",
+                    borderColor: isSelected ? (color || "#00FF41") : "rgba(255,255,255,0.2)",
+                    background: isSelected ? (color || "#00FF41") + "20" : "transparent",
                   }}
                   aria-pressed={isSelected}
                   aria-label={`${isSelected ? "Deselect" : "Select"} scenario: ${tl.name}`}
@@ -467,7 +467,7 @@ function EnhancedSnapshotCompare({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl p-4 space-y-4"
+          className="rounded-sm p-4 space-y-4"
           style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(255,255,255,0.1)" }}
         >
           <div className="flex items-center gap-2">
@@ -954,7 +954,7 @@ export default function AlternateTimeline() {
         <div className="hidden md:flex flex-row gap-4 mb-6">
           <TimelinePane
             label="Current Path"
-            borderColor="#00c8f8"
+            borderColor="#00FF41"
             params={paramsA}
             onParam={handleParamA}
             result={resultA}
@@ -962,7 +962,7 @@ export default function AlternateTimeline() {
           />
           <TimelinePane
             label="Better Path"
-            borderColor="#00e676"
+            borderColor="#00FF41"
             params={paramsB}
             onParam={handleParamB}
             result={resultB}
@@ -984,8 +984,8 @@ export default function AlternateTimeline() {
                 className={`flex-1 py-2.5 text-xs font-bold transition-all ${
                   activeTab === t
                     ? t === "A"
-                      ? "bg-[#00c8f8]/20 text-[#00c8f8] border-b-2 border-[#00c8f8]"
-                      : "bg-[#00e676]/20 text-[#00e676] border-b-2 border-[#00e676]"
+                      ? "bg-[#00FF41]/20 text-[#00FF41] border-b-2 border-[#00FF41]"
+                      : "bg-[#00FF41]/20 text-[#00FF41] border-b-2 border-[#00FF41]"
                     : "text-white/40 hover:text-white"
                 }`}
               >
@@ -997,7 +997,7 @@ export default function AlternateTimeline() {
             {activeTab === "A" && (
               <TimelinePane
                 label="Current Path"
-                borderColor="#00c8f8"
+                borderColor="#00FF41"
                 params={paramsA}
                 onParam={handleParamA}
                 result={resultA}
@@ -1009,7 +1009,7 @@ export default function AlternateTimeline() {
             {activeTab === "B" && (
               <TimelinePane
                 label="Better Path"
-                borderColor="#00e676"
+                borderColor="#00FF41"
                 params={paramsB}
                 onParam={handleParamB}
                 result={resultB}
@@ -1022,7 +1022,7 @@ export default function AlternateTimeline() {
         </div>
 
         {whatIfDecisions.length > 0 && (
-          <div className="mb-6 rounded-2xl overflow-hidden"
+          <div className="mb-6 rounded-sm overflow-hidden"
             style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(156,39,176,0.25)" }}>
             <button
               onClick={() => setShowWhatIf(v => !v)}
@@ -1177,7 +1177,7 @@ export default function AlternateTimeline() {
               const setAnnotation = which === "A" ? setSaveAnnotationA : setSaveAnnotationB;
               const saving = which === "A" ? savingA : savingB;
               const label = which === "A" ? "Current Path" : "Better Path";
-              const borderColor = which === "A" ? "#00c8f8" : "#00e676";
+              const borderColor = which === "A" ? "#00FF41" : "#00FF41";
 
               return (
                 <div key={which} className="rounded-xl p-4"
@@ -1245,7 +1245,7 @@ export default function AlternateTimeline() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mt-4 rounded-2xl p-4"
+              className="mt-4 rounded-sm p-4"
               style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(255,255,255,0.08)" }}
             >
               <div className="flex items-center gap-2 mb-4">
@@ -1264,7 +1264,7 @@ export default function AlternateTimeline() {
 
         {!isSignedIn && (
           <div className="mt-6 rounded-xl p-4 flex items-center gap-3"
-            style={{ background: "rgba(0,200,248,0.05)", border: "1px solid rgba(0,200,248,0.12)" }}>
+            style={{ background: "rgba(0,255,65,0.05)", border: "1px solid rgba(0,255,65,0.12)" }}>
             <AlertTriangle className="w-4 h-4 text-primary/60 shrink-0" aria-hidden="true" />
             <div className="text-xs text-white/50">
               <span className="text-primary font-bold">Sign in</span> to save scenarios, track your identity stage, and earn XP for exploring different financial paths.

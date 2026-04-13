@@ -106,13 +106,13 @@ export default function EntryRequirements({ destinations }: Props) {
   if (destinations.length === 0) return null;
 
   const sevColors = {
-    warning: { bg: "rgba(255,215,0,0.06)", border: "rgba(255,215,0,0.2)", icon: "#FFD700" },
+    warning: { bg: "rgba(255,215,0,0.06)", border: "rgba(255,215,0,0.2)", icon: "#FFB800" },
     info: { bg: "rgba(0,212,255,0.06)", border: "rgba(0,212,255,0.2)", icon: "#00D4FF" },
-    success: { bg: "rgba(0,255,136,0.06)", border: "rgba(0,255,136,0.2)", icon: "#00ff88" },
+    success: { bg: "rgba(0,255,65,0.06)", border: "rgba(0,255,65,0.2)", icon: "#00FF41" },
   };
 
   return (
-    <div className="glass-panel rounded-2xl p-5 md:p-7 border border-[rgba(255,215,0,0.15)] bg-[rgba(255,215,0,0.02)]">
+    <div className="glass-panel rounded-sm p-5 md:p-7 border border-[rgba(255,215,0,0.15)] bg-[rgba(255,215,0,0.02)]">
       <div className="flex items-center gap-2 mb-1">
         <AlertTriangle className="w-5 h-5 text-secondary" />
         <h2 className="text-lg font-bold">Entry Requirements & Alerts</h2>
@@ -137,7 +137,7 @@ export default function EntryRequirements({ destinations }: Props) {
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-[13px] font-bold text-white">{req.title}</p>
                     {req.severity === "warning" && (
-                      <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-[#ffd700]/15 text-[#ffd700]">Action Needed</span>
+                      <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-[#FFB800]/15 text-[#FFB800]">Action Needed</span>
                     )}
                   </div>
                   <p className="text-[12px] text-white/50 leading-relaxed mb-2">{req.description}</p>
@@ -154,8 +154,8 @@ export default function EntryRequirements({ destinations }: Props) {
 
       <div className="mt-4 rounded-xl bg-white/[0.02] border border-white/[0.06] p-4">
         <div className="flex items-center gap-2 mb-2">
-          <CheckCircle2 className="w-4 h-4 text-[#00ff88]" />
-          <p className="text-[12px] font-bold text-[#00ff88]">Pre-Travel Checklist</p>
+          <CheckCircle2 className="w-4 h-4 text-[#00FF41]" />
+          <p className="text-[12px] font-bold text-[#00FF41]">Pre-Travel Checklist</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
           {[

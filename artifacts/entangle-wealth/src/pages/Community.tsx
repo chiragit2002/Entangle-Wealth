@@ -58,7 +58,7 @@ interface Job {
 const INITIAL_COMMUNITIES: Community[] = [
   { id: "1", name: "Options Flow Traders", category: "trading", description: "Discussion on unusual options activity, Greeks analysis, and flow signals. Share setups and learn from experienced traders.", icon: "📈", iconBg: "rgba(0,212,255,0.15)", members: 2847, posts: 342, joined: false },
   { id: "2", name: "Real Estate Investors", category: "realestate", description: "Buy, sell, flip, and hold strategies. Market analysis, deal reviews, and networking for real estate investors.", icon: "🏠", iconBg: "rgba(255,215,0,0.15)", members: 1523, posts: 189, joined: false },
-  { id: "3", name: "Tax Strategy Hub", category: "tax", description: "Tax optimization, deduction strategies, IRS updates, and CPA recommendations for small business owners.", icon: "📊", iconBg: "rgba(0,255,136,0.15)", members: 3201, posts: 567, joined: false },
+  { id: "3", name: "Tax Strategy Hub", category: "tax", description: "Tax optimization, deduction strategies, IRS updates, and CPA recommendations for small business owners.", icon: "📊", iconBg: "rgba(0,255,65,0.15)", members: 3201, posts: 567, joined: false },
   { id: "4", name: "Tech Builders", category: "tech", description: "Software developers, startup founders, and tech professionals sharing opportunities and knowledge.", icon: "💻", iconBg: "rgba(0,212,255,0.15)", members: 4102, posts: 891, joined: false },
   { id: "5", name: "Gig Economy Workers", category: "gig", description: "DoorDash, Uber, TaskRabbit, and freelance workers sharing tips, tax strategies, and gig opportunities.", icon: "🛠️", iconBg: "rgba(255,215,0,0.15)", members: 1876, posts: 234, joined: false },
   { id: "6", name: "Crypto & DeFi", category: "trading", description: "Cryptocurrency analysis, DeFi protocols, and digital asset strategies for serious investors.", icon: "⚡", iconBg: "rgba(255,51,102,0.15)", members: 5234, posts: 1203, joined: false },
@@ -66,8 +66,8 @@ const INITIAL_COMMUNITIES: Community[] = [
 
 const INITIAL_POSTS: Post[] = [
   { id: "1", author: "Marcus T.", avatar: "MT", avatarBg: "#00d4ff", time: "2 hours ago", body: "Just found $3,200 in missed deductions using the TaxFlow receipt scanner. If you're a gig worker, you NEED to be tracking every mile and every meal. The IRS won't remind you | but EntangleWealth will.", likes: 47, comments: 12, liked: false },
-  { id: "2", author: "Sarah K.", avatar: "SK", avatarBg: "#ffd700", time: "5 hours ago", body: "The options flow signals have been incredible this week. Caught that NVDA unusual activity alert before the 8% move. Who else was in on that trade?", likes: 83, comments: 24, liked: false },
-  { id: "3", author: "David L.", avatar: "DL", avatarBg: "#00ff88", time: "8 hours ago", body: "Pro tip for gig workers: keep a separate business bank account. Makes tax time 10x easier and the IRS loves clear documentation. My CPA thanked me.", likes: 31, comments: 8, liked: false },
+  { id: "2", author: "Sarah K.", avatar: "SK", avatarBg: "#FFB800", time: "5 hours ago", body: "The options flow signals have been incredible this week. Caught that NVDA unusual activity alert before the 8% move. Who else was in on that trade?", likes: 83, comments: 24, liked: false },
+  { id: "3", author: "David L.", avatar: "DL", avatarBg: "#00FF41", time: "8 hours ago", body: "Pro tip for gig workers: keep a separate business bank account. Makes tax time 10x easier and the IRS loves clear documentation. My CPA thanked me.", likes: 31, comments: 8, liked: false },
   { id: "4", author: "Jessica M.", avatar: "JM", avatarBg: "#ff3366", time: "1 day ago", body: "Used the travel planner for my CES trip and it automatically separated my business vs personal expenses. Saved me hours of manual categorization. Game changer for anyone who travels for work.", likes: 56, comments: 15, liked: false },
 ];
 
@@ -394,7 +394,7 @@ export default function Community() {
                       <p className="text-sm font-bold flex items-center gap-1.5">
                         {p.author}
                         {p.author === "You" && isAmbassador && (
-                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-[rgba(255,215,0,0.15)] text-[#ffd700] border border-[rgba(255,215,0,0.3)]">
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-[rgba(255,215,0,0.15)] text-[#FFB800] border border-[rgba(255,215,0,0.3)]">
                             🏆 Ambassador
                           </span>
                         )}
@@ -478,7 +478,7 @@ export default function Community() {
                     onClick={() => rsvpEvent(e.id)}
                     className={`min-h-[44px] font-bold text-sm ${
                       e.rsvped
-                        ? "bg-transparent border border-[rgba(0,255,136,0.3)] text-[#00ff88] hover:bg-[rgba(0,255,136,0.1)]"
+                        ? "bg-transparent border border-[rgba(0,255,65,0.3)] text-[#00FF41] hover:bg-[rgba(0,255,65,0.1)]"
                         : "bg-gradient-to-r from-primary to-[#0099cc] text-black"
                     }`}
                     variant={e.rsvped ? "outline" : "default"}
@@ -537,7 +537,7 @@ export default function Community() {
                     <p className="text-[13px] text-primary mb-1">{j.company}</p>
                     <p className="text-[11px] text-[#555] mb-2">{j.meta}</p>
                     <div className="flex justify-between items-center">
-                      <p className="text-sm font-bold text-[#00ff88]">{j.salary}</p>
+                      <p className="text-sm font-bold text-[#00FF41]">{j.salary}</p>
                       <Button className="bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold text-xs min-h-[36px] px-4">
                         Apply
                       </Button>
@@ -555,13 +555,13 @@ export default function Community() {
               <h2 className="text-[28px] font-black mb-2 bg-gradient-to-r from-white via-primary to-secondary bg-clip-text text-transparent">Simple Pricing</h2>
               <p className="text-sm text-[#666]">Try everything free for 30 days. No card required.</p>
               <div className="mt-3">
-                <span className="px-4 py-1.5 rounded-full text-[13px] font-bold bg-[rgba(0,255,136,0.2)] text-[#00ff88]">30 DAY FREE TRIAL | NO CARD NEEDED</span>
+                <span className="px-4 py-1.5 rounded-full text-[13px] font-bold bg-[rgba(0,255,65,0.2)] text-[#00FF41]">30 DAY FREE TRIAL | NO CARD NEEDED</span>
               </div>
             </div>
 
-            <div className="glass-panel rounded-2xl p-6 text-center mb-4">
+            <div className="glass-panel rounded-sm p-6 text-center mb-4">
               <p className="text-sm font-bold text-[#555] uppercase tracking-wider mb-2">Starter</p>
-              <p className="text-[42px] font-black text-[#00ff88] mb-1">Free</p>
+              <p className="text-[42px] font-black text-[#00FF41] mb-1">Free</p>
               <p className="text-[13px] text-[#555] mb-5">Forever free tier</p>
               <div className="text-left space-y-0">
                 {["3 stock signals per day", "Basic options flow", "Community access", "5 receipt scans per month"].map((f, i) => (
@@ -576,7 +576,7 @@ export default function Community() {
               </Button>
             </div>
 
-            <div className="glass-panel rounded-2xl p-6 text-center mb-4 border-secondary/50 relative bg-gradient-to-br from-[rgba(255,215,0,0.05)] to-[rgba(0,212,255,0.05)]">
+            <div className="glass-panel rounded-sm p-6 text-center mb-4 border-secondary/50 relative bg-gradient-to-br from-[rgba(255,215,0,0.05)] to-[rgba(0,212,255,0.05)]">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-[rgba(255,215,0,0.15)] text-secondary">MOST POPULAR</span>
               </div>
@@ -593,7 +593,7 @@ export default function Community() {
               </Button>
             </div>
 
-            <div className="glass-panel rounded-2xl p-6 text-center mb-4">
+            <div className="glass-panel rounded-sm p-6 text-center mb-4">
               <p className="text-sm font-bold text-[#555] uppercase tracking-wider mb-2">Business</p>
               <p className="text-[42px] font-black text-primary mb-1">$79<span className="text-lg">/mo</span></p>
               <p className="text-[13px] text-[#555] mb-5">For teams and power users</p>
@@ -610,7 +610,7 @@ export default function Community() {
             <div className="glass-panel rounded-xl p-5 text-center mb-4">
               <p className="text-sm font-bold text-primary mb-2">Why EntangleWealth Pays For Itself</p>
               <p className="text-[13px] text-[#666] leading-relaxed">
-                Average user finds <strong className="text-[#00ff88]">$4,280</strong> in missed deductions.<br />
+                Average user finds <strong className="text-[#00FF41]">$4,280</strong> in missed deductions.<br />
                 Average signal win rate: <strong className="text-primary">87% confidence</strong>.<br />
                 One good trade or one found deduction covers a full year.<br /><br />
                 <strong className="text-secondary">$29/month = $348/year. Find one missed deduction and you're ahead.</strong>
@@ -645,7 +645,7 @@ export default function Community() {
 
         {showCreateCommunity && (
           <div className="fixed inset-0 z-[9998] bg-black/80 flex items-start justify-center pt-20 px-4 overflow-y-auto" onClick={e => { if (e.target === e.currentTarget) setShowCreateCommunity(false); }}>
-            <div className="bg-[#0d0d1a] border border-[rgba(0,212,255,0.15)] rounded-2xl p-5 w-full max-w-md">
+            <div className="bg-[#0d0d1a] border border-[rgba(0,212,255,0.15)] rounded-sm p-5 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-extrabold text-primary">Create Community</h3>
                 <button onClick={() => setShowCreateCommunity(false)} className="text-[#555] hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
@@ -680,7 +680,7 @@ export default function Community() {
 
         {showCreateEvent && (
           <div className="fixed inset-0 z-[9998] bg-black/80 flex items-start justify-center pt-20 px-4 overflow-y-auto" onClick={e => { if (e.target === e.currentTarget) setShowCreateEvent(false); }}>
-            <div className="bg-[#0d0d1a] border border-[rgba(0,212,255,0.15)] rounded-2xl p-5 w-full max-w-md">
+            <div className="bg-[#0d0d1a] border border-[rgba(0,212,255,0.15)] rounded-sm p-5 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-extrabold text-primary">Create Event</h3>
                 <button onClick={() => setShowCreateEvent(false)} className="text-[#555] hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
@@ -708,7 +708,7 @@ export default function Community() {
 
         {showPostJob && (
           <div className="fixed inset-0 z-[9998] bg-black/80 flex items-start justify-center pt-20 px-4 overflow-y-auto" onClick={e => { if (e.target === e.currentTarget) setShowPostJob(false); }}>
-            <div className="bg-[#0d0d1a] border border-[rgba(0,212,255,0.15)] rounded-2xl p-5 w-full max-w-md">
+            <div className="bg-[#0d0d1a] border border-[rgba(0,212,255,0.15)] rounded-sm p-5 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-extrabold text-primary">Post a Job</h3>
                 <button onClick={() => setShowPostJob(false)} className="text-[#555] hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>

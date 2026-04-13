@@ -226,7 +226,7 @@ const strategicActions = [
 
 function FeatureIcon({ has }: { has: boolean }) {
   return has ? (
-    <Check className="w-4 h-4 text-[#00e676]" />
+    <Check className="w-4 h-4 text-[#00FF41]" />
   ) : (
     <X className="w-4 h-4 text-[#ff4466] opacity-40" />
   );
@@ -235,8 +235,8 @@ function FeatureIcon({ has }: { has: boolean }) {
 function ThreatBadge({ level }: { level: string }) {
   const colors = {
     high: "bg-[#ff4466]/15 text-[#ff4466] border-[#ff4466]/20",
-    medium: "bg-[#f5c842]/15 text-[#f5c842] border-[#f5c842]/20",
-    low: "bg-[#00e676]/15 text-[#00e676] border-[#00e676]/20",
+    medium: "bg-[#FFB800]/15 text-[#FFB800] border-[#FFB800]/20",
+    low: "bg-[#00FF41]/15 text-[#00FF41] border-[#00FF41]/20",
   };
   return (
     <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${colors[level as keyof typeof colors]}`}>
@@ -261,7 +261,7 @@ function Section({ title, icon: Icon, color, children }: { title: string; icon: 
 
 function CompetitorCard({ c, isExpanded, onToggle }: { c: Competitor; isExpanded: boolean; onToggle: () => void }) {
   return (
-    <div className="glass-panel rounded-2xl overflow-hidden">
+    <div className="glass-panel rounded-sm overflow-hidden">
       <button onClick={onToggle} className="w-full p-4 md:p-5 flex items-center justify-between text-left">
         <div className="flex items-center gap-3 min-w-0">
           <div>
@@ -282,7 +282,7 @@ function CompetitorCard({ c, isExpanded, onToggle }: { c: Competitor; isExpanded
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2">Strengths</div>
               {c.strengths.map((s, i) => (
                 <div key={i} className="flex items-start gap-2 mb-1.5">
-                  <Check className="w-3 h-3 text-[#00e676] mt-0.5 flex-shrink-0" />
+                  <Check className="w-3 h-3 text-[#00FF41] mt-0.5 flex-shrink-0" />
                   <span className="text-xs text-white/80">{s}</span>
                 </div>
               ))}
@@ -545,7 +545,7 @@ export default function CompetitiveAnalysis() {
           </Button>
         </div>
 
-        <div className="glass-panel rounded-2xl p-5 md:p-8 mb-10 relative overflow-hidden">
+        <div className="glass-panel rounded-sm p-5 md:p-8 mb-10 relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-primary" />
           <h2 className="text-lg md:text-xl font-bold mb-3">April Dunford Positioning Statement</h2>
           <p className="text-sm md:text-base text-white/80 leading-relaxed italic">
@@ -562,7 +562,7 @@ export default function CompetitiveAnalysis() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
           {[
             { label: "Our Features", value: ewScore.toString(), sub: `of ${featureMatrix.length}`, color: "text-primary" },
-            { label: "Unique Features", value: "5", sub: "no competitor has", color: "text-[#00e676]" },
+            { label: "Unique Features", value: "5", sub: "no competitor has", color: "text-[#00FF41]" },
             { label: "Competitors", value: competitors.length.toString(), sub: "analyzed", color: "text-secondary" },
             { label: "Threat Level", value: "2 HIGH", sub: "TradingView, Robinhood", color: "text-[#ff4466]" },
           ].map((s) => (
@@ -587,8 +587,8 @@ export default function CompetitiveAnalysis() {
           </div>
         </Section>
 
-        <Section title="Feature Matrix | Quantum Superiority Map" icon={Zap} color="bg-[#00e676]/10 text-[#00e676]">
-          <div className="glass-panel rounded-2xl overflow-hidden">
+        <Section title="Feature Matrix | Quantum Superiority Map" icon={Zap} color="bg-[#00FF41]/10 text-[#00FF41]">
+          <div className="glass-panel rounded-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -641,7 +641,7 @@ export default function CompetitiveAnalysis() {
         </Section>
 
         <Section title="Positioning Map | Quantum Quadrant" icon={TrendingUp} color="bg-secondary/10 text-secondary">
-          <div className="glass-panel rounded-2xl p-6 md:p-8">
+          <div className="glass-panel rounded-sm p-6 md:p-8">
             <div className="relative w-full aspect-square max-w-lg mx-auto">
               <div className="absolute inset-0 border border-white/[0.06] rounded-lg">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-6 text-[10px] uppercase tracking-wider text-muted-foreground font-bold">High AI Sophistication</div>
@@ -695,7 +695,7 @@ export default function CompetitiveAnalysis() {
             {kanoAnalysis.map((k) => {
               const colors = {
                 Basic: { bg: "bg-white/[0.03]", border: "border-white/[0.06]", badge: "bg-white/10 text-white/50" },
-                Performance: { bg: "bg-[#00e676]/[0.03]", border: "border-[#00e676]/10", badge: "bg-[#00e676]/10 text-[#00e676]" },
+                Performance: { bg: "bg-[#00FF41]/[0.03]", border: "border-[#00FF41]/10", badge: "bg-[#00FF41]/10 text-[#00FF41]" },
                 Delighter: { bg: "bg-primary/[0.03]", border: "border-primary/10", badge: "bg-primary/10 text-primary" },
               }[k.category]!;
               return (
@@ -714,7 +714,7 @@ export default function CompetitiveAnalysis() {
         <Section title="Strategic Action Plan" icon={Shield} color="bg-[#ff4466]/10 text-[#ff4466]">
           <div className="space-y-4">
             {strategicActions.map((a, i) => (
-              <div key={a.title} className="glass-panel rounded-2xl p-5 md:p-6 relative overflow-hidden">
+              <div key={a.title} className="glass-panel rounded-sm p-5 md:p-6 relative overflow-hidden">
                 {a.urgency === "high" && (
                   <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#ff4466] via-[#ff4466] to-transparent" />
                 )}
@@ -737,7 +737,7 @@ export default function CompetitiveAnalysis() {
           </div>
         </Section>
 
-        <div className="glass-panel-gold rounded-2xl p-6 md:p-8 text-center mb-10">
+        <div className="glass-panel-gold rounded-sm p-6 md:p-8 text-center mb-10">
           <div className="text-[10px] uppercase tracking-[0.2em] text-secondary/60 font-bold mb-3">The Quantum Advantage</div>
           <h2 className="text-xl md:text-2xl font-bold mb-4">
             EntangleWealth has <span className="gold-text">5 features</span> that{" "}

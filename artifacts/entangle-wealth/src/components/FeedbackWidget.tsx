@@ -89,9 +89,9 @@ export function FeedbackWidget() {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" onClick={handleClose}>
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/60 " />
           <div
-            className="relative w-full max-w-sm rounded-2xl p-6 shadow-2xl"
+            className="relative w-full max-w-sm rounded-sm p-6 shadow-2xl"
             style={{
               background: "rgba(10,10,20,0.98)",
               border: "1px solid rgba(0,212,255,0.2)",
@@ -111,8 +111,8 @@ export function FeedbackWidget() {
 
             {submitted ? (
               <div className="text-center py-6">
-                <div className="w-12 h-12 rounded-full bg-[#00ff88]/20 flex items-center justify-center mx-auto mb-3">
-                  <Check className="w-6 h-6 text-[#00ff88]" />
+                <div className="w-12 h-12 rounded-full bg-[#00FF41]/20 flex items-center justify-center mx-auto mb-3">
+                  <Check className="w-6 h-6 text-[#00FF41]" />
                 </div>
                 <p className="text-white font-semibold">Thank you!</p>
                 <p className="text-white/50 text-sm mt-1">Your feedback helps us improve.</p>
@@ -132,7 +132,7 @@ export function FeedbackWidget() {
                       >
                         <Star
                           className={`w-8 h-8 transition-colors ${
-                            s <= effectiveRating ? "text-[#FFD700] fill-[#FFD700]" : "text-white/40"
+                            s <= effectiveRating ? "text-[#FFB800] fill-[#FFB800]" : "text-white/40"
                           }`}
                         />
                       </button>

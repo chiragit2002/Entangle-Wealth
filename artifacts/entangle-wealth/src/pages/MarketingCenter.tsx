@@ -51,8 +51,8 @@ const AGENT_CONFIGS: AgentConfig[] = [
   { id: "linkedin", name: "LinkedIn", maxChars: 3000, icon: <Linkedin className="w-5 h-5" />, color: "#0A66C2", gradient: "from-blue-700/20 to-cyan-700/20" },
   { id: "github", name: "GitHub", maxChars: 65536, icon: <Github className="w-5 h-5" />, color: "#8B5CF6", gradient: "from-purple-600/20 to-violet-700/20" },
   { id: "blog", name: "Blog/SEO", maxChars: 50000, icon: <FileText className="w-5 h-5" />, color: "#00D4FF", gradient: "from-cyan-500/20 to-teal-600/20" },
-  { id: "email", name: "Email Newsletter", maxChars: 50000, icon: <Mail className="w-5 h-5" />, color: "#FFD700", gradient: "from-yellow-500/20 to-amber-600/20" },
-  { id: "community", name: "Community Reply", maxChars: 5000, icon: <Users className="w-5 h-5" />, color: "#00ff88", gradient: "from-emerald-500/20 to-green-600/20" },
+  { id: "email", name: "Email Newsletter", maxChars: 50000, icon: <Mail className="w-5 h-5" />, color: "#FFB800", gradient: "from-yellow-500/20 to-amber-600/20" },
+  { id: "community", name: "Community Reply", maxChars: 5000, icon: <Users className="w-5 h-5" />, color: "#00FF41", gradient: "from-emerald-500/20 to-green-600/20" },
 ];
 
 const TONES = [
@@ -508,7 +508,7 @@ export default function MarketingCenter() {
     return (
       <Layout>
         <div className="flex flex-col items-center justify-center py-32 text-center px-4">
-          <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
+          <div className="w-16 h-16 rounded-sm bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
             <Shield className="w-8 h-8 text-red-400" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
@@ -536,15 +536,15 @@ export default function MarketingCenter() {
         {aiQueueStatus && (
           <div className="mb-4 p-3 rounded-lg border border-white/[0.06] bg-white/[0.02] flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">
-              <div className={`w-2 h-2 rounded-full ${aiQueueStatus.active > 0 ? "bg-[#00D4FF] animate-pulse" : "bg-[#00ff88]"}`} />
+              <div className={`w-2 h-2 rounded-full ${aiQueueStatus.active > 0 ? "bg-[#00D4FF] animate-pulse" : "bg-[#00FF41]"}`} />
               <span className="text-white/60">AI Queue:</span>
             </div>
             <span className="text-white/80 font-mono">{aiQueueStatus.active}/{aiQueueStatus.maxConcurrent} active</span>
             {aiQueueStatus.queued > 0 && (
-              <span className="text-[#FFD700] font-mono">{aiQueueStatus.queued} waiting</span>
+              <span className="text-[#FFB800] font-mono">{aiQueueStatus.queued} waiting</span>
             )}
             <span className="text-white/50">|</span>
-            <span className="text-[#00ff88] font-mono">{aiQueueStatus.totalProcessed} processed</span>
+            <span className="text-[#00FF41] font-mono">{aiQueueStatus.totalProcessed} processed</span>
             {aiQueueStatus.totalFailed > 0 && (
               <span className="text-[#ff3366] font-mono">{aiQueueStatus.totalFailed} failed</span>
             )}

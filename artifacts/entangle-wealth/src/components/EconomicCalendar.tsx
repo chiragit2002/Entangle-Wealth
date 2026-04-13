@@ -35,7 +35,7 @@ const EVENTS: EconEvent[] = [
   { date: "May 3", time: "8:30 AM", name: "Unemployment Rate", impact: "high", previous: "3.8%", forecast: "3.9%", category: "employment" },
 ];
 
-const impactColor = (i: string) => i === "high" ? "text-[#ff3366] bg-[#ff3366]/10" : i === "medium" ? "text-[#ffd700] bg-[#ffd700]/10" : "text-white/40 bg-white/[0.03]";
+const impactColor = (i: string) => i === "high" ? "text-[#ff3366] bg-[#ff3366]/10" : i === "medium" ? "text-[#FFB800] bg-[#FFB800]/10" : "text-white/40 bg-white/[0.03]";
 const catIcon = (c: string) => c === "fed" ? "FED" : c === "employment" ? "EMP" : c === "inflation" ? "CPI" : c === "gdp" ? "GDP" : c === "earnings" ? "ERN" : "HSG";
 
 export function EconomicCalendar() {

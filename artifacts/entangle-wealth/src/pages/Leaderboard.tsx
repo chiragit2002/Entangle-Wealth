@@ -22,7 +22,7 @@ interface LeaderboardEntry {
 const TIER_COLORS: Record<string, string> = {
   Diamond: "text-[#00D4FF]",
   Platinum: "text-white/70",
-  Gold: "text-[#FFD700]",
+  Gold: "text-[#FFB800]",
   Silver: "text-white/50",
   Bronze: "text-orange-400",
 };
@@ -39,7 +39,7 @@ const DEMO_LEADERBOARD: LeaderboardEntry[] = [
 ];
 
 function RankBadge({ rank }: { rank: number }) {
-  if (rank === 1) return <Crown className="w-4 h-4 text-[#FFD700]" />;
+  if (rank === 1) return <Crown className="w-4 h-4 text-[#FFB800]" />;
   if (rank === 2) return <Medal className="w-4 h-4 text-white/60" />;
   if (rank === 3) return <Medal className="w-4 h-4 text-orange-400" />;
   return <span className="text-xs font-mono font-bold text-white/30 w-4 text-center">{rank}</span>;
@@ -88,7 +88,7 @@ export default function Leaderboard() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Trophy className="w-7 h-7 text-[#FFD700]" />
+            <Trophy className="w-7 h-7 text-[#FFB800]" />
             <h1 className="text-3xl font-bold tracking-tight text-white">Leaderboard</h1>
           </div>
           <p className="text-white/50 text-sm">Top 100 traders ranked by performance</p>
@@ -114,7 +114,7 @@ export default function Leaderboard() {
 
         {/* My Rank Card */}
         {myRank && myRank.rank && (
-          <div className="bg-[#0a0a0f] border border-primary/20 rounded-xl p-4 mb-6 flex items-center justify-between">
+          <div className="bg-[#0A0E1A] border border-primary/20 rounded-xl p-4 mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Star className="w-4 h-4 text-primary" />
               <span className="text-sm text-white/50">Your ranking</span>
@@ -132,8 +132,8 @@ export default function Leaderboard() {
             {leaderboard.slice(0, 3).map((entry) => (
               <div
                 key={entry.userId}
-                className={`bg-[#0a0a0f] border rounded-xl p-4 text-center ${
-                  entry.rank === 1 ? "border-[#FFD700]/25 bg-[#FFD700]/[0.03]" :
+                className={`bg-[#0A0E1A] border rounded-xl p-4 text-center ${
+                  entry.rank === 1 ? "border-[#FFB800]/25 bg-[#FFB800]/[0.03]" :
                   entry.rank === 2 ? "border-white/15" :
                   "border-orange-500/20"
                 }`}
@@ -163,7 +163,7 @@ export default function Leaderboard() {
         )}
 
         {/* Full table */}
-        <div className="bg-[#0a0a0f] border border-white/[0.06] rounded-xl overflow-hidden" role="table" aria-label="Leaderboard rankings sorted by XP">
+        <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-xl overflow-hidden" role="table" aria-label="Leaderboard rankings sorted by XP">
           <div role="row" className="grid grid-cols-12 gap-2 px-4 py-3 bg-white/[0.02] border-b border-white/[0.06] text-[10px] font-semibold text-white/30 uppercase tracking-wider">
             <div role="columnheader" aria-sort="ascending" className="col-span-1">#</div>
             <div role="columnheader" className="col-span-5">Trader</div>

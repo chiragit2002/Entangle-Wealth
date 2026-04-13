@@ -59,7 +59,7 @@ export function InstallPrompt() {
   return (
     <div className="fixed bottom-20 lg:bottom-4 left-4 right-4 z-[60] max-w-md mx-auto animate-in slide-in-from-bottom-4 duration-300">
       <div
-        className="rounded-2xl p-4 flex items-start gap-3"
+        className="rounded-sm p-4 flex items-start gap-3"
         style={{
           background: "linear-gradient(135deg, rgba(0,212,255,0.12), rgba(0,40,60,0.95))",
           border: "1px solid rgba(0,212,255,0.2)",

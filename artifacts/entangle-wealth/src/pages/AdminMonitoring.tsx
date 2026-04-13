@@ -102,7 +102,7 @@ const LEVEL_ORDER: Record<string, number> = {
 const LEVEL_COLOR: Record<string, string> = {
   fatal: "#ff3366",
   error: "#ff8c42",
-  warning: "#FFD700",
+  warning: "#FFB800",
   info: "#00D4FF",
   debug: "#a0a0b0",
 };
@@ -180,7 +180,7 @@ function StackTrace({
               <span className="text-[#00D4FF]">{frame.filename}</span>
               <span className="text-white/40">:{frame.lineNo}</span>
               <span className="text-white/60"> in </span>
-              <span className="text-[#FFD700]">{frame.function || "?"}</span>
+              <span className="text-[#FFB800]">{frame.function || "?"}</span>
             </div>
           ))}
         </div>
@@ -316,7 +316,7 @@ function IssueRow({
               <LevelBadge level={issue.level} />
               <ProjectBadge project={issue._project} />
               {issue.status === "resolved" && (
-                <span className="text-[10px] text-[#00ff88] border border-[#00ff88]/30 bg-[#00ff88]/10 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] text-[#00FF41] border border-[#00FF41]/30 bg-[#00FF41]/10 px-2 py-0.5 rounded-full">
                   resolved
                 </span>
               )}
@@ -356,10 +356,10 @@ function IssueRow({
             <span
               className={`hidden sm:inline-flex text-[10px] font-mono px-2 py-0.5 rounded-full border ${
                 issue.status === "resolved"
-                  ? "bg-[#00ff88]/10 text-[#00ff88] border-[#00ff88]/30"
+                  ? "bg-[#00FF41]/10 text-[#00FF41] border-[#00FF41]/30"
                   : issue.status === "ignored"
                   ? "bg-white/5 text-white/30 border-white/10"
-                  : "bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/30"
+                  : "bg-[#FFB800]/10 text-[#FFB800] border-[#FFB800]/30"
               }`}
             >
               {issue.status}
@@ -619,7 +619,7 @@ export default function AdminMonitoring() {
             ].map(({ label, value, icon: Icon, color }) => (
               <div
                 key={label}
-                className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4"
+                className="bg-[#0A0E1A] border border-white/10 rounded-xl p-4"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <Icon className="w-4 h-4" style={{ color }} />
@@ -637,7 +637,7 @@ export default function AdminMonitoring() {
           </div>
 
           {trendData.length > 0 && (
-            <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-5 mb-8">
+            <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-5 mb-8">
               <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4">
                 Error Trend — Last 24h
               </h2>
@@ -670,7 +670,7 @@ export default function AdminMonitoring() {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#0a0a0f",
+                      backgroundColor: "#0A0E1A",
                       border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: 8,
                       color: "#fff",
@@ -690,7 +690,7 @@ export default function AdminMonitoring() {
             </div>
           )}
 
-          <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4 mb-4 space-y-3">
+          <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-4 mb-4 space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
               <input
@@ -711,9 +711,9 @@ export default function AdminMonitoring() {
                   onChange={(e) => setFilterProject(e.target.value)}
                   className="h-8 px-3 text-xs bg-white/[0.04] border border-white/[0.1] rounded-lg text-white focus:outline-none focus:border-[#00D4FF]/40 appearance-none"
                 >
-                  <option value="all" className="bg-[#0a0a0f]">All Projects</option>
-                  <option value="entangle-wealth-backend" className="bg-[#0a0a0f]">Backend</option>
-                  <option value="entangle-wealth-frontend" className="bg-[#0a0a0f]">Frontend</option>
+                  <option value="all" className="bg-[#0A0E1A]">All Projects</option>
+                  <option value="entangle-wealth-backend" className="bg-[#0A0E1A]">Backend</option>
+                  <option value="entangle-wealth-frontend" className="bg-[#0A0E1A]">Frontend</option>
                 </select>
               </div>
               <div>
@@ -725,11 +725,11 @@ export default function AdminMonitoring() {
                   onChange={(e) => setFilterLevel(e.target.value)}
                   className="h-8 px-3 text-xs bg-white/[0.04] border border-white/[0.1] rounded-lg text-white focus:outline-none focus:border-[#00D4FF]/40 appearance-none"
                 >
-                  <option value="all" className="bg-[#0a0a0f]">All Levels</option>
-                  <option value="fatal" className="bg-[#0a0a0f]">Fatal</option>
-                  <option value="error" className="bg-[#0a0a0f]">Error</option>
-                  <option value="warning" className="bg-[#0a0a0f]">Warning</option>
-                  <option value="info" className="bg-[#0a0a0f]">Info</option>
+                  <option value="all" className="bg-[#0A0E1A]">All Levels</option>
+                  <option value="fatal" className="bg-[#0A0E1A]">Fatal</option>
+                  <option value="error" className="bg-[#0A0E1A]">Error</option>
+                  <option value="warning" className="bg-[#0A0E1A]">Warning</option>
+                  <option value="info" className="bg-[#0A0E1A]">Info</option>
                 </select>
               </div>
               <div>
@@ -741,9 +741,9 @@ export default function AdminMonitoring() {
                   onChange={(e) => setFilterStatus(e.target.value)}
                   className="h-8 px-3 text-xs bg-white/[0.04] border border-white/[0.1] rounded-lg text-white focus:outline-none focus:border-[#00D4FF]/40 appearance-none"
                 >
-                  <option value="unresolved" className="bg-[#0a0a0f]">Unresolved</option>
-                  <option value="resolved" className="bg-[#0a0a0f]">Resolved</option>
-                  <option value="all" className="bg-[#0a0a0f]">All</option>
+                  <option value="unresolved" className="bg-[#0A0E1A]">Unresolved</option>
+                  <option value="resolved" className="bg-[#0A0E1A]">Resolved</option>
+                  <option value="all" className="bg-[#0A0E1A]">All</option>
                 </select>
               </div>
               <div className="ml-auto text-right">
@@ -813,7 +813,7 @@ export default function AdminMonitoring() {
               ))
             ) : !hasError && sortedAndFiltered.length === 0 ? (
               <div className="text-center py-16 bg-white/[0.01] border border-white/[0.06] rounded-xl">
-                <CheckCircle2 className="w-8 h-8 text-[#00ff88]/40 mx-auto mb-3" />
+                <CheckCircle2 className="w-8 h-8 text-[#00FF41]/40 mx-auto mb-3" />
                 <p className="text-white/30 text-sm">No issues found</p>
                 <p className="text-white/20 text-xs mt-1">
                   {filterStatus === "unresolved"

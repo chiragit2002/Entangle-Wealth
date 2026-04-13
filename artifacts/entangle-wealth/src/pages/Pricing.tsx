@@ -23,7 +23,7 @@ const plans = [
     tier: "free",
     price: "$0",
     period: "Free forever",
-    color: "text-[#00e676]",
+    color: "text-[#00FF41]",
     icon: Zap,
     features: [
       { text: "3 signals per day", on: true },
@@ -44,7 +44,7 @@ const plans = [
     tier: "pro",
     price: "$29",
     period: "per month · After 30-day free trial",
-    color: "text-[#f5c842]",
+    color: "text-[#FFB800]",
     icon: Sparkles,
     features: [
       { text: "Unlimited signals + full indicators", on: true },
@@ -67,7 +67,7 @@ const plans = [
     tier: "enterprise",
     price: "$79",
     period: "per month · For teams · After free trial",
-    color: "text-[#00c8f8]",
+    color: "text-[#00FF41]",
     icon: Users,
     features: [
       { text: "Everything in Pro", on: true },
@@ -206,15 +206,15 @@ export default function Pricing() {
           </div>
         )}
         {promo?.active && (
-          <div className="mb-8 relative overflow-hidden rounded-2xl border border-[#00e676]/30 bg-gradient-to-r from-[#00e676]/10 via-[#00c8f8]/10 to-[#f5c842]/10 p-6 text-center">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#00e676]/5 to-transparent animate-pulse" />
+          <div className="mb-8 relative overflow-hidden rounded-sm border border-[#00FF41]/30 bg-gradient-to-r from-[#00FF41]/10 via-[#00FF41]/10 to-[#FFB800]/10 p-6 text-center">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#00FF41]/5 to-transparent animate-pulse" />
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 bg-[#00e676]/20 rounded-full px-4 py-1.5 mb-3">
-                <Sparkles className="w-4 h-4 text-[#00e676]" />
-                <span className="text-sm font-black text-[#00e676] uppercase tracking-wider">Launch Window — Limited Time</span>
+              <div className="inline-flex items-center gap-2 bg-[#00FF41]/20 rounded-full px-4 py-1.5 mb-3">
+                <Sparkles className="w-4 h-4 text-[#00FF41]" />
+                <span className="text-sm font-black text-[#00FF41] uppercase tracking-wider">Launch Window — Limited Time</span>
               </div>
               <h2 className="text-2xl md:text-3xl font-black text-foreground mb-2">
-                Full Pro access. <span className="text-[#00e676]">Zero cost.</span> Right now.
+                Full Pro access. <span className="text-[#00FF41]">Zero cost.</span> Right now.
               </h2>
               <p className="text-muted-foreground text-sm md:text-base">
                 All Pro features unlocked until{" "}
@@ -235,7 +235,7 @@ export default function Pricing() {
             {promo?.active ? "All Pro features unlocked — no card needed." : "30 days free. No card. Cancel anytime."}
           </p>
           {!promo?.active && (
-            <div className="inline-block mt-4 bg-[rgba(0,230,118,0.1)] border border-[rgba(0,230,118,0.3)] rounded-full px-4 py-1.5 text-xs font-bold text-[#00e676]">
+            <div className="inline-block mt-4 bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.3)] rounded-full px-4 py-1.5 text-xs font-bold text-[#00FF41]">
               30-DAY FREE TRIAL | NO CREDIT CARD NEEDED
             </div>
           )}
@@ -268,7 +268,7 @@ export default function Pricing() {
                     <div key={f.text} className={`pricing-feature ${f.on ? "on" : ""}`}>
                       <span className="w-5 text-center flex-shrink-0">
                         {f.on ? (
-                          <Check className="w-4 h-4 text-[#00e676] inline" />
+                          <Check className="w-4 h-4 text-[#00FF41] inline" />
                         ) : (
                           <X className="w-4 h-4 text-muted-foreground/40 inline" />
                         )}
@@ -285,9 +285,9 @@ export default function Pricing() {
                   aria-label={isLoading ? `Redirecting to checkout for ${plan.name}` : plan.cta}
                   className={`w-full mt-5 h-12 font-bold text-sm active:scale-[0.98] transition-all ${
                     plan.ctaStyle === "gold"
-                      ? "bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black hover:opacity-90"
+                      ? "bg-gradient-to-r from-[#FFB800] to-[#cc9900] text-black hover:opacity-90"
                       : plan.ctaStyle === "blue"
-                      ? "bg-gradient-to-r from-[#00c8f8] to-[#0099cc] text-black hover:opacity-90"
+                      ? "bg-gradient-to-r from-[#00FF41] to-[#0099cc] text-black hover:opacity-90"
                       : "bg-white/5 border border-white/10 text-muted-foreground hover:bg-white/10"
                   }`}
                 >
@@ -305,11 +305,11 @@ export default function Pricing() {
 
         <div className="mobile-card-glow text-center p-6 md:p-8">
           <div className="text-2xl font-black tracking-tight mb-2">Get paid to share it.</div>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f5c842]/10 border border-[#f5c842]/25 text-[#f5c842] text-xs font-bold mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFB800]/10 border border-[#FFB800]/25 text-[#FFB800] text-xs font-bold mb-3">
             🏆 $36,000 Anniversary Bonus Pool — Your slice is waiting
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed mb-1">
-            Earn <strong className="text-[#f5c842]">20% monthly</strong> for every person you refer — for life. That adds up faster than you'd think.
+            Earn <strong className="text-[#FFB800]">20% monthly</strong> for every person you refer — for life. That adds up faster than you'd think.
           </p>
           <p className="text-xs text-white/50 mb-4">
             Every referral also gets you 5 entries into the $50K anniversary drawing and a share of the $36K bonus pool. Real money, not just points.
@@ -332,7 +332,7 @@ export default function Pricing() {
                 toast({ title: "Could not copy link", description: "Please copy manually: " + link, variant: "destructive" });
               }
             }}
-            className="bg-gradient-to-r from-[#f5c842] to-[#cc9900] text-black font-bold hover:opacity-90 h-12 px-8"
+            className="bg-gradient-to-r from-[#FFB800] to-[#cc9900] text-black font-bold hover:opacity-90 h-12 px-8"
           >
             Get Your Referral Link
           </Button>

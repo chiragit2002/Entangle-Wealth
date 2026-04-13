@@ -206,7 +206,7 @@ export default function Gigs() {
               <div key={gig.id} className="glass-panel p-5 hover:border-primary/30 transition-colors">
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-primary to-[#FFD700] flex items-center justify-center text-lg flex-shrink-0">
+                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-primary to-[#FFB800] flex items-center justify-center text-lg flex-shrink-0">
                       {CATEGORY_EMOJIS[gig.category] || "💼"}
                     </div>
                     <div className="min-w-0">
@@ -216,13 +216,13 @@ export default function Gigs() {
                       )}
                     </div>
                   </div>
-                  <div className="text-lg font-extrabold text-[#00ff88] flex-shrink-0 ml-2">{gig.price}</div>
+                  <div className="text-lg font-extrabold text-[#00FF41] flex-shrink-0 ml-2">{gig.price}</div>
                 </div>
                 <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{gig.description}</p>
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1">
-                      <Star className="w-3.5 h-3.5 text-[#FFD700] fill-[#FFD700]" />
+                      <Star className="w-3.5 h-3.5 text-[#FFB800] fill-[#FFB800]" />
                       {gig.rating}
                     </span>
                     <span>{gig.completedJobs} jobs</span>

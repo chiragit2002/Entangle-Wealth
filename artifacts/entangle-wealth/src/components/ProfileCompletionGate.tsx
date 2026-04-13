@@ -359,8 +359,8 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
   const canSave = profileDone && businessOwnerAnswered && !needsBusinessDocs;
 
   return (
-    <div className="fixed inset-0 z-[200] bg-background/95 backdrop-blur-sm flex items-start sm:items-center justify-center overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="profile-gate-title">
-      <div className="w-full max-w-lg rounded-none sm:rounded-2xl border-0 sm:border border-border/40 bg-card p-6 sm:p-8 sm:my-6 min-h-screen sm:min-h-0 shadow-2xl animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[200] bg-background/95  flex items-start sm:items-center justify-center overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="profile-gate-title">
+      <div className="w-full max-w-lg rounded-none sm:rounded-sm border-0 sm:border border-border/40 bg-card p-6 sm:p-8 sm:my-6 min-h-screen sm:min-h-0 shadow-2xl animate-in fade-in duration-300">
         <div className="flex items-start justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">

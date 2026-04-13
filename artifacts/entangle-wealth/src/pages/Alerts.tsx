@@ -46,10 +46,10 @@ interface AlertHistoryItem {
 }
 
 const ALERT_TYPE_OPTIONS = [
-  { value: "price_above", label: "Price Above", icon: TrendingUp, color: "#00ff88" },
+  { value: "price_above", label: "Price Above", icon: TrendingUp, color: "#00FF41" },
   { value: "price_below", label: "Price Below", icon: TrendingDown, color: "#ff3366" },
   { value: "rsi_oversold", label: "RSI Oversold (<30)", icon: Activity, color: "#00D4FF" },
-  { value: "rsi_overbought", label: "RSI Overbought (>70)", icon: Activity, color: "#ffd700" },
+  { value: "rsi_overbought", label: "RSI Overbought (>70)", icon: Activity, color: "#FFB800" },
   { value: "macd_crossover", label: "MACD Crossover", icon: Zap, color: "#9c27b0" },
   { value: "bollinger_breakout", label: "Bollinger Breakout", icon: AlertTriangle, color: "#ff6b35" },
 ];
@@ -332,13 +332,13 @@ export default function Alerts() {
           <div className="flex items-center gap-3">
             {dailyLimit && (
               <div className="text-xs text-white/30 bg-white/[0.04] rounded-lg px-3 py-2 border border-white/[0.06]">
-                <span className="text-[#ffd700] font-bold">{dailyUsed}</span>
+                <span className="text-[#FFB800] font-bold">{dailyUsed}</span>
                 <span className="text-white/50">/{dailyLimit} daily alerts</span>
                 <span className="text-white/50 ml-1">(Free)</span>
               </div>
             )}
             {tier === "pro" && (
-              <div className="text-xs text-[#00ff88] bg-[#00ff88]/5 rounded-lg px-3 py-2 border border-[#00ff88]/20">
+              <div className="text-xs text-[#00FF41] bg-[#00FF41]/5 rounded-lg px-3 py-2 border border-[#00FF41]/20">
                 Pro | Unlimited
               </div>
             )}
@@ -557,7 +557,7 @@ export default function Alerts() {
                               size="icon"
                               variant="ghost"
                               className="w-7 h-7"
-                              style={{ color: rule.enabled ? "#00ff88" : "rgba(255,255,255,0.3)" }}
+                              style={{ color: rule.enabled ? "#00FF41" : "rgba(255,255,255,0.3)" }}
                               aria-label={rule.enabled ? "Disable alert" : "Enable alert"}
                             >
                               {rule.enabled ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
@@ -689,7 +689,7 @@ export default function Alerts() {
               ))}
             </div>
             {digestFrequency !== "off" && (
-              <p className="text-[10px] text-[#00ff88]/60 mt-2">
+              <p className="text-[10px] text-[#00FF41]/60 mt-2">
                 {digestFrequency === "daily" ? "You'll receive a daily digest at 8:00 AM UTC" : "You'll receive a weekly digest every Monday at 8:00 AM UTC"}
               </p>
             )}

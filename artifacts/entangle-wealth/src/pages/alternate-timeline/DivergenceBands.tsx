@@ -10,7 +10,7 @@ export function DivergenceBands({ compareResult }: { compareResult: CompareResul
         const next = compareResult.deltas.find(d => d.horizon === DISPLAY_HORIZONS[i + 1]);
         if (!curr || !next) return null;
         const isPositive = curr.deltaNetWorth >= 0;
-        const fill = isPositive ? "rgba(0,230,118,0.10)" : "rgba(239,68,68,0.10)";
+        const fill = isPositive ? "rgba(0,255,65,0.10)" : "rgba(239,68,68,0.10)";
         return (
           <ReferenceArea
             key={h}

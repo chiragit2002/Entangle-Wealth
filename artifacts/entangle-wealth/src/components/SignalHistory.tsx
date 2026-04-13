@@ -10,7 +10,7 @@ export function SignalHistory() {
   const avgLoss = (signalHistory.filter(s => s.result === "loss").reduce((a, s) => a + s.pnl, 0) / losses).toFixed(2);
 
   return (
-    <div className="glass-panel rounded-2xl p-5">
+    <div className="glass-panel rounded-sm p-5">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-green-400" />

@@ -26,8 +26,8 @@ const STATUS_OPTIONS = ["all", "open", "in_progress", "resolved", "closed"] as c
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Circle }> = {
   open: { label: "Open", color: "#00D4FF", icon: Circle },
-  in_progress: { label: "In Progress", color: "#FFD700", icon: AlertCircle },
-  resolved: { label: "Resolved", color: "#00ff88", icon: CheckCircle2 },
+  in_progress: { label: "In Progress", color: "#FFB800", icon: AlertCircle },
+  resolved: { label: "Resolved", color: "#00FF41", icon: CheckCircle2 },
   closed: { label: "Closed", color: "#666", icon: CheckCircle2 },
 };
 
@@ -193,7 +193,7 @@ export default function AdminTickets() {
                             {ticket.resolved_at && (
                               <div>
                                 <span className="text-white/50">Resolved:</span>
-                                <span className="text-[#00ff88] ml-1 font-mono">{new Date(ticket.resolved_at).toLocaleString()}</span>
+                                <span className="text-[#00FF41] ml-1 font-mono">{new Date(ticket.resolved_at).toLocaleString()}</span>
                               </div>
                             )}
                           </div>

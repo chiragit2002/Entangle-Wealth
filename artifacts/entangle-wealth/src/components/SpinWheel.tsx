@@ -15,21 +15,21 @@ interface Prize {
 }
 
 const PRIZES: Prize[] = [
-  { rewardType: "cash", label: "$1K", color: "#1a3a2a", textColor: "#00ff88" },
+  { rewardType: "cash", label: "$1K", color: "#1a3a2a", textColor: "#00FF41" },
   { rewardType: "xp", label: "+50 XP", color: "#1a1a3a", textColor: "#00D4FF" },
   { rewardType: "cash", label: "$2K", color: "#1a2a3a", textColor: "#00D4FF" },
   { rewardType: "xp", label: "+100 XP", color: "#2a1a3a", textColor: "#a855f7" },
   { rewardType: "cash", label: "$3K", color: "#2a1a3a", textColor: "#a855f7" },
   { rewardType: "cash", label: "$4K", color: "#3a2a1a", textColor: "#f59e0b" },
   { rewardType: "xp", label: "+250 XP", color: "#1a1a2a", textColor: "#6366f1" },
-  { rewardType: "cash", label: "$5K", color: "#1a3a2a", textColor: "#00ff88" },
+  { rewardType: "cash", label: "$5K", color: "#1a3a2a", textColor: "#00FF41" },
   { rewardType: "cash", label: "$7.5K", color: "#1a2a3a", textColor: "#00D4FF" },
   { rewardType: "cash", label: "$10K", color: "#3a1a1a", textColor: "#ff3366" },
-  { rewardType: "multiplier", label: "2x Boost", color: "#2a1a00", textColor: "#FFD700" },
+  { rewardType: "multiplier", label: "2x Boost", color: "#2a1a00", textColor: "#FFB800" },
   { rewardType: "cash", label: "$25K", color: "#2a1a1a", textColor: "#ff6b35" },
   { rewardType: "cash", label: "$50K", color: "#1a1a3a", textColor: "#a855f7" },
   { rewardType: "streak_protection", label: "Streak+", color: "#2a0a1a", textColor: "#ff3366" },
-  { rewardType: "cash", label: "$100K", color: "#2a1a00", textColor: "#FFD700" },
+  { rewardType: "cash", label: "$100K", color: "#2a1a00", textColor: "#FFB800" },
 ];
 
 const SEG_ANGLE = (2 * Math.PI) / PRIZES.length;
@@ -174,14 +174,14 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
     ctx.arc(cx, cy, 20, 0, 2 * Math.PI);
     const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 20);
     grad.addColorStop(0, "#1a1a2e");
-    grad.addColorStop(1, "#0a0a0f");
+    grad.addColorStop(1, "#0A0E1A");
     ctx.fillStyle = grad;
     ctx.fill();
     ctx.strokeStyle = "rgba(255,215,0,0.3)";
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    ctx.fillStyle = "#FFD700";
+    ctx.fillStyle = "#FFB800";
     ctx.font = "bold 8px monospace";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -260,11 +260,11 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
   const specialPrizes = PRIZES.filter(p => p.rewardType === "multiplier" || p.rewardType === "streak_protection");
 
   return (
-    <div className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm overflow-hidden">
-      <div className="flex items-center justify-between px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FFD700]">
+    <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
+      <div className="flex items-center justify-between px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FFB800]">
         <div className="flex items-center gap-1.5">
-          <Gift className="w-3.5 h-3.5 text-[#FFD700]" />
-          <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FFD700]">DAILY SPIN</span>
+          <Gift className="w-3.5 h-3.5 text-[#FFB800]" />
+          <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FFB800]">DAILY SPIN</span>
           <span className="text-[8px] font-mono text-white/30 ml-1">CASH · XP · BOOSTS</span>
         </div>
         <div className="flex items-center gap-2">
@@ -275,7 +275,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
             </div>
           )}
           {status?.canSpin && (
-            <span className="text-[9px] font-mono text-[#00ff88] animate-pulse">READY</span>
+            <span className="text-[9px] font-mono text-[#00FF41] animate-pulse">READY</span>
           )}
         </div>
       </div>
@@ -291,9 +291,9 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
                 height: 0,
                 borderLeft: "7px solid transparent",
                 borderRight: "7px solid transparent",
-                borderTop: "16px solid #FFD700",
+                borderTop: "16px solid #FFB800",
                 marginTop: "-1px",
-                filter: "drop-shadow(0 0 4px #FFD700)",
+                filter: "drop-shadow(0 0 4px #FFB800)",
               }}
             />
             <motion.div
@@ -350,7 +350,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
               whileTap={!spinning && status?.canSpin && isSignedIn ? { scale: 0.96 } : {}}
               className={`mt-2 w-full h-8 text-[10px] font-mono font-bold rounded-sm transition-colors disabled:opacity-40 ${
                 status?.canSpin && isSignedIn && !spinning
-                  ? "bg-[#FFD700] text-black shadow-lg shadow-[#FFD700]/20"
+                  ? "bg-[#FFB800] text-black shadow-lg shadow-[#FFB800]/20"
                   : "bg-white/[0.05] text-white/30 border border-white/[0.08]"
               }`}
             >
@@ -380,14 +380,14 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
               }}
             >
               <Trophy className="w-5 h-5 mx-auto mb-1" style={{
-                color: winResult.rewardType === "cash" ? "#FFD700" :
+                color: winResult.rewardType === "cash" ? "#FFB800" :
                   winResult.rewardType === "xp" ? "#00D4FF" :
-                  winResult.rewardType === "multiplier" ? "#FFD700" : "#ff3366"
+                  winResult.rewardType === "multiplier" ? "#FFB800" : "#ff3366"
               }} />
               <p className="text-[9px] font-mono text-white/50 mb-0.5">YOU WON</p>
               {winResult.rewardType === "cash" && (
                 <>
-                  <p className="text-xl font-mono font-bold text-[#FFD700]">+${winResult.prize.toLocaleString()}</p>
+                  <p className="text-xl font-mono font-bold text-[#FFB800]">+${winResult.prize.toLocaleString()}</p>
                   <p className="text-[8px] font-mono text-white/30 mt-0.5">Added to paper trading balance</p>
                 </>
               )}
@@ -399,7 +399,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
               )}
               {winResult.rewardType === "multiplier" && (
                 <>
-                  <p className="text-xl font-mono font-bold text-[#FFD700]">2x XP Boost</p>
+                  <p className="text-xl font-mono font-bold text-[#FFB800]">2x XP Boost</p>
                   <p className="text-[8px] font-mono text-white/30 mt-0.5">XP multiplier activated on your streak</p>
                 </>
               )}
@@ -414,7 +414,7 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
         </AnimatePresence>
 
         {!isSignedIn && (
-          <p className="mt-2 text-[9px] font-mono text-[#FFD700]/60 text-center">Sign in to claim your free daily spin</p>
+          <p className="mt-2 text-[9px] font-mono text-[#FFB800]/60 text-center">Sign in to claim your free daily spin</p>
         )}
 
         <button
@@ -436,8 +436,8 @@ export function SpinWheel({ onBalanceChange }: { onBalanceChange?: () => void })
                   <span className="text-[9px] font-mono font-bold"
                     style={{
                       color: h.rewardType === "xp" ? "#00D4FF" :
-                        h.rewardType === "multiplier" ? "#FFD700" :
-                        h.rewardType === "streak_protection" ? "#ff3366" : "#FFD700"
+                        h.rewardType === "multiplier" ? "#FFB800" :
+                        h.rewardType === "streak_protection" ? "#ff3366" : "#FFB800"
                     }}>
                     {h.rewardType === "cash" ? `+$${h.prizeAmount.toLocaleString()}` : h.rewardLabel || "Reward"}
                   </span>

@@ -243,7 +243,7 @@ export default function Options() {
 
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+            <div className="w-16 h-16 rounded-sm bg-white/5 flex items-center justify-center mb-4">
               <Target className="w-8 h-8 text-muted-foreground" />
             </div>
             <p className="text-lg font-semibold mb-1">No signals match your filters</p>

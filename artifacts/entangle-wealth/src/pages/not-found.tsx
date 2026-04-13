@@ -58,7 +58,7 @@ export default function NotFound() {
       vy: (Math.random() - 0.5) * 1.5 - 0.3,
       alpha: 0.8,
       size: Math.random() * 3 + 1,
-      color: Math.random() > 0.5 ? "#00D4FF" : "#7B61FF",
+      color: "#00FF41",
     });
 
     particlesRef.current = Array.from({ length: 40 }, spawn);
@@ -122,26 +122,25 @@ export default function NotFound() {
           )}
 
           <div
-            className="relative w-36 h-36 rounded-3xl flex flex-col items-center justify-center mx-auto"
+            className="relative w-36 h-36 flex flex-col items-center justify-center mx-auto"
             style={{
-              background: "linear-gradient(135deg, rgba(0,212,255,0.06), rgba(123,97,255,0.06))",
-              border: "1px solid rgba(0,212,255,0.18)",
-              boxShadow: "0 0 40px rgba(0,212,255,0.08)",
+              borderRadius: 0,
+              background: "linear-gradient(135deg, rgba(0,255,65,0.06), rgba(0,255,65,0.03))",
+              border: "1px solid rgba(0,255,65,0.18)",
+              boxShadow: "0 0 40px rgba(0,255,65,0.08)",
             }}
           >
             <span
               className="text-5xl font-black font-mono"
               style={{
-                background: "linear-gradient(135deg, #00D4FF, #7B61FF)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                WebkitTextFillColor: "#00FF41",
               }}
             >
               404
             </span>
             <div
               className="text-[9px] tracking-[0.25em] uppercase mt-1"
-              style={{ color: "rgba(0,212,255,0.4)" }}
+              style={{ color: "rgba(0,255,65,0.4)" }}
             >
               Timeline Lost
             </div>
@@ -159,7 +158,7 @@ export default function NotFound() {
         <div className="flex flex-wrap gap-3 justify-center mb-12">
           <Link href="/">
             <Button
-              className="bg-[#00D4FF] text-black hover:bg-[#00D4FF]/90 gap-2 font-semibold shadow-[0_0_24px_rgba(0,212,255,0.2)]"
+              className="bg-[#00FF41] text-black hover:bg-[#00FF41]/90 gap-2 font-semibold shadow-[0_0_24px_rgba(0,255,65,0.2)]"
             >
               <Home className="w-4 h-4" /> Return to Origin
             </Button>
@@ -181,31 +180,32 @@ export default function NotFound() {
             {QUICK_LINKS.map((link) => (
               <Link key={link.href} href={link.href}>
                 <div
-                  className="flex items-center gap-3 p-4 rounded-xl cursor-pointer group transition-all duration-200"
+                  className="flex items-center gap-3 p-4 cursor-pointer group transition-all duration-200"
                   style={{
-                    background: "rgba(10,10,20,0.9)",
+                    borderRadius: 0,
+                    background: "rgba(10,14,26,0.9)",
                     border: "1px solid rgba(255,255,255,0.07)",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLDivElement).style.border = "1px solid rgba(0,212,255,0.25)";
-                    (e.currentTarget as HTMLDivElement).style.background = "rgba(0,212,255,0.04)";
+                    (e.currentTarget as HTMLDivElement).style.border = "1px solid rgba(0,255,65,0.25)";
+                    (e.currentTarget as HTMLDivElement).style.background = "rgba(0,255,65,0.04)";
                   }}
                   onMouseLeave={(e) => {
                     (e.currentTarget as HTMLDivElement).style.border = "1px solid rgba(255,255,255,0.07)";
-                    (e.currentTarget as HTMLDivElement).style.background = "rgba(10,10,20,0.9)";
+                    (e.currentTarget as HTMLDivElement).style.background = "rgba(10,14,26,0.9)";
                   }}
                 >
                   <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors"
-                    style={{ background: "rgba(255,255,255,0.04)" }}
+                    className="w-9 h-9 flex items-center justify-center flex-shrink-0 transition-colors"
+                    style={{ background: "rgba(255,255,255,0.04)", borderRadius: 0 }}
                   >
-                    <link.icon className="w-4 h-4 text-white/40 group-hover:text-[#00D4FF] transition-colors" />
+                    <link.icon className="w-4 h-4 text-white/40 group-hover:text-[#00FF41] transition-colors" />
                   </div>
                   <div className="text-left">
-                    <div className="text-sm font-medium text-white group-hover:text-[#00D4FF] transition-colors">
+                    <div className="text-sm font-medium text-white group-hover:text-[#00FF41] transition-colors uppercase font-mono">
                       {link.label}
                     </div>
-                    <div className="text-[11px] text-white/28">{link.desc}</div>
+                    <div className="text-[11px] text-white/28 font-mono">{link.desc}</div>
                   </div>
                 </div>
               </Link>

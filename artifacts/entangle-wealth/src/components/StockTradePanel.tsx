@@ -180,13 +180,13 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
     <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
         <div className="flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-[#00ff88]" />
+          <TrendingUp className="w-4 h-4 text-[#00FF41]" />
           <span className="text-sm font-bold text-white">Trade {symbol}</span>
         </div>
         {portfolio && (
           <div className="flex items-center gap-3 text-[10px] font-mono">
-            <span className="text-white/40">Cash: <span className="text-[#00ff88] font-bold">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span></span>
-            <span className={`font-bold ${pnl >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
+            <span className="text-white/40">Cash: <span className="text-[#00FF41] font-bold">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span></span>
+            <span className={`font-bold ${pnl >= 0 ? "text-[#00FF41]" : "text-[#ff3366]"}`}>
               P&L: {pnl >= 0 ? "+" : ""}{pnlPct}%
             </span>
           </div>
@@ -224,7 +224,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
             onClick={() => setSide("buy")}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
               side === "buy"
-                ? "bg-[#00ff88]/15 text-[#00ff88] border border-[#00ff88]/30"
+                ? "bg-[#00FF41]/15 text-[#00FF41] border border-[#00FF41]/30"
                 : "bg-white/[0.03] text-white/40 border border-white/[0.06] hover:border-white/10"
             }`}
           >
@@ -277,7 +277,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
                 onClick={() => setOptionType("CALL")}
                 className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
                   optionType === "CALL"
-                    ? "bg-[#00ff88]/15 text-[#00ff88] border border-[#00ff88]/30"
+                    ? "bg-[#00FF41]/15 text-[#00FF41] border border-[#00FF41]/30"
                     : "bg-white/[0.03] text-white/40 border border-white/[0.06]"
                 }`}
               >
@@ -359,7 +359,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
           disabled={loading || !isSignedIn}
           className={`w-full py-2.5 text-sm font-bold rounded-lg transition-all disabled:opacity-40 ${
             side === "buy"
-              ? "bg-[#00ff88] text-black hover:bg-[#00ff88]/80"
+              ? "bg-[#00FF41] text-black hover:bg-[#00FF41]/80"
               : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"
           }`}
         >
@@ -370,7 +370,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
         </button>
 
         {!isSignedIn && (
-          <p className="text-[10px] font-mono text-[#FFD700] text-center">Sign in to start paper trading</p>
+          <p className="text-[10px] font-mono text-[#FFB800] text-center">Sign in to start paper trading</p>
         )}
       </div>
 

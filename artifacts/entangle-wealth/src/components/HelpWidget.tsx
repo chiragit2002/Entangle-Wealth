@@ -18,7 +18,7 @@ export function HelpWidget() {
   return (
     <>
       {open && (
-        <div className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-[90] w-80 max-h-[70vh] bg-[#0a0a14] border border-white/10 rounded-2xl shadow-2xl shadow-black/80 flex flex-col animate-in slide-in-from-bottom-4 fade-in duration-200">
+        <div className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-[90] w-80 max-h-[70vh] bg-[#0a0a14] border border-white/10 rounded-sm shadow-2xl shadow-black/80 flex flex-col animate-in slide-in-from-bottom-4 fade-in duration-200">
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
             <div className="flex items-center gap-2">
               <HelpCircle className="w-4 h-4 text-[#00D4FF]" />
@@ -70,7 +70,7 @@ export function HelpWidget() {
                 </Link>
                 <Link href="/submit-ticket" onClick={() => setOpen(false)} className="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-white/[0.04] transition-colors group">
                   <div className="flex items-center gap-2">
-                    <MessageSquarePlus className="w-3.5 h-3.5 text-[#FFD700]" />
+                    <MessageSquarePlus className="w-3.5 h-3.5 text-[#FFB800]" />
                     <span className="text-xs font-medium text-white/60 group-hover:text-white/80">Submit a Ticket</span>
                   </div>
                   <ChevronRight className="w-3.5 h-3.5 text-white/40" />
@@ -78,8 +78,8 @@ export function HelpWidget() {
                 <Link href="/status" onClick={() => setOpen(false)} className="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-white/[0.04] transition-colors group">
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff88] opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00ff88]" />
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00FF41] opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00FF41]" />
                     </span>
                     <span className="text-xs font-medium text-white/60 group-hover:text-white/80">System Status</span>
                   </div>

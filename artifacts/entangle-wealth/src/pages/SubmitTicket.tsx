@@ -102,7 +102,7 @@ export default function SubmitTicket() {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-20 max-w-lg text-center">
-          <CheckCircle2 className="w-16 h-16 text-[#00ff88] mx-auto mb-6" />
+          <CheckCircle2 className="w-16 h-16 text-[#00FF41] mx-auto mb-6" />
           <h1 className="text-2xl font-bold mb-2">Ticket Submitted</h1>
           <p className="text-white/50 mb-2">Your ticket ID is <span className="text-[#00D4FF] font-mono font-bold">#{submitted.ticketId}</span></p>
           <p className="text-white/30 text-sm mb-8">We'll review your request and get back to you within 1–2 business days.</p>

@@ -16,7 +16,7 @@ const Section = ({ id, title, subtitle, children }: { id?: string; title: string
 );
 
 const StatCard = ({ label, value, sub, color = "#00D4FF" }: { label: string; value: string; sub?: string; color?: string }) => (
-  <div className="bg-[#0a0a0f] border border-gray-800/60 rounded-lg p-5 text-center">
+  <div className="bg-[#0A0E1A] border border-gray-800/60 rounded-lg p-5 text-center">
     <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">{label}</div>
     <div className="text-2xl md:text-3xl font-bold" style={{ color, fontFamily: "JetBrains Mono, monospace" }}>{value}</div>
     {sub && <div className="text-xs text-gray-500 mt-1">{sub}</div>}
@@ -393,8 +393,8 @@ export default function CaseStudy() {
       <div className="min-h-screen bg-[#020204] text-white" ref={reportRef}>
         <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
 
-          <div className="relative mb-16 py-16 px-8 rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, #020204 0%, #0a1628 50%, #020204 100%)" }}>
-            <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(circle at 30% 50%, #00D4FF 0%, transparent 50%), radial-gradient(circle at 70% 50%, #FFD700 0%, transparent 50%)" }} />
+          <div className="relative mb-16 py-16 px-8 rounded-sm overflow-hidden" style={{ background: "linear-gradient(135deg, #020204 0%, #0a1628 50%, #020204 100%)" }}>
+            <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(circle at 30% 50%, #00D4FF 0%, transparent 50%), radial-gradient(circle at 70% 50%, #FFB800 0%, transparent 50%)" }} />
             <div className="relative text-center">
               <div className="inline-block px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 mb-6">
                 <span className="text-cyan-400 text-xs tracking-widest uppercase" style={{ fontFamily: "JetBrains Mono, monospace" }}>Competitive Intelligence Report | {REPORT_DATE}</span>
@@ -430,13 +430,13 @@ export default function CaseStudy() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
             <StatCard label="Market Opportunity" value="$9.6B" sub="Growing to $34.5B by 2035" />
-            <StatCard label="Cost vs Bloomberg" value="99.6%" sub="Lower annual cost" color="#00ff88" />
-            <StatCard label="AI Models" value="6" sub="Consensus verification engine" color="#FFD700" />
+            <StatCard label="Cost vs Bloomberg" value="99.6%" sub="Lower annual cost" color="#00FF41" />
+            <StatCard label="AI Models" value="6" sub="Consensus verification engine" color="#FFB800" />
             <StatCard label="SEO Pages" value="166" sub="Across 7 content verticals" color="#9c27b0" />
           </div>
 
           <Section id="section-1" title="1. Executive Summary" subtitle="April Dunford Positioning Framework">
-            <div className="bg-[#0a0a0f] border border-cyan-500/20 rounded-xl p-6 md:p-8 mb-8">
+            <div className="bg-[#0A0E1A] border border-cyan-500/20 rounded-xl p-6 md:p-8 mb-8">
               <div className="flex items-start gap-3 mb-4">
                 <Target className="w-6 h-6 text-cyan-400 mt-1 flex-shrink-0" />
                 <div>
@@ -452,7 +452,7 @@ export default function CaseStudy() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-[#0a0a0f] border border-gray-800/60 rounded-lg p-5">
+              <div className="bg-[#0A0E1A] border border-gray-800/60 rounded-lg p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Globe className="w-5 h-5 text-cyan-400" />
                   <span className="text-sm font-semibold text-white">Competitive Alternatives</span>
@@ -464,7 +464,7 @@ export default function CaseStudy() {
                   <li>• "Do nothing" | gut-feel trading</li>
                 </ul>
               </div>
-              <div className="bg-[#0a0a0f] border border-gray-800/60 rounded-lg p-5">
+              <div className="bg-[#0A0E1A] border border-gray-800/60 rounded-lg p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Brain className="w-5 h-5 text-yellow-400" />
                   <span className="text-sm font-semibold text-white">Unique Attributes</span>
@@ -482,16 +482,16 @@ export default function CaseStudy() {
           <Section id="section-2" title="2. Market Opportunity" subtitle="$9.6B TAM growing to $34.5B by 2035">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               <StatCard label="Global Fintech Market" value="$394.9B" sub="18.2% CAGR → $1.76T by 2034" />
-              <StatCard label="Stock Trading Apps" value="$9.6B" sub="13.62% CAGR → $34.5B by 2035" color="#FFD700" />
+              <StatCard label="Stock Trading Apps" value="$9.6B" sub="13.62% CAGR → $34.5B by 2035" color="#FFB800" />
               <StatCard label="AI in Stock Market" value="$840M" sub="17% CAGR → $1.82B by 2030" color="#9c27b0" />
             </div>
             <div className="space-y-4">
               {[
                 { icon: Users, color: "#00D4FF", title: "Democratization", text: "400M+ retail investors globally trade via mobile apps. Retail accounts for 21-35% of US equity trading volume. Yet zero platforms offer multi-model AI consensus at accessible pricing." },
-                { icon: Brain, color: "#FFD700", title: "AI Maturity", text: "Predictive AI in finance reached $840M in 2025, growing 17% annually. 92% of financial institutions consider AI critical to competitiveness. The tools exist | but remain behind institutional paywalls." },
+                { icon: Brain, color: "#FFB800", title: "AI Maturity", text: "Predictive AI in finance reached $840M in 2025, growing 17% annually. 92% of financial institutions consider AI critical to competitiveness. The tools exist | but remain behind institutional paywalls." },
                 { icon: Layers, color: "#9c27b0", title: "Fragmentation", text: "Retail investors need 3-5 separate tools (charting, scanning, news, tax, options) at $200-$500/month combined. EntangleWealth consolidates all into one platform at $29/month." },
               ].map(({ icon: Icon, color, title, text }) => (
-                <div key={title} className="flex gap-4 bg-[#0a0a0f] border border-gray-800/60 rounded-lg p-5">
+                <div key={title} className="flex gap-4 bg-[#0A0E1A] border border-gray-800/60 rounded-lg p-5">
                   <Icon className="w-6 h-6 flex-shrink-0 mt-0.5" style={{ color }} />
                   <div>
                     <h4 className="font-semibold text-white mb-1">{title}</h4>
@@ -517,12 +517,12 @@ export default function CaseStudy() {
                 </thead>
                 <tbody>
                   {[
-                    { name: "Bloomberg Terminal", pricing: "$2,665/mo ($31,980/yr)", users: "325,000+", ai: "Human analysts, basic automation", threat: "Low", color: "#00ff88" },
-                    { name: "TradingView", pricing: "$0–$200/mo", users: "100M+", ai: "No AI analysis", threat: "Medium", color: "#FFD700" },
-                    { name: "Trade Ideas", pricing: "$89–$254/mo", users: "~50,000", ai: "Holly AI (single model)", threat: "Medium", color: "#FFD700" },
-                    { name: "Koyfin", pricing: "$0–$239/mo", users: "500,000+", ai: "No AI", threat: "Low", color: "#00ff88" },
-                    { name: "TrendSpider", pricing: "$54–$199/mo", users: "~30,000", ai: "Basic automation", threat: "Low", color: "#00ff88" },
-                    { name: "Danelfin", pricing: "$0–$59/mo", users: "~100,000", ai: "Single AI score (1-10)", threat: "Medium", color: "#FFD700" },
+                    { name: "Bloomberg Terminal", pricing: "$2,665/mo ($31,980/yr)", users: "325,000+", ai: "Human analysts, basic automation", threat: "Low", color: "#00FF41" },
+                    { name: "TradingView", pricing: "$0–$200/mo", users: "100M+", ai: "No AI analysis", threat: "Medium", color: "#FFB800" },
+                    { name: "Trade Ideas", pricing: "$89–$254/mo", users: "~50,000", ai: "Holly AI (single model)", threat: "Medium", color: "#FFB800" },
+                    { name: "Koyfin", pricing: "$0–$239/mo", users: "500,000+", ai: "No AI", threat: "Low", color: "#00FF41" },
+                    { name: "TrendSpider", pricing: "$54–$199/mo", users: "~30,000", ai: "Basic automation", threat: "Low", color: "#00FF41" },
+                    { name: "Danelfin", pricing: "$0–$59/mo", users: "~100,000", ai: "Single AI score (1-10)", threat: "Medium", color: "#FFB800" },
                     { name: "Robinhood", pricing: "$0–$5/mo", users: "24M+", ai: "No analysis AI", threat: "High", color: "#ff3366" },
                   ].map((c) => (
                     <tr key={c.name} className="border-b border-gray-800/40 hover:bg-white/[0.02]">
@@ -543,11 +543,11 @@ export default function CaseStudy() {
             <div className="space-y-6">
               {[
                 { num: "01", icon: Brain, color: "#00D4FF", title: "6-Model AI Consensus Engine", desc: "Every competitor uses either zero AI or a single-model approach. Bloomberg relies on human analysts. TradingView has no AI analysis. Trade Ideas uses Holly | a single AI. Danelfin uses a single scoring algorithm. EntangleWealth is the ONLY platform requiring 6 independent AI models (Price Action, Volume Analysis, Options Flow, Technical Indicators, Sentiment Analysis, Risk Management) to achieve consensus before issuing a signal. This cross-verification methodology mirrors institutional quant desks | but no retail platform has implemented it." },
-                { num: "02", icon: Layers, color: "#FFD700", title: "Full-Spectrum Financial Platform", desc: "Competitors are narrowly focused. Bloomberg does terminal. TradingView does charts. Trade Ideas does scanning. Robinhood does execution. None offer integrated tax intelligence (TaxGPT trained on IRS publications), career tools (resume builder, job search), income opportunities (gig marketplace, options income strategies), AND community features in a single platform. EntangleWealth consolidates what would require 5+ separate subscriptions." },
-                { num: "03", icon: DollarSign, color: "#00ff88", title: "Bloomberg-Grade Data at 99.6% Lower Cost", desc: "Bloomberg Terminal costs $31,980/year minimum with 2-year contract lock-in and 50% early termination penalty. EntangleWealth Pro delivers live market data, 55+ technical indicators, options flow, market internals (TICK, TRIN, A/D, VIX), multi-asset coverage (crypto, forex, commodities, bonds), and AI consensus analysis for $348/year | a 99.6% cost reduction. Even mid-market competitors: Trade Ideas $2,136/yr, TrendSpider $648–$2,388/yr, Koyfin Pro $948/yr | EntangleWealth undercuts every professional alternative." },
+                { num: "02", icon: Layers, color: "#FFB800", title: "Full-Spectrum Financial Platform", desc: "Competitors are narrowly focused. Bloomberg does terminal. TradingView does charts. Trade Ideas does scanning. Robinhood does execution. None offer integrated tax intelligence (TaxGPT trained on IRS publications), career tools (resume builder, job search), income opportunities (gig marketplace, options income strategies), AND community features in a single platform. EntangleWealth consolidates what would require 5+ separate subscriptions." },
+                { num: "03", icon: DollarSign, color: "#00FF41", title: "Bloomberg-Grade Data at 99.6% Lower Cost", desc: "Bloomberg Terminal costs $31,980/year minimum with 2-year contract lock-in and 50% early termination penalty. EntangleWealth Pro delivers live market data, 55+ technical indicators, options flow, market internals (TICK, TRIN, A/D, VIX), multi-asset coverage (crypto, forex, commodities, bonds), and AI consensus analysis for $348/year | a 99.6% cost reduction. Even mid-market competitors: Trade Ideas $2,136/yr, TrendSpider $648–$2,388/yr, Koyfin Pro $948/yr | EntangleWealth undercuts every professional alternative." },
                 { num: "04", icon: TrendingUp, color: "#9c27b0", title: "166-Page SEO Content Engine", desc: "EntangleWealth has deployed a programmatic SEO system generating 166 optimized pages across 7 content verticals (Glossary: 67, Indicators: 16, Strategies: 24, Patterns: 21, Sectors: 12, Comparisons: 11, Educational: 15). No competitor has comparable educational content infrastructure. This creates an organic acquisition moat that compounds over time, reducing CAC as the content library grows." },
               ].map(({ num, icon: Icon, color, title, desc }) => (
-                <div key={num} className="flex gap-5 bg-[#0a0a0f] border border-gray-800/60 rounded-xl p-6 hover:border-gray-700/60 transition-colors">
+                <div key={num} className="flex gap-5 bg-[#0A0E1A] border border-gray-800/60 rounded-xl p-6 hover:border-gray-700/60 transition-colors">
                   <div className="flex-shrink-0">
                     <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ background: `${color}15`, border: `1px solid ${color}30` }}>
                       <Icon className="w-6 h-6" style={{ color }} />
@@ -613,7 +613,7 @@ export default function CaseStudy() {
               <span className="flex items-center gap-1.5"><X className="w-3 h-3 text-red-400/60" /> Not available</span>
               <span className="text-gray-600 ml-4">EW = EntangleWealth, BBG = Bloomberg, TV = TradingView, TI = Trade Ideas, KF = Koyfin, TS = TrendSpider, DF = Danelfin, RH = Robinhood</span>
             </div>
-            <div className="mt-6 bg-[#0a0a0f] border border-emerald-500/20 rounded-lg p-5">
+            <div className="mt-6 bg-[#0A0E1A] border border-emerald-500/20 rounded-lg p-5">
               <div className="flex items-center gap-2 mb-2">
                 <Crown className="w-5 h-5 text-yellow-400" />
                 <span className="text-sm font-bold text-white">Feature Count Scorecard</span>
@@ -621,7 +621,7 @@ export default function CaseStudy() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
                 {[
                   { name: "EntangleWealth", score: "24/24", pct: "100%", color: "#00D4FF" },
-                  { name: "Bloomberg", score: "16/24", pct: "67%", color: "#FFD700" },
+                  { name: "Bloomberg", score: "16/24", pct: "67%", color: "#FFB800" },
                   { name: "TradingView", score: "12/24", pct: "50%", color: "#9c27b0" },
                   { name: "Robinhood", score: "8/24", pct: "33%", color: "#ff3366" },
                 ].map(s => (
@@ -641,13 +641,13 @@ export default function CaseStudy() {
                 { name: "Bloomberg Terminal", cost: "$31,980/yr", note: "2-year lock-in, 50% early exit penalty, $300 proprietary keyboard", bar: 100, color: "#ff3366" },
                 { name: "Trade Ideas Premium", cost: "$2,136/yr", note: "Holly AI requires Premium tier", bar: 6.7, color: "#ff6b35" },
                 { name: "TrendSpider Advanced", cost: "$2,388/yr", note: "Top tier for full features", bar: 7.5, color: "#ff6b35" },
-                { name: "Koyfin Pro", cost: "$948/yr", note: "Capital IQ data, no AI analysis", bar: 3, color: "#FFD700" },
-                { name: "TradingView Premium", cost: "$720/yr", note: "Charts only, no AI, no tax tools", bar: 2.3, color: "#FFD700" },
-                { name: "Danelfin Pro", cost: "$499/yr", note: "Single score, no terminal", bar: 1.6, color: "#FFD700" },
+                { name: "Koyfin Pro", cost: "$948/yr", note: "Capital IQ data, no AI analysis", bar: 3, color: "#FFB800" },
+                { name: "TradingView Premium", cost: "$720/yr", note: "Charts only, no AI, no tax tools", bar: 2.3, color: "#FFB800" },
+                { name: "Danelfin Pro", cost: "$499/yr", note: "Single score, no terminal", bar: 1.6, color: "#FFB800" },
                 { name: "EntangleWealth Pro", cost: "$348/yr", note: "Full platform: 6-model AI + terminal + tax + career", bar: 1.1, color: "#00D4FF", highlight: true },
-                { name: "EntangleWealth Starter", cost: "$0/yr", note: "Core features free forever", bar: 0.05, color: "#00ff88", highlight: true },
+                { name: "EntangleWealth Starter", cost: "$0/yr", note: "Core features free forever", bar: 0.05, color: "#00FF41", highlight: true },
               ].map((p) => (
-                <div key={p.name} className={`flex items-center gap-4 p-4 rounded-lg ${p.highlight ? "bg-cyan-500/[0.06] border border-cyan-500/20" : "bg-[#0a0a0f] border border-gray-800/40"}`}>
+                <div key={p.name} className={`flex items-center gap-4 p-4 rounded-lg ${p.highlight ? "bg-cyan-500/[0.06] border border-cyan-500/20" : "bg-[#0A0E1A] border border-gray-800/40"}`}>
                   <div className="w-48 flex-shrink-0">
                     <div className={`text-sm font-medium ${p.highlight ? "text-cyan-400" : "text-white"}`}>{p.name}</div>
                     <div className="text-xs text-gray-500">{p.note}</div>
@@ -659,7 +659,7 @@ export default function CaseStudy() {
                 </div>
               ))}
             </div>
-            <div className="bg-[#0a0a0f] border border-yellow-500/20 rounded-lg p-5">
+            <div className="bg-[#0A0E1A] border border-yellow-500/20 rounded-lg p-5">
               <h4 className="font-bold text-yellow-400 mb-2">Cost Efficiency Analysis</h4>
               <p className="text-sm text-gray-400">
                 EntangleWealth delivers <strong className="text-white">24 core capabilities</strong> at <strong className="text-emerald-400">$14.50/capability/year</strong>.
@@ -674,11 +674,11 @@ export default function CaseStudy() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
                 { title: "AI Consensus Verification", desc: "No competitor offers multi-model signal cross-verification. Single-model approaches are vulnerable to bias. EntangleWealth's 6-model consensus is architecturally unique in retail.", color: "#00D4FF" },
-                { title: "Financial Wellness Integration", desc: "Zero competitors combine trading analysis with tax optimization, career tools, and income generation. EntangleWealth addresses the full financial lifecycle of 400M+ retail investors.", color: "#FFD700" },
-                { title: "Content-Led Acquisition", desc: "No competitor has deployed programmatic SEO at this scale. 166 pages across 7 verticals create a compounding organic traffic moat that reduces CAC over time.", color: "#00ff88" },
+                { title: "Financial Wellness Integration", desc: "Zero competitors combine trading analysis with tax optimization, career tools, and income generation. EntangleWealth addresses the full financial lifecycle of 400M+ retail investors.", color: "#FFB800" },
+                { title: "Content-Led Acquisition", desc: "No competitor has deployed programmatic SEO at this scale. 166 pages across 7 verticals create a compounding organic traffic moat that reduces CAC over time.", color: "#00FF41" },
                 { title: "Price-to-Feature Ratio", desc: "The market splits into expensive-and-complete (Bloomberg) or cheap-and-limited (Robinhood). No platform occupies Bloomberg-features-at-retail-pricing.", color: "#9c27b0" },
               ].map((g) => (
-                <div key={g.title} className="bg-[#0a0a0f] border border-gray-800/60 rounded-lg p-5">
+                <div key={g.title} className="bg-[#0A0E1A] border border-gray-800/60 rounded-lg p-5">
                   <div className="w-3 h-3 rounded-full mb-3" style={{ background: g.color }} />
                   <h4 className="font-bold text-white mb-2">{g.title}</h4>
                   <p className="text-sm text-gray-400 leading-relaxed">{g.desc}</p>
@@ -688,7 +688,7 @@ export default function CaseStudy() {
           </Section>
 
           <Section id="section-8" title="8. Risk Factors & Honest Assessment" subtitle="Where competitors currently lead | and our mitigation strategy">
-            <div className="bg-[#0a0a0f] border border-red-500/20 rounded-lg p-6 mb-6">
+            <div className="bg-[#0A0E1A] border border-red-500/20 rounded-lg p-6 mb-6">
               <h4 className="font-bold text-red-400 mb-4 flex items-center gap-2">
                 <Shield className="w-5 h-5" /> Competitive Advantages Held by Others
               </h4>
@@ -709,7 +709,7 @@ export default function CaseStudy() {
                 ))}
               </div>
             </div>
-            <div className="bg-[#0a0a0f] border border-emerald-500/20 rounded-lg p-6">
+            <div className="bg-[#0A0E1A] border border-emerald-500/20 rounded-lg p-6">
               <h4 className="font-bold text-emerald-400 mb-2">Mitigation</h4>
               <p className="text-sm text-gray-400 leading-relaxed">
                 EntangleWealth's moat is not in competing on Bloomberg's data depth or TradingView's indicator count | it's in the <strong className="text-white">AI consensus layer</strong> and <strong className="text-white">full-lifecycle financial platform</strong> that neither can replicate without fundamental architectural changes.  
@@ -727,7 +727,7 @@ export default function CaseStudy() {
                 { num: 4, title: "Close the Execution Gap", text: "Partner with Alpaca for embedded execution to close the analysis-to-execution gap. This eliminates Robinhood's primary structural advantage while maintaining analytical superiority.", source: "Robinhood Q4 2024 earnings, Alpaca API capabilities" },
                 { num: 5, title: "Deploy Battlecard Questions", text: "For prospects evaluating Bloomberg: 'What would you do with the $31,000 you save per seat per year?' For TradingView: 'How many AI models cross-check your signals before you trade?'", source: "April Dunford positioning framework" },
               ].map((a) => (
-                <div key={a.num} className="flex gap-4 bg-[#0a0a0f] border border-gray-800/60 rounded-lg p-5">
+                <div key={a.num} className="flex gap-4 bg-[#0A0E1A] border border-gray-800/60 rounded-lg p-5">
                   <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center flex-shrink-0">
                     <span className="text-cyan-400 font-bold" style={{ fontFamily: "JetBrains Mono, monospace" }}>{a.num}</span>
                   </div>

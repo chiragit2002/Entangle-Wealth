@@ -53,7 +53,7 @@ export default function PersonalTripForm({ form, onChange, onPlan }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="glass-panel rounded-2xl p-5 md:p-7 border border-[rgba(0,212,255,0.15)]">
+      <div className="glass-panel rounded-sm p-5 md:p-7 border border-[rgba(0,212,255,0.15)]">
         <h2 className="text-lg font-bold mb-1">Plan Your Trip</h2>
         <p className="text-[12px] text-muted-foreground mb-5">Set up the basics of your personal trip.</p>
 

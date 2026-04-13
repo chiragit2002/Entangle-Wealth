@@ -26,17 +26,17 @@ export function FinancialDisclaimerBanner({ pageKey }: FinancialDisclaimerBanner
 
   return (
     <div className="mx-4 mt-2 mb-0">
-      <div className="max-w-7xl mx-auto bg-[#FFD700]/[0.04] border border-[#FFD700]/20 rounded-lg px-4 py-3">
+      <div className="max-w-7xl mx-auto bg-[#FFB800]/[0.04] border border-[#FFB800]/20 rounded-lg px-4 py-3">
         <div className="flex items-start gap-3">
-          <AlertTriangle className="w-4 h-4 text-[#FFD700] shrink-0 mt-0.5" />
-          <p className="text-[11px] text-[#FFD700]/70 leading-relaxed flex-1">
-            <strong className="text-[#FFD700]/90">Not financial advice.</strong>{" "}
+          <AlertTriangle className="w-4 h-4 text-[#FFB800] shrink-0 mt-0.5" />
+          <p className="text-[11px] text-[#FFB800]/70 leading-relaxed flex-1">
+            <strong className="text-[#FFB800]/90">Not financial advice.</strong>{" "}
             All data, signals, and analysis on this page are for educational purposes only. Past performance does not guarantee future results. Trading involves substantial risk of loss.{" "}
-            <Link href="/disclaimer" className="underline hover:text-[#FFD700]">Read full disclaimer</Link>
+            <Link href="/disclaimer" className="underline hover:text-[#FFB800]">Read full disclaimer</Link>
           </p>
           <button
             onClick={handleDismiss}
-            className="shrink-0 text-[#FFD700]/30 hover:text-[#FFD700]/60 transition-colors"
+            className="shrink-0 text-[#FFB800]/30 hover:text-[#FFB800]/60 transition-colors"
             aria-label="Dismiss disclaimer"
           >
             <X className="w-3.5 h-3.5" />

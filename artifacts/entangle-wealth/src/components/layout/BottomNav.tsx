@@ -38,17 +38,17 @@ function BottomNavComponent() {
             aria-hidden="true"
           />
           <div
-            className="fixed bottom-[72px] left-2 right-2 z-50 lg:hidden rounded-xl animate-in slide-in-from-bottom-2 duration-200 border border-border/60"
+            className="fixed bottom-[58px] left-0 right-0 z-50 lg:hidden animate-in slide-in-from-bottom-2 duration-200"
             role="dialog"
             aria-modal="true"
             aria-label="More navigation options"
             style={{
               background: "var(--bottomnav-bg)",
-              backdropFilter: "blur(16px)",
-              boxShadow: "0 -8px 32px rgba(0,0,0,0.15)",
+              borderTop: "1px solid rgba(0,255,65,0.12)",
+              boxShadow: "0 -4px 24px rgba(0,0,0,0.6)",
             }}
           >
-            <div className="p-3 grid grid-cols-3 gap-2">
+            <div className="p-2 grid grid-cols-3 gap-1">
               {moreItems.map((item) => {
                 const isActive = location === item.href;
                 const Icon = item.icon;
@@ -58,12 +58,12 @@ function BottomNavComponent() {
                     href={item.href}
                     onClick={() => setShowMore(false)}
                     aria-current={isActive ? "page" : undefined}
-                    className={`flex flex-col items-center gap-1.5 py-3 rounded-xl transition-colors duration-150 min-h-[60px] justify-center ${
-                      isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-[var(--nav-hover-bg)] hover:text-foreground/70"
+                    className={`flex flex-col items-center gap-1 py-2.5 transition-colors duration-150 min-h-[52px] justify-center ${
+                      isActive ? "text-primary bg-primary/10" : "text-muted-foreground hover:bg-[var(--nav-hover-bg)] hover:text-foreground/70"
                     }`}
                   >
-                    <Icon className="w-5 h-5" aria-hidden="true" />
-                    <span className="text-[9px] font-semibold tracking-wide">{item.label}</span>
+                    <Icon className="w-4 h-4" aria-hidden="true" />
+                    <span className="text-[8px] font-mono font-bold tracking-widest uppercase">{item.label}</span>
                   </Link>
                 );
               })}
@@ -73,15 +73,15 @@ function BottomNavComponent() {
       )}
 
       <nav
-        className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-border/50"
+        className="fixed bottom-0 left-0 right-0 z-50 lg:hidden"
         aria-label="Main navigation"
         style={{
           background: "var(--bottomnav-bg)",
-          backdropFilter: "blur(16px)",
+          borderTop: "1px solid rgba(0,255,65,0.12)",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >
-        <div className="flex h-[64px]">
+        <div className="flex h-[56px]">
           {primaryItems.map((item) => {
             const isActive = location === item.href || (item.href !== "/" && location.startsWith(item.href));
             const Icon = item.icon;
@@ -91,14 +91,14 @@ function BottomNavComponent() {
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
                 aria-label={item.label}
-                className={`flex-1 flex flex-col items-center justify-center gap-1 pb-1 text-[9px] font-semibold tracking-wide transition-colors duration-150 relative ${
+                className={`flex-1 flex flex-col items-center justify-center gap-0.5 pb-0.5 text-[8px] font-mono font-bold tracking-widest uppercase transition-colors duration-150 relative ${
                   isActive ? "text-primary" : "text-muted-foreground hover:text-foreground/60"
                 }`}
               >
                 {isActive && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-full bg-primary" aria-hidden="true" />
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-primary" aria-hidden="true" />
                 )}
-                <Icon className="w-5 h-5" aria-hidden="true" />
+                <Icon className="w-4 h-4" aria-hidden="true" />
                 <span>{item.label}</span>
               </Link>
             );
@@ -107,11 +107,11 @@ function BottomNavComponent() {
             onClick={() => setShowMore((s) => !s)}
             aria-expanded={showMore}
             aria-label="More pages"
-            className={`flex-1 flex flex-col items-center justify-center gap-1 pb-1 text-[9px] font-semibold tracking-wide transition-colors duration-150 ${
+            className={`flex-1 flex flex-col items-center justify-center gap-0.5 pb-0.5 text-[8px] font-mono font-bold tracking-widest uppercase transition-colors duration-150 ${
               showMore ? "text-primary" : "text-muted-foreground hover:text-foreground/60"
             }`}
           >
-            <MoreHorizontal className="w-5 h-5" aria-hidden="true" />
+            <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
             <span>More</span>
           </button>
         </div>

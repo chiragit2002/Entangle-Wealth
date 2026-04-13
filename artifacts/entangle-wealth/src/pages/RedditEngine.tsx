@@ -194,7 +194,7 @@ export default function RedditEngine() {
     return (
       <Layout>
         <div className="flex flex-col items-center justify-center py-32 text-center px-4">
-          <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
+          <div className="w-16 h-16 rounded-sm bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
             <Shield className="w-8 h-8 text-red-400" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
@@ -261,7 +261,7 @@ export default function RedditEngine() {
               className="bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white/80 focus:outline-none focus:border-primary/40"
             >
               {CATEGORIES.map((c) => (
-                <option key={c} value={c} className="bg-[#0a0a0f]">{c === "All" ? "All Categories" : c}</option>
+                <option key={c} value={c} className="bg-[#0A0E1A]">{c === "All" ? "All Categories" : c}</option>
               ))}
             </select>
 
@@ -273,10 +273,10 @@ export default function RedditEngine() {
               }}
               className="bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white/80 focus:outline-none focus:border-primary/40"
             >
-              <option value="All" className="bg-[#0a0a0f]">All Engagement</option>
-              <option value="High" className="bg-[#0a0a0f]">High</option>
-              <option value="Medium" className="bg-[#0a0a0f]">Medium</option>
-              <option value="Low" className="bg-[#0a0a0f]">Low</option>
+              <option value="All" className="bg-[#0A0E1A]">All Engagement</option>
+              <option value="High" className="bg-[#0A0E1A]">High</option>
+              <option value="Medium" className="bg-[#0A0E1A]">Medium</option>
+              <option value="Low" className="bg-[#0A0E1A]">Low</option>
             </select>
 
             <select
@@ -287,10 +287,10 @@ export default function RedditEngine() {
               }}
               className="bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white/80 focus:outline-none focus:border-primary/40"
             >
-              <option value="All" className="bg-[#0a0a0f]">All Statuses</option>
-              <option value="Active Target" className="bg-[#0a0a0f]">Active Target</option>
-              <option value="Research Only" className="bg-[#0a0a0f]">Research Only</option>
-              <option value="Avoid" className="bg-[#0a0a0f]">Avoid</option>
+              <option value="All" className="bg-[#0A0E1A]">All Statuses</option>
+              <option value="Active Target" className="bg-[#0A0E1A]">Active Target</option>
+              <option value="Research Only" className="bg-[#0A0E1A]">Research Only</option>
+              <option value="Avoid" className="bg-[#0A0E1A]">Avoid</option>
             </select>
           </div>
         </div>

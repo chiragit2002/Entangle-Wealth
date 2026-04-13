@@ -233,7 +233,7 @@ export default function Integrations() {
             <p className="text-[11px] text-white/40">Available</p>
           </div>
           <div className="glass-panel rounded-xl p-3 text-center">
-            <p className="text-[22px] font-extrabold font-mono text-[#00e676]">
+            <p className="text-[22px] font-extrabold font-mono text-[#00FF41]">
               {connections.filter((c) => c.lastSyncAt).length}
             </p>
             <p className="text-[11px] text-white/40">Synced</p>
@@ -369,7 +369,7 @@ function ProviderCard({
     <div
       className={`glass-panel rounded-xl p-4 border transition-all ${
         connected
-          ? "border-[#00e676]/20 bg-[#00e676]/[0.02]"
+          ? "border-[#00FF41]/20 bg-[#00FF41]/[0.02]"
           : "border-white/[0.06] hover:border-white/[0.12]"
       }`}
     >
@@ -384,7 +384,7 @@ function ProviderCard({
           <div className="flex items-center gap-2">
             <h3 className="text-[15px] font-bold truncate">{provider.name}</h3>
             {connected && (
-              <span className="flex items-center gap-1 text-[10px] font-bold text-[#00e676] bg-[#00e676]/10 px-2 py-0.5 rounded-full">
+              <span className="flex items-center gap-1 text-[10px] font-bold text-[#00FF41] bg-[#00FF41]/10 px-2 py-0.5 rounded-full">
                 <CheckCircle2 className="w-3 h-3" /> LINKED
               </span>
             )}

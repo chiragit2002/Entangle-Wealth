@@ -5,26 +5,26 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0" +
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-mono font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0" +
 " hover-elevate active-elevate-2",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground border border-primary-border hover:brightness-105 active:brightness-95",
+          "bg-primary text-primary-foreground border border-primary hover:opacity-90 active:opacity-80",
         destructive:
-          "bg-destructive text-destructive-foreground border border-destructive-border hover:brightness-105",
+          "bg-destructive text-destructive-foreground border border-destructive hover:opacity-90",
         outline:
-          "border [border-color:var(--button-outline)] bg-transparent hover:bg-white/[0.04] active:bg-white/[0.06]",
+          "border border-[rgba(0,255,65,0.25)] bg-transparent text-foreground hover:bg-[rgba(0,255,65,0.05)] active:bg-[rgba(0,255,65,0.08)]",
         secondary:
-          "bg-secondary text-secondary-foreground border border-secondary-border hover:brightness-110",
-        ghost: "border border-transparent hover:bg-white/[0.04] active:bg-white/[0.06]",
+          "bg-secondary text-secondary-foreground border border-[rgba(0,255,65,0.15)] hover:opacity-90",
+        ghost: "border border-transparent hover:bg-[rgba(0,255,65,0.05)] active:bg-[rgba(0,255,65,0.08)]",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
         default: "min-h-9 px-4 py-2",
-        sm: "min-h-8 rounded-md px-3 text-xs",
-        lg: "min-h-10 rounded-md px-8",
+        sm: "min-h-8 px-3 text-xs",
+        lg: "min-h-10 px-8",
         icon: "h-9 w-9",
       },
     },

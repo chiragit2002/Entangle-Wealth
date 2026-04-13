@@ -28,11 +28,11 @@ const TOPIC_ICONS: Record<string, typeof Cpu> = {
   Markets: Newspaper,
 };
 const TOPIC_COLORS: Record<string, string> = {
-  Microelectronics: "text-[#00c8f8] bg-[rgba(0,200,248,0.1)] border-[rgba(0,200,248,0.2)]",
+  Microelectronics: "text-[#00FF41] bg-[rgba(0,255,65,0.1)] border-[rgba(0,255,65,0.2)]",
   Geopolitics: "text-[#ff4466] bg-[rgba(255,68,102,0.1)] border-[rgba(255,68,102,0.2)]",
-  "Supply Chain": "text-[#f5c842] bg-[rgba(245,200,66,0.1)] border-[rgba(245,200,66,0.2)]",
-  "Tech Policy": "text-[#00e676] bg-[rgba(0,230,118,0.1)] border-[rgba(0,230,118,0.2)]",
-  Markets: "text-[#FFD700] bg-[rgba(255,215,0,0.1)] border-[rgba(255,215,0,0.2)]",
+  "Supply Chain": "text-[#FFB800] bg-[rgba(245,200,66,0.1)] border-[rgba(245,200,66,0.2)]",
+  "Tech Policy": "text-[#00FF41] bg-[rgba(0,255,65,0.1)] border-[rgba(0,255,65,0.2)]",
+  Markets: "text-[#FFB800] bg-[rgba(255,215,0,0.1)] border-[rgba(255,215,0,0.2)]",
 };
 
 function timeAgo(dateStr: string): string {
@@ -48,9 +48,9 @@ function timeAgo(dateStr: string): string {
 
 function ScoreBadge({ score }: { score: number }) {
   const color =
-    score >= 15 ? "text-[#00e676] bg-[rgba(0,230,118,0.15)]" :
-    score >= 8 ? "text-[#f5c842] bg-[rgba(245,200,66,0.15)]" :
-    score >= 3 ? "text-[#00c8f8] bg-[rgba(0,200,248,0.15)]" :
+    score >= 15 ? "text-[#00FF41] bg-[rgba(0,255,65,0.15)]" :
+    score >= 8 ? "text-[#FFB800] bg-[rgba(245,200,66,0.15)]" :
+    score >= 3 ? "text-[#00FF41] bg-[rgba(0,255,65,0.15)]" :
     "text-muted-foreground bg-white/5";
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${color}`}>
@@ -62,7 +62,7 @@ function ScoreBadge({ score }: { score: number }) {
 
 function SentimentDot({ sentiment }: { sentiment: string }) {
   const color =
-    sentiment === "positive" ? "bg-[#00e676]" :
+    sentiment === "positive" ? "bg-[#00FF41]" :
     sentiment === "negative" ? "bg-[#ff4466]" :
     "bg-[#5a5a7a]";
   return <span className={`w-2 h-2 rounded-full ${color} flex-shrink-0`} />;

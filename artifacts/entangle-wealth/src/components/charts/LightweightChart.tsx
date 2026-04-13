@@ -22,7 +22,7 @@ export default function LightweightChart({
   data,
   height = 400,
   showVolume = true,
-  upColor = "#00e676",
+  upColor = "#00FF41",
   downColor = "#ff3366",
 }: LightweightChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);

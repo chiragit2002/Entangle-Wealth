@@ -15,6 +15,10 @@ import {
   AlertCircle,
   RefreshCw,
   Globe,
+  Atom,
+  GitBranch,
+  Brain,
+  FileSearch,
 } from "lucide-react";
 import { fetchWithRetry } from "@/lib/api";
 import { EmailCapture } from "@/components/EmailCapture";
@@ -345,6 +349,217 @@ function LanguageSelector() {
   );
 }
 
+const EDGE_INSIGHTS = [
+  {
+    id: "quantum",
+    icon: Atom,
+    iconColor: "#00c8f8",
+    glowColor: "rgba(0,200,248,0.18)",
+    borderColor: "rgba(0,200,248,0.25)",
+    metric: "87% consensus accuracy",
+    headline: "Quantum Consensus Engine",
+    body: "6 AI agents cross-check every signal independently, then converge on a verdict. No single model bias — just collective precision your brokerage can't replicate.",
+    cta: "See It In Action",
+    ctaHref: "/terminal",
+    tag: "Terminal",
+  },
+  {
+    id: "timeline",
+    icon: GitBranch,
+    iconColor: "#00e676",
+    glowColor: "rgba(0,230,118,0.15)",
+    borderColor: "rgba(0,230,118,0.22)",
+    metric: "Avg $47k gap revealed at 10yr",
+    headline: "Alternate Timeline Simulator",
+    body: "See how a single decision today — save $200 more/month, pay off debt early — branches into radically different futures. No other platform shows you your money's parallel lives.",
+    cta: "Explore Your Timelines",
+    ctaHref: "/alternate-timeline",
+    tag: "Alternate Timeline",
+  },
+  {
+    id: "taxgpt",
+    icon: FileSearch,
+    iconColor: "#f5c842",
+    glowColor: "rgba(245,200,66,0.13)",
+    borderColor: "rgba(245,200,66,0.22)",
+    metric: "$4,200 avg tax savings found",
+    headline: "TaxGPT — Deductions You're Missing",
+    body: "An AI trained on IRS publications scans your situation for overlooked deductions, audit risks, and tax strategies most CPAs don't surface in a 30-minute meeting.",
+    cta: "Find Your Savings",
+    ctaHref: "/taxgpt",
+    tag: "TaxGPT",
+  },
+  {
+    id: "coach",
+    icon: Brain,
+    iconColor: "#a78bfa",
+    glowColor: "rgba(167,139,250,0.14)",
+    borderColor: "rgba(167,139,250,0.22)",
+    metric: "63+ AI disciplines",
+    headline: "Behavioral Finance Coach",
+    body: "Real-time nudges grounded in behavioral economics — the psychology of why you make money decisions, and how to make better ones. Not just analysis, but actual habit change.",
+    cta: "Meet Your Coach",
+    ctaHref: "/ai-coach",
+    tag: "AI Coach",
+  },
+];
+
+function EdgeInsightCard({
+  insight,
+  active,
+  onHover,
+}: {
+  insight: (typeof EDGE_INSIGHTS)[number];
+  active: boolean;
+  onHover: () => void;
+}) {
+  const Icon = insight.icon;
+  return (
+    <div
+      onMouseEnter={onHover}
+      className={`relative rounded-2xl p-5 flex flex-col gap-3 cursor-default transition-all duration-300 group ${
+        active ? "scale-[1.01]" : "opacity-80 hover:opacity-100"
+      }`}
+      style={{
+        background: active
+          ? `linear-gradient(135deg, ${insight.glowColor}, rgba(10,10,20,0.95))`
+          : "rgba(10,10,20,0.7)",
+        border: `1px solid ${active ? insight.borderColor : "rgba(255,255,255,0.07)"}`,
+        boxShadow: active
+          ? `0 0 32px ${insight.glowColor}, inset 0 1px 0 ${insight.borderColor}`
+          : "none",
+        transition: "all 0.35s ease",
+      }}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{
+            background: `${insight.iconColor}15`,
+            border: `1px solid ${insight.iconColor}30`,
+            boxShadow: active ? `0 0 14px ${insight.iconColor}40` : "none",
+          }}
+        >
+          <Icon
+            className="w-5 h-5 transition-transform duration-300"
+            style={{
+              color: insight.iconColor,
+              transform: active ? "scale(1.15)" : "scale(1)",
+            }}
+          />
+        </div>
+        <span
+          className="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full"
+          style={{
+            color: insight.iconColor,
+            background: `${insight.iconColor}12`,
+            border: `1px solid ${insight.iconColor}25`,
+          }}
+        >
+          {insight.tag}
+        </span>
+      </div>
+
+      <div
+        className="text-lg font-bold tabular-nums"
+        style={{ color: insight.iconColor }}
+      >
+        {insight.metric}
+      </div>
+
+      <div>
+        <p className="text-sm font-bold text-white mb-1">{insight.headline}</p>
+        <p className="text-xs text-white/50 leading-relaxed">{insight.body}</p>
+      </div>
+
+      <Link
+        href={insight.ctaHref}
+        onClick={() => trackEvent("edge_cta_clicked", { insight: insight.id })}
+        className="mt-auto flex items-center gap-1.5 text-xs font-semibold transition-all duration-200 group-hover:gap-2"
+        style={{ color: insight.iconColor }}
+      >
+        {insight.cta}
+        <ChevronRight className="w-3.5 h-3.5" />
+      </Link>
+
+      {active && (
+        <div
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse at 0% 0%, ${insight.glowColor} 0%, transparent 70%)`,
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function YourEdgeSection() {
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIdx((prev) => (prev + 1) % EDGE_INSIGHTS.length);
+    }, 3800);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <section className="py-16 lg:py-24 px-4 border-t border-white/5 relative overflow-hidden">
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,200,248,0.05) 0%, transparent 70%)`,
+        }}
+      />
+      <div className="container mx-auto max-w-5xl relative z-10">
+        <div className="text-center mb-10">
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#00c8f8]/70 mb-3">
+            <Atom className="w-3 h-3" />
+            Your Edge
+          </span>
+          <h2 className="text-2xl md:text-4xl font-bold text-white leading-tight">
+            Capabilities no one else gives you
+          </h2>
+          <p className="text-sm text-white/40 mt-3 max-w-lg mx-auto leading-relaxed">
+            EntangleWealth combines quantum-inspired consensus AI, timeline simulation, and behavioral coaching into one platform. Here's what sets us apart.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          {EDGE_INSIGHTS.map((insight, idx) => (
+            <EdgeInsightCard
+              key={insight.id}
+              insight={insight}
+              active={activeIdx === idx}
+              onHover={() => setActiveIdx(idx)}
+            />
+          ))}
+        </div>
+
+        <div className="flex items-center justify-center gap-2 mt-6">
+          {EDGE_INSIGHTS.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setActiveIdx(idx)}
+              aria-label={`View insight ${idx + 1}`}
+              className="transition-all duration-300 rounded-full"
+              style={{
+                width: activeIdx === idx ? "20px" : "6px",
+                height: "6px",
+                background:
+                  activeIdx === idx
+                    ? EDGE_INSIGHTS[idx].iconColor
+                    : "rgba(255,255,255,0.15)",
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
   const [, navigate] = useLocation();
   const [step, setStep] = useState<"cta" | "goal" | "done">("cta");
@@ -460,6 +675,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Your Edge */}
+        <YourEdgeSection />
 
         {/* Problem */}
         <section className="py-16 lg:py-24 px-4 border-t border-white/5">

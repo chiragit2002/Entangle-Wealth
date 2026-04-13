@@ -14,7 +14,7 @@ import { stockAlerts, optionsAlerts, unusualOptionsActivity, optionsIncomeData, 
 import { authFetch } from "@/lib/authFetch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, ArrowDownRight, Activity, Zap, Minus, TrendingUp, Shield, RefreshCw, Search, BarChart3, X, Terminal, Globe, Layers, Clock, Keyboard, ChevronUp, ChevronDown, Eye } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Activity, Zap, Minus, TrendingUp, Shield, RefreshCw, Search, BarChart3, X, Terminal, Globe, Layers, Clock, Keyboard, ChevronUp, ChevronDown, Eye, Atom, GitBranch, Brain, FileSearch, ChevronRight } from "lucide-react";
 import { generateMockOHLCV, runAllIndicators, getOverallSignal } from "@/lib/indicators";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/trackEvent";
@@ -106,6 +106,161 @@ const MARKET_INTERNALS = {
   vix: { current: 14.32, change: -5.6, percentile: 22 },
   breadth: { above50sma: 62.4, above200sma: 71.2, newHighs: 148, newLows: 42 },
 };
+
+const EDGE_PULSE_COUNT = 4;
+
+function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
+  consensusAccuracy?: number;
+  vixLevel?: number;
+  adRatio?: number;
+}) {
+  const insights = useMemo(() => {
+    const consensus = consensusAccuracy ?? 87;
+    const vix = vixLevel ?? 14;
+    const adSignal = adRatio != null ? (adRatio > 1.2 ? "breadth is strongly positive" : adRatio < 0.8 ? "breadth is weakening" : "breadth is mixed") : "breadth is positive";
+    return [
+      {
+        id: "consensus",
+        icon: Atom,
+        color: "#00c8f8",
+        text: `Quantum Consensus Engine is running at ${consensus}% accuracy — ${consensus >= 85 ? "6 of 6 agents agree on the current signal direction." : "agents are split; high-conviction trades are paused."}`,
+        subtext: `${consensus}% consensus accuracy`,
+        href: "/terminal",
+        label: "View Terminal",
+      },
+      {
+        id: "timeline",
+        icon: GitBranch,
+        color: "#00e676",
+        text: "Alternate Timeline: increasing your savings rate by 3% today could mean $68k more in 10 years.",
+        subtext: "Avg $47k divergence revealed",
+        href: "/alternate-timeline",
+        label: "Explore Timelines",
+      },
+      {
+        id: "taxgpt",
+        icon: FileSearch,
+        color: "#f5c842",
+        text: `Market ${adSignal} (VIX ${vix.toFixed(2)}) — a good time to review tax-loss harvesting opportunities with TaxGPT.`,
+        subtext: "$4,200 avg savings found",
+        href: "/taxgpt",
+        label: "Check Savings",
+      },
+      {
+        id: "coach",
+        icon: Brain,
+        color: "#a78bfa",
+        text: "Your AI Coach has a personalized habit insight ready — based on your activity pattern this week.",
+        subtext: "Behavioral finance coaching",
+        href: "/ai-coach",
+        label: "Talk to Coach",
+      },
+    ];
+  }, [consensusAccuracy, vixLevel, adRatio]);
+
+  const [idx, setIdx] = useState(() => Math.floor(Math.random() * EDGE_PULSE_COUNT));
+  const [animating, setAnimating] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const rotateInsight = () => {
+    setAnimating(true);
+    setTimeout(() => {
+      setIdx((prev) => (prev + 1) % insights.length);
+      setAnimating(false);
+    }, 200);
+  };
+
+  useEffect(() => {
+    intervalRef.current = setInterval(rotateInsight, 7000);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
+  const insight = insights[idx];
+  const Icon = insight.icon;
+
+  return (
+    <div
+      className="relative overflow-hidden rounded-xl"
+      style={{
+        background: "linear-gradient(135deg, rgba(10,10,20,0.95), rgba(5,5,15,0.98))",
+        padding: "1px",
+      }}
+    >
+      <div
+        className="absolute inset-0 rounded-xl"
+        style={{
+          background: `linear-gradient(135deg, ${insight.color}40 0%, transparent 50%, ${insight.color}20 100%)`,
+          animation: "pulse 3s ease-in-out infinite",
+        }}
+      />
+      <div
+        className="relative rounded-xl px-4 py-3 flex items-center gap-3"
+        style={{
+          background: "rgba(8,8,18,0.97)",
+          border: `1px solid ${insight.color}30`,
+          boxShadow: `0 0 20px ${insight.color}15, inset 0 1px 0 ${insight.color}12`,
+        }}
+      >
+        <div
+          className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+          style={{
+            background: `${insight.color}12`,
+            border: `1px solid ${insight.color}25`,
+            boxShadow: `0 0 10px ${insight.color}30`,
+          }}
+        >
+          <Icon className="w-4 h-4" style={{ color: insight.color }} />
+        </div>
+
+        <div
+          className="flex-1 min-w-0 transition-all duration-200"
+          style={{ opacity: animating ? 0 : 1, transform: animating ? "translateY(4px)" : "translateY(0)" }}
+        >
+          <div className="flex items-center gap-2 mb-0.5">
+            <span
+              className="text-[9px] font-bold uppercase tracking-widest"
+              style={{ color: insight.color }}
+            >
+              Edge Pulse
+            </span>
+            <span className="text-[9px] text-white/25 font-mono">·</span>
+            <span className="text-[9px] text-white/35 font-mono">{insight.subtext}</span>
+          </div>
+          <p className="text-xs text-white/70 leading-snug truncate">{insight.text}</p>
+        </div>
+
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Link
+            href={insight.href}
+            onClick={() => trackEvent("edge_pulse_clicked", { insight: insight.id })}
+            className="flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1.5 rounded-lg transition-all"
+            style={{
+              color: insight.color,
+              background: `${insight.color}10`,
+              border: `1px solid ${insight.color}25`,
+            }}
+          >
+            {insight.label}
+            <ChevronRight className="w-3 h-3" />
+          </Link>
+          <button
+            onClick={() => {
+              if (intervalRef.current) clearInterval(intervalRef.current);
+              rotateInsight();
+              intervalRef.current = setInterval(rotateInsight, 7000);
+            }}
+            className="text-white/20 hover:text-white/50 transition-colors"
+            title="Next insight"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const STARTING_CASH = 100_000;
 
@@ -455,6 +610,13 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
+
+        {/* Edge Pulse */}
+        <EdgePulseCard
+          consensusAccuracy={87}
+          vixLevel={MARKET_INTERNALS.vix.current}
+          adRatio={MARKET_INTERNALS.advDecl.ratio}
+        />
 
         {/* Quick Analysis result */}
         {(quickAnalysis || analyzingSymbol) && (

@@ -1,0 +1,34 @@
+The current sign-in / homepage looks like generic AI boilerplate. Replace it entirely with a Bloomberg Terminal-grade landing and authentication experience. Here is exactly what I want:
+
+BACKGROUND & LAYOUT:
+• Full-screen dark navy background (#0A0E1A) — no gradients, no blobs, no glows
+• A live animated ticker tape running across the very top of the screen (scrolling stock symbols, prices, % changes in green/red)
+• Left half of the screen: brand statement and live market data panel
+• Right half of the screen: the sign-in form
+
+LEFT SIDE — BRAND PANEL:
+• Large monospace logo: "ENTANGLE WEALTH" in white, with a subtle green terminal cursor blinking after it
+• Tagline in smaller monospace text: "INSTITUTIONAL-GRADE TRADING. GAMIFIED."
+• Below that, a live mini-dashboard showing 3–4 real market stat tiles (e.g. S&P 500, NASDAQ, BTC, VIX) with green/red % change indicators updating in real time
+• A short list of 3 platform features styled as terminal output lines:
+  > MONTE CARLO PROBABILITY ENGINE............ACTIVE
+  > FLASH COUNCIL AI ANALYSIS.................ACTIVE
+  > PAPER TRADING TERMINAL....................ACTIVE
+  > TAXFLOW REAL-TIME CALCULATOR..............ACTIVE
+
+RIGHT SIDE — SIGN IN FORM:
+• Dark panel (#0D1321) with a 1px border in dim green (#1a3a2a)
+• Title: "AUTHENTICATE" in monospace, all caps, green (#00FF41)
+• Subtitle: "Access requires credentials" in small muted text
+• Email input field: dark background, green bottom border only, monospace font, placeholder "> enter email address"
+• Continue button: full width, solid electric green (#00FF41), black text, monospace font, labeled "> INITIALIZE SESSION"
+• Google sign-in: styled as a terminal command line — "> CONTINUE WITH GOOGLE [oauth2]" — no colorful Google button
+• Sign up link: "NEW OPERATOR? > REGISTER" in dim green text
+• Remove the "Development mode" orange link entirely — hide it or delete it
+• Remove all rounded pill shapes — use sharp or very slightly rounded corners (4px max)
+
+OVERALL:
+• No cyan/teal color anywhere — the current cyan is off-brand
+• No white card boxes floating on the background
+• Everything must feel like you are logging into a $25,000/month trading terminal
+• Keep the Bloomberg design system consistent with the rest of the app

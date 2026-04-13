@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useListNews } from "@workspace/api-client-react";
 import type { NewsItem } from "@workspace/api-client-react";
 import { Link } from "wouter";
@@ -9,15 +9,6 @@ import {
   Search, ExternalLink, RefreshCw, Clock, Zap, ChevronDown, ChevronUp,
   Cpu, Globe, Truck, Scale, Newspaper,
 } from "lucide-react";
-
-const FALLBACK_ARTICLES: NewsItem[] = [
-  { id: "f1", topic: "Markets", title: "S&P 500 Holds Steady Amid Mixed Economic Signals", link: "", source: "Market Watch", published: new Date(Date.now() - 3600000).toISOString(), publishedAt: Date.now() - 3600000, summary: "Equity markets remain range-bound as investors weigh resilient consumer spending data against concerns about elevated interest rates.", score: 14, sentiment: "neutral", tickers: ["SPY", "QQQ"] },
-  { id: "f2", topic: "Microelectronics", title: "NVIDIA Unveils Next-Generation AI Chip Architecture", link: "", source: "Tech Insights", published: new Date(Date.now() - 7200000).toISOString(), publishedAt: Date.now() - 7200000, summary: "NVIDIA's latest GPU architecture promises a 3x performance leap for large language model training, reinforcing the company's dominance in AI infrastructure.", score: 18, sentiment: "positive", tickers: ["NVDA", "AMD"] },
-  { id: "f3", topic: "Geopolitics", title: "US-China Tech Tensions Escalate Over Semiconductor Exports", link: "", source: "Global Affairs", published: new Date(Date.now() - 10800000).toISOString(), publishedAt: Date.now() - 10800000, summary: "The Biden administration is considering additional restrictions on advanced semiconductor exports to China amid growing national security concerns.", score: 16, sentiment: "negative", tickers: ["INTC", "AVGO", "QCOM"] },
-  { id: "f4", topic: "Tech Policy", title: "EU Moves to Regulate AI Models with New Compliance Framework", link: "", source: "Policy Watch", published: new Date(Date.now() - 14400000).toISOString(), publishedAt: Date.now() - 14400000, summary: "European regulators unveiled a comprehensive AI governance framework that could reshape how large language models are deployed across member states.", score: 12, sentiment: "neutral", tickers: ["META", "GOOGL", "MSFT"] },
-  { id: "f5", topic: "Supply Chain", title: "Global Shipping Costs Stabilize After Post-Pandemic Surge", link: "", source: "Freight Weekly", published: new Date(Date.now() - 18000000).toISOString(), publishedAt: Date.now() - 18000000, summary: "Container shipping rates have normalized to pre-pandemic levels, offering relief to manufacturers and retailers dependent on global supply chains.", score: 9, sentiment: "positive", tickers: ["FDX", "UPS"] },
-  { id: "f6", topic: "Markets", title: "Federal Reserve Signals Pause in Rate Hike Cycle", link: "", source: "Economy Today", published: new Date(Date.now() - 21600000).toISOString(), publishedAt: Date.now() - 21600000, summary: "Fed officials indicated they may hold rates steady at the next FOMC meeting as inflation data continues its gradual descent toward the 2% target.", score: 17, sentiment: "positive", tickers: ["SPY", "TLT", "GLD"] },
-];
 
 const TOPICS = ["All", "Microelectronics", "Geopolitics", "Supply Chain", "Tech Policy", "Markets"];
 const TOPIC_ICONS: Record<string, typeof Cpu> = {
@@ -155,12 +146,6 @@ function SkeletonCard() {
   );
 }
 
-function getFallback(topic: string, search: string): NewsItem[] {
-  return FALLBACK_ARTICLES
-    .filter(a => topic === "All" || a.topic === topic)
-    .filter(a => !search || a.title.toLowerCase().includes(search.toLowerCase()));
-}
-
 export default function Research() {
   const [topic, setTopic] = useState("All");
   const [search, setSearch] = useState("");
@@ -176,14 +161,11 @@ export default function Research() {
   );
 
   const isInitializing = newsQuery.data?.initializing === true;
-  const items: NewsItem[] = newsQuery.data?.items.length
-    ? newsQuery.data.items
-    : isInitializing ? [] : getFallback(topic, search);
-  const total = newsQuery.data?.total ?? (isInitializing ? 0 : FALLBACK_ARTICLES.length);
-  const topicCounts: Record<string, number> = newsQuery.data?.topics
-    ?? (isInitializing ? {} : FALLBACK_ARTICLES.reduce((acc: Record<string, number>, a) => { acc[a.topic] = (acc[a.topic] || 0) + 1; return acc; }, {}));
+  const items: NewsItem[] = newsQuery.data?.items ?? [];
+  const total = newsQuery.data?.total ?? 0;
+  const topicCounts: Record<string, number> = newsQuery.data?.topics ?? {};
   const feedCount = newsQuery.data?.feedCount ?? 0;
-  const loading = newsQuery.isLoading || isInitializing;
+  const loading = newsQuery.isLoading;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -250,7 +232,16 @@ export default function Research() {
           })}
         </div>
 
-        {loading ? (
+        {isInitializing ? (
+          <div className="text-center py-16">
+            <div className="inline-block rounded-lg border border-[#00FF41]/20 bg-black/60 px-8 py-6 font-mono text-sm">
+              <div className="text-[#00FF41]/60 mb-1">$ scraping {feedCount} RSS feeds...</div>
+              <div className="text-[#00FF41]/60 mb-1">$ analyzing financial relevance...</div>
+              <div className="text-[#00FF41] animate-pulse">&gt; Initializing news intelligence...</div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-4">Live feed data will appear shortly.</p>
+          </div>
+        ) : loading ? (
           <div className="space-y-3">
             {[1, 2, 3, 4, 5].map((i) => <SkeletonCard key={i} />)}
           </div>

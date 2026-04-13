@@ -38,6 +38,7 @@ const Gigs = lazy(() => import("@/pages/Gigs"));
 const Community = lazy(() => import("@/pages/Community"));
 const Tax = lazy(() => import("@/pages/Tax"));
 const Receipts = lazy(() => import("@/pages/Receipts"));
+const Integrations = lazy(() => import("@/pages/Integrations"));
 const Travel = lazy(() => import("@/pages/Travel"));
 const TaxGPT = lazy(() => import("@/pages/TaxGPT"));
 const Resume = lazy(() => import("@/pages/Resume"));
@@ -416,6 +417,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/community">{() => <LazyPage component={Community} />}</Route>
             <Route path="/tax">{() => <LazyPage component={Tax} />}</Route>
             <Route path="/receipts">{() => <LazyProtected component={Receipts} />}</Route>
+            <Route path="/integrations">{() => <LazyProtected component={Integrations} />}</Route>
             <Route path="/travel">{() => <LazyPage component={Travel} />}</Route>
             <Route path="/tax-strategy">{() => <LazyProtected component={TaxStrategy} />}</Route>
             <Route path="/taxgpt">{() => <LazyProtected component={TaxGPT} />}</Route>

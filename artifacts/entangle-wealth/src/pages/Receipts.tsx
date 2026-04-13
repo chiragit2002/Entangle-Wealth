@@ -4,9 +4,11 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Receipt, Upload, Trash2, Download, FileText, Search, Check, Edit2,
   Car, Filter, ChevronDown, ChevronUp, Plus, Loader2, X, Camera,
+  Link2, ChevronRight as ChevronRightIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link } from "wouter";
 import type { DocumentEntry, MileageEntry } from "@/lib/taxflow-types";
 import { DOCUMENT_CATEGORIES } from "@/lib/taxflow-types";
 import {
@@ -311,6 +313,16 @@ export default function Receipts() {
             <p className="text-[12px] text-white/50">Upload receipts, log mileage, track deductions — all in one place.</p>
           </div>
         </div>
+
+        <Link href="/integrations">
+          <div className="glass-panel rounded-xl p-3 mb-4 border border-primary/10 hover:border-primary/30 cursor-pointer transition-all group flex items-center gap-3">
+            <Link2 className="w-4 h-4 text-primary flex-shrink-0" />
+            <p className="text-[12px] text-white/50 group-hover:text-white/70 transition-colors flex-1">
+              Connect QuickBooks, Xero, H&R Block & more to auto-import expenses
+            </p>
+            <ChevronRightIcon className="w-4 h-4 text-white/20 group-hover:text-primary flex-shrink-0" />
+          </div>
+        </Link>
 
         <div className="glass-panel rounded-xl p-3 mb-6 border border-white/[0.06]">
           <p className="text-[11px] text-white/30 leading-relaxed">

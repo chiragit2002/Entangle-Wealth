@@ -14,3 +14,4 @@ export * from "./behavioralFinance";
 export * from "./microfeedback";
 export * from "./conversations";
 export * from "./messages";
+export * from "./connectedAccounts";

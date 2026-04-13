@@ -43,6 +43,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/tax", label: "TaxFlow", desc: "Tax dashboard" },
       { href: "/travel", label: "Business Travel", desc: "IRS trip planner" },
       { href: "/receipts", label: "Receipt Capture", desc: "Scan & track receipts" },
+      { href: "/integrations", label: "Integrations", desc: "Connect accounting apps" },
     ],
   },
   {
@@ -88,6 +89,7 @@ const MOBILE_SECTIONS = [
       { href: "/tax", label: "TaxFlow" },
       { href: "/travel", label: "Business Travel" },
       { href: "/receipts", label: "Receipt Capture" },
+      { href: "/integrations", label: "Integrations" },
     ],
   },
   {

@@ -1099,7 +1099,7 @@ const BacktesterBadgeSchema = z.object({
   beatBenchmark: z.boolean().optional().default(false),
 });
 
-const BACKTESTER_BADGES = [
+const BACKTESTER_BADGES_V2 = [
   {
     slug: "strategy-scientist",
     name: "Strategy Scientist",
@@ -1160,7 +1160,7 @@ router.post("/gamification/backtester/award-badges", requireAuth, validateBody(B
     const newlyEarned: string[] = [];
     const notifications: { name: string; description: string; xpReward: number }[] = [];
 
-    for (const badgeDef of BACKTESTER_BADGES) {
+    for (const badgeDef of BACKTESTER_BADGES_V2) {
       const meetsCondition = badgeDef.check({ backtestCount, totalReturn, beatBenchmark: beatBenchmark ?? false });
       if (!meetsCondition) continue;
 

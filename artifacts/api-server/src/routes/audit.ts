@@ -1,11 +1,17 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
 import { db } from "@workspace/db";
-import { auditLogTable, uxSignalsTable, apiHealthChecksTable } from "@workspace/db/schema";
-import { desc, gte, lt, eq, and, sql } from "drizzle-orm";
+import { auditLogTable, uxSignalsTable, apiHealthChecksTable, visualBaselinesTable, crawlRunsTable } from "@workspace/db/schema";
+import { desc, gte, eq, and, sql } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import { MONITORED_ENDPOINTS } from "../lib/apiHealthMonitor";
 import { z } from "zod";
+import { spawn } from "node:child_process";
+import * as path from "node:path";
+import * as fs from "node:fs";
+import * as url from "node:url";
+
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 const router: IRouter = Router();
 
@@ -250,6 +256,183 @@ router.get("/audit/stats", requireAuth, requireAdmin, async (req, res) => {
       count: Number(r.count),
     })),
   });
+});
+
+let activeCrawlPid: number | null = null;
+
+router.post("/audit/crawl", requireAuth, requireAdmin, async (req, res) => {
+  if (activeCrawlPid !== null) {
+    res.status(409).json({ error: "A crawl is already in progress", pid: activeCrawlPid });
+    return;
+  }
+
+  const triggeredBy = (req.body?.triggeredBy as string | undefined) ?? "api";
+  // interactive=true enables button clicks, form fills, dropdown triggers.
+  // Disabled by default to keep scheduled/automated runs non-mutating.
+  const interactive = req.body?.interactive === true;
+
+  const [run] = await db.insert(crawlRunsTable).values({
+    status: "running",
+    triggeredBy,
+  }).returning();
+
+  const crawlRunId = run.id;
+
+  const baseUrl = process.env.CRAWLER_BASE_URL
+    || `http://localhost:${process.env.PORT || 3001}`;
+
+  const screenshotsDir = process.env.CRAWLER_SCREENSHOTS_DIR || "/tmp/crawl-screenshots";
+
+  const workspaceRoot = path.resolve(__dirname, "../../../../");
+
+  const child = spawn(
+    "pnpm",
+    ["--filter", "@workspace/scripts", "run", "crawler"],
+    {
+      cwd: workspaceRoot,
+      env: {
+        ...process.env,
+        CRAWLER_BASE_URL: baseUrl,
+        CRAWLER_SCREENSHOTS_DIR: screenshotsDir,
+        CRAWL_RUN_ID: String(crawlRunId),
+        CRAWLER_INTERACTIVE: interactive ? "true" : "false",
+      },
+      detached: false,
+      stdio: "pipe",
+    }
+  );
+
+  activeCrawlPid = child.pid ?? null;
+
+  child.stdout?.on("data", (data: Buffer) => {
+    process.stdout.write(`[Crawler] ${data}`);
+  });
+  child.stderr?.on("data", (data: Buffer) => {
+    process.stderr.write(`[Crawler ERR] ${data}`);
+  });
+
+  child.on("close", (code) => {
+    activeCrawlPid = null;
+    if (code !== 0) {
+      db.update(crawlRunsTable)
+        .set({ status: "failed", completedAt: new Date(), errorMessage: `Exit code ${code}` })
+        .where(eq(crawlRunsTable.id, crawlRunId))
+        .catch(() => {});
+    }
+  });
+
+  res.status(202).json({ ok: true, crawlRunId, pid: activeCrawlPid });
+});
+
+router.get("/audit/crawl/runs", requireAuth, requireAdmin, async (_req, res) => {
+  const runs = await db
+    .select()
+    .from(crawlRunsTable)
+    .orderBy(desc(crawlRunsTable.startedAt))
+    .limit(20);
+
+  res.json({ runs, activePid: activeCrawlPid });
+});
+
+router.get("/audit/visual-regressions", requireAuth, requireAdmin, async (req, res) => {
+  const { onlyRegressions, limit = "50" } = req.query;
+  const lim = Math.min(Number(limit) || 50, 200);
+
+  const conditions = [];
+  if (onlyRegressions === "true") {
+    conditions.push(eq(visualBaselinesTable.isRegression, true));
+  }
+  conditions.push(eq(visualBaselinesTable.isCurrent, true));
+
+  const rows = await db
+    .select()
+    .from(visualBaselinesTable)
+    .where(and(...conditions))
+    .orderBy(desc(visualBaselinesTable.createdAt))
+    .limit(lim);
+
+  res.json({ regressions: rows });
+});
+
+router.post("/audit/visual-regressions/:id/approve", requireAuth, requireAdmin, async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
+
+  const [row] = await db
+    .select()
+    .from(visualBaselinesTable)
+    .where(eq(visualBaselinesTable.id, id))
+    .limit(1);
+
+  if (!row) {
+    res.status(404).json({ error: "Baseline not found" });
+    return;
+  }
+
+  await db
+    .update(visualBaselinesTable)
+    .set({
+      approvedAt: new Date(),
+      isRegression: false,
+    })
+    .where(eq(visualBaselinesTable.id, id));
+
+  res.json({ ok: true });
+});
+
+router.get("/audit/screenshots/:runId/:filename", requireAuth, requireAdmin, (req, res) => {
+  const { runId, filename } = req.params;
+
+  if (!/^\d+$/.test(runId) || !/^[\w\-_.]+\.png$/.test(filename)) {
+    res.status(400).json({ error: "Invalid path" });
+    return;
+  }
+
+  const screenshotsDir = process.env.CRAWLER_SCREENSHOTS_DIR || "/tmp/crawl-screenshots";
+  const filePath = path.join(screenshotsDir, `run-${runId}`, filename);
+
+  if (!filePath.startsWith(screenshotsDir)) {
+    res.status(403).json({ error: "Forbidden" });
+    return;
+  }
+
+  if (!fs.existsSync(filePath)) {
+    res.status(404).json({ error: "Screenshot not found" });
+    return;
+  }
+
+  res.setHeader("Content-Type", "image/png");
+  res.setHeader("Cache-Control", "private, max-age=3600");
+  fs.createReadStream(filePath).pipe(res);
+});
+
+router.get("/audit/screenshots/:runId/diffs/:filename", requireAuth, requireAdmin, (req, res) => {
+  const { runId, filename } = req.params;
+
+  if (!/^\d+$/.test(runId) || !/^[\w\-_.]+\.png$/.test(filename)) {
+    res.status(400).json({ error: "Invalid path" });
+    return;
+  }
+
+  const screenshotsDir = process.env.CRAWLER_SCREENSHOTS_DIR || "/tmp/crawl-screenshots";
+  const filePath = path.join(screenshotsDir, `run-${runId}`, "diffs", filename);
+
+  if (!filePath.startsWith(screenshotsDir)) {
+    res.status(403).json({ error: "Forbidden" });
+    return;
+  }
+
+  if (!fs.existsSync(filePath)) {
+    res.status(404).json({ error: "Diff not found" });
+    return;
+  }
+
+  res.setHeader("Content-Type", "image/png");
+  res.setHeader("Cache-Control", "private, max-age=3600");
+  fs.createReadStream(filePath).pipe(res);
 });
 
 export default router;

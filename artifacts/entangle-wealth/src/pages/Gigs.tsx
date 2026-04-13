@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { authFetch } from "@/lib/authFetch";
+import { WealthProjectionCard } from "@/components/WealthProjectionCard";
 
 interface Gig {
   id: string;
@@ -115,7 +116,14 @@ export default function Gigs() {
             {showForm ? "Cancel" : "Post Gig"}
           </Button>
         </div>
-        <p className="text-muted-foreground mb-6">Find local services or offer your skills to earn extra income.</p>
+        <p className="text-muted-foreground mb-4">Find local services or offer your skills to earn extra income.</p>
+
+        <WealthProjectionCard
+          jobTitle="Gig & Side Income"
+          currentIncome={60000}
+          newIncome={75000}
+          className="mb-6"
+        />
 
         {showForm && (
           <div className="glass-panel p-6 mb-6 border border-primary/20">

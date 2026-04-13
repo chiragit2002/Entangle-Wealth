@@ -10,6 +10,7 @@ import { getActiveProfile, getChatHistory, saveChatHistory } from "@/lib/taxflow
 import { trackEvent } from "@/lib/trackEvent";
 import { UpgradePrompt, useUpgradePrompt } from "@/components/UpgradePrompt";
 import { MicroFeedback } from "@/components/MicroFeedback";
+import { PutItToWorkCard } from "@/components/PutItToWorkCard";
 
 interface AuditRisk {
   title: string;
@@ -101,6 +102,24 @@ function getLocalResponse(q: string): string {
 const RATE_LIMIT_MAX = 10;
 const RATE_LIMIT_WINDOW = 60_000;
 
+function extractSavingsAmount(text: string): number | null {
+  const patterns = [
+    /\$([0-9,]+)\s+(?:in\s+)?(?:tax\s+)?savings/i,
+    /saves?\s+(?:you\s+)?\$([0-9,]+)/i,
+    /(?:save|savings|deduction|refund)\s+(?:of\s+|worth\s+|~\s*)?\$([0-9,]+)/i,
+    /\$([0-9,]+)\s+(?:deduction|savings|refund|credit)/i,
+    /→\s*~?\$([0-9,]+)\s+tax\s+savings/i,
+  ];
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match) {
+      const amount = parseInt(match[1].replace(/,/g, ""), 10);
+      if (amount >= 200 && amount <= 200000) return amount;
+    }
+  }
+  return null;
+}
+
 export default function TaxGPT() {
   const [, setLocation] = useLocation();
   const { promptConfig, showUpgradePrompt, closePrompt } = useUpgradePrompt();
@@ -116,6 +135,7 @@ export default function TaxGPT() {
   });
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [detectedSavings, setDetectedSavings] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const rateLimitRef = useRef<number[]>([]);
 
@@ -177,6 +197,8 @@ export default function TaxGPT() {
       if (res.ok) {
         const data = await res.json();
         const answer = data.answer + (data.answer.includes("Disclaimer") ? "" : "\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice. Consult a licensed CPA for your specific situation.");
+        const savings = extractSavingsAmount(answer);
+        if (savings) setDetectedSavings(savings);
         setMessages(prev => [...prev, { role: "ai", text: answer, timestamp: Date.now(), source: "ai" as const }]);
       } else if (res.status === 429) {
         setMessages(prev => [...prev, { role: "ai", text: "You've reached the TaxGPT rate limit. Upgrade to Pro for unlimited queries.\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice.", timestamp: Date.now(), source: "ai" as const }]);
@@ -205,6 +227,7 @@ export default function TaxGPT() {
     const initial: ChatMessage[] = [{ role: "ai", text: "Chat cleared. How can I help you with your tax questions?\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice.", timestamp: Date.now() }];
     setMessages(initial);
     saveChatHistory(profileId, initial);
+    setDetectedSavings(null);
   };
 
   const getRiskColor = (level: string) => {
@@ -276,6 +299,11 @@ export default function TaxGPT() {
             )}
             {messages.length > 1 && !loading && messages[messages.length - 1]?.role === "ai" && (
               <MicroFeedback context="taxgpt" label="Was this answer helpful?" className="mt-2" />
+            )}
+            {detectedSavings && !loading && (
+              <div className="mt-3">
+                <PutItToWorkCard savingsAmount={detectedSavings} />
+              </div>
             )}
           </div>
           <div className="flex gap-2">

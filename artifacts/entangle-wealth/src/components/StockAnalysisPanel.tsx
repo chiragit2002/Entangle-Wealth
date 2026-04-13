@@ -3,6 +3,8 @@ import { analyzeStock, type FullAnalysis } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Brain, AlertTriangle, TrendingUp, TrendingDown, Activity, Loader2, Shield, Zap, Target } from "lucide-react";
 import { useUpgradePrompt, UpgradePrompt } from "@/components/UpgradePrompt";
+import { TaxImpactCard } from "@/components/TaxImpactCard";
+import { getActiveProfile } from "@/lib/taxflow-profile";
 
 interface StockAnalysisPanelProps {
   symbol: string;
@@ -32,6 +34,8 @@ export function StockAnalysisPanel({ symbol, name }: StockAnalysisPanelProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { promptConfig, showUpgradePrompt, closePrompt } = useUpgradePrompt();
+  const taxProfile = getActiveProfile();
+  const hasTaxProfile = !!taxProfile;
 
   const runAnalysis = async () => {
     setLoading(true);
@@ -227,6 +231,13 @@ export function StockAnalysisPanel({ symbol, name }: StockAnalysisPanelProps) {
             </ul>
           </div>
         </div>
+
+        <TaxImpactCard
+          symbol={symbol}
+          signal={analysis.overallSignal}
+          estimatedGain={analysis.priceTargets ? Math.round((analysis.priceTargets.bull - analysis.priceTargets.base) * 10) : 1000}
+          hasTaxProfile={hasTaxProfile}
+        />
 
         <div className="text-center">
           <Button onClick={runAnalysis} variant="outline" size="sm" className="border-primary/30 text-primary text-xs gap-1">

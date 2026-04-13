@@ -8,6 +8,9 @@ import {
   ChevronUp, Info, AlertCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { EntangledInsightsFeed } from "@/components/EntanglementCard";
+import { generateEntanglementInsights, type UserEntanglementContext } from "@/lib/entanglementEngine";
+import { getActiveProfile } from "@/lib/taxflow-profile";
 
 const API_BASE = "/api";
 
@@ -57,6 +60,16 @@ export default function AICoach() {
   const [loadingSummary, setLoadingSummary] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const taxProfile = getActiveProfile();
+  const entanglementCtx: UserEntanglementContext = {
+    hasCompletedTaxProfile: !!taxProfile,
+    taxSavingsFound: taxProfile ? 4200 : undefined,
+    currentIncome: taxProfile?.grossRevenue || 75000,
+    uncheckedTaxDeductions: taxProfile ? undefined : 3400,
+    coachRageClicks: 0,
+  };
+  const entanglementInsights = generateEntanglementInsights(entanglementCtx);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -138,7 +151,7 @@ export default function AICoach() {
       const res = await authFetch("/coaching/chat", getToken, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: messageText }),
+        body: JSON.stringify({ message: messageText, crossDomainContext: entanglementCtx }),
       });
 
       const data = await res.json();
@@ -263,6 +276,16 @@ export default function AICoach() {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {entanglementInsights.length > 0 && (
+            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+              <EntangledInsightsFeed
+                insights={entanglementInsights}
+                title="Cross-Domain Context"
+                maxItems={3}
+              />
             </div>
           )}
 

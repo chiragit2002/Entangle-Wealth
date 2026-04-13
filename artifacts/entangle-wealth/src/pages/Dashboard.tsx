@@ -26,6 +26,9 @@ import { Area, AreaChart, Bar, BarChart, XAxis, YAxis, ResponsiveContainer, Cart
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
 import { FinishSetupNudge } from "@/components/FinishSetupNudge";
 import { ProgressiveProfileCard } from "@/components/onboarding/ProgressiveProfileCard";
+import { EntangledInsightsFeed } from "@/components/EntanglementCard";
+import { generateEntanglementInsights, type UserEntanglementContext } from "@/lib/entanglementEngine";
+import { getActiveProfile } from "@/lib/taxflow-profile";
 
 const DASHBOARD_STOCKS: { symbol: string; name: string }[] = [
   { symbol: "AAPL", name: "Apple Inc." }, { symbol: "MSFT", name: "Microsoft Corporation" },
@@ -349,6 +352,25 @@ export default function Dashboard() {
   const [showFirstAnalysisWow, setShowFirstAnalysisWow] = useState(false);
   const [firstAnalysisSymbol, setFirstAnalysisSymbol] = useState("");
   const { isFirstAnalysis, markDone: markFirstAnalysisDone } = useFirstAnalysisWow();
+
+  const taxProfile = getActiveProfile();
+  const entanglementCtx = useMemo<UserEntanglementContext>(() => {
+    const pnl = portfolio.totalValue - 100_000;
+    return {
+      portfolioGainThisWeek: pnl > 0 ? Math.round(pnl) : undefined,
+      portfolioPositions: portfolio.positions,
+      hasCompletedTaxProfile: !!taxProfile,
+      taxSavingsFound: taxProfile ? 4200 : undefined,
+      currentIncome: taxProfile?.grossRevenue || 75000,
+      recentlyAnalyzedSymbol: quickAnalysis?.symbol,
+      recentlyAnalyzedSignal: quickAnalysis?.signal,
+    };
+  }, [portfolio, taxProfile, quickAnalysis]);
+
+  const entanglementInsights = useMemo(
+    () => generateEntanglementInsights(entanglementCtx),
+    [entanglementCtx]
+  );
 
   useEffect(() => { trackEvent("dashboard_viewed"); }, []);
 
@@ -705,6 +727,13 @@ export default function Dashboard() {
 
         {/* Progressive profiling — deferred occupation/focus questions */}
         <ProgressiveProfileCard className="mb-1" />
+
+        {/* Entangled Insights Feed */}
+        {entanglementInsights.length > 0 && (
+          <div className="glass-panel p-4">
+            <EntangledInsightsFeed insights={entanglementInsights} maxItems={5} />
+          </div>
+        )}
 
         {/* Section 2: Hero Panels — QuantumViz + Portfolio + Watchlist */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

@@ -116,8 +116,22 @@ async function getUserContext(userId: string) {
   };
 }
 
-function buildCoachingSystemPrompt(context: ReturnType<typeof getUserContext> extends Promise<infer T> ? T : never): string {
-  return `You are the EntangleWealth Behavioral Finance Coach — a personalized AI financial coach that helps users build lasting financial habits and make better money decisions.
+interface CrossDomainContext {
+  portfolioGainThisWeek?: number;
+  taxSavingsFound?: number;
+  hasCompletedTaxProfile?: boolean;
+  recentlyAnalyzedSymbol?: string;
+  recentlyAnalyzedSignal?: string;
+  gigIncomeMonthly?: number;
+  coachRageClicks?: number;
+  uncheckedTaxDeductions?: number;
+}
+
+function buildCoachingSystemPrompt(
+  context: ReturnType<typeof getUserContext> extends Promise<infer T> ? T : never,
+  crossDomain?: CrossDomainContext
+): string {
+  let prompt = `You are the EntangleWealth Behavioral Finance Coach — a personalized AI financial coach that helps users build lasting financial habits and make better money decisions.
 
 You are NOT TaxGPT. You focus on behavioral finance: habit formation, goal setting, financial mindset, and turning financial knowledge into real-world action.
 
@@ -130,9 +144,35 @@ Your user context:
 - Simulation runs: ${context.simulationRunsCount}
 - Recent activity categories: ${context.recentActivityCategories.join(", ") || "None"}
 ${context.occupation ? `- Occupation: ${context.occupation.name} (${context.occupation.category}) — Tax type: ${context.occupation.taxCategory}` : "- Occupation: not set"}
-${context.profile ? `- Financial profile: $${context.profile.annualIncome.toLocaleString()}/yr income, ${context.profile.savingsRate}% savings rate, $${context.profile.monthlyInvestment}/mo investment, ${context.profile.riskTolerance} risk tolerance` : "- Financial profile: not set up yet"}
+${context.profile ? `- Financial profile: $${context.profile.annualIncome.toLocaleString()}/yr income, ${context.profile.savingsRate}% savings rate, $${context.profile.monthlyInvestment}/mo investment, ${context.profile.riskTolerance} risk tolerance` : "- Financial profile: not set up yet"}`;
 
-Coaching style:
+  if (crossDomain) {
+    prompt += `\n\nCross-Domain Entanglement Signals (from other platform features):`;
+    if (crossDomain.portfolioGainThisWeek && crossDomain.portfolioGainThisWeek > 0) {
+      prompt += `\n- Portfolio gain this week: $${crossDomain.portfolioGainThisWeek.toLocaleString()}`;
+    }
+    if (crossDomain.taxSavingsFound) {
+      prompt += `\n- TaxGPT identified ~$${crossDomain.taxSavingsFound.toLocaleString()} in potential tax savings`;
+    }
+    if (crossDomain.hasCompletedTaxProfile === false) {
+      prompt += `\n- Tax profile NOT set up yet — user may be missing deductions`;
+    }
+    if (crossDomain.uncheckedTaxDeductions) {
+      prompt += `\n- Estimated unclaimed deductions: ~$${crossDomain.uncheckedTaxDeductions.toLocaleString()}`;
+    }
+    if (crossDomain.recentlyAnalyzedSymbol) {
+      prompt += `\n- Recently analyzed stock: ${crossDomain.recentlyAnalyzedSymbol} (signal: ${crossDomain.recentlyAnalyzedSignal || "unknown"})`;
+    }
+    if (crossDomain.gigIncomeMonthly) {
+      prompt += `\n- Gig/side income: ~$${crossDomain.gigIncomeMonthly.toLocaleString()}/mo`;
+    }
+    if (crossDomain.coachRageClicks && crossDomain.coachRageClicks > 2) {
+      prompt += `\n- Behavioral signal: user has been rage-clicking (frustrated with market moves)`;
+    }
+    prompt += `\n\nIMPORTANT: When relevant, weave these cross-domain signals naturally into your coaching. For example, if the user has been focused on trading but has unclaimed tax deductions, point out that the deductions dwarf short-term trading gains. Connect portfolio behavior to tax consequences. Reference their actual cross-domain data to show the platform's connected intelligence.`;
+  }
+
+  prompt += `\n\nCoaching style:
 - Be warm, direct, and encouraging — not preachy
 - Reference their actual data when giving advice
 - Connect habits to simulation outcomes
@@ -141,15 +181,27 @@ Coaching style:
 - Always emphasize progress, no matter how small
 
 IMPORTANT: This is educational guidance, not financial advice. Keep a friendly, human tone.`;
+
+  return prompt;
 }
 
 const CoachingChatSchema = z.object({
   message: z.string().min(1, "Message is required").max(1000, "Message max 1000 chars"),
+  crossDomainContext: z.object({
+    portfolioGainThisWeek: z.number().optional(),
+    taxSavingsFound: z.number().optional(),
+    hasCompletedTaxProfile: z.boolean().optional(),
+    recentlyAnalyzedSymbol: z.string().optional(),
+    recentlyAnalyzedSignal: z.string().optional(),
+    gigIncomeMonthly: z.number().optional(),
+    coachRageClicks: z.number().optional(),
+    uncheckedTaxDeductions: z.number().optional(),
+  }).optional(),
 });
 
 router.post("/coaching/chat", requireAuth, validateBody(CoachingChatSchema), async (req, res) => {
   const clerkId = (req as AuthenticatedRequest).userId;
-  const { message } = req.body;
+  const { message, crossDomainContext } = req.body;
 
   try {
     const userId = await resolveUserId(clerkId, req);
@@ -159,7 +211,7 @@ router.post("/coaching/chat", requireAuth, validateBody(CoachingChatSchema), asy
     }
 
     const context = await getUserContext(userId);
-    const systemPrompt = buildCoachingSystemPrompt(context);
+    const systemPrompt = buildCoachingSystemPrompt(context, crossDomainContext);
 
     const recentSessions = await db
       .select()

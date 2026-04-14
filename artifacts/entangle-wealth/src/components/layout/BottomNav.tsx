@@ -1,5 +1,5 @@
 import { useLocation, Link } from "wouter";
-import { Home, TrendingUp, BarChart3, Newspaper, Trophy, Clock, Radar, Activity, MoreHorizontal } from "lucide-react";
+import { Home, TrendingUp, BarChart3, Newspaper, Trophy, MoreHorizontal, Receipt, Terminal, Gamepad2 } from "lucide-react";
 import { useState, useEffect, memo } from "react";
 
 const primaryItems = [
@@ -11,9 +11,9 @@ const primaryItems = [
 ];
 
 const moreItems = [
-  { href: "/time-machine", label: "Time Machine", icon: Clock },
-  { href: "/sector-flow", label: "Sector Analysis", icon: Radar },
-  { href: "/volatility", label: "Volatility", icon: Activity },
+  { href: "/tax", label: "Tax", icon: Receipt },
+  { href: "/terminal", label: "Terminal", icon: Terminal },
+  { href: "/gamification", label: "Gamification", icon: Gamepad2 },
 ];
 
 function BottomNavComponent() {

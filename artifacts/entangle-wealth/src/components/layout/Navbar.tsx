@@ -10,40 +10,35 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 interface NavGroup {
   label: string;
-  items: { href: string; label: string; desc?: string }[];
+  items: { href: string; label: string }[];
 }
 
 const NAV_GROUPS: NavGroup[] = [
   {
     label: "Trade",
     items: [
-      { href: "/command-center", label: "Command Center" },
       { href: "/dashboard", label: "Dashboard" },
-      { href: "/market-overview", label: "Markets" },
       { href: "/charts", label: "Charts" },
       { href: "/options", label: "Options" },
       { href: "/screener", label: "Screener" },
+      { href: "/terminal", label: "Terminal" },
     ],
   },
   {
     label: "Analyze",
     items: [
       { href: "/technical", label: "Analysis" },
-      { href: "/sector-flow", label: "Sector Analysis" },
-      { href: "/volatility", label: "Volatility Analysis" },
       { href: "/stocks", label: "Stocks" },
       { href: "/research", label: "News" },
+      { href: "/alerts", label: "Alerts" },
     ],
   },
   {
-    label: "Tools",
+    label: "Tax",
     items: [
-      { href: "/time-machine", label: "Time Machine" },
-      { href: "/wealth-sim", label: "Wealth Sim" },
-      { href: "/ai-coach", label: "AI Coach" },
-      { href: "/alerts", label: "Alerts" },
       { href: "/tax", label: "TaxFlow" },
-      { href: "/travel", label: "Business Travel" },
+      { href: "/taxgpt", label: "TaxGPT" },
+      { href: "/tax-strategy", label: "Tax Strategy" },
       { href: "/receipts", label: "Receipt Capture" },
       { href: "/integrations", label: "Integrations" },
     ],
@@ -56,7 +51,6 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/trophy-case", label: "Trophy Case" },
       { href: "/community", label: "Community" },
       { href: "/wallet", label: "Rewards Balance" },
-      { href: "/blog", label: "Blog" },
     ],
   },
 ];
@@ -65,33 +59,29 @@ const MOBILE_SECTIONS = [
   {
     title: "Trade",
     links: [
-      { href: "/command-center", label: "Command Center" },
       { href: "/dashboard", label: "Dashboard" },
       { href: "/charts", label: "Charts" },
       { href: "/options", label: "Options" },
       { href: "/screener", label: "Screener" },
+      { href: "/terminal", label: "Terminal" },
     ],
   },
   {
     title: "Analyze",
     links: [
       { href: "/technical", label: "Analysis" },
-      { href: "/sector-flow", label: "Sector Analysis" },
-      { href: "/volatility", label: "Volatility Analysis" },
       { href: "/stocks", label: "Stocks" },
       { href: "/research", label: "News" },
+      { href: "/alerts", label: "Alerts" },
     ],
   },
   {
-    title: "Tools",
+    title: "Tax",
     links: [
-      { href: "/time-machine", label: "Time Machine" },
-      { href: "/wealth-sim", label: "Wealth Sim" },
-      { href: "/ai-coach", label: "AI Coach" },
-      { href: "/alerts", label: "Alerts" },
       { href: "/tax", label: "TaxFlow" },
+      { href: "/taxgpt", label: "TaxGPT" },
+      { href: "/tax-strategy", label: "Tax Strategy" },
       { href: "/receipts", label: "Receipt Capture" },
-      { href: "/integrations", label: "Integrations" },
     ],
   },
   {
@@ -99,10 +89,8 @@ const MOBILE_SECTIONS = [
     links: [
       { href: "/leaderboard", label: "Leaderboard" },
       { href: "/achievements", label: "Achievements" },
-      { href: "/trophy-case", label: "Trophy Case" },
       { href: "/community", label: "Community" },
       { href: "/wallet", label: "Rewards Balance" },
-      { href: "/blog", label: "Blog" },
     ],
   },
   {
@@ -191,11 +179,7 @@ function DropdownMenu({ group, isOpen, onToggle }: { group: NavGroup; isOpen: bo
 const ADMIN_NAV_GROUP: NavGroup = {
   label: "Admin",
   items: [
-    { href: "/token-admin", label: "Token Admin" },
-    { href: "/marketing", label: "Marketing AI" },
-    { href: "/analytics", label: "Analytics" },
-    { href: "/admin/tickets", label: "Support Tickets" },
-    { href: "/launch", label: "Launch Readiness" },
+    { href: "/admin", label: "Admin Hub" },
     { href: "/admin/monitoring", label: "Sentry Monitoring" },
     { href: "/admin/audit", label: "Audit Dashboard" },
   ],
@@ -204,11 +188,7 @@ const ADMIN_NAV_GROUP: NavGroup = {
 const ADMIN_MOBILE_SECTION = {
   title: "Admin",
   links: [
-    { href: "/token-admin", label: "Token Admin" },
-    { href: "/marketing", label: "Marketing AI" },
-    { href: "/analytics", label: "Analytics" },
-    { href: "/admin/tickets", label: "Support Tickets" },
-    { href: "/launch", label: "Launch Readiness" },
+    { href: "/admin", label: "Admin Hub" },
     { href: "/admin/monitoring", label: "Sentry Monitoring" },
     { href: "/admin/audit", label: "Audit Dashboard" },
   ],

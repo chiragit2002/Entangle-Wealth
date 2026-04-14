@@ -217,14 +217,14 @@ app.use((req, _res, next) => {
 app.use("/api/taxgpt", aiLimiter, aiTimeout);
 app.use("/api/analyze-document", aiLimiter, aiTimeout);
 app.use("/api/analyze", aiLimiter, aiTimeout);
-app.use("/api/coaching", aiTimeout);
-app.use("/api/marketing/generate", rateLimit({
-  windowMs: 60 * 1000,
-  limit: 5,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  message: { error: "Marketing AI rate limit exceeded. Max 5 requests per minute." },
-}), aiTimeout);
+// app.use("/api/coaching", aiTimeout);
+// app.use("/api/marketing/generate", rateLimit({
+//   windowMs: 60 * 1000,
+//   limit: 5,
+//   standardHeaders: "draft-7",
+//   legacyHeaders: false,
+//   message: { error: "Marketing AI rate limit exceeded. Max 5 requests per minute." },
+// }), aiTimeout);
 
 app.use("/api/taxgpt", userAiLimiter);
 app.use("/api/analyze-document", userAiLimiter);

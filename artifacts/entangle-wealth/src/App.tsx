@@ -11,27 +11,16 @@ import { Toaster as SonnerToaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ErrorFallback from "@/components/ErrorFallback";
 import NotFound from "@/pages/not-found";
-import { InstallPrompt } from "@/components/pwa/InstallPrompt";
-import { NotificationPrompt } from "@/components/pwa/NotificationPrompt";
 import { PageSkeleton, ChartSkeleton, TableSkeleton } from "@/components/pwa/PageSkeleton";
 import { captureReferralCode } from "@/lib/referral";
 import { trackEvent } from "@/lib/trackEvent";
 import { usePageTracking } from "@/hooks/usePageTracking";
-import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { TerminalAuthShell } from "@/components/TerminalAuthShell";
-import { Info } from "lucide-react";
 import { AuthErrorHandler } from "@/components/AuthErrorHandler";
 import { AuthTokenError } from "@/lib/authFetch";
-import { BootSequence } from "@/components/BootSequence";
-import { QuantumPageTransition } from "@/components/QuantumPageTransition";
 import { AuditErrorBoundary } from "@/components/AuditErrorBoundary";
 import { useUxTracker } from "@/hooks/useUxTracker";
-const MilestoneCelebrationModal = lazy(() =>
-  import("@/components/viral/MilestoneCelebrationModal").then((m) => ({ default: m.MilestoneCelebrationModal }))
-);
-import { ProfileCompletionGate } from "@/components/ProfileCompletionGate";
-import { PopupQueueProvider } from "@/components/PopupQueue";
 
 const Home = lazy(() => import("@/pages/Home"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -40,15 +29,10 @@ const Options = lazy(() => import("@/pages/Options"));
 const About = lazy(() => import("@/pages/About"));
 const Terminal = lazy(() => import("@/pages/Terminal"));
 const Stocks = lazy(() => import("@/pages/Stocks"));
-const Jobs = lazy(() => import("@/pages/Jobs"));
-const Gigs = lazy(() => import("@/pages/Gigs"));
-const Community = lazy(() => import("@/pages/Community"));
 const Tax = lazy(() => import("@/pages/Tax"));
 const Receipts = lazy(() => import("@/pages/Receipts"));
 const Integrations = lazy(() => import("@/pages/Integrations"));
-const Travel = lazy(() => import("@/pages/Travel"));
 const TaxGPT = lazy(() => import("@/pages/TaxGPT"));
-const Resume = lazy(() => import("@/pages/Resume"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const TechnicalAnalysis = lazy(() => import("@/pages/TechnicalAnalysis"));
 const Screener = lazy(() => import("@/pages/Screener"));
@@ -56,28 +40,14 @@ const Terms = lazy(() => import("@/pages/Terms"));
 const Privacy = lazy(() => import("@/pages/Privacy"));
 const Pricing = lazy(() => import("@/pages/Pricing"));
 const Research = lazy(() => import("@/pages/Research"));
-const TimeMachine = lazy(() => import("@/pages/TimeMachine"));
-const SectorFlow = lazy(() => import("@/pages/SectorFlow"));
-const VolatilityLab = lazy(() => import("@/pages/VolatilityLab"));
-const CompetitiveAnalysis = lazy(() => import("@/pages/CompetitiveAnalysis"));
-const OpenSourceIntel = lazy(() => import("@/pages/OpenSourceIntel"));
-const CaseStudy = lazy(() => import("@/pages/CaseStudy"));
 const Charts = lazy(() => import("@/pages/Charts"));
 const Leaderboard = lazy(() => import("@/pages/Leaderboard"));
 const Achievements = lazy(() => import("@/pages/Achievements"));
 const TrophyCase = lazy(() => import("@/pages/TrophyCase"));
 const TokenWallet = lazy(() => import("@/pages/TokenWallet"));
-const TravelMarketplace = lazy(() => import("@/pages/TravelMarketplace"));
 const RewardHistory = lazy(() => import("@/pages/RewardHistory"));
-const TokenAdmin = lazy(() => import("@/pages/TokenAdmin"));
 const TaxStrategy = lazy(() => import("@/pages/TaxStrategy"));
 const TaxYearSummary = lazy(() => import("@/pages/TaxYearSummary"));
-const MarketingCenter = lazy(() => import("@/pages/MarketingCenter"));
-const ContentCalendar = lazy(() => import("@/pages/ContentCalendar"));
-const RedditEngine = lazy(() => import("@/pages/RedditEngine"));
-const SeoEngine = lazy(() => import("@/pages/SeoEngine"));
-const BlogIndex = lazy(() => import("@/pages/BlogIndex"));
-const BlogPostPage = lazy(() => import("@/pages/BlogPost"));
 const AlertsPage = lazy(() => import("@/pages/Alerts"));
 const AnalyticsPage = lazy(() => import("@/pages/Analytics"));
 const CookiesPage = lazy(() => import("@/pages/Cookies"));
@@ -87,23 +57,18 @@ const AccessibilityPage = lazy(() => import("@/pages/Accessibility"));
 const HelpPage = lazy(() => import("@/pages/Help"));
 const SubmitTicketPage = lazy(() => import("@/pages/SubmitTicket"));
 const StatusPage = lazy(() => import("@/pages/Status"));
+const GamificationPage = lazy(() => import("@/pages/Gamification"));
+const Community = lazy(() => import("@/pages/Community"));
+const AdminHubPage = lazy(() => import("@/pages/AdminHub"));
 const AdminTicketsPage = lazy(() => import("@/pages/AdminTickets"));
 const AdminStatusPage = lazy(() => import("@/pages/AdminStatus"));
 const AdminScalabilityPage = lazy(() => import("@/pages/AdminScalability"));
-const LaunchReadinessPage = lazy(() => import("@/pages/LaunchReadiness"));
-const GamificationPage = lazy(() => import("@/pages/Gamification"));
-const GiveawayPage = lazy(() => import("@/pages/Giveaway"));
-const DailyContentPage = lazy(() => import("@/pages/DailyContent"));
 const AdminKycPage = lazy(() => import("@/pages/AdminKyc"));
-const WealthSimPage = lazy(() => import("@/pages/WealthSim"));
-const AlternateTimeline = lazy(() => import("@/pages/AlternateTimeline"));
-const HabitsDashboard = lazy(() => import("@/pages/HabitsDashboard"));
-const LifeOutcomes = lazy(() => import("@/pages/LifeOutcomes"));
-const AICoach = lazy(() => import("@/pages/AICoach"));
-const EvolutionDashboard = lazy(() => import("@/pages/EvolutionDashboard"));
 const AdminMonitoringPage = lazy(() => import("@/pages/AdminMonitoring"));
 const AdminAuditPage = lazy(() => import("@/pages/AdminAudit"));
-const CommandCenter = lazy(() => import("@/pages/CommandCenter"));
+const TokenAdmin = lazy(() => import("@/pages/TokenAdmin"));
+const MarketingCenter = lazy(() => import("@/pages/MarketingCenter"));
+const LaunchReadinessPage = lazy(() => import("@/pages/LaunchReadiness"));
 
 const IS_DEV = import.meta.env.MODE !== "production";
 const TestFixture = IS_DEV ? lazy(() => import("@/pages/TestFixture")) : null;
@@ -216,7 +181,6 @@ function useFacebookOAuth() {
   return { signInWithFacebook };
 }
 
-
 function useClerkAppearance() {
   const { resolvedTheme } = useTheme();
   return resolvedTheme === "dark" ? clerkAppearanceDark : clerkAppearanceLight;
@@ -289,7 +253,6 @@ function ClerkQueryClientCacheInvalidator() {
       if (userId && prevUserIdRef.current === null) {
         const accounts = user?.externalAccounts || [];
         const provider = accounts.length > 0 ? accounts[0].provider : null;
-
         const hasPasskeys = (user?.passkeys?.length ?? 0) > 0;
         const isOAuthLogin = accounts.length > 0;
 
@@ -399,98 +362,81 @@ function ClerkProviderWithRoutes() {
         <UxTrackerInit />
         <AuthErrorHandler />
         <TooltipProvider>
-          <PopupQueueProvider>
           <AuditErrorBoundary>
-          <ProfileCompletionGate>
           <Switch>
+            {/* Public */}
             <Route path="/">{() => <LazyPage component={Home} />}</Route>
-            <Route path="/dashboard">{() => <LazyProtected component={Dashboard} />}</Route>
-            <Route path="/earn">{() => <LazyProtected component={Earn} />}</Route>
-            <Route path="/options">{() => <LazyProtected component={Options} />}</Route>
-            <Route path="/stocks">{() => <LazyTable component={Stocks} />}</Route>
-            <Route path="/jobs">{() => <LazyTable component={Jobs} />}</Route>
-            <Route path="/gigs">{() => <LazyTable component={Gigs} />}</Route>
-            <Route path="/community">{() => <LazyProtected component={Community} />}</Route>
-            <Route path="/tax">{() => <LazyProtected component={Tax} />}</Route>
-            <Route path="/receipts">{() => <LazyProtected component={Receipts} />}</Route>
-            <Route path="/integrations">{() => <LazyProtected component={Integrations} />}</Route>
-            <Route path="/travel">{() => <LazyPage component={Travel} />}</Route>
-            <Route path="/tax-strategy">{() => <LazyProtected component={TaxStrategy} />}</Route>
-            <Route path="/tax-summary">{() => <LazyProtected component={TaxYearSummary} />}</Route>
-            <Route path="/taxgpt">{() => <LazyProtected component={TaxGPT} />}</Route>
-            <Route path="/technical">{() => <LazyChart component={TechnicalAnalysis} />}</Route>
-            <Route path="/charts">{() => <LazyChart component={Charts} />}</Route>
-            <Route path="/screener">{() => <LazyTable component={Screener} />}</Route>
-            <Route path="/terminal">{() => <LazyProtected component={Terminal} />}</Route>
             <Route path="/about">{() => <LazyPage component={About} />}</Route>
-            <Route path="/terms">{() => <LazyPage component={Terms} />}</Route>
-            <Route path="/privacy">{() => <LazyPage component={Privacy} />}</Route>
             <Route path="/pricing">{() => <LazyPage component={Pricing} />}</Route>
             <Route path="/research">{() => <LazyPage component={Research} />}</Route>
-            <Route path="/time-machine">{() => <LazyChart component={TimeMachine} />}</Route>
-            <Route path="/sector-flow">{() => <LazyChart component={SectorFlow} />}</Route>
-            <Route path="/volatility">{() => <LazyChart component={VolatilityLab} />}</Route>
-            <Route path="/competitive-intel">{() => <LazyPage component={CompetitiveAnalysis} />}</Route>
-            <Route path="/open-source-intel">{() => <LazyPage component={OpenSourceIntel} />}</Route>
-            <Route path="/case-study">{() => <LazyPage component={CaseStudy} />}</Route>
+            <Route path="/stocks">{() => <LazyTable component={Stocks} />}</Route>
+            <Route path="/status">{() => <LazyPage component={StatusPage} />}</Route>
+
+            {/* Auth */}
+            <Route path="/sign-in/*?" component={SignInPage} />
+            <Route path="/sign-up/*?" component={SignUpPage} />
+
+            {/* Core — Trading */}
+            <Route path="/dashboard">{() => <LazyProtected component={Dashboard} />}</Route>
+            <Route path="/charts">{() => <LazyChart component={Charts} />}</Route>
+            <Route path="/technical">{() => <LazyChart component={TechnicalAnalysis} />}</Route>
+            <Route path="/screener">{() => <LazyTable component={Screener} />}</Route>
+            <Route path="/terminal">{() => <LazyProtected component={Terminal} />}</Route>
+            <Route path="/options">{() => <LazyProtected component={Options} />}</Route>
+            <Route path="/earn">{() => <LazyProtected component={Earn} />}</Route>
+            <Route path="/alerts">{() => <LazyProtected component={AlertsPage} />}</Route>
+
+            {/* Core — Tax */}
+            <Route path="/tax">{() => <LazyProtected component={Tax} />}</Route>
+            <Route path="/taxgpt">{() => <LazyProtected component={TaxGPT} />}</Route>
+            <Route path="/tax-strategy">{() => <LazyProtected component={TaxStrategy} />}</Route>
+            <Route path="/tax-summary">{() => <LazyProtected component={TaxYearSummary} />}</Route>
+            <Route path="/receipts">{() => <LazyProtected component={Receipts} />}</Route>
+            <Route path="/integrations">{() => <LazyProtected component={Integrations} />}</Route>
+
+            {/* Core — Gamification */}
             <Route path="/leaderboard">{() => <LazyProtected component={Leaderboard} />}</Route>
             <Route path="/achievements">{() => <LazyProtected component={Achievements} />}</Route>
             <Route path="/trophy-case">{() => <LazyProtected component={TrophyCase} />}</Route>
-            <Route path="/sign-in/*?" component={SignInPage} />
-            <Route path="/sign-up/*?" component={SignUpPage} />
-            <Route path="/resume">{() => <LazyProtected component={Resume} />}</Route>
-            <Route path="/profile">{() => <LazyProtected component={Profile} />}</Route>
             <Route path="/wallet">{() => <LazyProtected component={TokenWallet} />}</Route>
-            <Route path="/marketplace">{() => <LazyProtected component={TravelMarketplace} />}</Route>
             <Route path="/rewards">{() => <LazyProtected component={RewardHistory} />}</Route>
-            <Route path="/token-admin">{() => <LazyProtected component={TokenAdmin} />}</Route>
-            <Route path="/marketing">{() => <LazyProtected component={MarketingCenter} />}</Route>
-            <Route path="/content-calendar">{() => <LazyProtected component={ContentCalendar} />}</Route>
-            <Route path="/reddit-engine">{() => <LazyProtected component={RedditEngine} />}</Route>
-            <Route path="/seo">{() => <LazyProtected component={SeoEngine} />}</Route>
-            <Route path="/alerts">{() => <LazyProtected component={AlertsPage} />}</Route>
-            <Route path="/analytics">{() => <LazyProtected component={AnalyticsPage} />}</Route>
-            <Route path="/blog">{() => <LazyPage component={BlogIndex} />}</Route>
-            <Route path="/blog/:slug">{() => <LazyPage component={BlogPostPage} />}</Route>
+            <Route path="/gamification">{() => <LazyProtected component={GamificationPage} />}</Route>
+            <Route path="/community">{() => <LazyProtected component={Community} />}</Route>
+
+            {/* Essential pages */}
+            <Route path="/profile">{() => <LazyProtected component={Profile} />}</Route>
+            <Route path="/help">{() => <LazyPage component={HelpPage} />}</Route>
+            <Route path="/submit-ticket">{() => <LazyProtected component={SubmitTicketPage} />}</Route>
+
+            {/* Legal */}
+            <Route path="/terms">{() => <LazyPage component={Terms} />}</Route>
+            <Route path="/privacy">{() => <LazyPage component={Privacy} />}</Route>
             <Route path="/cookies">{() => <LazyPage component={CookiesPage} />}</Route>
             <Route path="/disclaimer">{() => <LazyPage component={DisclaimerPage} />}</Route>
             <Route path="/dmca">{() => <LazyPage component={DmcaPage} />}</Route>
             <Route path="/accessibility">{() => <LazyPage component={AccessibilityPage} />}</Route>
-            <Route path="/help">{() => <LazyPage component={HelpPage} />}</Route>
-            <Route path="/submit-ticket">{() => <LazyProtected component={SubmitTicketPage} />}</Route>
-            <Route path="/status">{() => <LazyPage component={StatusPage} />}</Route>
+
+            {/* Admin (consolidated) */}
+            <Route path="/admin">{() => <LazyProtected component={AdminHubPage} />}</Route>
+            <Route path="/admin/token">{() => <LazyProtected component={TokenAdmin} />}</Route>
+            <Route path="/admin/marketing">{() => <LazyProtected component={MarketingCenter} />}</Route>
+            <Route path="/admin/analytics">{() => <LazyProtected component={AnalyticsPage} />}</Route>
             <Route path="/admin/tickets">{() => <LazyProtected component={AdminTicketsPage} />}</Route>
-            <Route path="/admin/status">{() => <LazyProtected component={AdminStatusPage} />}</Route>
-            <Route path="/admin/scalability">{() => <LazyProtected component={AdminScalabilityPage} />}</Route>
-            <Route path="/launch">{() => <LazyProtected component={LaunchReadinessPage} />}</Route>
-            <Route path="/daily-content">{() => <LazyProtected component={DailyContentPage} />}</Route>
-            <Route path="/gamification">{() => <LazyProtected component={GamificationPage} />}</Route>
-            <Route path="/giveaway">{() => <LazyPage component={GiveawayPage} />}</Route>
-            <Route path="/admin/kyc">{() => <LazyProtected component={AdminKycPage} />}</Route>
-            <Route path="/wealth-sim">{() => <LazyProtectedChart component={WealthSimPage} />}</Route>
-            <Route path="/alternate-timeline">{() => <LazyProtectedChart component={AlternateTimeline} />}</Route>
-            <Route path="/habits">{() => <LazyProtected component={HabitsDashboard} />}</Route>
-            <Route path="/life-outcomes">{() => <LazyProtectedChart component={LifeOutcomes} />}</Route>
-            <Route path="/ai-coach">{() => <LazyProtected component={AICoach} />}</Route>
-            <Route path="/admin/evolution">{() => <LazyProtected component={EvolutionDashboard} />}</Route>
+            <Route path="/admin/launch">{() => <LazyProtected component={LaunchReadinessPage} />}</Route>
             <Route path="/admin/monitoring">{() => <LazyProtected component={AdminMonitoringPage} />}</Route>
             <Route path="/admin/audit">{() => <LazyProtected component={AdminAuditPage} />}</Route>
-            <Route path="/command-center">{() => <LazyProtected component={CommandCenter} />}</Route>
+            <Route path="/admin/scalability">{() => <LazyProtected component={AdminScalabilityPage} />}</Route>
+            <Route path="/admin/kyc">{() => <LazyProtected component={AdminKycPage} />}</Route>
+            <Route path="/admin/status">{() => <LazyProtected component={AdminStatusPage} />}</Route>
+
+            {/* Dev */}
             <Route path="/__test">{() => <Suspense fallback={null}>{IS_DEV && TestFixture ? <TestFixture /> : null}</Suspense>}</Route>
             <Route component={NotFound} />
           </Switch>
-          </ProfileCompletionGate>
           </AuditErrorBoundary>
-          <OnboardingProvider />
-          <Suspense fallback={null}>
-            <MilestoneCelebrationModal />
-          </Suspense>
           <CookieConsentBanner />
-          <InstallPrompt />
-          <NotificationPrompt />
           <Toaster />
           <SonnerToaster position="bottom-right" theme="dark" />
-          </PopupQueueProvider>
         </TooltipProvider>
       </QueryClientProvider>
     </ClerkProvider>
@@ -498,15 +444,8 @@ function ClerkProviderWithRoutes() {
 }
 
 function App() {
-  const isAuthPage = typeof window !== "undefined" && (window.location.pathname.includes("/sign-in") || window.location.pathname.includes("/sign-up"));
-  const [bootDone, setBootDone] = useState(isAuthPage);
-
   useEffect(() => {
     captureReferralCode();
-  }, []);
-
-  const handleBootComplete = useCallback(() => {
-    setBootDone(true);
   }, []);
 
   return (
@@ -517,9 +456,7 @@ function App() {
           SentryReact.captureException(error);
         });
       }}>
-        {!bootDone && <BootSequence onComplete={handleBootComplete} />}
         <WouterRouter base={basePath}>
-          <QuantumPageTransition />
           <ClerkProviderWithRoutes />
         </WouterRouter>
       </ErrorBoundary>

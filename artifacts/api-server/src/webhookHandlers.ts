@@ -61,7 +61,16 @@ async function logWebhookEvent(params: {
     tierAfter: params.tierAfter,
     status: params.status,
     errorMessage: params.errorMessage || null,
-  }).onConflictDoNothing();
+  }).onConflictDoUpdate({
+    target: webhookEventsTable.eventId,
+    set: {
+      status: params.status,
+      errorMessage: params.errorMessage || null,
+      tierBefore: params.tierBefore,
+      tierAfter: params.tierAfter,
+      userId: params.userId,
+    },
+  });
 }
 
 async function updateUserTier(
@@ -105,12 +114,12 @@ export class WebhookHandlers {
     const event = stripe.webhooks.constructEvent(payload, signature, endpointSecret);
 
     const [alreadyProcessed] = await db
-      .select({ eventId: webhookEventsTable.eventId })
+      .select({ eventId: webhookEventsTable.eventId, status: webhookEventsTable.status })
       .from(webhookEventsTable)
       .where(eq(webhookEventsTable.eventId, event.id));
 
-    if (alreadyProcessed) {
-      logger.info({ eventId: event.id, eventType: event.type }, 'Skipping duplicate webhook event');
+    if (alreadyProcessed?.status === 'success') {
+      logger.info({ eventId: event.id, eventType: event.type }, 'Skipping duplicate webhook event (already succeeded)');
       return;
     }
 

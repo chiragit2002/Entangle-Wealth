@@ -123,6 +123,7 @@ export class WebhookHandlers {
       return;
     }
 
+    try {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
@@ -386,6 +387,19 @@ export class WebhookHandlers {
         });
         break;
       }
+    }
+    } catch (err) {
+      await logWebhookEvent({
+        eventId: event.id,
+        eventType: event.type,
+        stripeCustomerId: null,
+        userId: null,
+        tierBefore: null,
+        tierAfter: null,
+        status: 'error',
+        errorMessage: err instanceof Error ? err.message : String(err),
+      }).catch(logErr => logger.error({ logErr, eventId: event.id }, 'Failed to log webhook error event'));
+      throw err;
     }
   }
 }

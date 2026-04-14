@@ -158,6 +158,7 @@ export default function Alerts() {
       }
     } catch (err) {
       console.error("Failed to fetch digest preference:", err);
+      toast({ title: "Error", description: "Failed to load digest preference", variant: "destructive" });
     }
   }, [getToken]);
 
@@ -330,6 +331,7 @@ export default function Alerts() {
       });
     } catch (err) {
       console.error("Failed to update digest preference:", err);
+      toast({ title: "Error", description: "Failed to update digest preference", variant: "destructive" });
     }
   };
 

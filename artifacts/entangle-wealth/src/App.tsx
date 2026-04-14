@@ -1,13 +1,11 @@
-import { useEffect, useRef, useMemo, lazy, Suspense, useState, useCallback } from "react";
-import { Switch, Route, Link, useLocation, Router as WouterRouter, Redirect, useSearch } from "wouter";
-import logoImg from "@assets/Gemini_Generated_Image_nso2qnso2qnso2qn_1775900950533.png";
+import { useEffect, useRef, useMemo, lazy, Suspense } from "react";
+import { Switch, Route, useLocation, Router as WouterRouter, Redirect, useSearch } from "wouter";
 import { ClerkProvider, SignIn, SignUp, Show, useClerk } from "@clerk/react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 import * as SentryReact from "@sentry/react";
 import { ThemeProvider, useTheme } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as SonnerToaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ErrorFallback from "@/components/ErrorFallback";
 import NotFound from "@/pages/not-found";
@@ -21,35 +19,30 @@ import { AuthErrorHandler } from "@/components/AuthErrorHandler";
 import { AuthTokenError } from "@/lib/authFetch";
 import { AuditErrorBoundary } from "@/components/AuditErrorBoundary";
 import { useUxTracker } from "@/hooks/useUxTracker";
+import { clerkAppearanceDark, clerkAppearanceLight } from "@/lib/clerkAppearance";
 
 const Home = lazy(() => import("@/pages/Home"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
-const Earn = lazy(() => import("@/pages/Earn"));
 const Options = lazy(() => import("@/pages/Options"));
-const About = lazy(() => import("@/pages/About"));
-const Terminal = lazy(() => import("@/pages/Terminal"));
 const Stocks = lazy(() => import("@/pages/Stocks"));
 const Tax = lazy(() => import("@/pages/Tax"));
-const Receipts = lazy(() => import("@/pages/Receipts"));
-const Integrations = lazy(() => import("@/pages/Integrations"));
 const TaxGPT = lazy(() => import("@/pages/TaxGPT"));
+const TaxStrategy = lazy(() => import("@/pages/TaxStrategy"));
+const Receipts = lazy(() => import("@/pages/Receipts"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const TechnicalAnalysis = lazy(() => import("@/pages/TechnicalAnalysis"));
 const Screener = lazy(() => import("@/pages/Screener"));
-const Terms = lazy(() => import("@/pages/Terms"));
-const Privacy = lazy(() => import("@/pages/Privacy"));
-const Pricing = lazy(() => import("@/pages/Pricing"));
-const Research = lazy(() => import("@/pages/Research"));
 const Charts = lazy(() => import("@/pages/Charts"));
+const Terminal = lazy(() => import("@/pages/Terminal"));
 const Leaderboard = lazy(() => import("@/pages/Leaderboard"));
 const Achievements = lazy(() => import("@/pages/Achievements"));
-const TrophyCase = lazy(() => import("@/pages/TrophyCase"));
 const TokenWallet = lazy(() => import("@/pages/TokenWallet"));
-const RewardHistory = lazy(() => import("@/pages/RewardHistory"));
-const TaxStrategy = lazy(() => import("@/pages/TaxStrategy"));
-const TaxYearSummary = lazy(() => import("@/pages/TaxYearSummary"));
+const GamificationPage = lazy(() => import("@/pages/Gamification"));
 const AlertsPage = lazy(() => import("@/pages/Alerts"));
-const AnalyticsPage = lazy(() => import("@/pages/Analytics"));
+const Pricing = lazy(() => import("@/pages/Pricing"));
+const About = lazy(() => import("@/pages/About"));
+const Terms = lazy(() => import("@/pages/Terms"));
+const Privacy = lazy(() => import("@/pages/Privacy"));
 const CookiesPage = lazy(() => import("@/pages/Cookies"));
 const DisclaimerPage = lazy(() => import("@/pages/Disclaimer"));
 const DmcaPage = lazy(() => import("@/pages/Dmca"));
@@ -57,411 +50,122 @@ const AccessibilityPage = lazy(() => import("@/pages/Accessibility"));
 const HelpPage = lazy(() => import("@/pages/Help"));
 const SubmitTicketPage = lazy(() => import("@/pages/SubmitTicket"));
 const StatusPage = lazy(() => import("@/pages/Status"));
-const GamificationPage = lazy(() => import("@/pages/Gamification"));
-const Community = lazy(() => import("@/pages/Community"));
 const AdminHubPage = lazy(() => import("@/pages/AdminHub"));
-const AdminTicketsPage = lazy(() => import("@/pages/AdminTickets"));
-const AdminStatusPage = lazy(() => import("@/pages/AdminStatus"));
-const AdminScalabilityPage = lazy(() => import("@/pages/AdminScalability"));
-const AdminKycPage = lazy(() => import("@/pages/AdminKyc"));
-const AdminMonitoringPage = lazy(() => import("@/pages/AdminMonitoring"));
-const AdminAuditPage = lazy(() => import("@/pages/AdminAudit"));
-const TokenAdmin = lazy(() => import("@/pages/TokenAdmin"));
-const MarketingCenter = lazy(() => import("@/pages/MarketingCenter"));
-const LaunchReadinessPage = lazy(() => import("@/pages/LaunchReadiness"));
-
-const IS_DEV = import.meta.env.MODE !== "production";
-const TestFixture = IS_DEV ? lazy(() => import("@/pages/TestFixture")) : null;
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+if (!clerkPubKey) throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
 
-function stripBase(path: string): string {
-  return basePath && path.startsWith(basePath)
-    ? path.slice(basePath.length) || "/"
-    : path;
-}
+function stripBase(p: string) { return basePath && p.startsWith(basePath) ? p.slice(basePath.length) || "/" : p; }
+function createQC() { return new QueryClient({ defaultOptions: { queries: { retry: (n, e) => !(e instanceof AuthTokenError) && n < 3 } } }); }
+function useClerkAppearance() { const { resolvedTheme } = useTheme(); return resolvedTheme === "dark" ? clerkAppearanceDark : clerkAppearanceLight; }
 
-if (!clerkPubKey) {
-  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
-}
-
-function createQueryClient() {
-  return new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: (failureCount, error) => {
-          if (error instanceof AuthTokenError) return false;
-          return failureCount < 3;
-        },
-      },
-    },
-  });
-}
-
-const clerkAppearanceDark = {
-  variables: {
-    colorPrimary: "#FF8C00",
-    colorBackground: "#050505",
-    colorText: "#e0d8c8",
-    colorTextSecondary: "rgba(224,216,200,0.5)",
-    colorInputBackground: "rgba(255,165,0,0.04)",
-    colorInputText: "#e0d8c8",
-    borderRadius: "0.25rem",
-    fontFamily: "'JetBrains Mono', 'Fira Code', 'Courier New', monospace",
-  },
-  elements: {
-    card: "!bg-[#050505] border border-[#FF8C00]/10 !shadow-none !rounded-[4px]",
-    headerTitle: "!text-[#FF8C00] uppercase !tracking-[0.12em] !text-sm",
-    headerSubtitle: "!text-[#e0d8c8]/35 !text-xs !tracking-[0.04em]",
-    socialButtonsBlockButton: "!border-[#FF8C00]/10 !bg-[#FF8C00]/[0.04] !text-[#e0d8c8] hover:!bg-[#FF8C00]/[0.08] !rounded-[4px] !font-normal !tracking-wide",
-    socialButtonsBlockButtonText: "!text-[#e0d8c8] !font-normal !text-xs !tracking-wider",
-    socialButtonsBlockButtonArrow: "!text-[#FF8C00]/60",
-    formFieldLabel: "!text-[#e0d8c8]/50 uppercase !text-[10px] !tracking-[0.1em]",
-    formFieldInput: "!bg-[#FF8C00]/[0.04] !border-0 !border-b !border-b-[#FF8C00]/10 !text-[#e0d8c8] placeholder:!text-[#e0d8c8]/20 !rounded-none focus:!border-b-[#FF8C00]",
-    formButtonPrimary: "!bg-[#FF8C00] !text-black !font-bold hover:!bg-[#FF8C00]/90 uppercase !tracking-[0.1em] !rounded-[4px]",
-    footerActionLink: "!text-[#FF8C00]/60 hover:!text-[#FF8C00]/80",
-    footerAction: "!text-[#e0d8c8]/30",
-    dividerLine: "!bg-[#FF8C00]/10",
-    dividerText: "!text-[#e0d8c8]/20 !text-[10px] !tracking-[0.08em]",
-    identityPreviewEditButton: "!text-[#FF8C00]/60",
-    formFieldAction: "!text-[#FF8C00]/60",
-    alert: "!bg-red-500/10 !border-red-500/20 !text-red-300 !rounded-[4px]",
-    alertText: "!text-red-300",
-    logoBox: "hidden",
-    internal: "!bg-transparent",
-    rootBox: "!bg-transparent !shadow-none",
-    cardBox: "!bg-transparent !shadow-none",
-    badge: "hidden",
-    tagPrimaryButton: "hidden",
-    devModeNotice: "hidden",
-  },
-};
-
-const clerkAppearanceLight = {
-  variables: {
-    colorPrimary: "#CC7000",
-    colorBackground: "#ffffff",
-    colorText: "#1a1a2e",
-    colorTextSecondary: "rgba(0,0,0,0.5)",
-    colorInputBackground: "rgba(0,0,0,0.03)",
-    colorInputText: "#1a1a2e",
-    borderRadius: "0.25rem",
-    fontFamily: "inherit",
-  },
-  elements: {
-    card: "bg-white border border-black/10 shadow-xl",
-    headerTitle: "text-gray-900",
-    headerSubtitle: "text-gray-500",
-    socialButtonsBlockButton: "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 font-medium",
-    socialButtonsBlockButtonText: "text-gray-700 font-medium",
-    formFieldLabel: "text-gray-600",
-    formFieldInput: "bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400",
-    formButtonPrimary: "bg-[#CC7000] text-white font-bold hover:bg-[#CC7000]/90",
-    footerActionLink: "text-[#CC7000] hover:text-[#CC7000]/80",
-    dividerLine: "bg-gray-200",
-    dividerText: "text-gray-400",
-    identityPreviewEditButton: "text-[#CC7000]",
-    formFieldAction: "text-[#CC7000]",
-    alert: "bg-red-50 border-red-200 text-red-600",
-    alertText: "text-red-600",
-  },
-};
-
-function useFacebookOAuth() {
-  const clerk = useClerk();
-  const signInWithFacebook = async () => {
-    await clerk.client?.signIn.authenticateWithRedirect({
-      strategy: "oauth_facebook",
-      redirectUrl: `${window.location.origin}${basePath}/sso-callback`,
-      redirectUrlComplete: `${window.location.origin}${basePath}/dashboard`,
-    });
-  };
-  return { signInWithFacebook };
-}
-
-function useClerkAppearance() {
-  const { resolvedTheme } = useTheme();
-  return resolvedTheme === "dark" ? clerkAppearanceDark : clerkAppearanceLight;
-}
-
-function SignInPage() {
+function AuthPage({ mode }: { mode: "sign-in" | "sign-up" }) {
   const searchString = useSearch();
-  const params = new URLSearchParams(searchString);
-  const redirectReason = params.get("reason");
-  const { signInWithFacebook } = useFacebookOAuth();
-  const clerkAppearance = useClerkAppearance();
-
+  const reason = mode === "sign-in" ? new URLSearchParams(searchString).get("reason") : null;
+  const a = useClerkAppearance();
+  const Comp = mode === "sign-in" ? SignIn : SignUp;
   return (
-    <TerminalAuthShell reason={redirectReason} mode="sign-in">
-      <SignIn
-        routing="path"
-        path={`${basePath}/sign-in`}
-        signUpUrl={`${basePath}/sign-up`}
-        fallbackRedirectUrl={`${basePath}/dashboard`}
-        appearance={clerkAppearance}
-      />
-      <button
-        type="button"
-        onClick={signInWithFacebook}
-        className="sr-only"
-        aria-label="Sign in with Facebook"
-      >
-        Continue with Facebook
-      </button>
+    <TerminalAuthShell reason={reason} mode={mode}>
+      <Comp routing="path" path={`${basePath}/${mode}`} signInUrl={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} fallbackRedirectUrl={`${basePath}/dashboard`} appearance={a} />
     </TerminalAuthShell>
   );
 }
 
-function SignUpPage() {
-  const { signInWithFacebook } = useFacebookOAuth();
-  const clerkAppearance = useClerkAppearance();
-
-  return (
-    <TerminalAuthShell mode="sign-up">
-      <SignUp
-        routing="path"
-        path={`${basePath}/sign-up`}
-        signInUrl={`${basePath}/sign-in`}
-        fallbackRedirectUrl={`${basePath}/dashboard`}
-        appearance={clerkAppearance}
-      />
-      <button
-        type="button"
-        onClick={signInWithFacebook}
-        className="sr-only"
-        aria-label="Sign up with Facebook"
-      >
-        Continue with Facebook
-      </button>
-    </TerminalAuthShell>
-  );
-}
-
-function ClerkQueryClientCacheInvalidator() {
+function CacheInvalidator() {
   const { addListener } = useClerk();
   const qc = useQueryClient();
-  const prevUserIdRef = useRef<string | null | undefined>(undefined);
-
+  const prev = useRef<string | null | undefined>(undefined);
   useEffect(() => {
-    const unsubscribe = addListener(({ user }) => {
-      const userId = user?.id ?? null;
-      if (prevUserIdRef.current !== undefined && prevUserIdRef.current !== userId) {
-        qc.clear();
+    const unsub = addListener(({ user }) => {
+      const id = user?.id ?? null;
+      if (prev.current !== undefined && prev.current !== id) qc.clear();
+      if (id && prev.current === null) {
+        const accts = user?.externalAccounts || [];
+        const p = accts[0]?.provider;
+        trackEvent((user?.passkeys?.length ?? 0) > 0 && !accts.length ? "login_passkey" : p ? `login_oauth_${p}` : "login_email");
       }
-      if (userId && prevUserIdRef.current === null) {
-        const accounts = user?.externalAccounts || [];
-        const provider = accounts.length > 0 ? accounts[0].provider : null;
-        const hasPasskeys = (user?.passkeys?.length ?? 0) > 0;
-        const isOAuthLogin = accounts.length > 0;
-
-        if (hasPasskeys && !isOAuthLogin) {
-          trackEvent("login_passkey");
-        } else if (provider === "google") {
-          trackEvent("login_oauth_google");
-        } else if (provider === "github") {
-          trackEvent("login_oauth_github");
-        } else if (provider === "apple") {
-          trackEvent("login_oauth_apple");
-        } else if (provider === "facebook") {
-          trackEvent("login_oauth_facebook");
-        } else {
-          trackEvent("login_email");
-        }
-      }
-      prevUserIdRef.current = userId;
+      prev.current = id;
     });
-    return unsubscribe;
+    return unsub;
   }, [addListener, qc]);
-
   return null;
 }
 
-function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
-  const [location] = useLocation();
-  const returnUrl = encodeURIComponent(location);
-  return (
-    <>
-      <Show when="signed-in">
-        <Component />
-      </Show>
-      <Show when="signed-out">
-        <Redirect to={`/sign-in?reason=protected&redirect_url=${returnUrl}`} />
-      </Show>
-    </>
-  );
+function Protected({ component: C }: { component: React.ComponentType }) {
+  const [loc] = useLocation();
+  return <><Show when="signed-in"><C /></Show><Show when="signed-out"><Redirect to={`/sign-in?reason=protected&redirect_url=${encodeURIComponent(loc)}`} /></Show></>;
 }
-
-function LazyPage({ component: Component }: { component: React.ComponentType }) {
-  return (
-    <Suspense fallback={<PageSkeleton />}>
-      <Component />
-    </Suspense>
-  );
-}
-
-function LazyChart({ component: Component }: { component: React.ComponentType }) {
-  return (
-    <Suspense fallback={<ChartSkeleton />}>
-      <Component />
-    </Suspense>
-  );
-}
-
-function LazyTable({ component: Component }: { component: React.ComponentType }) {
-  return (
-    <Suspense fallback={<TableSkeleton />}>
-      <Component />
-    </Suspense>
-  );
-}
-
-function LazyProtected({ component: Component }: { component: React.ComponentType }) {
-  return (
-    <Suspense fallback={<PageSkeleton />}>
-      <ProtectedRoute component={Component} />
-    </Suspense>
-  );
-}
-
-function LazyProtectedChart({ component: Component }: { component: React.ComponentType }) {
-  return (
-    <Suspense fallback={<ChartSkeleton />}>
-      <ProtectedRoute component={Component} />
-    </Suspense>
-  );
-}
-
-function PageTracker() {
-  usePageTracking();
-  return null;
-}
-
-function UxTrackerInit() {
-  useUxTracker();
-  return null;
-}
+function LP({ component: C }: { component: React.ComponentType }) { return <Suspense fallback={<PageSkeleton />}><C /></Suspense>; }
+function LC({ component: C }: { component: React.ComponentType }) { return <Suspense fallback={<ChartSkeleton />}><C /></Suspense>; }
+function LT({ component: C }: { component: React.ComponentType }) { return <Suspense fallback={<TableSkeleton />}><C /></Suspense>; }
+function LPr({ component: C }: { component: React.ComponentType }) { return <Suspense fallback={<PageSkeleton />}><Protected component={C} /></Suspense>; }
+function Tracker() { usePageTracking(); useUxTracker(); return null; }
 
 function ClerkProviderWithRoutes() {
-  const [, setLocation] = useLocation();
-  const queryClient = useMemo(() => createQueryClient(), []);
-  const clerkAppearance = useClerkAppearance();
-
+  const [, nav] = useLocation();
+  const qc = useMemo(createQC, []);
+  const a = useClerkAppearance();
   return (
-    <ClerkProvider
-      publishableKey={clerkPubKey}
-      proxyUrl={clerkProxyUrl}
-      routerPush={(to) => setLocation(stripBase(to))}
-      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
-      appearance={clerkAppearance}
-    >
-      <QueryClientProvider client={queryClient}>
-        <ClerkQueryClientCacheInvalidator />
-        <PageTracker />
-        <UxTrackerInit />
-        <AuthErrorHandler />
+    <ClerkProvider publishableKey={clerkPubKey} proxyUrl={clerkProxyUrl} routerPush={(to) => nav(stripBase(to))} routerReplace={(to) => nav(stripBase(to), { replace: true })} appearance={a}>
+      <QueryClientProvider client={qc}>
+        <CacheInvalidator /><Tracker /><AuthErrorHandler />
         <TooltipProvider>
           <AuditErrorBoundary>
           <Switch>
-            {/* Public */}
-            <Route path="/">{() => <LazyPage component={Home} />}</Route>
-            <Route path="/about">{() => <LazyPage component={About} />}</Route>
-            <Route path="/pricing">{() => <LazyPage component={Pricing} />}</Route>
-            <Route path="/research">{() => <LazyPage component={Research} />}</Route>
-            <Route path="/stocks">{() => <LazyTable component={Stocks} />}</Route>
-            <Route path="/status">{() => <LazyPage component={StatusPage} />}</Route>
-
-            {/* Auth */}
-            <Route path="/sign-in/*?" component={SignInPage} />
-            <Route path="/sign-up/*?" component={SignUpPage} />
-
-            {/* Core — Trading */}
-            <Route path="/dashboard">{() => <LazyProtected component={Dashboard} />}</Route>
-            <Route path="/charts">{() => <LazyChart component={Charts} />}</Route>
-            <Route path="/technical">{() => <LazyChart component={TechnicalAnalysis} />}</Route>
-            <Route path="/screener">{() => <LazyTable component={Screener} />}</Route>
-            <Route path="/terminal">{() => <LazyProtected component={Terminal} />}</Route>
-            <Route path="/options">{() => <LazyProtected component={Options} />}</Route>
-            <Route path="/earn">{() => <LazyProtected component={Earn} />}</Route>
-            <Route path="/alerts">{() => <LazyProtected component={AlertsPage} />}</Route>
-
-            {/* Core — Tax */}
-            <Route path="/tax">{() => <LazyProtected component={Tax} />}</Route>
-            <Route path="/taxgpt">{() => <LazyProtected component={TaxGPT} />}</Route>
-            <Route path="/tax-strategy">{() => <LazyProtected component={TaxStrategy} />}</Route>
-            <Route path="/tax-summary">{() => <LazyProtected component={TaxYearSummary} />}</Route>
-            <Route path="/receipts">{() => <LazyProtected component={Receipts} />}</Route>
-            <Route path="/integrations">{() => <LazyProtected component={Integrations} />}</Route>
-
-            {/* Core — Gamification */}
-            <Route path="/leaderboard">{() => <LazyProtected component={Leaderboard} />}</Route>
-            <Route path="/achievements">{() => <LazyProtected component={Achievements} />}</Route>
-            <Route path="/trophy-case">{() => <LazyProtected component={TrophyCase} />}</Route>
-            <Route path="/wallet">{() => <LazyProtected component={TokenWallet} />}</Route>
-            <Route path="/rewards">{() => <LazyProtected component={RewardHistory} />}</Route>
-            <Route path="/gamification">{() => <LazyProtected component={GamificationPage} />}</Route>
-            <Route path="/community">{() => <LazyProtected component={Community} />}</Route>
-
-            {/* Essential pages */}
-            <Route path="/profile">{() => <LazyProtected component={Profile} />}</Route>
-            <Route path="/help">{() => <LazyPage component={HelpPage} />}</Route>
-            <Route path="/submit-ticket">{() => <LazyProtected component={SubmitTicketPage} />}</Route>
-
-            {/* Legal */}
-            <Route path="/terms">{() => <LazyPage component={Terms} />}</Route>
-            <Route path="/privacy">{() => <LazyPage component={Privacy} />}</Route>
-            <Route path="/cookies">{() => <LazyPage component={CookiesPage} />}</Route>
-            <Route path="/disclaimer">{() => <LazyPage component={DisclaimerPage} />}</Route>
-            <Route path="/dmca">{() => <LazyPage component={DmcaPage} />}</Route>
-            <Route path="/accessibility">{() => <LazyPage component={AccessibilityPage} />}</Route>
-
-            {/* Admin (consolidated) */}
-            <Route path="/admin">{() => <LazyProtected component={AdminHubPage} />}</Route>
-            <Route path="/admin/token">{() => <LazyProtected component={TokenAdmin} />}</Route>
-            <Route path="/admin/marketing">{() => <LazyProtected component={MarketingCenter} />}</Route>
-            <Route path="/admin/analytics">{() => <LazyProtected component={AnalyticsPage} />}</Route>
-            <Route path="/admin/tickets">{() => <LazyProtected component={AdminTicketsPage} />}</Route>
-            <Route path="/admin/launch">{() => <LazyProtected component={LaunchReadinessPage} />}</Route>
-            <Route path="/admin/monitoring">{() => <LazyProtected component={AdminMonitoringPage} />}</Route>
-            <Route path="/admin/audit">{() => <LazyProtected component={AdminAuditPage} />}</Route>
-            <Route path="/admin/scalability">{() => <LazyProtected component={AdminScalabilityPage} />}</Route>
-            <Route path="/admin/kyc">{() => <LazyProtected component={AdminKycPage} />}</Route>
-            <Route path="/admin/status">{() => <LazyProtected component={AdminStatusPage} />}</Route>
-
-            {/* Dev */}
-            <Route path="/__test">{() => <Suspense fallback={null}>{IS_DEV && TestFixture ? <TestFixture /> : null}</Suspense>}</Route>
+            <Route path="/">{() => <LP component={Home} />}</Route>
+            <Route path="/about">{() => <LP component={About} />}</Route>
+            <Route path="/pricing">{() => <LP component={Pricing} />}</Route>
+            <Route path="/stocks">{() => <LT component={Stocks} />}</Route>
+            <Route path="/status">{() => <LP component={StatusPage} />}</Route>
+            <Route path="/sign-in/*?" component={() => <AuthPage mode="sign-in" />} />
+            <Route path="/sign-up/*?" component={() => <AuthPage mode="sign-up" />} />
+            <Route path="/dashboard">{() => <LPr component={Dashboard} />}</Route>
+            <Route path="/charts">{() => <LC component={Charts} />}</Route>
+            <Route path="/technical">{() => <LC component={TechnicalAnalysis} />}</Route>
+            <Route path="/screener">{() => <LT component={Screener} />}</Route>
+            <Route path="/terminal">{() => <LPr component={Terminal} />}</Route>
+            <Route path="/options">{() => <LPr component={Options} />}</Route>
+            <Route path="/alerts">{() => <LPr component={AlertsPage} />}</Route>
+            <Route path="/tax">{() => <LPr component={Tax} />}</Route>
+            <Route path="/taxgpt">{() => <LPr component={TaxGPT} />}</Route>
+            <Route path="/tax-strategy">{() => <LPr component={TaxStrategy} />}</Route>
+            <Route path="/receipts">{() => <LPr component={Receipts} />}</Route>
+            <Route path="/leaderboard">{() => <LPr component={Leaderboard} />}</Route>
+            <Route path="/achievements">{() => <LPr component={Achievements} />}</Route>
+            <Route path="/gamification">{() => <LPr component={GamificationPage} />}</Route>
+            <Route path="/wallet">{() => <LPr component={TokenWallet} />}</Route>
+            <Route path="/profile">{() => <LPr component={Profile} />}</Route>
+            <Route path="/help">{() => <LP component={HelpPage} />}</Route>
+            <Route path="/submit-ticket">{() => <LPr component={SubmitTicketPage} />}</Route>
+            <Route path="/terms">{() => <LP component={Terms} />}</Route>
+            <Route path="/privacy">{() => <LP component={Privacy} />}</Route>
+            <Route path="/cookies">{() => <LP component={CookiesPage} />}</Route>
+            <Route path="/disclaimer">{() => <LP component={DisclaimerPage} />}</Route>
+            <Route path="/dmca">{() => <LP component={DmcaPage} />}</Route>
+            <Route path="/accessibility">{() => <LP component={AccessibilityPage} />}</Route>
+            <Route path="/admin/:rest*">{() => <LPr component={AdminHubPage} />}</Route>
             <Route component={NotFound} />
           </Switch>
           </AuditErrorBoundary>
           <CookieConsentBanner />
           <Toaster />
-          <SonnerToaster position="bottom-right" theme="dark" />
         </TooltipProvider>
       </QueryClientProvider>
     </ClerkProvider>
   );
 }
 
-function App() {
-  useEffect(() => {
-    captureReferralCode();
-  }, []);
-
+export default function App() {
+  useEffect(() => { captureReferralCode(); }, []);
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="ew-theme">
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={(error, info) => {
-        SentryReact.withScope((scope) => {
-          scope.setExtras({ componentStack: info.componentStack });
-          SentryReact.captureException(error);
-        });
+        SentryReact.withScope((scope) => { scope.setExtras({ componentStack: info.componentStack }); SentryReact.captureException(error); });
       }}>
-        <WouterRouter base={basePath}>
-          <ClerkProviderWithRoutes />
-        </WouterRouter>
+        <WouterRouter base={basePath}><ClerkProviderWithRoutes /></WouterRouter>
       </ErrorBoundary>
     </ThemeProvider>
   );
 }
-
-export default App;

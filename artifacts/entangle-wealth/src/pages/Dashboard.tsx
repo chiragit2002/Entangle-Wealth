@@ -547,7 +547,7 @@ export default function Dashboard() {
               <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isMarketOpen ? 'bg-[#FF8C00]' : 'bg-[#FFB800]'} opacity-60`} />
               <span className={`relative inline-flex rounded-full h-2 w-2 ${isMarketOpen ? 'bg-[#FF8C00]' : 'bg-[#FFB800]'}`} />
             </span>
-            <span className={`text-[10px] font-mono font-semibold tracking-wider ${isMarketOpen ? 'text-[#FF8C00]' : 'text-[#FFB800]'}`}>
+            <span role="status" aria-live="polite" className={`text-[10px] font-mono font-semibold tracking-wider ${isMarketOpen ? 'text-[#FF8C00]' : 'text-[#FFB800]'}`}>
               {isMarketOpen ? "Market Open" : "Market Closed"}
             </span>
           </div>
@@ -559,6 +559,10 @@ export default function Dashboard() {
             <input
               data-cmd-search
               placeholder="Search ticker..."
+              aria-label="Search stock ticker symbol"
+              role="combobox"
+              aria-expanded={showSearchDropdown && searchResults.length > 0}
+              aria-autocomplete="list"
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setShowSearchDropdown(true); }}
               onFocus={() => setShowSearchDropdown(true)}

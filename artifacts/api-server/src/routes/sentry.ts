@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
+import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
 
@@ -86,8 +87,8 @@ router.get("/sentry/issues", requireAuth, requireAdmin, async (req, res) => {
 
     res.json({ issues: allIssues.slice(0, Number(limit)), warnings: errors });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    res.status(502).json({ error: msg });
+    logger.error({ err }, "Sentry issues fetch failed");
+    res.status(502).json({ error: "Failed to fetch Sentry issues" });
   }
 });
 
@@ -112,13 +113,14 @@ router.get("/sentry/issues/:issueId", requireAuth, requireAdmin, async (req, res
       tags = tagResults
         .filter((r) => r.status === "fulfilled")
         .map((r) => (r as PromiseFulfilledResult<unknown>).value as Record<string, unknown>);
-    } catch {
+    } catch (err) {
+      logger.warn({ err, issueId }, "Failed to fetch Sentry issue tags");
     }
 
     res.json({ issue, latestEvent, tags });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    res.status(502).json({ error: msg });
+    logger.error({ err }, "Sentry issue detail fetch failed");
+    res.status(502).json({ error: "Failed to fetch Sentry issue details" });
   }
 });
 
@@ -160,8 +162,8 @@ router.get("/sentry/search", requireAuth, requireAdmin, async (req, res) => {
 
     res.json({ issues: allIssues.slice(0, Number(limit)), warnings: errors });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    res.status(502).json({ error: msg });
+    logger.error({ err }, "Sentry search failed");
+    res.status(502).json({ error: "Failed to search Sentry issues" });
   }
 });
 
@@ -223,8 +225,8 @@ router.get("/sentry/summary", requireAuth, requireAdmin, async (req, res) => {
       trend,
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    res.status(502).json({ error: msg });
+    logger.error({ err }, "Sentry summary fetch failed");
+    res.status(502).json({ error: "Failed to fetch Sentry summary" });
   }
 });
 

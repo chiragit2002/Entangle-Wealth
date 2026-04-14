@@ -10,15 +10,11 @@ async function resolveUserIdFromStripeCustomer(
   stripeCustomerId: string | null | undefined
 ): Promise<string | null> {
   if (!stripeCustomerId) return null;
-  try {
-    const [user] = await db
-      .select({ id: usersTable.id })
-      .from(usersTable)
-      .where(eq(usersTable.stripeCustomerId, stripeCustomerId));
-    return user?.id || null;
-  } catch {
-    return null;
-  }
+  const [user] = await db
+    .select({ id: usersTable.id })
+    .from(usersTable)
+    .where(eq(usersTable.stripeCustomerId, stripeCustomerId));
+  return user?.id || null;
 }
 
 async function resolveUserTierFromId(userId: string): Promise<string | null> {
@@ -34,12 +30,8 @@ async function resolvePlanTierFromProduct(
   priceProductId: string | null | undefined
 ): Promise<string | null> {
   if (!priceProductId) return null;
-  try {
-    const product = await stripe.products.retrieve(priceProductId);
-    return product.metadata?.tier || null;
-  } catch {
-    return null;
-  }
+  const product = await stripe.products.retrieve(priceProductId);
+  return product.metadata?.tier || null;
 }
 
 function extractCustomerId(
@@ -81,14 +73,27 @@ async function updateUserTier(
     .update(usersTable)
     .set({ subscriptionTier: newTier })
     .where(eq(usersTable.id, userId))
-    .returning({ id: usersTable.id });
+    .returning({ id: usersTable.id, subscriptionTier: usersTable.subscriptionTier });
 
   if (updated.length === 0) {
     throw new Error(`${context}: db update affected 0 rows for userId ${userId}`);
   }
+
+  const confirmedTier = updated[0].subscriptionTier;
+  if (confirmedTier !== newTier) {
+    logger.error({ userId, expected: newTier, actual: confirmedTier, context }, 'Tier read-back mismatch after update');
+    throw new Error(`${context}: tier read-back mismatch for userId ${userId}`);
+  }
+  logger.info({ userId, tier: confirmedTier, context }, 'Tier update confirmed via read-back');
 }
 
 export class WebhookHandlers {
+  /**
+   * stripeSync.processWebhook handles Replit connector object sync (accounts, products, prices).
+   * Our manual handler below manages application-specific logic: tier activation, virtual cash,
+   * and subscription lifecycle. These are separate concerns — stripeSync does NOT update our
+   * usersTable.subscriptionTier or paper_portfolios. Both must run.
+   */
   static async processWebhook(payload: Buffer, signature: string) {
     const stripeSync = await getStripeSync();
     await stripeSync.processWebhook(payload, signature);
@@ -98,6 +103,16 @@ export class WebhookHandlers {
     if (!endpointSecret) return;
 
     const event = stripe.webhooks.constructEvent(payload, signature, endpointSecret);
+
+    const [alreadyProcessed] = await db
+      .select({ eventId: webhookEventsTable.eventId })
+      .from(webhookEventsTable)
+      .where(eq(webhookEventsTable.eventId, event.id));
+
+    if (alreadyProcessed) {
+      logger.info({ eventId: event.id, eventType: event.type }, 'Skipping duplicate webhook event');
+      return;
+    }
 
     switch (event.type) {
       case 'checkout.session.completed': {

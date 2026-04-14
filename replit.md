@@ -28,7 +28,9 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **Payments**: Stripe for subscriptions and KYC verification.
 - **Data Management**: LocalStorage for client-side persistence.
 - **Occupation System**: Structured occupations for tax category mappings and AI context.
-- **Security**: Helmet for HTTP security headers, global and AI-specific rate limiting, CSRF protection.
+- **Security**: Helmet for HTTP security headers, global and AI-specific rate limiting, CSRF protection. BoundedRateLimitMap/CooldownMap/TimestampMap utilities (`api-server/src/lib/boundedMap.ts`) replace raw Maps for rate limiting with automatic TTL cleanup and max-size caps. AI input sanitizer unifies XSS and SQL injection patterns. News fetcher uses domain allowlist (not blacklist) for SSRF protection.
+- **Account Management**: Users can export all their data (GET `/api/users/me/export`) and delete their account (DELETE `/api/users/me` with confirmation string). Deletion cascades to all related tables. UI in Profile page under "Data & Account" section.
+- **Webhook Security**: Stripe webhook idempotency via `webhook_events` table dedup check. Helper functions throw on failure with read-back verification.
 - **Freemium Gating**: High-value features require sign-in, while browsable content remains public.
 - **Schema Management**: Drizzle ORM schema is the source of truth, with dev DB synced via `push-force`.
 - **Performance**: Paginated endpoints, database indexing, AI request queuing, exponential backoff with jitter, circuit breaker patterns, image compression, real-time metrics.

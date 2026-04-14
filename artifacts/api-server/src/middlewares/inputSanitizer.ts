@@ -21,8 +21,11 @@ const XSS_PATTERNS = [
 const AI_DANGEROUS_PATTERNS = [
   /<script[\s>]/i,
   /javascript\s*:/i,
-  /<iframe[\s>]/i,
+  /on(load|error|click|mouseover|focus|blur|submit|change|input|keydown|keyup|keypress)\s*=/i,
   /data\s*:\s*text\/html/i,
+  /<iframe[\s>]/i,
+  /<object[\s>]/i,
+  /<embed[\s>]/i,
   /(--|;)\s*(DROP|DELETE|INSERT|UPDATE)\s+/i,
   /UNION\s+(ALL\s+)?SELECT/i,
 ];

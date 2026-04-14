@@ -90,7 +90,9 @@ export default function NotificationCenter() {
         const data = await res.json();
         setUnreadCount(data.count);
       }
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to fetch unread count:", err);
+    }
   }, [getToken, isSignedIn]);
 
   const fetchHistory = useCallback(async () => {
@@ -110,7 +112,9 @@ export default function NotificationCenter() {
         setNotifications(items);
         setUnreadCount(items.filter(n => !n.read).length);
       }
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to fetch notification history:", err);
+    }
   }, [getToken, isSignedIn]);
 
   const fetchAlertRules = useCallback(async () => {
@@ -122,7 +126,9 @@ export default function NotificationCenter() {
         const data = await res.json();
         setAlerts(data.alerts);
       }
-    } catch { /* ignore */ } finally {
+    } catch (err) {
+      console.error("Failed to fetch alert rules:", err);
+    } finally {
       setLoadingAlerts(false);
     }
   }, [getToken, isSignedIn]);
@@ -178,10 +184,14 @@ export default function NotificationCenter() {
                   setNotifications(prev => [notif, ...prev.slice(0, 49)]);
                   setUnreadCount(prev => prev + 1);
                 }
-              } catch { /* ignore parse errors */ }
+              } catch (parseErr) {
+                console.warn("SSE parse error:", parseErr);
+              }
             }
           }
-        } catch { /* connection error */ }
+        } catch (connErr) {
+          console.warn("SSE connection error:", connErr);
+        }
         if (!aborted) await new Promise(r => setTimeout(r, 5_000));
       }
     }
@@ -203,7 +213,7 @@ export default function NotificationCenter() {
         }).then(() => {
           setNotifications(prev => prev.map(n => ({ ...n, read: true })));
           setUnreadCount(0);
-        }).catch(() => { /* ignore */ });
+        }).catch((err: unknown) => console.error("Failed to mark read:", err));
       }
     }
   }, [open, tab, fetchHistory, fetchAlertRules, unreadCount, getToken]);
@@ -232,7 +242,9 @@ export default function NotificationCenter() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       });
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to mark all read:", err);
+    }
   }, [getToken]);
 
   const clearAll = useCallback(() => {
@@ -285,14 +297,18 @@ export default function NotificationCenter() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ enabled: !alert.enabled }),
       });
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to toggle alert:", err);
+    }
   };
 
   const removeAlert = async (id: number) => {
     setAlerts(prev => prev.filter(a => a.id !== id));
     try {
       await authFetch(`/alerts/${id}`, getToken, { method: "DELETE" });
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to remove alert:", err);
+    }
   };
 
   return (

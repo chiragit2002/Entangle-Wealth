@@ -9,6 +9,11 @@ import {
   giveawayEntriesTable,
   userXpTable,
   streaksTable,
+  paperPortfoliosTable,
+  paperTradesTable,
+  paperPositionsTable,
+  alertsTable,
+  alertHistoryTable,
 } from "@workspace/db/schema";
 import { eq, count, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
@@ -311,6 +316,65 @@ router.get("/users/:userId/profile", validateParams(UserIdParamsSchema), async (
   } catch (error) {
     logger.error({ err: error }, "Error fetching profile");
     res.status(500).json({ error: "Failed to fetch profile" });
+  }
+});
+
+router.get("/users/me/export", requireAuth, async (req, res) => {
+  const clerkId = (req as AuthenticatedRequest).userId;
+  try {
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.clerkId, clerkId));
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+    const userId = user.id;
+    const { kycIdPhotoPath, kycSelfiePath, kycIdNumber, ...safeUser } = user;
+
+    const [xp] = await db.select().from(userXpTable).where(eq(userXpTable.userId, userId));
+    const [streak] = await db.select().from(streaksTable).where(eq(streaksTable.userId, userId));
+    const [account] = await db.select().from(paperPortfoliosTable).where(eq(paperPortfoliosTable.userId, userId));
+    const trades = await db.select().from(paperTradesTable).where(eq(paperTradesTable.userId, userId));
+    const positions = await db.select().from(paperPositionsTable).where(eq(paperPositionsTable.userId, userId));
+    const alerts = await db.select().from(alertsTable).where(eq(alertsTable.userId, userId));
+    const alertHistory = await db.select().from(alertHistoryTable).where(eq(alertHistoryTable.userId, userId)).limit(500);
+
+    const exportData = {
+      exportedAt: new Date().toISOString(),
+      profile: safeUser,
+      gamification: { xp: xp || null, streak: streak || null },
+      paperTrading: { account: account || null, trades, positions },
+      alerts: { rules: alerts, history: alertHistory },
+    };
+
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Content-Disposition", `attachment; filename="entanglewealth-export-${Date.now()}.json"`);
+    res.json(exportData);
+  } catch (error) {
+    logger.error({ err: error }, "Error exporting user data");
+    res.status(500).json({ error: "Failed to export data" });
+  }
+});
+
+const DeleteAccountSchema = z.object({
+  confirmation: z.literal("DELETE MY ACCOUNT"),
+});
+
+router.delete("/users/me", requireAuth, validateBody(DeleteAccountSchema), async (req, res) => {
+  const clerkId = (req as AuthenticatedRequest).userId;
+  try {
+    const [user] = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.clerkId, clerkId));
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    await db.delete(usersTable).where(eq(usersTable.id, user.id));
+
+    logger.info({ clerkId, userId: user.id }, "User account deleted");
+    res.json({ message: "Account deleted successfully" });
+  } catch (error) {
+    logger.error({ err: error }, "Error deleting user account");
+    res.status(500).json({ error: "Failed to delete account" });
   }
 });
 

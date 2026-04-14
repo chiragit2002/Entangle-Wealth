@@ -208,19 +208,24 @@ function cleanText(raw: string): string {
 
 const ALLOWED_PROTOCOLS = new Set(["http:", "https:"]);
 
+const ALLOWED_ARTICLE_DOMAINS = new Set(
+  FEEDS.map(f => new URL(f.url).hostname)
+);
+
+function isAllowedArticleDomain(hostname: string): boolean {
+  if (ALLOWED_ARTICLE_DOMAINS.has(hostname)) return true;
+  for (const allowed of ALLOWED_ARTICLE_DOMAINS) {
+    if (hostname.endsWith("." + allowed)) return true;
+  }
+  return false;
+}
+
 async function fetchArticleBody(url: string): Promise<string> {
   if (!url) return "";
   try {
     const parsed = new URL(url);
     if (!ALLOWED_PROTOCOLS.has(parsed.protocol)) return "";
-    const h = parsed.hostname;
-    if (h === "localhost" || h === "127.0.0.1" || h === "::1" || h === "0.0.0.0"
-      || h.startsWith("10.") || h.startsWith("192.168.")
-      || h.startsWith("172.16.") || h.startsWith("172.17.") || h.startsWith("172.18.")
-      || h.startsWith("172.19.") || h.startsWith("172.2") || h.startsWith("172.30.")
-      || h.startsWith("172.31.") || h.startsWith("169.254.")
-      || h.startsWith("fc") || h.startsWith("fd") || h.startsWith("fe80")
-      || h.endsWith(".local") || h.endsWith(".internal")) return "";
+    if (!isAllowedArticleDomain(parsed.hostname)) return "";
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
     const res = await fetch(url, {

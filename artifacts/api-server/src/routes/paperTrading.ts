@@ -155,7 +155,7 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
 
       if (side === "buy") {
         if (currentCash < totalCost) {
-          return { error: `> INSUFFICIENT FUNDS — ORDER REJECTED. Available: $${currentCash.toFixed(2)}, Required: $${totalCost.toFixed(2)}` };
+          return { error: "> INSUFFICIENT FUNDS — ORDER REJECTED" };
         }
 
         const newCash = currentCash - totalCost;
@@ -197,7 +197,7 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
           .where(and(eq(paperPositionsTable.userId, dbUserId), eq(paperPositionsTable.symbol, upperSymbol)));
 
         if (!existingPos || existingPos.quantity < qty) {
-          return { error: `Insufficient shares. You own ${existingPos?.quantity ?? 0} shares of ${upperSymbol}` };
+          return { error: `> INSUFFICIENT SHARES — ORDER REJECTED` };
         }
 
         const newCash = currentCash + totalCost;
@@ -315,25 +315,30 @@ router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTra
     const result = await db.transaction(async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${dbUserId.toString()} || '_paper_trade'))`);
 
-      const [portfolio] = await tx
-        .select()
-        .from(paperPortfoliosTable)
-        .where(eq(paperPortfoliosTable.userId, dbUserId));
+      const lockedRows = await tx.execute(
+        sql`SELECT id, cash_balance, user_id FROM paper_portfolios WHERE user_id = ${dbUserId} FOR UPDATE`
+      );
+      const lockedPortfolio = (lockedRows as any).rows?.[0] ?? (lockedRows as any)[0] ?? null;
 
-      const currentPortfolio = portfolio || (await tx
-        .insert(paperPortfoliosTable)
-        .values({ userId: dbUserId, cashBalance: startingCash })
-        .returning())[0];
+      let currentCash: number;
+      if (lockedPortfolio) {
+        currentCash = Number(lockedPortfolio.cash_balance);
+      } else {
+        const [created] = await tx
+          .insert(paperPortfoliosTable)
+          .values({ userId: dbUserId, cashBalance: startingCash })
+          .returning();
+        currentCash = created.cashBalance;
+      }
 
       if (side === "buy") {
-        if (currentPortfolio.cashBalance < totalCost) {
-          return { error: `Insufficient funds. Available: $${currentPortfolio.cashBalance.toFixed(2)}, Required: $${totalCost.toFixed(2)}` };
+        if (currentCash < totalCost) {
+          return { error: "> INSUFFICIENT FUNDS — ORDER REJECTED" };
         }
 
-        await tx
-          .update(paperPortfoliosTable)
-          .set({ cashBalance: currentPortfolio.cashBalance - totalCost, updatedAt: new Date() })
-          .where(eq(paperPortfoliosTable.userId, dbUserId));
+        await tx.execute(
+          sql`UPDATE paper_portfolios SET cash_balance = cash_balance - ${totalCost}, updated_at = NOW() WHERE user_id = ${dbUserId}`
+        );
 
         const [existingPos] = await tx
           .select()
@@ -371,13 +376,12 @@ router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTra
           ));
 
         if (!existingPos || existingPos.contracts < contracts) {
-          return { error: `Insufficient contracts. You own ${existingPos?.contracts ?? 0} ${upperSymbol} ${strike} ${optionType} contracts` };
+          return { error: "> INSUFFICIENT CONTRACTS — ORDER REJECTED" };
         }
 
-        await tx
-          .update(paperPortfoliosTable)
-          .set({ cashBalance: currentPortfolio.cashBalance + totalCost, updatedAt: new Date() })
-          .where(eq(paperPortfoliosTable.userId, dbUserId));
+        await tx.execute(
+          sql`UPDATE paper_portfolios SET cash_balance = cash_balance + ${totalCost}, updated_at = NOW() WHERE user_id = ${dbUserId}`
+        );
 
         const newContracts = existingPos.contracts - contracts;
         await tx

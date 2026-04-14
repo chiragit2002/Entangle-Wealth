@@ -158,6 +158,132 @@ function MyFeedback() {
   );
 }
 
+function DataManagementSection() {
+  const { getToken } = useAuth();
+  const { toast } = useToast();
+  const { signOut } = useClerk();
+  const [exporting, setExporting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const res = await authFetch("/users/me/export", getToken);
+      if (!res.ok) throw new Error("Export failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `entanglewealth-export-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast({ title: "Export Complete", description: "Your data has been downloaded." });
+    } catch (err) {
+      console.error("Export error:", err);
+      toast({ title: "Export Failed", description: "Could not export your data. Please try again.", variant: "destructive" });
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (confirmText !== "DELETE MY ACCOUNT") return;
+    setDeleting(true);
+    try {
+      const res = await authFetch("/users/me", getToken, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmation: "DELETE MY ACCOUNT" }),
+      });
+      if (!res.ok) throw new Error("Deletion failed");
+      toast({ title: "Account Deleted", description: "Your account has been permanently deleted." });
+      setTimeout(() => signOut(), 1500);
+    } catch (err) {
+      console.error("Account deletion error:", err);
+      toast({ title: "Deletion Failed", description: "Could not delete your account. Please try again.", variant: "destructive" });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="glass-panel p-6 mb-6">
+      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <FileText className="w-5 h-5 text-primary" /> Data & Account
+      </h3>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between py-2">
+          <div>
+            <p className="text-sm font-medium">Export Your Data</p>
+            <p className="text-xs text-muted-foreground">Download all your profile, trades, alerts, and gamification data</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExport}
+            disabled={exporting}
+            className="border-white/10 hover:bg-white/5"
+          >
+            {exporting ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <FileText className="w-4 h-4 mr-1" />}
+            {exporting ? "Exporting..." : "Export"}
+          </Button>
+        </div>
+
+        <div className="border-t border-white/5 pt-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-red-400">Delete Account</p>
+              <p className="text-xs text-muted-foreground">Permanently delete your account and all associated data</p>
+            </div>
+            {!showDeleteConfirm ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+              >
+                <AlertTriangle className="w-4 h-4 mr-1" /> Delete
+              </Button>
+            ) : null}
+          </div>
+          {showDeleteConfirm && (
+            <div className="mt-3 p-4 rounded-lg bg-red-500/5 border border-red-500/20">
+              <p className="text-xs text-red-300 mb-3">This action is permanent and cannot be undone. Type <span className="font-mono font-bold">DELETE MY ACCOUNT</span> to confirm.</p>
+              <Input
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                placeholder="Type DELETE MY ACCOUNT"
+                className="mb-3 bg-black/30 border-red-500/30 text-sm"
+              />
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => { setShowDeleteConfirm(false); setConfirmText(""); }}
+                  className="border-white/10"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleDelete}
+                  disabled={confirmText !== "DELETE MY ACCOUNT" || deleting}
+                >
+                  {deleting ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
+                  {deleting ? "Deleting..." : "Permanently Delete"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AlertDigestSettings() {
   const { getToken } = useAuth();
   const [freq, setFreq] = useState("off");
@@ -179,7 +305,7 @@ function AlertDigestSettings() {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ frequency: val }),
-    }).catch(() => { /* ignore */ });
+    }).catch((err: unknown) => console.error("Failed to update digest preference:", err));
   };
 
   if (!loaded) return null;
@@ -314,7 +440,9 @@ export default function Profile() {
           });
         }
       }
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to load profile:", err);
+    }
     setLoading(false);
   };
 
@@ -322,7 +450,9 @@ export default function Profile() {
     try {
       const res = await fetchAuth("/jobs/saved");
       if (res.ok) setSavedJobs(await res.json());
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to load saved jobs:", err);
+    }
   };
 
   const loadResume = async () => {
@@ -335,7 +465,9 @@ export default function Profile() {
           if (detailRes.ok) setResume(await detailRes.json());
         }
       }
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to load resume:", err);
+    }
   };
 
   const loadGamification = async () => {
@@ -608,7 +740,9 @@ export default function Profile() {
     try {
       await fetchAuth(`/jobs/saved/${jobId}`, { method: "DELETE" });
       setSavedJobs(prev => prev.filter(j => j.id !== jobId));
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to remove saved job:", err);
+    }
   };
 
   const kycStatusIcon = () => {
@@ -1300,6 +1434,8 @@ export default function Profile() {
           </div>
           <p className="text-[10px] text-muted-foreground mt-3">Additional privacy controls (portfolio visibility, gig profile) coming soon.</p>
         </div>
+
+        <DataManagementSection />
 
         <MyFeedback />
 

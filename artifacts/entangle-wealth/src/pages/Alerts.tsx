@@ -116,8 +116,11 @@ export default function Alerts() {
         setDailyLimit(data.dailyLimit);
         setDailyUsed(data.dailyUsed);
       }
-    } catch { /* ignore */ }
-  }, [getToken, rules.length]);
+    } catch (err) {
+      console.error("Failed to fetch alert rules:", err);
+      toast({ title: "Error", description: "Failed to load alert rules", variant: "destructive" });
+    }
+  }, [getToken, rules.length, toast]);
 
   const fetchHistory = useCallback(async (append = false) => {
     try {
@@ -128,8 +131,11 @@ export default function Alerts() {
         setHistory(prev => append ? [...prev, ...data.history] : data.history);
         setHistoryTotal(data.total || 0);
       }
-    } catch { /* ignore */ }
-  }, [getToken, history.length]);
+    } catch (err) {
+      console.error("Failed to fetch alert history:", err);
+      toast({ title: "Error", description: "Failed to load alert history", variant: "destructive" });
+    }
+  }, [getToken, history.length, toast]);
 
   const loadMoreRules = async () => {
     setLoadingMore(true);
@@ -150,7 +156,9 @@ export default function Alerts() {
         const data = await res.json();
         setDigestFrequency(data.digestFrequency || "off");
       }
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to fetch digest preference:", err);
+    }
   }, [getToken]);
 
   useEffect(() => {
@@ -290,7 +298,10 @@ export default function Alerts() {
         setRules(prev => prev.map(r => r.id === id ? { ...r, alertType: updated.alertType, threshold: updated.threshold } : r));
         setEditingId(null);
       }
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to save alert edit:", err);
+      toast({ title: "Error", description: "Failed to save alert changes", variant: "destructive" });
+    }
   };
 
   const markAllRead = async () => {
@@ -301,7 +312,10 @@ export default function Alerts() {
         body: JSON.stringify({}),
       });
       setHistory(prev => prev.map(h => ({ ...h, read: true })));
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to mark alerts as read:", err);
+      toast({ title: "Error", description: "Failed to mark alerts as read", variant: "destructive" });
+    }
   };
 
   const updateDigestPref = async (freq: string) => {
@@ -312,7 +326,9 @@ export default function Alerts() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ frequency: freq }),
       });
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to update digest preference:", err);
+    }
   };
 
   return (

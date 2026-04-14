@@ -97,7 +97,9 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
     try {
       const res = await authFetch("/paper-trading/portfolio", getToken);
       if (res.ok) setPortfolio(await res.json());
-    } catch {}
+    } catch (err) {
+      console.error("Failed to load portfolio:", err);
+    }
   }, [isSignedIn, getToken]);
 
   useEffect(() => { loadPortfolio(); }, [loadPortfolio]);
@@ -115,16 +117,17 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
         body: JSON.stringify({ symbol: symbol.toUpperCase(), side, quantity: Number(qty), price: Number(price) }),
       });
       let data: { message?: string; error?: string };
-      try { data = await res.json(); } catch { data = {}; }
-      if (res.ok) {
+      try { data = await res.json(); } catch { data = { error: "ORDER FAILED — PLEASE RETRY" }; }
+      if (res.ok && !data.error) {
         toast({ title: "Trade Executed", description: data.message || "Trade placed successfully" });
         setQty("");
         loadPortfolio();
       } else {
-        toast({ title: "Trade Failed", description: data.error || `Server error (${res.status})`, variant: "destructive" });
+        toast({ title: "ORDER FAILED", description: data.error || `Server error (${res.status})`, variant: "destructive" });
       }
-    } catch {
-      toast({ title: "Trade Failed", description: "Network error. Please check your connection and try again.", variant: "destructive" });
+    } catch (err) {
+      console.error("Stock trade execution error:", err);
+      toast({ title: "ORDER FAILED", description: "Network error. Please check your connection and try again.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -151,16 +154,17 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
         }),
       });
       let data: { message?: string; error?: string };
-      try { data = await res.json(); } catch { data = {}; }
-      if (res.ok) {
+      try { data = await res.json(); } catch { data = { error: "ORDER FAILED — PLEASE RETRY" }; }
+      if (res.ok && !data.error) {
         toast({ title: "Options Trade Executed", description: data.message || "Trade placed successfully" });
         setContracts("");
         loadPortfolio();
       } else {
-        toast({ title: "Trade Failed", description: data.error || `Server error (${res.status})`, variant: "destructive" });
+        toast({ title: "ORDER FAILED", description: data.error || `Server error (${res.status})`, variant: "destructive" });
       }
-    } catch {
-      toast({ title: "Trade Failed", description: "Network error. Please check your connection and try again.", variant: "destructive" });
+    } catch (err) {
+      console.error("Options trade execution error:", err);
+      toast({ title: "ORDER FAILED", description: "Network error. Please check your connection and try again.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -177,10 +181,10 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
     : (Number(contracts) || 0) * (Number(premium) || 0) * 100;
 
   return (
-    <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden">
+    <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden" role="region" aria-label={`Paper trade panel for ${symbol}`}>
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
         <div className="flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-[#FF8C00]" />
+          <TrendingUp className="w-4 h-4 text-[#FF8C00]" aria-hidden="true" />
           <span className="text-sm font-bold text-white">Trade {symbol}</span>
         </div>
         {portfolio && (
@@ -193,8 +197,12 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
         )}
       </div>
 
-      <div className="flex border-b border-white/[0.06]">
+      <div className="flex border-b border-white/[0.06]" role="tablist" aria-label="Trade type">
         <button
+          id="tab-stocks"
+          role="tab"
+          aria-selected={tab === "stocks"}
+          aria-controls="trade-panel-stocks"
           onClick={() => setTab("stocks")}
           className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors ${
             tab === "stocks"
@@ -202,10 +210,14 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
               : "text-white/40 hover:text-white/60"
           }`}
         >
-          <BarChart3 className="w-3.5 h-3.5" />
+          <BarChart3 className="w-3.5 h-3.5" aria-hidden="true" />
           Stocks
         </button>
         <button
+          id="tab-options"
+          role="tab"
+          aria-selected={tab === "options"}
+          aria-controls="trade-panel-options"
           onClick={() => setTab("options")}
           className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors ${
             tab === "options"
@@ -213,68 +225,77 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
               : "text-white/40 hover:text-white/60"
           }`}
         >
-          <Layers className="w-3.5 h-3.5" />
+          <Layers className="w-3.5 h-3.5" aria-hidden="true" />
           Options
         </button>
       </div>
 
       <div className="p-4 space-y-3">
-        <div className="flex gap-2">
+        <div className="flex gap-2" role="group" aria-label="Trade direction">
           <button
             onClick={() => setSide("buy")}
+            aria-pressed={side === "buy"}
+            aria-label={`Buy ${symbol}`}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
               side === "buy"
                 ? "bg-[#FF8C00]/15 text-[#FF8C00] border border-[#FF8C00]/30"
                 : "bg-white/[0.03] text-white/40 border border-white/[0.06] hover:border-white/10"
             }`}
           >
-            <ArrowUpRight className="w-3.5 h-3.5 inline mr-1" />
+            <ArrowUpRight className="w-3.5 h-3.5 inline mr-1" aria-hidden="true" />
             BUY
           </button>
           <button
             onClick={() => setSide("sell")}
+            aria-pressed={side === "sell"}
+            aria-label={`Sell ${symbol}`}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
               side === "sell"
                 ? "bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30"
                 : "bg-white/[0.03] text-white/40 border border-white/[0.06] hover:border-white/10"
             }`}
           >
-            <ArrowDownRight className="w-3.5 h-3.5 inline mr-1" />
+            <ArrowDownRight className="w-3.5 h-3.5 inline mr-1" aria-hidden="true" />
             SELL
           </button>
         </div>
 
         {tab === "stocks" ? (
-          <div className="space-y-2">
+          <div id="trade-panel-stocks" role="tabpanel" aria-labelledby="tab-stocks" className="space-y-2">
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Shares</label>
+                <label htmlFor="trade-shares" className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Shares</label>
                 <input
+                  id="trade-shares"
                   value={qty}
                   onChange={e => setQty(e.target.value)}
                   placeholder="100"
                   type="number"
+                  aria-label="Number of shares"
                   className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
                 />
               </div>
               <div>
-                <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Price</label>
+                <label htmlFor="trade-price" className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Price</label>
                 <input
+                  id="trade-price"
                   value={price}
                   onChange={e => setPrice(e.target.value)}
                   placeholder="0.00"
                   type="number"
                   step="0.01"
+                  aria-label="Price per share"
                   className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
                 />
               </div>
             </div>
           </div>
         ) : (
-          <div className="space-y-2">
-            <div className="flex gap-2">
+          <div id="trade-panel-options" role="tabpanel" aria-labelledby="tab-options" className="space-y-2">
+            <div className="flex gap-2" role="group" aria-label="Option type">
               <button
                 onClick={() => setOptionType("CALL")}
+                aria-pressed={optionType === "CALL"}
                 className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
                   optionType === "CALL"
                     ? "bg-[#FF8C00]/15 text-[#FF8C00] border border-[#FF8C00]/30"
@@ -285,6 +306,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
               </button>
               <button
                 onClick={() => setOptionType("PUT")}
+                aria-pressed={optionType === "PUT"}
                 className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
                   optionType === "PUT"
                     ? "bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30"
@@ -297,21 +319,25 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Strike</label>
+                <label htmlFor="trade-strike" className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Strike</label>
                 <input
+                  id="trade-strike"
                   value={strike}
                   onChange={e => setStrike(e.target.value)}
                   placeholder="Strike"
                   type="number"
                   step="0.01"
+                  aria-label="Strike price"
                   className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
                 />
               </div>
               <div>
-                <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Expiration</label>
+                <label htmlFor="trade-expiration" className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Expiration</label>
                 <select
+                  id="trade-expiration"
                   value={expiration}
                   onChange={e => setExpiration(e.target.value)}
+                  aria-label="Expiration date"
                   className="w-full h-9 px-2 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#FF8C00]/30"
                 >
                   {EXPIRATIONS.map(exp => (
@@ -323,23 +349,27 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Contracts</label>
+                <label htmlFor="trade-contracts" className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Contracts</label>
                 <input
+                  id="trade-contracts"
                   value={contracts}
                   onChange={e => setContracts(e.target.value)}
                   placeholder="1"
                   type="number"
+                  aria-label="Number of contracts"
                   className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
                 />
               </div>
               <div>
-                <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Premium</label>
+                <label htmlFor="trade-premium" className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Premium</label>
                 <input
+                  id="trade-premium"
                   value={premium}
                   onChange={e => setPremium(e.target.value)}
                   placeholder="0.00"
                   type="number"
                   step="0.01"
+                  aria-label="Premium per contract"
                   className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
                 />
               </div>
@@ -357,6 +387,7 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
         <button
           onClick={tab === "stocks" ? executeStockTrade : executeOptionsTrade}
           disabled={loading || !isSignedIn}
+          aria-label={`Execute ${side} ${tab === "stocks" ? "stock" : "options"} trade for ${symbol}`}
           className={`w-full py-2.5 text-sm font-bold rounded-lg transition-all disabled:opacity-40 ${
             side === "buy"
               ? "bg-[#FF8C00] text-black hover:bg-[#FF8C00]/80"

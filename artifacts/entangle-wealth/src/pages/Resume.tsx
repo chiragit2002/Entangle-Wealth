@@ -189,7 +189,8 @@ export default function Resume() {
           });
         }
       }
-    } catch {
+    } catch (err) {
+      console.error("Failed to load resume:", err);
     } finally {
       setLoading(false);
     }
@@ -212,7 +213,9 @@ export default function Resume() {
         }),
       });
       if (referredBy) clearStoredReferralCode();
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error("Failed to sync user profile:", err);
+    }
   };
 
   const saveResume = async () => {
@@ -242,7 +245,8 @@ export default function Resume() {
       setResume(prev => ({ ...prev, id: saved.id }));
       trackEvent("resume_saved");
       toast({ title: "Résumé saved", description: "Your quantum résumé has been entangled with the cloud." });
-    } catch {
+    } catch (err) {
+      console.error("Failed to save resume:", err);
       toast({ title: "Save failed", description: "Please try again.", variant: "destructive" });
     } finally {
       setSaving(false);

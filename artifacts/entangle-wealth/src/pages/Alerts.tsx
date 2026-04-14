@@ -236,7 +236,7 @@ export default function Alerts() {
           toast({ title: "Error", description: err.error || "Failed to create alert", variant: "destructive" });
         }
       }
-    } catch { toast({ title: "Error", description: "Something went wrong — please try again", variant: "destructive" }); } finally {
+    } catch (err) { console.error("Failed to create alert:", err); toast({ title: "Error", description: "Something went wrong — please try again", variant: "destructive" }); } finally {
       setCreating(false);
     }
   });
@@ -253,7 +253,8 @@ export default function Alerts() {
         setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: currentEnabled } : r));
         toast({ title: "Error", description: "Failed to toggle alert", variant: "destructive" });
       }
-    } catch {
+    } catch (err) {
+      console.error("Failed to toggle alert:", err);
       setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: currentEnabled } : r));
       toast({ title: "Error", description: "Something went wrong — please try again", variant: "destructive" });
     }
@@ -268,7 +269,8 @@ export default function Alerts() {
         setRules(prev);
         toast({ title: "Error", description: "Failed to delete alert", variant: "destructive" });
       }
-    } catch {
+    } catch (err) {
+      console.error("Failed to delete alert:", err);
       setRules(prev);
       toast({ title: "Error", description: "Something went wrong — please try again", variant: "destructive" });
     }

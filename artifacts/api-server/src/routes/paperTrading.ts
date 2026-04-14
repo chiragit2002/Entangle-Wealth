@@ -137,10 +137,11 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
     const result = await db.transaction(async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${dbUserId.toString()} || '_paper_trade'))`);
 
-      const lockedRows = await tx.execute(
+      const lockedRows = await tx.execute<{ id: number; cash_balance: number; user_id: string }>(
         sql`SELECT id, cash_balance, user_id FROM paper_portfolios WHERE user_id = ${dbUserId} FOR UPDATE`
       );
-      const lockedPortfolio = (lockedRows as any).rows?.[0] ?? (lockedRows as any)[0] ?? null;
+      const rows = Array.isArray(lockedRows) ? lockedRows : (lockedRows as { rows: { id: number; cash_balance: number; user_id: string }[] }).rows ?? [];
+      const lockedPortfolio = rows[0] ?? null;
 
       let currentCash: number;
       if (lockedPortfolio) {
@@ -315,10 +316,11 @@ router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTra
     const result = await db.transaction(async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${dbUserId.toString()} || '_paper_trade'))`);
 
-      const lockedRows = await tx.execute(
+      const lockedRows = await tx.execute<{ id: number; cash_balance: number; user_id: string }>(
         sql`SELECT id, cash_balance, user_id FROM paper_portfolios WHERE user_id = ${dbUserId} FOR UPDATE`
       );
-      const lockedPortfolio = (lockedRows as any).rows?.[0] ?? (lockedRows as any)[0] ?? null;
+      const rows = Array.isArray(lockedRows) ? lockedRows : (lockedRows as { rows: { id: number; cash_balance: number; user_id: string }[] }).rows ?? [];
+      const lockedPortfolio = rows[0] ?? null;
 
       let currentCash: number;
       if (lockedPortfolio) {

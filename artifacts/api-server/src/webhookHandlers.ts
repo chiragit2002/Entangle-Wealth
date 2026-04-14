@@ -232,31 +232,13 @@ export class WebhookHandlers {
 
           const tierBefore = await resolveUserTierFromId(userId);
 
-          const updateData: Partial<typeof usersTable.$inferInsert> = { subscriptionTier: newTier };
           if (typeof session.subscription === 'string') {
-            updateData.stripeSubscriptionId = session.subscription;
+            await db.update(usersTable)
+              .set({ stripeSubscriptionId: session.subscription })
+              .where(eq(usersTable.id, userId));
           }
 
-          const updated = await db
-            .update(usersTable)
-            .set(updateData)
-            .where(eq(usersTable.id, userId))
-            .returning({ id: usersTable.id });
-
-          if (updated.length === 0) {
-            await logWebhookEvent({
-              eventId: event.id,
-              eventType: event.type,
-              stripeCustomerId,
-              userId,
-              tierBefore,
-              tierAfter: newTier,
-              status: 'error',
-              errorMessage: 'DB update affected 0 rows',
-            });
-            throw new Error(`checkout.session.completed: db update affected 0 rows for userId ${userId}`);
-          }
-
+          await updateUserTier(userId, newTier, 'checkout.session.completed');
           logger.info({ userId, newTier, tierBefore }, 'Updated subscription tier on checkout.session.completed');
 
           await logWebhookEvent({
@@ -332,8 +314,12 @@ export class WebhookHandlers {
 
         const tierBefore = await resolveUserTierFromId(userId);
 
+        await db.update(usersTable)
+          .set({ stripeSubscriptionId: sub.id })
+          .where(eq(usersTable.id, userId));
+
         await updateUserTier(userId, newTier, 'customer.subscription.updated');
-        logger.info({ userId, newTier, tierBefore, status: sub.status }, 'Updated subscription tier on customer.subscription.updated');
+        logger.info({ userId, newTier, tierBefore, subscriptionId: sub.id, status: sub.status }, 'Updated subscription tier on customer.subscription.updated');
 
         await logWebhookEvent({
           eventId: event.id,

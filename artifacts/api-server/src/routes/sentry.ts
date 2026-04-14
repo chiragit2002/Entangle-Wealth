@@ -70,12 +70,13 @@ router.get("/sentry/issues", requireAuth, requireAdmin, async (req, res) => {
           allIssues.push(...tagged);
         }
       } catch (err) {
-        errors.push(err instanceof Error ? err.message : String(err));
+        logger.warn({ err, proj }, "Failed to fetch Sentry issues for project");
+        errors.push(proj);
       }
     }
 
     if (errors.length > 0 && allIssues.length === 0) {
-      res.status(502).json({ error: errors[0] });
+      res.status(502).json({ error: "Failed to fetch issues from Sentry" });
       return;
     }
 
@@ -85,7 +86,7 @@ router.get("/sentry/issues", requireAuth, requireAdmin, async (req, res) => {
       return bCount - aCount;
     });
 
-    res.json({ issues: allIssues.slice(0, Number(limit)), warnings: errors });
+    res.json({ issues: allIssues.slice(0, Number(limit)), warnings: errors.length > 0 ? ["Some projects could not be queried"] : [] });
   } catch (err) {
     logger.error({ err }, "Sentry issues fetch failed");
     res.status(502).json({ error: "Failed to fetch Sentry issues" });
@@ -151,16 +152,17 @@ router.get("/sentry/search", requireAuth, requireAdmin, async (req, res) => {
           allIssues.push(...tagged);
         }
       } catch (err) {
-        errors.push(err instanceof Error ? err.message : String(err));
+        logger.warn({ err, proj }, "Failed to search Sentry issues for project");
+        errors.push(proj);
       }
     }
 
     if (errors.length > 0 && allIssues.length === 0) {
-      res.status(502).json({ error: errors[0] });
+      res.status(502).json({ error: "Failed to search Sentry issues" });
       return;
     }
 
-    res.json({ issues: allIssues.slice(0, Number(limit)), warnings: errors });
+    res.json({ issues: allIssues.slice(0, Number(limit)), warnings: errors.length > 0 ? ["Some projects could not be queried"] : [] });
   } catch (err) {
     logger.error({ err }, "Sentry search failed");
     res.status(502).json({ error: "Failed to search Sentry issues" });
@@ -189,7 +191,8 @@ router.get("/sentry/summary", requireAuth, requireAdmin, async (req, res) => {
       ]);
 
       if (unresolvedR.status === "rejected") {
-        fetchErrors.push(unresolvedR.reason?.message || String(unresolvedR.reason));
+        logger.warn({ err: unresolvedR.reason, proj }, "Failed to fetch unresolved issues from Sentry");
+        fetchErrors.push(proj);
       } else if (Array.isArray(unresolvedR.value)) {
         totalUnresolved += unresolvedR.value.length;
       }
@@ -209,7 +212,7 @@ router.get("/sentry/summary", requireAuth, requireAdmin, async (req, res) => {
     }
 
     if (fetchErrors.length > 0 && totalUnresolved === 0 && trendMap.size === 0) {
-      res.status(502).json({ error: fetchErrors[0] });
+      res.status(502).json({ error: "Failed to fetch Sentry summary" });
       return;
     }
 

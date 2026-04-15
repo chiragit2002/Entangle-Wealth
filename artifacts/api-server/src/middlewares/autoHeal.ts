@@ -31,8 +31,8 @@ async function logCircuitEvent(endpoint: string, message: string): Promise<void>
       errorMessage: message,
       componentName: "AutoHealMiddleware",
     });
-  } catch {
-    // best effort
+  } catch (err) {
+    logger.debug({ error: err, endpoint }, "Circuit breaker audit log failed (best effort)");
   }
 }
 
@@ -123,7 +123,7 @@ async function triggerRestartHook(endpoint: string): Promise<void> {
       errorMessage: `Auto-heal restart hook triggered for endpoint ${endpoint} after ${REPEATED_500_LIMIT} consecutive 500 errors`,
       componentName: "AutoHealMiddleware",
     });
-  } catch {
-    // best effort
+  } catch (err) {
+    logger.debug({ error: err, endpoint }, "Auto-heal restart audit log failed (best effort)");
   }
 }

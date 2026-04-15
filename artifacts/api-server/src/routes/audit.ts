@@ -2,9 +2,11 @@ import { Router, type IRouter, type Request, type Response, type NextFunction } 
 import { db } from "@workspace/db";
 import { auditLogTable, uxSignalsTable, apiHealthChecksTable, visualBaselinesTable, crawlRunsTable } from "@workspace/db/schema";
 import { desc, gte, eq, and, sql } from "drizzle-orm";
+import { logger } from "../lib/logger";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import { MONITORED_ENDPOINTS } from "../lib/apiHealthMonitor";
+import { BoundedRateLimitMap } from "../lib/boundedMap";
 import { z } from "zod";
 import { spawn } from "node:child_process";
 import * as path from "node:path";
@@ -17,15 +19,15 @@ const router: IRouter = Router();
 
 const AUDIT_INGEST_WINDOW_MS = 60_000;
 const AUDIT_INGEST_MAX_PER_WINDOW = 60;
-const auditIngestCounts: Map<string, { count: number; windowStart: number }> = new Map();
+const auditIngestCounts = new BoundedRateLimitMap(5_000, "audit-ingest");
 
 function auditIngestSpamGuard(req: Request, res: Response, next: NextFunction): void {
   const ip = req.ip || req.socket?.remoteAddress || "unknown";
   const now = Date.now();
   const record = auditIngestCounts.get(ip);
 
-  if (!record || now - record.windowStart > AUDIT_INGEST_WINDOW_MS) {
-    auditIngestCounts.set(ip, { count: 1, windowStart: now });
+  if (!record || now >= record.resetAt) {
+    auditIngestCounts.set(ip, { count: 1, resetAt: now + AUDIT_INGEST_WINDOW_MS });
     return next();
   }
 
@@ -315,7 +317,7 @@ router.post("/audit/crawl", requireAuth, requireAdmin, async (req, res) => {
       db.update(crawlRunsTable)
         .set({ status: "failed", completedAt: new Date(), errorMessage: `Exit code ${code}` })
         .where(eq(crawlRunsTable.id, crawlRunId))
-        .catch(() => {});
+        .catch((err) => logger.warn({ error: err, crawlRunId }, "Failed to mark crawl run as failed"));
     }
   });
 

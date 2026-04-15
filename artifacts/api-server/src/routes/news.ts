@@ -220,12 +220,55 @@ function isAllowedArticleDomain(hostname: string): boolean {
   return false;
 }
 
+const PRIVATE_IP_PATTERNS = [
+  /^127\./,
+  /^10\./,
+  /^172\.(1[6-9]|2\d|3[01])\./,
+  /^192\.168\./,
+  /^0\./,
+  /^169\.254\./,
+  /^::1$/,
+  /^fc00:/i,
+  /^fe80:/i,
+  /^fd[0-9a-f]{2}:/i,
+];
+
+function isPrivateIp(ip: string): boolean {
+  return PRIVATE_IP_PATTERNS.some(r => r.test(ip));
+}
+
+async function resolveAndValidateHost(hostname: string): Promise<boolean> {
+  try {
+    const { resolve4, resolve6 } = await import("node:dns/promises");
+    let hasValidAddress = false;
+    try {
+      const addrs = await resolve4(hostname);
+      if (addrs.length > 0) {
+        if (addrs.some(isPrivateIp)) return false;
+        hasValidAddress = true;
+      }
+    } catch {}
+    try {
+      const addrs6 = await resolve6(hostname);
+      if (addrs6.length > 0) {
+        if (addrs6.some(isPrivateIp)) return false;
+        hasValidAddress = true;
+      }
+    } catch {}
+    return hasValidAddress;
+  } catch {
+    return false;
+  }
+}
+
 async function fetchArticleBody(url: string): Promise<string> {
   if (!url) return "";
   try {
     const parsed = new URL(url);
     if (!ALLOWED_PROTOCOLS.has(parsed.protocol)) return "";
     if (!isAllowedArticleDomain(parsed.hostname)) return "";
+    const dnsOk = await resolveAndValidateHost(parsed.hostname);
+    if (!dnsOk) return "";
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
     const res = await fetch(url, {

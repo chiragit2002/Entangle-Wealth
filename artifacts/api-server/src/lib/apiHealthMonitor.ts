@@ -159,8 +159,8 @@ async function triggerNewsCacheRefresh(): Promise<void> {
     await fetch(`${BASE_URL}/api/news?refresh=1`, {
       headers: { "X-Internal-Cache-Refresh": "1" },
     });
-  } catch {
-    // best effort
+  } catch (err) {
+    logger.debug({ error: err }, "News cache refresh request failed (best effort)");
   }
 }
 

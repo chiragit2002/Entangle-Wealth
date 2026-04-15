@@ -304,6 +304,18 @@ router.post("/gamification/xp", requireAuth, validateBody(XpSchema), async (req,
     const result = await db.transaction(async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_xp'))`);
 
+      const recentDup = await tx.select({ id: xpTransactionsTable.id })
+        .from(xpTransactionsTable)
+        .where(and(
+          eq(xpTransactionsTable.userId, userId),
+          eq(xpTransactionsTable.reason, reason),
+          gte(xpTransactionsTable.createdAt, new Date(Date.now() - XP_COOLDOWN_MS))
+        ))
+        .limit(1);
+      if (recentDup.length > 0) {
+        return { cooldownHit: true } as const;
+      }
+
       let [streak] = await tx.select().from(streaksTable).where(eq(streaksTable.userId, userId));
       const multiplier = streak?.multiplier || 1.0;
       const finalAmount = Math.min(applyMultiplier(baseAmount, multiplier), MAX_XP_PER_ACTION);
@@ -333,6 +345,11 @@ router.post("/gamification/xp", requireAuth, validateBody(XpSchema), async (req,
 
       return { updated, xpEarned: finalAmount, multiplier, prevLevel: xpRow.level, prevTier: xpRow.tier };
     });
+
+    if ("cooldownHit" in result) {
+      res.status(429).json({ error: "XP award cooldown active. Please wait before awarding XP for the same action." });
+      return;
+    }
 
     let newBadges: { slug: string; name: string; icon: string; xpReward: number }[] = [];
     if (category === "backtesting") {

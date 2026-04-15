@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import { getAuth } from "@clerk/express";
 import { logAuthEvent } from "../lib/authEventLogger";
 import { resetAttempts, recordFailedAttempt } from "./bruteForce";
+import { logger } from "../lib/logger";
 
 const recentSessions = new Map<string, number>();
 const SESSION_LOG_COOLDOWN = 5 * 60 * 1000;
@@ -45,8 +46,8 @@ export const authEventTracker = (req: Request, _res: Response, next: NextFunctio
         resetAttempts(ip);
       }
     }
-  } catch {
-    // no-op
+  } catch (err) {
+    logger.debug({ error: err }, "Auth event tracking failed (non-critical)");
   }
 
   next();

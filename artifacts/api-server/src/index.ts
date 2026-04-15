@@ -144,12 +144,6 @@ async function ensureGamificationTables() {
   }
 }
 
-async function ensurePaperTradingTables() {
-  // Paper trading tables (paper_portfolios, paper_trades, paper_positions) are
-  // managed by Drizzle schema and pushed via `drizzle-kit push`. This function
-  // is retained for potential runtime column migrations in the future.
-  logger.info("Paper trading tables managed by Drizzle schema");
-}
 
 async function ensureEmailSubscribersTable() {
   try {
@@ -613,7 +607,6 @@ await normalizePortfolioBalances();
 await ensureHabitsTables();
 await ensureDailyContentTable();
 await ensureAlertTables();
-await ensurePaperTradingTables();
 await ensureGamificationTables();
 await ensureEmailSubscribersTable();
 await ensureTimelineTables();

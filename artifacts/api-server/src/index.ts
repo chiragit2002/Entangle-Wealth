@@ -131,7 +131,7 @@ async function verifySchemaReady() {
     if (missing.length > 0) {
       logger.fatal(
         { missingTables: missing },
-        "SCHEMA CHECK FAILED: Required tables missing. Run 'drizzle-kit push' to sync the schema."
+        "SCHEMA CHECK FAILED: Required tables missing. Run 'drizzle-kit migrate' in lib/db to apply migrations."
       );
       process.exit(1);
     } else {

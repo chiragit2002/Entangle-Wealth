@@ -1,0 +1,80 @@
+{
+  "origin": "PrimeTalk|Lyra",
+  "structured_prompt": {
+    "origin": "PTPF-MINI",
+    "task": "Rebuild the Entangle Wealth error/recovery system and overall UI to restore the Bloomberg-terminal style design while ensuring full system stability, real-time data integrity, and seamless compatibility across all modules (dashboard, trading, alerts, portfolio, and user profiles).",
+    "constraints": [
+      "Remove current orange 'signal interrupted' style and revert to dark Bloomberg-terminal aesthetic (black/navy background, subtle neon accents, minimal color noise)",
+      "Error states must never block the system completely — must gracefully degrade instead",
+      "All modules must continue functioning even if one service fails (partial failure tolerance)",
+      "Reconnect logic must be automatic (no manual dependency)",
+      "System must retry API connections with exponential backoff",
+      "No fake data during outages — freeze last known valid state and display status",
+      "All UI components must remain visible and interactive where possible",
+      "Backend must maintain session integrity during connection drops",
+      "All modules (alerts, trading, portfolio, search) must stay synchronized",
+      "UI must feel like a professional trading terminal (fast, dense, information-rich)",
+      "No visual clutter, no oversized buttons, no arcade-style colors",
+      "All data pipelines must be observable and debuggable (logs + status indicators)"
+    ],
+    "process": [
+      "Remove current error screen that blocks entire UI",
+      "Implement global connection state manager (connected, degraded, disconnected)",
+      "Wrap all API calls with retry + timeout + fallback logic",
+      "On connection loss: freeze last valid data and show subtle status indicator",
+      "Auto-reconnect using exponential backoff (1s → 2s → 5s → 10s)",
+      "Rebuild UI styling to Bloomberg-terminal format (dense grids, small typography, high contrast)",
+      "Replace orange UI elements with neutral/dark + blue/green indicators",
+      "Add top-level system status bar (LIVE / DELAYED / DISCONNECTED)",
+      "Ensure each module (portfolio, alerts, trading) operates independently",
+      "Implement websocket reconnect logic for live data streams",
+      "Log all failures and retries in backend for debugging",
+      "Test full system under simulated outages (API down, websocket drop, slow network)",
+      "Ensure no module causes full dashboard crash (error boundaries everywhere)"
+    ],
+    "verify": {
+      "uncertainty_note": true,
+      "ask_followup_if_missing": false
+    },
+    "output_schema": {
+      "summary": "Resilient Bloomberg-style trading interface with graceful error handling and full system continuity",
+      "steps": [
+        "Replace blocking error screen with non-intrusive status system",
+        "Restore Bloomberg-style UI design",
+        "Implement auto-reconnect and failure handling",
+        "Ensure module independence and synchronization",
+        "Stabilize real-time data pipelines"
+      ],
+      "answer": "Deliver a fully stable, Bloomberg-terminal-inspired trading system where connection issues never break the experience, all modules remain functional, and the UI reflects a professional, high-performance financial platform",
+      "notes": [
+        "System must NEVER show full-screen failure unless backend is completely unreachable",
+        "Users should always see their data, even if temporarily frozen",
+        "Reconnection must be invisible and automatic",
+        "Design must prioritize information density over aesthetics",
+        "Every failure path must be handled intentionally (no silent crashes)"
+      ]
+    }
+  },
+  "guards": [
+    "AntiDriftCore_v6",
+    "HardLockTruth_v1.0",
+    "FileScan_Autobind_v1.0",
+    "SessionSplitChain_3.5.4",
+    "AutoValidator_v1.2"
+  ],
+  "sigill": [
+    "PrimeTalk",
+    "Lyra"
+  ],
+  "self_test": {
+    "json_valid": true,
+    "guards_verified": true,
+    "sigill_verified": true,
+    "final_score": 100
+  },
+  "notes": [
+    "Eliminates full-screen failure states and replaces with resilient system design",
+    "Restores professional trading terminal UX instead of gamified UI",
+    "Follows high-performance system prompting principles :contentReference[oaicite:0]{index=0}"
+  ]
+}

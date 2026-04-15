@@ -2,13 +2,16 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
-import { TrendingUp, ArrowUpRight, ArrowDownRight, RefreshCw, BarChart3, Layers } from "lucide-react";
+import { TrendingUp, ArrowUpRight, ArrowDownRight, RefreshCw, BarChart3, Layers, Clock, ChevronDown, X, WifiOff, TrendingDown } from "lucide-react";
+import { StockSearchDropdown } from "@/components/StockSearchDropdown";
 
 interface Position {
   id: number;
   symbol: string;
   quantity: number;
   avgCost: number;
+  currentPrice?: number;
+  unrealizedPnl?: number;
 }
 
 interface OptionsPosition {
@@ -44,6 +47,22 @@ interface OptionsTrade {
   createdAt: string;
 }
 
+interface PaperOrder {
+  id: number;
+  symbol: string;
+  side: string;
+  orderType: string;
+  quantity: number;
+  limitPrice: number | null;
+  stopPrice: number | null;
+  expiresAt: string | null;
+  status: string;
+  filledAt: string | null;
+  filledPrice: number | null;
+  reservedCash: number;
+  createdAt: string;
+}
+
 interface Portfolio {
   cashBalance: number;
   positions: Position[];
@@ -53,24 +72,38 @@ interface Portfolio {
   startingCash: number;
   optionsPositions?: OptionsPosition[];
   optionsTrades?: OptionsTrade[];
+  marketDataAvailable?: boolean;
 }
 
 const EXPIRATIONS = ["Apr 18", "Apr 25", "May 2", "May 16", "Jun 20", "Sep 19", "Dec 19", "Jan 2027"];
 
+type OrderSide = "buy" | "sell" | "short_sell" | "short_cover";
+type OrderType = "market" | "limit" | "stop" | "time_based";
+type TabType = "stocks" | "options" | "orders";
+
 interface StockTradePanelProps {
-  symbol: string;
+  symbol?: string;
   currentPrice?: number;
+  allowSymbolSearch?: boolean;
 }
 
-export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) {
+export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSymbolSearch = false }: StockTradePanelProps) {
   const { toast } = useToast();
   const { isSignedIn, getToken } = useAuth();
-  const [tab, setTab] = useState<"stocks" | "options">("stocks");
+  const [tab, setTab] = useState<TabType>("stocks");
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [pendingOrders, setPendingOrders] = useState<PaperOrder[]>([]);
+  const [marketDataUnavailable, setMarketDataUnavailable] = useState(false);
 
-  const [side, setSide] = useState<"buy" | "sell">("buy");
+  const [selectedSymbol, setSelectedSymbol] = useState(propSymbol);
+  const [selectedPrice, setSelectedPrice] = useState<number | undefined>(currentPrice);
+
+  const [side, setSide] = useState<OrderSide>("buy");
+  const [orderType, setOrderType] = useState<OrderType>("market");
   const [qty, setQty] = useState("");
-  const [price, setPrice] = useState("");
+  const [limitPrice, setLimitPrice] = useState("");
+  const [stopPrice, setStopPrice] = useState("");
+  const [expiresAt, setExpiresAt] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [optionType, setOptionType] = useState<"CALL" | "PUT">("CALL");
@@ -79,18 +112,25 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
   const [contracts, setContracts] = useState("");
   const [premium, setPremium] = useState("");
 
+  const symbol = selectedSymbol || propSymbol;
+  const livePrice = selectedPrice ?? currentPrice;
+
   useEffect(() => {
-    if (currentPrice) setPrice(currentPrice.toFixed(2));
+    if (propSymbol) setSelectedSymbol(propSymbol);
+  }, [propSymbol]);
+
+  useEffect(() => {
+    if (currentPrice) setSelectedPrice(currentPrice);
   }, [currentPrice]);
 
   useEffect(() => {
-    if (currentPrice && symbol) {
-      const step = currentPrice > 500 ? 10 : currentPrice > 100 ? 5 : currentPrice > 50 ? 2.5 : 1;
-      setStrike((Math.round(currentPrice / step) * step).toFixed(2));
-      const estimatedPremium = currentPrice * 0.03;
+    if (livePrice && symbol) {
+      const step = livePrice > 500 ? 10 : livePrice > 100 ? 5 : livePrice > 50 ? 2.5 : 1;
+      setStrike((Math.round(livePrice / step) * step).toFixed(2));
+      const estimatedPremium = livePrice * 0.03;
       setPremium(estimatedPremium.toFixed(2));
     }
-  }, [currentPrice, symbol]);
+  }, [livePrice, symbol]);
 
   const loadPortfolio = useCallback(async () => {
     if (!isSignedIn) return;
@@ -103,42 +143,93 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
           portfolioValue: data.portfolioValue ?? 0,
           totalValue: data.totalValue ?? data.cashBalance,
         });
+        if (data.marketDataAvailable === false) setMarketDataUnavailable(true);
+        else setMarketDataUnavailable(false);
       }
-    } catch (err) {
-      console.error("Failed to load portfolio:", err);
-    }
+    } catch { /* silent */ }
   }, [isSignedIn, getToken]);
 
-  useEffect(() => { loadPortfolio(); }, [loadPortfolio]);
+  const loadOrders = useCallback(async () => {
+    if (!isSignedIn) return;
+    try {
+      const res = await authFetch("/paper-trading/orders?status=pending", getToken);
+      if (res.ok) {
+        const data = await res.json();
+        setPendingOrders(data.orders ?? []);
+      }
+    } catch { /* silent */ }
+  }, [isSignedIn, getToken]);
+
+  useEffect(() => {
+    loadPortfolio();
+    loadOrders();
+  }, [loadPortfolio, loadOrders]);
 
   const executeStockTrade = useCallback(async () => {
-    if (!qty || !price) {
-      toast({ title: "Missing fields", description: "Enter quantity and price", variant: "destructive" });
+    if (!qty) {
+      toast({ title: "Missing fields", description: "Enter quantity", variant: "destructive" });
       return;
     }
+    if (!symbol) {
+      toast({ title: "Missing fields", description: "Select a stock", variant: "destructive" });
+      return;
+    }
+    if (orderType === "limit" && !limitPrice) {
+      toast({ title: "Missing fields", description: "Enter limit price", variant: "destructive" });
+      return;
+    }
+    if (orderType === "stop" && !stopPrice) {
+      toast({ title: "Missing fields", description: "Enter stop price", variant: "destructive" });
+      return;
+    }
+    if (orderType === "time_based" && !expiresAt) {
+      toast({ title: "Missing fields", description: "Enter expiration date/time", variant: "destructive" });
+      return;
+    }
+
     setLoading(true);
     try {
+      const body: Record<string, unknown> = {
+        symbol: symbol.toUpperCase(),
+        side,
+        quantity: Number(qty),
+        orderType,
+      };
+      if (orderType === "limit" && limitPrice) body.limitPrice = Number(limitPrice);
+      if (orderType === "stop" && stopPrice) body.stopPrice = Number(stopPrice);
+      if (orderType === "time_based" && expiresAt) body.expiresAt = new Date(expiresAt).toISOString();
+
       const res = await authFetch("/paper-trading/trade", getToken, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ symbol: symbol.toUpperCase(), side, quantity: Number(qty), price: Number(price) }),
+        body: JSON.stringify(body),
       });
-      let data: { message?: string; error?: string };
+      let data: { message?: string; error?: string; marketDataUnavailable?: boolean };
       try { data = await res.json(); } catch { data = { error: "ORDER FAILED — PLEASE RETRY" }; }
+
+      if (res.status === 503 || data.marketDataUnavailable) {
+        setMarketDataUnavailable(true);
+        toast({ title: "Market Data Unavailable", description: data.error || "Trading paused", variant: "destructive" });
+        return;
+      }
+
       if (res.ok && !data.error) {
-        toast({ title: "Trade Executed", description: data.message || "Trade placed successfully" });
+        toast({ title: "Order Placed", description: data.message || "Trade placed successfully" });
         setQty("");
+        setLimitPrice("");
+        setStopPrice("");
+        setExpiresAt("");
         loadPortfolio();
+        loadOrders();
       } else {
         toast({ title: "ORDER FAILED", description: data.error || `Server error (${res.status})`, variant: "destructive" });
       }
-    } catch (err) {
-      console.error("Stock trade execution error:", err);
-      toast({ title: "ORDER FAILED", description: "Network error. Please check your connection and try again.", variant: "destructive" });
+    } catch {
+      toast({ title: "ORDER FAILED", description: "Network error. Please check your connection.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
-  }, [symbol, side, qty, price, getToken, toast, loadPortfolio]);
+  }, [symbol, side, qty, orderType, limitPrice, stopPrice, expiresAt, getToken, toast, loadPortfolio, loadOrders]);
 
   const executeOptionsTrade = useCallback(async () => {
     if (!strike || !contracts || !premium) {
@@ -155,13 +246,18 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
           optionType,
           strike: Number(strike),
           expiration,
-          side,
+          side: side === "buy" || side === "sell" ? side : "buy",
           contracts: Number(contracts),
           premium: Number(premium),
         }),
       });
-      let data: { message?: string; error?: string };
+      let data: { message?: string; error?: string; marketDataUnavailable?: boolean };
       try { data = await res.json(); } catch { data = { error: "ORDER FAILED — PLEASE RETRY" }; }
+      if (res.status === 503 || data.marketDataUnavailable) {
+        setMarketDataUnavailable(true);
+        toast({ title: "Market Data Unavailable", description: data.error || "Trading paused", variant: "destructive" });
+        return;
+      }
       if (res.ok && !data.error) {
         toast({ title: "Options Trade Executed", description: data.message || "Trade placed successfully" });
         setContracts("");
@@ -169,30 +265,55 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
       } else {
         toast({ title: "ORDER FAILED", description: data.error || `Server error (${res.status})`, variant: "destructive" });
       }
-    } catch (err) {
-      console.error("Options trade execution error:", err);
-      toast({ title: "ORDER FAILED", description: "Network error. Please check your connection and try again.", variant: "destructive" });
+    } catch {
+      toast({ title: "ORDER FAILED", description: "Network error.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
   }, [symbol, optionType, strike, expiration, side, contracts, premium, getToken, toast, loadPortfolio]);
+
+  const cancelOrder = useCallback(async (orderId: number) => {
+    try {
+      const res = await authFetch(`/paper-trading/orders/${orderId}`, getToken, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        toast({ title: "Order cancelled", description: "Reserved funds have been refunded." });
+        loadOrders();
+        loadPortfolio();
+      } else {
+        toast({ title: "Error", description: data.error || "Failed to cancel order", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Error", description: "Network error", variant: "destructive" });
+    }
+  }, [getToken, toast, loadOrders, loadPortfolio]);
 
   const pnl = portfolio ? portfolio.totalValue - portfolio.startingCash : 0;
   const pnlPct = portfolio ? ((pnl / portfolio.startingCash) * 100).toFixed(2) : "0.00";
 
   const symbolPositions = portfolio?.positions.filter(p => p.symbol === symbol.toUpperCase()) ?? [];
   const symbolOptionsPositions = portfolio?.optionsPositions?.filter(p => p.symbol === symbol.toUpperCase()) ?? [];
+  const symbolPendingOrders = pendingOrders.filter(o => o.symbol === symbol.toUpperCase());
 
   const totalEstimate = tab === "stocks"
-    ? (Number(qty) || 0) * (Number(price) || 0)
+    ? (Number(qty) || 0) * (orderType === "limit" ? (Number(limitPrice) || livePrice || 0) : orderType === "stop" ? (Number(stopPrice) || livePrice || 0) : (livePrice || 0))
     : (Number(contracts) || 0) * (Number(premium) || 0) * 100;
 
+  const sideButtons: { id: OrderSide; label: string; color: string; bg: string; borderColor: string }[] = [
+    { id: "buy", label: "BUY", color: "#FF8C00", bg: "#FF8C00/15", borderColor: "#FF8C00/30" },
+    { id: "sell", label: "SELL", color: "#ff3366", bg: "#ff3366/15", borderColor: "#ff3366/30" },
+    { id: "short_sell", label: "SHORT", color: "#9c27b0", bg: "#9c27b0/15", borderColor: "#9c27b0/30" },
+    { id: "short_cover", label: "COVER", color: "#0099cc", bg: "#0099cc/15", borderColor: "#0099cc/30" },
+  ];
+
+  const activeSideConfig = sideButtons.find(b => b.id === side) ?? sideButtons[0];
+
   return (
-    <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden" role="region" aria-label={`Paper trade panel for ${symbol}`}>
+    <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden" role="region" aria-label={`Paper trade panel${symbol ? ` for ${symbol}` : ""}`}>
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
         <div className="flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-[#FF8C00]" aria-hidden="true" />
-          <span className="text-sm font-bold text-white">Trade {symbol}</span>
+          <TrendingUp className="w-4 h-4 text-[#FF8C00]" />
+          <span className="text-sm font-bold text-white">{symbol ? `Trade ${symbol}` : "Paper Trading"}</span>
         </div>
         {portfolio && (
           <div className="flex items-center gap-3 text-[10px] font-mono">
@@ -204,225 +325,282 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
         )}
       </div>
 
-      <div className="flex border-b border-white/[0.06]" role="tablist" aria-label="Trade type">
-        <button
-          id="tab-stocks"
-          role="tab"
-          aria-selected={tab === "stocks"}
-          aria-controls="trade-panel-stocks"
-          onClick={() => setTab("stocks")}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors ${
-            tab === "stocks"
-              ? "text-[#FF8C00] border-b-2 border-[#FF8C00] bg-[#FF8C00]/[0.04]"
-              : "text-white/40 hover:text-white/60"
-          }`}
-        >
-          <BarChart3 className="w-3.5 h-3.5" aria-hidden="true" />
-          Stocks
-        </button>
-        <button
-          id="tab-options"
-          role="tab"
-          aria-selected={tab === "options"}
-          aria-controls="trade-panel-options"
-          onClick={() => setTab("options")}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors ${
-            tab === "options"
-              ? "text-[#FF8C00] border-b-2 border-[#FF8C00] bg-[#FF8C00]/[0.04]"
-              : "text-white/40 hover:text-white/60"
-          }`}
-        >
-          <Layers className="w-3.5 h-3.5" aria-hidden="true" />
-          Options
-        </button>
-      </div>
-
-      <div className="p-4 space-y-3">
-        <div className="flex gap-2" role="group" aria-label="Trade direction">
-          <button
-            onClick={() => setSide("buy")}
-            aria-pressed={side === "buy"}
-            aria-label={`Buy ${symbol}`}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
-              side === "buy"
-                ? "bg-[#FF8C00]/15 text-[#FF8C00] border border-[#FF8C00]/30"
-                : "bg-white/[0.03] text-white/40 border border-white/[0.06] hover:border-white/10"
-            }`}
-          >
-            <ArrowUpRight className="w-3.5 h-3.5 inline mr-1" aria-hidden="true" />
-            BUY
-          </button>
-          <button
-            onClick={() => setSide("sell")}
-            aria-pressed={side === "sell"}
-            aria-label={`Sell ${symbol}`}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
-              side === "sell"
-                ? "bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30"
-                : "bg-white/[0.03] text-white/40 border border-white/[0.06] hover:border-white/10"
-            }`}
-          >
-            <ArrowDownRight className="w-3.5 h-3.5 inline mr-1" aria-hidden="true" />
-            SELL
-          </button>
+      {marketDataUnavailable && (
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-[#ff3366]/10 border-b border-[#ff3366]/20">
+          <WifiOff className="w-3.5 h-3.5 text-[#ff3366] flex-shrink-0" />
+          <span className="text-xs text-[#ff3366]">Market data unavailable — trading is paused</span>
         </div>
+      )}
 
-        {tab === "stocks" ? (
-          <div id="trade-panel-stocks" role="tabpanel" aria-labelledby="tab-stocks" className="space-y-2">
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label htmlFor="trade-shares" className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Shares</label>
-                <input
-                  id="trade-shares"
-                  value={qty}
-                  onChange={e => setQty(e.target.value)}
-                  placeholder="100"
-                  type="number"
-                  aria-label="Number of shares"
-                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
-                />
-              </div>
-              <div>
-                <label htmlFor="trade-price" className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Price</label>
-                <input
-                  id="trade-price"
-                  value={price}
-                  onChange={e => setPrice(e.target.value)}
-                  placeholder="0.00"
-                  type="number"
-                  step="0.01"
-                  aria-label="Price per share"
-                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
-                />
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div id="trade-panel-options" role="tabpanel" aria-labelledby="tab-options" className="space-y-2">
-            <div className="flex gap-2" role="group" aria-label="Option type">
-              <button
-                onClick={() => setOptionType("CALL")}
-                aria-pressed={optionType === "CALL"}
-                className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
-                  optionType === "CALL"
-                    ? "bg-[#FF8C00]/15 text-[#FF8C00] border border-[#FF8C00]/30"
-                    : "bg-white/[0.03] text-white/40 border border-white/[0.06]"
-                }`}
-              >
-                CALL
-              </button>
-              <button
-                onClick={() => setOptionType("PUT")}
-                aria-pressed={optionType === "PUT"}
-                className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
-                  optionType === "PUT"
-                    ? "bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30"
-                    : "bg-white/[0.03] text-white/40 border border-white/[0.06]"
-                }`}
-              >
-                PUT
-              </button>
-            </div>
+      {allowSymbolSearch && (
+        <div className="px-4 pt-3">
+          <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Stock</label>
+          <StockSearchDropdown
+            onSelect={(sym, _name, price) => {
+              setSelectedSymbol(sym);
+              setSelectedPrice(price);
+            }}
+            value={selectedSymbol}
+            placeholder="Search stock (e.g. AAPL)"
+            disabled={marketDataUnavailable}
+          />
+        </div>
+      )}
 
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label htmlFor="trade-strike" className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Strike</label>
-                <input
-                  id="trade-strike"
-                  value={strike}
-                  onChange={e => setStrike(e.target.value)}
-                  placeholder="Strike"
-                  type="number"
-                  step="0.01"
-                  aria-label="Strike price"
-                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
-                />
-              </div>
-              <div>
-                <label htmlFor="trade-expiration" className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Expiration</label>
-                <select
-                  id="trade-expiration"
-                  value={expiration}
-                  onChange={e => setExpiration(e.target.value)}
-                  aria-label="Expiration date"
-                  className="w-full h-9 px-2 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#FF8C00]/30"
-                >
-                  {EXPIRATIONS.map(exp => (
-                    <option key={exp} value={exp} className="bg-[#0a0a16]">{exp}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label htmlFor="trade-contracts" className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Contracts</label>
-                <input
-                  id="trade-contracts"
-                  value={contracts}
-                  onChange={e => setContracts(e.target.value)}
-                  placeholder="1"
-                  type="number"
-                  aria-label="Number of contracts"
-                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
-                />
-              </div>
-              <div>
-                <label htmlFor="trade-premium" className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Premium</label>
-                <input
-                  id="trade-premium"
-                  value={premium}
-                  onChange={e => setPremium(e.target.value)}
-                  placeholder="0.00"
-                  type="number"
-                  step="0.01"
-                  aria-label="Premium per contract"
-                  className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {totalEstimate > 0 && (
-          <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
-            <span className="text-[10px] font-mono text-white/40">Estimated Total</span>
-            <span className="text-sm font-mono font-bold text-white">${totalEstimate.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
-          </div>
-        )}
-
-        <button
-          onClick={tab === "stocks" ? executeStockTrade : executeOptionsTrade}
-          disabled={loading || !isSignedIn}
-          aria-label={`Execute ${side} ${tab === "stocks" ? "stock" : "options"} trade for ${symbol}`}
-          className={`w-full py-2.5 text-sm font-bold rounded-lg transition-all disabled:opacity-40 ${
-            side === "buy"
-              ? "bg-[#FF8C00] text-black hover:bg-[#FF8C00]/80"
-              : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"
-          }`}
-        >
-          {loading
-            ? "Executing..."
-            : `${side.toUpperCase()} ${tab === "stocks" ? `${qty || 0} ${symbol}` : `${contracts || 0} ${symbol} $${strike} ${optionType}`}`
-          }
-        </button>
-
-        {!isSignedIn && (
-          <p className="text-[10px] font-mono text-[#FFB800] text-center">Sign in to start paper trading</p>
-        )}
+      <div className="flex border-b border-white/[0.06]" role="tablist">
+        {(["stocks", "options", "orders"] as TabType[]).map(t => (
+          <button
+            key={t}
+            role="tab"
+            aria-selected={tab === t}
+            onClick={() => setTab(t)}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors ${tab === t ? "text-[#FF8C00] border-b-2 border-[#FF8C00] bg-[#FF8C00]/[0.04]" : "text-white/40 hover:text-white/60"}`}
+          >
+            {t === "stocks" && <><BarChart3 className="w-3.5 h-3.5" /> Stocks</>}
+            {t === "options" && <><Layers className="w-3.5 h-3.5" /> Options</>}
+            {t === "orders" && (
+              <>
+                <Clock className="w-3.5 h-3.5" /> Open Orders
+                {symbolPendingOrders.length > 0 && (
+                  <span className="text-[9px] bg-[#FF8C00] text-black rounded-full px-1.5 py-0.5 font-bold ml-0.5">
+                    {symbolPendingOrders.length}
+                  </span>
+                )}
+              </>
+            )}
+          </button>
+        ))}
       </div>
 
-      {(symbolPositions.length > 0 || symbolOptionsPositions.length > 0) && (
+      {tab === "orders" ? (
+        <div className="p-4">
+          {symbolPendingOrders.length === 0 ? (
+            <div className="text-center py-8">
+              <Clock className="w-8 h-8 mx-auto mb-2 text-white/10" />
+              <p className="text-xs text-white/30">No open orders{symbol ? ` for ${symbol}` : ""}</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {symbolPendingOrders.map(order => (
+                <div key={order.id} className="flex items-center justify-between bg-white/[0.03] rounded-lg px-3 py-2.5 border border-white/[0.06]">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-xs font-bold font-mono text-white">{order.symbol}</span>
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase ${order.side === "buy" ? "bg-[#FF8C00]/20 text-[#FF8C00]" : order.side === "sell" ? "bg-[#ff3366]/20 text-[#ff3366]" : order.side === "short_sell" ? "bg-[#9c27b0]/20 text-[#9c27b0]" : "bg-[#0099cc]/20 text-[#0099cc]"}`}>
+                        {order.side.replace("_", " ")}
+                      </span>
+                      <span className="text-[9px] text-white/30 uppercase">{order.orderType}</span>
+                    </div>
+                    <p className="text-[10px] font-mono text-white/50">
+                      {order.quantity} shares
+                      {order.limitPrice ? ` @ limit $${order.limitPrice.toFixed(2)}` : ""}
+                      {order.stopPrice ? ` @ stop $${order.stopPrice.toFixed(2)}` : ""}
+                      {order.expiresAt ? ` · expires ${new Date(order.expiresAt).toLocaleDateString()}` : ""}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => cancelOrder(order.id)}
+                    className="ml-2 p-1.5 rounded-lg text-white/30 hover:text-[#ff3366] hover:bg-[#ff3366]/10 transition-colors flex-shrink-0"
+                    aria-label="Cancel order"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="p-4 space-y-3">
+          <div className="grid grid-cols-4 gap-1" role="group" aria-label="Trade direction">
+            {sideButtons.map(btn => (
+              <button
+                key={btn.id}
+                onClick={() => setSide(btn.id)}
+                aria-pressed={side === btn.id}
+                className={`py-1.5 text-[10px] font-bold rounded-lg transition-all ${
+                  side === btn.id
+                    ? `border`
+                    : "bg-white/[0.03] text-white/40 border border-white/[0.06] hover:border-white/10"
+                }`}
+                style={side === btn.id ? {
+                  backgroundColor: `${btn.color}20`,
+                  color: btn.color,
+                  borderColor: `${btn.color}40`,
+                } : {}}
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
+
+          {tab === "stocks" ? (
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Shares</label>
+                  <input
+                    value={qty}
+                    onChange={e => setQty(e.target.value)}
+                    placeholder="100"
+                    type="number"
+                    aria-label="Number of shares"
+                    disabled={marketDataUnavailable}
+                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30 disabled:opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Order Type</label>
+                  <select
+                    value={orderType}
+                    onChange={e => setOrderType(e.target.value as OrderType)}
+                    disabled={marketDataUnavailable}
+                    className="w-full h-9 px-2 text-xs font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#FF8C00]/30 disabled:opacity-50 [&>option]:bg-[#0a0a16]"
+                  >
+                    <option value="market">Market</option>
+                    <option value="limit">Limit</option>
+                    <option value="stop">Stop</option>
+                    <option value="time_based">Time-Based</option>
+                  </select>
+                </div>
+              </div>
+
+              {orderType === "limit" && (
+                <div>
+                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Limit Price ($)</label>
+                  <input
+                    value={limitPrice}
+                    onChange={e => setLimitPrice(e.target.value)}
+                    placeholder={livePrice ? livePrice.toFixed(2) : "0.00"}
+                    type="number"
+                    step="0.01"
+                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
+                  />
+                </div>
+              )}
+
+              {orderType === "stop" && (
+                <div>
+                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Stop Price ($)</label>
+                  <input
+                    value={stopPrice}
+                    onChange={e => setStopPrice(e.target.value)}
+                    placeholder={livePrice ? livePrice.toFixed(2) : "0.00"}
+                    type="number"
+                    step="0.01"
+                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
+                  />
+                </div>
+              )}
+
+              {orderType === "time_based" && (
+                <div>
+                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Expires At</label>
+                  <input
+                    value={expiresAt}
+                    onChange={e => setExpiresAt(e.target.value)}
+                    type="datetime-local"
+                    min={new Date().toISOString().slice(0, 16)}
+                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#FF8C00]/30"
+                  />
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex gap-2" role="group" aria-label="Option type">
+                {(["CALL", "PUT"] as const).map(t => (
+                  <button
+                    key={t}
+                    onClick={() => setOptionType(t)}
+                    aria-pressed={optionType === t}
+                    className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
+                      optionType === t
+                        ? t === "CALL" ? "bg-[#FF8C00]/15 text-[#FF8C00] border border-[#FF8C00]/30" : "bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30"
+                        : "bg-white/[0.03] text-white/40 border border-white/[0.06]"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Strike</label>
+                  <input value={strike} onChange={e => setStrike(e.target.value)} placeholder="Strike" type="number" step="0.01" className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30" />
+                </div>
+                <div>
+                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Expiration</label>
+                  <select value={expiration} onChange={e => setExpiration(e.target.value)} className="w-full h-9 px-2 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#FF8C00]/30 [&>option]:bg-[#0a0a16]">
+                    {EXPIRATIONS.map(exp => <option key={exp} value={exp}>{exp}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Contracts</label>
+                  <input value={contracts} onChange={e => setContracts(e.target.value)} placeholder="1" type="number" className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30" />
+                </div>
+                <div>
+                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Premium</label>
+                  <input value={premium} onChange={e => setPremium(e.target.value)} placeholder="0.00" type="number" step="0.01" className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {totalEstimate > 0 && (
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+              <span className="text-[10px] font-mono text-white/40">Estimated Total</span>
+              <span className="text-sm font-mono font-bold text-white">${totalEstimate.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+            </div>
+          )}
+
+          <button
+            onClick={tab === "stocks" ? executeStockTrade : executeOptionsTrade}
+            disabled={loading || !isSignedIn || marketDataUnavailable || !symbol}
+            aria-label={`Execute ${side} ${tab} trade`}
+            className="w-full py-2.5 text-sm font-bold rounded-lg transition-all disabled:opacity-40"
+            style={{
+              backgroundColor: marketDataUnavailable ? "#444" : activeSideConfig.color === "#FF8C00" ? "#FF8C00" : activeSideConfig.color,
+              color: activeSideConfig.color === "#FF8C00" ? "#000" : "#fff",
+            }}
+          >
+            {loading
+              ? "Executing..."
+              : marketDataUnavailable
+                ? "Market Data Unavailable"
+                : !symbol
+                  ? "Select a stock"
+                  : `${side.toUpperCase().replace("_", " ")} ${tab === "stocks" ? `${qty || 0} ${symbol}` : `${contracts || 0} ${symbol} $${strike} ${optionType}`}${orderType !== "market" ? ` (${orderType})` : ""}`
+            }
+          </button>
+
+          {!isSignedIn && (
+            <p className="text-[10px] font-mono text-[#FFB800] text-center">Sign in to start paper trading</p>
+          )}
+        </div>
+      )}
+
+      {(symbolPositions.length > 0 || symbolOptionsPositions.length > 0) && tab !== "orders" && (
         <div className="border-t border-white/[0.06] px-4 py-3 space-y-2">
           <p className="text-[9px] font-mono text-white/30 uppercase font-bold">Your {symbol} Positions</p>
           {symbolPositions.map(p => (
             <div key={p.id} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <BarChart3 className="w-3 h-3 text-[#FF8C00]" />
-                <span className="text-xs font-mono font-bold text-white">{p.quantity} shares</span>
+                <span className={`text-xs font-mono font-bold ${p.quantity < 0 ? "text-[#9c27b0]" : "text-white"}`}>
+                  {p.quantity < 0 ? `${Math.abs(p.quantity)} short` : `${p.quantity} shares`}
+                </span>
               </div>
-              <span className="text-[10px] font-mono text-white/50">avg ${p.avgCost.toFixed(2)}</span>
-              <span className="text-xs font-mono text-white/70">${(p.quantity * p.avgCost).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+              <span className="text-[10px] font-mono text-white/50">avg ${Math.abs(p.avgCost).toFixed(2)}</span>
+              {p.unrealizedPnl !== undefined && (
+                <span className={`text-xs font-mono ${p.unrealizedPnl >= 0 ? "text-emerald-400" : "text-[#ff3366]"}`}>
+                  {p.unrealizedPnl >= 0 ? "+" : ""}${p.unrealizedPnl.toFixed(2)}
+                </span>
+              )}
             </div>
           ))}
           {symbolOptionsPositions.map(p => (

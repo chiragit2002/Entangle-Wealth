@@ -301,6 +301,19 @@ router.post("/gamification/xp", requireAuth, validateBody(XpSchema), async (req,
       return;
     }
 
+    const recentDup = await db.select({ id: xpTransactionsTable.id })
+      .from(xpTransactionsTable)
+      .where(and(
+        eq(xpTransactionsTable.userId, userId),
+        eq(xpTransactionsTable.reason, reason),
+        gte(xpTransactionsTable.createdAt, new Date(Date.now() - XP_COOLDOWN_MS))
+      ))
+      .limit(1);
+    if (recentDup.length > 0) {
+      res.status(429).json({ error: "XP award cooldown active. Please wait before awarding XP for the same action." });
+      return;
+    }
+
     const result = await db.transaction(async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${userId} || '_xp'))`);
 

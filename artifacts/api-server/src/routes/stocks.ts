@@ -11,6 +11,8 @@ import {
 } from "../data/nasdaq-stocks";
 import { stockCache } from "../lib/cache";
 import { validateQuery, validateParams, z } from "../lib/validateRequest";
+import { getLivePrices } from "../lib/priceService";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -92,6 +94,59 @@ router.get("/stocks", validateQuery(StocksQuerySchema), (req, res) => {
       totalPages: Math.ceil(total / limit),
     },
   });
+});
+
+const SearchQuerySchema = z.object({
+  q: z.string().min(1).max(50),
+});
+
+router.get("/stocks/search", validateQuery(SearchQuerySchema), async (req, res) => {
+  try {
+    const q = (req.query.q as string) || "";
+    if (!q.trim()) {
+      res.json({ results: [] });
+      return;
+    }
+
+    const matches = searchStocks(q.trim(), 20);
+    if (matches.length === 0) {
+      res.json({ results: [] });
+      return;
+    }
+
+    const symbols = matches.map(s => s.symbol);
+    let livePricesData: Record<string, number> = {};
+    let marketDataAvailable = true;
+    try {
+      livePricesData = await getLivePrices(symbols);
+    } catch {
+      marketDataAvailable = false;
+    }
+
+    const results = matches.map(stock => {
+      const livePrice = livePricesData[stock.symbol];
+      const prevClose = stock.price;
+      const currentPrice = livePrice ?? prevClose;
+      const changePercent = livePrice && prevClose > 0
+        ? ((livePrice - prevClose) / prevClose) * 100
+        : 0;
+
+      return {
+        symbol: stock.symbol,
+        name: stock.name,
+        sector: stock.sector,
+        livePrice: livePrice ?? null,
+        staticPrice: prevClose,
+        changePercent: Number(changePercent.toFixed(2)),
+        marketDataAvailable: !!livePrice,
+      };
+    });
+
+    res.json({ results, marketDataAvailable });
+  } catch (err) {
+    logger.error({ err }, "Stock search error");
+    res.status(500).json({ error: "Stock search failed" });
+  }
 });
 
 router.get("/stocks/movers", (_req, res) => {

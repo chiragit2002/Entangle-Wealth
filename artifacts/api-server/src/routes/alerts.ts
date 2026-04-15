@@ -4,6 +4,7 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { db } from "@workspace/db";
 import { alertsTable, alertHistoryTable, usersTable } from "@workspace/db/schema";
 import { eq, and, desc, gte, sql, count } from "drizzle-orm";
+import { getLivePrice } from "../lib/priceService";
 import { logger } from "../lib/logger";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { CircuitBreaker, registerCircuit } from "../lib/circuitBreaker";
@@ -23,6 +24,8 @@ function flushSseResponse(res: Response): void {
 const ALERT_TYPES = [
   "price_above",
   "price_below",
+  "pct_change",
+  "volume_spike",
   "rsi_oversold",
   "rsi_overbought",
   "macd_crossover",
@@ -128,6 +131,15 @@ router.post("/alerts", requireAuth, validateBody(AlertCreateSchema), async (req:
     return;
   }
   try {
+    const livePrice = await getLivePrice(sanitizedSymbol);
+    if (!livePrice || livePrice <= 0) {
+      res.status(503).json({
+        error: `Market data unavailable for ${sanitizedSymbol}. Cannot create alert without live price validation.`,
+        marketDataUnavailable: true,
+      });
+      return;
+    }
+
     const existingCount = await db
       .select({ c: count() })
       .from(alertsTable)
@@ -147,6 +159,7 @@ router.post("/alerts", requireAuth, validateBody(AlertCreateSchema), async (req:
         enabled: true,
       })
       .returning();
+    logger.info({ userId, symbol: sanitizedSymbol, alertType, livePrice }, "Alert created with live price validation");
     res.status(201).json(alert);
   } catch (err) {
     logger.error({ err }, "Failed to create alert");
@@ -507,6 +520,23 @@ async function fetchBars(symbol: string): Promise<number[]> {
   }
 }
 
+async function fetchBarVolumes(symbol: string): Promise<number[]> {
+  try {
+    return await alertsAlpacaCircuit.execute(
+      () =>
+        retryWithBackoff(async () => {
+          const url = `${ALPACA_DATA_URL}/v2/stocks/${symbol}/bars?timeframe=1Day&limit=25&adjustment=split&feed=iex&sort=asc`;
+          const res = await fetch(url, { headers: alpacaHeaders() });
+          if (!res.ok) throw new Error(`Alpaca bars volumes ${res.status}`);
+          const data = (await res.json()) as { bars?: Array<{ v: number }> };
+          return (data.bars || []).map((b) => b.v);
+        }, { label: "alpaca-alerts-bar-volumes", maxRetries: 4 })
+    );
+  } catch {
+    return [];
+  }
+}
+
 async function evaluateAlerts() {
   try {
     const activeAlerts = await db
@@ -522,6 +552,7 @@ async function evaluateAlerts() {
     const snapshots = await fetchSnapshots(symbols);
 
     const barsCache = new Map<string, number[]>();
+    const volumeCache = new Map<string, number[]>();
 
     for (const alert of activeAlerts) {
       const snap = snapshots[alert.symbol];
@@ -547,6 +578,40 @@ async function evaluateAlerts() {
             message = `${alert.symbol} price $${price.toFixed(2)} dropped below $${alert.threshold.toFixed(2)}`;
           }
           break;
+        case "pct_change": {
+          const prevClose = snap.prevDailyBar?.c || snap.dailyBar?.o || 0;
+          if (prevClose > 0) {
+            const pctChange = ((price - prevClose) / prevClose) * 100;
+            triggeredValue = pctChange;
+            const threshold = alert.threshold ?? 5;
+            if (Math.abs(pctChange) >= Math.abs(threshold)) {
+              triggered = true;
+              const dir = pctChange >= 0 ? "up" : "down";
+              message = `${alert.symbol} moved ${dir} ${Math.abs(pctChange).toFixed(2)}% (threshold: ${Math.abs(threshold).toFixed(1)}%)`;
+            }
+          }
+          break;
+        }
+        case "volume_spike": {
+          const currentVolume = snap.dailyBar?.v || snap.minuteBar?.v || 0;
+          if (!volumeCache.has(alert.symbol)) {
+            volumeCache.set(alert.symbol, await fetchBarVolumes(alert.symbol));
+          }
+          const historicalVolumes = volumeCache.get(alert.symbol) || [];
+          if (historicalVolumes.length >= 5 && currentVolume > 0) {
+            const avgVolume = historicalVolumes.slice(-20).reduce((a, b) => a + b, 0) / Math.min(historicalVolumes.length, 20);
+            if (avgVolume > 0) {
+              const multiplier = currentVolume / avgVolume;
+              triggeredValue = multiplier;
+              const threshold = alert.threshold ?? 2;
+              if (multiplier >= threshold) {
+                triggered = true;
+                message = `${alert.symbol} volume spike: ${multiplier.toFixed(1)}x average (${(currentVolume / 1_000_000).toFixed(1)}M vs avg ${(avgVolume / 1_000_000).toFixed(1)}M)`;
+              }
+            }
+          }
+          break;
+        }
         case "rsi_oversold":
         case "rsi_overbought": {
           if (!barsCache.has(alert.symbol)) {

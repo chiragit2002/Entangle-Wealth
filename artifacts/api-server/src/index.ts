@@ -14,6 +14,7 @@ import { ensureBacktesterBadgesExist } from "./routes/gamification";
 import { ensureSupportTables } from "./lib/supportTables";
 import { ensureBacktesterBadgesExist as ensureTask126BadgesExist } from "./lib/backtesterBadges";
 import { startAlertEvaluator, stopAlertEvaluator, closeAllSseConnections } from "./routes/alerts";
+import { startOrderEvaluator, stopOrderEvaluator } from "./routes/paperTrading";
 import { startDigestScheduler, stopDigestScheduler } from "./lib/emailDigest";
 import { startDailyContentScheduler, stopDailyContentScheduler } from "./routes/dailyContent";
 import { startDripScheduler, stopDripScheduler } from "./lib/dripEmails";
@@ -437,6 +438,7 @@ ensurePerformanceIndexes().catch((err) =>
   logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
 );
 startAlertEvaluator();
+startOrderEvaluator();
 startDigestScheduler();
 startDailyContentScheduler();
 startDripScheduler();
@@ -459,6 +461,7 @@ async function gracefulShutdown(signal: string) {
 
   logger.info("Step 1/5: Stopping background schedulers...");
   stopAlertEvaluator();
+  stopOrderEvaluator();
   stopDigestScheduler();
   stopDripScheduler();
   stopDailyContentScheduler();

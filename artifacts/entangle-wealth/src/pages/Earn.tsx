@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { FlashCouncil } from "@/components/FlashCouncil";
-import { incomeOpportunities, optionsIncomeData } from "@/lib/mock-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DollarSign, MapPin, Clock, Briefcase, TrendingUp, ChevronDown, ChevronUp, Bookmark, BookmarkCheck, CheckCircle, Info, Target, Trophy } from "lucide-react";
@@ -15,13 +14,13 @@ const categories = ["All", "Gig", "Freelance", "Options"] as const;
 
 export default function Earn() {
   const { toast } = useToast();
-  const weeklyTotal = optionsIncomeData.reduce((a, b) => a + b.income, 0);
+  const weeklyTotal = 0;
   const [activeCategory, setActiveCategory] = useState<typeof categories[number]>("All");
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [savedOpps, setSavedOpps] = useState<number[]>([]);
   const [claimedOpps, setClaimedOpps] = useState<number[]>([]);
 
-  const filtered = activeCategory === "All" ? incomeOpportunities : incomeOpportunities.filter(o => o.type === activeCategory);
+  const filtered: never[] = [];
 
   const getTypeBadge = (type: string) => {
     switch (type) {
@@ -107,7 +106,7 @@ export default function Earn() {
             >
               {cat === "All" ? "All" : `${getTypeIcon(cat)} ${cat}`}
               {cat !== "All" && (
-                <span className="ml-1 text-xs opacity-70">({incomeOpportunities.filter(o => o.type === cat).length})</span>
+                <span className="ml-1 text-xs opacity-70">(0)</span>
               )}
             </Button>
           ))}

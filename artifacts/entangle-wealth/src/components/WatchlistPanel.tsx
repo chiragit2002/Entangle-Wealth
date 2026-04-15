@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { marketTickerData } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
 import { X, Bell, BellOff, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,6 +11,11 @@ const defaultWatchlist: WatchlistItem[] = [
   { symbol: "PLTR", signal: "BUY", confidence: 79 },
 ];
 
+interface LivePrice {
+  price: number;
+  changePercent: number;
+}
+
 interface WatchlistPanelProps {
   externalItems?: WatchlistItem[];
   onRemove?: (symbol: string) => void;
@@ -22,6 +26,27 @@ export function WatchlistPanel({ externalItems, onRemove }: WatchlistPanelProps 
   const [internalItems, setInternalItems] = useState(defaultWatchlist);
   const items = externalItems ?? internalItems;
   const [alerts, setAlerts] = useState<string[]>(["NVDA"]);
+  const [prices, setPrices] = useState<Record<string, LivePrice>>({});
+
+  useEffect(() => {
+    if (items.length === 0) return;
+    const symbols = items.map(i => i.symbol).join(",");
+    fetch(`/api/alpaca/snapshots?symbols=${encodeURIComponent(symbols)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then((data: Record<string, any> | null) => {
+        if (!data) return;
+        const result: Record<string, LivePrice> = {};
+        for (const [sym, snap] of Object.entries(data)) {
+          const price = snap?.minuteBar?.c || snap?.dailyBar?.c || snap?.latestTrade?.p || 0;
+          const changePercent = snap?.dailyBar
+            ? ((snap.dailyBar.c - snap.dailyBar.o) / snap.dailyBar.o) * 100
+            : 0;
+          result[sym] = { price, changePercent };
+        }
+        setPrices(result);
+      })
+      .catch(() => {});
+  }, [items.length]);
 
   const removeItem = (symbol: string) => {
     if (onRemove) {
@@ -60,7 +85,7 @@ export function WatchlistPanel({ externalItems, onRemove }: WatchlistPanelProps 
       ) : (
         <div className="space-y-1">
           {items.map((item) => {
-            const market = marketTickerData.find(m => m.symbol === item.symbol);
+            const livePrice = prices[item.symbol];
             const hasAlert = alerts.includes(item.symbol);
             return (
               <div key={item.symbol} className="flex items-center gap-3 py-2 px-2 rounded-lg hover:bg-white/[0.02] transition-colors group">
@@ -71,11 +96,15 @@ export function WatchlistPanel({ externalItems, onRemove }: WatchlistPanelProps 
                       {item.signal}
                     </span>
                   </div>
-                  {market && (
+                  {livePrice && livePrice.price > 0 ? (
                     <div className="flex items-center gap-2 text-[10px] font-mono">
-                      <span className="text-white/60">${market.price.toFixed(2)}</span>
-                      <span className={market.isPositive ? "text-primary" : "text-red-400"}>{market.change}</span>
+                      <span className="text-white/60">${livePrice.price.toFixed(2)}</span>
+                      <span className={livePrice.changePercent >= 0 ? "text-primary" : "text-red-400"}>
+                        {livePrice.changePercent >= 0 ? "+" : ""}{livePrice.changePercent.toFixed(2)}%
+                      </span>
                     </div>
+                  ) : (
+                    <div className="text-[10px] font-mono text-white/25">Loading...</div>
                   )}
                 </div>
                 <div className="flex items-center gap-1 text-[10px] font-mono">

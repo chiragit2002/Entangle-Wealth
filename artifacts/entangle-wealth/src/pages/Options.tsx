@@ -3,7 +3,6 @@ import { Layout } from "@/components/layout/Layout";
 import { FlashCouncil } from "@/components/FlashCouncil";
 import { MarketTicker } from "@/components/MarketTicker";
 import { OptionsChain } from "@/components/OptionsChain";
-import { unusualOptionsActivity } from "@/lib/mock-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -20,7 +19,7 @@ import { StockTradePanel } from "@/components/StockTradePanel";
 type SortField = "time" | "symbol" | "strike" | "delta" | "gamma" | "theta" | "ivRank" | "strength";
 type SortDir = "asc" | "desc";
 
-const allTickers = [...new Set(unusualOptionsActivity.map(i => i.symbol))];
+const allTickers: string[] = [];
 
 export default function Options() {
   const { toast } = useToast();
@@ -74,21 +73,7 @@ export default function Options() {
     setVisibleCols(prev => ({ ...prev, [col]: !prev[col] }));
   };
 
-  const filtered = useMemo(() => {
-    let data = [...unusualOptionsActivity];
-    if (filterType !== "ALL") data = data.filter(i => i.type === filterType);
-    if (filterTickers.length > 0) data = data.filter(i => filterTickers.includes(i.symbol));
-    if (filterMinStrength > 0) data = data.filter(i => i.strength >= filterMinStrength);
-    if (filterMinIV > 0) data = data.filter(i => i.ivRank >= filterMinIV);
-
-    data.sort((a, b) => {
-      const aVal = a[sortField];
-      const bVal = b[sortField];
-      if (typeof aVal === "string" && typeof bVal === "string") return sortDir === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-      return sortDir === "asc" ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
-    });
-    return data;
-  }, [filterType, filterTickers, filterMinStrength, filterMinIV, sortField, sortDir]);
+  const filtered: never[] = [];
 
   const SortHeader = ({ field, children, className = "" }: { field: SortField; children: React.ReactNode; className?: string }) => (
     <button onClick={() => handleSort(field)} className={`flex items-center gap-1 hover:text-primary transition-colors group ${className}`}>
@@ -113,8 +98,7 @@ export default function Options() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Options Flow</h1>
             <p className="text-muted-foreground mt-1 text-sm">
-              Unusual activity with full Greeks · {filtered.length} of {unusualOptionsActivity.length} signals
-              <span className="text-white/30"> · simulated</span>
+              Unusual options activity — no data available yet
             </p>
           </div>
           

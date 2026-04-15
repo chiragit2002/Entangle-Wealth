@@ -1,17 +1,45 @@
-import { memo } from "react";
-import { marketTickerData } from "@/lib/mock-data";
+import { memo, useEffect, useState } from "react";
+
+interface TickerItem {
+  symbol: string;
+  price: number;
+  changePercent: number;
+  isPositive: boolean;
+}
 
 function MarketTickerBase() {
+  const [items, setItems] = useState<TickerItem[]>([]);
+
+  useEffect(() => {
+    fetch("/api/alpaca/movers")
+      .then(r => r.ok ? r.json() : null)
+      .then((data: { all?: { symbol: string; price: number; change: number }[] } | null) => {
+        if (!data?.all?.length) return;
+        const mapped: TickerItem[] = data.all.slice(0, 15).map(m => ({
+          symbol: m.symbol,
+          price: m.price,
+          changePercent: m.change,
+          isPositive: m.change >= 0,
+        }));
+        setItems(mapped);
+      })
+      .catch(() => {});
+  }, []);
+
+  if (items.length === 0) return null;
+
+  const doubled = [...items, ...items, ...items];
+
   return (
     <div data-tour="market-ticker" className="w-full bg-black/90 border-b border-white/10 overflow-hidden py-2 flex items-center relative z-20">
       <div className="w-full flex space-x-8 overflow-hidden">
         <div className="flex space-x-8 animate-[ticker_30s_linear_infinite] whitespace-nowrap px-4 hover:[animation-play-state:paused]">
-          {[...marketTickerData, ...marketTickerData, ...marketTickerData].map((item, i) => (
+          {doubled.map((item, i) => (
             <div key={`${item.symbol}-${i}`} className="flex items-center gap-2 text-sm font-mono tracking-wider">
               <span className="font-bold text-white">{item.symbol}</span>
               <span className="text-white/80">${item.price.toFixed(2)}</span>
               <span className={item.isPositive ? "text-primary" : "text-destructive"}>
-                {item.change}
+                {item.isPositive ? "+" : ""}{item.changePercent.toFixed(2)}%
               </span>
             </div>
           ))}

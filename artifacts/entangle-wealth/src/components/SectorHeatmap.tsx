@@ -1,9 +1,36 @@
-import { sectorData } from "@/lib/mock-data";
-import { useState, memo } from "react";
+import { useState, memo, useEffect } from "react";
+
+interface SectorEntry {
+  sector: string;
+  ticker: string;
+  change: number;
+  weight: number;
+  volume: string;
+}
+
+const SECTOR_ETFS: { sector: string; ticker: string; weight: number }[] = [
+  { sector: "Technology", ticker: "XLK", weight: 32 },
+  { sector: "Healthcare", ticker: "XLV", weight: 14 },
+  { sector: "Financials", ticker: "XLF", weight: 12 },
+  { sector: "Energy", ticker: "XLE", weight: 8 },
+  { sector: "Consumer Disc.", ticker: "XLY", weight: 11 },
+  { sector: "Industrials", ticker: "XLI", weight: 9 },
+  { sector: "Real Estate", ticker: "XLRE", weight: 5 },
+  { sector: "Utilities", ticker: "XLU", weight: 4 },
+  { sector: "Materials", ticker: "XLB", weight: 3 },
+  { sector: "Telecom", ticker: "XLC", weight: 2 },
+];
+
+function volumeLabel(v: number): string {
+  if (v > 5_000_000) return "High";
+  if (v > 1_000_000) return "Normal";
+  return "Low";
+}
 
 function SectorHeatmapBase() {
   const [hoveredSector, setHoveredSector] = useState<string | null>(null);
-  const maxWeight = Math.max(...sectorData.map(s => s.weight));
+  const [sectorData, setSectorData] = useState<SectorEntry[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const getHeatColor = (change: number) => {
     if (change >= 2) return "rgba(0,180,216, 0.35)";
@@ -18,6 +45,50 @@ function SectorHeatmapBase() {
     if (change >= 0) return "rgba(255, 255, 255, 0.08)";
     return "rgba(255, 68, 68, 0.2)";
   };
+
+  useEffect(() => {
+    const symbols = SECTOR_ETFS.map(s => s.ticker).join(",");
+    fetch(`/api/alpaca/snapshots?symbols=${encodeURIComponent(symbols)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then((data: Record<string, any> | null) => {
+        if (!data) return;
+        const entries: SectorEntry[] = SECTOR_ETFS.map(etf => {
+          const snap = data[etf.ticker];
+          const change = snap?.dailyBar
+            ? ((snap.dailyBar.c - snap.dailyBar.o) / snap.dailyBar.o) * 100
+            : 0;
+          const vol = snap?.dailyBar?.v || 0;
+          return {
+            sector: etf.sector,
+            ticker: etf.ticker,
+            change: parseFloat(change.toFixed(2)),
+            weight: etf.weight,
+            volume: volumeLabel(vol),
+          };
+        });
+        setSectorData(entries);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="glass-panel rounded-sm p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+          <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Sector Performance</h4>
+        </div>
+        <div className="grid grid-cols-5 gap-1.5">
+          {SECTOR_ETFS.map(s => (
+            <div key={s.ticker} className="bg-white/[0.03] rounded-lg animate-pulse" style={{ minHeight: 60 }} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const maxWeight = Math.max(...SECTOR_ETFS.map(s => s.weight));
 
   return (
     <div className="glass-panel rounded-sm p-5">

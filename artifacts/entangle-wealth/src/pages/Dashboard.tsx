@@ -15,7 +15,6 @@ import { FearGreedGauge } from "@/components/FearGreedGauge";
 import { WatchlistPanel } from "@/components/WatchlistPanel";
 import { SignalHistory } from "@/components/SignalHistory";
 import { EconomicCalendar } from "@/components/EconomicCalendar";
-import { stockAlerts, optionsAlerts, unusualOptionsActivity, optionsIncomeData, agentLogMessages } from "@/lib/mock-data";
 import { authFetch } from "@/lib/authFetch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,7 @@ import { runAllIndicators, getOverallSignal } from "@/lib/indicators";
 import { fetchBars, barsToStockData } from "@/lib/alpaca";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/trackEvent";
-import { Area, AreaChart, Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from "recharts";
+import { Area, AreaChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from "recharts";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
 import { FinishSetupNudge } from "@/components/FinishSetupNudge";
 import { ProgressiveProfileCard } from "@/components/onboarding/ProgressiveProfileCard";
@@ -120,16 +119,15 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
         color: "#00B4D8",
         text: hasConsensus
           ? `Quantum Consensus Engine — ${consensus >= 85 ? "6 of 6 agents agree on the current signal direction." : "agents are split; high-conviction trades are paused."}`
-          : "EXAMPLE SIGNAL — LIVE WHEN YOU CONNECT YOUR ACCOUNT: Quantum Consensus Engine cross-checks every signal across 6 independent AI agents.",
+          : "Quantum Consensus Engine cross-checks every signal across 6 independent AI agents. Connect your account to see live signals.",
         subtext: "Multi-model consensus",
         href: "/terminal",
         label: "View Terminal",
       },
       {
         id: "timeline",
-        icon: GitBranch,
         color: "#00B4D8",
-        text: "EXAMPLE SIGNAL — LIVE WHEN YOU CONNECT YOUR ACCOUNT: Alternate Timeline — see how one savings decision today branches into radically different 10-year futures.",
+        text: "Alternate Timeline — see how one savings decision today branches into radically different 10-year futures.",
         subtext: "Alternate Timeline Simulator",
         href: "/alternate-timeline",
         label: "Explore Timelines",
@@ -140,7 +138,7 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
         color: "#FFB800",
         text: hasVix && adSignal
           ? `Market ${adSignal} (VIX ${vix.toFixed(2)}) — a good time to review tax-loss harvesting opportunities with TaxGPT.`
-          : "EXAMPLE SIGNAL — LIVE WHEN YOU CONNECT YOUR ACCOUNT: TaxGPT analyzes every trade for deductions and tax-loss harvesting opportunities in real time.",
+          : "TaxGPT analyzes every trade for deductions and tax-loss harvesting opportunities in real time.",
         subtext: "Analyzes trades for deductions",
         href: "/taxgpt",
         label: "Check Savings",
@@ -149,7 +147,7 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
         id: "coach",
         icon: Brain,
         color: "#a78bfa",
-        text: "EXAMPLE SIGNAL — LIVE WHEN YOU CONNECT YOUR ACCOUNT: Your AI Coach will surface personalized habit insights based on your activity pattern.",
+        text: "Your AI Coach will surface personalized habit insights based on your activity pattern.",
         subtext: "Behavioral finance coaching",
         href: "/ai-coach",
         label: "Talk to Coach",
@@ -520,7 +518,7 @@ export default function Dashboard() {
     }
   }, [toast, isFirstAnalysis]);
 
-  const todayOptionsIncome = optionsIncomeData[optionsIncomeData.length - 1].income;
+  const todayOptionsIncome = 0;
 
   const isMarketOpen = (() => {
     const now = new Date();
@@ -933,78 +931,18 @@ export default function Dashboard() {
           </div>
 
           {secondaryTab === "signals" && (
-            <div className="divide-y divide-white/[0.04]">
-              {stockAlerts.map((alert) => (
-                <div key={alert.id} className="hover:bg-white/[0.01] transition-colors cursor-pointer" onClick={() => setExpandedSignal(expandedSignal === alert.id ? null : alert.id)}>
-                  <div className="flex items-center justify-between px-4 py-3">
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm font-bold font-mono text-white w-14">{alert.symbol}</span>
-                      <span className="text-xs text-white/50">${alert.price.toFixed(2)}</span>
-                      <span className="text-xs text-white/25 hidden md:inline">{alert.pattern}</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="w-20 hidden sm:block">
-                        <div className="flex justify-between text-xs mb-1">
-                          <span className="text-white/30">Conf.</span>
-                          <span className="text-white/50">{alert.confidence}%</span>
-                        </div>
-                        <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full ${alert.type === 'BUY' ? 'bg-primary' : alert.type === 'SELL' ? 'bg-red-400' : 'bg-[#FFB800]'}`} style={{ width: `${alert.confidence}%` }} />
-                        </div>
-                      </div>
-                      <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-lg ${alert.type === 'BUY' ? 'bg-primary/10 text-primary' : alert.type === 'SELL' ? 'bg-red-400/10 text-red-400' : 'bg-[#FFB800]/10 text-[#FFB800]'}`}>
-                        {alert.type}
-                      </span>
-                      {expandedSignal === alert.id ? <ChevronUp className="w-4 h-4 text-white/25" /> : <ChevronDown className="w-4 h-4 text-white/25" />}
-                    </div>
-                  </div>
-                  {expandedSignal === alert.id && (
-                    <div className="px-4 pb-3 animate-in fade-in slide-in-from-top-1 duration-150">
-                      <div className="bg-white/[0.02] rounded-xl p-3 text-xs text-white/40 space-y-1">
-                        <div className="flex gap-3">
-                          <span className="text-primary">{alert.source}</span>
-                          <span>·</span>
-                          <span>{alert.pattern}</span>
-                        </div>
-                        <p>{alert.note}</p>
-                        <div className="flex gap-4 pt-1">
-                          <span>Risk: 2.0%</span>
-                          <span>R:R 1:{alert.confidence > 80 ? '4' : alert.confidence > 60 ? '3' : '2'}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+            <div className="flex flex-col items-center justify-center py-12 text-center gap-2">
+              <Activity className="w-8 h-8 text-white/10 mb-1" />
+              <p className="text-sm font-medium text-white/30">No signals available</p>
+              <p className="text-xs text-white/20 max-w-xs">Stock signals will appear here when the analysis engine generates them.</p>
             </div>
           )}
 
           {secondaryTab === "options" && (
-            <div>
-              <div className="divide-y divide-white/[0.04]">
-                {optionsAlerts.map(a => (
-                  <div key={a.id} className="flex items-center gap-4 px-4 py-3 hover:bg-white/[0.01] transition-colors flex-wrap">
-                    <span className="text-sm font-bold text-white w-14">{a.symbol}</span>
-                    <span className={`px-2 py-0.5 text-xs font-semibold rounded-lg ${a.type === 'CALL' ? 'bg-primary/10 text-primary' : 'bg-red-400/10 text-red-400'}`}>{a.type}</span>
-                    <span className="text-xs text-white/50">${a.strike}</span>
-                    <span className="text-xs text-white/30">{new Date(a.exp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                    <span className="text-sm font-semibold text-[#FFB800]">{a.premium}</span>
-                    <span className="text-xs text-white/30 ml-auto hidden md:inline truncate max-w-[200px]">{a.flowType}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="border-t border-white/[0.06] p-4">
-                <p className="text-xs text-white/50 font-semibold mb-3">Options Income (Weekly)</p>
-                <ResponsiveContainer width="100%" height={160}>
-                  <BarChart data={optionsIncomeData}>
-                    <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
-                    <XAxis dataKey="day" tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} width={40} />
-                    <Tooltip contentStyle={{ background: '#0A0E1A', border: '1px solid rgba(255,215,0,0.15)', borderRadius: 12, color: '#fff', fontSize: 11 }} />
-                    <Bar dataKey="income" fill="#FFB800" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+            <div className="flex flex-col items-center justify-center py-12 text-center gap-2">
+              <BarChart3 className="w-8 h-8 text-white/10 mb-1" />
+              <p className="text-sm font-medium text-white/30">No options flow data</p>
+              <p className="text-xs text-white/20 max-w-xs">Options alerts and income data will appear here when available.</p>
             </div>
           )}
 
@@ -1028,15 +966,9 @@ export default function Dashboard() {
                 <div className="px-4 py-2.5">
                   <p className="text-xs text-white/50 font-semibold">Unusual Options Activity</p>
                 </div>
-                {unusualOptionsActivity.slice(0, 8).map(e => (
-                  <div key={e.id} className="flex items-center gap-3 px-4 py-2 hover:bg-white/[0.01] transition-colors">
-                    <span className="text-xs font-bold text-white w-12">{e.symbol}</span>
-                    <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${e.type === 'CALL' ? 'bg-primary/10 text-primary' : 'bg-red-400/10 text-red-400'}`}>{e.type}</span>
-                    <span className="text-[10px] text-white/50">${e.strike}</span>
-                    <span className={`text-[10px] font-mono font-semibold ml-auto ${e.delta > 0 ? 'text-primary' : 'text-red-400'}`}>Δ {e.delta > 0 ? '+' : ''}{Math.abs(e.delta)}</span>
-                    <span className={`text-[10px] font-semibold ${e.ivRank >= 70 ? 'text-[#FFB800]' : 'text-white/30'}`}>IV {e.ivRank}%</span>
-                  </div>
-                ))}
+                <div className="flex flex-col items-center justify-center py-6 text-center gap-1">
+                  <p className="text-xs text-white/20">No unusual activity detected</p>
+                </div>
               </div>
             </div>
           )}

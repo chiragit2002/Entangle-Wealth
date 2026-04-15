@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
-import { marketTickerData } from "@/lib/mock-data";
 import { getMarginalRate, TAX_RATES } from "@/lib/taxflow-rates";
 import { XPBar } from "@/components/XPBar";
 import {
@@ -48,24 +47,32 @@ const STEP_LABELS = [
   "Confirmed",
 ];
 
-function generateCandlestickData(basePrice: number, days = 60) {
-  const data = [];
-  let price = basePrice * 0.85;
-  const now = new Date();
-  for (let i = days; i >= 0; i--) {
-    const date = new Date(now);
-    date.setDate(date.getDate() - i);
-    const dateStr = date.toISOString().split("T")[0];
-    const open = price;
-    const change = (Math.random() - 0.48) * price * 0.025;
-    const close = Math.max(price + change, 0.01);
-    const high = Math.max(open, close) * (1 + Math.random() * 0.012);
-    const low = Math.min(open, close) * (1 - Math.random() * 0.012);
-    const volume = Math.floor(Math.random() * 5_000_000 + 1_000_000);
-    data.push({ time: dateStr, open, high, low, close, volume });
-    price = close;
+interface CandleBar {
+  time: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+async function fetchCandlestickData(symbol: string): Promise<CandleBar[]> {
+  try {
+    const res = await fetch(`/api/alpaca/bars/${symbol}?timeframe=1Day&limit=60`);
+    if (!res.ok) return [];
+    const data = await res.json() as { bars?: { t: string; o: number; h: number; l: number; c: number; v: number }[] };
+    if (!data.bars?.length) return [];
+    return data.bars.map(b => ({
+      time: b.t.split("T")[0],
+      open: b.o,
+      high: b.h,
+      low: b.l,
+      close: b.c,
+      volume: b.v,
+    }));
+  } catch {
+    return [];
   }
-  return data;
 }
 
 function generateOrderBook(price: number) {
@@ -139,30 +146,36 @@ interface StockInfo {
   symbol: string;
   name: string;
   price: number;
-  change: string;
+  changePercent: number;
   isPositive: boolean;
-  marketCap: string;
   volume: string;
   dayHigh: number;
   dayLow: number;
 }
 
-function getStockInfo(symbol: string): StockInfo | null {
-  const ticker = marketTickerData.find(m => m.symbol === symbol.toUpperCase());
+interface AlpacaSnapshot {
+  minuteBar?: { c: number; v: number };
+  dailyBar?: { c: number; o: number; h: number; l: number; v: number };
+  latestTrade?: { p: number };
+}
+
+function buildStockInfo(symbol: string, snap: AlpacaSnapshot | undefined): StockInfo | null {
   const popular = POPULAR_TICKERS.find(p => p.symbol === symbol.toUpperCase());
-  if (!ticker && !popular) return null;
-  const price = ticker?.price ?? 150 + Math.random() * 300;
-  const isPositive = ticker?.isPositive ?? true;
+  const price = snap?.minuteBar?.c || snap?.dailyBar?.c || snap?.latestTrade?.p || 0;
+  if (!price && !popular) return null;
+  const changePercent = snap?.dailyBar
+    ? ((snap.dailyBar.c - snap.dailyBar.o) / snap.dailyBar.o) * 100
+    : 0;
+  const vol = snap?.dailyBar?.v || snap?.minuteBar?.v || 0;
   return {
     symbol: symbol.toUpperCase(),
     name: popular?.name ?? symbol.toUpperCase(),
     price,
-    change: ticker?.change ?? (isPositive ? "+1.2%" : "-0.8%"),
-    isPositive,
-    marketCap: `$${(Math.random() * 3 + 0.5).toFixed(1)}T`,
-    volume: `${(Math.random() * 80 + 10).toFixed(0)}M`,
-    dayHigh: +(price * 1.015).toFixed(2),
-    dayLow: +(price * 0.985).toFixed(2),
+    changePercent,
+    isPositive: changePercent >= 0,
+    volume: vol >= 1_000_000 ? `${(vol / 1_000_000).toFixed(1)}M` : vol >= 1_000 ? `${(vol / 1_000).toFixed(0)}K` : `${vol}`,
+    dayHigh: snap?.dailyBar?.h || (price * 1.015),
+    dayLow: snap?.dailyBar?.l || (price * 0.985),
   };
 }
 
@@ -172,8 +185,9 @@ export function TradeFlowPanel() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStock, setSelectedStock] = useState<StockInfo | null>(null);
-  const [chartData, setChartData] = useState<ReturnType<typeof generateCandlestickData>>([]);
+  const [chartData, setChartData] = useState<CandleBar[]>([]);
   const [orderBook, setOrderBook] = useState<ReturnType<typeof generateOrderBook> | null>(null);
+  const [snapshots, setSnapshots] = useState<Record<string, AlpacaSnapshot>>({});
 
   const [gamification, setGamification] = useState<GamificationData | null>(null);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -200,15 +214,50 @@ export function TradeFlowPanel() {
       )
     : POPULAR_TICKERS;
 
-  const selectStock = useCallback((symbol: string) => {
-    const info = getStockInfo(symbol);
-    if (!info) return;
-    setSelectedStock(info);
-    setChartData(generateCandlestickData(info.price));
-    setOrderBook(generateOrderBook(info.price));
-    setLimitPrice(info.price.toFixed(2));
+  const selectStock = useCallback(async (symbol: string) => {
+    const upper = symbol.toUpperCase();
+    let snap = snapshots[upper];
+    if (!snap) {
+      try {
+        const res = await fetch(`/api/alpaca/snapshots?symbols=${encodeURIComponent(upper)}`);
+        if (res.ok) {
+          const data = await res.json() as Record<string, AlpacaSnapshot>;
+          snap = data[upper];
+          if (snap) setSnapshots(prev => ({ ...prev, [upper]: snap }));
+        }
+      } catch {}
+    }
+    const info = buildStockInfo(upper, snap);
+    if (!info && !POPULAR_TICKERS.find(p => p.symbol === upper)) return;
+    const resolvedInfo: StockInfo = info ?? {
+      symbol: upper,
+      name: POPULAR_TICKERS.find(p => p.symbol === upper)?.name ?? upper,
+      price: 0,
+      changePercent: 0,
+      isPositive: true,
+      volume: "—",
+      dayHigh: 0,
+      dayLow: 0,
+    };
+    setSelectedStock(resolvedInfo);
+    if (resolvedInfo.price > 0) {
+      setOrderBook(generateOrderBook(resolvedInfo.price));
+      setLimitPrice(resolvedInfo.price.toFixed(2));
+    }
     setSearchQuery("");
     setStep(2);
+    const bars = await fetchCandlestickData(upper);
+    if (bars.length > 0) setChartData(bars);
+  }, [snapshots]);
+
+  useEffect(() => {
+    const symbols = POPULAR_TICKERS.map(t => t.symbol).join(",");
+    fetch(`/api/alpaca/snapshots?symbols=${encodeURIComponent(symbols)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then((data: Record<string, AlpacaSnapshot> | null) => {
+        if (data) setSnapshots(data);
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -342,7 +391,9 @@ export function TradeFlowPanel() {
           <div className="flex items-center gap-2 text-[9px] font-mono">
             <span className="text-[#00B4D8] font-bold">{selectedStock.symbol}</span>
             <span className="text-white/40">${selectedStock.price.toFixed(2)}</span>
-            <span className={selectedStock.isPositive ? "text-[#00ff88]" : "text-[#ff3366]"}>{selectedStock.change}</span>
+            <span className={selectedStock.isPositive ? "text-[#00ff88]" : "text-[#ff3366]"}>
+              {selectedStock.changePercent >= 0 ? "+" : ""}{selectedStock.changePercent.toFixed(2)}%
+            </span>
             <button onClick={resetFlow} className="text-white/20 hover:text-white/40 transition-colors text-[8px] ml-2 border border-white/10 px-1 py-0.5 rounded-sm">
               RESET
             </button>
@@ -385,7 +436,11 @@ export function TradeFlowPanel() {
                   </p>
                   <div className="grid grid-cols-2 gap-1">
                     {filteredTickers.slice(0, 12).map(t => {
-                      const market = marketTickerData.find(m => m.symbol === t.symbol);
+                      const snap = snapshots[t.symbol];
+                      const price = snap?.minuteBar?.c || snap?.dailyBar?.c || snap?.latestTrade?.p;
+                      const changePercent = snap?.dailyBar
+                        ? ((snap.dailyBar.c - snap.dailyBar.o) / snap.dailyBar.o) * 100
+                        : null;
                       return (
                         <button
                           key={t.symbol}
@@ -396,11 +451,17 @@ export function TradeFlowPanel() {
                             <p className="text-[10px] font-mono font-bold text-white group-hover:text-[#00B4D8] transition-colors">{t.symbol}</p>
                             <p className="text-[8px] font-mono text-white/30 truncate max-w-[80px]">{t.name}</p>
                           </div>
-                          {market && (
+                          {price != null && price > 0 ? (
                             <div className="text-right">
-                              <p className="text-[10px] font-mono text-white/60">${market.price.toFixed(0)}</p>
-                              <p className={`text-[8px] font-mono ${market.isPositive ? "text-[#00ff88]" : "text-[#ff3366]"}`}>{market.change}</p>
+                              <p className="text-[10px] font-mono text-white/60">${price.toFixed(0)}</p>
+                              {changePercent != null && (
+                                <p className={`text-[8px] font-mono ${changePercent >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
+                                  {changePercent >= 0 ? "+" : ""}{changePercent.toFixed(1)}%
+                                </p>
+                              )}
                             </div>
+                          ) : (
+                            <div className="text-right text-[8px] font-mono text-white/20">—</div>
                           )}
                         </button>
                       );
@@ -417,7 +478,7 @@ export function TradeFlowPanel() {
                     <div className="flex items-center gap-2">
                       <span className="text-[13px] font-mono font-bold text-white">{selectedStock.symbol}</span>
                       <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-sm ${selectedStock.isPositive ? "bg-[#00ff88]/10 text-[#00ff88]" : "bg-[#ff3366]/10 text-[#ff3366]"}`}>
-                        {selectedStock.change}
+                        {selectedStock.changePercent >= 0 ? "+" : ""}{selectedStock.changePercent.toFixed(2)}%
                       </span>
                     </div>
                     <p className="text-[9px] font-mono text-white/35">{selectedStock.name}</p>
@@ -425,20 +486,16 @@ export function TradeFlowPanel() {
                   </div>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-right">
                     <div>
-                      <p className="text-[7px] font-mono text-white/25">MKT CAP</p>
-                      <p className="text-[9px] font-mono font-bold text-white/70">{selectedStock.marketCap}</p>
+                      <p className="text-[7px] font-mono text-white/25">DAY HIGH</p>
+                      <p className="text-[9px] font-mono font-bold text-white/70">{selectedStock.dayHigh > 0 ? `$${selectedStock.dayHigh.toFixed(2)}` : "—"}</p>
                     </div>
                     <div>
                       <p className="text-[7px] font-mono text-white/25">VOLUME</p>
                       <p className="text-[9px] font-mono font-bold text-white/70">{selectedStock.volume}</p>
                     </div>
                     <div>
-                      <p className="text-[7px] font-mono text-white/25">DAY HI</p>
-                      <p className="text-[9px] font-mono font-bold text-[#00ff88]">${selectedStock.dayHigh}</p>
-                    </div>
-                    <div>
-                      <p className="text-[7px] font-mono text-white/25">DAY LO</p>
-                      <p className="text-[9px] font-mono font-bold text-[#ff3366]">${selectedStock.dayLow}</p>
+                      <p className="text-[7px] font-mono text-white/25">DAY LOW</p>
+                      <p className="text-[9px] font-mono font-bold text-[#ff3366]">{selectedStock.dayLow > 0 ? `$${selectedStock.dayLow.toFixed(2)}` : "—"}</p>
                     </div>
                   </div>
                 </div>

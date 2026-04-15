@@ -1,12 +1,11 @@
 import { useEffect, useState, memo } from "react";
 import { Link } from "wouter";
-import { marketTickerData } from "@/lib/mock-data";
 
 const MARKET_STATS = [
   { label: "S&P 500", value: "5,127.45", change: "+1.2%", positive: true },
   { label: "NASDAQ", value: "16,438.12", change: "+1.5%", positive: true },
-  { label: "BTC/USD", value: "68,245.30", change: "+2.8%", positive: true },
-  { label: "VIX", value: "14.32", change: "-3.1%", positive: false },
+  { label: "BTC/USD", value: "—", change: "—", positive: true },
+  { label: "VIX", value: "—", change: "—", positive: false },
 ];
 
 const TERMINAL_LINES = [
@@ -16,17 +15,45 @@ const TERMINAL_LINES = [
   { label: "TAXFLOW REAL-TIME CALCULATOR", status: "ACTIVE" },
 ];
 
+interface TickerItem {
+  symbol: string;
+  price: number;
+  changePercent: number;
+  isPositive: boolean;
+}
+
 function TickerTape() {
+  const [items, setItems] = useState<TickerItem[]>([]);
+
+  useEffect(() => {
+    fetch("/api/alpaca/movers")
+      .then(r => r.ok ? r.json() : null)
+      .then((data: { all?: { symbol: string; price: number; change: number }[] } | null) => {
+        if (!data?.all?.length) return;
+        setItems(data.all.slice(0, 15).map(m => ({
+          symbol: m.symbol,
+          price: m.price,
+          changePercent: m.change,
+          isPositive: m.change >= 0,
+        })));
+      })
+      .catch(() => {});
+  }, []);
+
+  if (items.length === 0) return null;
+
+  const doubled = [...items, ...items, ...items, ...items];
+
   return (
     <div className="w-full overflow-hidden py-1.5 flex items-center"
       style={{ background: "#060910", borderBottom: "1px solid rgba(0,180,216,0.15)" }}>
       <div className="flex animate-[ticker_30s_linear_infinite] whitespace-nowrap">
-        {[...marketTickerData, ...marketTickerData, ...marketTickerData, ...marketTickerData].map((item, i) => (
+        {doubled.map((item, i) => (
           <div key={`${item.symbol}-${i}`} className="flex items-center gap-1.5 mx-4 text-xs tracking-wider" style={{ fontFamily: "'JetBrains Mono', 'Fira Code', 'Courier New', monospace" }}>
             <span style={{ color: "#ffffff", fontWeight: 700 }}>{item.symbol}</span>
             <span style={{ color: "rgba(255,255,255,0.6)" }}>${item.price.toFixed(2)}</span>
             <span style={{ color: item.isPositive ? "#00B4D8" : "#FF3B3B" }}>
-              {item.isPositive ? "\u25B2" : "\u25BC"} {item.change}
+              {item.isPositive ? "\u25B2" : "\u25BC"} {item.isPositive ? "+" : ""}{item.changePercent.toFixed(2)}%
             </span>
           </div>
         ))}

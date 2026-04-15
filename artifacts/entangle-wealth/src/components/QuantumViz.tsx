@@ -1,5 +1,13 @@
 import { useState, useEffect, memo } from "react";
-import { quantumNodes } from "@/lib/mock-data";
+
+const QUANTUM_NODES = [
+  { id: "price", label: "Price Action", status: "active" as const },
+  { id: "volume", label: "Volume", status: "active" as const },
+  { id: "flow", label: "Options Flow", status: "active" as const },
+  { id: "greeks", label: "Greeks", status: "active" as const },
+  { id: "sentiment", label: "Sentiment", status: "warning" as const },
+  { id: "risk", label: "Risk Mgmt", status: "active" as const },
+];
 
 function QuantumVizBase() {
   const [activeConnections, setActiveConnections] = useState<number[]>([0, 2, 4]);
@@ -25,7 +33,7 @@ function QuantumVizBase() {
   }, []);
 
   const cx = 200, cy = 160, r = 110;
-  const nodePositions = quantumNodes.map((_, i) => ({
+  const nodePositions = QUANTUM_NODES.map((_, i) => ({
     x: cx + r * Math.cos((i * Math.PI * 2) / 6 - Math.PI / 2),
     y: cy + r * Math.sin((i * Math.PI * 2) / 6 - Math.PI / 2),
   }));
@@ -79,7 +87,7 @@ function QuantumVizBase() {
               CONSENSUS
             </text>
 
-            {quantumNodes.map((node, i) => {
+            {QUANTUM_NODES.map((node, i) => {
               const pos = nodePositions[i];
               const isPulsing = pulsingNode === i;
               const color = node.status === "warning" ? "#FFB800" : "#00B4D8";
@@ -102,9 +110,6 @@ function QuantumVizBase() {
                   <text x={pos.x} y={pos.y + (i < 3 ? -28 : 32)} textAnchor="middle" fill="rgba(255,255,255,0.7)" fontSize="8" fontFamily="JetBrains Mono">
                     {node.label.toUpperCase()}
                   </text>
-                  <text x={pos.x} y={pos.y + (i < 3 ? -19 : 42)} textAnchor="middle" fill={color} fontSize="9" fontFamily="JetBrains Mono" fontWeight="bold">
-                    {node.confidence}%
-                  </text>
                 </g>
               );
             })}
@@ -113,13 +118,13 @@ function QuantumVizBase() {
 
         <div className="lg:w-48 flex flex-col gap-3 w-full lg:border-l lg:border-white/5 lg:pl-6">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Model Status</p>
-          {quantumNodes.map((node) => (
+          {QUANTUM_NODES.map((node) => (
             <div key={node.id} className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <div className={`w-1.5 h-1.5 rounded-full ${node.status === "active" ? "bg-primary" : "bg-secondary"}`} />
                 <span className="text-xs text-white/70">{node.label}</span>
               </div>
-              <span className={`text-xs font-mono font-bold ${node.status === "active" ? "text-primary" : "text-secondary"}`}>{node.confidence}%</span>
+              <span className={`text-xs font-mono font-bold text-white/40`}>—</span>
             </div>
           ))}
           <div className="border-t border-white/5 pt-3 mt-1">

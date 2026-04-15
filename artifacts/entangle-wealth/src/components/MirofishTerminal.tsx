@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { terminalOrderFlow, terminalSystemLog, marketTickerData } from "@/lib/mock-data";
 import { quickAnalyzeStock, fetchStocks, fetchNews, type NewsItem } from "@/lib/api";
 import { useAuth } from "@clerk/react";
 import { getActiveProfile } from "@/lib/taxflow-profile";
@@ -416,8 +415,7 @@ export function MirofishTerminal() {
   const [alerts, setAlerts] = useState<{ symbol: string; price: number; dir: "above" | "below" }[]>(() => loadLS(ALERTS_KEY, []));
   const [macros, setMacros] = useState<Record<string, string[]>>(() => loadLS(MACROS_KEY, {}));
   const [taxSettings, setTaxSettings] = useState<TaxSettings>(() => loadLS(TAX_SETTINGS_KEY, DEFAULT_TAX_SETTINGS));
-  const [liveOrderFlow, setLiveOrderFlow] = useState<OrderFlowItem[]>(terminalOrderFlow as OrderFlowItem[]);
-  const [visibleLogs, setVisibleLogs] = useState(6);
+  const [liveOrderFlow, setLiveOrderFlow] = useState<OrderFlowItem[]>([]);
   const [clock, setClock] = useState(new Date().toLocaleTimeString());
   const [liveNews, setLiveNews] = useState<TerminalNewsItem[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -427,12 +425,6 @@ export function MirofishTerminal() {
     return () => clearInterval(t);
   }, []);
 
-  useEffect(() => {
-    const t = setInterval(() => {
-      setVisibleLogs(v => (v >= terminalSystemLog.length ? 6 : v + 1));
-    }, 3000);
-    return () => clearInterval(t);
-  }, []);
 
   useEffect(() => { saveLS(WATCHLIST_KEY, watchlist); }, [watchlist]);
   useEffect(() => { saveLS(ALERTS_KEY, alerts); }, [alerts]);
@@ -784,21 +776,16 @@ export function MirofishTerminal() {
 
     if (cmd.startsWith("QUOTE")) {
       const sym = cmd.split(" ")[1] || "SPY";
-      const stock = marketTickerData.find(s => s.symbol === sym);
-      if (stock) {
-        addOutput(rawInput, `${stock.symbol} | $${stock.price.toFixed(2)} | ${stock.change} | Vol: ${(Math.random() * 50 + 10).toFixed(1)}M`);
-      } else {
-        try {
-          const data = await fetchStocks({ q: sym, limit: 1 });
-          if (data.stocks.length > 0) {
-            const s = data.stocks[0];
-            addOutput(rawInput, `${s.symbol} | $${s.price.toFixed(2)} | ${s.changePercent >= 0 ? "+" : ""}${Math.abs(s.changePercent).toFixed(2)}% | ${s.sector}`);
-          } else {
-            addOutput(rawInput, `Symbol ${sym} not found.`);
-          }
-        } catch {
+      try {
+        const data = await fetchStocks({ q: sym, limit: 1 });
+        if (data.stocks.length > 0) {
+          const s = data.stocks[0];
+          addOutput(rawInput, `${s.symbol} | $${s.price.toFixed(2)} | ${s.changePercent >= 0 ? "+" : ""}${Math.abs(s.changePercent).toFixed(2)}% | ${s.sector}`);
+        } else {
           addOutput(rawInput, `Symbol ${sym} not found.`);
         }
+      } catch {
+        addOutput(rawInput, `Symbol ${sym} not found.`);
       }
       return;
     }
@@ -842,8 +829,7 @@ export function MirofishTerminal() {
             } catch {}
           }
           if (!estimatedPrice) {
-            const localStock = marketTickerData.find(s => s.symbol === sym);
-            estimatedPrice = localStock ? localStock.price : 150;
+            estimatedPrice = 0;
           }
 
           const isFilled = data.status === "filled" && fillPrice > 0;
@@ -1145,16 +1131,7 @@ export function MirofishTerminal() {
             <span className="text-[9px] font-mono text-purple-400/70 uppercase tracking-wider">System Log</span>
           </div>
           <div className="space-y-0.5 max-h-64 overflow-y-auto">
-            {terminalSystemLog.slice(0, visibleLogs).map((log, i) => (
-              <div key={i} className="text-[10px] font-mono py-1 border-b border-white/[0.03] animate-in fade-in duration-500">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-white/30">{log.time}</span>
-                  <span className={`text-[8px] font-bold ${getLevelColor(log.level)}`}>{log.level}</span>
-                  <span className="text-white/50 text-[8px]">{log.module}</span>
-                </div>
-                <p className="text-white/60 leading-tight">{log.message}</p>
-              </div>
-            ))}
+            <div className="text-[10px] font-mono py-4 text-center text-white/15">No system events</div>
           </div>
         </div>
       </div>

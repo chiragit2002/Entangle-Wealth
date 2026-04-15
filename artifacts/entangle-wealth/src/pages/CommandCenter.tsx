@@ -10,10 +10,17 @@ import {
   TrendingUp, Terminal, Clock, Zap, ChevronDown, ChevronUp,
   Activity, AlertTriangle, ExternalLink, RefreshCw, Trophy,
 } from "lucide-react";
-import { councilMessages, terminalOrderFlow, terminalSystemLog } from "@/lib/mock-data";
 import { fetchAlpacaBars, type AlpacaBar } from "@/lib/api";
 
 const CC_STORAGE_KEY = "ew-command-center-layout";
+
+const COUNCIL_INSIGHTS = [
+  "Quantum Consensus Engine is online. Connect your brokerage to see live multi-agent signals.",
+  "6 independent AI agents cross-check every signal before it fires — zero single points of failure.",
+  "Risk Manager agent monitors portfolio exposure 24/7 — even when markets are closed.",
+  "Sentiment model ingests real-time news and social data to detect institutional positioning shifts.",
+  "Momentum and Technical agents vote independently — consensus required before any signal.",
+];
 
 function useUtcClock() {
   const [clock, setClock] = useState(() =>
@@ -281,7 +288,7 @@ function FlashCouncilPanel({ collapsed }: { collapsed: boolean }) {
     const t = setInterval(() => {
       setFading(true);
       setTimeout(() => {
-        setIdx((p) => (p + 1) % councilMessages.length);
+        setIdx((p) => (p + 1) % COUNCIL_INSIGHTS.length);
         setFading(false);
       }, 250);
     }, 3500);
@@ -305,7 +312,7 @@ function FlashCouncilPanel({ collapsed }: { collapsed: boolean }) {
             AI COUNCIL INSIGHT
           </div>
           <p className="text-[10px] font-mono leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
-            {councilMessages[idx]}
+            {COUNCIL_INSIGHTS[idx]}
           </p>
         </div>
         <div className="space-y-1">
@@ -356,7 +363,6 @@ function FlashCouncilPanel({ collapsed }: { collapsed: boolean }) {
 function MirofishPanel({ collapsed }: { collapsed: boolean }) {
   const [commandInput, setCommandInput] = useState("");
   const [history, setHistory] = useState<{ input: string; output: string }[]>([]);
-  const [visibleOrders, setVisibleOrders] = useState(5);
   const [clock, setClock] = useState(new Date().toLocaleTimeString());
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -365,12 +371,6 @@ function MirofishPanel({ collapsed }: { collapsed: boolean }) {
     return () => clearInterval(t);
   }, []);
 
-  useEffect(() => {
-    const t = setInterval(() => {
-      setVisibleOrders((v) => (v >= terminalOrderFlow.length ? 5 : v + 1));
-    }, 2500);
-    return () => clearInterval(t);
-  }, []);
 
   const addOutput = (input: string, output: string) => {
     setHistory((prev) => [...prev.slice(-8), { input, output }]);
@@ -421,45 +421,21 @@ function MirofishPanel({ collapsed }: { collapsed: boolean }) {
         </div>
       </div>
       <div className="flex-1 overflow-hidden grid grid-cols-2 gap-0">
-        <div className="border-r overflow-auto p-2" style={{ borderColor: "rgba(0,180,216,0.07)" }}>
-          <div className="text-[8px] font-mono uppercase tracking-widest mb-1.5" style={{ color: "rgba(0,255,136,0.6)" }}>
+        <div className="border-r overflow-auto p-2 flex flex-col items-center justify-center" style={{ borderColor: "rgba(0,180,216,0.07)" }}>
+          <div className="text-[8px] font-mono uppercase tracking-widest mb-1.5 w-full" style={{ color: "rgba(0,255,136,0.6)" }}>
             Live Order Flow
           </div>
-          {terminalOrderFlow.slice(0, visibleOrders).map((order, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-1.5 text-[9px] font-mono py-0.5 border-b"
-              style={{ borderColor: "rgba(255,255,255,0.03)" }}
-            >
-              <span style={{ color: "rgba(255,255,255,0.25)" }}>{order.time}</span>
-              <span className="font-bold w-7" style={{ color: order.action === "BUY" ? "#00ff88" : "#ff6b6b" }}>
-                {order.action}
-              </span>
-              <span className="font-bold" style={{ color: "rgba(255,255,255,0.85)" }}>{order.symbol}</span>
-              <span className="ml-auto" style={{ color: "rgba(255,255,255,0.5)" }}>${order.price}</span>
-            </div>
-          ))}
+          <p className="text-[9px] font-mono text-center py-6" style={{ color: "rgba(255,255,255,0.15)" }}>
+            No order flow data
+          </p>
         </div>
-        <div className="overflow-auto p-2">
+        <div className="overflow-auto p-2 flex flex-col">
           <div className="text-[8px] font-mono uppercase tracking-widest mb-1.5" style={{ color: "rgba(147,112,219,0.7)" }}>
             System Log
           </div>
-          {terminalSystemLog.slice(0, visibleOrders).map((log, i) => (
-            <div
-              key={i}
-              className="text-[9px] font-mono py-0.5 border-b"
-              style={{ borderColor: "rgba(255,255,255,0.03)" }}
-            >
-              <span style={{ color: "rgba(255,255,255,0.25)" }}>{log.time} </span>
-              <span
-                className="text-[7px] font-bold"
-                style={{ color: log.level === "WARN" ? "#f5c842" : log.level === "DATA" ? "#a78bfa" : "#00B4D8" }}
-              >
-                {log.level}
-              </span>
-              <span style={{ color: "rgba(255,255,255,0.55)" }}> {log.message.slice(0, 40)}</span>
-            </div>
-          ))}
+          <p className="text-[9px] font-mono text-center py-6" style={{ color: "rgba(255,255,255,0.15)" }}>
+            No system events
+          </p>
         </div>
       </div>
       <div className="border-t p-2 flex-shrink-0" style={{ borderColor: "rgba(0,180,216,0.08)" }}>

@@ -6,13 +6,20 @@ import { eq, and } from "drizzle-orm";
 import { logger } from "../logger";
 
 interface TradeExecutedPayload {
-  userId: string;
-  symbol: string;
-  side: string;
-  quantity: number;
-  price: number;
+  userId?: string;
+  symbol?: string;
+  side?: string;
+  quantity?: number;
+  price?: number;
   pnl?: number;
   strategyId?: string;
+  strategy_id?: string;
+  regime?: string;
+  action?: string;
+  result?: {
+    pnl?: number;
+    drawdown?: number;
+  };
   totalCost?: number;
 }
 
@@ -26,6 +33,7 @@ interface EpisodeRecord {
   strategyId: string;
   regime: string;
   pnl: number;
+  drawdown: number;
   timestamp: number;
 }
 
@@ -103,16 +111,24 @@ export class LearningAgent extends BaseAgent {
 
   private async onTradeExecuted(payload: TradeExecutedPayload): Promise<void> {
     try {
-      const { symbol, pnl, strategyId, side } = payload;
+      const pnl = payload.result?.pnl ?? payload.pnl;
       if (pnl === undefined || pnl === null) return;
 
-      const resolvedStrategyId = strategyId || `${side}_${symbol}`.toLowerCase();
-      const regime = this.currentRegimes.get(symbol?.toUpperCase()) || "unknown";
+      const strategyId = payload.strategy_id
+        || payload.strategyId
+        || (payload.side && payload.symbol ? `${payload.side}_${payload.symbol}`.toLowerCase() : "unknown");
+
+      const regime = payload.regime
+        || (payload.symbol ? this.currentRegimes.get(payload.symbol.toUpperCase()) : undefined)
+        || "unknown";
+
+      const drawdown = payload.result?.drawdown ?? 0;
 
       this.episodes.push({
-        strategyId: resolvedStrategyId,
+        strategyId,
         regime,
         pnl,
+        drawdown,
         timestamp: Date.now(),
       });
 
@@ -139,21 +155,23 @@ export class LearningAgent extends BaseAgent {
     const snapshot = [...this.episodes];
     this.episodes = [];
 
-    const insights = new Map<string, { pnls: number[] }>();
+    const insights = new Map<string, { pnls: number[]; drawdowns: number[] }>();
 
     for (const ep of snapshot) {
       const key = `${ep.strategyId}|||${ep.regime}`;
       if (!insights.has(key)) {
-        insights.set(key, { pnls: [] });
+        insights.set(key, { pnls: [], drawdowns: [] });
       }
-      insights.get(key)!.pnls.push(ep.pnl);
+      const bucket = insights.get(key)!;
+      bucket.pnls.push(ep.pnl);
+      bucket.drawdowns.push(ep.drawdown);
     }
 
     let upserted = 0;
 
     for (const [key, data] of insights) {
       const [strategyId, regime] = key.split("|||");
-      const { pnls } = data;
+      const { pnls, drawdowns } = data;
 
       try {
         const existing = await db
@@ -167,9 +185,6 @@ export class LearningAgent extends BaseAgent {
 
         const prev = existing[0];
 
-        const allPnls = prev
-          ? [...Array(prev.samples).fill(prev.avgPnl), ...pnls]
-          : pnls;
         const totalSamples = prev ? prev.samples + pnls.length : pnls.length;
         const totalPnl = (prev?.totalPnl || 0) + pnls.reduce((a, b) => a + b, 0);
         const avgPnl = totalPnl / totalSamples;
@@ -189,7 +204,7 @@ export class LearningAgent extends BaseAgent {
           : prev?.avgLossPnl || 0;
 
         const bestPnl = Math.max(prev?.bestPnl || -Infinity, ...pnls);
-        const maxDrawdown = Math.min(prev?.maxDrawdown || 0, ...pnls);
+        const worstDrawdown = Math.min(prev?.maxDrawdown || 0, ...drawdowns);
 
         if (prev) {
           await db
@@ -201,7 +216,7 @@ export class LearningAgent extends BaseAgent {
               winRate,
               avgWinPnl,
               avgLossPnl,
-              maxDrawdown,
+              maxDrawdown: worstDrawdown,
               bestPnl,
               lastUpdated: new Date(),
             })
@@ -216,7 +231,7 @@ export class LearningAgent extends BaseAgent {
             winRate,
             avgWinPnl,
             avgLossPnl,
-            maxDrawdown,
+            maxDrawdown: worstDrawdown,
             bestPnl,
           });
         }
@@ -248,6 +263,7 @@ export class LearningAgent extends BaseAgent {
     avgPnl: number;
     samples: number;
     winRate: number;
+    maxDrawdown: number;
     signal: "favorable" | "unfavorable" | "neutral" | "insufficient_data";
   } | null> {
     try {
@@ -279,6 +295,7 @@ export class LearningAgent extends BaseAgent {
         avgPnl: row.avgPnl,
         samples: row.samples,
         winRate: row.winRate,
+        maxDrawdown: row.maxDrawdown || 0,
         signal,
       };
     } catch (err) {
@@ -292,6 +309,7 @@ export class LearningAgent extends BaseAgent {
     avgPnl: number;
     samples: number;
     winRate: number;
+    maxDrawdown: number;
   }>> {
     try {
       return await db
@@ -300,6 +318,7 @@ export class LearningAgent extends BaseAgent {
           avgPnl: strategyRegimeInsightsTable.avgPnl,
           samples: strategyRegimeInsightsTable.samples,
           winRate: strategyRegimeInsightsTable.winRate,
+          maxDrawdown: strategyRegimeInsightsTable.maxDrawdown,
         })
         .from(strategyRegimeInsightsTable)
         .where(eq(strategyRegimeInsightsTable.strategyId, strategyId));

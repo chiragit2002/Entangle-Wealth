@@ -5,12 +5,7 @@ import { useSymbolPrices } from "@/contexts/LivePriceContext";
 
 export type WatchlistItem = { symbol: string; signal: string; confidence: number };
 
-const defaultWatchlist: WatchlistItem[] = [
-  { symbol: "NVDA", signal: "BUY", confidence: 87 },
-  { symbol: "AMD", signal: "BUY", confidence: 83 },
-  { symbol: "TSLA", signal: "SELL", confidence: 74 },
-  { symbol: "PLTR", signal: "BUY", confidence: 79 },
-];
+const defaultWatchlist: WatchlistItem[] = [];
 
 interface WatchlistPanelProps {
   externalItems?: WatchlistItem[];
@@ -82,7 +77,7 @@ export function WatchlistPanel({ externalItems, onRemove }: WatchlistPanelProps 
                       </span>
                     </div>
                   ) : (
-                    <div className="text-[10px] font-mono text-white/25">Loading...</div>
+                    <div className="text-[10px] font-mono text-white/25">Price unavailable</div>
                   )}
                 </div>
                 <div className="flex items-center gap-1 text-[10px] font-mono">

@@ -1006,13 +1006,49 @@ export function MirofishTerminal() {
     }
 
     if (cmd === "RISK") {
-      addOutput(rawInput, "Portfolio Risk: 8.4% | Max Drawdown: 0.8% | Beta: 1.35 | Sharpe: 2.1 | Kelly: 14.2%");
+      addOutput(rawInput, "[RISK] Live risk metrics are derived from your portfolio. Use POSITIONS to view holdings. Detailed risk analytics are available on the Dashboard.");
     } else if (cmd === "STATUS") {
-      addOutput(rawInput, `ENTANGLE-CORE: ONLINE | 7 AI Models Active | 5,000 NASDAQ Stocks | Tax: ${taxSettings.visible ? "ON" : "OFF"} (${(taxSettings.bracket * 100).toFixed(0)}% bracket, ${taxSettings.lotMethod}) | Uptime: 99.97%`);
+      addOutput(rawInput, `ENTANGLE-CORE: ONLINE | 5,000 NASDAQ Stocks indexed | Tax: ${taxSettings.visible ? "ON" : "OFF"} (${(taxSettings.bracket * 100).toFixed(0)}% bracket, ${taxSettings.lotMethod})`);
     } else if (cmd === "SIGNALS") {
-      addOutput(rawInput, "Active: NVDA BUY 87% | AMD BUY 83% | PLTR BUY 79% | TSLA SELL 74% | AAPL HOLD 52%");
+      if (!isSignedIn) { addOutput(rawInput, "[ERROR] Sign in required."); return; }
+      addOutput(rawInput, "[QUANTUM] Fetching active signals...");
+      try {
+        const token = await getToken();
+        const res = await fetch("/api/quant/signals", { headers: { Authorization: `Bearer ${token}` } });
+        if (res.ok) {
+          const data: { signals?: { symbol: string; action?: string; signal?: string; confidence: number }[] } = await res.json();
+          const signals = data.signals ?? [];
+          if (signals.length > 0) {
+            const top5 = signals.slice(0, 5).map(s => `${s.symbol} ${s.action ?? s.signal ?? "?"} ${s.confidence}%`).join(" | ");
+            appendOutput(`[SIGNALS] Active: ${top5}`);
+          } else {
+            appendOutput("[SIGNALS] No signals currently available. The quant engine may still be processing.");
+          }
+        } else {
+          appendOutput("[SIGNALS] Signal data unavailable.");
+        }
+      } catch {
+        appendOutput("[SIGNALS] Signal data unavailable.");
+      }
     } else if (cmd === "PORTFOLIO") {
-      addOutput(rawInput, "Value: $15,620 | Day P&L: +$1,420 (+10.0%) | Open Positions: 5 | Cash: $8,380");
+      if (!isSignedIn) { addOutput(rawInput, "[ERROR] Sign in required."); return; }
+      addOutput(rawInput, "[PAPER] Fetching portfolio summary...");
+      try {
+        const token = await getToken();
+        const res = await fetch("/api/alpaca/account", { headers: { Authorization: `Bearer ${token}` } });
+        if (res.ok) {
+          const data = await res.json();
+          const equity = parseFloat(data.equity || data.portfolio_value || "0");
+          const lastEquity = parseFloat(data.last_equity || "0");
+          const dayPL = lastEquity > 0 ? equity - lastEquity : 0;
+          const cash = parseFloat(data.cash || data.buying_power || "0");
+          appendOutput(`[PORTFOLIO] Value: $${equity.toFixed(2)} | Day P&L: ${dayPL >= 0 ? "+" : ""}$${dayPL.toFixed(2)} | Cash: $${cash.toFixed(2)}`);
+        } else {
+          appendOutput("[PORTFOLIO] Data unavailable — ensure paper trading account is connected.");
+        }
+      } catch {
+        appendOutput("[PORTFOLIO] Data unavailable — ensure paper trading account is connected.");
+      }
     } else if (cmd === "CLEAR") {
       setCommandHistory([]);
       setCommandInput("");

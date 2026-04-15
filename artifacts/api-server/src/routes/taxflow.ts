@@ -7,8 +7,25 @@ import { resolveUserId } from "../lib/resolveUserId";
 import { logger } from "../lib/logger";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { getStockBySymbol } from "../data/nasdaq-stocks";
+import { validateQuery, z } from "../lib/validateRequest";
 
 const router = Router();
+
+const TaxflowImpactQuerySchema = z.object({
+  symbol: z.string().max(20).optional().default(""),
+  side: z.enum(["buy", "sell"]).optional().default("buy"),
+  qty: z.coerce.number().int().min(0).optional().default(0),
+  price: z.coerce.number().min(0).optional().default(0),
+  bracket: z.coerce.number().min(0).max(1).optional().default(0.24),
+  state: z.string().max(2).optional().default(""),
+  method: z.enum(["FIFO", "LIFO"]).optional().default("FIFO"),
+});
+
+const TaxflowSummaryQuerySchema = z.object({
+  bracket: z.coerce.number().min(0).max(1).optional().default(0.24),
+  state: z.string().max(2).optional().default(""),
+  method: z.enum(["FIFO", "LIFO"]).optional().default("FIFO"),
+});
 
 interface TaxLot {
   tradeId: number;
@@ -228,7 +245,7 @@ function computeRealizedEvents(trades: { id: number; symbol: string; side: strin
   return events;
 }
 
-router.get("/taxflow/impact", requireAuth, async (req, res) => {
+router.get("/taxflow/impact", requireAuth, validateQuery(TaxflowImpactQuerySchema), async (req, res) => {
   try {
     const clerkId = (req as AuthenticatedRequest).userId;
     const dbUserId = await resolveUserId(clerkId, req);
@@ -237,14 +254,17 @@ router.get("/taxflow/impact", requireAuth, async (req, res) => {
       return;
     }
 
-    const { symbol, side, qty, price, bracket, state, method } = req.query;
-    const sym = (symbol as string || "").toUpperCase();
-    const tradeSide = (side as string || "buy").toLowerCase();
-    const tradeQty = parseInt(qty as string) || 0;
-    const tradePrice = parseFloat(price as string) || 0;
-    const taxBracket = parseFloat(bracket as string) || 0.24;
-    const stateCode = (state as string || "").toUpperCase();
-    const lotMethod = ((method as string) || "FIFO").toUpperCase() as "FIFO" | "LIFO";
+    const q = req.query as unknown as {
+      symbol: string; side: "buy" | "sell"; qty: number; price: number;
+      bracket: number; state: string; method: "FIFO" | "LIFO";
+    };
+    const sym = q.symbol.toUpperCase();
+    const tradeSide = q.side;
+    const tradeQty = q.qty;
+    const tradePrice = q.price;
+    const taxBracket = q.bracket;
+    const stateCode = q.state.toUpperCase();
+    const lotMethod = q.method;
 
     const trades = await getAllTrades(dbUserId);
     const totalValue = tradeQty * tradePrice;
@@ -363,7 +383,7 @@ router.get("/taxflow/impact", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/taxflow/summary", requireAuth, async (req, res) => {
+router.get("/taxflow/summary", requireAuth, validateQuery(TaxflowSummaryQuerySchema), async (req, res) => {
   try {
     const clerkId = (req as AuthenticatedRequest).userId;
     const dbUserId = await resolveUserId(clerkId, req);
@@ -372,9 +392,10 @@ router.get("/taxflow/summary", requireAuth, async (req, res) => {
       return;
     }
 
-    const bracket = parseFloat(req.query.bracket as string) || 0.24;
-    const stateCode = ((req.query.state as string) || "").toUpperCase();
-    const method = ((req.query.method as string) || "FIFO").toUpperCase() as "FIFO" | "LIFO";
+    const q = req.query as unknown as { bracket: number; state: string; method: "FIFO" | "LIFO" };
+    const bracket = q.bracket;
+    const stateCode = q.state.toUpperCase();
+    const method = q.method;
 
     const trades = await getAllTrades(dbUserId);
     const events = computeRealizedEvents(trades, method);
@@ -449,7 +470,7 @@ router.get("/taxflow/summary", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/taxflow/projection", requireAuth, async (req, res) => {
+router.get("/taxflow/projection", requireAuth, validateQuery(TaxflowSummaryQuerySchema), async (req, res) => {
   try {
     const clerkId = (req as AuthenticatedRequest).userId;
     const dbUserId = await resolveUserId(clerkId, req);
@@ -458,9 +479,10 @@ router.get("/taxflow/projection", requireAuth, async (req, res) => {
       return;
     }
 
-    const bracket = parseFloat(req.query.bracket as string) || 0.24;
-    const stateCode = ((req.query.state as string) || "").toUpperCase();
-    const method = ((req.query.method as string) || "FIFO").toUpperCase() as "FIFO" | "LIFO";
+    const q = req.query as unknown as { bracket: number; state: string; method: "FIFO" | "LIFO" };
+    const bracket = q.bracket;
+    const stateCode = q.state.toUpperCase();
+    const method = q.method;
 
     const trades = await getAllTrades(dbUserId);
     const events = computeRealizedEvents(trades, method);
@@ -514,7 +536,12 @@ router.get("/taxflow/projection", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/taxflow/optimize/:symbol", requireAuth, async (req, res) => {
+const TaxflowOptimizeQuerySchema = z.object({
+  bracket: z.coerce.number().min(0).max(1).optional().default(0.24),
+  method: z.enum(["FIFO", "LIFO"]).optional().default("FIFO"),
+});
+
+router.get("/taxflow/optimize/:symbol", requireAuth, validateQuery(TaxflowOptimizeQuerySchema), async (req, res) => {
   try {
     const clerkId = (req as AuthenticatedRequest).userId;
     const dbUserId = await resolveUserId(clerkId, req);
@@ -524,8 +551,9 @@ router.get("/taxflow/optimize/:symbol", requireAuth, async (req, res) => {
     }
 
     const sym = (req.params.symbol as string).toUpperCase();
-    const bracket = parseFloat(req.query.bracket as string) || 0.24;
-    const method = ((req.query.method as string) || "FIFO").toUpperCase() as "FIFO" | "LIFO";
+    const q = req.query as unknown as { bracket: number; method: "FIFO" | "LIFO" };
+    const bracket = q.bracket;
+    const method = q.method;
 
     const trades = await getAllTrades(dbUserId);
     const lots = buildOpenLots(trades, method);
@@ -600,7 +628,7 @@ router.get("/taxflow/optimize/:symbol", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/taxflow/harvest", requireAuth, async (req, res) => {
+router.get("/taxflow/harvest", requireAuth, validateQuery(TaxflowOptimizeQuerySchema), async (req, res) => {
   try {
     const clerkId = (req as AuthenticatedRequest).userId;
     const dbUserId = await resolveUserId(clerkId, req);
@@ -609,8 +637,9 @@ router.get("/taxflow/harvest", requireAuth, async (req, res) => {
       return;
     }
 
-    const bracket = parseFloat(req.query.bracket as string) || 0.24;
-    const method = ((req.query.method as string) || "FIFO").toUpperCase() as "FIFO" | "LIFO";
+    const q = req.query as unknown as { bracket: number; method: "FIFO" | "LIFO" };
+    const bracket = q.bracket;
+    const method = q.method;
 
     const trades = await getAllTrades(dbUserId);
     const lots = buildOpenLots(trades, method);
@@ -675,7 +704,7 @@ router.get("/taxflow/harvest", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/taxflow/export", requireAuth, async (req, res) => {
+router.get("/taxflow/export", requireAuth, validateQuery(TaxflowOptimizeQuerySchema), async (req, res) => {
   try {
     const clerkId = (req as AuthenticatedRequest).userId;
     const dbUserId = await resolveUserId(clerkId, req);
@@ -684,8 +713,9 @@ router.get("/taxflow/export", requireAuth, async (req, res) => {
       return;
     }
 
-    const bracket = parseFloat(req.query.bracket as string) || 0.24;
-    const method = ((req.query.method as string) || "FIFO").toUpperCase() as "FIFO" | "LIFO";
+    const q = req.query as unknown as { bracket: number; method: "FIFO" | "LIFO" };
+    const bracket = q.bracket;
+    const method = q.method;
 
     const trades = await getAllTrades(dbUserId);
     const events = computeRealizedEvents(trades, method);

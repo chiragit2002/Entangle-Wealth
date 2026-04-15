@@ -159,11 +159,12 @@ router.post("/integrations/accounting/sync", requireAuth, async (req, res) => {
 
     res.json({
       success: true,
+      syncStatus: "connected_not_syncing",
       lastSyncAt: new Date().toISOString(),
       summary: {
         receiptsImported: 0,
         expensesCategorized: 0,
-        message: "Sync initiated. Expenses will appear in your receipt tracker shortly.",
+        message: "Connection timestamp updated. Automatic expense import is not yet active — data will sync once the integration is fully configured.",
       },
     });
   } catch (err) {

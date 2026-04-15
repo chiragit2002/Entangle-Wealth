@@ -40,60 +40,65 @@ const VALID_SORT_FIELDS = ["symbol", "name", "price", "changePercent", "volume",
 type StockSortField = typeof VALID_SORT_FIELDS[number];
 
 router.get("/stocks", validateQuery(StocksQuerySchema), (req, res) => {
-  const query = (req.query.q as string) || "";
-  const sector = req.query.sector as string | undefined;
-  const capTier = req.query.capTier as string | undefined;
-  const { page, limit } = req.query as unknown as { page: number; limit: number };
-  const sortBy = ((req.query.sortBy as string) || "symbol") as StockSortField;
-  const sortDir = (req.query.sortDir as string) === "desc" ? "desc" : "asc";
-  const isValidSort = VALID_SORT_FIELDS.includes(sortBy);
+  try {
+    const query = (req.query.q as string) || "";
+    const sector = req.query.sector as string | undefined;
+    const capTier = req.query.capTier as string | undefined;
+    const { page, limit } = req.query as unknown as { page: number; limit: number };
+    const sortBy = ((req.query.sortBy as string) || "symbol") as StockSortField;
+    const sortDir = (req.query.sortDir as string) === "desc" ? "desc" : "asc";
+    const isValidSort = VALID_SORT_FIELDS.includes(sortBy);
 
-  let results: NasdaqStock[];
+    let results: NasdaqStock[];
 
-  if (query) {
-    // Full-text search: retrieve then filter and sort at request time
-    results = searchStocks(query, 5000);
-    if (sector) results = results.filter(s => s.sector === sector);
-    if (capTier) results = results.filter(s => s.capTier === capTier);
-    if (isValidSort) {
-      results = [...results].sort((a, b) => {
-        const aVal = a[sortBy], bVal = b[sortBy];
-        if (typeof aVal === "string" && typeof bVal === "string") {
-          return sortDir === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-        }
-        return sortDir === "asc" ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
-      });
+    if (query) {
+      // Full-text search: retrieve then filter and sort at request time
+      results = searchStocks(query, 5000);
+      if (sector) results = results.filter(s => s.sector === sector);
+      if (capTier) results = results.filter(s => s.capTier === capTier);
+      if (isValidSort) {
+        results = [...results].sort((a, b) => {
+          const aVal = a[sortBy], bVal = b[sortBy];
+          if (typeof aVal === "string" && typeof bVal === "string") {
+            return sortDir === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+          }
+          return sortDir === "asc" ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
+        });
+      }
+    } else if (sector || capTier) {
+      // Filter-only: use pre-built index then sort the (much smaller) result set
+      results = getFilteredStocks(sector, capTier);
+      if (isValidSort) {
+        results = [...results].sort((a, b) => {
+          const aVal = a[sortBy], bVal = b[sortBy];
+          if (typeof aVal === "string" && typeof bVal === "string") {
+            return sortDir === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+          }
+          return sortDir === "asc" ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
+        });
+      }
+    } else {
+      // No search query, no filter: use pre-sorted full index directly
+      results = isValidSort ? getSortedStocks(sortBy, sortDir) : getSortedStocks();
     }
-  } else if (sector || capTier) {
-    // Filter-only: use pre-built index then sort the (much smaller) result set
-    results = getFilteredStocks(sector, capTier);
-    if (isValidSort) {
-      results = [...results].sort((a, b) => {
-        const aVal = a[sortBy], bVal = b[sortBy];
-        if (typeof aVal === "string" && typeof bVal === "string") {
-          return sortDir === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-        }
-        return sortDir === "asc" ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
-      });
-    }
-  } else {
-    // No search query, no filter: use pre-sorted full index directly
-    results = isValidSort ? getSortedStocks(sortBy, sortDir) : getSortedStocks();
+
+    const total = results.length;
+    const offset = (page - 1) * limit;
+    const paged = results.slice(offset, offset + limit);
+
+    res.json({
+      stocks: paged,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (err) {
+    logger.error({ err }, "GET /stocks failed");
+    res.status(500).json({ error: "Failed to fetch stocks" });
   }
-
-  const total = results.length;
-  const offset = (page - 1) * limit;
-  const paged = results.slice(offset, offset + limit);
-
-  res.json({
-    stocks: paged,
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    },
-  });
 });
 
 const SearchQuerySchema = z.object({

@@ -2,6 +2,7 @@ import { Router } from "express";
 import type { Request } from "express";
 import { getAuth } from "@clerk/express";
 import { db } from "@workspace/db";
+import { requireAuth } from "../middlewares/requireAuth.js";
 import { customStrategiesTable } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
@@ -183,7 +184,7 @@ router.get("/quant/status", (_req, res) => {
   }
 });
 
-router.post("/quant/run", async (req, res) => {
+router.post("/quant/run", requireAuth, async (req, res) => {
   try {
     const status = getEngineStatus();
     if (status.isRunning) {

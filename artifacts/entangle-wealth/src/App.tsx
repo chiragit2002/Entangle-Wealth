@@ -184,7 +184,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/technical">{() => <LazyChart component={TechnicalAnalysis} />}</Route>
             <Route path="/screener">{() => <LazyTable component={Screener} />}</Route>
             <Route path="/terminal">{() => <LazyProtected component={Terminal} />}</Route>
-            <Route path="/quant-signals">{() => <LazyProtected component={QuantSignalsPage} />}</Route>
+            <Route path="/quant-signals">{() => <Redirect to="/quant" />}</Route>
             <Route path="/quant">{() => <LazyProtected component={QuantSignalsPage} />}</Route>
             <Route path="/options">{() => <LazyProtected component={Options} />}</Route>
             <Route path="/alerts">{() => <LazyProtected component={AlertsPage} />}</Route>
@@ -207,7 +207,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/accessibility">{() => <LazyPage component={AccessibilityPage} />}</Route>
             <Route path="/strategy-builder">{() => <LazyProtected component={StrategyBuilderPage} />}</Route>
             <Route path="/evaluate">{() => <LazyPage component={StrategyEvaluatorPage} />}</Route>
-            <Route path="/evaluator">{() => <LazyPage component={StrategyEvaluatorPage} />}</Route>
+            <Route path="/evaluator">{() => <Redirect to="/evaluate" />}</Route>
             <Route path="/eval-pipeline">{() => <LazyProtected component={EvalPipelinePage} />}</Route>
             <Route path="/admin/:rest*">{() => <LazyAdmin component={AdminHubPage} />}</Route>
             <Route path="/admin">{() => <LazyAdmin component={AdminHubPage} />}</Route>
@@ -238,7 +238,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/gigs">{() => <LazyPage component={Gigs} />}</Route>
             <Route path="/jobs">{() => <LazyPage component={Jobs} />}</Route>
             <Route path="/case-study/:slug">{() => <LazyPage component={CaseStudy} />}</Route>
-            <Route path="/case-study">{() => <LazyPage component={CaseStudy} />}</Route>
+            <Route path="/case-study">{() => <Redirect to="/case-study/platform-comparison" />}</Route>
             <Route component={NotFound} />
           </Switch>
           <CookieConsentBanner />

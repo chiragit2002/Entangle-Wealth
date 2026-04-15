@@ -17,21 +17,24 @@ interface TickerItem {
 function MarketTickerBase() {
   const { prices } = useSymbolPrices(TICKER_SYMBOLS);
   const [baseItems, setBaseItems] = useState<TickerItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     fetch("/api/alpaca/movers")
       .then(r => r.ok ? r.json() : null)
       .then((data: { all?: { symbol: string; price: number; change: number }[] } | null) => {
-        if (!data?.all?.length) return;
-        const mapped: TickerItem[] = data.all.slice(0, 15).map(m => ({
-          symbol: m.symbol,
-          price: m.price,
-          changePercent: m.change,
-          isPositive: m.change >= 0,
-        }));
-        setBaseItems(mapped);
+        if (data?.all?.length) {
+          const mapped: TickerItem[] = data.all.slice(0, 15).map(m => ({
+            symbol: m.symbol,
+            price: m.price,
+            changePercent: m.change,
+            isPositive: m.change >= 0,
+          }));
+          setBaseItems(mapped);
+        }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoaded(true));
   }, []);
 
   const items: TickerItem[] = baseItems.map(item => {
@@ -47,7 +50,15 @@ function MarketTickerBase() {
     return item;
   });
 
-  if (items.length === 0) return null;
+  if (!loaded) return null;
+
+  if (items.length === 0) {
+    return (
+      <div className="w-full bg-black/90 border-b border-white/10 py-2 flex items-center justify-center relative z-20">
+        <span className="text-xs font-mono text-white/30">Market data unavailable</span>
+      </div>
+    );
+  }
 
   const doubled = [...items, ...items, ...items];
 

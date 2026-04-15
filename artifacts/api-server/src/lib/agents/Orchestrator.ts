@@ -9,6 +9,10 @@ import { KillSwitchAgent } from "./KillSwitchAgent";
 import { DriftAgent } from "./DriftAgent";
 import { EnsembleAgent } from "./EnsembleAgent";
 import { AllocationAgent } from "./AllocationAgent";
+import { LearningAgent } from "./LearningAgent";
+import { PatternAgent } from "./PatternAgent";
+import { agentRegistry } from "./AgentRegistry";
+import { eventBus } from "./EventBus";
 import type { ExecutionDecision } from "./ExecutionAgent";
 import type { AllocationDecision } from "./AllocationAgent";
 import type { RegimeResult } from "./RegimeAgent";
@@ -43,6 +47,8 @@ export interface OrchestratorResult {
   };
   ensembleConsensus: string;
   driftRecommendation: string;
+  learnedBlock: boolean;
+  learnedInsight: string | null;
   stageTimings: {
     marketAnalysisMs: number;
     evaluationMs: number;
@@ -64,7 +70,6 @@ export class Orchestrator {
   private driftAgent: DriftAgent;
   private ensembleAgent: EnsembleAgent;
   private allocationAgent: AllocationAgent;
-
   constructor(
     regimeAgent: RegimeAgent,
     volatilityAgent: VolatilityAgent,
@@ -89,6 +94,16 @@ export class Orchestrator {
     this.allocationAgent = allocationAgent;
   }
 
+  private getLearning(): LearningAgent | null {
+    const a = agentRegistry.get("Learning");
+    return a instanceof LearningAgent ? a : null;
+  }
+
+  private getPattern(): PatternAgent | null {
+    const a = agentRegistry.get("Pattern");
+    return a instanceof PatternAgent ? a : null;
+  }
+
   async runCycle(input: OrchestratorInput): Promise<OrchestratorResult> {
     const totalStart = Date.now();
     const { strategyId, symbol, timeframe, action, ohlcv } = input;
@@ -101,6 +116,46 @@ export class Orchestrator {
       Promise.resolve(this.liquidityAgent.analyzeLiquidity(ohlcv.closes, ohlcv.highs, ohlcv.lows, ohlcv.volumes, symbol)),
     ]);
     const marketAnalysisMs = Date.now() - t1;
+
+    // Step 1.5: Check learned failure patterns before evaluation
+    let learnedBlock = false;
+    let learnedInsight: string | null = null;
+    const patternAgent = this.getPattern();
+    const learningAgent = this.getLearning();
+
+    if (patternAgent) {
+      const report = patternAgent.getLatestReport();
+      if (report) {
+        const failure = report.failures.find(
+          f => f.strategy_id === strategyId && f.regime === regime.regime,
+        );
+        if (failure && failure.severity === "critical") {
+          learnedBlock = true;
+          learnedInsight = failure.description;
+          logger.info({
+            strategyId,
+            regime: regime.regime,
+            insight: failure.description,
+            confidence: failure.confidence,
+          }, "[Orchestrator] Blocking decision due to learned failure pattern");
+        }
+      }
+    }
+
+    if (!learnedBlock && learningAgent) {
+      const insight = await learningAgent.getInsight(strategyId, regime.regime);
+      if (insight && insight.signal === "unfavorable" && insight.confidence >= 0.7 && insight.samples >= 10) {
+        learnedBlock = true;
+        learnedInsight = insight.insight;
+        logger.info({
+          strategyId,
+          regime: regime.regime,
+          insight: insight.insight,
+          confidence: insight.confidence,
+          samples: insight.samples,
+        }, "[Orchestrator] Blocking decision due to high-confidence unfavorable insight");
+      }
+    }
 
     // Step 2: Parallel — StrategyAgent evaluation + runAllModels + StressEngine
     const t2 = Date.now();
@@ -186,6 +241,16 @@ export class Orchestrator {
     }
     const killSwitchMs = Date.now() - t5;
 
+    // Step 5.5: Learned failure block — override to HOLD
+    if (learnedBlock && decision.action !== "EXIT") {
+      const originalAction = decision.action;
+      const originalRationale = decision.rationale;
+      decision.action = "HOLD";
+      decision.rationale = `[LEARNED BLOCK] ${learnedInsight} | Original ${originalAction}: ${originalRationale}`;
+      decision.score = 0;
+      decision.confidence = 0;
+    }
+
     // DriftAgent: record score and check for drift
     const driftReport = this.driftAgent.recordScore(strategyId, decision.score);
 
@@ -201,6 +266,24 @@ export class Orchestrator {
       });
     }
 
+    // Step 6: Store episode in LearningAgent memory via EventBus
+    eventBus.publish({
+      eventType: "trade_executed",
+      sourceAgent: "Orchestrator",
+      payload: {
+        strategy_id: strategyId,
+        symbol,
+        regime: regime.regime,
+        action: decision.action,
+        result: {
+          pnl: decision.score,
+          drawdown: stressResult.totalPenalty ? -Math.abs(stressResult.totalPenalty) : 0,
+        },
+      },
+    }).catch(err => {
+      logger.warn({ err }, "[Orchestrator] Failed to publish trade_executed episode");
+    });
+
     return {
       strategyId,
       symbol,
@@ -211,6 +294,8 @@ export class Orchestrator {
       marketContext: { regime, volatility, liquidity },
       ensembleConsensus: ensembleRanking.consensusLevel,
       driftRecommendation: driftReport.recommendation,
+      learnedBlock,
+      learnedInsight,
       stageTimings: {
         marketAnalysisMs,
         evaluationMs,

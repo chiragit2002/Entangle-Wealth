@@ -110,7 +110,7 @@ export function FirstVisitTooltips() {
     <>
       <div className="fixed inset-0 z-[90] bg-black/30" onClick={handleDismiss} />
       <div
-        className="fixed z-[91] w-[280px] bg-[#0a0a14] border border-[#FF8C00]/20 rounded-lg p-3 shadow-xl shadow-[#FF8C00]/10 animate-in fade-in slide-in-from-bottom-2 duration-300"
+        className="fixed z-[91] w-[280px] bg-[#0a0a14] border border-[#00B4D8]/20 rounded-lg p-3 shadow-xl shadow-[#00B4D8]/10 animate-in fade-in slide-in-from-bottom-2 duration-300"
         style={style}
       >
         <div className="flex items-start justify-between gap-2">
@@ -125,7 +125,7 @@ export function FirstVisitTooltips() {
         </div>
         <button
           onClick={handleDismiss}
-          className="text-[10px] font-mono text-[#FF8C00] mt-2 hover:underline"
+          className="text-[10px] font-mono text-[#00B4D8] mt-2 hover:underline"
         >
           Got it
         </button>

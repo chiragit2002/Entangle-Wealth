@@ -61,8 +61,8 @@ export function InstallPrompt() {
       <div
         className="rounded-sm p-4 flex items-start gap-3"
         style={{
-          background: "linear-gradient(135deg, rgba(255,140,0,0.12), rgba(0,40,60,0.95))",
-          border: "1px solid rgba(255,140,0,0.2)",
+          background: "linear-gradient(135deg, rgba(0,180,216,0.12), rgba(0,40,60,0.95))",
+          border: "1px solid rgba(0,180,216,0.2)",
           backdropFilter: "blur(20px)",
           boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
         }}
@@ -78,7 +78,7 @@ export function InstallPrompt() {
           <button
             onClick={handleInstall}
             className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-black transition-opacity hover:opacity-90"
-            style={{ background: "linear-gradient(135deg, #FF8C00, #0099cc)" }}
+            style={{ background: "linear-gradient(135deg, #00B4D8, #0099cc)" }}
           >
             <Download className="w-3.5 h-3.5" />
             Install App

@@ -11,7 +11,7 @@ const TIER_COLORS: Record<string, string> = {
   Silver: "#c0c0c0",
   Gold: "#FFB800",
   Platinum: "#e5e4e2",
-  Diamond: "#FF8C00",
+  Diamond: "#00B4D8",
 };
 
 const TIER_ICONS: Record<string, string> = {
@@ -132,7 +132,7 @@ export function GamificationWidget() {
             </div>
             <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
               <p className="text-[7px] font-mono text-white/30">MULTIPLIER</p>
-              <p className="text-[11px] font-mono font-bold text-[#FF8C00]">{data.streak.multiplier.toFixed(1)}x</p>
+              <p className="text-[11px] font-mono font-bold text-[#00B4D8]">{data.streak.multiplier.toFixed(1)}x</p>
             </div>
           </div>
 
@@ -147,7 +147,7 @@ export function GamificationWidget() {
           <div className="flex gap-1">
             <button
               onClick={handleCheckin}
-              className="flex-1 flex items-center justify-center gap-1 h-7 text-[9px] font-mono font-bold rounded-sm bg-[#FF8C00]/10 text-[#FF8C00] border border-[#FF8C00]/20 hover:bg-[#FF8C00]/20 transition-colors"
+              className="flex-1 flex items-center justify-center gap-1 h-7 text-[9px] font-mono font-bold rounded-sm bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/20 hover:bg-[#00B4D8]/20 transition-colors"
             >
               <Flame className="w-3 h-3" />
               CHECK IN
@@ -183,7 +183,7 @@ export function GamificationWidget() {
           )}
 
           <div className="flex items-center justify-end pt-0.5">
-            <a href="/achievements" className="flex items-center gap-0.5 text-[8px] font-mono text-[#FF8C00]/50 hover:text-[#FF8C00] transition-colors">
+            <a href="/achievements" className="flex items-center gap-0.5 text-[8px] font-mono text-[#00B4D8]/50 hover:text-[#00B4D8] transition-colors">
               View All <ChevronRight className="w-2.5 h-2.5" />
             </a>
           </div>

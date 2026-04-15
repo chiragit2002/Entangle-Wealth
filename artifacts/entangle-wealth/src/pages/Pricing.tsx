@@ -24,7 +24,7 @@ const plans = [
     tier: "free",
     price: "$0",
     period: "Free forever",
-    color: "text-[#FF8C00]",
+    color: "text-[#00B4D8]",
     icon: Zap,
     features: [
       { text: "3 signals per day", on: true },
@@ -66,7 +66,7 @@ const plans = [
     tier: "enterprise",
     price: "$79",
     period: "per month · For teams · After free trial",
-    color: "text-[#FF8C00]",
+    color: "text-[#00B4D8]",
     icon: Users,
     features: [
       { text: "Everything in Pro", on: true },
@@ -205,15 +205,15 @@ export default function Pricing() {
           </div>
         )}
         {promo?.active && (
-          <div className="mb-8 relative overflow-hidden rounded-sm border border-[#FF8C00]/30 bg-gradient-to-r from-[#FF8C00]/10 via-[#FF8C00]/10 to-[#FFB800]/10 p-6 text-center">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#FF8C00]/5 to-transparent animate-pulse" />
+          <div className="mb-8 relative overflow-hidden rounded-sm border border-[#00B4D8]/30 bg-gradient-to-r from-[#00B4D8]/10 via-[#00B4D8]/10 to-[#FFB800]/10 p-6 text-center">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#00B4D8]/5 to-transparent animate-pulse" />
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 bg-[#FF8C00]/20 rounded-full px-4 py-1.5 mb-3">
-                <Sparkles className="w-4 h-4 text-[#FF8C00]" />
-                <span className="text-sm font-black text-[#FF8C00] uppercase tracking-wider">Launch Window — Limited Time</span>
+              <div className="inline-flex items-center gap-2 bg-[#00B4D8]/20 rounded-full px-4 py-1.5 mb-3">
+                <Sparkles className="w-4 h-4 text-[#00B4D8]" />
+                <span className="text-sm font-black text-[#00B4D8] uppercase tracking-wider">Launch Window — Limited Time</span>
               </div>
               <h2 className="text-2xl md:text-3xl font-black text-foreground mb-2">
-                Full Pro access. <span className="text-[#FF8C00]">Zero cost.</span>
+                Full Pro access. <span className="text-[#00B4D8]">Zero cost.</span>
               </h2>
               <p className="text-muted-foreground text-sm md:text-base">
                 Every Pro feature unlocked until{" "}
@@ -245,19 +245,19 @@ export default function Pricing() {
               <p className="text-sm font-bold text-white/70">avg saved per year</p>
               <p className="text-xs text-white/35 mt-1">What Pro users recover in overlooked tax deductions alone</p>
             </div>
-            <div className="relative overflow-hidden bg-[#0a0a14] border border-[#FF8C00]/25 rounded-xl p-5 text-center">
-              <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at top, rgba(255,140,0,0.08) 0%, transparent 70%)" }} />
-              <TrendingUp className="w-6 h-6 text-[#FF8C00] mx-auto mb-2" />
-              <p className="text-2xl font-black text-[#FF8C00] mb-0.5">
+            <div className="relative overflow-hidden bg-[#0a0a14] border border-[#00B4D8]/25 rounded-xl p-5 text-center">
+              <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at top, rgba(0,180,216,0.08) 0%, transparent 70%)" }} />
+              <TrendingUp className="w-6 h-6 text-[#00B4D8] mx-auto mb-2" />
+              <p className="text-2xl font-black text-[#00B4D8] mb-0.5">
                 <span className="line-through text-white/20 text-lg mr-1">$99</span>$29
               </p>
               <p className="text-sm font-bold text-white/70">less than $1/day</p>
               <p className="text-xs text-white/35 mt-1">Bloomberg Terminal costs $2,000+/month. We charge $29.</p>
             </div>
-            <div className="relative overflow-hidden bg-[#0a0a14] border border-[#FF8C00]/25 rounded-xl p-5 text-center">
-              <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at top, rgba(255,140,0,0.08) 0%, transparent 70%)" }} />
-              <Clock className="w-6 h-6 text-[#FF8C00] mx-auto mb-2" />
-              <p className="text-2xl font-black text-[#FF8C00] mb-0.5">30 days</p>
+            <div className="relative overflow-hidden bg-[#0a0a14] border border-[#00B4D8]/25 rounded-xl p-5 text-center">
+              <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at top, rgba(0,180,216,0.08) 0%, transparent 70%)" }} />
+              <Clock className="w-6 h-6 text-[#00B4D8] mx-auto mb-2" />
+              <p className="text-2xl font-black text-[#00B4D8] mb-0.5">30 days</p>
               <p className="text-sm font-bold text-white/70">completely free</p>
               <p className="text-xs text-white/35 mt-1">Full Pro access. If it's not worth it, cancel. No questions.</p>
             </div>
@@ -296,7 +296,7 @@ export default function Pricing() {
                     <div key={f.text} className={`pricing-feature ${f.on ? "on" : ""}`}>
                       <span className="w-5 text-center flex-shrink-0">
                         {f.on ? (
-                          <Check className="w-4 h-4 text-[#FF8C00] inline" />
+                          <Check className="w-4 h-4 text-[#00B4D8] inline" />
                         ) : (
                           <X className="w-4 h-4 text-muted-foreground/40 inline" />
                         )}
@@ -315,7 +315,7 @@ export default function Pricing() {
                     plan.ctaStyle === "gold"
                       ? "bg-gradient-to-r from-[#FFB800] to-[#cc9900] text-black hover:opacity-90"
                       : plan.ctaStyle === "blue"
-                      ? "bg-gradient-to-r from-[#FF8C00] to-[#0099cc] text-black hover:opacity-90"
+                      ? "bg-gradient-to-r from-[#00B4D8] to-[#0099cc] text-black hover:opacity-90"
                       : "bg-white/5 border border-white/10 text-muted-foreground hover:bg-white/10"
                   }`}
                 >

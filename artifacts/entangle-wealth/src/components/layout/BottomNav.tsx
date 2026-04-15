@@ -19,7 +19,7 @@ function BottomNavComponent() {
       aria-label="Main navigation"
       style={{
         background: "var(--bottomnav-bg)",
-        borderTop: "1px solid rgba(255,140,0,0.12)",
+        borderTop: "1px solid rgba(0,180,216,0.12)",
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >

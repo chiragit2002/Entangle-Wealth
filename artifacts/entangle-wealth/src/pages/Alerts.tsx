@@ -11,11 +11,11 @@ import { UpgradePrompt, useUpgradePrompt } from "@/components/UpgradePrompt";
 import { StockSearchDropdown } from "@/components/StockSearchDropdown";
 
 const ALERT_TYPE_OPTIONS = [
-  { value: "price_above", label: "Price Above", icon: TrendingUp, color: "#FF8C00", needsThreshold: true, thresholdLabel: "Target Price ($)" },
+  { value: "price_above", label: "Price Above", icon: TrendingUp, color: "#00B4D8", needsThreshold: true, thresholdLabel: "Target Price ($)" },
   { value: "price_below", label: "Price Below", icon: TrendingDown, color: "#ff3366", needsThreshold: true, thresholdLabel: "Target Price ($)" },
   { value: "pct_change", label: "% Change", icon: BarChart2, color: "#9c27b0", needsThreshold: true, thresholdLabel: "Min % Change" },
   { value: "volume_spike", label: "Volume Spike", icon: Volume2, color: "#0099cc", needsThreshold: true, thresholdLabel: "Min Multiplier (e.g. 2 = 2x avg)" },
-  { value: "rsi_oversold", label: "RSI Oversold (<30)", icon: Activity, color: "#FF8C00", needsThreshold: false, thresholdLabel: "" },
+  { value: "rsi_oversold", label: "RSI Oversold (<30)", icon: Activity, color: "#00B4D8", needsThreshold: false, thresholdLabel: "" },
   { value: "rsi_overbought", label: "RSI Overbought (>70)", icon: Activity, color: "#FFB800", needsThreshold: false, thresholdLabel: "" },
   { value: "macd_crossover", label: "MACD Crossover", icon: Zap, color: "#9c27b0", needsThreshold: false, thresholdLabel: "" },
   { value: "bollinger_breakout", label: "Bollinger Breakout", icon: AlertTriangle, color: "#ff6b35", needsThreshold: false, thresholdLabel: "" },
@@ -26,7 +26,7 @@ function getAlertTypeLabel(type: string): string {
 }
 
 function getAlertTypeColor(type: string): string {
-  return ALERT_TYPE_OPTIONS.find(o => o.value === type)?.color || "#FF8C00";
+  return ALERT_TYPE_OPTIONS.find(o => o.value === type)?.color || "#00B4D8";
 }
 
 function formatTime(iso: string): string {
@@ -343,7 +343,7 @@ export default function Alerts() {
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight font-[family-name:var(--font-mono)]">
-              <span className="text-[#FF8C00]">Real-Time</span> Alerts
+              <span className="text-[#00B4D8]">Real-Time</span> Alerts
             </h1>
             <p className="text-white/50 text-sm mt-1">
               Configure price, % change, volume, RSI, MACD, and Bollinger alerts with live evaluation
@@ -358,7 +358,7 @@ export default function Alerts() {
               </div>
             )}
             {tier === "pro" && (
-              <div className="text-xs text-[#FF8C00] bg-[#FF8C00]/5 rounded-lg px-3 py-2 border border-[#FF8C00]/20">
+              <div className="text-xs text-[#00B4D8] bg-[#00B4D8]/5 rounded-lg px-3 py-2 border border-[#00B4D8]/20">
                 Pro | Unlimited
               </div>
             )}
@@ -369,7 +369,7 @@ export default function Alerts() {
           <Button
             onClick={() => setTab("rules")}
             variant="ghost"
-            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "rules" ? "bg-[#FF8C00]/10 text-[#FF8C00] border border-[#FF8C00]/20" : "text-white/40 hover:text-white/60"}`}
+            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "rules" ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/20" : "text-white/40 hover:text-white/60"}`}
           >
             <Settings className="w-4 h-4" /> Alert Rules
             <span className="text-xs bg-white/[0.06] px-2 py-0.5 rounded-full">{rules.length}</span>
@@ -377,7 +377,7 @@ export default function Alerts() {
           <Button
             onClick={() => setTab("history")}
             variant="ghost"
-            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "history" ? "bg-[#FF8C00]/10 text-[#FF8C00] border border-[#FF8C00]/20" : "text-white/40 hover:text-white/60"}`}
+            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "history" ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/20" : "text-white/40 hover:text-white/60"}`}
           >
             <History className="w-4 h-4" /> Triggered History
             {history.filter(h => !h.read).length > 0 && (
@@ -401,13 +401,13 @@ export default function Alerts() {
                 <Button
                   onClick={() => setShowForm(true)}
                   disabled={marketDataUnavailable}
-                  className="bg-[#FF8C00]/10 text-[#FF8C00] border border-[#FF8C00]/20 hover:bg-[#FF8C00]/20 disabled:opacity-50"
+                  className="bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/20 hover:bg-[#00B4D8]/20 disabled:opacity-50"
                 >
                   <Plus className="w-4 h-4 mr-2" /> New Alert Rule
                 </Button>
               ) : (
-                <form onSubmit={createAlert} className="rounded-xl bg-white/[0.03] border border-[#FF8C00]/20 p-4">
-                  <p className="text-sm font-bold text-[#FF8C00] mb-1 font-[family-name:var(--font-mono)]">Create Alert Rule</p>
+                <form onSubmit={createAlert} className="rounded-xl bg-white/[0.03] border border-[#00B4D8]/20 p-4">
+                  <p className="text-sm font-bold text-[#00B4D8] mb-1 font-[family-name:var(--font-mono)]">Create Alert Rule</p>
                   <p className="text-xs text-white/30 mb-4">Search for a stock and configure your condition. All alerts are validated against live prices.</p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
@@ -450,7 +450,7 @@ export default function Alerts() {
                         value={threshold}
                         onChange={e => setThreshold(e.target.value.replace(/[^0-9.]/g, ""))}
                         placeholder={alertType === "pct_change" ? "e.g. 5 (= 5%)" : alertType === "volume_spike" ? "e.g. 2 (= 2x avg)" : "e.g. 185.00"}
-                        className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#FF8C00]/30 font-mono"
+                        className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#00B4D8]/30 font-mono"
                       />
                     </div>
                   )}
@@ -463,7 +463,7 @@ export default function Alerts() {
                     <Button
                       type="submit"
                       disabled={creating || marketDataUnavailable}
-                      className="bg-[#FF8C00] text-black font-bold hover:bg-[#FF8C00]/80 gap-1 disabled:opacity-50"
+                      className="bg-[#00B4D8] text-black font-bold hover:bg-[#00B4D8]/80 gap-1 disabled:opacity-50"
                     >
                       {creating ? <><RefreshCw className="w-3 h-3 animate-spin" /> Creating...</> : "Create Alert"}
                     </Button>
@@ -485,7 +485,7 @@ export default function Alerts() {
                 <Bell className="w-12 h-12 mx-auto mb-3 text-white/10" />
                 <p className="text-white/30 text-sm font-semibold">No alert rules yet</p>
                 <p className="text-white/50 text-xs mt-1 max-w-xs mx-auto">Set up your first price alert to get notified when stocks hit your target levels.</p>
-                <Button onClick={() => setShowForm(true)} disabled={marketDataUnavailable} className="mt-4 bg-gradient-to-r from-[#FF8C00] to-[#0099cc] text-black text-xs font-bold hover:opacity-90">
+                <Button onClick={() => setShowForm(true)} disabled={marketDataUnavailable} className="mt-4 bg-gradient-to-r from-[#00B4D8] to-[#0099cc] text-black text-xs font-bold hover:opacity-90">
                   Create Your First Alert
                 </Button>
               </div>
@@ -503,7 +503,7 @@ export default function Alerts() {
                       {isEditing ? (
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
-                            <p className="text-sm font-bold text-[#FF8C00] font-[family-name:var(--font-mono)]">Edit: {rule.symbol}</p>
+                            <p className="text-sm font-bold text-[#00B4D8] font-[family-name:var(--font-mono)]">Edit: {rule.symbol}</p>
                             <Button onClick={() => setEditingId(null)} size="icon" variant="ghost" className="w-7 h-7 text-white/30 hover:text-white">
                               <X className="w-4 h-4" />
                             </Button>
@@ -522,11 +522,11 @@ export default function Alerts() {
                               placeholder={getThresholdLabel(editType)}
                               value={editThreshold}
                               onChange={e => setEditThreshold(e.target.value.replace(/[^0-9.]/g, ""))}
-                              className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8C00]/30 font-[family-name:var(--font-mono)]"
+                              className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/30 font-[family-name:var(--font-mono)]"
                             />
                           )}
                           <div className="flex gap-2">
-                            <Button onClick={() => saveEdit(rule.id)} className="flex-1 bg-[#FF8C00] text-black font-bold text-xs">Save</Button>
+                            <Button onClick={() => saveEdit(rule.id)} className="flex-1 bg-[#00B4D8] text-black font-bold text-xs">Save</Button>
                             <Button onClick={() => setEditingId(null)} variant="ghost" className="text-white/50 text-xs">Cancel</Button>
                           </div>
                         </div>
@@ -547,10 +547,23 @@ export default function Alerts() {
                             </div>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <Button onClick={() => startEdit(rule)} size="icon" variant="ghost" className="w-7 h-7 text-white/30 hover:text-[#FF8C00]" aria-label="Edit alert">
+                            <Button
+                              onClick={() => startEdit(rule)}
+                              size="icon"
+                              variant="ghost"
+                              className="w-7 h-7 text-white/30 hover:text-[#00B4D8]"
+                              aria-label="Edit alert"
+                            >
                               <Pencil className="w-4 h-4" />
                             </Button>
-                            <Button onClick={() => toggleAlert(rule.id, rule.enabled)} size="icon" variant="ghost" className="w-7 h-7" style={{ color: rule.enabled ? "#FF8C00" : "rgba(255,255,255,0.3)" }} aria-label={rule.enabled ? "Disable alert" : "Enable alert"}>
+                            <Button
+                              onClick={() => toggleAlert(rule.id, rule.enabled)}
+                              size="icon"
+                              variant="ghost"
+                              className="w-7 h-7"
+                              style={{ color: rule.enabled ? "#00B4D8" : "rgba(255,255,255,0.3)" }}
+                              aria-label={rule.enabled ? "Disable alert" : "Enable alert"}
+                            >
                               {rule.enabled ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
                             </Button>
                             <Button onClick={() => deleteAlert(rule.id)} size="icon" variant="ghost" className="w-7 h-7 text-white/30 hover:text-[#ff3366]" aria-label="Delete alert">
@@ -566,7 +579,7 @@ export default function Alerts() {
             )}
             {rules.length > 0 && rules.length < rulesTotal && (
               <div className="text-center mt-4">
-                <Button onClick={loadMoreRules} disabled={loadingMore} variant="ghost" className="text-[#FF8C00] text-xs gap-2">
+                <Button onClick={loadMoreRules} disabled={loadingMore} variant="ghost" className="text-[#00B4D8] text-xs gap-2">
                   {loadingMore ? <><RefreshCw className="w-3 h-3 animate-spin" /> Loading...</> : `Load More (${rules.length}/${rulesTotal})`}
                 </Button>
               </div>
@@ -576,7 +589,11 @@ export default function Alerts() {
           <div>
             {history.filter(h => !h.read).length > 0 && (
               <div className="mb-4">
-                <Button onClick={markAllRead} variant="ghost" className="text-[#FF8C00] text-xs">
+                <Button
+                  onClick={markAllRead}
+                  variant="ghost"
+                  className="text-[#00B4D8] text-xs"
+                >
                   Mark all as read
                 </Button>
               </div>
@@ -604,7 +621,7 @@ export default function Alerts() {
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-bold font-[family-name:var(--font-mono)]" style={{ color }}>{h.symbol}</span>
                           <span className="text-xs text-white/50">{getAlertTypeLabel(h.alertType)}</span>
-                          {!h.read && <div className="w-2 h-2 rounded-full bg-[#FF8C00]" />}
+                          {!h.read && <div className="w-2 h-2 rounded-full bg-[#00B4D8]" />}
                         </div>
                         <p className="text-xs text-white/50 mt-1">{h.message}</p>
                         <p className="text-[10px] text-white/50 mt-1 font-[family-name:var(--font-mono)]">
@@ -621,7 +638,7 @@ export default function Alerts() {
             )}
             {history.length > 0 && history.length < historyTotal && (
               <div className="text-center mt-4">
-                <Button onClick={loadMoreHistory} disabled={loadingMore} variant="ghost" className="text-[#FF8C00] text-xs gap-2">
+                <Button onClick={loadMoreHistory} disabled={loadingMore} variant="ghost" className="text-[#00B4D8] text-xs gap-2">
                   {loadingMore ? <><RefreshCw className="w-3 h-3 animate-spin" /> Loading...</> : `Load More (${history.length}/${historyTotal})`}
                 </Button>
               </div>
@@ -647,7 +664,7 @@ export default function Alerts() {
 
           <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-4">
             <div className="flex items-center gap-2 mb-3">
-              <Mail className="w-4 h-4 text-[#FF8C00]" />
+              <Mail className="w-4 h-4 text-[#00B4D8]" />
               <p className="text-xs font-bold text-white/30 font-[family-name:var(--font-mono)]">EMAIL DIGEST</p>
             </div>
             <p className="text-xs text-white/30 mb-3">Receive a summary of your triggered alerts via email</p>
@@ -661,14 +678,14 @@ export default function Alerts() {
                   key={opt.value}
                   onClick={() => updateDigestPref(opt.value)}
                   variant="ghost"
-                  className={`flex-1 h-auto py-2.5 rounded-lg text-xs font-semibold ${digestFrequency === opt.value ? "bg-[#FF8C00]/15 text-[#FF8C00] border border-[#FF8C00]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06] hover:text-white/50"}`}
+                  className={`flex-1 h-auto py-2.5 rounded-lg text-xs font-semibold ${digestFrequency === opt.value ? "bg-[#00B4D8]/15 text-[#00B4D8] border border-[#00B4D8]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06] hover:text-white/50"}`}
                 >
                   {opt.label}
                 </Button>
               ))}
             </div>
             {digestFrequency !== "off" && (
-              <p className="text-[10px] text-[#FF8C00]/60 mt-2">
+              <p className="text-[10px] text-[#00B4D8]/60 mt-2">
                 {digestFrequency === "daily" ? "You'll receive a daily digest at 8:00 AM UTC" : "You'll receive a weekly digest every Monday at 8:00 AM UTC"}
               </p>
             )}

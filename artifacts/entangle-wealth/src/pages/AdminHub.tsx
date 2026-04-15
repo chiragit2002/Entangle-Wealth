@@ -50,7 +50,7 @@ export default function AdminHub() {
     <div className="min-h-screen bg-[#020204] text-white flex flex-col">
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-6 max-w-6xl">
-        <h1 className="text-lg font-mono font-bold text-[#FF8C00] uppercase tracking-wider mb-4">Admin Hub</h1>
+        <h1 className="text-lg font-mono font-bold text-[#00B4D8] uppercase tracking-wider mb-4">Admin Hub</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {ADMIN_TABS.map((tab) => {
             const Icon = tab.icon;
@@ -58,9 +58,9 @@ export default function AdminHub() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className="flex items-center gap-3 p-3 border border-[#FF8C00]/10 bg-[#0A0E1A] hover:bg-[#FF8C00]/5 hover:border-[#FF8C00]/20 transition-colors text-left"
+                className="flex items-center gap-3 p-3 border border-[#00B4D8]/10 bg-[#0A0E1A] hover:bg-[#00B4D8]/5 hover:border-[#00B4D8]/20 transition-colors text-left"
               >
-                <Icon className="w-4 h-4 text-[#FF8C00]/60 shrink-0" />
+                <Icon className="w-4 h-4 text-[#00B4D8]/60 shrink-0" />
                 <span className="text-xs font-mono font-medium text-white/80">{tab.label}</span>
               </button>
             );

@@ -80,9 +80,9 @@ function useCountdown(targetDate: Date) {
 const HOW_TO_EARN = [
   {
     icon: TrendingUp,
-    color: "text-[#FF8C00]",
-    bg: "bg-[#FF8C00]/10",
-    border: "border-[#FF8C00]/20",
+    color: "text-[#00B4D8]",
+    bg: "bg-[#00B4D8]/10",
+    border: "border-[#00B4D8]/20",
     title: "Trade & Use Signals",
     desc: "Every 500 XP earned through trading, running analysis, or using signals = 1 entry. Up to 50 entries.",
     entryKey: "tradeEntries",
@@ -98,9 +98,9 @@ const HOW_TO_EARN = [
   },
   {
     icon: Zap,
-    color: "text-[#FF8C00]",
-    bg: "bg-[#FF8C00]/10",
-    border: "border-[#FF8C00]/20",
+    color: "text-[#00B4D8]",
+    bg: "bg-[#00B4D8]/10",
+    border: "border-[#00B4D8]/20",
     title: "Daily Logins",
     desc: "Staying active on the platform earns you login entries. Every 100 XP = 1 entry, up to 30.",
     entryKey: "loginEntries",
@@ -278,10 +278,10 @@ export default function Giveaway() {
         </div>
 
         {isSignedIn && entries && (
-          <div className="glass-panel rounded-sm p-6 mb-8 border border-[#FF8C00]/15">
+          <div className="glass-panel rounded-sm p-6 mb-8 border border-[#00B4D8]/15">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-bold flex items-center gap-2">
-                <Gift className="w-4 h-4 text-[#FF8C00]" />
+                <Gift className="w-4 h-4 text-[#00B4D8]" />
                 Your Entries
               </h2>
               {loading && <span className="text-[10px] text-white/30 animate-pulse">Updating...</span>}
@@ -293,7 +293,7 @@ export default function Giveaway() {
                 <p className="text-[9px] uppercase tracking-wider text-white/40 mt-0.5">Total Entries</p>
               </div>
               <div className="bg-white/[0.03] rounded-xl p-3 text-center border border-white/5">
-                <p className="text-2xl font-black font-mono text-[#FF8C00]">{odds}</p>
+                <p className="text-2xl font-black font-mono text-[#00B4D8]">{odds}</p>
                 <p className="text-[9px] uppercase tracking-wider text-white/40 mt-0.5">Win Odds</p>
               </div>
               <div className="bg-white/[0.03] rounded-xl p-3 text-center border border-white/5">
@@ -333,7 +333,7 @@ export default function Giveaway() {
                   <Button size="sm" variant="outline" className="border-[#c084fc]/30 text-[#c084fc] shrink-0" onClick={copyLink}>
                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   </Button>
-                  <Button size="sm" variant="outline" className="border-[#FF8C00]/30 text-[#FF8C00] shrink-0" onClick={shareLink}>
+                  <Button size="sm" variant="outline" className="border-[#00B4D8]/30 text-[#00B4D8] shrink-0" onClick={shareLink}>
                     <Share2 className="w-4 h-4" />
                   </Button>
                 </div>
@@ -360,7 +360,7 @@ export default function Giveaway() {
 
         <div className="mb-10">
           <h2 className="text-xl font-bold mb-5 flex items-center gap-2">
-            <Zap className="w-5 h-5 text-[#FF8C00]" />
+            <Zap className="w-5 h-5 text-[#00B4D8]" />
             How to Earn Entries
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -416,7 +416,7 @@ export default function Giveaway() {
                           <span className="text-sm font-medium">{entry.name}</span>
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-right font-mono font-bold text-[#FF8C00]">{entry.totalEntries.toLocaleString()}</td>
+                      <td className="py-3 px-4 text-right font-mono font-bold text-[#00B4D8]">{entry.totalEntries.toLocaleString()}</td>
                       <td className="py-3 px-4 text-right text-white/50 hidden md:table-cell">{entry.convertedReferrals}</td>
                       <td className="py-3 px-4 text-right text-white/50 hidden md:table-cell text-xs">{entry.odds}</td>
                       <td className="py-3 px-4 text-right font-mono font-bold text-[#c084fc] text-sm">
@@ -445,7 +445,7 @@ export default function Giveaway() {
               {[
                 { icon: Users, color: "text-[#c084fc]", val: "1–5 refs", bonus: "~$360–$1,800", label: "Starter share" },
                 { icon: Star, color: "text-[#FFB800]", val: "10–25 refs", bonus: "~$3,600–$9,000", label: "Active referrer" },
-                { icon: Crown, color: "text-[#FF8C00]", val: "50+ refs", bonus: "$18,000+", label: "Super referrer" },
+                { icon: Crown, color: "text-[#00B4D8]", val: "50+ refs", bonus: "$18,000+", label: "Super referrer" },
               ].map((t) => (
                 <div key={t.label} className="bg-white/[0.03] rounded-xl p-4 border border-white/5 text-center">
                   <t.icon className={`w-5 h-5 ${t.color} mx-auto mb-2`} />

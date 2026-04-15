@@ -58,7 +58,7 @@ export default function NotFound() {
       vy: (Math.random() - 0.5) * 1.5 - 0.3,
       alpha: 0.8,
       size: Math.random() * 3 + 1,
-      color: "#FF8C00",
+      color: "#00B4D8",
     });
 
     particlesRef.current = Array.from({ length: 40 }, spawn);
@@ -125,22 +125,22 @@ export default function NotFound() {
             className="relative w-36 h-36 flex flex-col items-center justify-center mx-auto"
             style={{
               borderRadius: 0,
-              background: "linear-gradient(135deg, rgba(255,140,0,0.06), rgba(255,140,0,0.03))",
-              border: "1px solid rgba(255,140,0,0.18)",
-              boxShadow: "0 0 40px rgba(255,140,0,0.08)",
+              background: "linear-gradient(135deg, rgba(0,180,216,0.06), rgba(0,180,216,0.03))",
+              border: "1px solid rgba(0,180,216,0.18)",
+              boxShadow: "0 0 40px rgba(0,180,216,0.08)",
             }}
           >
             <span
               className="text-5xl font-black font-mono"
               style={{
-                WebkitTextFillColor: "#FF8C00",
+                WebkitTextFillColor: "#00B4D8",
               }}
             >
               404
             </span>
             <div
               className="text-[9px] tracking-[0.25em] uppercase mt-1"
-              style={{ color: "rgba(255,140,0,0.4)" }}
+              style={{ color: "rgba(0,180,216,0.4)" }}
             >
               Timeline Lost
             </div>
@@ -158,7 +158,7 @@ export default function NotFound() {
         <div className="flex flex-wrap gap-3 justify-center mb-12">
           <Link href="/">
             <Button
-              className="bg-[#FF8C00] text-black hover:bg-[#FF8C00]/90 gap-2 font-semibold shadow-[0_0_24px_rgba(255,140,0,0.2)]"
+              className="bg-[#00B4D8] text-black hover:bg-[#00B4D8]/90 gap-2 font-semibold shadow-[0_0_24px_rgba(0,180,216,0.2)]"
             >
               <Home className="w-4 h-4" /> Return to Origin
             </Button>
@@ -187,8 +187,8 @@ export default function NotFound() {
                     border: "1px solid rgba(255,255,255,0.07)",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLDivElement).style.border = "1px solid rgba(255,140,0,0.25)";
-                    (e.currentTarget as HTMLDivElement).style.background = "rgba(255,140,0,0.04)";
+                    (e.currentTarget as HTMLDivElement).style.border = "1px solid rgba(0,180,216,0.25)";
+                    (e.currentTarget as HTMLDivElement).style.background = "rgba(0,180,216,0.04)";
                   }}
                   onMouseLeave={(e) => {
                     (e.currentTarget as HTMLDivElement).style.border = "1px solid rgba(255,255,255,0.07)";
@@ -199,10 +199,10 @@ export default function NotFound() {
                     className="w-9 h-9 flex items-center justify-center flex-shrink-0 transition-colors"
                     style={{ background: "rgba(255,255,255,0.04)", borderRadius: 0 }}
                   >
-                    <link.icon className="w-4 h-4 text-white/40 group-hover:text-[#FF8C00] transition-colors" />
+                    <link.icon className="w-4 h-4 text-white/40 group-hover:text-[#00B4D8] transition-colors" />
                   </div>
                   <div className="text-left">
-                    <div className="text-sm font-medium text-white group-hover:text-[#FF8C00] transition-colors uppercase font-mono">
+                    <div className="text-sm font-medium text-white group-hover:text-[#00B4D8] transition-colors uppercase font-mono">
                       {link.label}
                     </div>
                     <div className="text-[11px] text-white/28 font-mono">{link.desc}</div>

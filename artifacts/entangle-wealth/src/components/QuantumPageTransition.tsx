@@ -13,7 +13,7 @@ interface Particle {
   color: string;
 }
 
-const COLORS = ["#FF8C00", "#00FF88", "#7B61FF", "#FF8C00", "#FF8C00"];
+const COLORS = ["#00B4D8", "#00FF88", "#7B61FF", "#00B4D8", "#00B4D8"];
 
 export function QuantumPageTransition() {
   const canvasRef = useRef<HTMLCanvasElement>(null);

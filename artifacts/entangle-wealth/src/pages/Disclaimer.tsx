@@ -106,7 +106,7 @@ export default function Disclaimer() {
           </section>
 
           <section>
-            <p className="text-xs text-white/50">See also: <Link href="/terms" className="text-[#FF8C00] hover:underline">Terms of Use</Link> · <Link href="/privacy" className="text-[#FF8C00] hover:underline">Privacy Policy</Link></p>
+            <p className="text-xs text-white/50">See also: <Link href="/terms" className="text-[#00B4D8] hover:underline">Terms of Use</Link> · <Link href="/privacy" className="text-[#00B4D8] hover:underline">Privacy Policy</Link></p>
           </section>
         </div>
       </div>

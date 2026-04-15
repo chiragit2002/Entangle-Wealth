@@ -54,7 +54,7 @@ function UpgradePromptFixture() {
     return (
       <div className="p-8 text-white" data-testid="upgrade-dismissed">
         <p>Upgrade prompt dismissed</p>
-        <button onClick={() => setShow(true)} className="text-[#FF8C00]">Show again</button>
+        <button onClick={() => setShow(true)} className="text-[#00B4D8]">Show again</button>
       </div>
     );
   }
@@ -86,7 +86,7 @@ function FinishSetupNudgeFixture() {
     return (
       <div className="p-8 text-white" data-testid="nudge-dismissed">
         <p>Setup nudge dismissed</p>
-        <button onClick={() => setDismissed(false)} className="text-[#FF8C00]">Show again</button>
+        <button onClick={() => setDismissed(false)} className="text-[#00B4D8]">Show again</button>
       </div>
     );
   }

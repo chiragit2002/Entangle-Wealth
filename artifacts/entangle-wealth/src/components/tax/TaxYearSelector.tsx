@@ -15,7 +15,7 @@ export function TaxYearSelector() {
     <select
       value={year}
       onChange={handleChange}
-      className="bg-[#0d0f18] border border-white/10 rounded-lg px-2 py-1 text-[12px] text-white/70 font-mono focus:outline-none focus:border-[#FF8C00]/40 min-h-[32px] [&>option]:bg-[#0d0f18]"
+      className="bg-[#0d0f18] border border-white/10 rounded-lg px-2 py-1 text-[12px] text-white/70 font-mono focus:outline-none focus:border-[#00B4D8]/40 min-h-[32px] [&>option]:bg-[#0d0f18]"
       aria-label="Select tax year"
     >
       <option value={2024}>2024</option>

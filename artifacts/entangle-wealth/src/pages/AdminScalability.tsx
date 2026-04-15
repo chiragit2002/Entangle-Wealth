@@ -46,7 +46,7 @@ interface MetricsData {
 }
 
 function CircuitStateIcon({ state }: { state: string }) {
-  if (state === "closed") return <CheckCircle2 className="w-5 h-5 text-[#FF8C00]" />;
+  if (state === "closed") return <CheckCircle2 className="w-5 h-5 text-[#00B4D8]" />;
   if (state === "half-open") return <AlertTriangle className="w-5 h-5 text-[#FFB800]" />;
   return <XCircle className="w-5 h-5 text-[#ff3366]" />;
 }
@@ -55,7 +55,7 @@ function MetricCard({ icon: Icon, label, value, sub }: { icon: typeof Activity; 
   return (
     <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-4">
       <div className="flex items-center gap-2 mb-2">
-        <Icon className="w-4 h-4 text-[#FF8C00]" />
+        <Icon className="w-4 h-4 text-[#00B4D8]" />
         <span className="text-sm text-white/60">{label}</span>
       </div>
       <div className="text-2xl font-bold text-white font-mono">{value}</div>
@@ -107,7 +107,7 @@ export default function AdminScalability() {
     return (
       <Layout>
         <div className="min-h-screen bg-[#020204] flex items-center justify-center">
-          <div className="animate-spin w-8 h-8 border-2 border-[#FF8C00] border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-2 border-[#00B4D8] border-t-transparent rounded-full" />
         </div>
       </Layout>
     );
@@ -163,7 +163,7 @@ export default function AdminScalability() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-                <Zap className="w-8 h-8 text-[#FF8C00]" />
+                <Zap className="w-8 h-8 text-[#00B4D8]" />
                 Scalability Dashboard
               </h1>
               <p className="text-white/50 mt-1">Real-time system performance & health</p>
@@ -171,7 +171,7 @@ export default function AdminScalability() {
             <button
               onClick={fetchMetrics}
               disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 bg-[#FF8C00]/10 border border-[#FF8C00]/30 rounded-lg text-[#FF8C00] hover:bg-[#FF8C00]/20 transition disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 bg-[#00B4D8]/10 border border-[#00B4D8]/30 rounded-lg text-[#00B4D8] hover:bg-[#00B4D8]/20 transition disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
               Refresh
@@ -211,7 +211,7 @@ export default function AdminScalability() {
               <div className="grid md:grid-cols-2 gap-6 mb-8">
                 <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6">
                   <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
-                    <Shield className="w-5 h-5 text-[#FF8C00]" />
+                    <Shield className="w-5 h-5 text-[#00B4D8]" />
                     Circuit Breakers
                   </h2>
                   <div className="space-y-3">
@@ -230,7 +230,7 @@ export default function AdminScalability() {
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
                             circuit.state === "closed"
-                              ? "bg-[#FF8C00]/10 text-[#FF8C00]"
+                              ? "bg-[#00B4D8]/10 text-[#00B4D8]"
                               : circuit.state === "half-open"
                               ? "bg-[#FFB800]/10 text-[#FFB800]"
                               : "bg-[#ff3366]/10 text-[#ff3366]"
@@ -245,14 +245,14 @@ export default function AdminScalability() {
 
                 <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6">
                   <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
-                    <Cpu className="w-5 h-5 text-[#FF8C00]" />
+                    <Cpu className="w-5 h-5 text-[#00B4D8]" />
                     AI Request Queue
                   </h2>
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-3 bg-white/5 rounded-lg">
                         <div className="text-xs text-white/50">Active</div>
-                        <div className="text-2xl font-mono text-[#FF8C00]">
+                        <div className="text-2xl font-mono text-[#00B4D8]">
                           {metrics.aiQueue.active}/{metrics.aiQueue.maxConcurrent}
                         </div>
                       </div>
@@ -267,7 +267,7 @@ export default function AdminScalability() {
                     </div>
                     <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-[#FF8C00] rounded-full transition-all"
+                        className="h-full bg-[#00B4D8] rounded-full transition-all"
                         style={{
                           width: `${Math.min((metrics.aiQueue.active / metrics.aiQueue.maxConcurrent) * 100, 100)}%`,
                         }}
@@ -280,7 +280,7 @@ export default function AdminScalability() {
               <div className="grid md:grid-cols-2 gap-6 mb-8">
                 <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6">
                   <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
-                    <Server className="w-5 h-5 text-[#FF8C00]" />
+                    <Server className="w-5 h-5 text-[#00B4D8]" />
                     Cache Status
                   </h2>
                   <div className="space-y-3">
@@ -288,10 +288,10 @@ export default function AdminScalability() {
                       <div key={c.label} className="p-3 bg-white/5 rounded-lg">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-white/70 capitalize">{c.label} Cache</span>
-                          <span className="font-mono text-[#FF8C00]">{c.size} entries</span>
+                          <span className="font-mono text-[#00B4D8]">{c.size} entries</span>
                         </div>
                         <div className="flex items-center gap-4 text-xs text-white/40">
-                          <span>Hits: <span className="text-[#FF8C00] font-mono">{c.hits}</span></span>
+                          <span>Hits: <span className="text-[#00B4D8] font-mono">{c.hits}</span></span>
                           <span>Misses: <span className="text-[#ff3366] font-mono">{c.misses}</span></span>
                           <span>Hit Rate: <span className="text-[#FFB800] font-mono">{c.hitRate}%</span></span>
                         </div>
@@ -302,14 +302,14 @@ export default function AdminScalability() {
 
                 <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6">
                   <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
-                    <CheckCircle2 className="w-5 h-5 text-[#FF8C00]" />
+                    <CheckCircle2 className="w-5 h-5 text-[#00B4D8]" />
                     Health Checklist ({passCount}/{checklist.length})
                   </h2>
                   <div className="space-y-2">
                     {checklist.map((item, i) => (
                       <div key={i} className="flex items-start gap-3 p-2">
                         {item.ok ? (
-                          <CheckCircle2 className="w-4 h-4 text-[#FF8C00] mt-0.5 flex-shrink-0" />
+                          <CheckCircle2 className="w-4 h-4 text-[#00B4D8] mt-0.5 flex-shrink-0" />
                         ) : (
                           <XCircle className="w-4 h-4 text-[#ff3366] mt-0.5 flex-shrink-0" />
                         )}

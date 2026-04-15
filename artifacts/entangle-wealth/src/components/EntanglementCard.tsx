@@ -98,9 +98,9 @@ export function EntangledInsightsFeed({ insights, title = "Entangled Insights", 
       <div className="flex items-center gap-2 mb-3">
         <div
           className="w-6 h-6 rounded-md flex items-center justify-center"
-          style={{ background: "rgba(255,140,0,0.12)", border: "1px solid rgba(255,140,0,0.25)" }}
+          style={{ background: "rgba(0,180,216,0.12)", border: "1px solid rgba(0,180,216,0.25)" }}
         >
-          <Zap className="w-3.5 h-3.5 text-[#FF8C00]" />
+          <Zap className="w-3.5 h-3.5 text-[#00B4D8]" />
         </div>
         <span className="text-sm font-semibold text-white/70">{title}</span>
         <span className="text-[10px] text-white/25 ml-auto font-mono">{visible.length} connections active</span>

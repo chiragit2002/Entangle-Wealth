@@ -4,7 +4,7 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } fro
 export function RiskRadar() {
   const avgRisk = Math.round(riskDimensions.reduce((a, d) => a + d.value, 0) / riskDimensions.length);
   const riskLevel = avgRisk > 75 ? "HIGH" : avgRisk > 50 ? "MODERATE" : "LOW";
-  const riskColor = avgRisk > 75 ? "#ff4444" : avgRisk > 50 ? "#FFB800" : "#FF8C00";
+  const riskColor = avgRisk > 75 ? "#ff4444" : avgRisk > 50 ? "#FFB800" : "#00B4D8";
 
   return (
     <div className="glass-panel rounded-sm p-5">
@@ -26,8 +26,8 @@ export function RiskRadar() {
             />
             <Radar
               dataKey="value"
-              stroke="#FF8C00"
-              fill="#FF8C00"
+              stroke="#00B4D8"
+              fill="#00B4D8"
               fillOpacity={0.15}
               strokeWidth={1.5}
             />

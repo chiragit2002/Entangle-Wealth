@@ -100,8 +100,8 @@ export function FirstAnalysisWow({ onComplete, symbol }: FirstAnalysisWowProps) 
 
         const alpha = 0.3 + 0.3 * Math.sin(n.pulse);
         ctx.globalAlpha = alpha;
-        ctx.fillStyle = "#FF8C00";
-        ctx.shadowColor = "#FF8C00";
+        ctx.fillStyle = "#00B4D8";
+        ctx.shadowColor = "#00B4D8";
         ctx.shadowBlur = 8;
         ctx.beginPath();
         ctx.arc(n.x, n.y, 2.5, 0, Math.PI * 2);
@@ -116,7 +116,7 @@ export function FirstAnalysisWow({ onComplete, symbol }: FirstAnalysisWowProps) 
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 150) {
             ctx.globalAlpha = (1 - dist / 150) * 0.15;
-            ctx.strokeStyle = "#FF8C00";
+            ctx.strokeStyle = "#00B4D8";
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(n.x, n.y);
@@ -158,7 +158,7 @@ export function FirstAnalysisWow({ onComplete, symbol }: FirstAnalysisWowProps) 
       <div className="relative z-10 flex flex-col items-center text-center max-w-sm w-full">
         <div
           className="text-[9px] tracking-[0.4em] uppercase font-semibold mb-6"
-          style={{ color: "rgba(255,140,0,0.5)" }}
+          style={{ color: "rgba(0,180,216,0.5)" }}
         >
           First Quantum Analysis
           {symbol && ` · ${symbol}`}
@@ -167,8 +167,8 @@ export function FirstAnalysisWow({ onComplete, symbol }: FirstAnalysisWowProps) 
         <div
           className="w-20 h-20 rounded-full flex items-center justify-center mb-8 relative"
           style={{
-            border: "2px solid rgba(255,140,0,0.3)",
-            background: "rgba(255,140,0,0.05)",
+            border: "2px solid rgba(0,180,216,0.3)",
+            background: "rgba(0,180,216,0.05)",
           }}
         >
           {done ? (
@@ -185,7 +185,7 @@ export function FirstAnalysisWow({ onComplete, symbol }: FirstAnalysisWowProps) 
                 cy="20"
                 r="16"
                 fill="none"
-                stroke="rgba(255,140,0,0.15)"
+                stroke="rgba(0,180,216,0.15)"
                 strokeWidth="2"
               />
               <circle
@@ -193,7 +193,7 @@ export function FirstAnalysisWow({ onComplete, symbol }: FirstAnalysisWowProps) 
                 cy="20"
                 r="16"
                 fill="none"
-                stroke="#FF8C00"
+                stroke="#00B4D8"
                 strokeWidth="2"
                 strokeDasharray={`${progress} 100`}
                 strokeLinecap="round"
@@ -210,11 +210,11 @@ export function FirstAnalysisWow({ onComplete, symbol }: FirstAnalysisWowProps) 
               key={i}
               className="flex items-center gap-2 text-xs font-mono"
               style={{
-                color: i === stageIndex && !stage.done ? "#FF8C00" : "rgba(255,255,255,0.35)",
+                color: i === stageIndex && !stage.done ? "#00B4D8" : "rgba(255,255,255,0.35)",
                 animation: i === stageIndex ? "firstWowLine 0.2s ease-out" : "none",
               }}
             >
-              <span style={{ color: stage.done || i < stageIndex ? "#00FF88" : "#FF8C00" }}>
+              <span style={{ color: stage.done || i < stageIndex ? "#00FF88" : "#00B4D8" }}>
                 {i < stageIndex || stage.done ? "✓" : ">"}
               </span>
               <span>{stage.text}</span>
@@ -230,7 +230,7 @@ export function FirstAnalysisWow({ onComplete, symbol }: FirstAnalysisWowProps) 
             <div
               className="text-2xl font-extrabold"
               style={{
-                background: "linear-gradient(135deg, #FF8C00, #00FF88)",
+                background: "linear-gradient(135deg, #00B4D8, #00FF88)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}

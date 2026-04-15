@@ -99,7 +99,7 @@ function MyFeedback() {
   return (
     <div className="glass-panel p-6 mb-6">
       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-        <MessageSquare className="w-5 h-5 text-[#FF8C00]" /> My Feedback
+        <MessageSquare className="w-5 h-5 text-[#00B4D8]" /> My Feedback
         {feedbackList.length > 0 && (
           <span className="ml-auto text-xs text-muted-foreground">{total} submission{total !== 1 ? "s" : ""}</span>
         )}
@@ -131,7 +131,7 @@ function MyFeedback() {
               </div>
               <div className="flex items-center gap-1.5 text-[10px] text-white/30">
                 {fb.admin_response ? (
-                  <><CheckCircle className="w-3 h-3 text-[#FF8C00]" /><span className="text-[#FF8C00]">Responded</span></>
+                  <><CheckCircle className="w-3 h-3 text-[#00B4D8]" /><span className="text-[#00B4D8]">Responded</span></>
                 ) : (
                   <><Clock className="w-3 h-3" /><span>Pending</span></>
                 )}
@@ -142,10 +142,10 @@ function MyFeedback() {
             )}
             {fb.admin_response && (
               <div
-                className="rounded-lg p-3 text-sm text-[#FF8C00]"
-                style={{ background: "rgba(255,140,0,0.05)", borderLeft: "3px solid rgba(255,140,0,0.3)" }}
+                className="rounded-lg p-3 text-sm text-[#00B4D8]"
+                style={{ background: "rgba(0,180,216,0.05)", borderLeft: "3px solid rgba(0,180,216,0.3)" }}
               >
-                <p className="text-[10px] text-[#FF8C00]/60 uppercase tracking-wider mb-1">Team Response</p>
+                <p className="text-[10px] text-[#00B4D8]/60 uppercase tracking-wider mb-1">Team Response</p>
                 {fb.admin_response}
               </div>
             )}
@@ -858,7 +858,7 @@ export default function Profile() {
                 </Button>
               )}
               <Button
-                className={editing ? "bg-[#FF8C00] text-black font-bold hover:bg-[#FF8C00]/90 active:scale-[0.97] transition-all duration-150 gap-2" : "border-white/20 gap-2"}
+                className={editing ? "bg-[#00B4D8] text-black font-bold hover:bg-[#00B4D8]/90 active:scale-[0.97] transition-all duration-150 gap-2" : "border-white/20 gap-2"}
                 variant={editing ? "default" : "outline"}
                 onClick={() => editing ? saveProfile() : setEditing(true)}
                 disabled={saving}
@@ -1204,9 +1204,9 @@ export default function Profile() {
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-primary" /> Investment Progress</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
-              <DollarSign className="w-5 h-5 text-[#FF8C00] mx-auto mb-1" />
+              <DollarSign className="w-5 h-5 text-[#00B4D8] mx-auto mb-1" />
               <p className="text-[10px] text-muted-foreground uppercase">This Month</p>
-              <p className="text-xl font-bold font-mono text-[#FF8C00]">$1,247</p>
+              <p className="text-xl font-bold font-mono text-[#00B4D8]">$1,247</p>
             </div>
             <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
               <Zap className="w-5 h-5 text-primary mx-auto mb-1" />
@@ -1305,7 +1305,7 @@ export default function Profile() {
               </div>
               <div
                 className="mt-4 rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:opacity-90 transition-opacity"
-                style={{ background: "linear-gradient(135deg, rgba(245,200,66,0.08), rgba(255,140,0,0.06))", border: "1px solid rgba(245,200,66,0.2)" }}
+                style={{ background: "linear-gradient(135deg, rgba(245,200,66,0.08), rgba(0,180,216,0.06))", border: "1px solid rgba(245,200,66,0.2)" }}
                 onClick={() => window.location.href = "/giveaway"}
               >
                 <div className="flex-shrink-0 text-2xl">🎉</div>

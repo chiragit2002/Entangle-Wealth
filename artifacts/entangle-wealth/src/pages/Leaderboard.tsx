@@ -21,7 +21,7 @@ interface LeaderboardEntry {
 }
 
 const TRADER_TIER_COLORS: Record<string, string> = {
-  Diamond: "text-[#FF8C00]",
+  Diamond: "text-[#00B4D8]",
   Platinum: "text-white/70",
   Gold: "text-[#FFB800]",
   Silver: "text-white/50",

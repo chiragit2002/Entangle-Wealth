@@ -127,7 +127,7 @@ export default function TravelMarketplace() {
             return (
               <div key={listing.id} className="glass-panel rounded-xl overflow-hidden hover:border-white/20 transition-all group">
                 <div className="h-32 flex items-center justify-center text-6xl" style={{
-                  background: "linear-gradient(135deg, rgba(255,140,0,0.1), rgba(255,215,0,0.05))",
+                  background: "linear-gradient(135deg, rgba(0,180,216,0.1), rgba(255,215,0,0.05))",
                 }}>
                   {listing.image}
                 </div>

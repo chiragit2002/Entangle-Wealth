@@ -226,7 +226,7 @@ const strategicActions = [
 
 function FeatureIcon({ has }: { has: boolean }) {
   return has ? (
-    <Check className="w-4 h-4 text-[#FF8C00]" />
+    <Check className="w-4 h-4 text-[#00B4D8]" />
   ) : (
     <X className="w-4 h-4 text-[#ff4466] opacity-40" />
   );
@@ -236,7 +236,7 @@ function ThreatBadge({ level }: { level: string }) {
   const colors = {
     high: "bg-[#ff4466]/15 text-[#ff4466] border-[#ff4466]/20",
     medium: "bg-[#FFB800]/15 text-[#FFB800] border-[#FFB800]/20",
-    low: "bg-[#FF8C00]/15 text-[#FF8C00] border-[#FF8C00]/20",
+    low: "bg-[#00B4D8]/15 text-[#00B4D8] border-[#00B4D8]/20",
   };
   return (
     <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${colors[level as keyof typeof colors]}`}>
@@ -282,7 +282,7 @@ function CompetitorCard({ c, isExpanded, onToggle }: { c: Competitor; isExpanded
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2">Strengths</div>
               {c.strengths.map((s, i) => (
                 <div key={i} className="flex items-start gap-2 mb-1.5">
-                  <Check className="w-3 h-3 text-[#FF8C00] mt-0.5 flex-shrink-0" />
+                  <Check className="w-3 h-3 text-[#00B4D8] mt-0.5 flex-shrink-0" />
                   <span className="text-xs text-white/80">{s}</span>
                 </div>
               ))}
@@ -538,7 +538,7 @@ export default function CompetitiveAnalysis() {
           <Button
             onClick={generatePDF}
             disabled={isGeneratingPDF}
-            className="bg-primary text-black font-bold hover:bg-primary/90 h-11 px-6 shadow-[0_0_20px_rgba(255,140,0,0.2)]"
+            className="bg-primary text-black font-bold hover:bg-primary/90 h-11 px-6 shadow-[0_0_20px_rgba(0,180,216,0.2)]"
           >
             <Download className="w-4 h-4 mr-2" />
             {isGeneratingPDF ? "Generating..." : "Export PDF"}
@@ -562,7 +562,7 @@ export default function CompetitiveAnalysis() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
           {[
             { label: "Our Features", value: ewScore.toString(), sub: `of ${featureMatrix.length}`, color: "text-primary" },
-            { label: "Unique Features", value: "5", sub: "no competitor has", color: "text-[#FF8C00]" },
+            { label: "Unique Features", value: "5", sub: "no competitor has", color: "text-[#00B4D8]" },
             { label: "Competitors", value: competitors.length.toString(), sub: "analyzed", color: "text-secondary" },
             { label: "Threat Level", value: "2 HIGH", sub: "TradingView, Robinhood", color: "text-[#ff4466]" },
           ].map((s) => (
@@ -587,7 +587,7 @@ export default function CompetitiveAnalysis() {
           </div>
         </Section>
 
-        <Section title="Feature Matrix | Quantum Superiority Map" icon={Zap} color="bg-[#FF8C00]/10 text-[#FF8C00]">
+        <Section title="Feature Matrix | Quantum Superiority Map" icon={Zap} color="bg-[#00B4D8]/10 text-[#00B4D8]">
           <div className="glass-panel rounded-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -658,7 +658,7 @@ export default function CompetitiveAnalysis() {
                 <div className="absolute text-[10px] bottom-[5%] right-[5%] text-muted-foreground/40 font-bold uppercase">Broad Manual</div>
 
                 {[
-                  { name: "EntangleWealth", x: 82, y: 12, color: "#FF8C00", size: "w-4 h-4", glow: true },
+                  { name: "EntangleWealth", x: 82, y: 12, color: "#00B4D8", size: "w-4 h-4", glow: true },
                   { name: "Bloomberg", x: 90, y: 55, color: "#FF6600", size: "w-3 h-3", glow: false },
                   { name: "TradingView", x: 65, y: 72, color: "#2962FF", size: "w-3 h-3", glow: false },
                   { name: "Koyfin", x: 55, y: 65, color: "#8BC34A", size: "w-2.5 h-2.5", glow: false },
@@ -695,7 +695,7 @@ export default function CompetitiveAnalysis() {
             {kanoAnalysis.map((k) => {
               const colors = {
                 Basic: { bg: "bg-white/[0.03]", border: "border-white/[0.06]", badge: "bg-white/10 text-white/50" },
-                Performance: { bg: "bg-[#FF8C00]/[0.03]", border: "border-[#FF8C00]/10", badge: "bg-[#FF8C00]/10 text-[#FF8C00]" },
+                Performance: { bg: "bg-[#00B4D8]/[0.03]", border: "border-[#00B4D8]/10", badge: "bg-[#00B4D8]/10 text-[#00B4D8]" },
                 Delighter: { bg: "bg-primary/[0.03]", border: "border-primary/10", badge: "bg-primary/10 text-primary" },
               }[k.category]!;
               return (

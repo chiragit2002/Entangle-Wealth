@@ -86,7 +86,7 @@ function BloombergPanelHeader({
         <Link
           href={href}
           className="text-[9px] font-mono opacity-40 hover:opacity-80 transition-opacity flex items-center gap-0.5"
-          style={{ color: "#FF8C00" }}
+          style={{ color: "#00B4D8" }}
           onClick={(e) => e.stopPropagation()}
         >
           <ExternalLink className="w-2.5 h-2.5" />
@@ -178,7 +178,7 @@ function MonteCarloPanel({ collapsed }: { collapsed: boolean }) {
         {final && (
           <div className="grid grid-cols-3 gap-2">
             {[
-              { label: "Base Case", val: fmt(final.netWorth), color: "#FF8C00" },
+              { label: "Base Case", val: fmt(final.netWorth), color: "#00B4D8" },
               { label: "Optimistic", val: fmt(final.optimistic), color: "#00ff88" },
               { label: "Pessimistic", val: fmt(final.pessimistic), color: "#ff6b6b" },
             ].map(({ label, val, color }) => (
@@ -200,10 +200,10 @@ function MonteCarloPanel({ collapsed }: { collapsed: boolean }) {
         )}
         {projections.length > 0 && (
           <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full" preserveAspectRatio="xMidYMid meet">
-            <polygon points={conePts} fill="rgba(255,140,0,0.07)" />
+            <polygon points={conePts} fill="rgba(0,180,216,0.07)" />
             <polyline points={pessPts} fill="none" stroke="rgba(255,107,107,0.5)" strokeWidth="1" strokeDasharray="3,2" />
             <polyline points={optPts} fill="none" stroke="rgba(0,255,136,0.5)" strokeWidth="1" strokeDasharray="3,2" />
-            <polyline points={basePts} fill="none" stroke="#FF8C00" strokeWidth="1.5" />
+            <polyline points={basePts} fill="none" stroke="#00B4D8" strokeWidth="1.5" />
             {[0, 0.25, 0.5, 0.75, 1].map((pct) => {
               const idx = Math.round(pct * (projections.length - 1));
               const p = projections[idx];
@@ -224,7 +224,7 @@ function MonteCarloPanel({ collapsed }: { collapsed: boolean }) {
         )}
         <div className="grid grid-cols-2 gap-2">
           {[
-            { label: "Monthly", key: "monthlyInvestment" as const, min: 0, max: 5000, step: 50, color: "#FF8C00" },
+            { label: "Monthly", key: "monthlyInvestment" as const, min: 0, max: 5000, step: 50, color: "#00B4D8" },
             { label: "Return %", key: "expectedReturnRate" as const, min: 1, max: 15, step: 0.5, color: "#f5c842" },
           ].map(({ label, key, min, max, step, color }) => (
             <div key={key}>
@@ -254,7 +254,7 @@ function MonteCarloPanel({ collapsed }: { collapsed: boolean }) {
         <Link
           href="/wealth-sim"
           className="flex items-center justify-center gap-1.5 w-full py-1.5 rounded text-[9px] font-mono font-bold uppercase tracking-widest transition-opacity hover:opacity-80"
-          style={{ background: "rgba(255,140,0,0.08)", border: "1px solid rgba(255,140,0,0.2)", color: "#FF8C00" }}
+          style={{ background: "rgba(0,180,216,0.08)", border: "1px solid rgba(0,180,216,0.2)", color: "#00B4D8" }}
         >
           Full Simulation <ExternalLink className="w-2.5 h-2.5" />
         </Link>
@@ -268,12 +268,12 @@ function FlashCouncilPanel({ collapsed }: { collapsed: boolean }) {
   const [fading, setFading] = useState(false);
   const [agentStatuses] = useState(() =>
     [
-      { name: "MACRO-AGENT", color: "#FF8C00", status: "BULLISH", conf: 87 },
+      { name: "MACRO-AGENT", color: "#00B4D8", status: "BULLISH", conf: 87 },
       { name: "SENTIMENT", color: "#00ff88", status: "BUY", conf: 91 },
       { name: "TECHNICAL", color: "#f5c842", status: "HOLD", conf: 73 },
       { name: "QUANT-7", color: "#a78bfa", status: "BUY", conf: 84 },
       { name: "RISK-MGR", color: "#ff9f43", status: "CAUTION", conf: 62 },
-      { name: "MOMENTUM", color: "#FF8C00", status: "BUY", conf: 79 },
+      { name: "MOMENTUM", color: "#00B4D8", status: "BUY", conf: 79 },
     ]
   );
 
@@ -296,12 +296,12 @@ function FlashCouncilPanel({ collapsed }: { collapsed: boolean }) {
         <div
           className="rounded px-3 py-2.5 transition-opacity duration-250"
           style={{
-            background: "rgba(255,140,0,0.05)",
-            border: "1px solid rgba(255,140,0,0.12)",
+            background: "rgba(0,180,216,0.05)",
+            border: "1px solid rgba(0,180,216,0.12)",
             opacity: fading ? 0 : 1,
           }}
         >
-          <div className="text-[8px] font-mono uppercase tracking-widest mb-1" style={{ color: "rgba(255,140,0,0.6)" }}>
+          <div className="text-[8px] font-mono uppercase tracking-widest mb-1" style={{ color: "rgba(0,180,216,0.6)" }}>
             AI COUNCIL INSIGHT
           </div>
           <p className="text-[10px] font-mono leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
@@ -405,7 +405,7 @@ function MirofishPanel({ collapsed }: { collapsed: boolean }) {
     <div className="flex flex-col h-full overflow-hidden bg-[#000810]">
       <div
         className="flex items-center justify-between px-3 py-1.5 border-b flex-shrink-0"
-        style={{ borderColor: "rgba(255,140,0,0.08)", background: "rgba(0,8,16,0.98)" }}
+        style={{ borderColor: "rgba(0,180,216,0.08)", background: "rgba(0,8,16,0.98)" }}
       >
         <div className="flex items-center gap-3">
           <div className="flex gap-1">
@@ -421,7 +421,7 @@ function MirofishPanel({ collapsed }: { collapsed: boolean }) {
         </div>
       </div>
       <div className="flex-1 overflow-hidden grid grid-cols-2 gap-0">
-        <div className="border-r overflow-auto p-2" style={{ borderColor: "rgba(255,140,0,0.07)" }}>
+        <div className="border-r overflow-auto p-2" style={{ borderColor: "rgba(0,180,216,0.07)" }}>
           <div className="text-[8px] font-mono uppercase tracking-widest mb-1.5" style={{ color: "rgba(0,255,136,0.6)" }}>
             Live Order Flow
           </div>
@@ -453,7 +453,7 @@ function MirofishPanel({ collapsed }: { collapsed: boolean }) {
               <span style={{ color: "rgba(255,255,255,0.25)" }}>{log.time} </span>
               <span
                 className="text-[7px] font-bold"
-                style={{ color: log.level === "WARN" ? "#f5c842" : log.level === "DATA" ? "#a78bfa" : "#FF8C00" }}
+                style={{ color: log.level === "WARN" ? "#f5c842" : log.level === "DATA" ? "#a78bfa" : "#00B4D8" }}
               >
                 {log.level}
               </span>
@@ -462,24 +462,24 @@ function MirofishPanel({ collapsed }: { collapsed: boolean }) {
           ))}
         </div>
       </div>
-      <div className="border-t p-2 flex-shrink-0" style={{ borderColor: "rgba(255,140,0,0.08)" }}>
+      <div className="border-t p-2 flex-shrink-0" style={{ borderColor: "rgba(0,180,216,0.08)" }}>
         <div ref={scrollRef} className="max-h-16 overflow-y-auto mb-1.5 space-y-0.5">
           {history.map((h, i) => (
             <div key={i} className="text-[9px] font-mono">
-              <div style={{ color: "#FF8C00" }}>
-                <span style={{ color: "rgba(255,140,0,0.4)" }}>~$ </span>{h.input}
+              <div style={{ color: "#00B4D8" }}>
+                <span style={{ color: "rgba(0,180,216,0.4)" }}>~$ </span>{h.input}
               </div>
               <div style={{ color: "rgba(255,255,255,0.55)" }} className="pl-3 whitespace-pre-wrap">{h.output}</div>
             </div>
           ))}
         </div>
         <form onSubmit={handleCommand} className="flex items-center gap-1.5">
-          <span className="text-[9px] font-mono" style={{ color: "rgba(255,140,0,0.4)" }}>~$</span>
+          <span className="text-[9px] font-mono" style={{ color: "rgba(0,180,216,0.4)" }}>~$</span>
           <input
             value={commandInput}
             onChange={(e) => setCommandInput(e.target.value)}
             className="flex-1 bg-transparent border-none outline-none text-[10px] font-mono caret-primary"
-            style={{ color: "#FF8C00" }}
+            style={{ color: "#00B4D8" }}
             placeholder="HELP for commands..."
             autoComplete="off"
           />
@@ -581,7 +581,7 @@ function BacktesterPanel({ collapsed }: { collapsed: boolean }) {
             <stop offset="100%" stopColor={profitColor} stopOpacity="0.02" />
           </linearGradient>
         </defs>
-        <line x1={pad.l} y1={invest} x2={pad.l + pw} y2={invest} stroke="rgba(255,140,0,0.25)" strokeDasharray="4,3" strokeWidth="1" />
+        <line x1={pad.l} y1={invest} x2={pad.l + pw} y2={invest} stroke="rgba(0,180,216,0.25)" strokeDasharray="4,3" strokeWidth="1" />
         <polygon points={area} fill="url(#bt-grad)" />
         <polyline points={pts.join(" ")} fill="none" stroke={profitColor} strokeWidth="1.5" />
         <text x={pad.l} y={h - 2} fill="rgba(255,255,255,0.25)" fontSize="7" fontFamily="monospace">{result.startDate}</text>
@@ -708,7 +708,7 @@ function BacktesterPanel({ collapsed }: { collapsed: boolean }) {
 }
 
 const PANELS = [
-  { id: "monte-carlo", title: "MONTE CARLO CONE", icon: <TrendingUp className="w-3 h-3" />, statusColor: "#FF8C00", statusLabel: "LIVE", href: "/wealth-sim" },
+  { id: "monte-carlo", title: "MONTE CARLO CONE", icon: <TrendingUp className="w-3 h-3" />, statusColor: "#00B4D8", statusLabel: "LIVE", href: "/wealth-sim" },
   { id: "flash-council", title: "FLASH COUNCIL", icon: <Zap className="w-3 h-3" />, statusColor: "#00ff88", statusLabel: "ACTIVE", href: "/dashboard" },
   { id: "mirofish", title: "MIROFISH TERMINAL", icon: <Terminal className="w-3 h-3" />, statusColor: "#a78bfa", statusLabel: "ONLINE", href: "/terminal" },
   { id: "backtester", title: "TIME MACHINE BACKTESTER", icon: <Clock className="w-3 h-3" />, statusColor: "#f5c842", statusLabel: "READY", href: "/time-machine" },
@@ -785,7 +785,7 @@ export default function CommandCenter() {
       }}
     >
       <div className="flex items-center gap-4">
-        <span className="text-[9px] font-mono font-bold uppercase tracking-widest" style={{ color: "#FF8C00" }}>
+        <span className="text-[9px] font-mono font-bold uppercase tracking-widest" style={{ color: "#00B4D8" }}>
           EntangleWealth Command Center
         </span>
         <div className="flex items-center gap-1.5">
@@ -890,7 +890,7 @@ export default function CommandCenter() {
                     </div>
                   </div>
                 </ResizablePanel>
-                <ResizableHandle className="w-1 bg-white/[0.04] hover:bg-[#FF8C00]/30 transition-colors" />
+                <ResizableHandle className="w-1 bg-white/[0.04] hover:bg-[#00B4D8]/30 transition-colors" />
                 <ResizablePanel defaultSize={topSizes[1]} minSize={20}>
                   <div className="flex flex-col h-full">
                     <BloombergPanelHeader
@@ -905,7 +905,7 @@ export default function CommandCenter() {
                 </ResizablePanel>
               </ResizablePanelGroup>
             </ResizablePanel>
-            <ResizableHandle className="h-1 bg-white/[0.04] hover:bg-[#FF8C00]/30 transition-colors" />
+            <ResizableHandle className="h-1 bg-white/[0.04] hover:bg-[#00B4D8]/30 transition-colors" />
             <ResizablePanel defaultSize={verticalSizes[1]} minSize={20}>
               <ResizablePanelGroup
                 direction="horizontal"
@@ -927,7 +927,7 @@ export default function CommandCenter() {
                     </div>
                   </div>
                 </ResizablePanel>
-                <ResizableHandle className="w-1 bg-white/[0.04] hover:bg-[#FF8C00]/30 transition-colors" />
+                <ResizableHandle className="w-1 bg-white/[0.04] hover:bg-[#00B4D8]/30 transition-colors" />
                 <ResizablePanel defaultSize={bottomSizes[1]} minSize={20}>
                   <div
                     className="flex flex-col h-full border-t"

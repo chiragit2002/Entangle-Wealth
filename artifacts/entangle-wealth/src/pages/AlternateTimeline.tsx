@@ -123,8 +123,8 @@ function ChartSection({
             />
             <Legend wrapperStyle={{ fontSize: 11, fontFamily: "JetBrains Mono" }} />
             <DivergenceBands compareResult={compareResult} />
-            {resultA && <Line type="monotone" dataKey="Current Path" stroke="#FF8C00" strokeWidth={2} dot={{ r: 3, fill: "#FF8C00" }} connectNulls animationDuration={800} />}
-            {resultB && <Line type="monotone" dataKey="Better Path" stroke="#FF8C00" strokeWidth={2} dot={{ r: 3, fill: "#FF8C00" }} connectNulls animationDuration={800} />}
+            {resultA && <Line type="monotone" dataKey="Current Path" stroke="#00B4D8" strokeWidth={2} dot={{ r: 3, fill: "#00B4D8" }} connectNulls animationDuration={800} />}
+            {resultB && <Line type="monotone" dataKey="Better Path" stroke="#00B4D8" strokeWidth={2} dot={{ r: 3, fill: "#00B4D8" }} connectNulls animationDuration={800} />}
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -267,7 +267,7 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
                 <Line
                   type="monotone"
                   dataKey="gap"
-                  stroke={((d20?.deltaNetWorth || 0) >= 0) ? "#FF8C00" : "#ef4444"}
+                  stroke={((d20?.deltaNetWorth || 0) >= 0) ? "#00B4D8" : "#ef4444"}
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   animationDuration={900}
@@ -306,7 +306,7 @@ function IdentityBadge({ stage }: { stage: Stage }) {
           <div
             key={s}
             className={`h-1.5 rounded-full transition-all duration-500 ${i <= idx ? "w-6" : "w-2 opacity-20"}`}
-            style={{ backgroundColor: i <= idx ? "#FF8C00" : "#555" }}
+            style={{ backgroundColor: i <= idx ? "#00B4D8" : "#555" }}
           />
         ))}
       </div>
@@ -350,7 +350,7 @@ function EnhancedSnapshotCompare({
     return row;
   });
 
-  const COLORS = ["#FF8C00", "#FF8C00", "#f59e0b", "#a78bfa", "#f87171"];
+  const COLORS = ["#00B4D8", "#00B4D8", "#f59e0b", "#a78bfa", "#f87171"];
 
   const generateAnnotation = (tl: SavedTimeline): string => {
     const r5 = tl.results.find(r => r.horizon === "5yr");
@@ -417,8 +417,8 @@ function EnhancedSnapshotCompare({
                   onClick={() => toggleSelect(tl.id)}
                   className="w-4 h-4 rounded border mt-0.5 shrink-0 transition-all flex items-center justify-center"
                   style={{
-                    borderColor: isSelected ? (color || "#FF8C00") : "rgba(255,255,255,0.2)",
-                    background: isSelected ? (color || "#FF8C00") + "20" : "transparent",
+                    borderColor: isSelected ? (color || "#00B4D8") : "rgba(255,255,255,0.2)",
+                    background: isSelected ? (color || "#00B4D8") + "20" : "transparent",
                   }}
                   aria-pressed={isSelected}
                   aria-label={`${isSelected ? "Deselect" : "Select"} scenario: ${tl.name}`}
@@ -958,7 +958,7 @@ export default function AlternateTimeline() {
         <div className="hidden md:flex flex-row gap-4 mb-6">
           <TimelinePane
             label="Current Path"
-            borderColor="#FF8C00"
+            borderColor="#00B4D8"
             params={paramsA}
             onParam={handleParamA}
             result={resultA}
@@ -966,7 +966,7 @@ export default function AlternateTimeline() {
           />
           <TimelinePane
             label="Better Path"
-            borderColor="#FF8C00"
+            borderColor="#00B4D8"
             params={paramsB}
             onParam={handleParamB}
             result={resultB}
@@ -988,8 +988,8 @@ export default function AlternateTimeline() {
                 className={`flex-1 py-2.5 text-xs font-bold transition-all ${
                   activeTab === t
                     ? t === "A"
-                      ? "bg-[#FF8C00]/20 text-[#FF8C00] border-b-2 border-[#FF8C00]"
-                      : "bg-[#FF8C00]/20 text-[#FF8C00] border-b-2 border-[#FF8C00]"
+                      ? "bg-[#00B4D8]/20 text-[#00B4D8] border-b-2 border-[#00B4D8]"
+                      : "bg-[#00B4D8]/20 text-[#00B4D8] border-b-2 border-[#00B4D8]"
                     : "text-white/40 hover:text-white"
                 }`}
               >
@@ -1001,7 +1001,7 @@ export default function AlternateTimeline() {
             {activeTab === "A" && (
               <TimelinePane
                 label="Current Path"
-                borderColor="#FF8C00"
+                borderColor="#00B4D8"
                 params={paramsA}
                 onParam={handleParamA}
                 result={resultA}
@@ -1013,7 +1013,7 @@ export default function AlternateTimeline() {
             {activeTab === "B" && (
               <TimelinePane
                 label="Better Path"
-                borderColor="#FF8C00"
+                borderColor="#00B4D8"
                 params={paramsB}
                 onParam={handleParamB}
                 result={resultB}
@@ -1181,7 +1181,7 @@ export default function AlternateTimeline() {
               const setAnnotation = which === "A" ? setSaveAnnotationA : setSaveAnnotationB;
               const saving = which === "A" ? savingA : savingB;
               const label = which === "A" ? "Current Path" : "Better Path";
-              const borderColor = which === "A" ? "#FF8C00" : "#FF8C00";
+              const borderColor = which === "A" ? "#00B4D8" : "#00B4D8";
 
               return (
                 <div key={which} className="rounded-xl p-4"
@@ -1268,7 +1268,7 @@ export default function AlternateTimeline() {
 
         {!isSignedIn && (
           <div className="mt-6 rounded-xl p-4 flex items-center gap-3"
-            style={{ background: "rgba(255,140,0,0.05)", border: "1px solid rgba(255,140,0,0.12)" }}>
+            style={{ background: "rgba(0,180,216,0.05)", border: "1px solid rgba(0,180,216,0.12)" }}>
             <AlertTriangle className="w-4 h-4 text-primary/60 shrink-0" aria-hidden="true" />
             <div className="text-xs text-white/50">
               <span className="text-primary font-bold">Sign in</span> to save scenarios, track your identity stage, and earn XP for exploring different financial paths.
@@ -1276,7 +1276,7 @@ export default function AlternateTimeline() {
           </div>
         )}
 
-        <div className="mt-6 rounded-2xl overflow-hidden" style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(255,140,0,0.2)" }}>
+        <div className="mt-6 rounded-2xl overflow-hidden" style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(0,180,216,0.2)" }}>
           <button
             onClick={() => setShowMonteCarlo(v => !v)}
             className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/[0.02] transition-colors"
@@ -1380,7 +1380,7 @@ export default function AlternateTimeline() {
                         <div className="text-[9px] text-red-400/60 font-mono uppercase tracking-wider">Pessimistic (P10)</div>
                         <div className="text-lg font-black text-red-400 font-mono mt-1">{fmtK(lastP10)}</div>
                       </div>
-                      <div className="text-center rounded-xl p-3" style={{ background: "rgba(255,140,0,0.06)", border: "1px solid rgba(255,140,0,0.2)" }}>
+                      <div className="text-center rounded-xl p-3" style={{ background: "rgba(0,180,216,0.06)", border: "1px solid rgba(0,180,216,0.2)" }}>
                         <div className="text-[9px] text-primary/60 font-mono uppercase tracking-wider">Median (P50)</div>
                         <div className="text-lg font-black text-primary font-mono mt-1">{fmtK(lastP50)}</div>
                       </div>
@@ -1395,8 +1395,8 @@ export default function AlternateTimeline() {
                         <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                           <defs>
                             <linearGradient id="mcCone" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#FF8C00" stopOpacity={0.2} />
-                              <stop offset="95%" stopColor="#FF8C00" stopOpacity={0.02} />
+                              <stop offset="5%" stopColor="#00B4D8" stopOpacity={0.2} />
+                              <stop offset="95%" stopColor="#00B4D8" stopOpacity={0.02} />
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.04)" />
@@ -1407,7 +1407,7 @@ export default function AlternateTimeline() {
                             formatter={(val: number, name: string) => [fmtK(val), name]}
                           />
                           <Area type="monotone" dataKey="p90" stroke="#00ff88" strokeWidth={1} fill="url(#mcCone)" fillOpacity={0.3} name="Optimistic (P90)" dot={false} strokeDasharray="3 3" />
-                          <Area type="monotone" dataKey="p50" stroke="#FF8C00" strokeWidth={2} fill="url(#mcCone)" fillOpacity={0} name="Median (P50)" dot={false} />
+                          <Area type="monotone" dataKey="p50" stroke="#00B4D8" strokeWidth={2} fill="url(#mcCone)" fillOpacity={0} name="Median (P50)" dot={false} />
                           <Area type="monotone" dataKey="p10" stroke="#ff3366" strokeWidth={1} fill="transparent" fillOpacity={0} name="Pessimistic (P10)" dot={false} strokeDasharray="3 3" />
                           {mcResult.lifeEvents.map((ev, i) => (
                             <ReferenceLine key={i} x={`Yr ${ev.year}`} stroke="#ffd700" strokeDasharray="4 2" strokeOpacity={0.6} label={{ value: ev.label, fontSize: 8, fill: "#ffd700" }} />
@@ -1416,7 +1416,7 @@ export default function AlternateTimeline() {
                       </ResponsiveContainer>
                     </div>
 
-                    <div className="rounded-xl px-4 py-3" style={{ background: "rgba(255,140,0,0.04)", border: "1px solid rgba(255,140,0,0.12)" }}>
+                    <div className="rounded-xl px-4 py-3" style={{ background: "rgba(0,180,216,0.04)", border: "1px solid rgba(0,180,216,0.12)" }}>
                       <div className="text-[10px] text-primary/60 font-mono uppercase tracking-wider mb-1.5">AI Narrative</div>
                       <p className="text-[12px] text-white/70 leading-relaxed">{mcResult.narrative}</p>
                     </div>

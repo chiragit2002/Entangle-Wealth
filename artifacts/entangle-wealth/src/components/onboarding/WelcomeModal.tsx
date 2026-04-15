@@ -62,12 +62,12 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
       aria-modal="true"
       aria-labelledby="welcome-modal-title"
     >
-      <div className="bg-[#0a0a14] border border-white/10 rounded-sm w-full max-w-sm overflow-hidden shadow-2xl shadow-[#FF8C00]/5 animate-in fade-in zoom-in-95 duration-300">
+      <div className="bg-[#0a0a14] border border-white/10 rounded-sm w-full max-w-sm overflow-hidden shadow-2xl shadow-[#00B4D8]/5 animate-in fade-in zoom-in-95 duration-300">
 
         <div className="px-6 pt-6 pb-4">
           <div className="flex items-center gap-2.5 mb-1">
-            <div className="w-9 h-9 rounded-xl bg-[#FF8C00]/10 flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-4.5 h-4.5 text-[#FF8C00]" />
+            <div className="w-9 h-9 rounded-xl bg-[#00B4D8]/10 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-4.5 h-4.5 text-[#00B4D8]" />
             </div>
             <div>
               <h2 id="welcome-modal-title" className="text-lg font-bold text-white leading-tight">
@@ -88,7 +88,7 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
                 onClick={() => setGoal(opt.id)}
                 className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl border text-left transition-all duration-200 active:scale-[0.98] ${
                   goal === opt.id
-                    ? "border-[#FF8C00]/50 bg-[#FF8C00]/8 text-white"
+                    ? "border-[#00B4D8]/50 bg-[#00B4D8]/8 text-white"
                     : "border-white/8 bg-white/[0.02] text-white/70 hover:border-white/15 hover:bg-white/[0.04]"
                 }`}
                 aria-pressed={goal === opt.id}
@@ -96,7 +96,7 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
                 <div className="flex-1">
                   <p className="text-sm font-semibold">{opt.label}</p>
                 </div>
-                {goal === opt.id && <CheckCircle2 className="w-4 h-4 text-[#FF8C00] shrink-0" aria-hidden="true" />}
+                {goal === opt.id && <CheckCircle2 className="w-4 h-4 text-[#00B4D8] shrink-0" aria-hidden="true" />}
               </button>
             ))}
           </div>
@@ -104,7 +104,7 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
           <button
             onClick={handleComplete}
             disabled={saving || !goal}
-            className="flex items-center justify-center gap-1.5 w-full px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#FF8C00] to-[#0099cc] text-black text-sm font-bold hover:opacity-90 active:scale-[0.97] transition-all disabled:opacity-50 min-h-[44px]"
+            className="flex items-center justify-center gap-1.5 w-full px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00B4D8] to-[#0099cc] text-black text-sm font-bold hover:opacity-90 active:scale-[0.97] transition-all disabled:opacity-50 min-h-[44px]"
             aria-busy={saving}
           >
             {saving ? (

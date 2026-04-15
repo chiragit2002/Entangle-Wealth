@@ -66,7 +66,7 @@ const PLATFORM_META: Record<string, { label: string; icon: React.ReactNode; colo
   engagement: {
     label: "Engagement",
     icon: <MessageCircle className="w-4 h-4" />,
-    color: "#FF8C00",
+    color: "#00B4D8",
     gradient: "from-emerald-500/20 to-green-600/20",
   },
 };

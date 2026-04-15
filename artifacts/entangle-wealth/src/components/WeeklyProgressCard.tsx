@@ -44,7 +44,7 @@ export function WeeklyProgressCard() {
     localStorage.setItem(key, "true");
   };
 
-  const tierColor = summary.tier === "Diamond" ? "#FF8C00"
+  const tierColor = summary.tier === "Diamond" ? "#00B4D8"
     : summary.tier === "Platinum" ? "#b8c0cc"
     : summary.tier === "Gold" ? "#FFB800"
     : summary.tier === "Silver" ? "#c0c0c0"
@@ -96,18 +96,18 @@ export function WeeklyProgressCard() {
               color="rgb(251,146,60)"
             />
             <StatTile
-              icon={<TrendingUp className="w-3 h-3 text-[#FF8C00]" />}
+              icon={<TrendingUp className="w-3 h-3 text-[#00B4D8]" />}
               label="SIGNALS"
               value={`${summary.signalsViewed}`}
               sub="viewed this week"
-              color="#FF8C00"
+              color="#00B4D8"
             />
             <StatTile
-              icon={<Target className="w-3 h-3 text-[#FF8C00]" />}
+              icon={<Target className="w-3 h-3 text-[#00B4D8]" />}
               label="CHALLENGES"
               value={`${summary.challengesCompleted}`}
               sub="completed"
-              color="#FF8C00"
+              color="#00B4D8"
             />
             <StatTile
               icon={<Trophy className="w-3 h-3" style={{ color: tierColor }} />}

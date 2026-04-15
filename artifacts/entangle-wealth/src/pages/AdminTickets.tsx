@@ -25,9 +25,9 @@ interface SupportTicket {
 const STATUS_OPTIONS = ["all", "open", "in_progress", "resolved", "closed"] as const;
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Circle }> = {
-  open: { label: "Open", color: "#FF8C00", icon: Circle },
+  open: { label: "Open", color: "#00B4D8", icon: Circle },
   in_progress: { label: "In Progress", color: "#FFB800", icon: AlertCircle },
-  resolved: { label: "Resolved", color: "#FF8C00", icon: CheckCircle2 },
+  resolved: { label: "Resolved", color: "#00B4D8", icon: CheckCircle2 },
   closed: { label: "Closed", color: "#666", icon: CheckCircle2 },
 };
 
@@ -111,7 +111,7 @@ export default function AdminTickets() {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Ticket className="w-6 h-6 text-[#FF8C00]" />
+            <Ticket className="w-6 h-6 text-[#00B4D8]" />
             <div>
               <h1 className="text-2xl font-bold">Support Tickets</h1>
               <p className="text-xs text-white/30">{tickets.length} tickets</p>
@@ -130,7 +130,7 @@ export default function AdminTickets() {
               onClick={() => setStatusFilter(s)}
               className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
                 statusFilter === s
-                  ? "bg-[#FF8C00]/10 text-[#FF8C00] border-[#FF8C00]/30"
+                  ? "bg-[#00B4D8]/10 text-[#00B4D8] border-[#00B4D8]/30"
                   : "bg-white/[0.03] text-white/40 border-white/[0.06] hover:bg-white/[0.06]"
               }`}
             >
@@ -157,7 +157,7 @@ export default function AdminTickets() {
               const cfg = STATUS_CONFIG[ticket.status] || STATUS_CONFIG.open;
               const StatusIcon = cfg.icon;
               return (
-                <div key={ticket.id} className={`border rounded-xl overflow-hidden transition-colors ${isExpanded ? "border-[#FF8C00]/20 bg-white/[0.02]" : "border-white/[0.06] bg-white/[0.01]"}`}>
+                <div key={ticket.id} className={`border rounded-xl overflow-hidden transition-colors ${isExpanded ? "border-[#00B4D8]/20 bg-white/[0.02]" : "border-white/[0.06] bg-white/[0.01]"}`}>
                   <button onClick={() => setExpandedId(isExpanded ? null : ticket.id)} className="w-full flex items-center justify-between px-5 py-4 text-left">
                     <div className="flex items-center gap-4 min-w-0 flex-1">
                       <span className="text-xs font-mono text-white/40 shrink-0">#{ticket.id}</span>
@@ -193,7 +193,7 @@ export default function AdminTickets() {
                             {ticket.resolved_at && (
                               <div>
                                 <span className="text-white/50">Resolved:</span>
-                                <span className="text-[#FF8C00] ml-1 font-mono">{new Date(ticket.resolved_at).toLocaleString()}</span>
+                                <span className="text-[#00B4D8] ml-1 font-mono">{new Date(ticket.resolved_at).toLocaleString()}</span>
                               </div>
                             )}
                           </div>
@@ -227,7 +227,7 @@ export default function AdminTickets() {
                                 value={editNotes[ticket.id] ?? ticket.admin_notes ?? ""}
                                 onChange={(e) => setEditNotes((prev) => ({ ...prev, [ticket.id]: e.target.value }))}
                                 rows={3}
-                                className="w-full mt-1 px-3 py-2 text-xs bg-white/[0.03] border border-white/[0.06] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8C00]/30 resize-none"
+                                className="w-full mt-1 px-3 py-2 text-xs bg-white/[0.03] border border-white/[0.06] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/30 resize-none"
                                 placeholder="Add internal notes..."
                               />
                               <button
@@ -235,7 +235,7 @@ export default function AdminTickets() {
                                   const notes = editNotes[ticket.id];
                                   if (notes !== undefined) updateTicket(ticket.id, undefined, notes);
                                 }}
-                                className="mt-1 px-3 py-1 text-[10px] font-semibold bg-[#FF8C00]/10 text-[#FF8C00] border border-[#FF8C00]/20 rounded-lg hover:bg-[#FF8C00]/20 transition-colors"
+                                className="mt-1 px-3 py-1 text-[10px] font-semibold bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/20 rounded-lg hover:bg-[#00B4D8]/20 transition-colors"
                               >
                                 <MessageSquare className="w-3 h-3 inline mr-1" />
                                 Save Notes
@@ -256,7 +256,7 @@ export default function AdminTickets() {
             <button
               onClick={() => { setLoadingMore(true); fetchTickets(true); }}
               disabled={loadingMore}
-              className="text-[#FF8C00] text-xs font-semibold hover:underline"
+              className="text-[#00B4D8] text-xs font-semibold hover:underline"
             >
               {loadingMore ? "Loading..." : `Load More (${tickets.length}/${ticketsTotal})`}
             </button>

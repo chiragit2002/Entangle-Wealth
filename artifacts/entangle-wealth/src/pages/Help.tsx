@@ -61,7 +61,7 @@ export default function Help() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search for help..."
-            className="w-full h-12 pl-12 pr-4 text-sm bg-white/[0.03] border border-white/[0.08] rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8C00]/40 transition-colors"
+            className="w-full h-12 pl-12 pr-4 text-sm bg-white/[0.03] border border-white/[0.08] rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/40 transition-colors"
           />
         </div>
 
@@ -70,7 +70,7 @@ export default function Help() {
             onClick={() => setActiveCategory("all")}
             className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-colors ${
               activeCategory === "all"
-                ? "bg-[#FF8C00]/10 text-[#FF8C00] border-[#FF8C00]/30"
+                ? "bg-[#00B4D8]/10 text-[#00B4D8] border-[#00B4D8]/30"
                 : "bg-white/[0.03] text-white/40 border-white/[0.06] hover:bg-white/[0.06]"
             }`}
           >
@@ -84,7 +84,7 @@ export default function Help() {
                 onClick={() => setActiveCategory(cat.key)}
                 className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-colors flex items-center gap-1.5 ${
                   activeCategory === cat.key
-                    ? "bg-[#FF8C00]/10 text-[#FF8C00] border-[#FF8C00]/30"
+                    ? "bg-[#00B4D8]/10 text-[#00B4D8] border-[#00B4D8]/30"
                     : "bg-white/[0.03] text-white/40 border-white/[0.06] hover:bg-white/[0.06]"
                 }`}
               >
@@ -103,7 +103,7 @@ export default function Help() {
               Try a different search term or category, or scroll down to{" "}
               <Link
                 href="/help#submit-ticket"
-                className="text-[#FF8C00] hover:underline"
+                className="text-[#00B4D8] hover:underline"
               >
                 submit a support ticket
               </Link>{" "}
@@ -119,7 +119,7 @@ export default function Help() {
                   key={faq.id}
                   className={`border rounded-xl overflow-hidden transition-colors ${
                     isOpen
-                      ? "border-[#FF8C00]/20 bg-[#FF8C00]/[0.02]"
+                      ? "border-[#00B4D8]/20 bg-[#00B4D8]/[0.02]"
                       : "border-white/[0.06] bg-white/[0.01] hover:border-white/10"
                   }`}
                 >
@@ -139,7 +139,7 @@ export default function Help() {
                       </span>
                     </div>
                     {isOpen ? (
-                      <ChevronUp className="w-4 h-4 text-[#FF8C00] shrink-0 ml-2" />
+                      <ChevronUp className="w-4 h-4 text-[#00B4D8] shrink-0 ml-2" />
                     ) : (
                       <ChevronDown className="w-4 h-4 text-white/40 shrink-0 ml-2" />
                     )}
@@ -163,7 +163,7 @@ export default function Help() {
           id="submit-ticket"
           className="mt-16 text-center bg-white/[0.02] border border-white/[0.06] rounded-sm p-8"
         >
-          <MessageSquarePlus className="w-10 h-10 text-[#FF8C00] mx-auto mb-4" />
+          <MessageSquarePlus className="w-10 h-10 text-[#00B4D8] mx-auto mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">
             Still need help?
           </h2>
@@ -172,7 +172,7 @@ export default function Help() {
             team will get back to you within 1–2 business days.
           </p>
           <Link href="/submit-ticket">
-            <button className="px-6 py-2.5 text-sm font-semibold bg-[#FF8C00] text-black rounded-xl hover:bg-[#FF8C00]/90 transition-colors">
+            <button className="px-6 py-2.5 text-sm font-semibold bg-[#00B4D8] text-black rounded-xl hover:bg-[#00B4D8]/90 transition-colors">
               Submit a Ticket
             </button>
           </Link>
@@ -181,7 +181,7 @@ export default function Help() {
         <div className="mt-8 text-center">
           <Link
             href="/status"
-            className="text-xs text-white/50 hover:text-[#FF8C00] transition-colors"
+            className="text-xs text-white/50 hover:text-[#00B4D8] transition-colors"
           >
             Check system status
           </Link>

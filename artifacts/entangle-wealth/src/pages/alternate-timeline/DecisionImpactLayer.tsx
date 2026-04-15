@@ -49,14 +49,14 @@ export function DecisionImpactLayer({ compareResult, selectedHorizon }: {
 
       <div className="flex items-center gap-3" aria-hidden="true">
         <div className="flex items-center gap-1.5 flex-1">
-          <div className="w-2 h-2 rounded-full bg-[#FF8C00]" />
+          <div className="w-2 h-2 rounded-full bg-[#00B4D8]" />
           <div className="text-[9px] text-white/40 font-mono">Current Path</div>
         </div>
         <div className="flex-1 relative h-2 flex items-center">
           <div className="absolute inset-0 flex items-center">
             <motion.div
               className="h-px w-full"
-              style={{ background: isPositive ? "linear-gradient(to right, #FF8C00, #FF8C00)" : "linear-gradient(to right, #FF8C00, #ef4444)" }}
+              style={{ background: isPositive ? "linear-gradient(to right, #00B4D8, #00B4D8)" : "linear-gradient(to right, #00B4D8, #ef4444)" }}
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: 0.7, ease: "easeOut" }}
@@ -74,12 +74,12 @@ export function DecisionImpactLayer({ compareResult, selectedHorizon }: {
         </div>
         <div className="flex items-center gap-1.5 flex-1 justify-end">
           <div className="text-[9px] text-white/40 font-mono">Better Path</div>
-          <div className="w-2 h-2 rounded-full bg-[#FF8C00]" />
+          <div className="w-2 h-2 rounded-full bg-[#00B4D8]" />
         </div>
       </div>
 
       <div className="flex items-center justify-between rounded-xl px-4 py-3"
-        style={{ background: isPositive ? "rgba(255,140,0,0.06)" : "rgba(239,68,68,0.06)", border: `1px solid ${isPositive ? "rgba(255,140,0,0.15)" : "rgba(239,68,68,0.15)"}` }}>
+        style={{ background: isPositive ? "rgba(0,180,216,0.06)" : "rgba(239,68,68,0.06)", border: `1px solid ${isPositive ? "rgba(0,180,216,0.15)" : "rgba(239,68,68,0.15)"}` }}>
         <div className="text-xs text-white/50 font-mono">Path difference @ {selectedHorizon}</div>
         <motion.div
           key={selectedDelta}

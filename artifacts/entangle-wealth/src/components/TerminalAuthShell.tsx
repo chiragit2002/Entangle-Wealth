@@ -19,13 +19,13 @@ const TERMINAL_LINES = [
 function TickerTape() {
   return (
     <div className="w-full overflow-hidden py-1.5 flex items-center"
-      style={{ background: "#060910", borderBottom: "1px solid rgba(255,140,0,0.15)" }}>
+      style={{ background: "#060910", borderBottom: "1px solid rgba(0,180,216,0.15)" }}>
       <div className="flex animate-[ticker_30s_linear_infinite] whitespace-nowrap">
         {[...marketTickerData, ...marketTickerData, ...marketTickerData, ...marketTickerData].map((item, i) => (
           <div key={`${item.symbol}-${i}`} className="flex items-center gap-1.5 mx-4 text-xs tracking-wider" style={{ fontFamily: "'JetBrains Mono', 'Fira Code', 'Courier New', monospace" }}>
             <span style={{ color: "#ffffff", fontWeight: 700 }}>{item.symbol}</span>
             <span style={{ color: "rgba(255,255,255,0.6)" }}>${item.price.toFixed(2)}</span>
-            <span style={{ color: item.isPositive ? "#FF8C00" : "#FF3B3B" }}>
+            <span style={{ color: item.isPositive ? "#00B4D8" : "#FF3B3B" }}>
               {item.isPositive ? "\u25B2" : "\u25BC"} {item.change}
             </span>
           </div>
@@ -46,7 +46,7 @@ function BlinkingCursor() {
       display: "inline-block",
       width: "10px",
       height: "20px",
-      background: visible ? "#FF8C00" : "transparent",
+      background: visible ? "#00B4D8" : "transparent",
       marginLeft: "4px",
       verticalAlign: "middle",
       transition: "background 0.1s",
@@ -58,7 +58,7 @@ function MarketStatTile({ label, value, change, positive }: { label: string; val
   return (
     <div style={{
       background: "#0D1321",
-      border: "1px solid rgba(255,140,0,0.12)",
+      border: "1px solid rgba(0,180,216,0.12)",
       padding: "12px 14px",
       flex: "1 1 0",
       minWidth: 0,
@@ -81,7 +81,7 @@ function MarketStatTile({ label, value, change, positive }: { label: string; val
         <span style={{
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: "12px",
-          color: positive ? "#FF8C00" : "#FF3B3B",
+          color: positive ? "#00B4D8" : "#FF3B3B",
           fontWeight: 500,
         }}>{change}</span>
       </div>
@@ -106,10 +106,10 @@ function TerminalLine({ label, status, delay }: { label: string; status: string;
       color: "rgba(255,255,255,0.5)",
       lineHeight: "1.8",
     }}>
-      <span style={{ color: "#FF8C00" }}>{"> "}</span>
+      <span style={{ color: "#00B4D8" }}>{"> "}</span>
       {label}
       <span style={{ color: "rgba(255,255,255,0.15)" }}>{dots}</span>
-      <span style={{ color: "#FF8C00", fontWeight: 600 }}>{status}</span>
+      <span style={{ color: "#00B4D8", fontWeight: 600 }}>{status}</span>
     </div>
   );
 }
@@ -184,7 +184,7 @@ const TerminalAuthShellBase = memo(function TerminalAuthShell({
 
           <div style={{
             background: "#0D1321",
-            border: "1px solid rgba(255,140,0,0.12)",
+            border: "1px solid rgba(0,180,216,0.12)",
             padding: "16px 18px",
           }}>
             {TERMINAL_LINES.map((line, i) => (
@@ -205,11 +205,11 @@ const TerminalAuthShellBase = memo(function TerminalAuthShell({
             <div style={{
               marginBottom: "16px",
               padding: "8px 16px",
-              border: "1px solid rgba(255,140,0,0.2)",
-              background: "rgba(255,140,0,0.05)",
+              border: "1px solid rgba(0,180,216,0.2)",
+              background: "rgba(0,180,216,0.05)",
               fontFamily: "'JetBrains Mono', monospace",
               fontSize: "12px",
-              color: "#FF8C00",
+              color: "#00B4D8",
               maxWidth: "420px",
               width: "100%",
             }}>
@@ -230,9 +230,9 @@ const TerminalAuthShellBase = memo(function TerminalAuthShell({
             letterSpacing: "0.04em",
           }}>
             By continuing, you agree to our{" "}
-            <Link href="/terms" style={{ color: "rgba(255,140,0,0.5)", textDecoration: "none" }}>Terms</Link>
+            <Link href="/terms" style={{ color: "rgba(0,180,216,0.5)", textDecoration: "none" }}>Terms</Link>
             {" "}&{" "}
-            <Link href="/privacy" style={{ color: "rgba(255,140,0,0.5)", textDecoration: "none" }}>Privacy Policy</Link>
+            <Link href="/privacy" style={{ color: "rgba(0,180,216,0.5)", textDecoration: "none" }}>Privacy Policy</Link>
           </p>
         </div>
       </div>

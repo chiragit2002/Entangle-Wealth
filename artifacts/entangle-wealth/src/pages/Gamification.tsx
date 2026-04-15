@@ -54,18 +54,18 @@ interface GamificationStatus {
 }
 
 const WHEEL_SEGMENTS = [
-  { label: "+50 XP", color: "#FF8C00", textColor: "#000" },
+  { label: "+50 XP", color: "#00B4D8", textColor: "#000" },
   { label: "+100 XP", color: "#FFB800", textColor: "#000" },
-  { label: "+50 XP", color: "#FF8C00", textColor: "#000" },
-  { label: "+250 XP", color: "#FF8C00", textColor: "#000" },
+  { label: "+50 XP", color: "#00B4D8", textColor: "#000" },
+  { label: "+250 XP", color: "#00B4D8", textColor: "#000" },
   { label: "+100 XP", color: "#FFB800", textColor: "#000" },
   { label: "2x Boost", color: "#9c27b0", textColor: "#fff" },
-  { label: "+50 XP", color: "#FF8C00", textColor: "#000" },
+  { label: "+50 XP", color: "#00B4D8", textColor: "#000" },
   { label: "Streak+", color: "#ff6b35", textColor: "#fff" },
 ];
 
 const TIER_COLOR_MAP: Record<string, string> = {
-  Diamond: "#FF8C00",
+  Diamond: "#00B4D8",
   Platinum: "#b8c0cc",
   Gold: "#FFB800",
   Silver: "#c0c0c0",
@@ -137,7 +137,7 @@ function SpinWheel({ canSpin, spinning, rotation }: { canSpin: boolean; spinning
             </g>
           ))}
           <circle cx={cx} cy={cy} r="14" fill="#0a0a14" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
-          <circle cx={cx} cy={cy} r="8" fill="#FF8C00" />
+          <circle cx={cx} cy={cy} r="8" fill="#00B4D8" />
         </svg>
       </div>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 z-10">
@@ -297,7 +297,7 @@ export default function Gamification() {
           <div className="text-center">
             <Trophy className="w-12 h-12 text-[#FFB800] mx-auto mb-4" />
             <p className="text-white/60 mb-4">Sign in to access your rewards dashboard</p>
-            <Link href="/sign-in" className="px-4 py-2 bg-[#FF8C00] text-black font-bold rounded-sm text-sm">Sign In</Link>
+            <Link href="/sign-in" className="px-4 py-2 bg-[#00B4D8] text-black font-bold rounded-sm text-sm">Sign In</Link>
           </div>
         </div>
       </Layout>
@@ -406,11 +406,11 @@ export default function Gamification() {
                 <div className="flex items-center gap-4">
                   <div className="text-center">
                     <p className="text-[9px] font-mono text-white/25 uppercase tracking-widest">Weekly</p>
-                    <p className="text-[15px] font-black font-mono text-[#FF8C00]">+{status.xp.weeklyXp.toLocaleString()}</p>
+                    <p className="text-[15px] font-black font-mono text-[#00B4D8]">+{status.xp.weeklyXp.toLocaleString()}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-[9px] font-mono text-white/25 uppercase tracking-widest">Monthly</p>
-                    <p className="text-[15px] font-black font-mono text-[#FF8C00]">+{status.xp.monthlyXp.toLocaleString()}</p>
+                    <p className="text-[15px] font-black font-mono text-[#00B4D8]">+{status.xp.monthlyXp.toLocaleString()}</p>
                   </div>
                 </div>
               </div>
@@ -423,7 +423,7 @@ export default function Gamification() {
                   <Gift className="w-3.5 h-3.5 text-[#FFB800]" />
                   <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FFB800]">Daily Spin</span>
                   {status?.canSpin && (
-                    <span className="ml-auto text-[8px] font-mono text-[#FF8C00] bg-[#FF8C00]/10 border border-[#FF8C00]/20 px-1.5 py-0.5 rounded-sm">READY</span>
+                    <span className="ml-auto text-[8px] font-mono text-[#00B4D8] bg-[#00B4D8]/10 border border-[#00B4D8]/20 px-1.5 py-0.5 rounded-sm">READY</span>
                   )}
                 </div>
                 <div className="p-4 flex flex-col items-center gap-4">
@@ -435,7 +435,7 @@ export default function Gamification() {
 
                   {showResult && spinResult && (
                     <div className="w-full text-center animate-in fade-in zoom-in-95 duration-300">
-                      <div className="bg-gradient-to-r from-[#FFB800]/10 to-[#FF8C00]/10 border border-[#FFB800]/20 rounded-sm px-4 py-3">
+                      <div className="bg-gradient-to-r from-[#FFB800]/10 to-[#00B4D8]/10 border border-[#FFB800]/20 rounded-sm px-4 py-3">
                         <p className="text-[9px] font-mono text-white/40 uppercase tracking-widest mb-1">You Won!</p>
                         <p className="text-xl font-black font-mono text-[#FFB800]">{spinResult.reward}</p>
                       </div>
@@ -476,9 +476,9 @@ export default function Gamification() {
                     <p className="text-[9px] font-mono text-white/25 uppercase tracking-widest mb-2">Possible Rewards</p>
                     <div className="grid grid-cols-2 gap-1">
                       {[
-                        { label: "+50 XP", chance: "50%", color: "#FF8C00" },
+                        { label: "+50 XP", chance: "50%", color: "#00B4D8" },
                         { label: "+100 XP", chance: "30%", color: "#FFB800" },
-                        { label: "+250 XP", chance: "15%", color: "#FF8C00" },
+                        { label: "+250 XP", chance: "15%", color: "#00B4D8" },
                         { label: "2x XP Boost", chance: "4%", color: "#9c27b0" },
                         { label: "Streak Boost", chance: "1%", color: "#ff6b35" },
                       ].map(r => (
@@ -495,9 +495,9 @@ export default function Gamification() {
               <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                 <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FF8C00]">
-                    <Zap className="w-3.5 h-3.5 text-[#FF8C00]" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FF8C00]">XP Progress</span>
+                  <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#00B4D8]">
+                    <Zap className="w-3.5 h-3.5 text-[#00B4D8]" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00B4D8]">XP Progress</span>
                   </div>
                   <div className="p-4 space-y-4">
                     <div>
@@ -523,8 +523,8 @@ export default function Gamification() {
                       {[
                         { label: "Level", value: status?.xp.level ?? 1, color: tierColor },
                         { label: "Tier", value: derivedTier, color: tierColor },
-                        { label: "To Next Lvl", value: `${status?.xpToNextLevel.toLocaleString() ?? 0} XP`, color: "#FF8C00" },
-                        { label: "Multiplier", value: `${status?.streak.multiplier.toFixed(1) ?? "1.0"}x`, color: "#FF8C00" },
+                        { label: "To Next Lvl", value: `${status?.xpToNextLevel.toLocaleString() ?? 0} XP`, color: "#00B4D8" },
+                        { label: "Multiplier", value: `${status?.streak.multiplier.toFixed(1) ?? "1.0"}x`, color: "#00B4D8" },
                       ].map(stat => (
                         <div key={stat.label} className="bg-white/[0.02] border border-white/[0.04] rounded-sm px-2.5 py-2">
                           <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest">{stat.label}</p>
@@ -572,7 +572,7 @@ export default function Gamification() {
                         >
                           <div className="flex items-center gap-2">
                             {milestone.active ? (
-                              <CheckCircle className="w-3.5 h-3.5 text-[#FF8C00]" />
+                              <CheckCircle className="w-3.5 h-3.5 text-[#00B4D8]" />
                             ) : (
                               <Clock className="w-3.5 h-3.5 text-white/40" />
                             )}
@@ -614,9 +614,9 @@ export default function Gamification() {
                 </div>
 
                 <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden sm:col-span-2">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FF8C00]">
-                    <TrendingUp className="w-3.5 h-3.5 text-[#FF8C00]" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FF8C00]">Recent Rewards</span>
+                  <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#00B4D8]">
+                    <TrendingUp className="w-3.5 h-3.5 text-[#00B4D8]" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00B4D8]">Recent Rewards</span>
                     <Link href="/achievements" className="ml-auto text-[9px] font-mono text-white/40 hover:text-white/40 flex items-center gap-0.5 transition-colors">
                       View all <ChevronRight className="w-2.5 h-2.5" />
                     </Link>
@@ -644,7 +644,7 @@ export default function Gamification() {
                           </div>
                           <div className="text-right">
                             {r.type === "xp_gain" ? (
-                              <span className="text-[11px] font-mono font-bold text-[#FF8C00]">+{r.amount} XP</span>
+                              <span className="text-[11px] font-mono font-bold text-[#00B4D8]">+{r.amount} XP</span>
                             ) : r.rewardType === "multiplier" ? (
                               <span className="text-[11px] font-mono font-bold text-[#9c27b0]">2x Boost</span>
                             ) : (

@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 
 interface Props {
   children: ReactNode;
@@ -6,7 +7,7 @@ interface Props {
 
 interface State {
   hasError: boolean;
-  countdown: number;
+  errorMessage?: string;
 }
 
 function getSessionId(): string {
@@ -76,19 +77,17 @@ function installGlobalHandlers() {
 }
 
 export class AuditErrorBoundary extends Component<Props, State> {
-  private intervalId: ReturnType<typeof setInterval> | null = null;
-
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, countdown: 5 };
+    this.state = { hasError: false };
 
     if (typeof window !== "undefined") {
       installGlobalHandlers();
     }
   }
 
-  static getDerivedStateFromError(): State {
-    return { hasError: true, countdown: 5 };
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, errorMessage: error?.message };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
@@ -102,21 +101,6 @@ export class AuditErrorBoundary extends Component<Props, State> {
       errorMessage: `${error.name}: ${error.message}`,
       sessionId: getSessionId(),
     });
-
-    this.intervalId = setInterval(() => {
-      this.setState((s) => {
-        if (s.countdown <= 1) {
-          clearInterval(this.intervalId!);
-          window.location.href = "/dashboard";
-          return s;
-        }
-        return { ...s, countdown: s.countdown - 1 };
-      });
-    }, 1000);
-  }
-
-  componentWillUnmount() {
-    if (this.intervalId) clearInterval(this.intervalId);
   }
 
   render() {
@@ -129,71 +113,83 @@ export class AuditErrorBoundary extends Component<Props, State> {
         style={{
           minHeight: "100vh",
           background: "#0A0E1A",
-          color: "#00FF41",
-          fontFamily: "'JetBrains Mono', 'Fira Code', 'Courier New', monospace",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          flexDirection: "column",
           padding: "2rem",
         }}
       >
-        <pre
-          style={{
-            fontSize: "clamp(11px, 1.5vw, 14px)",
-            lineHeight: 1.8,
-            whiteSpace: "pre-wrap",
-            maxWidth: "640px",
-            textAlign: "left",
-          }}
-        >
-          {`> SYSTEM ENCOUNTERED AN ERROR
-> LOGGING FOR REVIEW
-> REDIRECTING IN ${this.state.countdown} SECOND${this.state.countdown !== 1 ? "S" : ""}...
-
-> [AUDIT] Error captured and logged.
-> [AUDIT] Recovery initiated.`}
-        </pre>
-        <div
-          style={{
-            marginTop: "2rem",
-            width: "100%",
-            maxWidth: "640px",
-            height: "2px",
-            background: "#1a3a2a",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
+        <div style={{ maxWidth: "480px", width: "100%" }}>
           <div
             style={{
-              position: "absolute",
-              left: 0,
-              top: 0,
-              height: "100%",
-              width: `${((5 - this.state.countdown) / 5) * 100}%`,
-              background: "#00FF41",
-              transition: "width 1s linear",
+              padding: "1.5rem",
+              border: "1px solid rgba(239,68,68,0.15)",
+              background: "rgba(239,68,68,0.04)",
+              fontFamily: "'IBM Plex Mono', 'JetBrains Mono', monospace",
             }}
-          />
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
+              <AlertTriangle style={{ width: "16px", height: "16px", color: "rgba(239,68,68,0.6)" }} />
+              <span style={{ fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(239,68,68,0.6)" }}>
+                Unhandled Error
+              </span>
+            </div>
+            <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+              A critical error occurred. The error has been logged automatically.
+              {this.state.errorMessage && import.meta.env.DEV && (
+                <span style={{ display: "block", marginTop: "0.5rem", color: "rgba(239,68,68,0.5)", fontSize: "11px", wordBreak: "break-all" }}>
+                  {this.state.errorMessage}
+                </span>
+              )}
+            </p>
+            <div style={{ display: "flex", gap: "0.75rem" }}>
+              <button
+                onClick={() => this.setState({ hasError: false })}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.375rem",
+                  padding: "0.375rem 0.875rem",
+                  background: "#00B4D8",
+                  color: "#0A0E1A",
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                }}
+              >
+                <RefreshCw style={{ width: "12px", height: "12px" }} />
+                Retry
+              </button>
+              <button
+                onClick={() => (window.location.href = "/dashboard")}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.375rem",
+                  padding: "0.375rem 0.875rem",
+                  background: "transparent",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "rgba(255,255,255,0.4)",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  fontSize: "11px",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                }}
+              >
+                <Home style={{ width: "12px", height: "12px" }} />
+                Dashboard
+              </button>
+            </div>
+          </div>
+          <div style={{ marginTop: "0.5rem", fontSize: "9px", fontFamily: "inherit", color: "rgba(255,255,255,0.12)", letterSpacing: "0.1em" }}>
+            ENTANGLEWEALTH · ERROR CAPTURED · AUDIT LOGGED
+          </div>
         </div>
-        <button
-          onClick={() => (window.location.href = "/dashboard")}
-          style={{
-            marginTop: "1.5rem",
-            padding: "0.5rem 1.5rem",
-            background: "transparent",
-            border: "1px solid #00FF41",
-            color: "#00FF41",
-            cursor: "pointer",
-            fontFamily: "inherit",
-            fontSize: "12px",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-          }}
-        >
-          &gt; REDIRECT NOW
-        </button>
       </div>
     );
   }

@@ -8,7 +8,7 @@ const TIER_GRADIENTS: Record<string, { start: string; end: string; glow: string 
   Silver: { start: "#c0c0c0", end: "#a8a8a8", glow: "rgba(192,192,192,0.4)" },
   Gold: { start: "#FFB800", end: "#FFA500", glow: "rgba(255,215,0,0.55)" },
   Platinum: { start: "#e5e4e2", end: "#b8b6b0", glow: "rgba(229,228,226,0.4)" },
-  Diamond: { start: "#FF8C00", end: "#00CC33", glow: "rgba(255,140,0,0.6)" },
+  Diamond: { start: "#00B4D8", end: "#00CC33", glow: "rgba(0,180,216,0.6)" },
 };
 
 interface XPBarProps {

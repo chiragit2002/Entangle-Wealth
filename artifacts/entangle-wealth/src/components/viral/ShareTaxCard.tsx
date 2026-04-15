@@ -33,7 +33,7 @@ export function ShareTaxCard({ data, referralLink }: Props) {
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 600, 400);
 
-    ctx.strokeStyle = "rgba(255,140,0,0.06)";
+    ctx.strokeStyle = "rgba(0,180,216,0.06)";
     ctx.lineWidth = 1;
     for (let x = 0; x < 600; x += 30) {
       ctx.beginPath();
@@ -48,18 +48,18 @@ export function ShareTaxCard({ data, referralLink }: Props) {
       ctx.stroke();
     }
 
-    ctx.fillStyle = "#FF8C00";
+    ctx.fillStyle = "#00B4D8";
     ctx.font = "bold 14px sans-serif";
     ctx.fillText("EntangleWealth TaxFlow", 30, 40);
     ctx.fillStyle = "rgba(255,255,255,0.3)";
     ctx.font = "11px sans-serif";
     ctx.fillText("AI-Powered Tax Optimization", 30, 58);
 
-    ctx.fillStyle = "rgba(255,140,0,0.1)";
+    ctx.fillStyle = "rgba(0,180,216,0.1)";
     ctx.beginPath();
     ctx.roundRect(30, 80, 540, 120, 16);
     ctx.fill();
-    ctx.strokeStyle = "rgba(255,140,0,0.2)";
+    ctx.strokeStyle = "rgba(0,180,216,0.2)";
     ctx.stroke();
 
     ctx.fillStyle = "rgba(255,255,255,0.4)";
@@ -67,18 +67,18 @@ export function ShareTaxCard({ data, referralLink }: Props) {
     ctx.textAlign = "center";
     ctx.fillText("ESTIMATED TAX SAVINGS", 300, 110);
 
-    ctx.fillStyle = "#FF8C00";
+    ctx.fillStyle = "#00B4D8";
     ctx.font = "bold 52px sans-serif";
     ctx.fillText(formatDollar(data.savings), 300, 170);
 
-    ctx.fillStyle = "rgba(255,140,0,0.08)";
+    ctx.fillStyle = "rgba(0,180,216,0.08)";
     ctx.beginPath();
     ctx.roundRect(30, 220, 260, 80, 12);
     ctx.fill();
     ctx.fillStyle = "rgba(255,255,255,0.4)";
     ctx.font = "11px sans-serif";
     ctx.fillText("DEDUCTIONS FOUND", 160, 248);
-    ctx.fillStyle = "#FF8C00";
+    ctx.fillStyle = "#00B4D8";
     ctx.font = "bold 28px sans-serif";
     ctx.fillText(formatDollar(data.deductionsFound), 160, 282);
 
@@ -151,7 +151,7 @@ export function ShareTaxCard({ data, referralLink }: Props) {
         <Button
           size="sm"
           variant="outline"
-          className="border-[#FF8C00]/30 text-[#FF8C00] gap-1 text-xs"
+          className="border-[#00B4D8]/30 text-[#00B4D8] gap-1 text-xs"
           onClick={handleDownload}
         >
           <Download className="w-3.5 h-3.5" /> Save Card

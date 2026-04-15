@@ -91,7 +91,7 @@ export function HelpWidget() {
               {panel === "feedback" ? (
                 <button onClick={() => setPanel("main")} className="text-white/50 hover:text-white/80 transition-colors text-xs mr-1">←</button>
               ) : null}
-              <HelpCircle className="w-4 h-4 text-[#FF8C00]" />
+              <HelpCircle className="w-4 h-4 text-[#00B4D8]" />
               <span className="text-sm font-bold text-white">{panel === "feedback" ? "Feedback" : "Support"}</span>
             </div>
             <button onClick={handleClose} className="text-white/50 hover:text-white/50 transition-colors" aria-label="Close support">
@@ -108,7 +108,7 @@ export function HelpWidget() {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search FAQ..."
-                    className="w-full h-9 pl-9 pr-3 text-xs bg-white/[0.04] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8C00]/40 transition-colors"
+                    className="w-full h-9 pl-9 pr-3 text-xs bg-white/[0.04] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/40 transition-colors"
                     autoFocus
                   />
                 </div>
@@ -135,7 +135,7 @@ export function HelpWidget() {
                   <div className="space-y-1.5">
                     <Link href="/help" onClick={handleClose} className="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-white/[0.04] transition-colors group">
                       <div className="flex items-center gap-2">
-                        <ExternalLink className="w-3.5 h-3.5 text-[#FF8C00]" />
+                        <ExternalLink className="w-3.5 h-3.5 text-[#00B4D8]" />
                         <span className="text-xs font-medium text-white/60 group-hover:text-white/80">Help Center</span>
                       </div>
                       <ChevronRight className="w-3.5 h-3.5 text-white/40" />
@@ -150,8 +150,8 @@ export function HelpWidget() {
                     <Link href="/status" onClick={handleClose} className="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-white/[0.04] transition-colors group">
                       <div className="flex items-center gap-2">
                         <span className="relative flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF8C00] opacity-75" />
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF8C00]" />
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00B4D8] opacity-75" />
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00B4D8]" />
                         </span>
                         <span className="text-xs font-medium text-white/60 group-hover:text-white/80">System Status</span>
                       </div>
@@ -176,8 +176,8 @@ export function HelpWidget() {
             <div className="flex-1 overflow-y-auto px-4 py-4 min-h-0">
               {submitted ? (
                 <div className="text-center py-6">
-                  <div className="w-12 h-12 rounded-full bg-[#FF8C00]/20 flex items-center justify-center mx-auto mb-3">
-                    <Check className="w-6 h-6 text-[#FF8C00]" />
+                  <div className="w-12 h-12 rounded-full bg-[#00B4D8]/20 flex items-center justify-center mx-auto mb-3">
+                    <Check className="w-6 h-6 text-[#00B4D8]" />
                   </div>
                   <p className="text-white font-semibold">Thank you!</p>
                   <p className="text-white/50 text-sm mt-1">Your feedback helps us improve.</p>
@@ -210,9 +210,9 @@ export function HelpWidget() {
                           onClick={() => setCategory(cat.value)}
                           className="px-2.5 py-1 rounded-full text-xs font-medium transition-all"
                           style={{
-                            background: category === cat.value ? "rgba(255,140,0,0.2)" : "rgba(255,255,255,0.05)",
-                            border: `1px solid ${category === cat.value ? "rgba(255,140,0,0.5)" : "rgba(255,255,255,0.08)"}`,
-                            color: category === cat.value ? "#FF8C00" : "rgba(255,255,255,0.5)",
+                            background: category === cat.value ? "rgba(0,180,216,0.2)" : "rgba(255,255,255,0.05)",
+                            border: `1px solid ${category === cat.value ? "rgba(0,180,216,0.5)" : "rgba(255,255,255,0.08)"}`,
+                            color: category === cat.value ? "#00B4D8" : "rgba(255,255,255,0.5)",
                           }}
                         >
                           {cat.label}
@@ -238,7 +238,7 @@ export function HelpWidget() {
                     onClick={handleSubmitFeedback}
                     disabled={submitting}
                     className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-semibold text-sm transition-all disabled:opacity-50"
-                    style={{ background: "linear-gradient(135deg, #FF8C00, #FF6600)", color: "#000" }}
+                    style={{ background: "linear-gradient(135deg, #00B4D8, #FF6600)", color: "#000" }}
                   >
                     <Send className="w-4 h-4" />
                     {submitting ? "Submitting..." : "Submit Feedback"}
@@ -255,7 +255,7 @@ export function HelpWidget() {
         className={`fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-[89] w-12 h-12 rounded-full flex items-center justify-center shadow-xl transition-all duration-200 ${
           open
             ? "bg-white/10 border border-white/20 scale-0 opacity-0"
-            : "bg-[#FF8C00] hover:bg-[#FF8C00]/90 shadow-[0_0_30px_rgba(255,140,0,0.3)] scale-100 opacity-100"
+            : "bg-[#00B4D8] hover:bg-[#00B4D8]/90 shadow-[0_0_30px_rgba(0,180,216,0.3)] scale-100 opacity-100"
         }`}
         aria-label="Open support"
       >

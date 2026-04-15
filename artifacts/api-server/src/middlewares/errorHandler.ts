@@ -14,11 +14,18 @@ const AUTH_FAILURE_THRESHOLD = 10;
 const VALIDATION_BURST_THRESHOLD = 20;
 const CLEANUP_INTERVAL_MS = 5 * 60_000;
 
+const retryMetrics = new Map<string, { attempts: number; failures: number; lastFailure: number }>();
+
 setInterval(() => {
   const now = Date.now();
   for (const [key, entry] of suspicious4xxMap) {
     if (now - entry.windowStart > SUSPICIOUS_WINDOW_MS * 2) {
       suspicious4xxMap.delete(key);
+    }
+  }
+  for (const [key, entry] of retryMetrics) {
+    if (now - entry.lastFailure > 10 * 60_000) {
+      retryMetrics.delete(key);
     }
   }
 }, CLEANUP_INTERVAL_MS).unref();
@@ -58,10 +65,53 @@ function trackSuspicious4xx(req: Request, status: number): void {
   }
 }
 
+export function logApiRetry(label: string, attempt: number, error: Error): void {
+  const key = label;
+  const entry = retryMetrics.get(key) ?? { attempts: 0, failures: 0, lastFailure: 0 };
+  entry.attempts += 1;
+  entry.failures += 1;
+  entry.lastFailure = Date.now();
+  retryMetrics.set(key, entry);
+
+  logger.warn(
+    { label, attempt, error: error.message, totalFailures: entry.failures },
+    `[retry] API retry attempt ${attempt} for ${label}`
+  );
+}
+
+export function logApiRecovery(label: string, attempt: number): void {
+  const entry = retryMetrics.get(label);
+  logger.info(
+    { label, attempt, previousFailures: entry?.failures ?? 0 },
+    `[retry] API recovered after ${attempt} attempt(s) for ${label}`
+  );
+  retryMetrics.delete(label);
+}
+
+export function logApiFailure(label: string, maxAttempts: number, error: Error): void {
+  const entry = retryMetrics.get(label);
+  logger.error(
+    { label, maxAttempts, error: error.message, totalFailures: entry?.failures ?? maxAttempts },
+    `[retry] API permanently failed after ${maxAttempts} attempts for ${label}`
+  );
+  Sentry.withScope((scope) => {
+    scope.setTag("retry.label", label);
+    scope.setTag("retry.maxAttempts", String(maxAttempts));
+    scope.setExtra("totalFailures", entry?.failures ?? maxAttempts);
+    Sentry.captureException(error);
+  });
+}
+
 export const track4xxMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   res.on("finish", () => {
     if (res.statusCode >= 400 && res.statusCode < 500) {
       trackSuspicious4xx(req, res.statusCode);
+    }
+    if (res.statusCode === 502 || res.statusCode === 503) {
+      logger.warn(
+        { method: req.method, path: req.path, status: res.statusCode },
+        `[connection] Upstream failure response ${res.statusCode}`
+      );
     }
   });
   next();
@@ -91,6 +141,7 @@ export const globalErrorHandler = (
       method: req.method,
       path: req.path,
       ip: req.ip,
+      status,
     },
     "Unhandled error"
   );

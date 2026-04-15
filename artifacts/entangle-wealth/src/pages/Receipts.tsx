@@ -332,11 +332,11 @@ export default function Receipts() {
 
         <div className="flex gap-2 mb-6">
           <button onClick={() => setDocTab("documents")}
-            className={`flex-1 py-2 rounded-xl text-[13px] font-semibold transition-all ${docTab === "documents" ? "bg-[#FF8C00]/10 text-[#FF8C00] border border-[#FF8C00]/30" : "text-white/40 border border-transparent"}`}>
+            className={`flex-1 py-2 rounded-xl text-[13px] font-semibold transition-all ${docTab === "documents" ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/30" : "text-white/40 border border-transparent"}`}>
             <FileText className="w-4 h-4 inline mr-1" /> Documents
           </button>
           <button onClick={() => setDocTab("mileage")}
-            className={`flex-1 py-2 rounded-xl text-[13px] font-semibold transition-all ${docTab === "mileage" ? "bg-[#FF8C00]/10 text-[#FF8C00] border border-[#FF8C00]/30" : "text-white/40 border border-transparent"}`}>
+            className={`flex-1 py-2 rounded-xl text-[13px] font-semibold transition-all ${docTab === "mileage" ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/30" : "text-white/40 border border-transparent"}`}>
             <Car className="w-4 h-4 inline mr-1" /> Mileage Log
           </button>
         </div>
@@ -358,7 +358,7 @@ export default function Receipts() {
                   onDrop={handleDrop}
                   onClick={() => fileRef.current?.click()}
                   className={`glass-panel rounded-xl p-6 border-dashed border-2 text-center cursor-pointer transition-colors min-h-[140px] flex flex-col items-center justify-center ${
-                    dragOver ? "border-[#FF8C00]/60 bg-[#FF8C00]/5" : "border-primary/20 hover:border-primary/40"
+                    dragOver ? "border-[#00B4D8]/60 bg-[#00B4D8]/5" : "border-primary/20 hover:border-primary/40"
                   }`}
                   role="button"
                   tabIndex={0}
@@ -452,19 +452,19 @@ export default function Receipts() {
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <div className="text-right">
-                          <p className="text-[16px] font-extrabold font-mono" style={{ color: d.deductiblePct === 100 ? "#FF8C00" : "#ffb800" }}>
+                          <p className="text-[16px] font-extrabold font-mono" style={{ color: d.deductiblePct === 100 ? "#00B4D8" : "#ffb800" }}>
                             ${d.amount.toFixed(2)}
                           </p>
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full inline-block" style={{
-                            background: d.status === "confirmed" ? "rgba(255,140,0,0.15)" : d.status === "analyzed" ? "rgba(156,39,176,0.15)" : "rgba(255,184,0,0.15)",
-                            color: d.status === "confirmed" ? "#FF8C00" : d.status === "analyzed" ? "#9c27b0" : "#ffb800",
+                            background: d.status === "confirmed" ? "rgba(0,180,216,0.15)" : d.status === "analyzed" ? "rgba(156,39,176,0.15)" : "rgba(255,184,0,0.15)",
+                            color: d.status === "confirmed" ? "#00B4D8" : d.status === "analyzed" ? "#9c27b0" : "#ffb800",
                           }}>
                             {d.status === "confirmed" ? "CONFIRMED" : d.status === "analyzed" ? "AI ANALYZED" : "PENDING"}
                           </span>
                         </div>
                         <div className="flex flex-col gap-1">
                           {d.status === "analyzed" && (
-                            <button onClick={() => confirmDocument(d.id)} className="text-[#FF8C00] hover:text-[#FF8C00]/80 p-1" aria-label="Confirm">
+                            <button onClick={() => confirmDocument(d.id)} className="text-[#00B4D8] hover:text-[#00B4D8]/80 p-1" aria-label="Confirm">
                               <Check className="w-4 h-4" />
                             </button>
                           )}
@@ -482,7 +482,7 @@ export default function Receipts() {
                           <p className="text-[11px] text-white/50 mt-1">Items: {d.aiAnalysis.items.join(", ")}</p>
                         )}
                         <p className="text-[11px] mt-1">
-                          <span className={d.aiAnalysis.auditReady ? "text-[#FF8C00]" : "text-[#ffb800]"}>
+                          <span className={d.aiAnalysis.auditReady ? "text-[#00B4D8]" : "text-[#ffb800]"}>
                             {d.aiAnalysis.auditReady ? "✓ Audit Ready" : "⚠ Review Needed"}
                           </span>
                           {d.aiAnalysis.ircSection && <span className="text-white/30 ml-2">· {d.aiAnalysis.ircSection}</span>}
@@ -513,12 +513,12 @@ export default function Receipts() {
                         <td className="p-3 text-white/60">{d.date}</td>
                         <td className="p-3 text-white/80 font-semibold">{d.vendor || d.fileName}</td>
                         <td className="p-3 text-white/50">{d.category}</td>
-                        <td className="p-3 text-right font-mono font-bold text-[#FF8C00]">${d.amount.toFixed(2)}</td>
-                        <td className="p-3 text-right font-mono text-[#FF8C00]">${d.deductibleAmount.toFixed(2)}</td>
+                        <td className="p-3 text-right font-mono font-bold text-[#00B4D8]">${d.amount.toFixed(2)}</td>
+                        <td className="p-3 text-right font-mono text-[#00B4D8]">${d.deductibleAmount.toFixed(2)}</td>
                         <td className="p-3 text-center">
                           <span className="text-[10px] px-2 py-0.5 rounded-full" style={{
-                            background: d.status === "confirmed" ? "rgba(255,140,0,0.15)" : "rgba(255,184,0,0.15)",
-                            color: d.status === "confirmed" ? "#FF8C00" : "#ffb800",
+                            background: d.status === "confirmed" ? "rgba(0,180,216,0.15)" : "rgba(255,184,0,0.15)",
+                            color: d.status === "confirmed" ? "#00B4D8" : "#ffb800",
                           }}>{d.status}</span>
                         </td>
                         <td className="p-3">
@@ -540,7 +540,7 @@ export default function Receipts() {
               </div>
               <div className="glass-panel rounded-xl p-4 text-center">
                 <p className="text-[10px] text-muted-foreground uppercase">Deductible</p>
-                <p className="text-xl font-bold font-mono text-[#FF8C00]">${deductibleTotal.toFixed(2)}</p>
+                <p className="text-xl font-bold font-mono text-[#00B4D8]">${deductibleTotal.toFixed(2)}</p>
               </div>
             </div>
 
@@ -563,7 +563,7 @@ export default function Receipts() {
                 <Input placeholder="End location" value={mileageForm.end} onChange={e => setMileageForm(p => ({ ...p, end: e.target.value.slice(0, 200) }))} className="bg-white/5 border-white/10" />
                 <Input placeholder="Business purpose" value={mileageForm.purpose} onChange={e => setMileageForm(p => ({ ...p, purpose: e.target.value.slice(0, 500) }))} className="bg-white/5 border-white/10 col-span-2" />
               </div>
-              <Button className="w-full mt-3 bg-gradient-to-r from-[#FF8C00] to-[#0099cc] text-black font-bold min-h-[44px]" onClick={addMileageEntry}>
+              <Button className="w-full mt-3 bg-gradient-to-r from-[#00B4D8] to-[#0099cc] text-black font-bold min-h-[44px]" onClick={addMileageEntry}>
                 <Plus className="w-4 h-4 mr-1" /> Add Trip
               </Button>
             </div>
@@ -575,11 +575,11 @@ export default function Receipts() {
               </div>
               <div className="glass-panel rounded-xl p-4 text-center">
                 <p className="text-[10px] text-muted-foreground uppercase">YTD Deduction</p>
-                <p className="text-xl font-bold font-mono text-[#FF8C00]">${ytdMileageDeduction.toFixed(2)}</p>
+                <p className="text-xl font-bold font-mono text-[#00B4D8]">${ytdMileageDeduction.toFixed(2)}</p>
               </div>
               <div className="glass-panel rounded-xl p-4 text-center">
                 <p className="text-[10px] text-muted-foreground uppercase">IRS Rate</p>
-                <p className="text-xl font-bold font-mono text-[#FF8C00]">${rates.mileageRate}/mi</p>
+                <p className="text-xl font-bold font-mono text-[#00B4D8]">${rates.mileageRate}/mi</p>
               </div>
             </div>
 
@@ -611,7 +611,7 @@ export default function Receipts() {
                         <td className="p-3 text-white/70">{m.endLocation}</td>
                         <td className="p-3 text-right font-mono text-white">{m.miles}</td>
                         <td className="p-3 text-white/50">{m.purpose}</td>
-                        <td className="p-3 text-right font-mono font-bold text-[#FF8C00]">${m.deductible.toFixed(2)}</td>
+                        <td className="p-3 text-right font-mono font-bold text-[#00B4D8]">${m.deductible.toFixed(2)}</td>
                         <td className="p-3">
                           <button onClick={() => setMileage(prev => prev.filter(e => e.id !== m.id))} className="text-white/50 hover:text-[#ff4757]">
                             <Trash2 className="w-3 h-3" />

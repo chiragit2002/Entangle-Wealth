@@ -234,7 +234,7 @@ export default function TaxGPT() {
     switch (level) {
       case "HIGH": return "#ff4757";
       case "MEDIUM": return "#ffb800";
-      default: return "#FF8C00";
+      default: return "#00B4D8";
     }
   };
 
@@ -268,7 +268,7 @@ export default function TaxGPT() {
             {messages.map((msg, i) => (
               <div key={i} className={`rounded-xl p-3 text-[14px] leading-relaxed max-w-[90%] whitespace-pre-line ${
                 msg.role === "user"
-                  ? "ml-auto bg-[rgba(255,140,0,0.1)] border border-[rgba(255,140,0,0.15)] text-right"
+                  ? "ml-auto bg-[rgba(0,180,216,0.1)] border border-[rgba(0,180,216,0.15)] text-right"
                   : msg.source === "cached"
                   ? "bg-[rgba(255,183,0,0.04)] border border-[rgba(255,183,0,0.2)]"
                   : "bg-[rgba(156,39,176,0.06)] border border-[rgba(156,39,176,0.15)]"
@@ -282,10 +282,10 @@ export default function TaxGPT() {
                 {msg.source === "ai" && msg.role === "ai" && (
                   <div className="flex items-center gap-1.5 mb-2 pb-2 border-b border-[rgba(156,39,176,0.15)]">
                     <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF8C00] opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF8C00]" />
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00B4D8] opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00B4D8]" />
                     </span>
-                    <span className="text-[10px] font-bold text-[#FF8C00] uppercase tracking-wider">AI Response</span>
+                    <span className="text-[10px] font-bold text-[#00B4D8] uppercase tracking-wider">AI Response</span>
                   </div>
                 )}
                 {msg.text}

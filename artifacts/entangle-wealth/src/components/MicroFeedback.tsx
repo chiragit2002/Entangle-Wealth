@@ -71,7 +71,7 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2 text-sm text-white/70">
             {helpful ? (
-              <ThumbsUp className="w-4 h-4 text-[#FF8C00]" />
+              <ThumbsUp className="w-4 h-4 text-[#00B4D8]" />
             ) : (
               <ThumbsDown className="w-4 h-4 text-[#ff3366]" />
             )}
@@ -93,7 +93,7 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
             onClick={() => handleSubmit(true)}
             disabled={submitting}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-            style={{ background: "rgba(255,140,0,0.15)", border: "1px solid rgba(255,140,0,0.3)", color: "#FF8C00" }}
+            style={{ background: "rgba(0,180,216,0.15)", border: "1px solid rgba(0,180,216,0.3)", color: "#00B4D8" }}
           >
             <Send className="w-3 h-3" />
             {submitting ? "Sending..." : "Submit"}
@@ -115,7 +115,7 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
       <span className="text-xs text-white/50">{label}</span>
       <button
         onClick={() => handleVote(true)}
-        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-[#FF8C00] hover:bg-[#FF8C00]/10 border border-white/10 hover:border-[#FF8C00]/30 transition-all"
+        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-[#00B4D8] hover:bg-[#00B4D8]/10 border border-white/10 hover:border-[#00B4D8]/30 transition-all"
         aria-label="Helpful"
       >
         <ThumbsUp className="w-3.5 h-3.5" />

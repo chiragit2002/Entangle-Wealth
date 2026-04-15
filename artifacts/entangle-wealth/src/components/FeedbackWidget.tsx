@@ -77,9 +77,9 @@ export function FeedbackWidget() {
         onClick={handleOpen}
         className="fixed bottom-20 right-4 z-50 flex items-center gap-2 px-3 py-2.5 rounded-full text-sm font-semibold shadow-lg transition-all duration-200 hover:scale-105 active:scale-95 md:bottom-8"
         style={{
-          background: "linear-gradient(135deg, #FF8C00, #0099cc)",
+          background: "linear-gradient(135deg, #00B4D8, #0099cc)",
           color: "#000",
-          boxShadow: "0 4px 20px rgba(255,140,0,0.4)",
+          boxShadow: "0 4px 20px rgba(0,180,216,0.4)",
         }}
         aria-label="Give feedback"
       >
@@ -94,14 +94,14 @@ export function FeedbackWidget() {
             className="relative w-full max-w-sm rounded-sm p-6 shadow-2xl"
             style={{
               background: "rgba(10,10,20,0.98)",
-              border: "1px solid rgba(255,140,0,0.2)",
-              boxShadow: "0 0 60px rgba(255,140,0,0.1)",
+              border: "1px solid rgba(0,180,216,0.2)",
+              boxShadow: "0 0 60px rgba(0,180,216,0.1)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <MessageSquarePlus className="w-5 h-5 text-[#FF8C00]" />
+                <MessageSquarePlus className="w-5 h-5 text-[#00B4D8]" />
                 Quick Feedback
               </h3>
               <button onClick={handleClose} className="text-white/50 hover:text-white transition-colors">
@@ -111,8 +111,8 @@ export function FeedbackWidget() {
 
             {submitted ? (
               <div className="text-center py-6">
-                <div className="w-12 h-12 rounded-full bg-[#FF8C00]/20 flex items-center justify-center mx-auto mb-3">
-                  <Check className="w-6 h-6 text-[#FF8C00]" />
+                <div className="w-12 h-12 rounded-full bg-[#00B4D8]/20 flex items-center justify-center mx-auto mb-3">
+                  <Check className="w-6 h-6 text-[#00B4D8]" />
                 </div>
                 <p className="text-white font-semibold">Thank you!</p>
                 <p className="text-white/50 text-sm mt-1">Your feedback helps us improve.</p>
@@ -152,9 +152,9 @@ export function FeedbackWidget() {
                         onClick={() => setCategory(cat.value)}
                         className="px-2.5 py-1 rounded-full text-xs font-medium transition-all"
                         style={{
-                          background: category === cat.value ? "rgba(255,140,0,0.2)" : "rgba(255,255,255,0.05)",
-                          border: `1px solid ${category === cat.value ? "rgba(255,140,0,0.5)" : "rgba(255,255,255,0.08)"}`,
-                          color: category === cat.value ? "#FF8C00" : "rgba(255,255,255,0.5)",
+                          background: category === cat.value ? "rgba(0,180,216,0.2)" : "rgba(255,255,255,0.05)",
+                          border: `1px solid ${category === cat.value ? "rgba(0,180,216,0.5)" : "rgba(255,255,255,0.08)"}`,
+                          color: category === cat.value ? "#00B4D8" : "rgba(255,255,255,0.5)",
                         }}
                       >
                         {cat.label}
@@ -184,7 +184,7 @@ export function FeedbackWidget() {
                   disabled={submitting}
                   className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-semibold text-sm transition-all disabled:opacity-50"
                   style={{
-                    background: "linear-gradient(135deg, #FF8C00, #0099cc)",
+                    background: "linear-gradient(135deg, #00B4D8, #0099cc)",
                     color: "#000",
                   }}
                 >

@@ -60,7 +60,7 @@ export function GigIncomeOptimizerModule() {
       <div className="space-y-2">
         {items.map((item) => (
           <div key={item.label} className="flex items-start gap-3 py-2 border-b border-white/[0.04] last:border-0">
-            <div className={`mt-0.5 w-1.5 h-1.5 rounded-full shrink-0 ${item.priority === "high" ? "bg-yellow-400" : item.priority === "medium" ? "bg-[#FF8C00]" : "bg-white/20"}`} />
+            <div className={`mt-0.5 w-1.5 h-1.5 rounded-full shrink-0 ${item.priority === "high" ? "bg-yellow-400" : item.priority === "medium" ? "bg-[#00B4D8]" : "bg-white/20"}`} />
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-white/80">{item.label}</p>
               <p className="text-[10px] text-white/40 mt-0.5">{item.detail}</p>

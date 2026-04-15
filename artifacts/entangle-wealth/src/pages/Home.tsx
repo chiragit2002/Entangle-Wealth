@@ -218,7 +218,7 @@ function InlineError({ message, retry }: { message: string; retry?: () => void }
       {retry && (
         <button
           onClick={retry}
-          className="ml-auto flex items-center gap-1 text-[#FF8C00]/60 hover:text-[#FF8C00] transition-colors"
+          className="ml-auto flex items-center gap-1 text-[#00B4D8]/60 hover:text-[#00B4D8] transition-colors"
         >
           <RefreshCw className="w-3 h-3" /> Retry
         </button>
@@ -294,7 +294,7 @@ function RecentSignupTicker({
   }
   const s = signups[idx];
   return (
-    <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#FF8C00]/15 bg-[#FF8C00]/5 text-[11px] font-medium text-[#FF8C00]">
+    <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#00B4D8]/15 bg-[#00B4D8]/5 text-[11px] font-medium text-[#00B4D8]">
       <UserPlus className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
       <span>
         {s.name} just joined {s.timeLabel}
@@ -328,15 +328,15 @@ function GoalSelector({ onSelect }: { onSelect: (goal: string) => void }) {
           className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border text-left transition-all duration-200 text-sm font-medium
             ${
               selected === id
-                ? "border-[#FF8C00] bg-[#FF8C00]/10 text-white"
+                ? "border-[#00B4D8] bg-[#00B4D8]/10 text-white"
                 : "border-white/10 bg-white/[0.03] text-white/80 hover:border-white/20 hover:bg-white/[0.06]"
             }`}
         >
           <Icon
-            className={`w-4 h-4 flex-shrink-0 ${selected === id ? "text-[#FF8C00]" : "text-white/40"}`}
+            className={`w-4 h-4 flex-shrink-0 ${selected === id ? "text-[#00B4D8]" : "text-white/40"}`}
           />
           <span>{label}</span>
-          {selected === id && <CheckCircle className="w-4 h-4 text-[#FF8C00] ml-auto" />}
+          {selected === id && <CheckCircle className="w-4 h-4 text-[#00B4D8] ml-auto" />}
         </button>
       ))}
     </div>
@@ -381,7 +381,7 @@ function LanguageSelector() {
         onClick={() => setOpen(!open)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/70 hover:text-white text-xs font-medium transition-all"
       >
-        <Globe className="w-3.5 h-3.5 text-[#FF8C00]" />
+        <Globe className="w-3.5 h-3.5 text-[#00B4D8]" />
         <span>{current.flag}</span>
         <span>{current.label}</span>
       </button>
@@ -398,13 +398,13 @@ function LanguageSelector() {
               }}
               className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
                 selected === lang.code
-                  ? "bg-[#FF8C00]/10 text-[#FF8C00]"
+                  ? "bg-[#00B4D8]/10 text-[#00B4D8]"
                   : "text-white/70 hover:bg-white/[0.06] hover:text-white"
               }`}
             >
               <span className="text-base">{lang.flag}</span>
               <span>{lang.label}</span>
-              {selected === lang.code && <CheckCircle className="w-3.5 h-3.5 ml-auto text-[#FF8C00]" />}
+              {selected === lang.code && <CheckCircle className="w-3.5 h-3.5 ml-auto text-[#00B4D8]" />}
             </button>
           ))}
         </div>
@@ -417,8 +417,8 @@ const EDGE_INSIGHTS = [
   {
     id: "quantum",
     icon: Atom,
-    iconColor: "#FF8C00",
-    borderColor: "rgba(255,140,0,0.25)",
+    iconColor: "#00B4D8",
+    borderColor: "rgba(0,180,216,0.25)",
     benefit: "Six AI agents vote on every signal. Consensus only. No noise.",
     headline: "Quantum Consensus Engine",
     body: "6 independent AI models analyze the same signal simultaneously. When they disagree, you hear nothing. When they converge, you get a verdict with confidence score and hard reasoning — not a colored arrow.",
@@ -429,8 +429,8 @@ const EDGE_INSIGHTS = [
   {
     id: "timeline",
     icon: GitBranch,
-    iconColor: "#FF8C00",
-    borderColor: "rgba(255,140,0,0.22)",
+    iconColor: "#00B4D8",
+    borderColor: "rgba(0,180,216,0.22)",
     benefit: "One decision today. Radically different futures tomorrow.",
     headline: "Alternate Timeline Simulator",
     body: "Save $200 more a month. Pay off that card six months early. The simulator shows you exactly how one choice branches your financial life — in dollars and years, not percentages and jargon.",
@@ -613,7 +613,7 @@ function YourEdgeSection() {
     <section className="py-16 lg:py-24 px-4 border-t border-white/5 relative overflow-hidden">
       <div className="container mx-auto max-w-5xl relative z-10">
         <div className="text-center mb-10">
-          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#FF8C00]/70 mb-3">
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#00B4D8]/70 mb-3">
             <Atom className="w-3 h-3" aria-hidden="true" />
             Your Edge
           </span>
@@ -698,7 +698,7 @@ function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
           setStep("goal");
           trackEvent("hero_cta_clicked");
         }}
-        className="h-11 px-8 bg-[#FF8C00] text-[#0A0E1A] font-mono font-bold hover:opacity-90 active:opacity-80 text-sm tracking-wider shadow-[0_0_20px_rgba(255,140,0,0.20)] transition-all duration-150"
+        className="h-11 px-8 bg-[#00B4D8] text-[#0A0E1A] font-mono font-bold hover:opacity-90 active:opacity-80 text-sm tracking-wider shadow-[0_0_20px_rgba(0,180,216,0.20)] transition-all duration-150"
       >
         Get my financial picture — free
       </Button>
@@ -714,7 +714,7 @@ function MicroConversionFlow({ referralCode }: { referralCode?: string }) {
   }
 
   return (
-    <div className="flex items-center gap-2 text-[#FF8C00] text-sm font-medium animate-in fade-in duration-300">
+    <div className="flex items-center gap-2 text-[#00B4D8] text-sm font-medium animate-in fade-in duration-300">
       <CheckCircle className="w-5 h-5" />
       <span>Great — taking you there now...</span>
     </div>
@@ -763,7 +763,7 @@ export default function Home() {
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
               Stop guessing with
               <br />
-              <span className="text-[#FF8C00]">your financial future.</span>
+              <span className="text-[#00B4D8]">your financial future.</span>
             </h1>
 
             <p className="max-w-lg text-base md:text-lg text-white/60 leading-relaxed">
@@ -778,7 +778,7 @@ export default function Home() {
 
             <div className="flex flex-wrap items-center justify-center gap-5 pt-1">
               <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
-                <Lock className="w-3.5 h-3.5 text-[#FF8C00]" />
+                <Lock className="w-3.5 h-3.5 text-[#00B4D8]" />
                 Your data stays yours
               </span>
               {stats.members > 0 && (
@@ -800,7 +800,7 @@ export default function Home() {
         <section className="py-16 lg:py-24 px-4">
           <RevealSection>
             <div className="container mx-auto max-w-2xl text-center space-y-6">
-              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#FF8C00]/60">
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00B4D8]/60">
                 The real problem
               </p>
               <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
@@ -836,7 +836,7 @@ export default function Home() {
         <section className="py-16 lg:py-24 px-4">
           <RevealSection>
             <div className="container mx-auto max-w-2xl text-center space-y-6">
-              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#FF8C00]/60">
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00B4D8]/60">
                 The fix
               </p>
               <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
@@ -850,14 +850,14 @@ export default function Home() {
                   {
                     title: "Clarity",
                     desc: "Your full financial picture, in one place, right now. No spreadsheets. No avoidance. Just the truth.",
-                    color: "text-[#FF8C00]",
-                    border: "border-[#FF8C00]/20",
+                    color: "text-[#00B4D8]",
+                    border: "border-[#00B4D8]/20",
                   },
                   {
                     title: "Simplicity",
                     desc: "We cut every piece of noise between you and the answer. One next step, in plain language, no degree required.",
-                    color: "text-[#FF8C00]",
-                    border: "border-[#FF8C00]/20",
+                    color: "text-[#00B4D8]",
+                    border: "border-[#00B4D8]/20",
                   },
                   {
                     title: "Confidence",
@@ -899,15 +899,15 @@ export default function Home() {
                     num: "1",
                     title: "Tell us what you're working with",
                     desc: "No 47-question form. No linking accounts you don't trust. Just enough to give you something real in under two minutes.",
-                    color: "text-[#FF8C00]",
-                    bg: "bg-[#FF8C00]/10",
+                    color: "text-[#00B4D8]",
+                    bg: "bg-[#00B4D8]/10",
                   },
                   {
                     num: "2",
                     title: "Six AI models go to work",
                     desc: "Multiple models analyze your situation in parallel. When they converge on the same answer, we surface it — with confidence scores and the actual reasoning.",
-                    color: "text-[#FF8C00]",
-                    bg: "bg-[#FF8C00]/10",
+                    color: "text-[#00B4D8]",
+                    bg: "bg-[#00B4D8]/10",
                   },
                   {
                     num: "3",
@@ -950,7 +950,7 @@ export default function Home() {
           <RevealSection>
             <div className="container mx-auto max-w-3xl">
               <div className="text-center mb-10">
-                <p className="text-[11px] font-semibold tracking-widest uppercase text-[#FF8C00]/60 mb-3">
+                <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00B4D8]/60 mb-3">
                   The shift
                 </p>
                 <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
@@ -982,8 +982,8 @@ export default function Home() {
                 </RevealSection>
 
                 <RevealSection delay={120}>
-                  <div className="glass-panel rounded-2xl p-6 border border-[#FF8C00]/20 h-full">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF8C00]/60 mb-5">After</p>
+                  <div className="glass-panel rounded-2xl p-6 border border-[#00B4D8]/20 h-full">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#00B4D8]/60 mb-5">After</p>
                     <div className="space-y-4">
                       {[
                         "One specific action you can execute this week",
@@ -992,7 +992,7 @@ export default function Home() {
                         "A financial trajectory you can actually explain to yourself",
                       ].map((text) => (
                         <div key={text} className="flex items-start gap-3">
-                          <CheckCircle className="w-4 h-4 text-[#FF8C00] flex-shrink-0 mt-0.5" />
+                          <CheckCircle className="w-4 h-4 text-[#00B4D8] flex-shrink-0 mt-0.5" />
                           <p className="text-sm text-white/70 leading-relaxed">{text}</p>
                         </div>
                       ))}
@@ -1003,7 +1003,7 @@ export default function Home() {
 
               <RevealSection delay={200}>
                 <div className="mt-6 flex items-center justify-center gap-3 px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                  <ArrowRight className="w-4 h-4 text-[#FF8C00] flex-shrink-0" />
+                  <ArrowRight className="w-4 h-4 text-[#00B4D8] flex-shrink-0" />
                   <p className="text-sm text-white/50 leading-relaxed">
                     Members consistently report that the first session is the moment something finally clicks.
                   </p>
@@ -1054,7 +1054,7 @@ export default function Home() {
                         </div>
                         <p className="text-sm text-white/70 leading-relaxed flex-1">"{t.message}"</p>
                         <div className="flex items-center gap-2 pt-3 border-t border-white/5">
-                          <div className="w-7 h-7 rounded-full bg-[#FF8C00]/20 flex items-center justify-center text-xs font-bold text-[#FF8C00]">
+                          <div className="w-7 h-7 rounded-full bg-[#00B4D8]/20 flex items-center justify-center text-xs font-bold text-[#00B4D8]">
                             {t.name.charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -1088,13 +1088,13 @@ export default function Home() {
                 {[
                   {
                     icon: CheckCircle,
-                    color: "text-[#FF8C00]",
+                    color: "text-[#00B4D8]",
                     title: "Plain language, always",
                     desc: "If you need a finance degree to understand our output, we failed. Every insight is written for a real person with real things to do.",
                   },
                   {
                     icon: ShieldCheck,
-                    color: "text-[#FF8C00]",
+                    color: "text-[#00B4D8]",
                     title: "Your data is yours, full stop",
                     desc: "Encrypted. Never sold. Never used to train models without consent. You're not the product here.",
                   },
@@ -1175,7 +1175,7 @@ export default function Home() {
                     </div>
                     <p className="text-sm text-white/70 leading-relaxed flex-1">"{t.message}"</p>
                     <div className="flex items-center gap-2 pt-3 border-t border-white/5">
-                      <div className="w-7 h-7 rounded-full bg-[#FF8C00]/20 flex items-center justify-center text-xs font-bold text-[#FF8C00]">
+                      <div className="w-7 h-7 rounded-full bg-[#00B4D8]/20 flex items-center justify-center text-xs font-bold text-[#00B4D8]">
                         {t.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
@@ -1193,7 +1193,7 @@ export default function Home() {
         <section className="py-20 lg:py-28 px-4 border-t border-white/5">
           <RevealSection>
             <div className="container mx-auto max-w-2xl text-center flex flex-col items-center space-y-6">
-              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#FF8C00]/60">
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00B4D8]/60">
                 You already know something has to change.
               </p>
               <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">

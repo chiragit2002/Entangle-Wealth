@@ -184,8 +184,8 @@ export default function AICoach() {
         <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-sm bg-gradient-to-br from-[#FF8C00]/20 to-purple-500/20 border border-[#FF8C00]/30 flex items-center justify-center">
-                <Brain className="w-6 h-6 text-[#FF8C00]" />
+              <div className="w-12 h-12 rounded-sm bg-gradient-to-br from-[#00B4D8]/20 to-purple-500/20 border border-[#00B4D8]/30 flex items-center justify-center">
+                <Brain className="w-6 h-6 text-[#00B4D8]" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">AI Financial Coach</h1>
@@ -214,10 +214,10 @@ export default function AICoach() {
               <button onClick={fetchNudge} className="ml-auto text-primary/60 hover:text-primary shrink-0">Retry</button>
             </div>
           ) : nudge ? (
-            <div className="border border-[#FF8C00]/20 bg-[#FF8C00]/5 rounded-xl p-4 flex items-start gap-3">
-              <Sparkles className="w-5 h-5 text-[#FF8C00] mt-0.5 flex-shrink-0" />
+            <div className="border border-[#00B4D8]/20 bg-[#00B4D8]/5 rounded-xl p-4 flex items-start gap-3">
+              <Sparkles className="w-5 h-5 text-[#00B4D8] mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-xs text-[#FF8C00] font-semibold mb-1">Daily Nudge</p>
+                <p className="text-xs text-[#00B4D8] font-semibold mb-1">Daily Nudge</p>
                 <p className="text-sm text-white/80">{nudge.nudge}</p>
                 {nudge.context && (
                   <div className="flex items-center gap-3 mt-2 text-xs text-white/40">
@@ -262,13 +262,13 @@ export default function AICoach() {
 
                 {Array.isArray(weeklySummary.suggestedActions) && weeklySummary.suggestedActions.length > 0 && (
                   <div>
-                    <p className="text-xs text-[#FF8C00] font-semibold mb-2 flex items-center gap-1">
+                    <p className="text-xs text-[#00B4D8] font-semibold mb-2 flex items-center gap-1">
                       <Target className="w-3 h-3" /> Next Week's Focus
                     </p>
                     <ul className="space-y-1.5">
                       {weeklySummary.suggestedActions.map((action, i) => (
                         <li key={i} className="flex items-start gap-2 text-sm text-white/70">
-                          <TrendingUp className="w-4 h-4 text-[#FF8C00] mt-0.5 flex-shrink-0" />
+                          <TrendingUp className="w-4 h-4 text-[#00B4D8] mt-0.5 flex-shrink-0" />
                           {action}
                         </li>
                       ))}
@@ -293,7 +293,7 @@ export default function AICoach() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.length === 0 && !isSignedIn && (
                 <div className="flex flex-col items-center justify-center h-full text-center gap-4">
-                  <Brain className="w-12 h-12 text-[#FF8C00]/50" />
+                  <Brain className="w-12 h-12 text-[#00B4D8]/50" />
                   <p className="text-white/50 text-sm">Sign in to chat with your personalized AI coach</p>
                 </div>
               )}
@@ -306,12 +306,12 @@ export default function AICoach() {
                   <div
                     className={`w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center ${
                       msg.role === "assistant"
-                        ? "bg-gradient-to-br from-[#FF8C00]/20 to-purple-500/20 border border-[#FF8C00]/30"
+                        ? "bg-gradient-to-br from-[#00B4D8]/20 to-purple-500/20 border border-[#00B4D8]/30"
                         : "bg-white/10"
                     }`}
                   >
                     {msg.role === "assistant" ? (
-                      <Brain className="w-4 h-4 text-[#FF8C00]" />
+                      <Brain className="w-4 h-4 text-[#00B4D8]" />
                     ) : (
                       <span className="text-white/60 text-xs">You</span>
                     )}
@@ -320,7 +320,7 @@ export default function AICoach() {
                     className={`max-w-[80%] rounded-sm px-4 py-3 text-sm leading-relaxed ${
                       msg.role === "assistant"
                         ? "bg-white/[0.06] text-white/80 border border-white/[0.08] rounded-tl-sm"
-                        : "bg-[#FF8C00]/15 text-white border border-[#FF8C00]/20 rounded-tr-sm"
+                        : "bg-[#00B4D8]/15 text-white border border-[#00B4D8]/20 rounded-tr-sm"
                     }`}
                   >
                     {msg.content}
@@ -330,15 +330,15 @@ export default function AICoach() {
 
               {sending && (
                 <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#FF8C00]/20 to-purple-500/20 border border-[#FF8C00]/30 flex items-center justify-center flex-shrink-0">
-                    <Brain className="w-4 h-4 text-[#FF8C00]" />
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#00B4D8]/20 to-purple-500/20 border border-[#00B4D8]/30 flex items-center justify-center flex-shrink-0">
+                    <Brain className="w-4 h-4 text-[#00B4D8]" />
                   </div>
                   <div className="bg-white/[0.06] border border-white/[0.08] rounded-sm rounded-tl-sm px-4 py-3 flex items-center gap-2">
                     <div className="flex gap-1">
                       {[0, 1, 2].map(i => (
                         <div
                           key={i}
-                          className="w-1.5 h-1.5 rounded-full bg-[#FF8C00]/60 animate-bounce"
+                          className="w-1.5 h-1.5 rounded-full bg-[#00B4D8]/60 animate-bounce"
                           style={{ animationDelay: `${i * 0.15}s` }}
                         />
                       ))}
@@ -372,14 +372,14 @@ export default function AICoach() {
                   onKeyDown={handleKeyDown}
                   placeholder={isSignedIn ? "Ask your coach anything..." : "Sign in to chat with your AI coach"}
                   disabled={!isSignedIn || sending}
-                  className="flex-1 bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 resize-none focus:outline-none focus:border-[#FF8C00]/40 transition-colors disabled:opacity-40"
+                  className="flex-1 bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 resize-none focus:outline-none focus:border-[#00B4D8]/40 transition-colors disabled:opacity-40"
                   rows={1}
                   style={{ minHeight: "44px", maxHeight: "120px" }}
                 />
                 <button
                   onClick={() => sendMessage()}
                   disabled={!isSignedIn || !input.trim() || sending}
-                  className="w-11 h-11 rounded-xl bg-[#FF8C00] text-black flex items-center justify-center hover:bg-[#FF8C00]/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+                  className="w-11 h-11 rounded-xl bg-[#00B4D8] text-black flex items-center justify-center hover:bg-[#00B4D8]/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
                 >
                   {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </button>

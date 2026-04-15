@@ -300,7 +300,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
     : (Number(contracts) || 0) * (Number(premium) || 0) * 100;
 
   const sideButtons: { id: OrderSide; label: string; color: string; bg: string; borderColor: string }[] = [
-    { id: "buy", label: "BUY", color: "#FF8C00", bg: "#FF8C00/15", borderColor: "#FF8C00/30" },
+    { id: "buy", label: "BUY", color: "#00B4D8", bg: "#00B4D8/15", borderColor: "#00B4D8/30" },
     { id: "sell", label: "SELL", color: "#ff3366", bg: "#ff3366/15", borderColor: "#ff3366/30" },
     { id: "short_sell", label: "SHORT", color: "#9c27b0", bg: "#9c27b0/15", borderColor: "#9c27b0/30" },
     { id: "short_cover", label: "COVER", color: "#0099cc", bg: "#0099cc/15", borderColor: "#0099cc/30" },
@@ -312,13 +312,13 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
     <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden" role="region" aria-label={`Paper trade panel${symbol ? ` for ${symbol}` : ""}`}>
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
         <div className="flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-[#FF8C00]" />
+          <TrendingUp className="w-4 h-4 text-[#00B4D8]" aria-hidden="true" />
           <span className="text-sm font-bold text-white">{symbol ? `Trade ${symbol}` : "Paper Trading"}</span>
         </div>
         {portfolio && (
           <div className="flex items-center gap-3 text-[10px] font-mono">
-            <span className="text-white/40">Cash: <span className="text-[#FF8C00] font-bold">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span></span>
-            <span className={`font-bold ${pnl >= 0 ? "text-[#FF8C00]" : "text-[#ff3366]"}`}>
+            <span className="text-white/40">Cash: <span className="text-[#00B4D8] font-bold">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span></span>
+            <span className={`font-bold ${pnl >= 0 ? "text-[#00B4D8]" : "text-[#ff3366]"}`}>
               P&L: {pnl >= 0 ? "+" : ""}{pnlPct}%
             </span>
           </div>
@@ -354,7 +354,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
             role="tab"
             aria-selected={tab === t}
             onClick={() => setTab(t)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors ${tab === t ? "text-[#FF8C00] border-b-2 border-[#FF8C00] bg-[#FF8C00]/[0.04]" : "text-white/40 hover:text-white/60"}`}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors ${tab === t ? "text-[#00B4D8] border-b-2 border-[#00B4D8] bg-[#00B4D8]/[0.04]" : "text-white/40 hover:text-white/60"}`}
           >
             {t === "stocks" && <><BarChart3 className="w-3.5 h-3.5" /> Stocks</>}
             {t === "options" && <><Layers className="w-3.5 h-3.5" /> Options</>}
@@ -362,7 +362,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
               <>
                 <Clock className="w-3.5 h-3.5" /> Open Orders
                 {symbolPendingOrders.length > 0 && (
-                  <span className="text-[9px] bg-[#FF8C00] text-black rounded-full px-1.5 py-0.5 font-bold ml-0.5">
+                  <span className="text-[9px] bg-[#00B4D8] text-black rounded-full px-1.5 py-0.5 font-bold ml-0.5">
                     {symbolPendingOrders.length}
                   </span>
                 )}
@@ -386,7 +386,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className="text-xs font-bold font-mono text-white">{order.symbol}</span>
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase ${order.side === "buy" ? "bg-[#FF8C00]/20 text-[#FF8C00]" : order.side === "sell" ? "bg-[#ff3366]/20 text-[#ff3366]" : order.side === "short_sell" ? "bg-[#9c27b0]/20 text-[#9c27b0]" : "bg-[#0099cc]/20 text-[#0099cc]"}`}>
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase ${order.side === "buy" ? "bg-[#00B4D8]/20 text-[#00B4D8]" : order.side === "sell" ? "bg-[#ff3366]/20 text-[#ff3366]" : order.side === "short_sell" ? "bg-[#9c27b0]/20 text-[#9c27b0]" : "bg-[#0099cc]/20 text-[#0099cc]"}`}>
                         {order.side.replace("_", " ")}
                       </span>
                       <span className="text-[9px] text-white/30 uppercase">{order.orderType}</span>
@@ -446,7 +446,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
                     type="number"
                     aria-label="Number of shares"
                     disabled={marketDataUnavailable}
-                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30 disabled:opacity-50"
+                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/30 disabled:opacity-50"
                   />
                 </div>
                 <div>
@@ -455,7 +455,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
                     value={orderType}
                     onChange={e => setOrderType(e.target.value as OrderType)}
                     disabled={marketDataUnavailable}
-                    className="w-full h-9 px-2 text-xs font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#FF8C00]/30 disabled:opacity-50 [&>option]:bg-[#0a0a16]"
+                    className="w-full h-9 px-2 text-xs font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#00B4D8]/30 disabled:opacity-50 [&>option]:bg-[#0a0a16]"
                   >
                     <option value="market">Market</option>
                     <option value="limit">Limit</option>
@@ -474,7 +474,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
                     placeholder={livePrice ? livePrice.toFixed(2) : "0.00"}
                     type="number"
                     step="0.01"
-                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
+                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/30"
                   />
                 </div>
               )}
@@ -488,7 +488,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
                     placeholder={livePrice ? livePrice.toFixed(2) : "0.00"}
                     type="number"
                     step="0.01"
-                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30"
+                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/30"
                   />
                 </div>
               )}
@@ -501,7 +501,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
                     onChange={e => setExpiresAt(e.target.value)}
                     type="datetime-local"
                     min={new Date().toISOString().slice(0, 16)}
-                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#FF8C00]/30"
+                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#00B4D8]/30"
                   />
                 </div>
               )}
@@ -516,7 +516,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
                     aria-pressed={optionType === t}
                     className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
                       optionType === t
-                        ? t === "CALL" ? "bg-[#FF8C00]/15 text-[#FF8C00] border border-[#FF8C00]/30" : "bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30"
+                        ? t === "CALL" ? "bg-[#00B4D8]/15 text-[#00B4D8] border border-[#00B4D8]/30" : "bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30"
                         : "bg-white/[0.03] text-white/40 border border-white/[0.06]"
                     }`}
                   >
@@ -528,11 +528,11 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Strike</label>
-                  <input value={strike} onChange={e => setStrike(e.target.value)} placeholder="Strike" type="number" step="0.01" className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30" />
+                  <input value={strike} onChange={e => setStrike(e.target.value)} placeholder="Strike" type="number" step="0.01" className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/30" />
                 </div>
                 <div>
                   <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Expiration</label>
-                  <select value={expiration} onChange={e => setExpiration(e.target.value)} className="w-full h-9 px-2 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#FF8C00]/30 [&>option]:bg-[#0a0a16]">
+                  <select value={expiration} onChange={e => setExpiration(e.target.value)} className="w-full h-9 px-2 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#00B4D8]/30 [&>option]:bg-[#0a0a16]">
                     {EXPIRATIONS.map(exp => <option key={exp} value={exp}>{exp}</option>)}
                   </select>
                 </div>
@@ -541,11 +541,11 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Contracts</label>
-                  <input value={contracts} onChange={e => setContracts(e.target.value)} placeholder="1" type="number" className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30" />
+                  <input value={contracts} onChange={e => setContracts(e.target.value)} placeholder="1" type="number" className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/30" />
                 </div>
                 <div>
                   <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Premium</label>
-                  <input value={premium} onChange={e => setPremium(e.target.value)} placeholder="0.00" type="number" step="0.01" className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF8C00]/30" />
+                  <input value={premium} onChange={e => setPremium(e.target.value)} placeholder="0.00" type="number" step="0.01" className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/30" />
                 </div>
               </div>
             </div>
@@ -564,8 +564,8 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
             aria-label={`Execute ${side} ${tab} trade`}
             className="w-full py-2.5 text-sm font-bold rounded-lg transition-all disabled:opacity-40"
             style={{
-              backgroundColor: marketDataUnavailable ? "#444" : activeSideConfig.color === "#FF8C00" ? "#FF8C00" : activeSideConfig.color,
-              color: activeSideConfig.color === "#FF8C00" ? "#000" : "#fff",
+              backgroundColor: marketDataUnavailable ? "#444" : activeSideConfig.color,
+              color: activeSideConfig.color === "#00B4D8" ? "#000" : "#fff",
             }}
           >
             {loading
@@ -590,7 +590,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
           {symbolPositions.map(p => (
             <div key={p.id} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <BarChart3 className="w-3 h-3 text-[#FF8C00]" />
+                <BarChart3 className="w-3 h-3 text-[#00B4D8]" />
                 <span className={`text-xs font-mono font-bold ${p.quantity < 0 ? "text-[#9c27b0]" : "text-white"}`}>
                   {p.quantity < 0 ? `${Math.abs(p.quantity)} short` : `${p.quantity} shares`}
                 </span>

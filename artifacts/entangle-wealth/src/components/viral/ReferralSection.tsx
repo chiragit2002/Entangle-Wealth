@@ -15,7 +15,7 @@ const TIERS = [
     benefit: "Never miss a trade again",
     detail: "5 bonus signals every day for 30 days",
     color: "#00d4ff",
-    glow: "rgba(255,140,0,0.35)",
+    glow: "rgba(0,180,216,0.35)",
   },
   {
     key: "taxgpt_unlimited",
@@ -313,7 +313,7 @@ export function ReferralSection() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at 80% 20%, rgba(255,140,0,0.04) 0%, transparent 60%)",
+            "radial-gradient(ellipse at 80% 20%, rgba(0,180,216,0.04) 0%, transparent 60%)",
         }}
       />
 
@@ -492,7 +492,7 @@ export function ReferralSection() {
           className="referral-share-btn w-full relative overflow-hidden rounded-xl py-4 font-bold text-sm text-black transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed mb-3"
           style={{
             background: code
-              ? "linear-gradient(135deg, #00d4ff 0%, #0099cc 50%, #FF8C00 100%)"
+              ? "linear-gradient(135deg, #00d4ff 0%, #0099cc 50%, #00B4D8 100%)"
               : "rgba(255,255,255,0.1)",
             backgroundSize: "200% 100%",
           }}
@@ -515,7 +515,7 @@ export function ReferralSection() {
               title="Copy link"
             >
               {copied ? (
-                <Check className="w-4 h-4 text-[#FF8C00]" />
+                <Check className="w-4 h-4 text-[#00B4D8]" />
               ) : (
                 <Copy className="w-4 h-4" />
               )}

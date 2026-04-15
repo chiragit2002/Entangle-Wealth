@@ -20,8 +20,8 @@ import { TradeFlowPanel } from "@/components/TradeFlowPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 function PanelHeader({ title, icon, color = "cyan", rightContent }: { title: string; icon?: React.ReactNode; color?: string; rightContent?: React.ReactNode }) {
-  const borderColor = color === "cyan" ? "border-l-[#FF8C00]" : color === "gold" ? "border-l-[#FFB800]" : color === "green" ? "border-l-[#FF8C00]" : color === "red" ? "border-l-[#ff3366]" : color === "purple" ? "border-l-[#9c27b0]" : "border-l-white/20";
-  const textColor = color === "cyan" ? "text-[#FF8C00]" : color === "gold" ? "text-[#FFB800]" : color === "green" ? "text-[#FF8C00]" : color === "red" ? "text-[#ff3366]" : color === "purple" ? "text-[#9c27b0]" : "text-white/60";
+  const borderColor = color === "cyan" ? "border-l-[#00B4D8]" : color === "gold" ? "border-l-[#FFB800]" : color === "green" ? "border-l-[#00B4D8]" : color === "red" ? "border-l-[#ff3366]" : color === "purple" ? "border-l-[#9c27b0]" : "border-l-white/20";
+  const textColor = color === "cyan" ? "text-[#00B4D8]" : color === "gold" ? "text-[#FFB800]" : color === "green" ? "text-[#00B4D8]" : color === "red" ? "text-[#ff3366]" : color === "purple" ? "text-[#9c27b0]" : "text-white/60";
   return (
     <div className={`flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 ${borderColor}`}>
       <div className="flex items-center gap-1.5">
@@ -81,7 +81,7 @@ function MobilePanelTabs({ activeTab, onTabChange }: { activeTab: MobileTab; onT
               onClick={() => onTabChange(tab.key)}
               className={`flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-sm text-[9px] font-mono font-bold uppercase tracking-widest transition-all ${
                 isActive
-                  ? "bg-[#FF8C00]/10 text-[#FF8C00] border border-[#FF8C00]/30"
+                  ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/30"
                   : "text-white/35 hover:text-white/60 border border-transparent"
               }`}
               aria-current={isActive ? "true" : undefined}
@@ -116,7 +116,7 @@ function MobileTerminalView({ portfolioRefreshKey, handleSpinBalanceChange, onOp
         {activeTab === "terminal" && (
           <BloombergPanel>
             <PanelHeader title="MIROFISH TERMINAL" icon={<TerminalIcon className="w-3 h-3" />} color="cyan" rightContent={
-              <span className="text-[8px] font-mono text-white/40">Type <span className="text-[#FF8C00]/50">help</span> for commands</span>
+              <span className="text-[8px] font-mono text-white/40">Type <span className="text-[#00B4D8]/50">help</span> for commands</span>
             } />
             <MirofishTerminal />
           </BloombergPanel>
@@ -277,17 +277,17 @@ export default function Terminal() {
       <div className="bg-[#040408] border-b border-white/[0.06] px-3 py-1.5 flex items-center justify-between">
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <div className="flex items-center gap-1.5 shrink-0">
-            <TerminalIcon className="w-3.5 h-3.5 text-[#FF8C00]" />
-            <span className="text-[11px] font-mono font-bold text-[#FF8C00] tracking-wider hidden sm:inline">ANALYSIS TERMINAL v3.0</span>
-            <span className="text-[11px] font-mono font-bold text-[#FF8C00] tracking-wider sm:hidden">TERMINAL v3.0</span>
+            <TerminalIcon className="w-3.5 h-3.5 text-[#00B4D8]" />
+            <span className="text-[11px] font-mono font-bold text-[#00B4D8] tracking-wider hidden sm:inline">ANALYSIS TERMINAL v3.0</span>
+            <span className="text-[11px] font-mono font-bold text-[#00B4D8] tracking-wider sm:hidden">TERMINAL v3.0</span>
           </div>
           <div className="h-3 w-px bg-white/10 hidden sm:block" />
           <div className="flex items-center gap-1.5">
             <span className="relative flex h-2 w-2">
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isMarketOpen ? 'bg-[#FF8C00]' : 'bg-[#FFB800]'} opacity-75`} />
-              <span className={`relative inline-flex rounded-full h-2 w-2 ${isMarketOpen ? 'bg-[#FF8C00]' : 'bg-[#FFB800]'}`} />
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isMarketOpen ? 'bg-[#00B4D8]' : 'bg-[#FFB800]'} opacity-75`} />
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${isMarketOpen ? 'bg-[#00B4D8]' : 'bg-[#FFB800]'}`} />
             </span>
-            <span className={`text-[9px] font-mono font-bold uppercase tracking-wider ${isMarketOpen ? 'text-[#FF8C00]' : 'text-[#FFB800]'} hidden sm:inline`}>
+            <span className={`text-[9px] font-mono font-bold uppercase tracking-wider ${isMarketOpen ? 'text-[#00B4D8]' : 'text-[#FFB800]'} hidden sm:inline`}>
               {isMarketOpen ? "MARKET OPEN" : "MARKET CLOSED"}
             </span>
           </div>
@@ -309,7 +309,7 @@ export default function Terminal() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onClick={() => setShowShortcuts(false)} role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
           <div className="bg-[#0a0a14] border border-white/10 rounded-sm p-6 max-w-md w-full mx-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-[12px] font-mono font-bold text-[#FF8C00] tracking-wider">KEYBOARD SHORTCUTS</span>
+              <span className="text-[12px] font-mono font-bold text-[#00B4D8] tracking-wider">KEYBOARD SHORTCUTS</span>
               <button onClick={() => setShowShortcuts(false)} aria-label="Close shortcuts" className="text-white/50 hover:text-white/40"><X className="w-4 h-4" /></button>
             </div>
             <div className="space-y-1">
@@ -339,7 +339,7 @@ export default function Terminal() {
           <div className="mb-1.5">
             <BloombergPanel>
               <PanelHeader title="MIROFISH TERMINAL" icon={<TerminalIcon className="w-3 h-3" />} color="cyan" rightContent={
-                <span className="text-[8px] font-mono text-white/40">Type <span className="text-[#FF8C00]/50">help</span> to see all commands</span>
+                <span className="text-[8px] font-mono text-white/40">Type <span className="text-[#00B4D8]/50">help</span> to see all commands</span>
               } />
               <div className="p-0">
                 <MirofishTerminal />

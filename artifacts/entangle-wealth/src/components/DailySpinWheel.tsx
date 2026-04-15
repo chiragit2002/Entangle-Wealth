@@ -22,7 +22,7 @@ interface WheelSegment {
 }
 
 const SEGMENT_COLORS: Record<string, string> = {
-  xp: "#FF8C00",
+  xp: "#00B4D8",
   multiplier: "#FFB800",
   streak_protection: "#ff3366",
 };
@@ -34,15 +34,15 @@ const SEGMENT_ICONS: Record<string, string> = {
 };
 
 const DEFAULT_SEGMENTS: WheelSegment[] = [
-  { label: "+50 XP", color: "#FF8C00", icon: "⚡", rewardType: "xp", rewardValue: 50 },
+  { label: "+50 XP", color: "#00B4D8", icon: "⚡", rewardType: "xp", rewardValue: 50 },
   { label: "+100 XP", color: "#9c27b0", icon: "✨", rewardType: "xp", rewardValue: 100 },
   { label: "+250 XP", color: "#FFB800", icon: "🔥", rewardType: "xp", rewardValue: 250 },
-  { label: "2x XP", color: "#FF8C00", icon: "⚡⚡", rewardType: "multiplier", rewardValue: 2 },
+  { label: "2x XP", color: "#00B4D8", icon: "⚡⚡", rewardType: "multiplier", rewardValue: 2 },
   { label: "Streak Shield", color: "#ff3366", icon: "🛡️", rewardType: "streak_protection", rewardValue: 1 },
 ];
 
 function rewardsToSegments(rewards: BackendReward[]): WheelSegment[] {
-  const colors = ["#FF8C00", "#9c27b0", "#FFB800", "#6366f1", "#f59e0b", "#ff3366"];
+  const colors = ["#00B4D8", "#9c27b0", "#FFB800", "#6366f1", "#f59e0b", "#ff3366"];
   return rewards.map((r, i) => ({
     label: r.reward,
     color: SEGMENT_COLORS[r.rewardType] || colors[i % colors.length],
@@ -133,11 +133,11 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
     centerGrad.addColorStop(1, "#0A0E1A");
     ctx.fillStyle = centerGrad;
     ctx.fill();
-    ctx.strokeStyle = "#FF8C00";
+    ctx.strokeStyle = "#00B4D8";
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    ctx.fillStyle = "#FF8C00";
+    ctx.fillStyle = "#00B4D8";
     ctx.font = "bold 11px 'JetBrains Mono', monospace";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -253,7 +253,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
     <BigWinOverlay show={showBigWin} label="BIG WIN" onDone={() => setShowBigWin(false)} />
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 ">
       <div className="relative w-[360px] bg-[#0A0E1A] border border-white/[0.1] rounded-xl shadow-2xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FF8C00]/5 via-transparent to-[#FFB800]/5 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#00B4D8]/5 via-transparent to-[#FFB800]/5 pointer-events-none" />
 
         <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
@@ -272,7 +272,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
 
         <div className="relative flex flex-col items-center py-6 px-4">
           <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-[#FF8C00]/10 blur-xl" />
+            <div className="absolute inset-0 rounded-full bg-[#00B4D8]/10 blur-xl" />
             <motion.div
               style={{ rotate: rotationDeg, width: 280, height: 280 }}
               className={`relative cursor-pointer rounded-full ${!spinning && !canSpin ? "opacity-60" : ""}`}
@@ -299,7 +299,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
                   resultTier === "jackpot"
                     ? "bg-[#FFB800]/15 border border-[#FFB800]/40"
                     : resultTier === "large"
-                    ? "bg-[#FF8C00]/10 border border-[#FF8C00]/30"
+                    ? "bg-[#00B4D8]/10 border border-[#00B4D8]/30"
                     : "bg-[#FFB800]/10 border border-[#FFB800]/20"
                 }`}
               >
@@ -324,13 +324,13 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
             <div className="mt-4 text-center">
               {canSpin ? (
                 <div>
-                  <p className="text-sm font-mono text-[#FF8C00] font-bold">Ready to spin!</p>
+                  <p className="text-sm font-mono text-[#00B4D8] font-bold">Ready to spin!</p>
                   <p className="text-[10px] font-mono text-white/30 mt-1">Tap the wheel to claim your daily reward</p>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 justify-center">
                   <Clock className="w-3.5 h-3.5 text-white/30" />
-                  <p className="text-xs font-mono text-white/40">Next spin in <span className="text-[#FF8C00] font-bold">{countdown}</span></p>
+                  <p className="text-xs font-mono text-white/40">Next spin in <span className="text-[#00B4D8] font-bold">{countdown}</span></p>
                 </div>
               )}
             </div>
@@ -354,7 +354,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
 
           <div className="grid grid-cols-3 gap-1.5">
             <div className="flex items-center gap-1.5 bg-white/[0.02] rounded px-2 py-1.5">
-              <Zap className="w-3 h-3 text-[#FF8C00]" />
+              <Zap className="w-3 h-3 text-[#00B4D8]" />
               <span className="text-[8px] font-mono text-white/40">XP Boosts</span>
             </div>
             <div className="flex items-center gap-1.5 bg-white/[0.02] rounded px-2 py-1.5">

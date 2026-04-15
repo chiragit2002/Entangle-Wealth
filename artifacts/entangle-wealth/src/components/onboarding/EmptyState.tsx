@@ -64,15 +64,15 @@ export function EmptyState({
       <div
         className="w-14 h-14 rounded-xl flex items-center justify-center mb-5 relative"
         style={{
-          background: "rgba(255,140,0,0.06)",
-          border: "1px solid rgba(255,140,0,0.12)",
+          background: "rgba(0,180,216,0.06)",
+          border: "1px solid rgba(0,180,216,0.12)",
         }}
       >
-        <Icon className="w-6 h-6" style={{ color: "rgba(255,140,0,0.7)" }} />
+        <Icon className="w-6 h-6" style={{ color: "rgba(0,180,216,0.7)" }} />
         <div
           className="absolute inset-0 rounded-xl pointer-events-none"
           style={{
-            background: "radial-gradient(circle at center, rgba(255,140,0,0.06), transparent 70%)",
+            background: "radial-gradient(circle at center, rgba(0,180,216,0.06), transparent 70%)",
           }}
         />
       </div>

@@ -1,5 +1,5 @@
 import { Component, type ReactNode } from "react";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 
 interface Props {
   children: ReactNode;
@@ -24,26 +24,31 @@ export class PageErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center py-24 px-4 text-center space-y-5">
-          <div className="w-14 h-14 rounded-full bg-white/[0.04] border border-white/10 flex items-center justify-center">
-            <AlertCircle className="w-7 h-7 text-white/30" />
+        <div
+          className="flex flex-col items-center justify-center py-10 px-4 text-center gap-3"
+          style={{
+            background: "rgba(239,68,68,0.03)",
+            border: "1px solid rgba(239,68,68,0.10)",
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400/50" />
+            <span className="text-xs font-mono text-white/50">
+              {this.props.fallbackTitle ?? "Module unavailable"}
+            </span>
           </div>
-          <div className="space-y-2">
-            <h2 className="text-base font-semibold text-white/70">
-              {this.props.fallbackTitle ?? "Something went wrong"}
-            </h2>
-            <p className="text-sm text-white/50 max-w-sm">
-              This section encountered an error. Your data is safe — try refreshing.
-            </p>
-          </div>
+          <p className="text-[11px] text-white/30 max-w-xs">
+            This section encountered an error. Other modules continue working normally.
+          </p>
           <button
-            onClick={() => {
-              this.setState({ hasError: false });
+            onClick={() => this.setState({ hasError: false })}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono text-white/40 hover:text-white/70 transition-colors"
+            style={{
+              border: "1px solid rgba(255,255,255,0.08)",
             }}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.06] border border-white/10 text-sm text-white/60 hover:text-white hover:bg-white/[0.10] transition-colors"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
-            Try again
+            <RefreshCw className="w-3 h-3" />
+            Retry
           </button>
         </div>
       );

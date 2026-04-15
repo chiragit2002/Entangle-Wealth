@@ -117,7 +117,7 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
       {
         id: "consensus",
         icon: Atom,
-        color: "#FF8C00",
+        color: "#00B4D8",
         text: hasConsensus
           ? `Quantum Consensus Engine — ${consensus >= 85 ? "6 of 6 agents agree on the current signal direction." : "agents are split; high-conviction trades are paused."}`
           : "EXAMPLE SIGNAL — LIVE WHEN YOU CONNECT YOUR ACCOUNT: Quantum Consensus Engine cross-checks every signal across 6 independent AI agents.",
@@ -128,7 +128,7 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
       {
         id: "timeline",
         icon: GitBranch,
-        color: "#FF8C00",
+        color: "#00B4D8",
         text: "EXAMPLE SIGNAL — LIVE WHEN YOU CONNECT YOUR ACCOUNT: Alternate Timeline — see how one savings decision today branches into radically different 10-year futures.",
         subtext: "Alternate Timeline Simulator",
         href: "/alternate-timeline",
@@ -296,7 +296,7 @@ function DataRow({ label, value, change }: { label: string; value: string; chang
       <div className="flex items-center gap-2">
         <span className="text-xs font-mono font-medium text-white/80">{value}</span>
         {change !== undefined && (
-          <span className={`text-[10px] font-mono font-semibold ${change >= 0 ? 'text-[#FF8C00]' : 'text-red-400'}`}>
+          <span className={`text-[10px] font-mono font-semibold ${change >= 0 ? 'text-[#00B4D8]' : 'text-red-400'}`}>
             {change >= 0 ? '+' : ''}{Math.abs(change).toFixed(2)}%
           </span>
         )}
@@ -551,10 +551,10 @@ export default function Dashboard() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <span className={`relative flex h-2 w-2`}>
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isMarketOpen ? 'bg-[#FF8C00]' : 'bg-[#FFB800]'} opacity-60`} />
-              <span className={`relative inline-flex rounded-full h-2 w-2 ${isMarketOpen ? 'bg-[#FF8C00]' : 'bg-[#FFB800]'}`} />
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isMarketOpen ? 'bg-[#00B4D8]' : 'bg-[#FFB800]'} opacity-60`} />
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${isMarketOpen ? 'bg-[#00B4D8]' : 'bg-[#FFB800]'}`} />
             </span>
-            <span role="status" aria-live="polite" className={`text-[10px] font-mono font-semibold tracking-wider ${isMarketOpen ? 'text-[#FF8C00]' : 'text-[#FFB800]'}`}>
+            <span role="status" aria-live="polite" className={`text-[10px] font-mono font-semibold tracking-wider ${isMarketOpen ? 'text-[#00B4D8]' : 'text-[#FFB800]'}`}>
               {isMarketOpen ? "Market Open" : "Market Closed"}
             </span>
           </div>
@@ -638,7 +638,7 @@ export default function Dashboard() {
               label: "Portfolio",
               value: `$${portfolio.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
               sub: `${pnl >= 0 ? '+' : ''}${Math.abs(parseFloat(pnlPct)).toFixed(2)}% P&L`,
-              color: pnl >= 0 ? "#FF8C00" : "#ff4757",
+              color: pnl >= 0 ? "#00B4D8" : "#ff4757",
               isPositive: pnl >= 0,
             },
             {
@@ -669,9 +669,9 @@ export default function Dashboard() {
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-semibold font-mono tracking-wider transition-all hover:opacity-90"
             style={{
-              background: "rgba(255,140,0,0.08)",
-              border: "1px solid rgba(255,140,0,0.2)",
-              color: "rgba(255,140,0,0.8)",
+              background: "rgba(0,180,216,0.08)",
+              border: "1px solid rgba(0,180,216,0.2)",
+              color: "rgba(0,180,216,0.8)",
             }}
           >
             <Eye className="w-3 h-3" />
@@ -695,7 +695,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div className="flex items-center gap-6">
                     <div className="text-center">
-                      <p className={`text-3xl font-bold ${quickAnalysis.signal.includes("BUY") ? "text-[#FF8C00]" : quickAnalysis.signal.includes("SELL") ? "text-red-400" : "text-[#FFB800]"}`}>{quickAnalysis.confidence}%</p>
+                      <p className={`text-3xl font-bold ${quickAnalysis.signal.includes("BUY") ? "text-[#00B4D8]" : quickAnalysis.signal.includes("SELL") ? "text-red-400" : "text-[#FFB800]"}`}>{quickAnalysis.confidence}%</p>
                       <p className="text-xs text-white/35 mt-0.5">Confidence</p>
                     </div>
                     <div className="h-10 w-px bg-white/10" />
@@ -843,15 +843,15 @@ export default function Dashboard() {
                         <AreaChart data={portfolioChartPoints}>
                           <defs>
                             <linearGradient id="pgGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor={pnl >= 0 ? "#FF8C00" : "#ff4757"} stopOpacity={0.2} />
-                              <stop offset="95%" stopColor={pnl >= 0 ? "#FF8C00" : "#ff4757"} stopOpacity={0} />
+                              <stop offset="5%" stopColor={pnl >= 0 ? "#00B4D8" : "#ff4757"} stopOpacity={0.2} />
+                              <stop offset="95%" stopColor={pnl >= 0 ? "#00B4D8" : "#ff4757"} stopOpacity={0} />
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
                           <XAxis dataKey="time" tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} />
                           <YAxis tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(1)}k`} domain={['dataMin - 500', 'dataMax + 500']} width={48} />
-                          <Tooltip contentStyle={{ background: '#0A0E1A', border: '1px solid rgba(255,140,0,0.15)', borderRadius: 12, color: '#fff', fontSize: 12 }} formatter={(value: number) => [`$${value.toLocaleString()}`, '']} />
-                          <Area type="monotone" dataKey="value" stroke={pnl >= 0 ? "#FF8C00" : "#ff4757"} strokeWidth={2} fill="url(#pgGrad)" />
+                          <Tooltip contentStyle={{ background: '#0A0E1A', border: '1px solid rgba(0,180,216,0.15)', borderRadius: 12, color: '#fff', fontSize: 12 }} formatter={(value: number) => [`$${value.toLocaleString()}`, '']} />
+                          <Area type="monotone" dataKey="value" stroke={pnl >= 0 ? "#00B4D8" : "#ff4757"} strokeWidth={2} fill="url(#pgGrad)" />
                         </AreaChart>
                       </ResponsiveContainer>
                     )}

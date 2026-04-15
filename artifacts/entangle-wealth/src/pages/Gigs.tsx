@@ -219,7 +219,7 @@ export default function Gigs() {
                       )}
                     </div>
                   </div>
-                  <div className="text-lg font-extrabold text-[#FF8C00] flex-shrink-0 ml-2">{gig.price}</div>
+                  <div className="text-lg font-extrabold text-[#00B4D8] flex-shrink-0 ml-2">{gig.price}</div>
                 </div>
                 <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{gig.description}</p>
                 <div className="flex items-center justify-between text-xs text-muted-foreground">

@@ -33,9 +33,9 @@ const ALERT_TYPE_OPTIONS = [
 
 function getNotifIcon(type: AppNotification["type"]) {
   switch (type) {
-    case "price_above": return <TrendingUp className="w-4 h-4 text-[#FF8C00]" />;
+    case "price_above": return <TrendingUp className="w-4 h-4 text-[#00B4D8]" />;
     case "price_below": return <TrendingDown className="w-4 h-4 text-[#ff3366]" />;
-    case "rsi_oversold": return <Activity className="w-4 h-4 text-[#FF8C00]" />;
+    case "rsi_oversold": return <Activity className="w-4 h-4 text-[#00B4D8]" />;
     case "rsi_overbought": return <Activity className="w-4 h-4 text-[#FFB800]" />;
     case "macd_crossover": return <Zap className="w-4 h-4 text-[#9c27b0]" />;
     case "bollinger_breakout": return <AlertTriangle className="w-4 h-4 text-[#ff6b35]" />;
@@ -45,9 +45,9 @@ function getNotifIcon(type: AppNotification["type"]) {
 
 function getNotifBorder(type: AppNotification["type"]) {
   switch (type) {
-    case "price_above": return "border-l-[#FF8C00]";
+    case "price_above": return "border-l-[#00B4D8]";
     case "price_below": return "border-l-[#ff3366]";
-    case "rsi_oversold": return "border-l-[#FF8C00]";
+    case "rsi_oversold": return "border-l-[#00B4D8]";
     case "rsi_overbought": return "border-l-[#FFB800]";
     case "macd_crossover": return "border-l-[#9c27b0]";
     case "bollinger_breakout": return "border-l-[#ff6b35]";
@@ -329,7 +329,7 @@ export default function NotificationCenter() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div ref={dropdownRef} tabIndex={-1} role="dialog" aria-label="Notification Center" className="fixed right-2 left-2 top-14 sm:absolute sm:left-auto sm:top-full sm:mt-2 sm:right-0 sm:w-[380px] sm:max-w-[calc(100vw-32px)] bg-[var(--nav-dropdown-bg,#0d0d1a)] border border-[rgba(255,140,0,0.15)] rounded-xl shadow-2xl shadow-black/50 z-50 overflow-hidden max-h-[70vh] sm:max-h-[520px] flex flex-col outline-none">
+          <div ref={dropdownRef} tabIndex={-1} role="dialog" aria-label="Notification Center" className="fixed right-2 left-2 top-14 sm:absolute sm:left-auto sm:top-full sm:mt-2 sm:right-0 sm:w-[380px] sm:max-w-[calc(100vw-32px)] bg-[var(--nav-dropdown-bg,#0d0d1a)] border border-[rgba(0,180,216,0.15)] rounded-xl shadow-2xl shadow-black/50 z-50 overflow-hidden max-h-[70vh] sm:max-h-[520px] flex flex-col outline-none">
             <div className="flex items-center justify-between p-3 border-b border-white/[0.06]">
               <div className="flex gap-1">
                 <button onClick={() => setTab("notifications")}
@@ -428,7 +428,7 @@ export default function NotificationCenter() {
                               {a.threshold != null ? ` @ $${a.threshold.toFixed(2)}` : ""}
                             </p>
                           </div>
-                          <button onClick={() => toggleAlert(a.id)} className={`p-1.5 rounded ${a.enabled ? "text-[#FF8C00]" : "text-white/40"}`}>
+                          <button onClick={() => toggleAlert(a.id)} className={`p-1.5 rounded ${a.enabled ? "text-[#00B4D8]" : "text-white/40"}`}>
                             <Check className="w-3.5 h-3.5" />
                           </button>
                           <button onClick={() => removeAlert(a.id)} className="p-1.5 text-white/40 hover:text-[#ff3366]">

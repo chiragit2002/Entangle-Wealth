@@ -107,8 +107,8 @@ export default function EntryRequirements({ destinations }: Props) {
 
   const sevColors = {
     warning: { bg: "rgba(255,215,0,0.06)", border: "rgba(255,215,0,0.2)", icon: "#FFB800" },
-    info: { bg: "rgba(255,140,0,0.06)", border: "rgba(255,140,0,0.2)", icon: "#FF8C00" },
-    success: { bg: "rgba(255,140,0,0.06)", border: "rgba(255,140,0,0.2)", icon: "#FF8C00" },
+    info: { bg: "rgba(0,180,216,0.06)", border: "rgba(0,180,216,0.2)", icon: "#00B4D8" },
+    success: { bg: "rgba(0,180,216,0.06)", border: "rgba(0,180,216,0.2)", icon: "#00B4D8" },
   };
 
   return (
@@ -154,8 +154,8 @@ export default function EntryRequirements({ destinations }: Props) {
 
       <div className="mt-4 rounded-xl bg-white/[0.02] border border-white/[0.06] p-4">
         <div className="flex items-center gap-2 mb-2">
-          <CheckCircle2 className="w-4 h-4 text-[#FF8C00]" />
-          <p className="text-[12px] font-bold text-[#FF8C00]">Pre-Travel Checklist</p>
+          <CheckCircle2 className="w-4 h-4 text-[#00B4D8]" />
+          <p className="text-[12px] font-bold text-[#00B4D8]">Pre-Travel Checklist</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
           {[

@@ -75,10 +75,10 @@ export function GettingStartedChecklist() {
             onKeyDown={e => e.key === "Enter" || e.key === " " ? setCollapsed(c => !c) : undefined}
           >
             <div className="flex items-center gap-2">
-              <Rocket className="w-4 h-4 text-[#FF8C00]" aria-hidden="true" />
+              <Rocket className="w-4 h-4 text-[#00B4D8]" aria-hidden="true" />
               <span className="text-xs font-bold text-white/80">Chapter 1: Discover</span>
               <span
-                className="text-[10px] font-mono text-[#FF8C00]"
+                className="text-[10px] font-mono text-[#00B4D8]"
                 aria-label={`${completedCount} of ${milestones.length} complete`}
               >
                 {completedCount}/{milestones.length}
@@ -114,7 +114,7 @@ export function GettingStartedChecklist() {
               aria-label={`${Math.round(progressPct)}% complete`}
             >
               <div
-                className="h-full bg-gradient-to-r from-[#FF8C00] to-[#FFB800] transition-all duration-500 ease-out rounded-full"
+                className="h-full bg-gradient-to-r from-[#00B4D8] to-[#00B4D8] transition-all duration-500 ease-out rounded-full"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
@@ -136,7 +136,7 @@ export function GettingStartedChecklist() {
                     aria-disabled={done}
                   >
                     {done ? (
-                      <CheckCircle2 className="w-4 h-4 text-[#FF8C00] shrink-0" aria-hidden="true" />
+                      <CheckCircle2 className="w-4 h-4 text-[#00B4D8] shrink-0" aria-hidden="true" />
                     ) : (
                       <Circle className="w-4 h-4 text-white/40 shrink-0 group-hover:text-white/40 transition-colors" aria-hidden="true" />
                     )}

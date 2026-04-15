@@ -122,11 +122,11 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
       return (
         <button
           onClick={() => setIsMinimized(false)}
-          className="fixed bottom-4 right-4 z-50 flex items-center gap-2 px-3 py-2 bg-[#0A0E1A] border border-[#FF8C00]/30 rounded-lg shadow-lg shadow-black/50 hover:border-[#FF8C00]/50 transition-colors"
+          className="fixed bottom-4 right-4 z-50 flex items-center gap-2 px-3 py-2 bg-[#0A0E1A] border border-[#00B4D8]/30 rounded-lg shadow-lg shadow-black/50 hover:border-[#00B4D8]/50 transition-colors"
         >
-          <TrendingUp className="w-3.5 h-3.5 text-[#FF8C00]" />
-          <span className="text-[10px] font-mono font-bold text-[#FF8C00]">PAPER TRADE</span>
-          <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#FF8C00]' : 'text-[#ff3366]'}`}>
+          <TrendingUp className="w-3.5 h-3.5 text-[#00B4D8]" />
+          <span className="text-[10px] font-mono font-bold text-[#00B4D8]">PAPER TRADE</span>
+          <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00B4D8]' : 'text-[#ff3366]'}`}>
             {pnl >= 0 ? '+' : ''}{pnlPct}%
           </span>
         </button>
@@ -139,12 +139,12 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
         <div className="fixed bottom-4 right-4 z-50 w-[320px] bg-[#0A0E1A] border border-white/[0.08] rounded-lg shadow-2xl shadow-black/60 overflow-hidden">
         <div className="flex items-center justify-between px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] cursor-pointer" onClick={() => setIsExpanded(v => !v)}>
           <div className="flex items-center gap-1.5">
-            <TrendingUp className="w-3 h-3 text-[#FF8C00]" />
-            <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FF8C00]">PAPER TRADING</span>
+            <TrendingUp className="w-3 h-3 text-[#00B4D8]" />
+            <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00B4D8]">PAPER TRADING</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-[9px] font-mono text-white/30">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-            <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#FF8C00]' : 'text-[#ff3366]'}`}>
+            <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00B4D8]' : 'text-[#ff3366]'}`}>
               {pnl >= 0 ? '+' : ''}{pnlPct}%
             </span>
             <button onClick={(e) => { e.stopPropagation(); setIsMinimized(true); }} className="text-white/50 hover:text-white/50 transition-colors">
@@ -162,11 +162,11 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
           <div className="grid grid-cols-4 gap-1.5">
             <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
               <p className="text-[7px] font-mono text-white/30">CASH</p>
-              <p className="text-[10px] font-mono font-bold text-[#FF8C00]">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+              <p className="text-[10px] font-mono font-bold text-[#00B4D8]">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
             </div>
             <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
               <p className="text-[7px] font-mono text-white/30">POSITIONS</p>
-              <p className="text-[10px] font-mono font-bold text-[#FF8C00]">${portfolio.portfolioValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+              <p className="text-[10px] font-mono font-bold text-[#00B4D8]">${portfolio.portfolioValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
             </div>
             <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
               <p className="text-[7px] font-mono text-white/30">TOTAL</p>
@@ -174,23 +174,23 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
             </div>
             <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
               <p className="text-[7px] font-mono text-white/30">P&L</p>
-              <p className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#FF8C00]' : 'text-[#ff3366]'}`}>{pnl >= 0 ? '+' : ''}${pnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+              <p className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00B4D8]' : 'text-[#ff3366]'}`}>{pnl >= 0 ? '+' : ''}${pnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
             </div>
           </div>
 
           <div className="flex gap-1">
-            <button onClick={() => setTradeSide("buy")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#FF8C00]/20 text-[#FF8C00] border border-[#FF8C00]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>BUY</button>
+            <button onClick={() => setTradeSide("buy")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00B4D8]/20 text-[#00B4D8] border border-[#00B4D8]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>BUY</button>
             <button onClick={() => setTradeSide("sell")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "sell" ? "bg-[#ff3366]/20 text-[#ff3366] border border-[#ff3366]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>SELL</button>
           </div>
 
           <div className="grid grid-cols-3 gap-1">
-            <input value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8C00]/30" />
-            <input value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8C00]/30" />
-            <input value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8C00]/30" />
+            <input value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/30" />
+            <input value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/30" />
+            <input value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/30" />
           </div>
 
           <div className="flex gap-1">
-            <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} className={`flex-1 h-7 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#FF8C00] text-black hover:bg-[#FF8C00]/80" : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"} disabled:opacity-40`}>
+            <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} className={`flex-1 h-7 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00B4D8] text-black hover:bg-[#00B4D8]/80" : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"} disabled:opacity-40`}>
               {tradeLoading ? "EXECUTING..." : `${tradeSide.toUpperCase()} ORDER`}
             </button>
             <button onClick={resetPortfolio} disabled={!isSignedIn} className="px-2 h-7 text-[9px] font-mono font-bold text-white/30 bg-white/[0.03] border border-white/[0.06] rounded-sm hover:text-white/50 transition-colors disabled:opacity-40">
@@ -200,7 +200,7 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
 
           <button
             onClick={() => setShowCashStore(true)}
-            className="w-full flex items-center justify-center gap-1 h-6 text-[9px] font-mono font-bold text-[#FF8C00]/60 bg-[#FF8C00]/[0.04] border border-[#FF8C00]/[0.15] rounded-sm hover:text-[#FF8C00] hover:bg-[#FF8C00]/[0.08] transition-colors"
+            className="w-full flex items-center justify-center gap-1 h-6 text-[9px] font-mono font-bold text-[#00B4D8]/60 bg-[#00B4D8]/[0.04] border border-[#00B4D8]/[0.15] rounded-sm hover:text-[#00B4D8] hover:bg-[#00B4D8]/[0.08] transition-colors"
           >
             <PlusCircle className="w-3 h-3" />
             ADD FUNDS
@@ -213,7 +213,7 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
               <p className="text-[8px] font-mono text-white/25 mb-1">OPEN POSITIONS</p>
               {portfolio.positions.map(p => (
                 <div key={p.id} className="flex items-center justify-between py-0.5">
-                  <span className="text-[10px] font-mono font-bold text-[#FF8C00]">{p.symbol}</span>
+                  <span className="text-[10px] font-mono font-bold text-[#00B4D8]">{p.symbol}</span>
                   <span className="text-[9px] font-mono text-white/40">{p.quantity} @ ${p.avgCost.toFixed(2)}</span>
                   <span className="text-[9px] font-mono text-white/60">${(p.quantity * p.avgCost).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                 </div>
@@ -226,8 +226,8 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
               <p className="text-[8px] font-mono text-white/25 mb-1">RECENT TRADES</p>
               {portfolio.trades.slice(0, 5).map(t => (
                 <div key={t.id} className="flex items-center justify-between py-0.5">
-                  <span className={`text-[9px] font-mono font-bold ${t.side === 'buy' ? 'text-[#FF8C00]' : 'text-[#ff3366]'}`}>{t.side.toUpperCase()}</span>
-                  <span className="text-[10px] font-mono text-[#FF8C00]">{t.symbol}</span>
+                  <span className={`text-[9px] font-mono font-bold ${t.side === 'buy' ? 'text-[#00B4D8]' : 'text-[#ff3366]'}`}>{t.side.toUpperCase()}</span>
+                  <span className="text-[10px] font-mono text-[#00B4D8]">{t.symbol}</span>
                   <span className="text-[9px] font-mono text-white/40">{t.quantity} @ ${t.price.toFixed(2)}</span>
                 </div>
               ))}
@@ -255,19 +255,19 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
           <span className="text-[8px] font-mono font-bold text-[#ff3366]">⚠ Market data temporarily unavailable — trading paused. Portfolio values shown are cash only.</span>
         </div>
       )}
-      <div className="flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FF8C00]">
+      <div className="flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#00B4D8]">
         <div className="flex items-center gap-1.5">
-          <TrendingUp className="w-3 h-3 text-[#FF8C00]" />
-          <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FF8C00]">PAPER TRADING</span>
+          <TrendingUp className="w-3 h-3 text-[#00B4D8]" />
+          <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00B4D8]">PAPER TRADING</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[9px] font-mono text-white/30">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })} CASH</span>
-          <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#FF8C00]' : 'text-[#ff3366]'}`}>
+          <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00B4D8]' : 'text-[#ff3366]'}`}>
             {pnl >= 0 ? '+' : ''}{pnlPct}%
           </span>
           <button
             onClick={() => setShowCashStore(true)}
-            className="flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-mono font-bold text-[#FF8C00]/60 border border-[#FF8C00]/20 rounded-sm hover:text-[#FF8C00] hover:border-[#FF8C00]/40 transition-colors"
+            className="flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-mono font-bold text-[#00B4D8]/60 border border-[#00B4D8]/20 rounded-sm hover:text-[#00B4D8] hover:border-[#00B4D8]/40 transition-colors"
           >
             <PlusCircle className="w-2.5 h-2.5" />
             ADD FUNDS
@@ -278,11 +278,11 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
         <div className="grid grid-cols-4 gap-1.5">
           <div className="bg-white/[0.03] rounded-sm p-2 text-center">
             <p className="text-[8px] font-mono text-white/30">CASH</p>
-            <p className="text-[11px] font-mono font-bold text-[#FF8C00]">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+            <p className="text-[11px] font-mono font-bold text-[#00B4D8]">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
           </div>
           <div className="bg-white/[0.03] rounded-sm p-2 text-center">
             <p className="text-[8px] font-mono text-white/30">POSITIONS</p>
-            <p className="text-[11px] font-mono font-bold text-[#FF8C00]">${portfolio.portfolioValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+            <p className="text-[11px] font-mono font-bold text-[#00B4D8]">${portfolio.portfolioValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
           </div>
           <div className="bg-white/[0.03] rounded-sm p-2 text-center">
             <p className="text-[8px] font-mono text-white/30">TOTAL</p>
@@ -290,23 +290,23 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
           </div>
           <div className="bg-white/[0.03] rounded-sm p-2 text-center">
             <p className="text-[8px] font-mono text-white/30">P&L</p>
-            <p className={`text-[11px] font-mono font-bold ${pnl >= 0 ? 'text-[#FF8C00]' : 'text-[#ff3366]'}`}>{pnl >= 0 ? '+' : ''}${pnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+            <p className={`text-[11px] font-mono font-bold ${pnl >= 0 ? 'text-[#00B4D8]' : 'text-[#ff3366]'}`}>{pnl >= 0 ? '+' : ''}${pnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
           </div>
         </div>
 
         <div className="flex gap-1">
-          <button onClick={() => setTradeSide("buy")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#FF8C00]/20 text-[#FF8C00] border border-[#FF8C00]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>BUY</button>
+          <button onClick={() => setTradeSide("buy")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00B4D8]/20 text-[#00B4D8] border border-[#00B4D8]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>BUY</button>
           <button onClick={() => setTradeSide("sell")} className={`flex-1 py-1 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "sell" ? "bg-[#ff3366]/20 text-[#ff3366] border border-[#ff3366]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06]"}`}>SELL</button>
         </div>
 
         <div className="grid grid-cols-3 gap-1">
-          <input value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8C00]/30" />
-          <input value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8C00]/30" />
-          <input value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8C00]/30" />
+          <input value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/30" />
+          <input value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/30" />
+          <input value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" className="h-7 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/30" />
         </div>
 
         <div className="flex gap-1">
-          <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} className={`flex-1 h-7 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#FF8C00] text-black hover:bg-[#FF8C00]/80" : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"} disabled:opacity-40`}>
+          <button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} className={`flex-1 h-7 text-[9px] font-mono font-bold rounded-sm transition-colors ${tradeSide === "buy" ? "bg-[#00B4D8] text-black hover:bg-[#00B4D8]/80" : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"} disabled:opacity-40`}>
             {tradeLoading ? "EXECUTING..." : `${tradeSide.toUpperCase()} ORDER`}
           </button>
           <button onClick={resetPortfolio} disabled={!isSignedIn} className="px-2 h-7 text-[9px] font-mono font-bold text-white/30 bg-white/[0.03] border border-white/[0.06] rounded-sm hover:text-white/50 transition-colors disabled:opacity-40">
@@ -316,7 +316,7 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
 
         <button
           onClick={() => setShowCashStore(true)}
-          className="w-full flex items-center justify-center gap-1.5 h-7 text-[9px] font-mono font-bold text-[#FF8C00]/60 bg-[#FF8C00]/[0.04] border border-[#FF8C00]/[0.15] rounded-sm hover:text-[#FF8C00] hover:bg-[#FF8C00]/[0.08] transition-colors"
+          className="w-full flex items-center justify-center gap-1.5 h-7 text-[9px] font-mono font-bold text-[#00B4D8]/60 bg-[#00B4D8]/[0.04] border border-[#00B4D8]/[0.15] rounded-sm hover:text-[#00B4D8] hover:bg-[#00B4D8]/[0.08] transition-colors"
         >
           <PlusCircle className="w-3.5 h-3.5" />
           ADD FUNDS
@@ -329,7 +329,7 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
             <p className="text-[8px] font-mono text-white/25 mb-1">OPEN POSITIONS</p>
             {portfolio.positions.map(p => (
               <div key={p.id} className="flex items-center justify-between py-0.5">
-                <span className="text-[10px] font-mono font-bold text-[#FF8C00]">{p.symbol}</span>
+                <span className="text-[10px] font-mono font-bold text-[#00B4D8]">{p.symbol}</span>
                 <span className="text-[9px] font-mono text-white/40">{p.quantity} shares @ ${p.avgCost.toFixed(2)}</span>
                 <span className="text-[9px] font-mono text-white/60">${(p.quantity * p.avgCost).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
               </div>

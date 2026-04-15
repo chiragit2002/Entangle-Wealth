@@ -21,6 +21,7 @@ import { AuthTokenError } from "@/lib/authFetch";
 import { useUxTracker } from "@/hooks/useUxTracker";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { clerkAppearanceDark, clerkAppearanceLight } from "@/lib/clerkAppearance";
+import { ConnectionProvider } from "@/contexts/ConnectionContext";
 
 const Home = lazy(() => import("@/pages/Home"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -187,11 +188,13 @@ export default function App() {
   useEffect(() => { captureReferralCode(); }, []);
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="ew-theme">
-      <ErrorBoundary FallbackComponent={ErrorFallback} onError={(error, info) => {
-        SentryReact.withScope((scope) => { scope.setExtras({ componentStack: info.componentStack }); SentryReact.captureException(error); });
-      }}>
-        <WouterRouter base={basePath}><ClerkProviderWithRoutes /></WouterRouter>
-      </ErrorBoundary>
+      <ConnectionProvider>
+        <ErrorBoundary FallbackComponent={ErrorFallback} onError={(error, info) => {
+          SentryReact.withScope((scope) => { scope.setExtras({ componentStack: info.componentStack }); SentryReact.captureException(error); });
+        }}>
+          <WouterRouter base={basePath}><ClerkProviderWithRoutes /></WouterRouter>
+        </ErrorBoundary>
+      </ConnectionProvider>
     </ThemeProvider>
   );
 }

@@ -305,7 +305,7 @@ export default function Options() {
                             <div className="flex-1 min-w-[160px] flex items-center justify-center gap-3">
                               <Progress
                                 value={item.strength}
-                                className={`h-2 flex-1 max-w-[120px] ${item.strength > 80 ? 'bg-primary/20 [&>div]:bg-primary shadow-[0_0_10px_rgba(255,140,0,0.5)]' : 'bg-white/10 [&>div]:bg-white/50'}`}
+                                className={`h-2 flex-1 max-w-[120px] ${item.strength > 80 ? 'bg-primary/20 [&>div]:bg-primary shadow-[0_0_10px_rgba(0,180,216,0.5)]' : 'bg-white/10 [&>div]:bg-white/50'}`}
                               />
                               <span className="font-mono text-sm font-bold w-10 text-right">{item.strength}</span>
                               {item.strength > 90 && <Zap className="w-4 h-4 text-primary animate-pulse" />}

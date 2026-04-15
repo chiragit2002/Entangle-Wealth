@@ -142,7 +142,7 @@ export function ActivityNudge() {
 
   return (
     <div className="col-span-12 mb-1.5">
-      <div className="bg-gradient-to-r from-[#001a10] via-[#FF8C0008] to-[#001a10] border border-[#FF8C00]/15 rounded-lg px-4 py-3 flex items-start justify-between gap-3 animate-in slide-in-from-top-2 duration-300">
+      <div className="bg-gradient-to-r from-[#001a10] via-[#00B4D808] to-[#001a10] border border-[#00B4D8]/15 rounded-lg px-4 py-3 flex items-start justify-between gap-3 animate-in slide-in-from-top-2 duration-300">
         <div className="flex-1 min-w-0">
           <p className="text-[12px] font-semibold text-white/70 mb-1.5">
             {incompleteItems.length} setup {incompleteItems.length === 1 ? "step" : "steps"} remaining
@@ -152,7 +152,7 @@ export function ActivityNudge() {
               <Link
                 key={item.id}
                 href={item.href}
-                className="flex items-center gap-1 px-2.5 py-1 bg-[#FF8C00]/10 border border-[#FF8C00]/20 rounded-lg text-[10px] font-medium text-[#FF8C00] hover:bg-[#FF8C00]/15 transition-colors"
+                className="flex items-center gap-1 px-2.5 py-1 bg-[#00B4D8]/10 border border-[#00B4D8]/20 rounded-lg text-[10px] font-medium text-[#00B4D8] hover:bg-[#00B4D8]/15 transition-colors"
               >
                 {item.label}
                 <ArrowRight className="w-2.5 h-2.5" />

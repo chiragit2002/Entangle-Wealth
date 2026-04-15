@@ -11,7 +11,7 @@ export function FearGreedGauge() {
     if (v <= 45) return "#ff8844";
     if (v <= 55) return "#888888";
     if (v <= 75) return "#44bb44";
-    return "#FF8C00";
+    return "#00B4D8";
   };
 
   return (
@@ -30,7 +30,7 @@ export function FearGreedGauge() {
                 <stop offset="25%" stopColor="#ff8844" />
                 <stop offset="50%" stopColor="#888888" />
                 <stop offset="75%" stopColor="#44bb44" />
-                <stop offset="100%" stopColor="#FF8C00" />
+                <stop offset="100%" stopColor="#00B4D8" />
               </linearGradient>
             </defs>
             <path

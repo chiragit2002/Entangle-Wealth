@@ -185,7 +185,7 @@ export default function Tax() {
     return Math.min(s, 100);
   }, [profile, totalDocumented, totalGap, totalFound, planIds]);
 
-  const scoreColor = complianceScore >= 80 ? "#FF8C00" : complianceScore >= 60 ? "#FFB800" : "#ff4757";
+  const scoreColor = complianceScore >= 80 ? "#00B4D8" : complianceScore >= 60 ? "#FFB800" : "#ff4757";
   const scoreLabel = complianceScore >= 80 ? "GOOD" : complianceScore >= 60 ? "FAIR" : "NEEDS WORK";
   const circumference = 2 * Math.PI * 60;
   const offset = circumference - (complianceScore / 100) * circumference;
@@ -441,14 +441,14 @@ export default function Tax() {
         </div>
 
         {!profile && !showOnboarding && (
-          <div className="glass-panel rounded-xl p-6 mb-6 border border-[#FF8C00]/20 bg-[#FF8C00]/[0.03] flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="glass-panel rounded-xl p-6 mb-6 border border-[#00B4D8]/20 bg-[#00B4D8]/[0.03] flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div className="flex-1 min-w-0">
               <p className="font-bold text-white mb-1">No tax profile set up yet</p>
               <p className="text-sm text-white/50">Add your income and entity type to see personalized deductions, savings estimates, and quarterly tax payments.</p>
             </div>
             <Button
               onClick={() => setShowOnboarding(true)}
-              className="shrink-0 bg-[#FF8C00] text-black font-bold hover:bg-[#FF8C00]/90 gap-2"
+              className="shrink-0 bg-[#00B4D8] text-black font-bold hover:bg-[#00B4D8]/90 gap-2"
             >
               <Calculator className="w-4 h-4" /> Set up TaxFlow
             </Button>
@@ -456,7 +456,7 @@ export default function Tax() {
         )}
 
         {profile && (
-          <div className="glass-panel rounded-xl p-4 mb-6 border-l-4 border-l-[#FF8C00]">
+          <div className="glass-panel rounded-xl p-4 mb-6 border-l-4 border-l-[#00B4D8]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-bold text-[15px]">{profile.name || profile.businessName}</p>
@@ -466,7 +466,7 @@ export default function Tax() {
               </div>
               <div className="text-right">
                 <p className="text-[11px] text-muted-foreground">Revenue</p>
-                <p className="font-mono font-bold text-[#FF8C00]">{formatDollar(profile.grossRevenue)}</p>
+                <p className="font-mono font-bold text-[#00B4D8]">{formatDollar(profile.grossRevenue)}</p>
               </div>
             </div>
           </div>
@@ -486,20 +486,20 @@ export default function Tax() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 mt-4">
-            <div className="rounded-xl p-3 border border-[rgba(255,140,0,0.2)] bg-[rgba(255,140,0,0.05)] text-center">
-              <p className="text-lg font-extrabold font-mono text-[#FF8C00]">{formatDollar(totalFound)}</p>
+            <div className="rounded-xl p-3 border border-[rgba(0,180,216,0.2)] bg-[rgba(0,180,216,0.05)] text-center">
+              <p className="text-lg font-extrabold font-mono text-[#00B4D8]">{formatDollar(totalFound)}</p>
               <p className="text-[11px] text-muted-foreground mt-1">Deductions Found</p>
             </div>
             <div className="rounded-xl p-3 border border-[rgba(255,184,0,0.2)] bg-[rgba(255,184,0,0.05)] text-center">
               <p className="text-lg font-extrabold font-mono text-[#ffb800]">{formatDollar(totalGap)}</p>
               <p className="text-[11px] text-muted-foreground mt-1">Gap (Undocumented)</p>
             </div>
-            <div className="rounded-xl p-3 border border-[rgba(255,140,0,0.2)] bg-[rgba(255,140,0,0.05)] text-center">
-              <p className="text-lg font-extrabold font-mono text-[#FF8C00]">{formatDollar(totalDocumented)}</p>
+            <div className="rounded-xl p-3 border border-[rgba(0,180,216,0.2)] bg-[rgba(0,180,216,0.05)] text-center">
+              <p className="text-lg font-extrabold font-mono text-[#00B4D8]">{formatDollar(totalDocumented)}</p>
               <p className="text-[11px] text-muted-foreground mt-1">Documented</p>
             </div>
-            <div className="rounded-xl p-3 border border-[rgba(255,140,0,0.2)] bg-[rgba(255,140,0,0.05)] text-center">
-              <p className="text-lg font-extrabold font-mono text-[#FF8C00]">{formatDollar(Math.round(potentialSavings))}</p>
+            <div className="rounded-xl p-3 border border-[rgba(0,180,216,0.2)] bg-[rgba(0,180,216,0.05)] text-center">
+              <p className="text-lg font-extrabold font-mono text-[#00B4D8]">{formatDollar(Math.round(potentialSavings))}</p>
               <p className="text-[11px] text-muted-foreground mt-1">Potential Savings</p>
             </div>
           </div>
@@ -507,14 +507,14 @@ export default function Tax() {
 
         <div className="flex gap-2 mb-6">
           <div className="flex-1 h-3 bg-white/[0.06] rounded-full overflow-hidden">
-            <div className="h-full rounded-full bg-[#FF8C00]" style={{ width: `${totalFound > 0 ? (totalDocumented / totalFound) * 100 : 0}%` }} />
+            <div className="h-full rounded-full bg-[#00B4D8]" style={{ width: `${totalFound > 0 ? (totalDocumented / totalFound) * 100 : 0}%` }} />
           </div>
           <span className="text-[11px] text-muted-foreground font-mono">{totalFound > 0 ? Math.round((totalDocumented / totalFound) * 100) : 0}%</span>
         </div>
 
         <div className="flex gap-3 mb-8 overflow-x-auto pb-2">
           <Link href="/taxgpt">
-            <Button className="bg-[#FF8C00] text-black font-bold gap-2 whitespace-nowrap min-h-[44px] hover:bg-[#FF8C00]/90 active:scale-[0.97] transition-all">
+            <Button className="bg-[#00B4D8] text-black font-bold gap-2 whitespace-nowrap min-h-[44px] hover:bg-[#00B4D8]/90 active:scale-[0.97] transition-all">
               <MessageCircle className="w-4 h-4" /> Get my tax answers
             </Button>
           </Link>
@@ -531,7 +531,7 @@ export default function Tax() {
         </div>
 
         <div className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4">
-          <TrendingUp className="w-5 h-5 text-[#FF8C00]" />
+          <TrendingUp className="w-5 h-5 text-[#00B4D8]" />
           <h2 className="text-lg font-semibold">Deduction Category Breakdown</h2>
         </div>
 
@@ -544,17 +544,17 @@ export default function Tax() {
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[13px] font-semibold text-white/80">{c.label}</span>
                   <div className="flex items-center gap-3 text-[11px] font-mono">
-                    <span className="text-[#FF8C00] font-bold">{formatDollar(c.found)}</span>
+                    <span className="text-[#00B4D8] font-bold">{formatDollar(c.found)}</span>
                     <span className="text-white/30">/</span>
-                    <span className="text-[#FF8C00]">{formatDollar(c.documented)}</span>
+                    <span className="text-[#00B4D8]">{formatDollar(c.documented)}</span>
                     {gap > 0 && <span className="text-[#ffb800]">⚠ {formatDollar(gap)}</span>}
-                    {gap === 0 && c.found > 0 && <span className="text-[#FF8C00]">✓</span>}
+                    {gap === 0 && c.found > 0 && <span className="text-[#00B4D8]">✓</span>}
                   </div>
                 </div>
                 <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
                   <div className="h-full rounded-full" style={{
                     width: `${Math.min(100, pct)}%`,
-                    backgroundColor: pct >= 100 ? "#FF8C00" : pct >= 50 ? "#FF8C00" : "#ffb800",
+                    backgroundColor: pct >= 100 ? "#00B4D8" : pct >= 50 ? "#00B4D8" : "#ffb800",
                   }} />
                 </div>
               </div>
@@ -581,17 +581,17 @@ export default function Tax() {
                     </span>
                   </div>
                   <p className="text-[13px] text-muted-foreground mb-2">{opp.how.slice(0, 120)}...</p>
-                  <p className="text-[13px] font-mono font-bold text-[#FF8C00] mb-3">
+                  <p className="text-[13px] font-mono font-bold text-[#00B4D8] mb-3">
                     Est. savings: {formatDollar(Math.round(opp.estimated * marginalRate))}
                   </p>
                   <div className="flex gap-2">
                     <Link href="/tax-strategy">
-                      <Button size="sm" variant="outline" className="border-[#FF8C00]/30 text-[#FF8C00] text-[12px] min-h-[36px]">
+                      <Button size="sm" variant="outline" className="border-[#00B4D8]/30 text-[#00B4D8] text-[12px] min-h-[36px]">
                         Learn More
                       </Button>
                     </Link>
                     <Link href="/taxgpt">
-                      <Button size="sm" variant="outline" className="border-[#FF8C00]/30 text-[#FF8C00] text-[12px] min-h-[36px]">
+                      <Button size="sm" variant="outline" className="border-[#00B4D8]/30 text-[#00B4D8] text-[12px] min-h-[36px]">
                         Ask TaxGPT
                       </Button>
                     </Link>
@@ -607,7 +607,7 @@ export default function Tax() {
             onClick={() => setExpandEstimator(!expandEstimator)}
             className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4 w-full text-left"
           >
-            <Calculator className="w-5 h-5 text-[#FF8C00]" />
+            <Calculator className="w-5 h-5 text-[#00B4D8]" />
             <h2 className="text-lg font-semibold flex-1">Tax Estimator</h2>
             {expandEstimator ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
           </button>
@@ -617,7 +617,7 @@ export default function Tax() {
               <div className="grid grid-cols-3 gap-2 text-[12px] mb-4">
                 <div className="font-semibold text-white/50"></div>
                 <div className="font-semibold text-center text-[#ff4757]">No Planning</div>
-                <div className="font-semibold text-center text-[#FF8C00]">With Strategies</div>
+                <div className="font-semibold text-center text-[#00B4D8]">With Strategies</div>
               </div>
               {[
                 ["Gross Revenue", formatDollar(estimator.gross), formatDollar(estimator.gross)],
@@ -628,12 +628,12 @@ export default function Tax() {
                 <div key={i} className={`grid grid-cols-3 gap-2 text-[13px] py-2 ${i === 3 ? "border-t border-white/10 font-bold" : ""}`}>
                   <div className="text-white/60">{label}</div>
                   <div className="text-center font-mono text-[#ff4757]">{noPlan}</div>
-                  <div className="text-center font-mono text-[#FF8C00]">{withPlan}</div>
+                  <div className="text-center font-mono text-[#00B4D8]">{withPlan}</div>
                 </div>
               ))}
-              <div className="mt-4 p-4 rounded-xl bg-[rgba(255,140,0,0.08)] border border-[rgba(255,140,0,0.2)] text-center">
+              <div className="mt-4 p-4 rounded-xl bg-[rgba(0,180,216,0.08)] border border-[rgba(0,180,216,0.2)] text-center">
                 <p className="text-[11px] text-muted-foreground uppercase mb-1">Total Estimated Savings</p>
-                <p className="text-2xl font-black font-mono text-[#FF8C00]">{formatDollar(Math.round(Math.max(0, estimator.savings)))}</p>
+                <p className="text-2xl font-black font-mono text-[#00B4D8]">{formatDollar(Math.round(Math.max(0, estimator.savings)))}</p>
               </div>
               {estimator.savings > 0 && (
                 <div className="mt-4 pt-4 border-t border-white/10">

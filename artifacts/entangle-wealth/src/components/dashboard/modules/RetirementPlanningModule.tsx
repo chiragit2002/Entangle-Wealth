@@ -8,8 +8,8 @@ export function RetirementPlanningModule() {
       limit: "$4,400 / $8,750",
       note: "Triple tax advantage — prioritize first",
       badge: "#1 Priority",
-      color: "text-[#FF8C00]",
-      badgeColor: "bg-[#FF8C00]/15 text-[#FF8C00]",
+      color: "text-[#00B4D8]",
+      badgeColor: "bg-[#00B4D8]/15 text-[#00B4D8]",
     },
     {
       name: "401(k) to Match",

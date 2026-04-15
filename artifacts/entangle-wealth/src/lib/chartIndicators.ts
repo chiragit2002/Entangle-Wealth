@@ -130,7 +130,7 @@ export function calcWMASeries(prices: number[], period: number, color: string = 
   };
 }
 
-export function calcDEMASeries(prices: number[], period: number, color: string = "#FF8C00"): IndicatorSeries {
+export function calcDEMASeries(prices: number[], period: number, color: string = "#00B4D8"): IndicatorSeries {
   const e1 = emaArrFull(prices, period);
   const e2 = emaArrFull(e1, period);
   const data: (number | null)[] = prices.map((_, i) =>
@@ -292,9 +292,9 @@ export function calcDonchianSeries(highs: number[], lows: number[], period: numb
     name: `Donchian (${period})`,
     type: "overlay",
     lines: [
-      { label: "DC Upper", data: upper, color: "#FF8C00", width: 1 },
-      { label: "DC Mid", data: mid, color: "#FF8C00", width: 1, style: "dashed" },
-      { label: "DC Lower", data: lower, color: "#FF8C00", width: 1 },
+      { label: "DC Upper", data: upper, color: "#00B4D8", width: 1 },
+      { label: "DC Mid", data: mid, color: "#00B4D8", width: 1, style: "dashed" },
+      { label: "DC Lower", data: lower, color: "#00B4D8", width: 1 },
     ],
   };
 }
@@ -643,7 +643,7 @@ export function calcCCISeries(highs: number[], lows: number[], closes: number[],
   return {
     name: `CCI (${period})`,
     type: "subpane",
-    lines: [{ label: `CCI ${period}`, data, color: "#FF8C00", width: 1.5 }],
+    lines: [{ label: `CCI ${period}`, data, color: "#00B4D8", width: 1.5 }],
     zones: [
       { value: 100, color: "#EF5350", style: "dashed" },
       { value: 0, color: "#787B86", style: "dashed" },
@@ -812,7 +812,7 @@ export function calcChaikinOscSeries(highs: number[], lows: number[], closes: nu
   return {
     name: "Chaikin Oscillator",
     type: "subpane",
-    lines: [{ label: "Chaikin", data, color: "#FF8C00", width: 1.5 }],
+    lines: [{ label: "Chaikin", data, color: "#00B4D8", width: 1.5 }],
     zones: [{ value: 0, color: "#787B86", style: "dashed" }],
   };
 }
@@ -912,7 +912,7 @@ export function computeIndicator(id: string, data: StockData): IndicatorSeries |
     case "sma20": return calcSMASeries(closes, 20, "#2196F3");
     case "sma50": return calcSMASeries(closes, 50, "#FF9800");
     case "sma200": return calcSMASeries(closes, 200, "#F44336");
-    case "ema9": return calcEMASeries(closes, 9, "#FF8C00");
+    case "ema9": return calcEMASeries(closes, 9, "#00B4D8");
     case "ema21": return calcEMASeries(closes, 21, "#FFEB3B");
     case "ema55": return calcEMASeries(closes, 55, "#E91E63");
     case "wma14": return calcWMASeries(closes, 14);

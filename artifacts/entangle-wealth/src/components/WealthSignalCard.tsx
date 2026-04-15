@@ -45,14 +45,14 @@ export function WealthSignalCard({
     ctx.roundRect(0, 0, W, H, 20);
     ctx.fill();
 
-    ctx.strokeStyle = "rgba(255,140,0,0.25)";
+    ctx.strokeStyle = "rgba(0,180,216,0.25)";
     ctx.lineWidth = 1;
     ctx.roundRect(0.5, 0.5, W - 1, H - 1, 20);
     ctx.stroke();
 
     const grid = ctx.createLinearGradient(0, 0, W, 0);
-    grid.addColorStop(0, "rgba(255,140,0,0.03)");
-    grid.addColorStop(1, "rgba(255,140,0,0.01)");
+    grid.addColorStop(0, "rgba(0,180,216,0.03)");
+    grid.addColorStop(1, "rgba(0,180,216,0.01)");
     ctx.fillStyle = grid;
     for (let x = 0; x < W; x += 40) {
       ctx.fillRect(x, 0, 1, H);
@@ -62,19 +62,19 @@ export function WealthSignalCard({
     }
 
     const topGrad = ctx.createLinearGradient(0, 0, W, 0);
-    topGrad.addColorStop(0, "#FF8C00");
+    topGrad.addColorStop(0, "#00B4D8");
     topGrad.addColorStop(1, "#00FF88");
     ctx.fillStyle = topGrad;
     ctx.roundRect(0, 0, W, 3, [20, 20, 0, 0]);
     ctx.fill();
 
     ctx.font = "bold 11px 'JetBrains Mono', monospace";
-    ctx.fillStyle = "rgba(255,140,0,0.6)";
+    ctx.fillStyle = "rgba(0,180,216,0.6)";
     ctx.letterSpacing = "3px";
     ctx.fillText("ENTANGLEWEALTH", 30, 38);
 
     ctx.font = "bold 11px 'JetBrains Mono', monospace";
-    ctx.fillStyle = "rgba(255,140,0,0.4)";
+    ctx.fillStyle = "rgba(0,180,216,0.4)";
     const dateStr = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
     const dateWidth = ctx.measureText(dateStr).width;
     ctx.fillText(dateStr, W - 30 - dateWidth, 38);
@@ -100,7 +100,7 @@ export function WealthSignalCard({
     const statsY = 218;
     const stats = [
       { label: "Streak", value: `${streak}d`, color: "#FFD700" },
-      { label: "Level", value: `${level}`, color: "#FF8C00" },
+      { label: "Level", value: `${level}`, color: "#00B4D8" },
       { label: "XP", value: `${xp.toLocaleString()}`, color: "#7B61FF" },
     ];
 
@@ -126,7 +126,7 @@ export function WealthSignalCard({
     });
 
     ctx.font = "bold 10px 'JetBrains Mono', monospace";
-    ctx.fillStyle = "rgba(255,140,0,0.25)";
+    ctx.fillStyle = "rgba(0,180,216,0.25)";
     ctx.letterSpacing = "1px";
     ctx.fillText("WEALTH SIGNAL", 30, H - 22);
 
@@ -180,8 +180,8 @@ export function WealthSignalCard({
         className="w-full max-w-xl rounded-2xl overflow-hidden"
         style={{
           background: "#0a0a18",
-          border: "1px solid rgba(255,140,0,0.2)",
-          boxShadow: "0 0 60px rgba(255,140,0,0.1)",
+          border: "1px solid rgba(0,180,216,0.2)",
+          boxShadow: "0 0 60px rgba(0,180,216,0.1)",
         }}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
@@ -201,17 +201,17 @@ export function WealthSignalCard({
             className="rounded-xl overflow-hidden mb-5"
             style={{
               background: "linear-gradient(135deg, #0a0a18, #060d1a)",
-              border: "1px solid rgba(255,140,0,0.2)",
+              border: "1px solid rgba(0,180,216,0.2)",
               padding: "28px 24px",
               position: "relative",
             }}
           >
             <div
               className="absolute top-0 left-0 right-0 h-0.5 rounded-full"
-              style={{ background: "linear-gradient(90deg, #FF8C00, #00FF88)" }}
+              style={{ background: "linear-gradient(90deg, #00B4D8, #00FF88)" }}
             />
 
-            <div className="text-[9px] tracking-[3px] font-bold text-[#FF8C00]/60 uppercase mb-3">
+            <div className="text-[9px] tracking-[3px] font-bold text-[#00B4D8]/60 uppercase mb-3">
               EntangleWealth
             </div>
 
@@ -243,10 +243,10 @@ export function WealthSignalCard({
                 style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.06)" }}
               >
                 <div className="flex items-center gap-1 mb-1">
-                  <Zap className="w-3 h-3 text-[#FF8C00]" />
+                  <Zap className="w-3 h-3 text-[#00B4D8]" />
                   <span className="text-[9px] text-white/40 uppercase tracking-widest">Level</span>
                 </div>
-                <div className="text-lg font-bold text-[#FF8C00]">{level}</div>
+                <div className="text-lg font-bold text-[#00B4D8]">{level}</div>
               </div>
               <div
                 className="rounded-lg p-3"
@@ -260,7 +260,7 @@ export function WealthSignalCard({
               </div>
             </div>
 
-            <div className="absolute bottom-3 right-4 text-[9px] font-mono text-[#FF8C00]/20 tracking-wider">
+            <div className="absolute bottom-3 right-4 text-[9px] font-mono text-[#00B4D8]/20 tracking-wider">
               WEALTH SIGNAL
             </div>
           </div>
@@ -281,7 +281,7 @@ export function WealthSignalCard({
               disabled={sharing}
               className="flex-1 gap-2"
               style={{
-                background: "linear-gradient(135deg, #FF8C00, #FF6600)",
+                background: "linear-gradient(135deg, #00B4D8, #FF6600)",
                 color: "#000",
                 fontWeight: "700",
               }}

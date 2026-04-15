@@ -58,7 +58,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  trading: "text-[#FF8C00] bg-[#FF8C00]/10 border-[#FF8C00]/30",
+  trading: "text-[#00B4D8] bg-[#00B4D8]/10 border-[#00B4D8]/30",
   streak: "text-orange-400 bg-orange-400/10 border-orange-400/30",
   community: "text-purple-400 bg-purple-400/10 border-purple-400/30",
   milestone: "text-yellow-400 bg-yellow-400/10 border-yellow-400/30",
@@ -312,7 +312,7 @@ export default function Achievements() {
                 >
                   {badge.earned && (
                     <div className="absolute top-2 right-2">
-                      <CheckCircle className="w-4 h-4 text-[#FF8C00]" />
+                      <CheckCircle className="w-4 h-4 text-[#00B4D8]" />
                     </div>
                   )}
                   <div className={`w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center border ${
@@ -430,7 +430,7 @@ function ChallengeCard({ challenge }: { challenge: ChallengeData }) {
   const effectiveXp = Math.round(challenge.xpReward * multiplier);
 
   return (
-    <div className={`glass-panel p-4 ${challenge.completed ? "border-[#FF8C00]/20 bg-[#FF8C00]/5" : urgent ? "border-orange-500/30" : ""}`}>
+    <div className={`glass-panel p-4 ${challenge.completed ? "border-[#00B4D8]/20 bg-[#00B4D8]/5" : urgent ? "border-orange-500/30" : ""}`}>
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -440,7 +440,7 @@ function ChallengeCard({ challenge }: { challenge: ChallengeData }) {
             }`}>
               {challenge.type}
             </span>
-            {challenge.completed && <CheckCircle className="w-4 h-4 text-[#FF8C00]" />}
+            {challenge.completed && <CheckCircle className="w-4 h-4 text-[#00B4D8]" />}
           </div>
           <p className="text-xs text-muted-foreground">{challenge.description}</p>
         </div>
@@ -461,7 +461,7 @@ function ChallengeCard({ challenge }: { challenge: ChallengeData }) {
       <div className="flex items-center gap-3 mb-2">
         <div className="flex-1 bg-white/5 rounded-full h-2">
           <div
-            className={`h-2 rounded-full transition-all ${challenge.completed ? "bg-[#FF8C00]" : urgent ? "bg-orange-400" : "bg-primary"}`}
+            className={`h-2 rounded-full transition-all ${challenge.completed ? "bg-[#00B4D8]" : urgent ? "bg-orange-400" : "bg-primary"}`}
             style={{ width: `${progressPercent}%` }}
           />
         </div>

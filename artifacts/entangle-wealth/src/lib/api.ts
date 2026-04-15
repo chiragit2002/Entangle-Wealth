@@ -1,5 +1,20 @@
 const API_BASE = "/api";
 
+const BACKOFF_DELAYS = [1000, 2000, 5000, 10000];
+
+const staleCache = new Map<string, { data: unknown; timestamp: number }>();
+
+export interface CachedResult<T> {
+  data: T;
+  stale: boolean;
+  lastUpdated: number | null;
+}
+
+function getCacheKey(input: RequestInfo | URL, init?: RequestInit): string {
+  const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+  return `${init?.method ?? "GET"}:${url}`;
+}
+
 export async function fetchWithRetry(
   input: RequestInfo | URL,
   init?: RequestInit,
@@ -9,16 +24,54 @@ export async function fetchWithRetry(
   while (true) {
     attempt++;
     try {
-      const res = await fetch(input, init);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15_000);
+      const mergedInit = init?.signal
+        ? init
+        : { ...init, signal: controller.signal };
+
+      const res = await fetch(input, mergedInit);
+      clearTimeout(timeout);
+
       if ((res.status === 502 || res.status === 503) && attempt < maxAttempts) {
-        await new Promise((r) => setTimeout(r, 500 * attempt));
+        const delay = BACKOFF_DELAYS[Math.min(attempt - 1, BACKOFF_DELAYS.length - 1)];
+        await new Promise((r) => setTimeout(r, delay));
         continue;
       }
       return res;
     } catch (err) {
       if (attempt >= maxAttempts) throw err;
-      await new Promise((r) => setTimeout(r, 500 * attempt));
+      const delay = BACKOFF_DELAYS[Math.min(attempt - 1, BACKOFF_DELAYS.length - 1)];
+      await new Promise((r) => setTimeout(r, delay));
     }
+  }
+}
+
+async function fetchWithCache<T>(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+  maxAttempts = 3
+): Promise<CachedResult<T>> {
+  const cacheKey = getCacheKey(input, init);
+
+  try {
+    const res = await fetchWithRetry(input, init, maxAttempts);
+    if (!res.ok) {
+      const cached = staleCache.get(cacheKey);
+      if (cached) {
+        return { data: cached.data as T, stale: true, lastUpdated: cached.timestamp };
+      }
+      throw new Error(`HTTP ${res.status}`);
+    }
+    const data = await res.json() as T;
+    staleCache.set(cacheKey, { data, timestamp: Date.now() });
+    return { data, stale: false, lastUpdated: Date.now() };
+  } catch (err) {
+    const cached = staleCache.get(cacheKey);
+    if (cached) {
+      return { data: cached.data as T, stale: true, lastUpdated: cached.timestamp };
+    }
+    throw err;
   }
 }
 
@@ -114,9 +167,8 @@ export async function fetchStocks(params: {
   if (params.sortBy) sp.set("sortBy", params.sortBy);
   if (params.sortDir) sp.set("sortDir", params.sortDir);
 
-  const res = await fetchWithRetry(`${API_BASE}/stocks?${sp.toString()}`);
-  if (!res.ok) throw new Error("Failed to fetch stocks");
-  return res.json();
+  const result = await fetchWithCache<StocksResponse>(`${API_BASE}/stocks?${sp.toString()}`);
+  return result.data;
 }
 
 export async function fetchStock(symbol: string): Promise<Stock> {
@@ -126,15 +178,13 @@ export async function fetchStock(symbol: string): Promise<Stock> {
 }
 
 export async function fetchMovers(): Promise<Movers> {
-  const res = await fetchWithRetry(`${API_BASE}/stocks/movers`);
-  if (!res.ok) throw new Error("Failed to fetch movers");
-  return res.json();
+  const result = await fetchWithCache<Movers>(`${API_BASE}/stocks/movers`);
+  return result.data;
 }
 
 export async function fetchSectors(): Promise<{ sectors: SectorSummary[] }> {
-  const res = await fetchWithRetry(`${API_BASE}/stocks/sectors`);
-  if (!res.ok) throw new Error("Failed to fetch sectors");
-  return res.json();
+  const result = await fetchWithCache<{ sectors: SectorSummary[] }>(`${API_BASE}/stocks/sectors`);
+  return result.data;
 }
 
 export async function analyzeStock(symbol: string): Promise<FullAnalysis> {
@@ -223,7 +273,7 @@ export async function fetchAlpacaBars(symbol: string, params?: {
   return res.json();
 }
 
-export async function fetchAlpacaSnapshots(symbols: string[]): Promise<Record<string, any>> {
+export async function fetchAlpacaSnapshots(symbols: string[]): Promise<Record<string, unknown>> {
   const res = await fetch(`${API_BASE}/alpaca/snapshots?symbols=${symbols.join(",")}`);
   if (!res.ok) throw new Error("Failed to fetch snapshots");
   return res.json();
@@ -241,7 +291,11 @@ export async function fetchNews(params?: {
   if (params?.search) sp.set("search", params.search);
   if (params?.limit) sp.set("limit", String(params.limit));
   if (params?.offset) sp.set("offset", String(params.offset));
-  const res = await fetchWithRetry(`${API_BASE}/news?${sp.toString()}`, { signal: params?.signal });
-  if (!res.ok) throw new Error("Failed to fetch news");
-  return res.json();
+  const result = await fetchWithCache<NewsResponse>(
+    `${API_BASE}/news?${sp.toString()}`,
+    params?.signal ? { signal: params.signal } : undefined
+  );
+  return result.data;
 }
+
+export { fetchWithCache };

@@ -102,15 +102,15 @@ export default function SubmitTicket() {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-20 max-w-lg text-center">
-          <CheckCircle2 className="w-16 h-16 text-[#FF8C00] mx-auto mb-6" />
+          <CheckCircle2 className="w-16 h-16 text-[#00B4D8] mx-auto mb-6" />
           <h1 className="text-2xl font-bold mb-2">Ticket Submitted</h1>
-          <p className="text-white/50 mb-2">Your ticket ID is <span className="text-[#FF8C00] font-mono font-bold">#{submitted.ticketId}</span></p>
+          <p className="text-white/50 mb-2">Your ticket ID is <span className="text-[#00B4D8] font-mono font-bold">#{submitted.ticketId}</span></p>
           <p className="text-white/30 text-sm mb-8">We'll review your request and get back to you within 1–2 business days.</p>
           <div className="flex justify-center gap-3">
             <Button onClick={() => navigate("/help")} variant="outline" className="rounded-xl text-white/60">
               Back to Help
             </Button>
-            <Button onClick={() => { setSubmitted(null); form.reset(); }} variant="ghost" className="rounded-xl text-[#FF8C00] border border-[#FF8C00]/30 hover:bg-[#FF8C00]/20">
+            <Button onClick={() => { setSubmitted(null); form.reset(); }} variant="ghost" className="rounded-xl text-[#00B4D8] border border-[#00B4D8]/30 hover:bg-[#00B4D8]/20">
               Submit Another
             </Button>
           </div>
@@ -122,7 +122,7 @@ export default function SubmitTicket() {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-12 max-w-2xl">
-        <Link href="/help" className="inline-flex items-center gap-1.5 text-xs text-white/30 hover:text-[#FF8C00] transition-colors mb-6">
+        <Link href="/help" className="inline-flex items-center gap-1.5 text-xs text-white/30 hover:text-[#00B4D8] transition-colors mb-6">
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to Help Center
         </Link>
@@ -146,7 +146,7 @@ export default function SubmitTicket() {
                       placeholder="Brief summary of your issue"
                       maxLength={200}
                       aria-invalid={!!form.formState.errors.subject}
-                      className={`w-full h-11 px-4 text-sm bg-white/[0.03] border rounded-xl text-white placeholder:text-white/40 focus:outline-none transition-colors ${form.formState.errors.subject ? "border-[#ff3366]/60 focus:border-[#ff3366]/80" : "border-white/[0.08] focus:border-[#FF8C00]/40"}`}
+                      className={`w-full h-11 px-4 text-sm bg-white/[0.03] border rounded-xl text-white placeholder:text-white/40 focus:outline-none transition-colors ${form.formState.errors.subject ? "border-[#ff3366]/60 focus:border-[#ff3366]/80" : "border-white/[0.08] focus:border-[#00B4D8]/40"}`}
                     />
                   </FormControl>
                   <FormMessage className="text-[11px] text-[#ff3366]" />
@@ -163,7 +163,7 @@ export default function SubmitTicket() {
                   <FormControl>
                     <select
                       {...field}
-                      className="w-full h-11 px-4 text-sm bg-white/[0.03] border border-white/[0.08] rounded-xl text-white focus:outline-none focus:border-[#FF8C00]/40 transition-colors appearance-none"
+                      className="w-full h-11 px-4 text-sm bg-white/[0.03] border border-white/[0.08] rounded-xl text-white focus:outline-none focus:border-[#00B4D8]/40 transition-colors appearance-none"
                     >
                       {CATEGORIES.map((c) => (
                         <option key={c.value} value={c.value} className="bg-black text-white">{c.label}</option>
@@ -187,7 +187,7 @@ export default function SubmitTicket() {
                       rows={6}
                       maxLength={5000}
                       aria-invalid={!!form.formState.errors.description}
-                      className={`w-full px-4 py-3 text-sm bg-white/[0.03] border rounded-xl text-white placeholder:text-white/40 focus:outline-none transition-colors resize-none ${form.formState.errors.description ? "border-[#ff3366]/60 focus:border-[#ff3366]/80" : "border-white/[0.08] focus:border-[#FF8C00]/40"}`}
+                      className={`w-full px-4 py-3 text-sm bg-white/[0.03] border rounded-xl text-white placeholder:text-white/40 focus:outline-none transition-colors resize-none ${form.formState.errors.description ? "border-[#ff3366]/60 focus:border-[#ff3366]/80" : "border-white/[0.08] focus:border-[#00B4D8]/40"}`}
                     />
                   </FormControl>
                   <div className="flex items-center justify-between mt-1">
@@ -215,7 +215,7 @@ export default function SubmitTicket() {
                   <p className="text-[10px] text-white/50 mt-1">{screenshotFile?.name}</p>
                 </div>
               ) : (
-                <label className="flex items-center justify-center gap-2 w-full h-20 border-2 border-dashed border-white/[0.08] rounded-xl cursor-pointer hover:border-[#FF8C00]/30 transition-colors">
+                <label className="flex items-center justify-center gap-2 w-full h-20 border-2 border-dashed border-white/[0.08] rounded-xl cursor-pointer hover:border-[#00B4D8]/30 transition-colors">
                   <Upload className="w-4 h-4 text-white/40" />
                   <span className="text-xs text-white/50">Click to upload a screenshot (max 5MB)</span>
                   <input type="file" accept="image/*" onChange={handleScreenshot} className="hidden" />
@@ -226,7 +226,7 @@ export default function SubmitTicket() {
             <Button
               type="submit"
               disabled={submitting}
-              className="w-full h-11 bg-[#FF8C00] text-black hover:bg-[#FF8C00]/90 rounded-xl font-semibold gap-2"
+              className="w-full h-11 bg-[#00B4D8] text-black hover:bg-[#00B4D8]/90 rounded-xl font-semibold gap-2"
             >
               {submitting ? <><RefreshCw className="w-4 h-4 animate-spin" /> Submitting...</> : <>Submit Ticket <Send className="w-4 h-4" /></>}
             </Button>

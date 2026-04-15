@@ -11,6 +11,43 @@ import { fetchStockUniverse } from "../lib/quantEngine/executionEngine.js";
 import { buildCustomSignal } from "../lib/quantEngine/strategyBridge.js";
 import type { CustomStrategyConfig } from "../lib/quantEngine/strategyBridge.js";
 import type { SignalOpportunity } from "../lib/quantEngine/scorer.js";
+import { RegimeAgent } from "../lib/agents/RegimeAgent.js";
+import { VolatilityAgent } from "../lib/agents/VolatilityAgent.js";
+import { LiquidityAgent } from "../lib/agents/LiquidityAgent.js";
+import { StrategyAgent } from "../lib/agents/StrategyAgent.js";
+import { RiskAgent } from "../lib/agents/RiskAgent.js";
+import { ExecutionAgent } from "../lib/agents/ExecutionAgent.js";
+import { KillSwitchAgent } from "../lib/agents/KillSwitchAgent.js";
+import { DriftAgent } from "../lib/agents/DriftAgent.js";
+import { EnsembleAgent } from "../lib/agents/EnsembleAgent.js";
+import { AllocationAgent } from "../lib/agents/AllocationAgent.js";
+import { Orchestrator } from "../lib/agents/Orchestrator.js";
+import { FinalArbiter } from "../lib/agents/FinalArbiter.js";
+import type { OrchestratorInput } from "../lib/agents/Orchestrator.js";
+
+const regimeAgent = new RegimeAgent();
+const volatilityAgent = new VolatilityAgent();
+const liquidityAgent = new LiquidityAgent();
+const strategyAgent = new StrategyAgent();
+const riskAgent = new RiskAgent();
+const executionAgent = new ExecutionAgent();
+const killSwitchAgent = new KillSwitchAgent();
+const driftAgent = new DriftAgent();
+const ensembleAgent = new EnsembleAgent();
+const allocationAgent = new AllocationAgent();
+const orchestrator = new Orchestrator(
+  regimeAgent,
+  volatilityAgent,
+  liquidityAgent,
+  strategyAgent,
+  riskAgent,
+  executionAgent,
+  killSwitchAgent,
+  driftAgent,
+  ensembleAgent,
+  allocationAgent,
+);
+const finalArbiter = new FinalArbiter(10);
 
 const router = Router();
 
@@ -164,6 +201,116 @@ router.post("/quant/run", async (req, res) => {
   } catch (err) {
     logger.error({ err }, "POST /quant/run failed");
     res.status(500).json({ error: "Failed to trigger engine run" });
+  }
+});
+
+function deriveAction(closes: number[]): "buy" | "sell" | "hold" {
+  if (closes.length < 26) return "hold";
+  const price = closes[closes.length - 1];
+  const sma20 = closes.slice(-20).reduce((a, b) => a + b, 0) / 20;
+  const ema12 = closes.slice(-12).reduce((a, b) => a + b, 0) / 12;
+  const ema26 = closes.slice(-26).reduce((a, b) => a + b, 0) / 26;
+  const macdLine = ema12 - ema26;
+  const gains = [];
+  const losses = [];
+  for (let i = closes.length - 15; i < closes.length; i++) {
+    const change = closes[i] - closes[i - 1];
+    if (change >= 0) gains.push(change);
+    else losses.push(Math.abs(change));
+  }
+  const avgGain = gains.length ? gains.reduce((a, b) => a + b, 0) / gains.length : 0;
+  const avgLoss = losses.length ? losses.reduce((a, b) => a + b, 0) / losses.length : 0.001;
+  const rs = avgGain / avgLoss;
+  const rsi = 100 - 100 / (1 + rs);
+
+  let bullish = 0;
+  let bearish = 0;
+  if (price > sma20) bullish++; else bearish++;
+  if (macdLine > 0) bullish++; else bearish++;
+  if (rsi < 40) bullish++;
+  if (rsi > 60) bearish++;
+
+  if (bullish > bearish + 1) return "buy";
+  if (bearish > bullish + 1) return "sell";
+  return "hold";
+}
+
+router.post("/quant/orchestrate", async (req, res) => {
+  try {
+    const { symbols, timeframes, topN } = req.body as {
+      symbols?: string[];
+      timeframes?: string[];
+      topN?: number;
+    };
+
+    const targetSymbols: string[] = Array.isArray(symbols) && symbols.length > 0
+      ? symbols.slice(0, 20).map((s: string) => String(s).toUpperCase())
+      : ["AAPL", "MSFT", "NVDA", "GOOGL", "AMZN"];
+
+    const targetTimeframes: string[] = Array.isArray(timeframes) && timeframes.length > 0
+      ? timeframes.slice(0, 3)
+      : ["1Day"];
+
+    const arbiter = topN && typeof topN === "number" ? new FinalArbiter(Math.min(topN, 50)) : finalArbiter;
+
+    logger.info({ symbols: targetSymbols, timeframes: targetTimeframes }, "POST /quant/orchestrate: starting");
+
+    const ohlcvByTimeframe = new Map<string, Map<string, import("../lib/quantEngine/strategyGenerator.js").OHLCVData>>();
+    await Promise.all(
+      targetTimeframes.map(async tf => {
+        const stockDataForTf = await fetchStockUniverse(targetSymbols, tf);
+        ohlcvByTimeframe.set(tf, stockDataForTf);
+      }),
+    );
+
+    const inputs: OrchestratorInput[] = [];
+    for (const symbol of targetSymbols) {
+      for (const tf of targetTimeframes) {
+        const tfData = ohlcvByTimeframe.get(tf);
+        const ohlcv = tfData?.get(symbol);
+        if (!ohlcv || ohlcv.closes.length < 20) continue;
+        const action = deriveAction(ohlcv.closes);
+        inputs.push({
+          strategyId: `sys:${symbol}:${tf}`,
+          symbol,
+          timeframe: tf,
+          action,
+          ohlcv,
+        });
+      }
+    }
+
+    if (inputs.length === 0) {
+      res.status(502).json({ error: "No market data available for requested symbols" });
+      return;
+    }
+
+    const orchestratorResults = await orchestrator.runMulti(inputs);
+    const output = arbiter.arbitrate(orchestratorResults);
+
+    const symbolsFetched = new Set(
+      [...ohlcvByTimeframe.values()].flatMap(m => [...m.keys()]),
+    ).size;
+
+    logger.info({
+      symbols: targetSymbols.length,
+      timeframes: targetTimeframes.length,
+      evaluated: orchestratorResults.length,
+      top: output.topStrategies.length,
+    }, "POST /quant/orchestrate: complete");
+
+    res.json({
+      ...output,
+      meta: {
+        symbolsRequested: targetSymbols.length,
+        symbolsFetched,
+        timeframes: targetTimeframes,
+        inputsEvaluated: inputs.length,
+      },
+    });
+  } catch (err) {
+    logger.error({ err }, "POST /quant/orchestrate failed");
+    res.status(500).json({ error: "Orchestration failed" });
   }
 });
 

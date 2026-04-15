@@ -42,6 +42,14 @@ import {
   UserProfileAgent,
   SyncAgent,
   RecoveryAgent,
+  RegimeAgent,
+  VolatilityAgent,
+  LiquidityAgent,
+  DriftAgent,
+  EnsembleAgent,
+  AllocationAgent,
+  KillSwitchAgent,
+  ExecutionAgent,
 } from "./lib/agents";
 import { startScheduler, stopScheduler } from "./lib/quantEngine/index";
 import { pool, db } from "@workspace/db";
@@ -552,6 +560,14 @@ agentRegistry.register(new StrategyAgent());
 agentRegistry.register(new UserProfileAgent());
 agentRegistry.register(new SyncAgent());
 agentRegistry.register(new RecoveryAgent());
+agentRegistry.register(new RegimeAgent());
+agentRegistry.register(new VolatilityAgent());
+agentRegistry.register(new LiquidityAgent());
+agentRegistry.register(new DriftAgent());
+agentRegistry.register(new EnsembleAgent());
+agentRegistry.register(new AllocationAgent());
+agentRegistry.register(new KillSwitchAgent());
+agentRegistry.register(new ExecutionAgent());
 
 await agentRegistry.startAll();
 logger.info("Agent orchestration framework started");

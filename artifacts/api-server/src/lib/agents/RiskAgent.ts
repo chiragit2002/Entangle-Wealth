@@ -48,6 +48,32 @@ export class RiskAgent extends BaseAgent {
     if (eventType === "portfolio_updated") await this.onPortfolioUpdated(payload as PortfolioUpdatedPayload);
   }
 
+  assessFromInputs(inputs: {
+    failedScenarios: number;
+    resilienceScore: number;
+    volatilityRegime: string;
+    liquidityTier: string;
+  }): { riskLevel: "LOW" | "MEDIUM" | "HIGH"; rationale: string } {
+    const { failedScenarios, resilienceScore } = inputs;
+    const vol = inputs.volatilityRegime.toLowerCase();
+    const liq = inputs.liquidityTier.toLowerCase();
+
+    let score = 0;
+    if (failedScenarios >= 3) score += 3;
+    else if (failedScenarios >= 1) score += 1;
+    if (resilienceScore < 40) score += 2;
+    else if (resilienceScore < 70) score += 1;
+    if (vol === "extreme" || vol === "crisis" || vol === "high") score += 2;
+    else if (vol === "moderate" || vol === "medium") score += 1;
+    if (liq === "illiquid") score += 2;
+    else if (liq === "low") score += 1;
+
+    const riskLevel: "LOW" | "MEDIUM" | "HIGH" = score >= 5 ? "HIGH" : score >= 2 ? "MEDIUM" : "LOW";
+    const rationale = `failedScenarios=${failedScenarios}, resilience=${resilienceScore.toFixed(0)}, vol=${inputs.volatilityRegime}, liq=${inputs.liquidityTier}`;
+
+    return { riskLevel, rationale };
+  }
+
   private async onPortfolioUpdated(payload: PortfolioUpdatedPayload): Promise<void> {
     const t0 = Date.now();
     try {

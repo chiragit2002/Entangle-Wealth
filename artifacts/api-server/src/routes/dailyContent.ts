@@ -8,6 +8,7 @@ import { anthropicCircuit } from "../lib/circuitBreaker";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { logger } from "../lib/logger";
 import { validateBody, validateParams, validateQuery, z } from "../lib/validateRequest";
+import { MASTER_BASE_PROMPT } from "../lib/masterPrompt";
 
 const router = Router();
 
@@ -170,7 +171,7 @@ async function generateBatchForDate(batchDate: string, theme: string): Promise<v
 
       while (!valid && attempts < maxAttempts) {
         attempts++;
-        const systemPrompt = `${BRAND_VOICE_SYSTEM}\n\n${platform.rules}`;
+        const systemPrompt = `${MASTER_BASE_PROMPT}\n\n---\n\n## Domain Specialization: Daily Content Creation\n\n${BRAND_VOICE_SYSTEM}\n\n${platform.rules}`;
         const userMessage = `Today's content theme: ${theme}\n\nGenerate a ${platform.label} for EntangleWealth. The content should authentically reflect this theme while following all brand voice and platform rules above.`;
 
         const message = await aiQueue.enqueue(() =>

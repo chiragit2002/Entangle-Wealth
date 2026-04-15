@@ -11,6 +11,7 @@ import { getOccupationById } from "@workspace/occupations";
 import { logger } from "../lib/logger";
 import { sanitizeAiOutput, appendDisclaimer } from "../middlewares/inputSanitizer";
 import { aiQueue, AIQueueOverflowError } from "../lib/aiQueue";
+import { MASTER_BASE_PROMPT } from "../lib/masterPrompt";
 
 let openai: any = null;
 try {
@@ -253,7 +254,13 @@ router.post("/taxgpt", requireAuth, validateBody(TaxGptRequestSchema), async (re
       ? getOccupationById(userRecord.occupationId)
       : undefined;
 
-    let systemPrompt = TAX_SYSTEM_PROMPT;
+    let systemPrompt = `${MASTER_BASE_PROMPT}
+
+---
+
+## Domain Specialization: TaxGPT
+
+${TAX_SYSTEM_PROMPT}`;
 
     if (occupationData) {
       systemPrompt += `\n\n═══════════════════════════════════════\n  USER OCCUPATION CONTEXT\n═══════════════════════════════════════\n`;

@@ -10,6 +10,7 @@ import { anthropicCircuit } from "../lib/circuitBreaker";
 import { retryWithBackoff } from "../lib/retryWithBackoff";
 import { validateBody, z } from "../lib/validateRequest";
 import { logger } from "../lib/logger";
+import { MASTER_BASE_PROMPT } from "../lib/masterPrompt";
 
 const router = Router();
 
@@ -221,7 +222,7 @@ router.post("/marketing/generate", requireAuth, requireAdmin, validateBody(Marke
             client.messages.create({
               model: "claude-sonnet-4-6",
               max_tokens: 8192,
-              system: `${platformConfig.systemPrompt}\n\n${toneInstruction}\n\nPlatform character limit: ${platformConfig.maxChars} characters. Stay well within this limit.`,
+              system: `${MASTER_BASE_PROMPT}\n\n---\n\n## Domain Specialization: Marketing Content\n\n${platformConfig.systemPrompt}\n\n${toneInstruction}\n\nPlatform character limit: ${platformConfig.maxChars} characters. Stay well within this limit.`,
               messages: [
                 {
                   role: "user",

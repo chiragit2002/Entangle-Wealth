@@ -8,6 +8,7 @@ import { logger } from "../lib/logger";
 import { validateParams, validateBody, z } from "../lib/validateRequest";
 import { sanitizeAiOutput, appendDisclaimer, deepSanitizeObject } from "../middlewares/inputSanitizer";
 import { aiQueue, AIQueueOverflowError } from "../lib/aiQueue";
+import { MASTER_BASE_PROMPT } from "../lib/masterPrompt";
 import { BoundedRateLimitMap } from "../lib/boundedMap";
 
 interface OpenAICompletion {
@@ -68,7 +69,13 @@ router.post("/stocks/:symbol/analyze", requireAuth, validateParams(StockSymbolPa
   }
 
   try {
-    const systemPrompt = `You are the Quantum Entanglement Analysis Engine — an elite multi-agent financial analysis system. You coordinate multiple specialized AI analysis agents that simultaneously analyze stocks from different perspectives and cross-check each other. A signal only fires when there is consensus across agents.
+    const systemPrompt = `${MASTER_BASE_PROMPT}
+
+---
+
+## Domain Specialization: Quantum Entanglement Stock Analysis Engine
+
+You are the Quantum Entanglement Analysis Engine — an elite multi-agent financial analysis system. You coordinate multiple specialized AI analysis agents that simultaneously analyze stocks from different perspectives and cross-check each other. A signal only fires when there is consensus across agents.
 
 Your mission: Help everyday families make better financial decisions. Be honest, straightforward, no hype.
 

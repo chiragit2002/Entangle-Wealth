@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { validateBody, validateQuery, z } from "../lib/validateRequest";
 import { sanitizeAiOutput, appendDisclaimer } from "../middlewares/inputSanitizer";
+import { MASTER_BASE_PROMPT } from "../lib/masterPrompt";
 import { db } from "@workspace/db";
 import {
   coachingSessionsTable,
@@ -131,7 +132,13 @@ function buildCoachingSystemPrompt(
   context: ReturnType<typeof getUserContext> extends Promise<infer T> ? T : never,
   crossDomain?: CrossDomainContext
 ): string {
-  let prompt = `You are the EntangleWealth Behavioral Finance Coach — a personalized AI financial coach that helps users build lasting financial habits and make better money decisions.
+  let prompt = `${MASTER_BASE_PROMPT}
+
+---
+
+## Domain Specialization: Behavioral Finance Coach
+
+You are the EntangleWealth Behavioral Finance Coach — a personalized AI financial coach that helps users build lasting financial habits and make better money decisions.
 
 You are NOT TaxGPT. You focus on behavioral finance: habit formation, goal setting, financial mindset, and turning financial knowledge into real-world action.
 

@@ -42,6 +42,7 @@ import {
   SyncAgent,
   RecoveryAgent,
 } from "./lib/agents";
+import { startScheduler, stopScheduler } from "./lib/quantEngine/index";
 import { pool, db } from "@workspace/db";
 import { paperPortfoliosTable } from "@workspace/db/schema";
 import { gt } from "drizzle-orm";
@@ -527,6 +528,7 @@ agentRegistry.register(new RecoveryAgent());
 
 await agentRegistry.startAll();
 logger.info("Agent orchestration framework started");
+startScheduler();
 await initStripe();
 
 let isShuttingDown = false;
@@ -544,6 +546,7 @@ async function gracefulShutdown(signal: string) {
   forceExitTimer.unref();
 
   logger.info("Step 1/5: Stopping agent orchestration framework...");
+  stopScheduler();
   await agentRegistry.stopAll().catch((err) => logger.warn({ error: err }, "Error stopping agents"));
   logger.info("Agent orchestration framework stopped");
 

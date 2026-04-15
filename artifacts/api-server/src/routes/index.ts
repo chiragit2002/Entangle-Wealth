@@ -49,6 +49,7 @@ import stressTestRouter from "./stressTest";
 import dashboardModulesRouter from "./dashboardModules";
 import journeyRouter from "./journey";
 import agentsRouter from "./agents";
+import quantRouter from "./quant";
 
 export function createRouter(app: Express): IRouter {
 const router: IRouter = Router();
@@ -103,6 +104,7 @@ router.use(stressTestRouter);
 router.use(dashboardModulesRouter);
 router.use(journeyRouter);
 router.use(agentsRouter);
+router.use(quantRouter);
 
 return router;
 }

@@ -8,6 +8,7 @@ import { logger } from "../lib/logger";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { validateBody, z } from "../lib/validateRequest";
 import { getLivePrice, getLivePrices } from "../lib/priceService";
+import { eventBus } from "../lib/agents/EventBus";
 import type { InferSelectModel } from "drizzle-orm";
 
 type DbPosition = InferSelectModel<typeof paperPositionsTable>;
@@ -558,6 +559,18 @@ router.delete("/paper-trading/orders/:id", requireAuth, async (req, res) => {
       return;
     }
     res.json(result);
+
+    eventBus.publish({
+      eventType: "trade_executed",
+      sourceAgent: "PaperTrading",
+      payload: {
+        userId: (req as AuthenticatedRequest).userId,
+        symbol: upperSymbol,
+        side,
+        quantity: qty,
+        price: px,
+      },
+    }).catch((err) => logger.warn({ err }, "Failed to publish trade_executed event"));
   } catch (err) {
     logger.error({ err }, "Failed to cancel order");
     res.status(500).json({ error: "Failed to cancel order" });

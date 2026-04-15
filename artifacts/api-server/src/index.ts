@@ -19,6 +19,29 @@ import { startDigestScheduler, stopDigestScheduler } from "./lib/emailDigest";
 import { startDailyContentScheduler, stopDailyContentScheduler } from "./routes/dailyContent";
 import { startDripScheduler, stopDripScheduler } from "./lib/dripEmails";
 import { startApiHealthMonitor } from "./lib/apiHealthMonitor";
+import {
+  agentRegistry,
+  AlertEvaluatorAgent,
+  bindAlertEvaluatorToAgent,
+  OrderEvaluatorAgent,
+  bindOrderEvaluatorToAgent,
+  EmailDigestAgent,
+  bindEmailDigestToAgent,
+  DailyContentAgent,
+  bindDailyContentToAgent,
+  DripEmailAgent,
+  bindDripEmailToAgent,
+  ApiHealthAgent,
+  bindApiHealthToAgent,
+  CrawlSchedulerAgent,
+  PortfolioAgent,
+  RiskAgent,
+  TaxAgent,
+  StrategyAgent,
+  UserProfileAgent,
+  SyncAgent,
+  RecoveryAgent,
+} from "./lib/agents";
 import { pool, db } from "@workspace/db";
 import { paperPortfoliosTable } from "@workspace/db/schema";
 import { gt } from "drizzle-orm";
@@ -110,6 +133,47 @@ async function seedHabitDefinitions() {
     }
   } catch (err) {
     logger.warn({ error: err }, "Failed to seed habit definitions (non-fatal)");
+  }
+}
+
+async function ensureAgentTables() {
+  try {
+    const client = await pool.connect();
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS agent_logs (
+          id SERIAL PRIMARY KEY,
+          agent_name TEXT NOT NULL,
+          action TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'info',
+          message TEXT,
+          metadata JSONB,
+          error_message TEXT,
+          duration_ms INTEGER,
+          created_at TIMESTAMPTZ DEFAULT NOW()
+        );
+        CREATE INDEX IF NOT EXISTS idx_agent_logs_agent_name ON agent_logs (agent_name);
+        CREATE INDEX IF NOT EXISTS idx_agent_logs_status ON agent_logs (status);
+        CREATE INDEX IF NOT EXISTS idx_agent_logs_created_at ON agent_logs (created_at);
+
+        CREATE TABLE IF NOT EXISTS agent_events (
+          id SERIAL PRIMARY KEY,
+          event_type TEXT NOT NULL,
+          source_agent TEXT NOT NULL,
+          payload JSONB,
+          processed_by JSONB,
+          created_at TIMESTAMPTZ DEFAULT NOW()
+        );
+        CREATE INDEX IF NOT EXISTS idx_agent_events_event_type ON agent_events (event_type);
+        CREATE INDEX IF NOT EXISTS idx_agent_events_source_agent ON agent_events (source_agent);
+        CREATE INDEX IF NOT EXISTS idx_agent_events_created_at ON agent_events (created_at);
+      `);
+      logger.info("Agent tables ensured (agent_logs, agent_events)");
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    logger.warn({ error: err }, "Failed to ensure agent tables (non-fatal)");
   }
 }
 
@@ -430,6 +494,7 @@ ensureTask126BadgesExist().catch((err) =>
   logger.warn({ error: err }, "Failed to seed task-126 backtester badges (non-fatal)")
 );
 await verifySchemaReady();
+await ensureAgentTables();
 await normalizePortfolioBalances();
 await ensureGamificationTables();
 await ensureSupportTables();
@@ -437,12 +502,30 @@ await seedHabitDefinitions();
 ensurePerformanceIndexes().catch((err) =>
   logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
 );
-startAlertEvaluator();
-startOrderEvaluator();
-startDigestScheduler();
-startDailyContentScheduler();
-startDripScheduler();
-startApiHealthMonitor();
+bindAlertEvaluatorToAgent(startAlertEvaluator, stopAlertEvaluator);
+bindOrderEvaluatorToAgent(startOrderEvaluator, stopOrderEvaluator);
+bindEmailDigestToAgent(startDigestScheduler, stopDigestScheduler);
+bindDailyContentToAgent(startDailyContentScheduler, stopDailyContentScheduler);
+bindDripEmailToAgent(startDripScheduler, stopDripScheduler);
+bindApiHealthToAgent(startApiHealthMonitor);
+
+agentRegistry.register(new AlertEvaluatorAgent());
+agentRegistry.register(new OrderEvaluatorAgent());
+agentRegistry.register(new EmailDigestAgent());
+agentRegistry.register(new DailyContentAgent());
+agentRegistry.register(new DripEmailAgent());
+agentRegistry.register(new ApiHealthAgent());
+agentRegistry.register(new CrawlSchedulerAgent());
+agentRegistry.register(new PortfolioAgent());
+agentRegistry.register(new RiskAgent());
+agentRegistry.register(new TaxAgent());
+agentRegistry.register(new StrategyAgent());
+agentRegistry.register(new UserProfileAgent());
+agentRegistry.register(new SyncAgent());
+agentRegistry.register(new RecoveryAgent());
+
+await agentRegistry.startAll();
+logger.info("Agent orchestration framework started");
 await initStripe();
 
 let isShuttingDown = false;
@@ -459,13 +542,9 @@ async function gracefulShutdown(signal: string) {
   }, 30_000);
   forceExitTimer.unref();
 
-  logger.info("Step 1/5: Stopping background schedulers...");
-  stopAlertEvaluator();
-  stopOrderEvaluator();
-  stopDigestScheduler();
-  stopDripScheduler();
-  stopDailyContentScheduler();
-  logger.info("Background schedulers stopped");
+  logger.info("Step 1/5: Stopping agent orchestration framework...");
+  await agentRegistry.stopAll().catch((err) => logger.warn({ error: err }, "Error stopping agents"));
+  logger.info("Agent orchestration framework stopped");
 
   if (!httpServer) {
     logger.info("No HTTP server, closing database pool...");

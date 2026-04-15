@@ -64,6 +64,29 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **Performance**: Metrics middleware, AI request queuing, circuit breakers for external APIs, image compression.
 - **Routes**: Comprehensive API routes for all platform features.
 
+## Agent Orchestration Framework (`artifacts/api-server/src/lib/agents/`)
+- **BaseAgent**: Abstract class with `init/start/stop/handleEvent/healthCheck` lifecycle, heartbeat tracking, error counting, and DB-backed audit logging to `agent_logs` table.
+- **EventBus**: In-process typed pub/sub system. All events are persisted to `agent_events` table for full audit trail. Agents subscribe by event type; handlers run in parallel with isolated error handling.
+- **AgentRegistry**: Manages 13 registered agents. Starts/stops all in sequence, runs periodic heartbeat health checks, auto-restarts failed agents (up to 3 attempts).
+- **13 Agents**:
+  - `AlertEvaluator` — wraps alert evaluation engine
+  - `EmailDigest` — wraps daily/weekly digest scheduler
+  - `DailyContent` — wraps AI social content generator
+  - `DripEmail` — wraps drip email sequence scheduler
+  - `ApiHealth` — wraps endpoint health monitor
+  - `CrawlScheduler` — wraps automated site crawl scheduler
+  - `Portfolio` — recalculates holdings/P&L on `trade_executed` and `price_update` events; emits `portfolio_updated`
+  - `Risk` — evaluates concentration/cash risk on `portfolio_updated`; emits `risk_assessed`
+  - `Tax` — checks wash sale rules and estimates tax impact on `trade_executed`; emits `tax_assessed`
+  - `Strategy` — evaluates RSI/MACD/Bollinger signals on `price_update`; emits `strategy_signal`
+  - `UserProfile` — selects top 4 dashboard modules based on occupation/business status on `user_session`; emits `dashboard_configured`
+  - `Sync` — checks portfolio data consistency after trades and portfolio updates; emits `sync_discrepancy`
+  - `Recovery` — monitors all agent heartbeats, logs unhealthy agents every 2 minutes
+- **Event Chain**: Paper trading → `trade_executed` → Portfolio + Tax + Sync agents → `portfolio_updated` → Risk agent → `risk_assessed`
+- **Database Tables**: `agent_logs` (every action/error with metadata) and `agent_events` (every published event with subscribers). Auto-created on startup if not present.
+- **Status API**: `GET /api/agents/status` (admin-only) returns live health per agent with green/yellow/red indicators. Also `GET /api/agents/logs` and `GET /api/agents/events`.
+- **Frontend**: `SystemStatus` component in Navbar (admin-only) shows real-time colored dot + tooltip with per-agent breakdown. Polls every 60 seconds.
+
 # External Dependencies
 
 - **Monorepo tool**: pnpm workspaces

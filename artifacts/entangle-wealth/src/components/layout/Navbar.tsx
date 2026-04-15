@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import NotificationCenter from "@/components/NotificationCenter";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { SystemStatus } from "./SystemStatus";
 
 interface NavLink { href: string; label: string }
 
@@ -123,6 +124,7 @@ function NavbarComponent() {
         </div>
 
         <div className="hidden lg:flex items-center gap-1">
+          <SystemStatus />
           <ThemeToggle />
           <NotificationCenter />
           <Show when="signed-in">

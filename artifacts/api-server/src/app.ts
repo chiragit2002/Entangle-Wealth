@@ -26,7 +26,7 @@ import seoRouter from "./routes/seo";
 import { logger } from "./lib/logger";
 import { getAuth } from "@clerk/express";
 import { standardTimeout, aiTimeout } from "./middlewares/requestTimeout";
-import { startCrawlScheduler } from "./lib/crawlScheduler";
+
 
 const app: Express = express();
 
@@ -242,7 +242,5 @@ app.use((req, res, next) => {
 app.use("/api", createRouter(app));
 
 app.use(globalErrorHandler);
-
-startCrawlScheduler();
 
 export default app;

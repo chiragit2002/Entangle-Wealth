@@ -48,6 +48,7 @@ import auditRouter from "./audit";
 import stressTestRouter from "./stressTest";
 import dashboardModulesRouter from "./dashboardModules";
 import journeyRouter from "./journey";
+import agentsRouter from "./agents";
 
 export function createRouter(app: Express): IRouter {
 const router: IRouter = Router();
@@ -101,6 +102,7 @@ router.use(taxflowRouter);
 router.use(stressTestRouter);
 router.use(dashboardModulesRouter);
 router.use(journeyRouter);
+router.use(agentsRouter);
 
 return router;
 }

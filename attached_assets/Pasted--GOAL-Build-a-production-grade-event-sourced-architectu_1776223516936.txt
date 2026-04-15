@@ -1,0 +1,260 @@
+[GOAL] :: Build a production-grade event-sourced architecture for EntangleWealth, a stock trading simulator where users trade with simulated capital (including paid boosts and referral rewards), ensuring every trade deterministically updates portfolios based on real market price movements with zero drift.
+
+[CONTEXT] :: 
+- Users trade stocks with simulated balances (default 100,000; early users get 5x boost)
+- Users can purchase additional simulated capital
+- Referral system increases user balance
+- Trades must reflect real market price fluctuations
+- System must feel real, fair, and non-exploitable
+- High concurrency expected (many users trading same assets)
+
+[CONSTRAINTS] :: 
+- Deterministic portfolio updates (no desync ever)
+- Event-sourced (full audit trail)
+- Real-time price integration (read-only external market data)
+- No balance fabrication or silent mutation
+- All user advantages (boosts/referrals) must be traceable events
+- Sub-100ms trade execution path (excluding market data latency)
+- Strong anti-cheat guarantees
+
+---
+
+[STEPS] ::
+
+STEP A — DATABASE SCHEMA (EntangleWealth Specialized)
+
+Action:
+Design core tables with trading + game economy support
+
+Output:
+
+TABLE: users  
+- user_id (PK)  
+- created_at  
+- referral_code  
+- referred_by  
+- is_early_user (bool)  
+
+---
+
+TABLE: portfolios  
+- portfolio_id (PK)  
+- user_id (FK)  
+- cash_balance  
+- created_at  
+
+---
+
+TABLE: positions  
+- position_id (PK)  
+- portfolio_id (FK)  
+- ticker  
+- quantity  
+- avg_price  
+
+---
+
+TABLE: orders (command layer)  
+- order_id (PK)  
+- user_id  
+- ticker  
+- side (buy/sell)  
+- quantity  
+- status (pending/filled/rejected)  
+- created_at  
+
+---
+
+TABLE: strategy_events (CORE SOURCE OF TRUTH)  
+- event_id (PK, sequential)  
+- user_id  
+- portfolio_id  
+- event_type  
+- payload (JSON)  
+- market_price (locked at execution)  
+- timestamp  
+- idempotency_key  
+
+INDEXES:
+- (portfolio_id, event_id)
+- (user_id, timestamp)
+- (ticker, timestamp)
+
+---
+
+TABLE: portfolio_snapshots  
+- portfolio_id  
+- last_event_id  
+- state (cash + positions JSON)  
+- created_at  
+
+---
+
+SCALING:
+- Partition events by portfolio_id or time
+- Append-only writes
+- Read via snapshot + delta replay
+
+---
+
+STEP B — EVENT DESIGN RULES (Trading + Economy Safe)
+
+Allowed Event Types:
+
+1. ACCOUNT EVENTS
+- USER_CREATED
+- EARLY_BOOST_GRANTED (x5 starting capital)
+- REFERRAL_REWARD_GRANTED
+- PURCHASED_BALANCE
+
+---
+
+2. TRADING EVENTS
+- ORDER_PLACED
+- ORDER_FILLED
+- ORDER_REJECTED
+
+---
+
+3. PORTFOLIO MUTATIONS (CRITICAL)
+- CASH_DEBITED
+- CASH_CREDITED
+- POSITION_OPENED
+- POSITION_INCREASED
+- POSITION_REDUCED
+- POSITION_CLOSED
+
+---
+
+RULES:
+- Events must contain ONLY raw facts (no derived totals)
+- Every trade MUST include:
+  - execution_price (locked)
+  - quantity
+  - ticker
+- No recalculating past trades with new prices
+
+---
+
+ANTI-PATTERNS (FORBIDDEN):
+- ❌ Storing portfolio total value in events  
+- ❌ Mutating past events  
+- ❌ Using “latest price” during replay  
+
+---
+
+STEP C — REPLAY ENGINE LOGIC (This is where correctness lives)
+
+Action:
+
+When user requests portfolio:
+
+1. Load latest snapshot
+2. Fetch events where event_id > snapshot.last_event_id
+3. Replay sequentially:
+
+PSEUDOCODE:
+
+state = snapshot.state
+
+for event in events:
+  if event.type == CASH_DEBITED:
+    state.cash -= event.amount
+
+  if event.type == POSITION_INCREASED:
+    update avg_price deterministically
+
+  if event.type == POSITION_REDUCED:
+    reduce quantity
+
+4. Attach LIVE MARKET PRICES (external feed):
+  portfolio_value = Σ(position.qty * live_price)
+
+IMPORTANT:
+- Trade price = historical locked price  
+- Portfolio value = live price  
+
+---
+
+ERROR HANDLING:
+- Missing event → halt + flag corruption  
+- Duplicate idempotency_key → ignore  
+
+---
+
+TIME TRAVEL:
+- Replay until timestamp T → reconstruct past portfolio exactly
+
+---
+
+STEP D — SNAPSHOT STRATEGY (Performance without lying)
+
+Rules:
+
+- Create snapshot every:
+  - 50 events OR
+  - 30 seconds (whichever first)
+
+Snapshot contains:
+- cash_balance
+- positions (ticker, qty, avg_price)
+
+---
+
+READ FLOW:
+
+1. Load snapshot  
+2. Replay small delta (fast)  
+
+---
+
+INVALIDATION:
+
+- If event stream corruption detected:
+  → rebuild snapshot from scratch  
+
+---
+
+FAILSAFE:
+
+- If snapshot missing:
+  → full replay (slower but correct)
+
+---
+
+---
+
+[CRITICAL TRADING FLOW — MUST BE EXACT]
+
+When user places trade:
+
+1. Fetch latest market price (real-time feed)
+2. Lock price → attach to event
+3. Validate:
+   - sufficient cash or shares
+4. Write events:
+   - ORDER_PLACED
+   - CASH_DEBITED
+   - POSITION_UPDATED
+   - ORDER_FILLED
+
+5. Return updated portfolio (snapshot + delta replay)
+
+---
+
+[ANTI-CHEAT GUARANTEES]
+
+- No client-side price usage  
+- All prices come from server-side feed  
+- Idempotency keys prevent duplicate trades  
+- Event log = audit trail (cannot fake profit)
+
+---
+
+[OUTPUT]
+
+A fully deterministic, event-sourced trading system where:
+- Every trade permanently alters portfolio state via events
+- Portfolio value updates live with market prices
+- All boosts, purchases, and referrals are traceable
+- System is replayable, auditable, and cheat-resistant

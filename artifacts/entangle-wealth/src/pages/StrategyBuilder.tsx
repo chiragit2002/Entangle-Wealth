@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Plus, Edit2, Trash2, Copy, Play, Power, PowerOff, ChevronLeft,
   BarChart3, TrendingUp, TrendingDown, Loader2, X, Check, Tag,
-  Zap, Activity, Target, Shield, ArrowDownUp,
+  Zap, Activity, Target as TargetIcon, Shield, ArrowDownUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -846,6 +846,13 @@ export default function StrategyBuilder() {
                             >
                               <Play className="w-4 h-4" />
                             </button>
+                            <a
+                              href={`${BASE_URL}/eval-pipeline`}
+                              title="Multi-Model Evaluation"
+                              className="p-1.5 rounded-lg text-white/30 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
+                            >
+                              <TargetIcon className="w-4 h-4" />
+                            </a>
                             <button
                               onClick={() => startEdit(s)}
                               title="Edit"

@@ -22,3 +22,4 @@ export * from "./pushSubscriptions";
 export * from "./dailyContent";
 export * from "./agents";
 export * from "./customStrategies";
+export * from "./strategyEvaluations";

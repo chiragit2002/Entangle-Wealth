@@ -129,10 +129,11 @@ async function verifySchemaReady() {
     const existing = new Set(rows.map((r: { tablename: string }) => r.tablename));
     const missing = requiredTables.filter((t) => !existing.has(t));
     if (missing.length > 0) {
-      logger.error(
+      logger.fatal(
         { missingTables: missing },
         "SCHEMA CHECK FAILED: Required tables missing. Run 'drizzle-kit push' to sync the schema."
       );
+      process.exit(1);
     } else {
       logger.info("Schema readiness check passed — all required tables present");
     }

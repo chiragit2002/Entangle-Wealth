@@ -4,6 +4,7 @@ import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import { agentRegistry } from "../lib/agents";
 import { LearningAgent } from "../lib/agents/LearningAgent";
+import { PatternAgent } from "../lib/agents/PatternAgent";
 import { pool } from "@workspace/db";
 import { logger } from "../lib/logger";
 
@@ -200,6 +201,67 @@ router.get("/agents/learning/insights/:strategyId/:regime", requireAuth, async (
   } catch (err) {
     logger.error({ err }, "Failed to fetch learning insight");
     res.status(500).json({ error: "Failed to fetch learning insight" });
+  }
+});
+
+function getPatternAgent(): PatternAgent | null {
+  const agent = agentRegistry.get("Pattern");
+  if (agent instanceof PatternAgent) return agent;
+  return null;
+}
+
+router.get("/agents/patterns", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const pattern = getPatternAgent();
+    if (!pattern) {
+      res.status(503).json({ error: "PatternAgent not available" });
+      return;
+    }
+
+    const report = pattern.getLatestReport();
+    if (!report) {
+      res.json({ failures: [], streaks: [], regimeVulnerabilities: [], timestamp: null, message: "No scan completed yet" });
+      return;
+    }
+
+    res.json(report);
+  } catch (err) {
+    logger.error({ err }, "Failed to fetch pattern report");
+    res.status(500).json({ error: "Failed to fetch pattern report" });
+  }
+});
+
+router.post("/agents/patterns/scan", requireAuth, requireAdmin, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const pattern = getPatternAgent();
+    if (!pattern) {
+      res.status(503).json({ error: "PatternAgent not available" });
+      return;
+    }
+
+    const report = await pattern.scan();
+    res.json(report);
+  } catch (err) {
+    logger.error({ err }, "Failed to run pattern scan");
+    res.status(500).json({ error: "Failed to run pattern scan" });
+  }
+});
+
+router.get("/agents/patterns/history", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const pattern = getPatternAgent();
+    if (!pattern) {
+      res.status(503).json({ error: "PatternAgent not available" });
+      return;
+    }
+
+    const limit = Math.min(parseInt(String(req.query.limit || "10"), 10), 100);
+    const history = pattern.getReportHistory();
+    const sliced = history.slice(-limit);
+    res.json({ reports: sliced, count: sliced.length });
+  } catch (err) {
+    logger.error({ err }, "Failed to fetch pattern history");
+    res.status(500).json({ error: "Failed to fetch pattern history" });
   }
 });
 

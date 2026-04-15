@@ -17,8 +17,8 @@ import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { TerminalAuthShell } from "@/components/TerminalAuthShell";
 import { AuthErrorHandler } from "@/components/AuthErrorHandler";
 import { AuthTokenError } from "@/lib/authFetch";
-import { AuditErrorBoundary } from "@/components/AuditErrorBoundary";
 import { useUxTracker } from "@/hooks/useUxTracker";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { clerkAppearanceDark, clerkAppearanceLight } from "@/lib/clerkAppearance";
 
 const Home = lazy(() => import("@/pages/Home"));
@@ -62,11 +62,7 @@ function stripBasePath(path: string) {
 }
 
 function createQueryClient() {
-  return new QueryClient({
-    defaultOptions: {
-      queries: { retry: (count, error) => !(error instanceof AuthTokenError) && count < 3 },
-    },
-  });
+  return new QueryClient({ defaultOptions: { queries: { retry: (count, error) => !(error instanceof AuthTokenError) && count < 3 } } });
 }
 
 function useClerkAppearance() {
@@ -106,39 +102,29 @@ function CacheInvalidator() {
   return null;
 }
 
-function RequireAuth({ component: Component }: { component: React.ComponentType }) {
+type Wrap = { component: React.ComponentType };
+
+function RequireAuth({ component: Component }: Wrap) {
   const [location] = useLocation();
   return (
     <>
       <Show when="signed-in"><Component /></Show>
-      <Show when="signed-out">
-        <Redirect to={`/sign-in?reason=protected&redirect_url=${encodeURIComponent(location)}`} />
-      </Show>
+      <Show when="signed-out"><Redirect to={`/sign-in?reason=protected&redirect_url=${encodeURIComponent(location)}`} /></Show>
     </>
   );
 }
 
-function LazyPage({ component: Component }: { component: React.ComponentType }) {
-  return <Suspense fallback={<PageSkeleton />}><Component /></Suspense>;
+function RequireAdmin({ component: Component }: Wrap) {
+  const isAdmin = useIsAdmin();
+  return isAdmin ? <Component /> : <Redirect to="/dashboard" />;
 }
 
-function LazyChart({ component: Component }: { component: React.ComponentType }) {
-  return <Suspense fallback={<ChartSkeleton />}><Component /></Suspense>;
-}
-
-function LazyTable({ component: Component }: { component: React.ComponentType }) {
-  return <Suspense fallback={<TableSkeleton />}><Component /></Suspense>;
-}
-
-function LazyProtected({ component: Component }: { component: React.ComponentType }) {
-  return <Suspense fallback={<PageSkeleton />}><RequireAuth component={Component} /></Suspense>;
-}
-
-function PageTracker() {
-  usePageTracking();
-  useUxTracker();
-  return null;
-}
+function LazyPage({ component: Component }: Wrap) { return <Suspense fallback={<PageSkeleton />}><Component /></Suspense>; }
+function LazyChart({ component: Component }: Wrap) { return <Suspense fallback={<ChartSkeleton />}><Component /></Suspense>; }
+function LazyTable({ component: Component }: Wrap) { return <Suspense fallback={<TableSkeleton />}><Component /></Suspense>; }
+function LazyProtected({ component: Component }: Wrap) { return <Suspense fallback={<PageSkeleton />}><RequireAuth component={Component} /></Suspense>; }
+function LazyAdmin({ component: Component }: Wrap) { return <Suspense fallback={<PageSkeleton />}><RequireAuth component={() => <RequireAdmin component={Component} />} /></Suspense>; }
+function PageTracker() { usePageTracking(); useUxTracker(); return null; }
 
 function ClerkProviderWithRoutes() {
   const [, navigate] = useLocation();
@@ -149,7 +135,6 @@ function ClerkProviderWithRoutes() {
       <QueryClientProvider client={queryClient}>
         <CacheInvalidator /><PageTracker /><AuthErrorHandler />
         <TooltipProvider>
-          <AuditErrorBoundary>
           <Switch>
             <Route path="/">{() => <LazyPage component={Home} />}</Route>
             <Route path="/about">{() => <LazyPage component={About} />}</Route>
@@ -182,11 +167,10 @@ function ClerkProviderWithRoutes() {
             <Route path="/disclaimer">{() => <LazyPage component={DisclaimerPage} />}</Route>
             <Route path="/dmca">{() => <LazyPage component={DmcaPage} />}</Route>
             <Route path="/accessibility">{() => <LazyPage component={AccessibilityPage} />}</Route>
-            <Route path="/admin/:rest*">{() => <LazyProtected component={AdminHubPage} />}</Route>
-            <Route path="/admin">{() => <LazyProtected component={AdminHubPage} />}</Route>
+            <Route path="/admin/:rest*">{() => <LazyAdmin component={AdminHubPage} />}</Route>
+            <Route path="/admin">{() => <LazyAdmin component={AdminHubPage} />}</Route>
             <Route component={NotFound} />
           </Switch>
-          </AuditErrorBoundary>
           <CookieConsentBanner />
           <Toaster />
         </TooltipProvider>

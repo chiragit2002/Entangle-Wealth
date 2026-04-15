@@ -237,8 +237,8 @@ app.use((req, res, next) => {
   return standardTimeout(req, res, next);
 });
 
-app.use(seoRouter);
-app.use("/api", seoRouter);
+// app.use(seoRouter);
+// app.use("/api", seoRouter);
 app.use("/api", createRouter(app));
 
 app.use(globalErrorHandler);

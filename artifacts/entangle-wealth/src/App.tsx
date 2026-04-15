@@ -146,6 +146,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/dmca">{() => <LP component={DmcaPage} />}</Route>
             <Route path="/accessibility">{() => <LP component={AccessibilityPage} />}</Route>
             <Route path="/admin/:rest*">{() => <LPr component={AdminHubPage} />}</Route>
+            <Route path="/admin">{() => <LPr component={AdminHubPage} />}</Route>
             <Route component={NotFound} />
           </Switch>
           </AuditErrorBoundary>

@@ -408,7 +408,8 @@ try {
   }
   trackConnections(httpServer);
   trackOpenSockets(httpServer);
-} catch {
+} catch (err) {
+  logger.fatal({ error: err }, "Server startup failed");
   process.exit(1);
   throw new Error("unreachable");
 }

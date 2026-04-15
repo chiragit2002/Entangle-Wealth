@@ -72,7 +72,7 @@ function scoreM1_Trend(data: OHLCVData, params: Record<string, number>): number 
   const { closes } = data;
   if (closes.length < 50) return 50;
 
-  const fastPeriod = params.ema_fast ?? params.fast ?? 12;
+  const fastPeriod = params.ema_fast ?? params.fast ?? 10;
   const slowPeriod = params.ema_slow ?? params.slow ?? 26;
   const fastEma = ema(closes, fastPeriod);
   const slowEma = ema(closes, slowPeriod);

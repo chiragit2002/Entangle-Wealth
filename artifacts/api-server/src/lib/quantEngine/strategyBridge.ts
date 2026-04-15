@@ -46,20 +46,20 @@ function prevEma(closes: number[], period: number): number {
 
 const CONDITION_EVALUATORS: Record<string, ConditionEvaluator> = {
   ema_fast_crosses_above_ema_slow: (data, p) => {
-    const f = p.fast ?? 12; const s = p.slow ?? 26;
+    const f = p.fast ?? 10; const s = p.slow ?? 26;
     return safeEma(data.closes, f) > safeEma(data.closes, s) &&
            prevEma(data.closes, f) <= prevEma(data.closes, s);
   },
   ema_fast_above_ema_slow: (data, p) =>
-    safeEma(data.closes, p.fast ?? 12) > safeEma(data.closes, p.slow ?? 26),
+    safeEma(data.closes, p.fast ?? 10) > safeEma(data.closes, p.slow ?? 26),
 
   ema_fast_crosses_below_ema_slow: (data, p) => {
-    const f = p.fast ?? 12; const s = p.slow ?? 26;
+    const f = p.fast ?? 10; const s = p.slow ?? 26;
     return safeEma(data.closes, f) < safeEma(data.closes, s) &&
            prevEma(data.closes, f) >= prevEma(data.closes, s);
   },
   ema_fast_below_ema_slow: (data, p) =>
-    safeEma(data.closes, p.fast ?? 12) < safeEma(data.closes, p.slow ?? 26),
+    safeEma(data.closes, p.fast ?? 10) < safeEma(data.closes, p.slow ?? 26),
 
   sma_fast_crosses_above_sma_slow: (data, p) => {
     const f = p.fast ?? 10; const s = p.slow ?? 20; const cl = data.closes;

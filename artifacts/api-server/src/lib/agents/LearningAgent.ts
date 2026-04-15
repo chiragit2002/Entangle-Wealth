@@ -122,7 +122,7 @@ export class LearningAgent extends BaseAgent {
   }
 
   async init(): Promise<void> {
-    eventBus.subscribe("trade_executed", this.name, async (payload) => {
+    eventBus.subscribe("episode_recorded", this.name, async (payload) => {
       await this.onTradeExecuted(payload as TradeExecutedPayload);
     });
 
@@ -150,7 +150,7 @@ export class LearningAgent extends BaseAgent {
   }
 
   async stop(): Promise<void> {
-    eventBus.unsubscribe("trade_executed", this.name);
+    eventBus.unsubscribe("episode_recorded", this.name);
     eventBus.unsubscribe("regime_detected", this.name);
     if (this.intervalHandle) { clearInterval(this.intervalHandle); this.intervalHandle = null; }
     if (this.consolidationTimer) { clearInterval(this.consolidationTimer); this.consolidationTimer = null; }
@@ -165,7 +165,7 @@ export class LearningAgent extends BaseAgent {
 
   async handleEvent(eventType: string, payload: unknown): Promise<void> {
     this.heartbeat();
-    if (eventType === "trade_executed") await this.onTradeExecuted(payload as TradeExecutedPayload);
+    if (eventType === "episode_recorded") await this.onTradeExecuted(payload as TradeExecutedPayload);
     if (eventType === "regime_detected") this.onRegimeDetected(payload as RegimeDetectedPayload);
   }
 

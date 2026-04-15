@@ -1,8 +1,11 @@
+import { createHash } from "crypto";
 import { BaseAgent } from "./BaseAgent";
 import { eventBus } from "./EventBus";
 import { logger } from "../logger";
+import type { ExchangeAdapter, OrderResult } from "../exchange/ExchangeAdapter";
+import { OrderSide, OrderType } from "../exchange/ExchangeAdapter";
 
-export type ExecutionAction = "BUY" | "SELL" | "HOLD" | "EXIT";
+export type ExecutionAction = "BUY" | "SELL" | "HOLD" | "EXIT" | "BLOCK";
 
 export interface ExecutionDecision {
   strategyId: string;
@@ -35,8 +38,23 @@ export interface ExecutionInput {
   stressScore?: number;
 }
 
+export type ExecuteOutcome =
+  | { routed: false; reason: string }
+  | { routed: true; orderResult: OrderResult };
+
+const IDEMPOTENCY_WINDOW_MS = 5 * 60 * 1000;
+const IDEMPOTENCY_CACHE_MAX = 10_000;
+
+function makeIdempotencyKey(strategyId: string, symbol: string, action: ExecutionAction, timestampMs: number): string {
+  const windowedTs = Math.floor(timestampMs / IDEMPOTENCY_WINDOW_MS) * IDEMPOTENCY_WINDOW_MS;
+  return createHash("sha256")
+    .update(`${strategyId}:${symbol}:${action}:${windowedTs}`)
+    .digest("hex");
+}
+
 export class ExecutionAgent extends BaseAgent {
   private intervalHandle: ReturnType<typeof setInterval> | null = null;
+  private idempotencyCache = new Map<string, number>();
 
   constructor() {
     super("Execution", "Synthesizes evaluation, stress, risk, and context inputs into a scored decision");
@@ -158,6 +176,68 @@ export class ExecutionAgent extends BaseAgent {
         volatilityPenalty,
       },
     };
+  }
+
+  async execute(decision: ExecutionDecision, adapter: ExchangeAdapter, sizeShares = 1): Promise<ExecuteOutcome> {
+    const { action, strategyId, symbol } = decision;
+
+    if (action === "HOLD" || action === "BLOCK") {
+      logger.info({ strategyId, symbol, action }, `[ExecutionAgent] ${action} — no order placed`);
+      return { routed: false, reason: `${action}: no-op` };
+    }
+
+    const idempotencyKey = makeIdempotencyKey(strategyId, symbol, action, Date.now());
+    const existing = this.idempotencyCache.get(idempotencyKey);
+    if (existing) {
+      logger.warn({ strategyId, symbol, action, idempotencyKey }, "[ExecutionAgent] Duplicate order suppressed by idempotency cache");
+      return { routed: false, reason: "duplicate: idempotency key already used in this window" };
+    }
+
+    this.pruneIdempotencyCache();
+    this.idempotencyCache.set(idempotencyKey, Date.now());
+
+    try {
+      let orderResult: OrderResult;
+
+      if (action === "EXIT") {
+        logger.info({ strategyId, symbol }, "[ExecutionAgent] EXIT — closing position");
+        orderResult = await adapter.closePosition(symbol);
+      } else {
+        const side = action === "BUY" ? OrderSide.BUY : OrderSide.SELL;
+        logger.info({ strategyId, symbol, action, side, sizeShares }, "[ExecutionAgent] Placing order");
+        orderResult = await adapter.placeOrder(symbol, side, sizeShares, OrderType.MARKET);
+      }
+
+      this.heartbeat();
+      this.resetErrors();
+
+      await eventBus.publish({
+        eventType: "trade_executed",
+        sourceAgent: this.name,
+        payload: {
+          strategy_id: strategyId,
+          symbol,
+          action,
+          orderResult,
+          idempotencyKey,
+        },
+      });
+
+      return { routed: true, orderResult };
+    } catch (err) {
+      this.incrementError();
+      logger.error({ err, strategyId, symbol, action }, "[ExecutionAgent] Order routing failed");
+      this.idempotencyCache.delete(idempotencyKey);
+      throw err;
+    }
+  }
+
+  private pruneIdempotencyCache(): void {
+    if (this.idempotencyCache.size < IDEMPOTENCY_CACHE_MAX) return;
+    const cutoff = Date.now() - IDEMPOTENCY_WINDOW_MS;
+    for (const [key, ts] of this.idempotencyCache) {
+      if (ts < cutoff) this.idempotencyCache.delete(key);
+    }
   }
 
   private async onExecutionRequested(payload: ExecutionInput): Promise<void> {

@@ -241,11 +241,11 @@ export class Orchestrator {
     }
     const killSwitchMs = Date.now() - t5;
 
-    // Step 5.5: Learned failure block — override to HOLD
+    // Step 5.5: Learned failure block — override to BLOCK (no-op in execution layer)
     if (learnedBlock && decision.action !== "EXIT") {
       const originalAction = decision.action;
       const originalRationale = decision.rationale;
-      decision.action = "HOLD";
+      decision.action = "BLOCK";
       decision.rationale = `[LEARNED BLOCK] ${learnedInsight} | Original ${originalAction}: ${originalRationale}`;
       decision.score = 0;
       decision.confidence = 0;
@@ -256,7 +256,7 @@ export class Orchestrator {
 
     // AllocationAgent: compute position sizing (skip if EXIT or low score)
     let allocation: AllocationDecision | null = null;
-    if (decision.action !== "EXIT" && decision.action !== "HOLD") {
+    if (decision.action !== "EXIT" && decision.action !== "HOLD" && decision.action !== "BLOCK") {
       allocation = this.allocationAgent.allocate({
         strategyId,
         symbol,
@@ -266,9 +266,9 @@ export class Orchestrator {
       });
     }
 
-    // Step 6: Store episode in LearningAgent memory via EventBus
+    // Step 6: Store episode in LearningAgent memory via EventBus (decision-level, not order-level)
     eventBus.publish({
-      eventType: "trade_executed",
+      eventType: "episode_recorded",
       sourceAgent: "Orchestrator",
       payload: {
         strategy_id: strategyId,
@@ -281,7 +281,7 @@ export class Orchestrator {
         },
       },
     }).catch(err => {
-      logger.warn({ err }, "[Orchestrator] Failed to publish trade_executed episode");
+      logger.warn({ err }, "[Orchestrator] Failed to publish episode_recorded event");
     });
 
     return {

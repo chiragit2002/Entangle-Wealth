@@ -25,6 +25,9 @@ import { AllocationAgent } from "../lib/agents/AllocationAgent.js";
 import { Orchestrator } from "../lib/agents/Orchestrator.js";
 import { FinalArbiter } from "../lib/agents/FinalArbiter.js";
 import type { OrchestratorInput } from "../lib/agents/Orchestrator.js";
+import { runExecutionLoop, asyncIterableFromArray } from "../lib/executionLoop.js";
+import { AlpacaExchangeAdapter } from "../lib/exchange/AlpacaExchangeAdapter.js";
+import { MockExchange } from "../lib/exchange/MockExchange.js";
 
 const regimeAgent = new RegimeAgent();
 const volatilityAgent = new VolatilityAgent();
@@ -323,6 +326,114 @@ router.get("/quant/runs", async (req, res) => {
   } catch (err) {
     logger.error({ err }, "GET /quant/runs failed");
     res.status(500).json({ error: "Failed to fetch historical runs" });
+  }
+});
+
+router.post("/quant/execute", requireAuth, async (req, res) => {
+  try {
+    const {
+      symbols,
+      timeframes,
+      mock = false,
+      shareSize = 1,
+      stopOnError = false,
+    } = req.body as {
+      symbols?: string[];
+      timeframes?: string[];
+      mock?: boolean;
+      shareSize?: number;
+      stopOnError?: boolean;
+    };
+
+    const targetSymbols: string[] = Array.isArray(symbols) && symbols.length > 0
+      ? symbols.slice(0, 10).map((s: string) => String(s).toUpperCase())
+      : ["AAPL", "MSFT", "NVDA"];
+
+    const targetTimeframes: string[] = Array.isArray(timeframes) && timeframes.length > 0
+      ? timeframes.slice(0, 2)
+      : ["1Day"];
+
+    const alpacaKey = process.env.ALPACA_KEY_ID || process.env.ALPACA_API_KEY || "";
+    const alpacaSecret = process.env.ALPACA_API_SECRET || "";
+    const hasAlpacaCreds = alpacaKey.startsWith("PK") && alpacaSecret.length > 30;
+    const useMock = mock || !hasAlpacaCreds;
+    const adapter = useMock ? new MockExchange() : new AlpacaExchangeAdapter();
+
+    logger.info(
+      { symbols: targetSymbols, timeframes: targetTimeframes, useMock, shareSize },
+      "POST /quant/execute: starting execution loop",
+    );
+
+    const ohlcvByTimeframe = new Map<string, Map<string, import("../lib/quantEngine/strategyGenerator.js").OHLCVData>>();
+    await Promise.all(
+      targetTimeframes.map(async tf => {
+        const stockDataForTf = await fetchStockUniverse(targetSymbols, tf);
+        ohlcvByTimeframe.set(tf, stockDataForTf);
+      }),
+    );
+
+    const inputs: OrchestratorInput[] = [];
+    for (const symbol of targetSymbols) {
+      for (const tf of targetTimeframes) {
+        const tfData = ohlcvByTimeframe.get(tf);
+        const ohlcv = tfData?.get(symbol);
+        if (!ohlcv || ohlcv.closes.length < 20) continue;
+        const action = deriveAction(ohlcv.closes);
+        inputs.push({
+          strategyId: `exec:${symbol}:${tf}`,
+          symbol,
+          timeframe: tf,
+          action,
+          ohlcv,
+        });
+      }
+    }
+
+    if (inputs.length === 0) {
+      res.status(502).json({ error: "No market data available for requested symbols" });
+      return;
+    }
+
+    const loopResults = await runExecutionLoop(
+      orchestrator,
+      executionAgent,
+      adapter,
+      asyncIterableFromArray(inputs),
+      { defaultShareSize: Math.max(1, Math.min(shareSize, 1000)), stopOnError },
+    );
+
+    const routed = loopResults.filter(r => r.outcome.routed);
+    const blocked = loopResults.filter(r => !r.outcome.routed);
+
+    logger.info(
+      { total: loopResults.length, routed: routed.length, blocked: blocked.length, useMock },
+      "POST /quant/execute: complete",
+    );
+
+    res.json({
+      usedMockExchange: useMock,
+      total: loopResults.length,
+      routedCount: routed.length,
+      blockedCount: blocked.length,
+      results: loopResults.map(r => ({
+        strategyId: r.input.strategyId,
+        symbol: r.input.symbol,
+        timeframe: r.input.timeframe,
+        action: r.orchestratorResult?.decision?.action ?? null,
+        score: r.orchestratorResult?.decision?.score ?? null,
+        rationale: r.orchestratorResult?.decision?.rationale ?? null,
+        killSwitchOverridden: r.killSwitchOverridden,
+        killSwitchReasons: r.orchestratorResult?.killSwitch?.reasons ?? [],
+        routed: r.outcome.routed,
+        orderResult: r.outcome.routed ? r.outcome.orderResult : null,
+        blockedReason: !r.outcome.routed ? r.outcome.reason : null,
+        durationMs: r.durationMs,
+        timestamp: r.timestamp,
+      })),
+    });
+  } catch (err) {
+    logger.error({ err }, "POST /quant/execute failed");
+    res.status(500).json({ error: "Execution loop failed" });
   }
 });
 

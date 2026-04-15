@@ -247,16 +247,21 @@ async function resolveAndValidateHost(hostname: string): Promise<boolean> {
         if (addrs.some(isPrivateIp)) return false;
         hasValidAddress = true;
       }
-    } catch {}
+    } catch (err) {
+      logger.debug({ hostname, error: err }, "DNS IPv4 resolution failed for article fetch");
+    }
     try {
       const addrs6 = await resolve6(hostname);
       if (addrs6.length > 0) {
         if (addrs6.some(isPrivateIp)) return false;
         hasValidAddress = true;
       }
-    } catch {}
+    } catch (err) {
+      logger.debug({ hostname, error: err }, "DNS IPv6 resolution failed for article fetch");
+    }
     return hasValidAddress;
-  } catch {
+  } catch (err) {
+    logger.debug({ hostname, error: err }, "DNS module import failed");
     return false;
   }
 }

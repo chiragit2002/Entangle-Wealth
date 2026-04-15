@@ -45,69 +45,6 @@ if (missingOptional.length > 0) {
   console.warn(`[STARTUP] Missing optional environment variables (some features may be disabled): ${missingOptional.join(", ")}`);
 }
 
-async function ensureDailyContentTable() {
-  try {
-    const client = await pool.connect();
-    try {
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS daily_content_posts (
-          id SERIAL PRIMARY KEY,
-          batch_date DATE NOT NULL,
-          platform TEXT NOT NULL,
-          content TEXT NOT NULL,
-          theme TEXT NOT NULL,
-          status TEXT NOT NULL DEFAULT 'draft',
-          created_at TIMESTAMPTZ DEFAULT now(),
-          updated_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE INDEX IF NOT EXISTS idx_daily_content_batch_date ON daily_content_posts (batch_date);
-        CREATE INDEX IF NOT EXISTS idx_daily_content_status ON daily_content_posts (status);
-      `);
-      logger.info("Daily content table ensured");
-    } finally {
-      client.release();
-    }
-  } catch (err) {
-    logger.warn({ error: err }, "Failed to ensure daily content table (non-fatal)");
-  }
-}
-
-async function ensureAlertTables() {
-  try {
-    const client = await pool.connect();
-    try {
-      await client.query(`
-        ALTER TABLE users ADD COLUMN IF NOT EXISTS alert_email_digest TEXT DEFAULT 'off';
-        CREATE TABLE IF NOT EXISTS push_subscriptions (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT NOT NULL,
-          endpoint TEXT NOT NULL,
-          subscription_json TEXT NOT NULL,
-          created_at TIMESTAMPTZ DEFAULT now(),
-          updated_at TIMESTAMPTZ DEFAULT now(),
-          UNIQUE(user_id, endpoint)
-        );
-        CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user_id ON push_subscriptions (user_id);
-        CREATE TABLE IF NOT EXISTS analytics_events (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT,
-          event TEXT NOT NULL,
-          properties JSONB,
-          session_id TEXT,
-          created_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE INDEX IF NOT EXISTS idx_analytics_event ON analytics_events (event);
-        CREATE INDEX IF NOT EXISTS idx_analytics_created_at ON analytics_events (created_at);
-        CREATE INDEX IF NOT EXISTS idx_analytics_user_id ON analytics_events (user_id);
-      `);
-      logger.info("Alert ancillary tables ensured");
-    } finally {
-      client.release();
-    }
-  } catch (err) {
-    logger.warn({ error: err }, "Failed to ensure alert ancillary tables (non-fatal)");
-  }
-}
 
 async function ensureGamificationTables() {
   // Gamification tables (streaks, daily_spins, giveaway_entries, founder_status) are
@@ -145,78 +82,10 @@ async function ensureGamificationTables() {
 }
 
 
-async function ensureEmailSubscribersTable() {
+async function seedHabitDefinitions() {
   try {
     const client = await pool.connect();
     try {
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS email_subscribers (
-          id TEXT PRIMARY KEY,
-          email TEXT NOT NULL UNIQUE,
-          preference TEXT NOT NULL DEFAULT 'tips',
-          drip_stage INTEGER NOT NULL DEFAULT 0,
-          subscribed BOOLEAN NOT NULL DEFAULT true,
-          unsubscribe_token TEXT NOT NULL,
-          converted BOOLEAN NOT NULL DEFAULT false,
-          next_send_at TIMESTAMPTZ,
-          created_at TIMESTAMPTZ DEFAULT now(),
-          updated_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE INDEX IF NOT EXISTS idx_email_subscribers_email ON email_subscribers (email);
-        CREATE INDEX IF NOT EXISTS idx_email_subscribers_next_send ON email_subscribers (next_send_at)
-          WHERE subscribed = true AND converted = false;
-      `);
-      logger.info("Email subscribers table ensured");
-    } finally {
-      client.release();
-    }
-  } catch (err) {
-    logger.warn({ error: err }, "Failed to ensure email_subscribers table (non-fatal)");
-  }
-}
-
-async function ensureHabitsTables() {
-  try {
-    const client = await pool.connect();
-    try {
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS habit_definitions (
-          id SERIAL PRIMARY KEY,
-          slug TEXT NOT NULL UNIQUE,
-          title TEXT NOT NULL,
-          description TEXT NOT NULL DEFAULT '',
-          category TEXT NOT NULL DEFAULT 'general',
-          xp_reward INTEGER NOT NULL DEFAULT 10,
-          icon TEXT NOT NULL DEFAULT '⚡',
-          difficulty TEXT NOT NULL DEFAULT 'easy',
-          linked_habit TEXT,
-          is_active BOOLEAN NOT NULL DEFAULT true,
-          created_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE TABLE IF NOT EXISTS user_habits (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-          habit_id INTEGER NOT NULL REFERENCES habit_definitions(id) ON DELETE CASCADE,
-          current_streak INTEGER NOT NULL DEFAULT 0,
-          longest_streak INTEGER NOT NULL DEFAULT 0,
-          total_completions INTEGER NOT NULL DEFAULT 0,
-          last_completed_at TIMESTAMPTZ,
-          created_at TIMESTAMPTZ DEFAULT now(),
-          updated_at TIMESTAMPTZ DEFAULT now(),
-          UNIQUE (user_id, habit_id)
-        );
-        CREATE TABLE IF NOT EXISTS daily_action_completions (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-          habit_id INTEGER NOT NULL REFERENCES habit_definitions(id) ON DELETE CASCADE,
-          completed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-          xp_awarded INTEGER NOT NULL DEFAULT 0
-        );
-        CREATE INDEX IF NOT EXISTS idx_user_habits_user ON user_habits (user_id);
-        CREATE INDEX IF NOT EXISTS idx_daily_completions_user ON daily_action_completions (user_id);
-        CREATE INDEX IF NOT EXISTS idx_daily_completions_date ON daily_action_completions (completed_at);
-      `);
-
       const { rows } = await client.query(`SELECT COUNT(*) FROM habit_definitions WHERE is_active = true`);
       if (parseInt(rows[0].count) === 0) {
         await client.query(`
@@ -235,86 +104,40 @@ async function ensureHabitsTables() {
         `);
         logger.info("Seeded default habit definitions");
       }
-
-      logger.info("Habits tables ensured");
     } finally {
       client.release();
     }
   } catch (err) {
-    logger.warn({ error: err }, "Failed to ensure habits tables (non-fatal)");
+    logger.warn({ error: err }, "Failed to seed habit definitions (non-fatal)");
   }
 }
 
-async function ensureTimelineTables() {
+async function verifySchemaReady() {
+  const requiredTables = [
+    "users", "alerts", "alert_history", "analytics_events", "api_health_checks",
+    "push_subscriptions", "email_subscribers", "daily_content_posts",
+    "habit_definitions", "user_habits", "daily_action_completions",
+    "timelines", "timeline_results", "timeline_comparisons", "user_identity_stages",
+    "paper_portfolios", "paper_trades", "paper_positions",
+    "user_xp", "xp_transactions", "badges", "streaks",
+  ];
+  const client = await pool.connect();
   try {
-    const client = await pool.connect();
-    try {
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS timelines (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
-          name TEXT NOT NULL DEFAULT 'My Timeline',
-          annotation TEXT,
-          monthly_income REAL NOT NULL DEFAULT 5000,
-          savings_rate REAL NOT NULL DEFAULT 0.15,
-          monthly_debt REAL NOT NULL DEFAULT 500,
-          investment_rate REAL NOT NULL DEFAULT 0.07,
-          current_net_worth REAL NOT NULL DEFAULT 0,
-          emergency_fund_months REAL NOT NULL DEFAULT 0,
-          is_baseline BOOLEAN DEFAULT false,
-          metadata JSONB DEFAULT '{}',
-          created_at TIMESTAMPTZ DEFAULT now(),
-          updated_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE INDEX IF NOT EXISTS idx_timelines_user_id ON timelines (user_id);
-
-        CREATE TABLE IF NOT EXISTS timeline_results (
-          id SERIAL PRIMARY KEY,
-          timeline_id INTEGER NOT NULL REFERENCES timelines(id) ON DELETE CASCADE,
-          horizon TEXT NOT NULL,
-          projected_net_worth REAL NOT NULL,
-          savings_accumulated REAL NOT NULL,
-          debt_remaining REAL NOT NULL,
-          investment_value REAL NOT NULL,
-          stability_score REAL NOT NULL,
-          stress_index REAL NOT NULL,
-          opportunity_score REAL NOT NULL,
-          milestones JSONB DEFAULT '[]',
-          created_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE INDEX IF NOT EXISTS idx_timeline_results_timeline ON timeline_results (timeline_id);
-
-        CREATE TABLE IF NOT EXISTS timeline_comparisons (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
-          timeline_a_id INTEGER NOT NULL REFERENCES timelines(id) ON DELETE CASCADE,
-          timeline_b_id INTEGER NOT NULL REFERENCES timelines(id) ON DELETE CASCADE,
-          delta_net_worth_5yr REAL,
-          delta_net_worth_10yr REAL,
-          delta_net_worth_20yr REAL,
-          delta_stress REAL,
-          delta_opportunity REAL,
-          summary TEXT,
-          created_at TIMESTAMPTZ DEFAULT now()
-        );
-
-        CREATE TABLE IF NOT EXISTS user_identity_stages (
-          id SERIAL PRIMARY KEY,
-          user_id TEXT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-          stage TEXT NOT NULL DEFAULT 'Aware',
-          simulations_run INTEGER NOT NULL DEFAULT 0,
-          snapshots_saved INTEGER NOT NULL DEFAULT 0,
-          scenarios_explored INTEGER NOT NULL DEFAULT 0,
-          updated_at TIMESTAMPTZ DEFAULT now()
-        );
-        CREATE INDEX IF NOT EXISTS idx_user_identity_stages_user ON user_identity_stages (user_id);
-      `);
-      logger.info("Timeline tables ensured");
-    } finally {
-      client.release();
+    const { rows } = await client.query(
+      `SELECT tablename FROM pg_tables WHERE schemaname = 'public'`
+    );
+    const existing = new Set(rows.map((r: { tablename: string }) => r.tablename));
+    const missing = requiredTables.filter((t) => !existing.has(t));
+    if (missing.length > 0) {
+      logger.error(
+        { missingTables: missing },
+        "SCHEMA CHECK FAILED: Required tables missing. Run 'drizzle-kit push' to sync the schema."
+      );
+    } else {
+      logger.info("Schema readiness check passed — all required tables present");
     }
-  } catch (err) {
-    logger.warn({ error: err }, "Failed to ensure timeline tables (non-fatal)");
+  } finally {
+    client.release();
   }
 }
 
@@ -603,14 +426,11 @@ ensureBacktesterBadgesExist().catch((err) =>
 ensureTask126BadgesExist().catch((err) =>
   logger.warn({ error: err }, "Failed to seed task-126 backtester badges (non-fatal)")
 );
+await verifySchemaReady();
 await normalizePortfolioBalances();
-await ensureHabitsTables();
-await ensureDailyContentTable();
-await ensureAlertTables();
 await ensureGamificationTables();
-await ensureEmailSubscribersTable();
-await ensureTimelineTables();
 await ensureSupportTables();
+await seedHabitDefinitions();
 ensurePerformanceIndexes().catch((err) =>
   logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
 );

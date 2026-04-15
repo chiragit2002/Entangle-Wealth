@@ -18,3 +18,5 @@ export * from "./connectedAccounts";
 export * from "./audit";
 export * from "./webhookEvents";
 export * from "./balanceTransactions";
+export * from "./pushSubscriptions";
+export * from "./dailyContent";

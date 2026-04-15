@@ -29,20 +29,6 @@ const MOBILE_SECTIONS = [
       { href: "/pricing", label: "Pricing" },
     ],
   },
-  {
-    title: "More",
-    links: [
-      { href: "/charts", label: "Charts" },
-      { href: "/technical", label: "Analysis" },
-      { href: "/options", label: "Options" },
-      { href: "/terminal", label: "Terminal" },
-      { href: "/alerts", label: "Alerts" },
-      { href: "/taxgpt", label: "TaxGPT" },
-      { href: "/achievements", label: "Achievements" },
-      { href: "/help", label: "Help" },
-      { href: "/about", label: "About" },
-    ],
-  },
 ];
 
 const TICKER_SYMBOLS = [

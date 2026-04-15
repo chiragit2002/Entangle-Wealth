@@ -1,12 +1,11 @@
-import { lazy, Suspense } from "react";
-import { Switch, Route, Link, useLocation } from "wouter";
+import { lazy, Suspense, useState } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { PageSkeleton } from "@/components/pwa/PageSkeleton";
 import {
   Coins, Megaphone, BarChart3, Ticket, Rocket, Monitor, Shield,
-  Users, Radio, TrendingUp,
+  Users, Radio, TrendingUp, ArrowLeft,
 } from "lucide-react";
 
 const TokenAdmin = lazy(() => import("@/pages/TokenAdmin"));
@@ -20,74 +19,88 @@ const AdminScalabilityPage = lazy(() => import("@/pages/AdminScalability"));
 const AdminKycPage = lazy(() => import("@/pages/AdminKyc"));
 const AdminStatusPage = lazy(() => import("@/pages/AdminStatus"));
 
-const ADMIN_TOOLS = [
-  { href: "/admin/token", label: "Token Admin", icon: Coins, desc: "Manage token economy" },
-  { href: "/admin/marketing", label: "Marketing AI", icon: Megaphone, desc: "Content generation" },
-  { href: "/admin/analytics", label: "Analytics", icon: BarChart3, desc: "Usage analytics" },
-  { href: "/admin/tickets", label: "Support Tickets", icon: Ticket, desc: "Customer support" },
-  { href: "/admin/launch", label: "Launch Readiness", icon: Rocket, desc: "Launch checklist" },
-  { href: "/admin/monitoring", label: "Sentry Monitoring", icon: Monitor, desc: "Error tracking" },
-  { href: "/admin/audit", label: "Audit Dashboard", icon: Shield, desc: "Security audit log" },
-  { href: "/admin/scalability", label: "Scalability", icon: TrendingUp, desc: "Infrastructure" },
-  { href: "/admin/kyc", label: "KYC Review", icon: Users, desc: "Identity verification" },
-  { href: "/admin/status", label: "Status Page", icon: Radio, desc: "System status" },
-];
+const ADMIN_TABS = [
+  { id: "token", label: "Token", icon: Coins, component: TokenAdmin },
+  { id: "marketing", label: "Marketing", icon: Megaphone, component: MarketingCenter },
+  { id: "analytics", label: "Analytics", icon: BarChart3, component: AnalyticsPage },
+  { id: "tickets", label: "Tickets", icon: Ticket, component: AdminTicketsPage },
+  { id: "launch", label: "Launch", icon: Rocket, component: LaunchReadinessPage },
+  { id: "monitoring", label: "Monitoring", icon: Monitor, component: AdminMonitoringPage },
+  { id: "audit", label: "Audit", icon: Shield, component: AdminAuditPage },
+  { id: "scalability", label: "Scale", icon: TrendingUp, component: AdminScalabilityPage },
+  { id: "kyc", label: "KYC", icon: Users, component: AdminKycPage },
+  { id: "status", label: "Status", icon: Radio, component: AdminStatusPage },
+] as const;
 
-function AdminIndex() {
+export default function AdminHub() {
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+
+  const activeEntry = ADMIN_TABS.find((t) => t.id === activeTab);
+  const ActiveComponent = activeEntry?.component;
+
   return (
     <div className="min-h-screen bg-[#020204] text-white flex flex-col">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
-        <h1 className="text-xl font-mono font-bold text-[#FF8C00] mb-1 uppercase tracking-wider">Admin Hub</h1>
-        <p className="text-xs text-muted-foreground font-mono mb-6">Internal tools and administration</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {ADMIN_TOOLS.map((tool) => {
-            const Icon = tool.icon;
+      <main className="flex-1 container mx-auto px-4 py-6 max-w-6xl">
+        <div className="flex items-center gap-3 mb-4">
+          {activeTab && (
+            <button
+              onClick={() => setActiveTab(null)}
+              className="flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-3 h-3" /> Back
+            </button>
+          )}
+          <h1 className="text-lg font-mono font-bold text-[#FF8C00] uppercase tracking-wider">
+            {activeEntry ? activeEntry.label : "Admin Hub"}
+          </h1>
+        </div>
+
+        <div className="flex gap-1 flex-wrap mb-5 border-b border-[#FF8C00]/10 pb-3">
+          {ADMIN_TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
             return (
-              <Link
-                key={tool.href}
-                href={tool.href}
-                className="flex items-center gap-3 p-3 border border-[#FF8C00]/10 bg-[#0A0E1A] hover:bg-[#FF8C00]/5 hover:border-[#FF8C00]/20 transition-colors"
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider transition-colors ${
+                  isActive
+                    ? "text-[#FF8C00] bg-[#FF8C00]/10 border border-[#FF8C00]/30"
+                    : "text-muted-foreground hover:text-white hover:bg-[#FF8C00]/5 border border-transparent"
+                }`}
               >
-                <Icon className="w-4 h-4 text-[#FF8C00]/60 shrink-0" />
-                <div>
-                  <div className="text-xs font-mono font-medium text-white/80">{tool.label}</div>
-                  <div className="text-[10px] text-muted-foreground">{tool.desc}</div>
-                </div>
-              </Link>
+                <Icon className="w-3 h-3" />
+                {tab.label}
+              </button>
             );
           })}
         </div>
+
+        {ActiveComponent ? (
+          <Suspense fallback={<PageSkeleton />}>
+            <ActiveComponent />
+          </Suspense>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {ADMIN_TABS.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className="flex items-center gap-3 p-3 border border-[#FF8C00]/10 bg-[#0A0E1A] hover:bg-[#FF8C00]/5 hover:border-[#FF8C00]/20 transition-colors text-left"
+                >
+                  <Icon className="w-4 h-4 text-[#FF8C00]/60 shrink-0" />
+                  <span className="text-xs font-mono font-medium text-white/80">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </main>
       <Footer />
       <BottomNav />
     </div>
-  );
-}
-
-function Lazy({ component: C }: { component: React.ComponentType }) {
-  return <Suspense fallback={<PageSkeleton />}><C /></Suspense>;
-}
-
-export default function AdminHub() {
-  const [location] = useLocation();
-  const isIndex = location === "/admin" || location === "/admin/";
-
-  if (isIndex) return <AdminIndex />;
-
-  return (
-    <Switch>
-      <Route path="/admin/token">{() => <Lazy component={TokenAdmin} />}</Route>
-      <Route path="/admin/marketing">{() => <Lazy component={MarketingCenter} />}</Route>
-      <Route path="/admin/analytics">{() => <Lazy component={AnalyticsPage} />}</Route>
-      <Route path="/admin/tickets">{() => <Lazy component={AdminTicketsPage} />}</Route>
-      <Route path="/admin/launch">{() => <Lazy component={LaunchReadinessPage} />}</Route>
-      <Route path="/admin/monitoring">{() => <Lazy component={AdminMonitoringPage} />}</Route>
-      <Route path="/admin/audit">{() => <Lazy component={AdminAuditPage} />}</Route>
-      <Route path="/admin/scalability">{() => <Lazy component={AdminScalabilityPage} />}</Route>
-      <Route path="/admin/kyc">{() => <Lazy component={AdminKycPage} />}</Route>
-      <Route path="/admin/status">{() => <Lazy component={AdminStatusPage} />}</Route>
-      <Route>{() => <AdminIndex />}</Route>
-    </Switch>
   );
 }

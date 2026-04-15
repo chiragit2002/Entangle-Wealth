@@ -7,12 +7,18 @@ import {
   Loader2, Play, ChevronLeft, Trophy, Shield, Wrench, FileText,
   BarChart3, Zap, AlertTriangle, CheckCircle2, XCircle, Target,
   TrendingUp, Activity, Gauge, GitBranch, GitCommit, ArrowLeftRight,
-  Clock, Hash, Plus,
+  Clock, Hash, Plus, Sparkles,
 } from "lucide-react";
 import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer,
 } from "recharts";
+import { motion, AnimatePresence } from "framer-motion";
+import { AnimatedGauge, ScoreRing } from "@/components/strategy/AnimatedGauge";
+import { HeatmapGrid } from "@/components/strategy/HeatmapGrid";
+import { BeforeAfterCard } from "@/components/strategy/BeforeAfterCard";
+import { FadeIn } from "@/components/strategy/PageTransition";
+import { EvalPipelineSkeleton } from "@/components/strategy/StrategySkeletons";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
 
@@ -119,40 +125,14 @@ const MODEL_LABELS: Record<string, string> = {
   M6: "Signal Logic",
 };
 
-function ScoreGauge({ score, size = 120, label }: { score: number; size?: number; label?: string }) {
-  const r = (size - 12) / 2;
-  const circ = Math.PI * r;
-  const offset = circ - (score / 100) * circ;
-  const color = score >= 80 ? "#00FF41" : score >= 60 ? "#FFD700" : "#FF4444";
-
-  return (
-    <div className="flex flex-col items-center">
-      <svg width={size} height={size / 2 + 16} viewBox={`0 0 ${size} ${size / 2 + 16}`}>
-        <path
-          d={`M 6 ${size / 2 + 6} A ${r} ${r} 0 0 1 ${size - 6} ${size / 2 + 6}`}
-          fill="none"
-          stroke="rgba(255,255,255,0.08)"
-          strokeWidth="8"
-          strokeLinecap="round"
-        />
-        <path
-          d={`M 6 ${size / 2 + 6} A ${r} ${r} 0 0 1 ${size - 6} ${size / 2 + 6}`}
-          fill="none"
-          stroke={color}
-          strokeWidth="8"
-          strokeLinecap="round"
-          strokeDasharray={circ}
-          strokeDashoffset={offset}
-          style={{ transition: "stroke-dashoffset 1s ease-out" }}
-        />
-        <text x={size / 2} y={size / 2} textAnchor="middle" fill={color} fontSize="24" fontWeight="bold" fontFamily="monospace">
-          {score.toFixed(1)}
-        </text>
-      </svg>
-      {label && <span className="text-xs text-white/40 mt-1">{label}</span>}
-    </div>
-  );
-}
+const MODEL_COLORS: Record<string, string> = {
+  M1: "#00d4ff",
+  M2: "#a78bfa",
+  M3: "#f59e0b",
+  M4: "#10b981",
+  M5: "#f97316",
+  M6: "#ec4899",
+};
 
 function ModelRadar({ scores }: { scores: EvalScores }) {
   const data = Object.entries(scores).map(([key, value]) => ({
@@ -162,39 +142,120 @@ function ModelRadar({ scores }: { scores: EvalScores }) {
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={250}>
-      <RadarChart data={data}>
-        <PolarGrid stroke="rgba(255,255,255,0.08)" />
+    <ResponsiveContainer width="100%" height={280}>
+      <RadarChart data={data} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
+        <PolarGrid stroke="rgba(255,255,255,0.06)" gridType="polygon" />
         <PolarAngleAxis dataKey="model" tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 10 }} />
         <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
-        <Radar name="Score" dataKey="score" stroke="#00D4FF" fill="#00D4FF" fillOpacity={0.15} strokeWidth={2} />
+        <Radar
+          name="Score"
+          dataKey="score"
+          stroke="#00D4FF"
+          fill="#00D4FF"
+          fillOpacity={0.12}
+          strokeWidth={2}
+          dot={{ fill: "#00D4FF", r: 3, strokeWidth: 0 }}
+          activeDot={{ r: 5, fill: "#00D4FF" }}
+        />
       </RadarChart>
     </ResponsiveContainer>
   );
 }
 
-function StressChart({ results }: { results: StressResult[] }) {
-  const data = results.map(r => ({
-    scenario: r.scenario.replace(/_/g, " "),
-    score: r.score,
-    drawdown: Math.abs(r.max_drawdown),
-    failure: r.failure,
-  }));
+function RunningView({ jobId }: { jobId: string | null }) {
+  const [activeModel, setActiveModel] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveModel(prev => (prev < 5 ? prev + 1 : 5));
+    }, 1800);
+    return () => clearInterval(interval);
+  }, []);
+
+  const models = Object.entries(MODEL_LABELS);
 
   return (
-    <ResponsiveContainer width="100%" height={200}>
-      <BarChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-        <XAxis dataKey="scenario" tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 10 }} />
-        <YAxis tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 10 }} />
-        <Tooltip
-          contentStyle={{ background: "#0D1321", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }}
-          labelStyle={{ color: "rgba(255,255,255,0.7)" }}
-        />
-        <Bar dataKey="score" fill="#00D4FF" radius={[4, 4, 0, 0]} />
-        <Bar dataKey="drawdown" fill="#FF8C00" radius={[4, 4, 0, 0]} />
-      </BarChart>
-    </ResponsiveContainer>
+    <FadeIn>
+      <div className="bg-white/[0.02] border border-white/8 rounded-2xl p-8 space-y-8">
+        <div className="flex flex-col items-center gap-3">
+          <div className="relative">
+            <div className="w-20 h-20 rounded-full border-2 border-white/5" />
+            <div className="absolute inset-0 w-20 h-20 rounded-full border-2 border-t-[#00D4FF] border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+            <div className="absolute inset-0 w-20 h-20 rounded-full border-2 border-b-purple-400 border-l-transparent border-r-transparent border-t-transparent animate-spin" style={{ animationDirection: "reverse", animationDuration: "1.5s" }} />
+            <Target className="w-7 h-7 text-[#00D4FF] absolute inset-0 m-auto" />
+          </div>
+          <div className="text-center">
+            <p className="text-white/70 text-sm font-semibold">Running 6-model evaluation pipeline</p>
+            {jobId && <p className="text-white/25 text-xs font-mono mt-1">Job: {jobId}</p>}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <div className="text-xs font-mono font-semibold text-white/40 uppercase tracking-widest">Pipeline Progress</div>
+          <div className="relative">
+            <div className="absolute left-[19px] top-5 bottom-5 w-px bg-white/8" />
+            <div className="space-y-2">
+              {models.map(([key, label], i) => {
+                const done = i < activeModel;
+                const running = i === activeModel;
+                const color = MODEL_COLORS[key] ?? "#00d4ff";
+
+                return (
+                  <motion.div
+                    key={key}
+                    className="flex items-center gap-4"
+                    animate={done ? { opacity: 1 } : running ? { opacity: 1 } : { opacity: 0.4 }}
+                  >
+                    <div
+                      className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 z-10 border-2 transition-all duration-500"
+                      style={
+                        done
+                          ? { borderColor: `${color}60`, background: `${color}15`, boxShadow: `0 0 12px ${color}20` }
+                          : running
+                          ? { borderColor: color, background: `${color}20`, boxShadow: `0 0 16px ${color}40` }
+                          : { borderColor: "rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)" }
+                      }
+                    >
+                      {done ? (
+                        <CheckCircle2 className="w-4 h-4" style={{ color }} />
+                      ) : running ? (
+                        <Loader2 className="w-4 h-4 animate-spin" style={{ color }} />
+                      ) : (
+                        <span className="text-[10px] font-mono font-bold text-white/20">{key}</span>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-xs font-mono font-semibold" style={{ color: done || running ? (done ? "rgba(255,255,255,0.7)" : color) : "rgba(255,255,255,0.3)" }}>
+                            {key} — {label}
+                          </span>
+                        </div>
+                        {done && (
+                          <span className="text-[10px] font-mono text-white/25">done</span>
+                        )}
+                        {running && (
+                          <span className="text-[10px] font-mono animate-pulse" style={{ color }}>analyzing…</span>
+                        )}
+                      </div>
+                      <div className="h-1 bg-white/5 rounded-full mt-1.5 overflow-hidden">
+                        <motion.div
+                          className="h-full rounded-full"
+                          style={{ background: color }}
+                          initial={{ width: "0%" }}
+                          animate={{ width: done ? "100%" : running ? "65%" : "0%" }}
+                          transition={{ duration: done ? 0.5 : 1.5, ease: "easeInOut" }}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </FadeIn>
   );
 }
 
@@ -377,14 +438,15 @@ export default function EvalPipeline() {
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                 )}
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00D4FF]/20 to-purple-500/20 border border-[#00D4FF]/30 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00D4FF]/20 to-purple-500/20 border border-[#00D4FF]/30 flex items-center justify-center"
+                  style={{ boxShadow: "0 0 20px rgba(0,212,255,0.1)" }}>
                   <Target className="w-5 h-5 text-[#00D4FF]" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-white">Multi-Model Evaluation</h1>
                   <p className="text-sm text-white/50">
                     {view === "select" ? "6-model scoring pipeline with stress testing & refinement" :
-                     view === "running" ? "Evaluation in progress..." :
+                     view === "running" ? "Evaluation pipeline running…" :
                      view === "rankings" ? "Strategy Rankings" :
                      view === "versions" ? `Version History${selectedStrategy ? ` — ${selectedStrategy.name}` : ""}` :
                      "Evaluation Results"}
@@ -405,563 +467,456 @@ export default function EvalPipeline() {
               </div>
             </div>
 
-            {view === "select" && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 flex items-center gap-3">
-                    <Activity className="w-6 h-6 text-[#00D4FF]" />
-                    <div>
-                      <div className="text-xl font-bold text-white">{strategies.length}</div>
-                      <div className="text-xs text-white/40">Strategies</div>
-                    </div>
-                  </div>
-                  <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 flex items-center gap-3">
-                    <Gauge className="w-6 h-6 text-purple-400" />
-                    <div>
-                      <div className="text-xl font-bold text-white">6</div>
-                      <div className="text-xs text-white/40">Scoring Models</div>
-                    </div>
-                  </div>
-                  <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 flex items-center gap-3">
-                    <Shield className="w-6 h-6 text-orange-400" />
-                    <div>
-                      <div className="text-xl font-bold text-white">3</div>
-                      <div className="text-xs text-white/40">Stress Scenarios</div>
-                    </div>
-                  </div>
-                </div>
+            <AnimatePresence mode="wait">
 
-                <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
-                  <div className="text-xs font-semibold text-white/50 uppercase tracking-wider">Select Strategy to Evaluate</div>
-                  {loading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-[#00D4FF]" />
+              {view === "select" && (
+                <motion.div key="select" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="space-y-6">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 flex items-center gap-3">
+                      <Activity className="w-6 h-6 text-[#00D4FF]" />
+                      <div>
+                        {loading ? <div className="h-6 w-8 bg-white/5 rounded animate-pulse" /> : <div className="text-xl font-bold text-white">{strategies.length}</div>}
+                        <div className="text-xs text-white/40">Strategies</div>
+                      </div>
                     </div>
-                  ) : strategies.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-white/40 text-sm">No strategies found. Create one in the Strategy Builder first.</p>
+                    <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 flex items-center gap-3">
+                      <Gauge className="w-6 h-6 text-purple-400" />
+                      <div>
+                        <div className="text-xl font-bold text-white">6</div>
+                        <div className="text-xs text-white/40">Scoring Models</div>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {strategies.map(s => (
-                        <button
-                          key={s.id}
-                          onClick={() => setSelectedId(s.id)}
-                          className={`w-full text-left p-3 rounded-xl border transition-all ${selectedId === s.id ? "border-[#00D4FF]/50 bg-[#00D4FF]/5" : "border-white/8 bg-white/[0.01] hover:border-white/15"}`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <span className="font-semibold text-white text-sm">{s.name}</span>
-                              <span className="text-xs text-white/30 ml-2">{s.type.replace(/_/g, " ")}</span>
-                            </div>
-                            <div className="flex gap-2 text-xs text-white/30">
-                              <span>{s.assets.slice(0, 3).join(", ")}{s.assets.length > 3 ? ` +${s.assets.length - 3}` : ""}</span>
-                              <span>{s.timeframes[0]}</span>
-                            </div>
-                          </div>
-                        </button>
-                      ))}
+                    <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 flex items-center gap-3">
+                      <Shield className="w-6 h-6 text-orange-400" />
+                      <div>
+                        <div className="text-xl font-bold text-white">3</div>
+                        <div className="text-xs text-white/40">Stress Scenarios</div>
+                      </div>
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                {selectedId && (
                   <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
-                    <div className="text-xs font-semibold text-white/50 uppercase tracking-wider">Evaluation Options</div>
-                    <div className="flex gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" checked={runStress} onChange={e => setRunStress(e.target.checked)} className="accent-[#00D4FF]" />
-                        <span className="text-sm text-white/70">Run Stress Tests</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" checked={runRefinement} onChange={e => setRunRefinement(e.target.checked)} className="accent-[#00D4FF]" />
-                        <span className="text-sm text-white/70">Run Parameter Refinement</span>
-                      </label>
-                    </div>
-
-                    <Button onClick={submitEval} disabled={submitting} className="bg-[#00D4FF] hover:bg-[#00D4FF]/80 text-black font-semibold">
-                      {submitting ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Play className="w-4 h-4 mr-1.5" />}
-                      Run Full Evaluation
-                    </Button>
-                  </div>
-                )}
-
-                <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-3">
-                  <div className="text-xs font-semibold text-white/50 uppercase tracking-wider">Scoring Models (M1-M6)</div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {Object.entries(MODEL_LABELS).map(([key, label]) => (
-                      <div key={key} className="bg-white/[0.02] border border-white/8 rounded-lg p-3">
-                        <div className="text-[#00D4FF] font-mono text-xs font-bold">{key}</div>
-                        <div className="text-white/60 text-xs mt-0.5">{label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {view === "running" && (
-              <div className="flex flex-col items-center justify-center py-24 gap-4">
-                <div className="relative">
-                  <div className="w-20 h-20 rounded-full border-4 border-[#00D4FF]/20 border-t-[#00D4FF] animate-spin" />
-                  <Target className="w-8 h-8 text-[#00D4FF] absolute inset-0 m-auto" />
-                </div>
-                <p className="text-white/60 text-sm">Running 6-model evaluation pipeline...</p>
-                <p className="text-white/30 text-xs font-mono">Job: {jobId}</p>
-                <div className="flex gap-2 mt-2">
-                  {["M1", "M2", "M3", "M4", "M5", "M6"].map((m, i) => (
-                    <div key={m} className="px-2 py-1 rounded bg-white/5 border border-white/10 text-xs text-white/40 animate-pulse" style={{ animationDelay: `${i * 200}ms` }}>
-                      {m}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {view === "results" && evalResult && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 flex flex-col items-center">
-                    <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">Total Score</div>
-                    <ScoreGauge score={evalResult.score_total} size={160} />
-                    <div className="mt-3 text-center">
-                      <div className="text-xs text-white/40">Confidence</div>
-                      <div className="text-lg font-bold text-[#00D4FF] font-mono">{(evalResult.confidence * 100).toFixed(0)}%</div>
-                    </div>
-                  </div>
-
-                  <div className="lg:col-span-2 bg-white/[0.02] border border-white/8 rounded-xl p-5">
-                    <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">Model Scores</div>
-                    <ModelRadar scores={evalResult.scores} />
-                    <div className="grid grid-cols-3 gap-2 mt-3">
-                      {Object.entries(evalResult.scores).map(([key, val]) => (
-                        <div key={key} className="flex items-center justify-between bg-white/[0.03] rounded-lg px-3 py-2">
-                          <span className="text-xs text-white/40">{MODEL_LABELS[key]}</span>
-                          <span className={`text-sm font-bold font-mono ${val >= 80 ? "text-[#00FF41]" : val >= 60 ? "text-[#FFD700]" : "text-red-400"}`}>
-                            {val}
-                          </span>
+                    <div className="text-xs font-semibold text-white/50 uppercase tracking-wider">Select Strategy to Evaluate</div>
+                    {loading ? (
+                      <EvalPipelineSkeleton />
+                    ) : strategies.length === 0 ? (
+                      <div className="text-center py-12">
+                        <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
+                          <Target className="w-7 h-7 text-white/20" />
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {evalResult.stress && (
-                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-orange-400" />
-                      <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Stress Test Results</span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="bg-white/[0.03] border border-white/8 rounded-lg p-3">
-                        <div className="text-xs text-white/40">Worst Drawdown</div>
-                        <div className="text-lg font-bold text-red-400 font-mono">{evalResult.stress.worst_drawdown}%</div>
+                        <p className="text-white/40 text-sm">No strategies found.</p>
+                        <p className="text-white/25 text-xs mt-1">Create one in the Strategy Builder first.</p>
+                        <a href="/strategy-builder" className="inline-block mt-3 text-xs text-[#00D4FF] hover:underline">Go to Strategy Builder →</a>
                       </div>
-                      <div className="bg-white/[0.03] border border-white/8 rounded-lg p-3">
-                        <div className="text-xs text-white/40">Recovery Time</div>
-                        <div className="text-lg font-bold text-[#FFD700] font-mono">{evalResult.stress.recovery_time}</div>
-                      </div>
-                      <div className="bg-white/[0.03] border border-white/8 rounded-lg p-3">
-                        <div className="text-xs text-white/40">Failure Regimes</div>
-                        <div className="text-sm font-semibold text-white/70">
-                          {evalResult.stress.failure_regimes.length > 0
-                            ? evalResult.stress.failure_regimes.map(r => r.replace(/_/g, " ")).join(", ")
-                            : "None"}
-                        </div>
-                      </div>
-                    </div>
-                    {evalResult.stress.results && evalResult.stress.results.length > 0 && (
-                      <div>
-                        <StressChart results={evalResult.stress.results} />
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
-                          {evalResult.stress.results.map(r => (
-                            <div key={r.scenario} className={`flex items-center gap-2 p-2 rounded-lg border ${r.failure ? "border-red-500/20 bg-red-500/5" : "border-green-500/20 bg-green-500/5"}`}>
-                              {r.failure ? <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" /> : <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" />}
-                              <div className="min-w-0">
-                                <div className="text-xs font-medium text-white/70 capitalize">{r.scenario.replace(/_/g, " ")}</div>
-                                <div className="text-xs text-white/40">Score: {r.score} | DD: {r.max_drawdown.toFixed(1)}%</div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {evalResult.refinements && evalResult.refinements.length > 0 && (
-                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Wrench className="w-4 h-4 text-purple-400" />
-                      <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Parameter Refinements</span>
-                    </div>
-                    <div className="space-y-2">
-                      {evalResult.refinements.map((r, i) => (
-                        <div key={i} className="flex items-center justify-between bg-white/[0.03] border border-white/8 rounded-lg px-4 py-3">
-                          <div>
-                            <span className="text-sm font-mono text-white/70">{r.param}</span>
-                            <div className="flex items-center gap-2 text-xs mt-0.5">
-                              <span className="text-white/30">{r.old}</span>
-                              <span className="text-white/20">→</span>
-                              <span className="text-[#00D4FF] font-semibold">{r.new}</span>
-                            </div>
-                          </div>
-                          <span className="text-xs font-semibold text-[#00FF41] bg-[#00FF41]/10 px-2 py-1 rounded">{r.impact}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {summaryData && (
-                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-[#00D4FF]" />
-                      <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Strategy Summary</span>
-                    </div>
-                    <p className="text-sm text-white/70 leading-relaxed">{summaryData.summary}</p>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-xs font-semibold text-green-400 mb-1">Strengths</div>
-                        <div className="flex flex-wrap gap-1">
-                          {summaryData.strengths.map(s => (
-                            <span key={s} className="px-2 py-0.5 rounded text-xs bg-green-500/10 border border-green-500/20 text-green-400 capitalize">{s}</span>
-                          ))}
-                          {summaryData.strengths.length === 0 && <span className="text-xs text-white/30">None identified</span>}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-red-400 mb-1">Weaknesses</div>
-                        <div className="flex flex-wrap gap-1">
-                          {summaryData.weaknesses.map(w => (
-                            <span key={w} className="px-2 py-0.5 rounded text-xs bg-red-500/10 border border-red-500/20 text-red-400 capitalize">{w}</span>
-                          ))}
-                          {summaryData.weaknesses.length === 0 && <span className="text-xs text-white/30">None identified</span>}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-[#00D4FF] mb-1">Best Conditions</div>
-                        <div className="flex flex-wrap gap-1">
-                          {summaryData.best_conditions.map(c => (
-                            <span key={c} className="px-2 py-0.5 rounded text-xs bg-[#00D4FF]/10 border border-[#00D4FF]/20 text-[#00D4FF] capitalize">{c}</span>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-[#FF8C00] mb-1">Break Conditions</div>
-                        <div className="flex flex-wrap gap-1">
-                          {summaryData.break_conditions.map(c => (
-                            <span key={c} className="px-2 py-0.5 rounded text-xs bg-[#FF8C00]/10 border border-[#FF8C00]/20 text-[#FF8C00] capitalize">{c}</span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Score Drivers</div>
-                      <div className="space-y-1">
-                        {Object.entries(summaryData.score_drivers).map(([key, desc]) => (
-                          <div key={key} className="flex items-start gap-2 text-xs">
-                            <span className="text-[#00D4FF] font-mono font-bold min-w-[24px]">{key}</span>
-                            <span className="text-white/50">{desc}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex gap-3">
-                  <Button variant="outline" size="sm" onClick={resetToSelect} className="border-white/10 text-white/60">
-                    <ChevronLeft className="w-4 h-4 mr-1" /> Evaluate Another
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={fetchRankings} className="border-white/10 text-white/60">
-                    <Trophy className="w-4 h-4 mr-1" /> View Rankings
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {view === "rankings" && (
-              <div className="space-y-4">
-                <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5">
-                  <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Strategy Rankings</div>
-                  {rankings.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-white/40 text-sm">No evaluation results yet. Run evaluations to populate rankings.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {rankings.map(r => (
-                        <div key={r.rank} className="flex items-center gap-4 bg-white/[0.02] border border-white/8 rounded-lg p-3 hover:border-white/15 transition-all">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${r.rank === 1 ? "bg-[#FFD700]/20 text-[#FFD700]" : r.rank === 2 ? "bg-gray-400/20 text-gray-300" : r.rank === 3 ? "bg-orange-600/20 text-orange-400" : "bg-white/5 text-white/30"}`}>
-                            {r.rank}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-semibold text-white text-sm">{r.strategy_name}</div>
-                            <div className="text-xs text-white/30">ID: {r.strategy_id}</div>
-                          </div>
-                          <div className="text-right">
-                            <div className={`text-lg font-bold font-mono ${r.score >= 80 ? "text-[#00FF41]" : r.score >= 60 ? "text-[#FFD700]" : "text-red-400"}`}>
-                              {r.score.toFixed(1)}
-                            </div>
-                            <div className="text-xs text-white/30">{(r.confidence * 100).toFixed(0)}% conf</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {view === "versions" && (
-              <div className="space-y-6">
-                <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <GitBranch className="w-4 h-4 text-purple-400" />
-                      <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Version Timeline</span>
-                    </div>
-                    <span className="text-xs text-white/30">{versions.length} version{versions.length !== 1 ? "s" : ""}</span>
-                  </div>
-
-                  {versionsLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-[#00D4FF]" />
-                    </div>
-                  ) : versions.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-white/40 text-sm">No versions recorded yet. Run a refinement to auto-create versions.</p>
-                    </div>
-                  ) : (
-                    <div className="relative">
-                      <div className="absolute left-[19px] top-4 bottom-4 w-px bg-white/10" />
-                      <div className="space-y-3">
-                        {versions.map((v, idx) => (
-                          <div key={v.id} className="relative flex gap-4">
-                            <div className="flex-shrink-0 z-10">
-                              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
-                                idx === versions.length - 1
-                                  ? "border-[#00D4FF] bg-[#00D4FF]/10"
-                                  : v.origin === "refinement_engine"
-                                    ? "border-purple-400 bg-purple-400/10"
-                                    : "border-white/20 bg-white/5"
-                              }`}>
-                                {v.origin === "refinement_engine" ? (
-                                  <Wrench className="w-4 h-4 text-purple-400" />
-                                ) : (
-                                  <GitCommit className="w-4 h-4 text-white/40" />
+                    ) : (
+                      <div className="space-y-2">
+                        {strategies.map(s => (
+                          <button
+                            key={s.id}
+                            onClick={() => setSelectedId(s.id)}
+                            className={`w-full text-left p-3 rounded-xl border transition-all ${
+                              selectedId === s.id
+                                ? "border-[#00D4FF]/50 bg-[#00D4FF]/5"
+                                : "border-white/8 bg-white/[0.01] hover:border-white/15 hover:bg-white/[0.02]"
+                            }`}
+                            style={selectedId === s.id ? { boxShadow: "0 0 20px rgba(0,212,255,0.06)" } : {}}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                {selectedId === s.id && (
+                                  <div className="w-1.5 h-1.5 rounded-full bg-[#00D4FF]" style={{ boxShadow: "0 0 6px #00D4FF" }} />
+                                )}
+                                <span className="font-semibold text-white text-sm">{s.name}</span>
+                                <span className="text-xs text-white/30 bg-white/5 px-1.5 py-0.5 rounded font-mono">{s.type.replace(/_/g, " ")}</span>
+                                {s.isActive && (
+                                  <span className="text-[10px] bg-green-500/10 border border-green-500/20 text-green-400 px-1.5 py-0.5 rounded font-mono">Active</span>
                                 )}
                               </div>
-                            </div>
-                            <div className={`flex-1 bg-white/[0.02] border rounded-xl p-4 transition-all ${
-                              (compareA === v.version || compareB === v.version)
-                                ? "border-[#00D4FF]/50 bg-[#00D4FF]/5"
-                                : "border-white/8 hover:border-white/15"
-                            }`}>
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="font-mono font-bold text-white text-sm">v{v.version}</span>
-                                    <span className="text-[10px] font-mono text-white/20 bg-white/5 px-1.5 py-0.5 rounded flex items-center gap-1">
-                                      <Hash className="w-3 h-3" />{v.version_hash}
-                                    </span>
-                                    <span className={`text-[10px] px-1.5 py-0.5 rounded ${
-                                      v.origin === "refinement_engine"
-                                        ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
-                                        : "bg-white/5 text-white/30 border border-white/10"
-                                    }`}>
-                                      {v.origin === "refinement_engine" ? "refinement" : "manual"}
-                                    </span>
-                                    {v.parent_version && (
-                                      <span className="text-[10px] text-white/20 flex items-center gap-0.5">
-                                        <ChevronLeft className="w-3 h-3" /> v{v.parent_version}
-                                      </span>
-                                    )}
-                                  </div>
-
-                                  {v.notes && (
-                                    <p className="text-xs text-white/40 mt-1">{v.notes}</p>
-                                  )}
-
-                                  <div className="flex items-center gap-4 mt-2 text-xs text-white/30">
-                                    <span className="flex items-center gap-1">
-                                      <Clock className="w-3 h-3" />
-                                      {new Date(v.created_at).toLocaleDateString()} {new Date(v.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                                    </span>
-                                    {v.score_snapshot.score_total != null && (
-                                      <span className={`font-mono font-bold ${(v.score_snapshot.score_total ?? 0) >= 80 ? "text-[#00FF41]" : (v.score_snapshot.score_total ?? 0) >= 60 ? "text-[#FFD700]" : "text-red-400"}`}>
-                                        {v.score_snapshot.score_total?.toFixed(1)}
-                                      </span>
-                                    )}
-                                    {v.score_snapshot.confidence != null && (
-                                      <span className="text-[#00D4FF]">{((v.score_snapshot.confidence ?? 0) * 100).toFixed(0)}% conf</span>
-                                    )}
-                                  </div>
-
-                                  {v.changes && v.changes.length > 0 && (
-                                    <div className="mt-2 flex flex-wrap gap-1.5">
-                                      {v.changes.map((c, ci) => (
-                                        <span key={ci} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40 font-mono">
-                                          {c.field.replace("parameters.", "")}: {String(c.old)} → {String(c.new)}
-                                        </span>
-                                      ))}
-                                    </div>
-                                  )}
-
-                                  {v.stress_delta && (v.stress_delta.drawdown_change || v.stress_delta.recovery_speed) && (
-                                    <div className="mt-2 flex gap-2">
-                                      {v.stress_delta.drawdown_change && (
-                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20 text-orange-400">
-                                          DD: {v.stress_delta.drawdown_change}
-                                        </span>
-                                      )}
-                                      {v.stress_delta.recovery_speed && (
-                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#00D4FF]/10 border border-[#00D4FF]/20 text-[#00D4FF]">
-                                          Recovery: {v.stress_delta.recovery_speed}
-                                        </span>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-
-                                <button
-                                  onClick={() => {
-                                    if (!compareA || (compareA && compareB)) {
-                                      setCompareA(v.version);
-                                      setCompareB(null);
-                                      setComparison(null);
-                                    } else if (compareA !== v.version) {
-                                      setCompareB(v.version);
-                                    }
-                                  }}
-                                  className={`flex-shrink-0 p-1.5 rounded-lg border transition-all text-xs ${
-                                    compareA === v.version ? "border-[#00D4FF]/50 bg-[#00D4FF]/10 text-[#00D4FF]" :
-                                    compareB === v.version ? "border-purple-400/50 bg-purple-400/10 text-purple-400" :
-                                    "border-white/10 text-white/30 hover:border-white/20 hover:text-white/50"
-                                  }`}
-                                  title={compareA === v.version ? "Selected as A" : compareB === v.version ? "Selected as B" : "Select for comparison"}
-                                >
-                                  <ArrowLeftRight className="w-3.5 h-3.5" />
-                                </button>
+                              <div className="flex gap-2 text-xs text-white/30">
+                                <span>{s.assets.slice(0, 3).join(", ")}{s.assets.length > 3 ? ` +${s.assets.length - 3}` : ""}</span>
+                                <span>{s.timeframes[0]}</span>
                               </div>
                             </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {selectedId && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4"
+                    >
+                      <div className="text-xs font-semibold text-white/50 uppercase tracking-wider">Evaluation Options</div>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" checked={runStress} onChange={e => setRunStress(e.target.checked)} className="accent-[#00D4FF]" />
+                          <span className="text-sm text-white/70">Run Stress Tests</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" checked={runRefinement} onChange={e => setRunRefinement(e.target.checked)} className="accent-[#00D4FF]" />
+                          <span className="text-sm text-white/70">Run Parameter Refinement</span>
+                        </label>
+                      </div>
+
+                      <Button
+                        onClick={submitEval}
+                        disabled={submitting}
+                        style={{ background: "linear-gradient(135deg, #00D4FF, #0099cc)", color: "#000", boxShadow: "0 0 20px rgba(0,212,255,0.2)" }}
+                        className="font-semibold"
+                      >
+                        {submitting ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Play className="w-4 h-4 mr-1.5" />}
+                        Run Full Evaluation
+                      </Button>
+                    </motion.div>
+                  )}
+
+                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-3">
+                    <div className="text-xs font-semibold text-white/50 uppercase tracking-wider">Scoring Models (M1–M6)</div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {Object.entries(MODEL_LABELS).map(([key, label]) => (
+                        <div key={key} className="bg-white/[0.02] border border-white/8 rounded-lg p-3 flex items-center gap-2 hover:border-white/15 transition-all">
+                          <div
+                            className="w-2 h-2 rounded-full flex-shrink-0"
+                            style={{ background: MODEL_COLORS[key], boxShadow: `0 0 6px ${MODEL_COLORS[key]}` }}
+                          />
+                          <div>
+                            <div className="font-mono text-xs font-bold" style={{ color: MODEL_COLORS[key] }}>{key}</div>
+                            <div className="text-white/50 text-xs">{label}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {view === "running" && (
+                <motion.div key="running" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <RunningView jobId={jobId} />
+                </motion.div>
+              )}
+
+              {view === "results" && evalResult && (
+                <motion.div key="results" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 flex flex-col items-center">
+                      <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Total Score</div>
+                      <AnimatedGauge score={evalResult.score_total} label="TOTAL" size={180} />
+                      <div className="mt-4 text-center">
+                        <div className="text-xs text-white/40 mb-1">Confidence</div>
+                        <div className="text-2xl font-bold text-[#00D4FF] font-mono" style={{ textShadow: "0 0 12px rgba(0,212,255,0.4)" }}>
+                          {(evalResult.confidence * 100).toFixed(0)}%
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="lg:col-span-2 bg-white/[0.02] border border-white/8 rounded-xl p-5">
+                      <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Model Score Radar</div>
+                      <ModelRadar scores={evalResult.scores} />
+                      <div className="grid grid-cols-3 gap-2 mt-2">
+                        {Object.entries(evalResult.scores).map(([key, val]) => (
+                          <div key={key} className="flex items-center justify-between bg-white/[0.03] border border-white/6 rounded-lg px-3 py-2">
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-1.5 h-1.5 rounded-full" style={{ background: MODEL_COLORS[key] }} />
+                              <span className="text-xs text-white/40">{MODEL_LABELS[key]?.split(" ")[0]}</span>
+                            </div>
+                            <span
+                              className="text-sm font-bold font-mono"
+                              style={{ color: MODEL_COLORS[key] }}
+                            >
+                              {val}
+                            </span>
                           </div>
                         ))}
                       </div>
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                {compareA && compareB && (
-                  <div className="flex justify-center">
-                    <Button
-                      onClick={compareVersions}
-                      disabled={comparingLoading}
-                      className="bg-[#00D4FF] hover:bg-[#00D4FF]/80 text-black font-semibold"
-                    >
-                      {comparingLoading ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <ArrowLeftRight className="w-4 h-4 mr-1.5" />}
-                      Compare v{compareA} vs v{compareB}
+                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5">
+                    <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Per-Model Rings</div>
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
+                      {Object.entries(evalResult.scores).map(([key, val]) => (
+                        <ScoreRing
+                          key={key}
+                          score={val}
+                          size={80}
+                          label={`${key}\n${MODEL_LABELS[key]?.split(" ")[0]}`}
+                          color={MODEL_COLORS[key]}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {evalResult.stress && (
+                    <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-orange-400" />
+                        <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Stress Test Results</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="bg-red-500/5 border border-red-500/15 rounded-lg p-3">
+                          <div className="text-xs text-white/40">Worst Drawdown</div>
+                          <div className="text-xl font-bold text-red-400 font-mono mt-1">{evalResult.stress.worst_drawdown}%</div>
+                        </div>
+                        <div className="bg-yellow-500/5 border border-yellow-500/15 rounded-lg p-3">
+                          <div className="text-xs text-white/40">Recovery Time</div>
+                          <div className="text-xl font-bold text-yellow-400 font-mono mt-1">{evalResult.stress.recovery_time}</div>
+                        </div>
+                        <div className="bg-white/[0.02] border border-white/8 rounded-lg p-3">
+                          <div className="text-xs text-white/40">Failure Regimes</div>
+                          <div className="text-sm font-semibold text-white/60 mt-1">
+                            {evalResult.stress.failure_regimes.length > 0
+                              ? evalResult.stress.failure_regimes.map(r => r.replace(/_/g, " ")).join(", ")
+                              : <span className="text-green-400">None</span>}
+                          </div>
+                        </div>
+                      </div>
+                      {evalResult.stress.results && evalResult.stress.results.length > 0 && (
+                        <div>
+                          <div className="text-xs font-mono text-white/30 uppercase tracking-wider mb-3">Scenario Heatmap</div>
+                          <HeatmapGrid results={evalResult.stress.results} />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {evalResult.refinements && evalResult.refinements.length > 0 && (
+                    <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-purple-400" />
+                        <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Parameter Refinements</span>
+                        <span className="text-[10px] font-mono text-purple-400/60 bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 rounded ml-1">
+                          {evalResult.refinements.length} suggestions
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {evalResult.refinements.map((r, i) => (
+                          <BeforeAfterCard
+                            key={i}
+                            param={r.param}
+                            oldValue={r.old}
+                            newValue={r.new}
+                            impact={r.impact}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {summaryData && (
+                    <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-[#00D4FF]" />
+                        <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Strategy Summary</span>
+                      </div>
+                      <p className="text-sm text-white/70 leading-relaxed">{summaryData.summary}</p>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="text-xs font-semibold text-green-400 mb-1">Strengths</div>
+                          <div className="flex flex-wrap gap-1">
+                            {summaryData.strengths.map(s => (
+                              <span key={s} className="px-2 py-0.5 rounded text-xs bg-green-500/10 border border-green-500/20 text-green-400 capitalize">{s}</span>
+                            ))}
+                            {summaryData.strengths.length === 0 && <span className="text-xs text-white/30">None identified</span>}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-xs font-semibold text-red-400 mb-1">Weaknesses</div>
+                          <div className="flex flex-wrap gap-1">
+                            {summaryData.weaknesses.map(w => (
+                              <span key={w} className="px-2 py-0.5 rounded text-xs bg-red-500/10 border border-red-500/20 text-red-400 capitalize">{w}</span>
+                            ))}
+                            {summaryData.weaknesses.length === 0 && <span className="text-xs text-white/30">None identified</span>}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-xs font-semibold text-[#00D4FF] mb-1">Best Conditions</div>
+                          <div className="flex flex-wrap gap-1">
+                            {summaryData.best_conditions.map(c => (
+                              <span key={c} className="px-2 py-0.5 rounded text-xs bg-[#00D4FF]/10 border border-[#00D4FF]/20 text-[#00D4FF] capitalize">{c}</span>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-xs font-semibold text-orange-400 mb-1">Break Conditions</div>
+                          <div className="flex flex-wrap gap-1">
+                            {summaryData.break_conditions.map(c => (
+                              <span key={c} className="px-2 py-0.5 rounded text-xs bg-orange-500/10 border border-orange-500/20 text-orange-400 capitalize">{c}</span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    <Button variant="outline" size="sm" onClick={resetToSelect} className="border-white/10 text-white/60">
+                      <ChevronLeft className="w-4 h-4 mr-1" /> Evaluate Another
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={fetchRankings} className="border-white/10 text-white/60">
+                      <Trophy className="w-4 h-4 mr-1" /> View Rankings
                     </Button>
                   </div>
-                )}
+                </motion.div>
+              )}
 
-                {comparison && (
-                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-5">
-                    <div className="flex items-center gap-2">
-                      <ArrowLeftRight className="w-4 h-4 text-[#00D4FF]" />
-                      <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                        Comparison: v{comparison.version_a.version} vs v{comparison.version_b.version}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4">
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className="text-xs font-semibold text-[#00D4FF]">v{comparison.version_a.version}</span>
-                          <span className="text-[10px] font-mono text-white/20">{comparison.version_a.version_hash}</span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded ${comparison.version_a.origin === "refinement_engine" ? "bg-purple-500/10 text-purple-400" : "bg-white/5 text-white/30"}`}>
-                            {comparison.version_a.origin === "refinement_engine" ? "refinement" : "manual"}
-                          </span>
-                        </div>
-                        <div className="space-y-1 text-xs">
-                          <div className="flex justify-between">
-                            <span className="text-white/40">Score</span>
-                            <span className="font-mono font-bold text-white">{comparison.version_a.score_total?.toFixed(1) ?? "—"}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-white/40">Confidence</span>
-                            <span className="font-mono text-white">{comparison.version_a.confidence != null ? `${(comparison.version_a.confidence * 100).toFixed(0)}%` : "—"}</span>
-                          </div>
-                        </div>
+              {view === "rankings" && (
+                <motion.div key="rankings" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
+                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5">
+                    <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Strategy Rankings</div>
+                    {rankings.length === 0 ? (
+                      <div className="text-center py-10">
+                        <Trophy className="w-10 h-10 text-white/15 mx-auto mb-3" />
+                        <p className="text-white/40 text-sm">No evaluation results yet.</p>
+                        <p className="text-white/25 text-xs mt-1">Run evaluations to populate rankings.</p>
                       </div>
-
-                      <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4">
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className="text-xs font-semibold text-purple-400">v{comparison.version_b.version}</span>
-                          <span className="text-[10px] font-mono text-white/20">{comparison.version_b.version_hash}</span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded ${comparison.version_b.origin === "refinement_engine" ? "bg-purple-500/10 text-purple-400" : "bg-white/5 text-white/30"}`}>
-                            {comparison.version_b.origin === "refinement_engine" ? "refinement" : "manual"}
-                          </span>
-                        </div>
-                        <div className="space-y-1 text-xs">
-                          <div className="flex justify-between">
-                            <span className="text-white/40">Score</span>
-                            <span className="font-mono font-bold text-white">{comparison.version_b.score_total?.toFixed(1) ?? "—"}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-white/40">Confidence</span>
-                            <span className="font-mono text-white">{comparison.version_b.confidence != null ? `${(comparison.version_b.confidence * 100).toFixed(0)}%` : "—"}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 space-y-3">
-                      <div className="text-xs font-semibold text-white/40 uppercase tracking-wider">Score Delta</div>
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-white/40">Total</span>
-                          <span className={`font-mono font-bold text-lg ${!comparison.diff.score_total ? "text-white/20" : comparison.diff.score_total.startsWith("+") ? "text-[#00FF41]" : comparison.diff.score_total.startsWith("-") ? "text-red-400" : "text-white/40"}`}>
-                            {comparison.diff.score_total ?? "N/A"}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-white/40">Confidence</span>
-                          <span className={`font-mono text-sm ${!comparison.diff.confidence ? "text-white/20" : comparison.diff.confidence.startsWith("+") ? "text-[#00D4FF]" : comparison.diff.confidence.startsWith("-") ? "text-orange-400" : "text-white/40"}`}>
-                            {comparison.diff.confidence ?? "N/A"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {Object.keys(comparison.diff.model_scores).length > 0 && (
-                      <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 space-y-3">
-                        <div className="text-xs font-semibold text-white/40 uppercase tracking-wider">Model Score Changes</div>
-                        <div className="grid grid-cols-3 gap-2">
-                          {Object.entries(comparison.diff.model_scores).map(([key, delta]) => (
-                            <div key={key} className="flex items-center justify-between bg-white/[0.03] rounded-lg px-3 py-2">
-                              <span className="text-xs text-white/40">{MODEL_LABELS[key] ?? key}</span>
-                              <span className={`text-sm font-bold font-mono ${!delta ? "text-white/20" : delta.startsWith("+") && delta !== "+0.0" ? "text-[#00FF41]" : delta.startsWith("-") ? "text-red-400" : "text-white/20"}`}>
-                                {delta ?? "—"}
-                              </span>
+                    ) : (
+                      <div className="space-y-2">
+                        {rankings.map(r => (
+                          <motion.div
+                            key={r.rank}
+                            initial={{ opacity: 0, x: -8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: r.rank * 0.05 }}
+                            className="flex items-center gap-4 bg-white/[0.02] border border-white/8 rounded-lg p-3 hover:border-white/15 transition-all"
+                          >
+                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm ${
+                              r.rank === 1 ? "bg-[#FFD700]/15 text-[#FFD700] border border-[#FFD700]/30" :
+                              r.rank === 2 ? "bg-gray-400/15 text-gray-300 border border-gray-400/30" :
+                              r.rank === 3 ? "bg-orange-600/15 text-orange-400 border border-orange-600/30" :
+                              "bg-white/5 text-white/30 border border-white/10"
+                            }`}
+                              style={r.rank <= 3 ? { boxShadow: `0 0 12px ${r.rank === 1 ? "rgba(255,215,0,0.1)" : r.rank === 2 ? "rgba(160,160,160,0.1)" : "rgba(255,140,0,0.1)"}` } : {}}
+                            >
+                              {r.rank}
                             </div>
-                          ))}
-                        </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-white text-sm">{r.strategy_name}</div>
+                              <div className="text-xs text-white/25 font-mono">ID: {r.strategy_id}</div>
+                            </div>
+                            <div className="text-right">
+                              <div className={`text-xl font-bold font-mono ${
+                                r.score >= 80 ? "text-[#00D4FF]" : r.score >= 60 ? "text-yellow-400" : "text-red-400"
+                              }`} style={{ textShadow: r.score >= 80 ? "0 0 10px rgba(0,212,255,0.3)" : "none" }}>
+                                {r.score.toFixed(1)}
+                              </div>
+                              <div className="text-xs text-white/25">{(r.confidence * 100).toFixed(0)}% conf</div>
+                            </div>
+                          </motion.div>
+                        ))}
                       </div>
                     )}
+                  </div>
+                </motion.div>
+              )}
 
-                    {comparison.diff.parameter_changes.length > 0 && (
-                      <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 space-y-3">
-                        <div className="text-xs font-semibold text-white/40 uppercase tracking-wider">Parameter Changes</div>
-                        <div className="space-y-2">
-                          {comparison.diff.parameter_changes.map((c, i) => (
-                            <div key={i} className="flex items-center justify-between bg-white/[0.02] border border-white/8 rounded-lg px-4 py-3">
-                              <span className="text-sm font-mono text-white/70">{c.field.replace("parameters.", "")}</span>
-                              <div className="flex items-center gap-2 text-xs">
-                                <span className="text-white/30">{String(c.old ?? "—")}</span>
-                                <span className="text-white/20">→</span>
-                                <span className="text-[#00D4FF] font-semibold">{String(c.new ?? "—")}</span>
+              {view === "versions" && (
+                <motion.div key="versions" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
+                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <GitBranch className="w-4 h-4 text-purple-400" />
+                        <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Version Timeline</span>
+                      </div>
+                      <span className="text-xs text-white/30">{versions.length} version{versions.length !== 1 ? "s" : ""}</span>
+                    </div>
+
+                    {versionsLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-6 h-6 animate-spin text-[#00D4FF]" />
+                      </div>
+                    ) : versions.length === 0 ? (
+                      <div className="text-center py-8">
+                        <GitBranch className="w-10 h-10 text-white/15 mx-auto mb-3" />
+                        <p className="text-white/40 text-sm">No versions recorded yet.</p>
+                        <p className="text-white/25 text-xs mt-1">Run a refinement to auto-create versions.</p>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <div className="absolute left-[19px] top-4 bottom-4 w-px bg-white/10" />
+                        <div className="space-y-3">
+                          {versions.map((v, idx) => (
+                            <div key={v.id} className="relative flex gap-4">
+                              <div className="flex-shrink-0 z-10">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
+                                  idx === versions.length - 1
+                                    ? "border-[#00D4FF] bg-[#00D4FF]/10"
+                                    : v.origin === "refinement_engine"
+                                      ? "border-purple-400 bg-purple-400/10"
+                                      : "border-white/20 bg-white/5"
+                                }`}
+                                  style={idx === versions.length - 1 ? { boxShadow: "0 0 12px rgba(0,212,255,0.2)" } : {}}>
+                                  {v.origin === "refinement_engine" ? (
+                                    <Sparkles className="w-4 h-4 text-purple-400" />
+                                  ) : (
+                                    <GitCommit className="w-4 h-4 text-white/40" />
+                                  )}
+                                </div>
+                              </div>
+                              <div className={`flex-1 bg-white/[0.02] border rounded-xl p-4 transition-all ${
+                                (compareA === v.version || compareB === v.version)
+                                  ? "border-[#00D4FF]/50 bg-[#00D4FF]/5"
+                                  : "border-white/8 hover:border-white/15"
+                              }`}>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className="font-mono font-bold text-white text-sm">v{v.version}</span>
+                                      <span className="text-[10px] font-mono text-white/20 bg-white/5 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                        <Hash className="w-3 h-3" />{v.version_hash}
+                                      </span>
+                                      <span className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                                        v.origin === "refinement_engine"
+                                          ? "bg-purple-500/10 text-purple-400 border-purple-500/20"
+                                          : "bg-white/5 text-white/30 border-white/10"
+                                      }`}>
+                                        {v.origin === "refinement_engine" ? "refinement" : "manual"}
+                                      </span>
+                                    </div>
+                                    {v.notes && <p className="text-xs text-white/40 mt-1">{v.notes}</p>}
+                                    <div className="flex items-center gap-4 mt-2 text-xs text-white/30">
+                                      <span className="flex items-center gap-1">
+                                        <Clock className="w-3 h-3" />
+                                        {new Date(v.created_at).toLocaleDateString()} {new Date(v.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                      </span>
+                                      {v.score_snapshot.score_total != null && (
+                                        <span className={`font-mono font-bold ${(v.score_snapshot.score_total ?? 0) >= 80 ? "text-[#00D4FF]" : (v.score_snapshot.score_total ?? 0) >= 60 ? "text-yellow-400" : "text-red-400"}`}>
+                                          {v.score_snapshot.score_total?.toFixed(1)}
+                                        </span>
+                                      )}
+                                    </div>
+                                    {v.changes && v.changes.length > 0 && (
+                                      <div className="mt-2 flex flex-wrap gap-1.5">
+                                        {v.changes.map((c, ci) => (
+                                          <span key={ci} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40 font-mono">
+                                            {c.field.replace("parameters.", "")}: {String(c.old)} → {String(c.new)}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <button
+                                    onClick={() => {
+                                      if (!compareA || (compareA && compareB)) {
+                                        setCompareA(v.version);
+                                        setCompareB(null);
+                                        setComparison(null);
+                                      } else if (compareA !== v.version) {
+                                        setCompareB(v.version);
+                                      }
+                                    }}
+                                    className={`flex-shrink-0 p-1.5 rounded-lg border transition-all text-xs ${
+                                      compareA === v.version ? "border-[#00D4FF]/50 bg-[#00D4FF]/10 text-[#00D4FF]" :
+                                      compareB === v.version ? "border-purple-400/50 bg-purple-400/10 text-purple-400" :
+                                      "border-white/10 text-white/30 hover:border-white/20 hover:text-white/50"
+                                    }`}
+                                  >
+                                    <ArrowLeftRight className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           ))}
@@ -969,15 +924,77 @@ export default function EvalPipeline() {
                       </div>
                     )}
                   </div>
-                )}
 
-                <div className="flex gap-3">
-                  <Button variant="outline" size="sm" onClick={resetToSelect} className="border-white/10 text-white/60">
-                    <ChevronLeft className="w-4 h-4 mr-1" /> Back
-                  </Button>
-                </div>
-              </div>
-            )}
+                  {compareA && compareB && (
+                    <div className="flex justify-center">
+                      <Button
+                        onClick={compareVersions}
+                        disabled={comparingLoading}
+                        style={{ background: "linear-gradient(135deg, #00D4FF, #0099cc)", color: "#000" }}
+                        className="font-semibold"
+                      >
+                        {comparingLoading ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <ArrowLeftRight className="w-4 h-4 mr-1.5" />}
+                        Compare v{compareA} vs v{compareB}
+                      </Button>
+                    </div>
+                  )}
+
+                  {comparison && (
+                    <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-5">
+                      <div className="flex items-center gap-2">
+                        <ArrowLeftRight className="w-4 h-4 text-[#00D4FF]" />
+                        <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
+                          Comparison: v{comparison.version_a.version} vs v{comparison.version_b.version}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        {[comparison.version_a, comparison.version_b].map((v, i) => (
+                          <div key={i} className="bg-white/[0.03] border border-white/8 rounded-xl p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                              <span className="text-xs font-semibold" style={{ color: i === 0 ? "#00D4FF" : "#a78bfa" }}>v{v.version}</span>
+                              <span className="text-[10px] font-mono text-white/20">{v.version_hash}</span>
+                            </div>
+                            <div className="space-y-1.5">
+                              {v.score_total != null && (
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs text-white/40">Score</span>
+                                  <span className={`text-sm font-bold font-mono ${v.score_total >= 80 ? "text-[#00D4FF]" : v.score_total >= 60 ? "text-yellow-400" : "text-red-400"}`}>
+                                    {v.score_total.toFixed(1)}
+                                  </span>
+                                </div>
+                              )}
+                              {v.confidence != null && (
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs text-white/40">Confidence</span>
+                                  <span className="text-sm font-mono text-white/70">{(v.confidence * 100).toFixed(0)}%</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {comparison.diff.parameter_changes.length > 0 && (
+                        <div>
+                          <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">Parameter Changes</div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {comparison.diff.parameter_changes.map((c, i) => (
+                              <BeforeAfterCard
+                                key={i}
+                                param={c.field.replace("parameters.", "")}
+                                oldValue={Number(c.old)}
+                                newValue={Number(c.new)}
+                                impact="version change"
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+            </AnimatePresence>
 
           </div>
         </div>

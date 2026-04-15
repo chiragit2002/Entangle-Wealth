@@ -207,6 +207,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/accessibility">{() => <LazyPage component={AccessibilityPage} />}</Route>
             <Route path="/strategy-builder">{() => <LazyProtected component={StrategyBuilderPage} />}</Route>
             <Route path="/evaluate">{() => <LazyPage component={StrategyEvaluatorPage} />}</Route>
+            <Route path="/evaluator">{() => <LazyPage component={StrategyEvaluatorPage} />}</Route>
             <Route path="/eval-pipeline">{() => <LazyProtected component={EvalPipelinePage} />}</Route>
             <Route path="/admin/:rest*">{() => <LazyAdmin component={AdminHubPage} />}</Route>
             <Route path="/admin">{() => <LazyAdmin component={AdminHubPage} />}</Route>

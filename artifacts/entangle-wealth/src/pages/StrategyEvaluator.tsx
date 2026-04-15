@@ -1,16 +1,20 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { useToast } from "@/hooks/use-toast";
 import {
   Cpu, Target, Zap, Clock, Activity, CheckCircle2, XCircle,
   AlertTriangle, ChevronRight, BarChart2, TrendingUp, TrendingDown,
-  Minus, Loader2, Send, RefreshCw, ShieldAlert,
+  Minus, Loader2, Send, RefreshCw, ShieldAlert, Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  ResponsiveContainer, Tooltip as RechartsTooltip,
 } from "recharts";
+import { motion, AnimatePresence } from "framer-motion";
+import { AnimatedGauge } from "@/components/strategy/AnimatedGauge";
+import { FadeIn } from "@/components/strategy/PageTransition";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
 
@@ -109,80 +113,98 @@ function riskColor(risk: string) {
   return "text-red-400";
 }
 
-function ScoreGauge({ score, label = "SCORE" }: { score: number; label?: string }) {
-  const clamped = Math.min(100, Math.max(0, score));
-  const angle = (clamped / 100) * 180;
-  const rad = ((angle - 90) * Math.PI) / 180;
-  const cx = 80, cy = 80, r = 65;
-  const nx = cx + r * Math.cos(rad);
-  const ny = cy + r * Math.sin(rad);
-  const color = clamped >= 70 ? "#00d4ff" : clamped >= 40 ? "#a78bfa" : "#ff3366";
-
-  const arcPath = (startAngle: number, endAngle: number, radius: number, col: string) => {
-    const sa = ((startAngle - 90) * Math.PI) / 180;
-    const ea = ((endAngle - 90) * Math.PI) / 180;
-    const x1 = cx + radius * Math.cos(sa);
-    const y1 = cy + radius * Math.sin(sa);
-    const x2 = cx + radius * Math.cos(ea);
-    const y2 = cy + radius * Math.sin(ea);
-    const large = endAngle - startAngle > 180 ? 1 : 0;
-    return (
-      <path
-        d={`M ${x1} ${y1} A ${radius} ${radius} 0 ${large} 1 ${x2} ${y2}`}
-        fill="none" stroke={col} strokeWidth="10" strokeLinecap="round"
-      />
-    );
-  };
-
-  return (
-    <svg width="160" height="90" viewBox="0 0 160 90">
-      {arcPath(0, 180, r, "rgba(255,255,255,0.06)")}
-      {clamped > 0 && arcPath(0, angle, r, color)}
-      <line x1={cx} y1={cy} x2={nx} y2={ny} stroke={color} strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx={cx} cy={cy} r="4" fill={color} />
-      <text x={cx} y={cy - 12} textAnchor="middle" fill={color} fontSize="22" fontWeight="bold" fontFamily="monospace">
-        {clamped.toFixed(0)}
-      </text>
-      <text x={cx} y={cy + 4} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="9" fontFamily="monospace">
-        {label}
-      </text>
-      <text x="12" y="86" fill="rgba(255,255,255,0.2)" fontSize="8" fontFamily="monospace">0</text>
-      <text x="138" y="86" fill="rgba(255,255,255,0.2)" fontSize="8" fontFamily="monospace" textAnchor="end">100</text>
-    </svg>
-  );
-}
-
-function AgentProgressBar({ agent, visible }: { agent: AgentResult; visible: boolean }) {
+function AgentCard({ agent, index }: { agent: AgentResult; index: number }) {
   const col = signalColor(agent.signal);
+  const [expanded, setExpanded] = useState(false);
+
   return (
-    <div className={`transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}>
-      <div className="flex items-start gap-3 py-3 border-b border-white/5 last:border-0">
+    <motion.div
+      initial={{ opacity: 0, x: -12 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.35, delay: index * 0.08, ease: [0.4, 0, 0.2, 1] }}
+      className="border-b border-white/5 last:border-0 cursor-pointer"
+      onClick={() => setExpanded(e => !e)}
+    >
+      <div className="flex items-start gap-3 py-3">
         <div className="mt-0.5 flex-shrink-0">
-          <CheckCircle2 className="w-4 h-4" style={{ color: col }} />
+          <div
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold font-mono border"
+            style={{
+              background: `${col}15`,
+              borderColor: `${col}30`,
+              color: col,
+              boxShadow: `0 0 8px ${col}20`,
+            }}
+          >
+            {agent.id}
+          </div>
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2 mb-1">
+          <div className="flex items-center justify-between gap-2 mb-1.5">
             <div>
-              <span className="text-xs font-semibold text-white/80 font-mono">
-                Agent {agent.id} — {agent.name}
-              </span>
-              <span className="ml-2 text-xs text-white/30">{agent.domain}</span>
+              <span className="text-xs font-semibold text-white/80 font-mono">{agent.name}</span>
+              <span className="ml-2 text-xs text-white/25">{agent.domain}</span>
             </div>
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold border flex-shrink-0 ${signalBg(agent.signal)}`}>
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold border flex-shrink-0 ${signalBg(agent.signal)}`}
+              style={{ boxShadow: `0 0 8px ${col}20` }}>
               <SignalIcon signal={agent.signal} />
               {agent.signal}
             </span>
           </div>
           <div className="flex items-center gap-2 mb-1.5">
-            <div className="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full rounded-full transition-all duration-700" style={{ width: `${agent.confidence}%`, background: col }} />
+            <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${agent.confidence}%` }}
+                transition={{ duration: 0.8, delay: index * 0.08 + 0.2, ease: "easeOut" }}
+                style={{ background: `linear-gradient(90deg, ${col}60, ${col})` }}
+              />
             </div>
-            <span className="text-xs font-mono" style={{ color: col }}>{agent.confidence}%</span>
+            <span className="text-xs font-mono font-semibold" style={{ color: col }}>{agent.confidence}%</span>
           </div>
-          <p className="text-xs text-white/40 leading-relaxed">{agent.reasoning}</p>
-          <p className="text-xs text-white/25 font-mono mt-0.5">KEY: {agent.keyMetric}</p>
+          <AnimatePresence>
+            {expanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <p className="text-xs text-white/40 leading-relaxed pb-1">{agent.reasoning}</p>
+                <p className="text-xs text-white/25 font-mono">KEY: {agent.keyMetric}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          {!expanded && (
+            <p className="text-xs text-white/30 leading-relaxed line-clamp-1">{agent.reasoning}</p>
+          )}
         </div>
       </div>
+    </motion.div>
+  );
+}
+
+function ConsensusBadge({ reached, signal }: { reached: boolean; signal: string }) {
+  const col = signalColor(signal);
+  return (
+    <div className="flex items-center gap-2">
+      <div className="relative">
+        <div
+          className="w-2.5 h-2.5 rounded-full"
+          style={{ background: reached ? "#00d4ff" : "#ff8c00" }}
+        />
+        {reached && (
+          <div
+            className="absolute inset-0 rounded-full animate-ping"
+            style={{ background: "#00d4ff", opacity: 0.4 }}
+          />
+        )}
+      </div>
+      <span className={`text-xs font-mono font-semibold ${reached ? "text-[#00d4ff]" : "text-orange-400"}`}>
+        {reached ? "Consensus Reached" : "No Consensus"}
+      </span>
     </div>
   );
 }
@@ -193,34 +215,36 @@ function ErrorPanel({ error, onReset }: { error: EvalError; onReset: () => void 
   const isCapacity = error.kind === "capacity";
 
   return (
-    <div className={`border rounded-2xl p-8 flex flex-col items-center gap-4 ${
-      isRateLimit ? "bg-yellow-500/[0.05] border-yellow-500/20" :
-      isAuth ? "bg-purple-500/[0.05] border-purple-500/20" :
-      "bg-red-500/[0.05] border-red-500/20"
-    }`}>
-      {isRateLimit ? (
-        <ShieldAlert className="w-10 h-10 text-yellow-400/60" />
-      ) : isAuth ? (
-        <ShieldAlert className="w-10 h-10 text-purple-400/60" />
-      ) : (
-        <XCircle className="w-10 h-10 text-red-400/60" />
-      )}
-      <div className="text-center space-y-1">
-        <p className={`text-sm font-mono font-semibold ${isRateLimit ? "text-yellow-400" : isAuth ? "text-purple-400" : "text-red-400"}`}>
-          {isRateLimit ? "Rate Limit Reached" : isAuth ? "Sign In Required" : isCapacity ? "Service At Capacity" : "Evaluation Failed"}
-        </p>
-        <p className="text-white/40 text-xs max-w-xs">{error.message}</p>
-        {isRateLimit && error.retryAfter && (
-          <p className="text-yellow-400/50 text-xs font-mono">Retry in {error.retryAfter}s</p>
+    <FadeIn>
+      <div className={`border rounded-2xl p-8 flex flex-col items-center gap-4 ${
+        isRateLimit ? "bg-yellow-500/[0.05] border-yellow-500/20" :
+        isAuth ? "bg-purple-500/[0.05] border-purple-500/20" :
+        "bg-red-500/[0.05] border-red-500/20"
+      }`}>
+        {isRateLimit ? (
+          <ShieldAlert className="w-10 h-10 text-yellow-400/60" />
+        ) : isAuth ? (
+          <ShieldAlert className="w-10 h-10 text-purple-400/60" />
+        ) : (
+          <XCircle className="w-10 h-10 text-red-400/60" />
         )}
-        {isAuth && (
-          <a href="/sign-in" className="inline-block mt-2 text-xs text-purple-400 underline underline-offset-2">Sign in to evaluate</a>
-        )}
+        <div className="text-center space-y-1">
+          <p className={`text-sm font-mono font-semibold ${isRateLimit ? "text-yellow-400" : isAuth ? "text-purple-400" : "text-red-400"}`}>
+            {isRateLimit ? "Rate Limit Reached" : isAuth ? "Sign In Required" : isCapacity ? "Service At Capacity" : "Evaluation Failed"}
+          </p>
+          <p className="text-white/40 text-xs max-w-xs">{error.message}</p>
+          {isRateLimit && error.retryAfter && (
+            <p className="text-yellow-400/50 text-xs font-mono">Retry in {error.retryAfter}s</p>
+          )}
+          {isAuth && (
+            <a href="/sign-in" className="inline-block mt-2 text-xs text-purple-400 underline underline-offset-2">Sign in to evaluate</a>
+          )}
+        </div>
+        <Button size="sm" variant="outline" onClick={onReset} className="border-white/10 text-white/60 hover:text-white">
+          Try Again
+        </Button>
       </div>
-      <Button size="sm" variant="outline" onClick={onReset} className="border-white/10 text-white/60 hover:text-white">
-        Try Again
-      </Button>
-    </div>
+    </FadeIn>
   );
 }
 
@@ -245,6 +269,64 @@ function classifyError(status: number, body: Record<string, unknown>): EvalError
   }
   return { kind: "generic", message: String(body.error ?? "Evaluation failed. Please try again.") };
 }
+
+function PipelineProgress({ current, total, phase }: { current: number; total: number; phase: string }) {
+  const modelNames = ["Market Trend", "Momentum", "Volume Flow", "Sentiment", "Risk Profile", "Signal Logic", "Final Consensus"];
+  return (
+    <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Activity className="w-4 h-4 text-cyan-400 animate-pulse" />
+          <span className="text-xs font-mono font-semibold text-white/60 uppercase tracking-wider">Agent Swarm</span>
+        </div>
+        <span className="text-xs font-mono text-white/30">{current} / {total || "?"} agents complete</span>
+      </div>
+      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+        <motion.div
+          className="h-full rounded-full"
+          style={{ background: "linear-gradient(90deg, #00d4ff, #a78bfa)" }}
+          initial={{ width: 0 }}
+          animate={{ width: total ? `${(current / total) * 100}%` : "10%" }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        />
+      </div>
+      <div className="flex gap-2 flex-wrap">
+        {(total > 0 ? Array.from({ length: total }) : Array.from({ length: 7 })).map((_, i) => (
+          <motion.div
+            key={i}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-mono"
+            animate={i < current
+              ? { borderColor: "rgba(0,212,255,0.3)", background: "rgba(0,212,255,0.08)", color: "#00d4ff" }
+              : i === current
+              ? { borderColor: "rgba(167,139,250,0.3)", background: "rgba(167,139,250,0.08)", color: "#a78bfa" }
+              : { borderColor: "rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.02)", color: "rgba(255,255,255,0.25)" }
+            }
+          >
+            {i < current ? (
+              <CheckCircle2 className="w-3 h-3" />
+            ) : i === current ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <div className="w-3 h-3 rounded-full border border-current opacity-40" />
+            )}
+            {modelNames[i] ?? `Agent ${i + 1}`}
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const CustomRadarTooltip = ({ active, payload }: { active?: boolean; payload?: { value: number; payload: { agent: string } }[] }) => {
+  if (!active || !payload?.length) return null;
+  const d = payload[0];
+  return (
+    <div className="bg-[#0D1321] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono">
+      <div className="text-white/60 mb-0.5">{d.payload.agent}</div>
+      <div className="text-[#00d4ff] font-bold">{d.value}% confidence</div>
+    </div>
+  );
+};
 
 export default function StrategyEvaluator() {
   const { toast } = useToast();
@@ -378,6 +460,7 @@ export default function StrategyEvaluator() {
   const radarData = deepResult?.agents.map(a => ({
     agent: a.name.split(" ").slice(-1)[0],
     confidence: a.confidence,
+    fullMark: 100,
   })) ?? [];
 
   const aggregateScore = deepResult
@@ -390,10 +473,10 @@ export default function StrategyEvaluator() {
         <div className="min-h-screen bg-black text-white">
           <div className="max-w-[1200px] mx-auto px-4 py-6 space-y-6">
 
-            {/* Header */}
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 flex items-center justify-center"
+                  style={{ boxShadow: "0 0 20px rgba(0,212,255,0.1)" }}>
                   <Cpu className="w-5 h-5 text-cyan-400" />
                 </div>
                 <div>
@@ -416,7 +499,6 @@ export default function StrategyEvaluator() {
                 <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 space-y-5">
                   <div className="text-xs font-mono font-semibold text-white/40 uppercase tracking-widest">Configuration</div>
 
-                  {/* Asset */}
                   <div>
                     <label className="text-xs text-white/50 mb-2 block font-mono">Asset</label>
                     <div className="flex flex-wrap gap-1.5 mb-2">
@@ -429,6 +511,7 @@ export default function StrategyEvaluator() {
                               ? "bg-[#00d4ff]/15 border-[#00d4ff]/30 text-[#00d4ff]"
                               : "bg-white/3 border-white/8 text-white/40 hover:text-white/70 hover:border-white/20"
                           }`}
+                          style={symbol === s && !customSymbol ? { boxShadow: "0 0 8px rgba(0,212,255,0.15)" } : {}}
                         >
                           {s}
                         </button>
@@ -440,11 +523,10 @@ export default function StrategyEvaluator() {
                       onChange={e => setCustomSymbol(e.target.value.toUpperCase().replace(/[^A-Z0-9.\-]/g, ""))}
                       placeholder="Or type a symbol…"
                       maxLength={10}
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-cyan-500/40 font-mono"
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-cyan-500/40 font-mono transition-colors"
                     />
                   </div>
 
-                  {/* Timeframe */}
                   <div>
                     <label className="text-xs text-white/50 mb-2 block font-mono">Timeframe</label>
                     <div className="flex gap-1.5">
@@ -464,7 +546,6 @@ export default function StrategyEvaluator() {
                     </div>
                   </div>
 
-                  {/* Market State */}
                   <div>
                     <label className="text-xs text-white/50 mb-2 block font-mono">Market State</label>
                     <div className="grid grid-cols-2 gap-1.5">
@@ -477,7 +558,7 @@ export default function StrategyEvaluator() {
                           }`}
                           style={
                             marketState === m.value
-                              ? { background: `${m.color}18`, borderColor: `${m.color}40`, color: m.color }
+                              ? { background: `${m.color}18`, borderColor: `${m.color}40`, color: m.color, boxShadow: `0 0 10px ${m.color}10` }
                               : {}
                           }
                         >
@@ -487,7 +568,6 @@ export default function StrategyEvaluator() {
                     </div>
                   </div>
 
-                  {/* Eval Mode */}
                   <div>
                     <label className="text-xs text-white/50 mb-2 block font-mono">Evaluation Mode</label>
                     <div className="flex gap-1.5">
@@ -499,7 +579,7 @@ export default function StrategyEvaluator() {
                             : "bg-white/3 border-white/8 text-white/40 hover:text-white/70"
                         }`}
                       >
-                        <div className="font-semibold">Fast</div>
+                        <div className="font-semibold flex items-center justify-center gap-1"><Zap className="w-3 h-3" />Fast</div>
                         <div className="text-[10px] opacity-60">Quick scan</div>
                       </button>
                       <button
@@ -510,20 +590,24 @@ export default function StrategyEvaluator() {
                             : "bg-white/3 border-white/8 text-white/40 hover:text-white/70"
                         }`}
                       >
-                        <div className="font-semibold">Deep</div>
+                        <div className="font-semibold flex items-center justify-center gap-1"><Sparkles className="w-3 h-3" />Deep</div>
                         <div className="text-[10px] opacity-60">Full agent swarm</div>
                       </button>
                     </div>
                     <p className="text-[10px] text-white/20 font-mono mt-1.5">
                       {evalMode === "fast"
                         ? "Fast: single AI pass via quick-analyze endpoint"
-                        : "Deep: 7-agent SSE stream with live progress"}
+                        : "Deep: multi-agent SSE stream with live progress"}
                     </p>
                   </div>
 
-                  {/* Submit */}
                   <Button
-                    className="w-full bg-[#00d4ff] hover:bg-[#00b8d9] text-black font-mono font-bold h-10"
+                    className="w-full font-mono font-bold h-10"
+                    style={{
+                      background: "linear-gradient(135deg, #00d4ff, #0099cc)",
+                      color: "#000",
+                      boxShadow: "0 0 20px rgba(0,212,255,0.2)",
+                    }}
                     onClick={runEvaluation}
                     disabled={phase === "connecting" || phase === "streaming"}
                   >
@@ -553,62 +637,68 @@ export default function StrategyEvaluator() {
               {/* Right: Results */}
               <div className="space-y-5">
 
-                {/* Idle */}
-                {phase === "idle" && (
-                  <div className="bg-white/[0.02] border border-white/8 rounded-2xl flex flex-col items-center justify-center py-20 gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-purple-500/10 border border-cyan-500/20 flex items-center justify-center">
-                      <BarChart2 className="w-7 h-7 text-white/20" />
-                    </div>
-                    <div className="text-center">
-                      <p className="text-white/30 text-sm font-mono">Configure and run an evaluation</p>
-                      <p className="text-white/20 text-xs mt-1">Scores will appear here</p>
-                    </div>
-                  </div>
-                )}
+                <AnimatePresence mode="wait">
 
-                {/* Connecting */}
-                {phase === "connecting" && (
-                  <div className="bg-white/[0.02] border border-white/8 rounded-2xl flex flex-col items-center justify-center py-16 gap-4">
-                    <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
-                    <p className="text-white/40 text-sm font-mono">
-                      {evalMode === "fast" ? "Running quick analysis…" : "Initializing agent swarm…"}
-                    </p>
-                  </div>
-                )}
+                  {phase === "idle" && (
+                    <motion.div
+                      key="idle"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="bg-white/[0.02] border border-white/8 rounded-2xl flex flex-col items-center justify-center py-20 gap-4"
+                    >
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-purple-500/10 border border-cyan-500/20 flex items-center justify-center">
+                        <BarChart2 className="w-8 h-8 text-white/15" />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-white/40 text-sm font-mono">Configure and run an evaluation</p>
+                        <p className="text-white/20 text-xs mt-1">Scores, radar chart, and agent breakdown will appear here</p>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        {["M1", "M2", "M3", "M4", "M5", "M6"].map((m) => (
+                          <span key={m} className="text-[10px] font-mono text-white/15 px-2 py-1 rounded border border-white/6 bg-white/3">{m}</span>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
 
-                {/* Deep mode: streaming agents */}
+                  {phase === "connecting" && (
+                    <motion.div
+                      key="connecting"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="bg-white/[0.02] border border-white/8 rounded-2xl flex flex-col items-center justify-center py-16 gap-4"
+                    >
+                      <div className="relative">
+                        <div className="w-16 h-16 rounded-full border-2 border-white/10" />
+                        <div className="absolute inset-0 w-16 h-16 rounded-full border-2 border-t-cyan-400 border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+                        <Cpu className="w-6 h-6 text-cyan-400/60 absolute inset-0 m-auto" />
+                      </div>
+                      <p className="text-white/40 text-sm font-mono">
+                        {evalMode === "fast" ? "Running quick analysis…" : "Initializing agent swarm…"}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 {(phase === "streaming" || (phase === "done" && evalMode === "deep")) && streamAgents.length > 0 && (
-                  <>
-                    <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          {phase === "streaming" ? (
-                            <Activity className="w-4 h-4 text-cyan-400 animate-pulse" />
-                          ) : (
-                            <CheckCircle2 className="w-4 h-4 text-green-400" />
-                          )}
-                          <span className="text-xs font-mono font-semibold text-white/60 uppercase tracking-wider">
-                            {phase === "streaming" ? "Agents Running" : "Evaluation Complete"}
-                          </span>
-                        </div>
-                        <span className="text-xs font-mono text-white/30">
-                          {streamAgents.length} / {totalAgents || "?"} agents
-                        </span>
-                      </div>
-                      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full transition-all duration-500"
-                          style={{ width: totalAgents ? `${(streamAgents.length / totalAgents) * 100}%` : "0%" }}
-                        />
-                      </div>
-                    </div>
+                  <FadeIn>
+                    <PipelineProgress
+                      current={streamAgents.length}
+                      total={totalAgents}
+                      phase={phase}
+                    />
 
-                    <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5">
+                    <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 mt-5">
                       <div className="text-xs font-mono font-semibold text-white/40 uppercase tracking-widest mb-4">
                         Agent Results
+                        {phase === "done" && (
+                          <span className="ml-2 text-[#00d4ff] normal-case">— All complete</span>
+                        )}
                       </div>
                       {streamAgents.map((agent, i) => (
-                        <AgentProgressBar key={agent.id} agent={agent} visible={i < streamAgents.length} />
+                        <AgentCard key={agent.id} agent={agent} index={i} />
                       ))}
                       {phase === "streaming" && (
                         <div className="flex items-center gap-2 py-3 text-white/30">
@@ -617,29 +707,32 @@ export default function StrategyEvaluator() {
                         </div>
                       )}
                     </div>
-                  </>
+                  </FadeIn>
                 )}
 
-                {/* FAST result dashboard */}
                 {phase === "done" && fastResult && evalMode === "fast" && (
-                  <>
+                  <FadeIn>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 flex flex-col items-center">
-                        <ScoreGauge score={fastResult.confidence} label="CONFIDENCE" />
-                        <div className="text-xs text-white/30 font-mono mt-1">Confidence Score</div>
+                        <AnimatedGauge score={fastResult.confidence} label="CONFIDENCE" size={160} />
+                        <div className="text-xs text-white/30 font-mono mt-2">Confidence Score</div>
                       </div>
-                      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 flex flex-col items-center justify-center gap-2">
-                        <div className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold font-mono border ${signalBg(fastResult.signal)}`}>
+                      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 flex flex-col items-center justify-center gap-3">
+                        <div
+                          className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold font-mono border ${signalBg(fastResult.signal)}`}
+                          style={{ boxShadow: `0 0 12px ${signalColor(fastResult.signal)}25` }}
+                        >
                           <SignalIcon signal={fastResult.signal} />
                           {fastResult.signal}
                         </div>
                         <div className="text-xs text-white/30 font-mono">Signal</div>
-                        <div className={`text-xs font-mono font-semibold ${riskColor(fastResult.risk)}`}>
+                        <div className={`text-xs font-mono font-semibold px-3 py-1 rounded-full ${riskColor(fastResult.risk)}`}
+                          style={{ background: `${fastResult.risk === "LOW" ? "rgba(0,255,0," : fastResult.risk === "MEDIUM" ? "rgba(255,200,0," : "rgba(255,0,0,"}0.08)` }}>
                           {fastResult.risk} RISK
                         </div>
                       </div>
-                      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 space-y-2">
-                        <div className="text-xs font-mono font-semibold text-white/40 uppercase tracking-widest mb-3">Metrics</div>
+                      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 space-y-3">
+                        <div className="text-xs font-mono font-semibold text-white/40 uppercase tracking-widest mb-2">Metrics</div>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1.5 text-white/40">
                             <Clock className="w-3 h-3" />
@@ -666,38 +759,37 @@ export default function StrategyEvaluator() {
                       </div>
                     </div>
 
-                    <div className="bg-[#00d4ff]/[0.04] border border-[#00d4ff]/15 rounded-2xl p-5">
+                    <div className="bg-[#00d4ff]/[0.04] border border-[#00d4ff]/15 rounded-2xl p-5 mt-4">
                       <div className="text-xs font-mono font-semibold text-[#00d4ff]/50 uppercase tracking-widest mb-2">Analysis Summary</div>
                       <p className="text-sm text-white/60 leading-relaxed">{fastResult.summary}</p>
                     </div>
 
-                    <div className="text-xs text-white/20 font-mono text-center pb-4">{fastResult.disclaimer}</div>
-                  </>
+                    <div className="text-xs text-white/20 font-mono text-center pb-2 mt-2">{fastResult.disclaimer}</div>
+                  </FadeIn>
                 )}
 
-                {/* DEEP result dashboard */}
                 {phase === "done" && deepResult && evalMode === "deep" && (
-                  <>
+                  <FadeIn>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 flex flex-col items-center">
-                        <ScoreGauge score={aggregateScore ?? 0} label="AGG SCORE" />
-                        <div className="text-xs text-white/30 font-mono mt-1">Aggregate Agent Score</div>
+                        <AnimatedGauge score={aggregateScore ?? 0} label="AGG SCORE" size={160} />
+                        <div className="text-xs text-white/30 font-mono mt-2">Aggregate Agent Score</div>
                       </div>
                       <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 flex flex-col items-center">
-                        <ScoreGauge score={deepResult.confidenceScore} label="CONFIDENCE" />
-                        <div className="text-xs text-white/30 font-mono mt-1">Consensus Confidence</div>
+                        <AnimatedGauge score={deepResult.confidenceScore} label="CONFIDENCE" size={160} />
+                        <div className="text-xs text-white/30 font-mono mt-2">Consensus Confidence</div>
                       </div>
-                      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 space-y-2">
+                      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 space-y-3">
                         <div className="text-xs font-mono font-semibold text-white/40 uppercase tracking-widest mb-2">Result</div>
-                        <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold font-mono border ${signalBg(deepResult.overallSignal)}`}>
+                        <div
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold font-mono border ${signalBg(deepResult.overallSignal)}`}
+                          style={{ boxShadow: `0 0 12px ${signalColor(deepResult.overallSignal)}25` }}
+                        >
                           <SignalIcon signal={deepResult.overallSignal} />
                           {deepResult.overallSignal.replace("_", " ")}
                         </div>
-                        <div className={`flex items-center gap-1 text-xs font-mono ${deepResult.consensusReached ? "text-green-400/70" : "text-yellow-400/70"}`}>
-                          {deepResult.consensusReached ? <CheckCircle2 className="w-3 h-3" /> : <AlertTriangle className="w-3 h-3" />}
-                          {deepResult.consensusReached ? "Consensus reached" : "No consensus"}
-                        </div>
-                        <div className="space-y-1 pt-1">
+                        <ConsensusBadge reached={deepResult.consensusReached} signal={deepResult.overallSignal} />
+                        <div className="space-y-1.5 pt-1">
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-mono text-white/30">Latency</span>
                             <span className="text-xs font-mono text-white/60">{latencyMs != null ? `${(latencyMs / 1000).toFixed(1)}s` : "—"}</span>
@@ -715,27 +807,46 @@ export default function StrategyEvaluator() {
                     </div>
 
                     {radarData.length > 0 && (
-                      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5">
+                      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 mt-4">
                         <div className="text-xs font-mono font-semibold text-white/40 uppercase tracking-widest mb-4">Agent Confidence Radar</div>
-                        <div className="h-56">
+                        <div className="h-64">
                           <ResponsiveContainer width="100%" height="100%">
-                            <RadarChart data={radarData}>
-                              <PolarGrid stroke="rgba(255,255,255,0.06)" />
-                              <PolarAngleAxis dataKey="agent" tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10, fontFamily: "monospace" }} />
-                              <Radar dataKey="confidence" stroke="#00d4ff" fill="#00d4ff" fillOpacity={0.12} strokeWidth={1.5} />
+                            <RadarChart data={radarData} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
+                              <PolarGrid stroke="rgba(255,255,255,0.05)" gridType="polygon" />
+                              <PolarAngleAxis
+                                dataKey="agent"
+                                tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11, fontFamily: "monospace" }}
+                              />
+                              <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
+                              <Radar
+                                dataKey="confidence"
+                                stroke="#00d4ff"
+                                fill="#00d4ff"
+                                fillOpacity={0.12}
+                                strokeWidth={2}
+                                dot={{ fill: "#00d4ff", strokeWidth: 0, r: 3 }}
+                                activeDot={{ r: 5, fill: "#00d4ff", strokeWidth: 0 }}
+                              />
+                              <RechartsTooltip content={<CustomRadarTooltip />} />
                             </RadarChart>
                           </ResponsiveContainer>
                         </div>
                       </div>
                     )}
 
-                    <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5">
+                    <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 mt-4">
                       <div className="text-xs font-mono font-semibold text-white/40 uppercase tracking-widest mb-4">Model Score Breakdown</div>
                       <div className="space-y-3">
                         {deepResult.agents.map((agent, i) => {
                           const col = signalColor(agent.signal);
                           return (
-                            <div key={agent.id} className="flex items-center gap-3">
+                            <motion.div
+                              key={agent.id}
+                              className="flex items-center gap-3"
+                              initial={{ opacity: 0, x: -8 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: i * 0.05, duration: 0.3 }}
+                            >
                               <div className="w-5 text-right">
                                 <span className="text-xs font-mono text-white/20">M{i + 1}</span>
                               </div>
@@ -743,7 +854,13 @@ export default function StrategyEvaluator() {
                                 <span className="text-xs font-mono text-white/50 truncate block" title={agent.name}>{agent.name}</span>
                               </div>
                               <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
-                                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${agent.confidence}%`, background: col }} />
+                                <motion.div
+                                  className="h-full rounded-full"
+                                  style={{ background: `linear-gradient(90deg, ${col}60, ${col})` }}
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${agent.confidence}%` }}
+                                  transition={{ duration: 0.8, delay: i * 0.05 + 0.3 }}
+                                />
                               </div>
                               <div className="w-10 text-right">
                                 <span className="text-xs font-mono" style={{ color: col }}>{agent.confidence}</span>
@@ -754,33 +871,33 @@ export default function StrategyEvaluator() {
                                   {agent.signal.slice(0, 4)}
                                 </span>
                               </div>
-                            </div>
+                            </motion.div>
                           );
                         })}
                       </div>
                     </div>
 
                     {deepResult.priceTargets && (
-                      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5">
+                      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 mt-4">
                         <div className="text-xs font-mono font-semibold text-white/40 uppercase tracking-widest mb-4">Price Targets</div>
                         <div className="grid grid-cols-3 gap-4">
-                          <div className="text-center">
-                            <div className="text-xs text-white/30 font-mono mb-1">Bear</div>
-                            <div className="text-lg font-bold font-mono text-red-400">${deepResult.priceTargets.bear}</div>
+                          <div className="text-center bg-red-500/5 border border-red-500/15 rounded-xl py-4">
+                            <div className="text-xs text-red-400/60 font-mono mb-1">Bear</div>
+                            <div className="text-xl font-bold font-mono text-red-400">${deepResult.priceTargets.bear}</div>
                           </div>
-                          <div className="text-center">
+                          <div className="text-center bg-white/[0.03] border border-white/15 rounded-xl py-4">
                             <div className="text-xs text-white/30 font-mono mb-1">Base</div>
-                            <div className="text-lg font-bold font-mono text-white/70">${deepResult.priceTargets.base}</div>
+                            <div className="text-xl font-bold font-mono text-white/70">${deepResult.priceTargets.base}</div>
                           </div>
-                          <div className="text-center">
-                            <div className="text-xs text-white/30 font-mono mb-1">Bull</div>
-                            <div className="text-lg font-bold font-mono text-[#00d4ff]">${deepResult.priceTargets.bull}</div>
+                          <div className="text-center bg-[#00d4ff]/5 border border-[#00d4ff]/20 rounded-xl py-4">
+                            <div className="text-xs text-[#00d4ff]/50 font-mono mb-1">Bull</div>
+                            <div className="text-xl font-bold font-mono text-[#00d4ff]">${deepResult.priceTargets.bull}</div>
                           </div>
                         </div>
                       </div>
                     )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                       {deepResult.riskFactors?.length > 0 && (
                         <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5">
                           <div className="text-xs font-mono font-semibold text-white/40 uppercase tracking-widest mb-3">Risk Factors</div>
@@ -810,17 +927,19 @@ export default function StrategyEvaluator() {
                     </div>
 
                     {deepResult.flashCouncilSummary && (
-                      <div className="bg-[#00d4ff]/[0.04] border border-[#00d4ff]/15 rounded-2xl p-5">
-                        <div className="text-xs font-mono font-semibold text-[#00d4ff]/50 uppercase tracking-widest mb-2">Flash Council Summary</div>
+                      <div className="bg-[#00d4ff]/[0.04] border border-[#00d4ff]/15 rounded-2xl p-5 mt-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Sparkles className="w-3.5 h-3.5 text-[#00d4ff]/50" />
+                          <div className="text-xs font-mono font-semibold text-[#00d4ff]/50 uppercase tracking-widest">Flash Council Summary</div>
+                        </div>
                         <p className="text-sm text-white/60 leading-relaxed">{deepResult.flashCouncilSummary}</p>
                       </div>
                     )}
 
-                    <div className="text-xs text-white/20 font-mono text-center pb-4">{deepResult.disclaimer}</div>
-                  </>
+                    <div className="text-xs text-white/20 font-mono text-center pb-2 mt-2">{deepResult.disclaimer}</div>
+                  </FadeIn>
                 )}
 
-                {/* Error */}
                 {phase === "error" && evalError && (
                   <ErrorPanel error={evalError} onReset={reset} />
                 )}

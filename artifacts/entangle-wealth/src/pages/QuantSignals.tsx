@@ -4,6 +4,7 @@ import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain, TrendingUp, TrendingDown, RefreshCw, Activity,
   ChevronUp, ChevronDown, ChevronsUpDown, Play, Clock, Zap,
@@ -55,7 +56,7 @@ interface EngineStatus {
   errors: number;
 }
 
-type SortField = "score" | "confidence" | "expectedReturn" | "riskScore" | "winRate" | "symbol" | "action";
+type SortField = "score" | "confidence" | "expectedReturn" | "riskScore" | "winRate" | "symbol" | "action" | "maxDrawdown";
 type SortDir = "asc" | "desc";
 type FilterAction = "all" | "BUY" | "SELL";
 type FilterRisk = "all" | "LOW" | "MEDIUM" | "HIGH";
@@ -238,16 +239,40 @@ function SignalsTab() {
       {/* Engine Status */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
         {[
-          { icon: Activity, label: "Status", value: status?.isRunning ? "Running" : "Idle", cls: status?.isRunning ? "text-yellow-400" : "text-green-400" },
-          { icon: Clock, label: "Last Run", value: formatRelative(status?.lastRunAt ?? null), cls: "text-white/80" },
-          { icon: BarChart3, label: "Stocks Scanned", value: status?.stocksScanned?.toLocaleString() ?? "—", cls: "text-white/80" },
-          { icon: Zap, label: "Strategies Run", value: status?.strategiesEvaluated != null ? (status.strategiesEvaluated >= 1000 ? `${(status.strategiesEvaluated / 1000).toFixed(1)}k` : status.strategiesEvaluated.toLocaleString()) : "—", cls: "text-white/80" },
-          { icon: Target, label: "Signals Found", value: status?.signalsGenerated?.toLocaleString() ?? "—", cls: "text-white/80" },
-          { icon: Zap, label: "Run Time", value: status?.totalRunTimeMs ? formatDuration(status.totalRunTimeMs) : "—", cls: "text-white/80" },
-        ].map(({ icon: Icon, label, value, cls }) => (
-          <div key={label} className="bg-white/[0.03] border border-white/8 rounded-xl p-3">
-            <div className="text-xs text-white/40 mb-1 flex items-center gap-1"><Icon className="w-3 h-3" /> {label}</div>
-            <div className={`text-sm font-semibold ${cls}`}>{value}</div>
+          {
+            icon: Activity,
+            label: "Status",
+            value: status?.isRunning ? "Running" : status ? "Idle" : "—",
+            cls: status?.isRunning ? "text-yellow-400" : "text-green-400",
+            pulse: status?.isRunning,
+          },
+          { icon: Clock, label: "Last Run", value: formatRelative(status?.lastRunAt ?? null), cls: "text-white/70", pulse: false },
+          { icon: BarChart3, label: "Stocks Scanned", value: status?.stocksScanned?.toLocaleString() ?? "—", cls: "text-[#00d4ff]/80", pulse: false },
+          {
+            icon: Zap,
+            label: "Strategies Run",
+            value: status?.strategiesEvaluated != null ? (status.strategiesEvaluated >= 1000 ? `${(status.strategiesEvaluated / 1000).toFixed(1)}k` : status.strategiesEvaluated.toLocaleString()) : "—",
+            cls: "text-purple-400/80",
+            pulse: false,
+          },
+          { icon: Target, label: "Signals Found", value: status?.signalsGenerated?.toLocaleString() ?? "—", cls: "text-white/70", pulse: false },
+          { icon: Zap, label: "Run Time", value: status?.totalRunTimeMs ? formatDuration(status.totalRunTimeMs) : "—", cls: "text-white/60", pulse: false },
+        ].map(({ icon: Icon, label, value, cls, pulse }) => (
+          <div
+            key={label}
+            className="bg-white/[0.03] border border-white/8 rounded-xl p-3 transition-all"
+            style={pulse ? { borderColor: "rgba(251,191,36,0.2)", background: "rgba(251,191,36,0.04)", boxShadow: "0 0 12px rgba(251,191,36,0.05)" } : {}}
+          >
+            <div className="text-xs text-white/40 mb-1 flex items-center gap-1">
+              <Icon className="w-3 h-3" /> {label}
+              {pulse && (
+                <span className="ml-auto relative flex">
+                  <span className="animate-ping absolute h-1.5 w-1.5 rounded-full bg-yellow-400 opacity-75" />
+                  <span className="relative rounded-full h-1.5 w-1.5 bg-yellow-400" />
+                </span>
+              )}
+            </div>
+            <div className={`text-sm font-semibold font-mono ${cls}`}>{value}</div>
           </div>
         ))}
       </div>
@@ -338,57 +363,95 @@ function SignalsTab() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/4">
-                {filteredSorted.map((signal, idx) => (
-                  <tr key={`${signal.symbol}-${signal.strategyId}`} className="hover:bg-white/[0.03] transition-colors group">
-                    <td className="px-3 py-2.5 text-white/25 text-xs">{idx + 1}</td>
-                    <td className="px-3 py-2.5"><span className="font-bold text-white">{signal.symbol}</span></td>
-                    <td className="px-3 py-2.5">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold border ${actionBg(signal.action)}`}>
-                        {signal.action === "BUY" ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                        {signal.action}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full ${signal.action === "BUY" ? "bg-[#00d4ff]" : "bg-[#ff3366]"}`} style={{ width: `${signal.confidence}%` }} />
+                {filteredSorted.map((signal, idx) => {
+                  const actionCol = signal.action === "BUY" ? "#00d4ff" : signal.action === "SELL" ? "#ff3366" : "rgba(255,255,255,0.4)";
+                  const scoreCol = signal.score >= 70 ? "#00d4ff" : signal.score >= 50 ? "#a78bfa" : "#ff3366";
+                  return (
+                    <tr
+                      key={`${signal.symbol}-${signal.strategyId}`}
+                      className="transition-all group"
+                      style={{}}
+                      onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = "rgba(255,255,255,0.02)"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = ""; }}
+                    >
+                      <td className="px-3 py-2.5 text-white/20 text-xs font-mono">{idx + 1}</td>
+                      <td className="px-3 py-2.5">
+                        <span className="font-bold text-white font-mono">{signal.symbol}</span>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold border ${actionBg(signal.action)}`}
+                          style={{ boxShadow: `0 0 8px ${actionCol}15` }}
+                        >
+                          {signal.action === "BUY" ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                          {signal.action}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-500"
+                              style={{
+                                width: `${signal.confidence}%`,
+                                background: `linear-gradient(90deg, ${actionCol}60, ${actionCol})`,
+                              }}
+                            />
+                          </div>
+                          <span className="text-xs font-mono font-medium" style={{ color: actionCol }}>{signal.confidence.toFixed(1)}%</span>
                         </div>
-                        <span className={`text-xs font-medium ${actionColor(signal.action)}`}>{signal.confidence.toFixed(1)}%</span>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <span className={`text-xs font-semibold ${signal.expectedReturn >= 0 ? "text-green-400" : "text-red-400"}`}>
-                        {signal.expectedReturn >= 0 ? "+" : ""}{signal.expectedReturn.toFixed(2)}%
-                      </span>
-                    </td>
-                    <td className="px-3 py-2.5"><span className="text-xs text-white/70">{signal.winRate.toFixed(1)}%</span></td>
-                    <td className="px-3 py-2.5"><span className="text-xs text-white/70">{signal.maxDrawdown.toFixed(1)}%</span></td>
-                    <td className="px-3 py-2.5">
-                      <span className={`inline-flex px-2 py-0.5 rounded-md text-xs font-medium border ${riskBadge(signal.riskLevel)}`}>{signal.riskLevel}</span>
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-12 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                          <div className="h-full bg-purple-400 rounded-full" style={{ width: `${Math.min(100, signal.score)}%` }} />
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <span className={`text-xs font-semibold font-mono ${signal.expectedReturn >= 0 ? "text-green-400" : "text-red-400"}`}>
+                          {signal.expectedReturn >= 0 ? "+" : ""}{signal.expectedReturn.toFixed(2)}%
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <span className={`text-xs font-mono ${signal.winRate >= 50 ? "text-green-400/80" : "text-white/50"}`}>
+                          {signal.winRate.toFixed(1)}%
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <span className={`text-xs font-mono ${Math.abs(signal.maxDrawdown) > 20 ? "text-red-400/80" : "text-white/50"}`}>
+                          {signal.maxDrawdown.toFixed(1)}%
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <span className={`inline-flex px-2 py-0.5 rounded-md text-xs font-medium border ${riskBadge(signal.riskLevel)}`}>
+                          {signal.riskLevel}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-12 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full"
+                              style={{
+                                width: `${Math.min(100, signal.score)}%`,
+                                background: scoreCol,
+                                boxShadow: `0 0 6px ${scoreCol}40`,
+                              }}
+                            />
+                          </div>
+                          <span className="text-xs font-semibold font-mono" style={{ color: scoreCol }}>{signal.score.toFixed(1)}</span>
                         </div>
-                        <span className="text-xs font-semibold text-purple-400">{signal.score.toFixed(1)}</span>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2.5 max-w-[200px]">
-                      <div className="truncate text-xs text-white/40" title={signal.strategyName}>{signal.strategyName}</div>
-                      <div className="text-xs text-white/20 font-mono truncate">{signal.strategyId}</div>
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <button
-                        onClick={() => navigate(`/technical?symbol=${signal.symbol}`)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-white/5 text-white/40 hover:text-white"
-                        title={`Open ${signal.symbol} in Technical Analysis`}
-                      >
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-3 py-2.5 max-w-[200px]">
+                        <div className="truncate text-xs text-white/40" title={signal.strategyName}>{signal.strategyName}</div>
+                        <div className="text-[10px] text-white/20 font-mono truncate">{signal.strategyId}</div>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <button
+                          onClick={() => navigate(`/technical?symbol=${signal.symbol}`)}
+                          className="opacity-0 group-hover:opacity-100 transition-all p-1 rounded-md hover:bg-white/8 text-white/30 hover:text-[#00d4ff]"
+                          title={`Open ${signal.symbol} in Technical Analysis`}
+                        >
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

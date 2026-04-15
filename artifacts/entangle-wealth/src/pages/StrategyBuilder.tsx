@@ -9,8 +9,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
+import { motion, AnimatePresence } from "framer-motion";
+import { FadeIn } from "@/components/strategy/PageTransition";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
 
@@ -1048,51 +1050,83 @@ export default function StrategyBuilder() {
 
                 {/* Right: Summary */}
                 <div className="space-y-4">
-                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-4 sticky top-24">
-                    <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">Strategy Preview</div>
-                    <div className="space-y-2.5 text-sm">
-                      <div>
-                        <span className="text-white/40 text-xs">Name</span>
-                        <div className="text-white font-medium">{form.name || "—"}</div>
-                      </div>
-                      <div>
-                        <span className="text-white/40 text-xs">Type</span>
-                        <div className="text-purple-300 font-medium">{INDICATOR_TYPES.find(i => i.value === form.type)?.label}</div>
-                      </div>
-                      <div>
-                        <span className="text-white/40 text-xs">Entry Rules</span>
-                        <div className="text-green-400 text-xs">{form.logic.entry.map(conditionLabel).join(", ") || "None"}</div>
-                      </div>
-                      <div>
-                        <span className="text-white/40 text-xs">Exit Rules</span>
-                        <div className="text-red-400 text-xs">{form.logic.exit.map(conditionLabel).join(", ") || "None"}</div>
-                      </div>
-                      <div>
-                        <span className="text-white/40 text-xs">Assets</span>
-                        <div className="text-[#00d4ff] text-xs font-mono">{form.assets.join(", ") || "None selected"}</div>
-                      </div>
-                      <div>
-                        <span className="text-white/40 text-xs">Timeframe</span>
-                        <div className="text-white/70 text-xs">{form.timeframes.join(", ") || "None"}</div>
-                      </div>
-                      <div>
-                        <span className="text-white/40 text-xs">Parameters</span>
-                        <div className="space-y-1 mt-1">
-                          {Object.entries(form.parameters).map(([k, v]) => (
-                            <div key={k} className="flex justify-between text-xs">
-                              <span className="text-white/40">{k}</span>
-                              <span className="text-white/70 font-mono">{v}</span>
-                            </div>
-                          ))}
+                  <div className="bg-white/[0.02] border border-white/8 rounded-2xl p-5 sticky top-24 space-y-4">
+                    <div>
+                      <div className="text-xs font-mono font-semibold text-white/40 uppercase tracking-widest mb-3">Strategy Preview</div>
+                      {form.name ? (
+                        <div
+                          className="bg-gradient-to-br from-purple-500/10 to-blue-500/5 border border-purple-500/20 rounded-xl px-3 py-2 mb-3"
+                          style={{ boxShadow: "0 0 20px rgba(167,139,250,0.05)" }}
+                        >
+                          <div className="text-white font-bold">{form.name}</div>
+                          <div className="text-purple-300/60 text-xs mt-0.5">{INDICATOR_TYPES.find(i => i.value === form.type)?.label}</div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="bg-white/3 border border-white/8 rounded-xl px-3 py-2 mb-3 text-white/20 text-sm italic">
+                          Enter a strategy name…
+                        </div>
+                      )}
                     </div>
 
-                    <div className="mt-4 pt-4 border-t border-white/5 space-y-2">
+                    <div className="space-y-3">
+                      {form.logic.entry.length > 0 && (
+                        <div>
+                          <div className="text-[10px] font-mono font-semibold text-green-400/50 uppercase tracking-wider mb-1">Entry Rules</div>
+                          <div className="flex flex-wrap gap-1">
+                            {form.logic.entry.map(e => (
+                              <span key={e} className="text-[10px] font-mono px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20 text-green-400">{conditionLabel(e)}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {form.logic.exit.length > 0 && (
+                        <div>
+                          <div className="text-[10px] font-mono font-semibold text-red-400/50 uppercase tracking-wider mb-1">Exit Rules</div>
+                          <div className="flex flex-wrap gap-1">
+                            {form.logic.exit.map(e => (
+                              <span key={e} className="text-[10px] font-mono px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-400">{conditionLabel(e)}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {form.assets.length > 0 && (
+                        <div>
+                          <div className="text-[10px] font-mono font-semibold text-[#00d4ff]/50 uppercase tracking-wider mb-1">Assets</div>
+                          <div className="text-xs font-mono text-[#00d4ff]/70">{form.assets.join(", ")}</div>
+                        </div>
+                      )}
+                      {form.timeframes.length > 0 && (
+                        <div className="flex items-center justify-between">
+                          <div className="text-[10px] font-mono text-white/30 uppercase tracking-wider">Timeframe</div>
+                          <div className="text-xs font-mono text-white/60">{form.timeframes.join(", ")}</div>
+                        </div>
+                      )}
+                      {Object.entries(form.parameters).length > 0 && (
+                        <div>
+                          <div className="text-[10px] font-mono font-semibold text-white/30 uppercase tracking-wider mb-1.5">Parameters</div>
+                          <div className="space-y-1">
+                            {Object.entries(form.parameters).map(([k, v]) => (
+                              <div key={k} className="flex items-center justify-between gap-2">
+                                <span className="text-xs text-white/30 font-mono">{k}</span>
+                                <div className="flex items-center gap-2 flex-1 max-w-[120px]">
+                                  <div className="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
+                                    <div className="h-full bg-purple-400/50 rounded-full" style={{ width: `${Math.min(100, (v / 200) * 100)}%` }} />
+                                  </div>
+                                  <span className="text-xs font-mono text-purple-300/80 w-8 text-right">{v}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-3 border-t border-white/5 space-y-2">
                       <Button
                         onClick={saveStrategy}
                         disabled={saving}
-                        className="w-full bg-purple-600 hover:bg-purple-700 text-sm"
+                        className="w-full font-mono font-bold h-9"
+                        style={{ background: "linear-gradient(135deg, #7c3aed, #6d28d9)", boxShadow: "0 0 20px rgba(124,58,237,0.2)" }}
                         size="sm"
                       >
                         {saving ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Check className="w-4 h-4 mr-1.5" />}
@@ -1118,7 +1152,7 @@ export default function StrategyBuilder() {
                     {/* Result cards */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       <div className={`bg-white/[0.02] border rounded-xl p-4 ${backtestResults.winRate >= 50 ? "border-green-500/20" : "border-red-500/20"}`}>
-                        <div className="text-xs text-white/40 mb-1 flex items-center gap-1"><Target className="w-3 h-3" /> Win Rate</div>
+                        <div className="text-xs text-white/40 mb-1 flex items-center gap-1"><TargetIcon className="w-3 h-3" /> Win Rate</div>
                         <div className={`text-2xl font-bold ${backtestResults.winRate >= 50 ? "text-green-400" : "text-red-400"}`}>
                           {backtestResults.winRate.toFixed(1)}%
                         </div>
@@ -1144,25 +1178,69 @@ export default function StrategyBuilder() {
 
                     {/* Equity curve */}
                     {backtestResults.equityCurve.length > 2 && (
-                      <div className="bg-white/[0.02] border border-white/8 rounded-xl p-4">
-                        <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Equity Curve</div>
-                        <ResponsiveContainer width="100%" height={220}>
-                          <LineChart data={backtestResults.equityCurve}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                            <XAxis dataKey="bar" tick={{ fill: "rgba(255,255,255,0.2)", fontSize: 10 }} />
-                            <YAxis tick={{ fill: "rgba(255,255,255,0.2)", fontSize: 10 }} tickFormatter={(v: number) => `$${v.toFixed(0)}`} />
-                            <Tooltip
-                              contentStyle={{ background: "#0a0e1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 12 }}
-                              formatter={(v: number) => [`$${v.toFixed(2)}`, "Equity"]}
+                      <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="text-xs font-semibold text-white/50 uppercase tracking-wider">Equity Curve</div>
+                          <div className="flex items-center gap-3 text-xs font-mono">
+                            <span className="flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full" style={{ background: backtestResults.avgReturn >= 0 ? "#22c55e" : "#ef4444" }} />
+                              <span className="text-white/40">Equity</span>
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full bg-red-500/60" />
+                              <span className="text-white/40">Drawdown</span>
+                            </span>
+                          </div>
+                        </div>
+                        <ResponsiveContainer width="100%" height={240}>
+                          <AreaChart data={backtestResults.equityCurve} margin={{ top: 4, right: 4, bottom: 0, left: 4 }}>
+                            <defs>
+                              <linearGradient id="equityGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor={backtestResults.avgReturn >= 0 ? "#22c55e" : "#ef4444"} stopOpacity={0.25} />
+                                <stop offset="95%" stopColor={backtestResults.avgReturn >= 0 ? "#22c55e" : "#ef4444"} stopOpacity={0.02} />
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                            <XAxis
+                              dataKey="bar"
+                              tick={{ fill: "rgba(255,255,255,0.2)", fontSize: 10, fontFamily: "monospace" }}
+                              axisLine={false}
+                              tickLine={false}
                             />
-                            <Line
+                            <YAxis
+                              tick={{ fill: "rgba(255,255,255,0.2)", fontSize: 10, fontFamily: "monospace" }}
+                              tickFormatter={(v: number) => `$${v.toFixed(0)}`}
+                              axisLine={false}
+                              tickLine={false}
+                              width={55}
+                            />
+                            <ReferenceLine
+                              y={backtestResults.equityCurve[0]?.equity ?? 100000}
+                              stroke="rgba(255,255,255,0.1)"
+                              strokeDasharray="4 4"
+                            />
+                            <Tooltip
+                              contentStyle={{
+                                background: "#0D1321",
+                                border: "1px solid rgba(255,255,255,0.1)",
+                                borderRadius: 10,
+                                fontSize: 12,
+                                fontFamily: "monospace",
+                              }}
+                              formatter={(v: number) => [`$${v.toFixed(2)}`, "Equity"]}
+                              labelStyle={{ color: "rgba(255,255,255,0.4)", marginBottom: 4 }}
+                            />
+                            <Area
                               type="monotone"
                               dataKey="equity"
                               stroke={backtestResults.avgReturn >= 0 ? "#22c55e" : "#ef4444"}
-                              strokeWidth={1.5}
+                              strokeWidth={2}
+                              fill="url(#equityGrad)"
                               dot={false}
+                              activeDot={{ r: 4, strokeWidth: 0, fill: backtestResults.avgReturn >= 0 ? "#22c55e" : "#ef4444" }}
+                              style={{ filter: `drop-shadow(0 0 6px ${backtestResults.avgReturn >= 0 ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.2)"})` }}
                             />
-                          </LineChart>
+                          </AreaChart>
                         </ResponsiveContainer>
                       </div>
                     )}

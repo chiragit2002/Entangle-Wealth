@@ -14,7 +14,7 @@ interface NavLink { href: string; label: string }
 const CORE_LINKS: NavLink[] = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/stocks", label: "Stocks" },
-  { href: "/quant", label: "Quant Signals" },
+  { href: "/quant-signals", label: "Quant Signals" },
   { href: "/strategy-builder", label: "Strategy Builder" },
   { href: "/evaluate", label: "Evaluator" },
   { href: "/eval-pipeline", label: "Eval Pipeline" },
@@ -29,7 +29,7 @@ const MOBILE_SECTIONS = [
     links: [
       { href: "/dashboard", label: "Dashboard" },
       { href: "/stocks", label: "Stocks" },
-      { href: "/quant", label: "Quant Signals" },
+      { href: "/quant-signals", label: "Quant Signals" },
       { href: "/strategy-builder", label: "Strategy Builder" },
       { href: "/evaluate", label: "Evaluator" },
       { href: "/eval-pipeline", label: "Eval Pipeline" },
@@ -94,58 +94,67 @@ function NavbarComponent() {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isMobileMenuOpen]);
 
-  const navLinks = useMemo(() => {
-    const links = [...CORE_LINKS];
-    if (isAdmin) links.push({ href: "/admin", label: "Admin" });
-    return links;
-  }, [isAdmin]);
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location]);
 
+  const coreLinks = useMemo(() => CORE_LINKS, []);
   const mobileSections = useMemo(() => {
     const sections = [...MOBILE_SECTIONS];
-    if (isAdmin) sections.push({ title: "Admin", links: [{ href: "/admin", label: "Admin Hub" }] });
+    if (isAdmin) {
+      sections.push({ title: "Admin", links: [{ href: "/admin", label: "Admin Hub" }] });
+    }
     return sections;
   }, [isAdmin]);
 
   return (
-    <nav className="sticky top-0 z-50 w-full" aria-label="Main navigation" style={{ background: "var(--nav-bg)", borderBottom: "1px solid rgba(0,180,216,0.12)" }}>
+    <nav className="sticky top-0 z-50 border-b border-[rgba(0,180,216,0.12)]" style={{ background: "var(--nav-bg)" }} role="navigation" aria-label="Main navigation">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-3 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded text-xs font-mono">Skip to content</a>
       <TickerTape />
-      <div className="container mx-auto px-4 md:px-6 h-11 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
-          <img src={logoImg} alt="EntangleWealth logo" className="w-6 h-6 object-contain opacity-90" />
-          <span className="font-mono font-bold text-sm tracking-wider" style={{ color: "#00B4D8" }}>
-            ENTANGLE<span style={{ color: "rgba(0,180,216,0.5)" }}>WEALTH</span>
+      <div className="max-w-[1800px] mx-auto px-3 sm:px-6 flex items-center h-[42px] gap-4">
+        <Link href="/" className="flex items-center gap-2 flex-shrink-0 mr-2">
+          <img src={logoImg} alt="EntangleWealth logo" className="w-[28px] h-[28px] object-contain" />
+          <span className="font-bold text-sm tracking-tight hidden sm:block">
+            <span className="text-foreground">ENTANGLE</span>
+            <span className="text-primary">WEALTH</span>
           </span>
         </Link>
 
-        <div className="hidden lg:flex items-center gap-0 mx-4">
-          {navLinks.map((link) => (
+        <div className="hidden lg:flex items-center gap-0.5 flex-1">
+          {coreLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`text-[11px] font-mono font-semibold uppercase tracking-wider px-2.5 py-1.5 transition-colors duration-150 hover:text-foreground hover:bg-[var(--nav-hover-bg)] ${
-                location === link.href || (link.href !== "/" && location.startsWith(link.href)) ? "text-primary" : "text-muted-foreground"
-              }`}
+              className={`text-[11px] font-mono px-3 py-1.5 transition-colors duration-150 ${location === link.href ? "text-primary bg-primary/10" : "text-muted-foreground hover:bg-[var(--nav-hover-bg)] hover:text-foreground"}`}
             >
               {link.label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link href="/admin" className={`text-[11px] font-mono px-3 py-1.5 transition-colors duration-150 ${location.startsWith("/admin") ? "text-yellow-400 bg-yellow-400/10" : "text-yellow-600 hover:bg-yellow-400/5 hover:text-yellow-400"}`}>
+              Admin
+            </Link>
+          )}
         </div>
 
-        <div className="hidden lg:flex items-center gap-1">
+        <div className="hidden lg:flex items-center gap-1 ml-auto">
           <SystemStatus />
           <ThemeToggle />
           <NotificationCenter />
           <Show when="signed-in">
-            <div className="flex items-center gap-1 ml-1">
-              <Link href="/profile">
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground gap-1.5 text-xs h-7 font-mono">
-                  <User className="w-3 h-3" />{user?.firstName || "PROFILE"}
-                </Button>
-              </Link>
-              <Button variant="ghost" size="sm" aria-label="Sign out" className="text-muted-foreground hover:text-destructive h-7 w-7 p-0" onClick={() => signOut(() => setLocation("/"))}>
-                <LogOut className="w-3 h-3" aria-hidden="true" />
-              </Button>
-            </div>
+            <Link href="/profile">
+              <button className="flex items-center gap-1.5 text-[11px] font-mono px-2 py-1 text-muted-foreground hover:text-foreground hover:bg-[var(--nav-hover-bg)] transition-colors duration-150">
+                <User className="w-3.5 h-3.5" />
+                <span className="hidden xl:inline">{user?.firstName ?? "Profile"}</span>
+              </button>
+            </Link>
+            <button
+              onClick={() => signOut(() => setLocation("/"))}
+              className="flex items-center gap-1.5 text-[11px] font-mono px-2 py-1 text-muted-foreground hover:text-foreground hover:bg-[var(--nav-hover-bg)] transition-colors duration-150"
+              title="Sign out"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
           </Show>
           <Show when="signed-out">
             <Link href="/sign-in"><Button variant="ghost" size="sm" className="h-7 px-3 text-xs text-muted-foreground hover:text-foreground font-mono">SIGN IN</Button></Link>

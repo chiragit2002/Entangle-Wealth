@@ -53,6 +53,7 @@ import quantRouter from "./quant";
 import priceStreamRouter from "./priceStream";
 import strategiesRouter from "./strategies";
 import evaluateRouter from "./evaluate";
+import quantSignalsRouter from "./quantSignals";
 
 export function createRouter(app: Express): IRouter {
 const router: IRouter = Router();
@@ -111,6 +112,7 @@ router.use(quantRouter);
 router.use(priceStreamRouter);
 router.use(strategiesRouter);
 router.use(evaluateRouter);
+router.use(quantSignalsRouter);
 
 return router;
 }

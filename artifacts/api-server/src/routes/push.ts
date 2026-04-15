@@ -21,7 +21,8 @@ function tryConfigureVapid(pub: string, priv: string): boolean {
     webpush.setVapidDetails(vapidSubject, pub, priv);
     activePublicKey = pub;
     return true;
-  } catch {
+  } catch (err) {
+    logger.warn({ error: err }, "Failed to initialize VAPID details");
     return false;
   }
 }

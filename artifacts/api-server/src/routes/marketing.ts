@@ -21,7 +21,8 @@ async function getAnthropicClient() {
     const mod = await import("@workspace/integrations-anthropic-ai");
     _anthropic = mod.anthropic;
     return _anthropic;
-  } catch {
+  } catch (err) {
+    logger.warn({ error: err }, "Anthropic client not available");
     return null;
   }
 }

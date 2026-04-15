@@ -291,7 +291,7 @@ export function closeAllSseConnections(): void {
       res.write(`event: shutdown\ndata: ${JSON.stringify({ type: "shutdown", message: "Server is shutting down." })}\n\n`);
       res.end();
       closed++;
-    } catch { /* connection already gone */ }
+    } catch (err) { logger.debug({ error: err }, "SSE connection already gone during shutdown"); }
   }
   sseGlobalQueue.length = 0;
   sseClients.clear();
@@ -315,7 +315,7 @@ function sseEvictOldestGlobal(): void {
   try {
     res.write(`event: evicted\ndata: ${JSON.stringify({ type: "evicted", message: "Connection evicted due to global SSE limit." })}\n\n`);
     res.end();
-  } catch { /* connection already gone */ }
+  } catch (err) { logger.debug({ error: err }, "SSE connection already gone during global eviction"); }
   sseRemoveClient(userId, res);
   logger.warn({ userId, global: sseGlobalQueue.length, max: SSE_GLOBAL_MAX }, "Evicted oldest global SSE connection (global limit)");
 }
@@ -347,7 +347,7 @@ router.get("/alerts/stream", (req: Request, res: Response) => {
     try {
       oldest.write(`event: evicted\ndata: ${JSON.stringify({ type: "evicted", message: "Connection evicted due to per-user limit." })}\n\n`);
       oldest.end();
-    } catch { /* connection already gone */ }
+    } catch (err) { logger.debug({ error: err }, "SSE connection already gone during per-user eviction"); }
     sseRemoveClient(userId, oldest);
     logger.warn({ userId, perUserMax: SSE_MAX_PER_USER }, "Evicted oldest SSE connection for user (per-user limit)");
   }
@@ -388,7 +388,7 @@ export function pushAlertToUser(userId: string, data: Record<string, unknown>) {
   if (clients) {
     const payload = `data: ${JSON.stringify(data)}\n\n`;
     for (const res of clients) {
-      try { res.write(payload); } catch { /* client gone */ }
+      try { res.write(payload); } catch (err) { logger.debug({ error: err }, "SSE client gone during push"); }
     }
   }
 
@@ -431,7 +431,8 @@ async function fetchSnapshots(symbols: string[]): Promise<Record<string, Snapsho
           return (await res.json()) as Record<string, SnapshotData>;
         }, { label: "alpaca-alerts-snapshots", maxRetries: 4 })
     );
-  } catch {
+  } catch (err) {
+    logger.debug({ error: err }, "Failed to fetch Alpaca snapshots for alerts");
     return {};
   }
 }
@@ -500,7 +501,8 @@ async function fetchBars(symbol: string): Promise<number[]> {
           return (data.bars || []).map((b) => b.c);
         }, { label: "alpaca-alerts-bars", maxRetries: 4 })
     );
-  } catch {
+  } catch (err) {
+    logger.debug({ error: err }, "Failed to fetch Alpaca bars for alerts");
     return [];
   }
 }

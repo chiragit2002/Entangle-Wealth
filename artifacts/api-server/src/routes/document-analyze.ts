@@ -124,7 +124,8 @@ router.post("/analyze-document", requireAuth, validateBody(DocumentAnalyzeSchema
       const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
       const analysis = JSON.parse(cleaned);
       res.json(analysis);
-    } catch {
+    } catch (err) {
+      logger.warn({ error: err, rawContent: content?.slice(0, 200) }, "Failed to parse AI document analysis response");
       res.json({
         docType: "receipt",
         vendor: fileName?.split(".")[0]?.replace(/[-_]/g, " ") || "Unknown",

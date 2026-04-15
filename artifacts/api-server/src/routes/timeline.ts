@@ -260,7 +260,8 @@ async function updateIdentityStage(userId: string, field: "simulationsRun" | "sn
     }
 
     return newStage;
-  } catch {
+  } catch (err) {
+    logger.debug({ error: err }, "Failed to determine identity stage, defaulting to Aware");
     return "Aware";
   }
 }

@@ -8,7 +8,8 @@ async function getSharp() {
   try {
     sharpModule = (await import("sharp")).default as unknown as typeof import("sharp");
     return sharpModule;
-  } catch {
+  } catch (err) {
+    logger.debug({ error: err }, "Sharp module not available for image compression");
     return null;
   }
 }

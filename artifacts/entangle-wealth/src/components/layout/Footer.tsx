@@ -31,11 +31,9 @@ function FooterComponent() {
           </div>
           <div className="flex flex-col gap-2">
             <span className="text-[9px] font-bold uppercase tracking-[0.15em] mb-1" style={{ color: "rgba(255,140,0,0.5)" }}>LEARN</span>
-            <Link href="/blog" className="text-muted-foreground hover:text-foreground transition-colors duration-150">Financial Glossary</Link>
             <Link href="/technical" className="text-muted-foreground hover:text-foreground transition-colors duration-150">Technical Indicators</Link>
             <Link href="/tax-strategy" className="text-muted-foreground hover:text-foreground transition-colors duration-150">Trading Strategies</Link>
             <Link href="/charts" className="text-muted-foreground hover:text-foreground transition-colors duration-150">Chart Patterns</Link>
-            <Link href="/sector-flow" className="text-muted-foreground hover:text-foreground transition-colors duration-150">Sector Analysis</Link>
             <Link href="/screener" className="text-muted-foreground hover:text-foreground transition-colors duration-150">Stock Comparisons</Link>
           </div>
           <div className="flex flex-col gap-2">

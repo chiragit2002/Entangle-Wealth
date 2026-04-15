@@ -57,18 +57,31 @@ const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 if (!clerkPubKey) throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
 
-function stripBase(p: string) { return basePath && p.startsWith(basePath) ? p.slice(basePath.length) || "/" : p; }
-function createQC() { return new QueryClient({ defaultOptions: { queries: { retry: (n, e) => !(e instanceof AuthTokenError) && n < 3 } } }); }
-function useClerkAppearance() { const { resolvedTheme } = useTheme(); return resolvedTheme === "dark" ? clerkAppearanceDark : clerkAppearanceLight; }
+function stripBasePath(path: string) {
+  return basePath && path.startsWith(basePath) ? path.slice(basePath.length) || "/" : path;
+}
+
+function createQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: { retry: (count, error) => !(error instanceof AuthTokenError) && count < 3 },
+    },
+  });
+}
+
+function useClerkAppearance() {
+  const { resolvedTheme } = useTheme();
+  return resolvedTheme === "dark" ? clerkAppearanceDark : clerkAppearanceLight;
+}
 
 function AuthPage({ mode }: { mode: "sign-in" | "sign-up" }) {
   const searchString = useSearch();
   const reason = mode === "sign-in" ? new URLSearchParams(searchString).get("reason") : null;
-  const a = useClerkAppearance();
-  const Comp = mode === "sign-in" ? SignIn : SignUp;
+  const appearance = useClerkAppearance();
+  const AuthComponent = mode === "sign-in" ? SignIn : SignUp;
   return (
     <TerminalAuthShell reason={reason} mode={mode}>
-      <Comp routing="path" path={`${basePath}/${mode}`} signInUrl={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} fallbackRedirectUrl={`${basePath}/dashboard`} appearance={a} />
+      <AuthComponent routing="path" path={`${basePath}/${mode}`} signInUrl={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} fallbackRedirectUrl={`${basePath}/dashboard`} appearance={appearance} />
     </TerminalAuthShell>
   );
 }
@@ -93,60 +106,84 @@ function CacheInvalidator() {
   return null;
 }
 
-function Protected({ component: C }: { component: React.ComponentType }) {
-  const [loc] = useLocation();
-  return <><Show when="signed-in"><C /></Show><Show when="signed-out"><Redirect to={`/sign-in?reason=protected&redirect_url=${encodeURIComponent(loc)}`} /></Show></>;
+function RequireAuth({ component: Component }: { component: React.ComponentType }) {
+  const [location] = useLocation();
+  return (
+    <>
+      <Show when="signed-in"><Component /></Show>
+      <Show when="signed-out">
+        <Redirect to={`/sign-in?reason=protected&redirect_url=${encodeURIComponent(location)}`} />
+      </Show>
+    </>
+  );
 }
-function LP({ component: C }: { component: React.ComponentType }) { return <Suspense fallback={<PageSkeleton />}><C /></Suspense>; }
-function LC({ component: C }: { component: React.ComponentType }) { return <Suspense fallback={<ChartSkeleton />}><C /></Suspense>; }
-function LT({ component: C }: { component: React.ComponentType }) { return <Suspense fallback={<TableSkeleton />}><C /></Suspense>; }
-function LPr({ component: C }: { component: React.ComponentType }) { return <Suspense fallback={<PageSkeleton />}><Protected component={C} /></Suspense>; }
-function Tracker() { usePageTracking(); useUxTracker(); return null; }
+
+function LazyPage({ component: Component }: { component: React.ComponentType }) {
+  return <Suspense fallback={<PageSkeleton />}><Component /></Suspense>;
+}
+
+function LazyChart({ component: Component }: { component: React.ComponentType }) {
+  return <Suspense fallback={<ChartSkeleton />}><Component /></Suspense>;
+}
+
+function LazyTable({ component: Component }: { component: React.ComponentType }) {
+  return <Suspense fallback={<TableSkeleton />}><Component /></Suspense>;
+}
+
+function LazyProtected({ component: Component }: { component: React.ComponentType }) {
+  return <Suspense fallback={<PageSkeleton />}><RequireAuth component={Component} /></Suspense>;
+}
+
+function PageTracker() {
+  usePageTracking();
+  useUxTracker();
+  return null;
+}
 
 function ClerkProviderWithRoutes() {
-  const [, nav] = useLocation();
-  const qc = useMemo(createQC, []);
-  const a = useClerkAppearance();
+  const [, navigate] = useLocation();
+  const queryClient = useMemo(createQueryClient, []);
+  const appearance = useClerkAppearance();
   return (
-    <ClerkProvider publishableKey={clerkPubKey} proxyUrl={clerkProxyUrl} routerPush={(to) => nav(stripBase(to))} routerReplace={(to) => nav(stripBase(to), { replace: true })} appearance={a}>
-      <QueryClientProvider client={qc}>
-        <CacheInvalidator /><Tracker /><AuthErrorHandler />
+    <ClerkProvider publishableKey={clerkPubKey} proxyUrl={clerkProxyUrl} routerPush={(to) => navigate(stripBasePath(to))} routerReplace={(to) => navigate(stripBasePath(to), { replace: true })} appearance={appearance}>
+      <QueryClientProvider client={queryClient}>
+        <CacheInvalidator /><PageTracker /><AuthErrorHandler />
         <TooltipProvider>
           <AuditErrorBoundary>
           <Switch>
-            <Route path="/">{() => <LP component={Home} />}</Route>
-            <Route path="/about">{() => <LP component={About} />}</Route>
-            <Route path="/pricing">{() => <LP component={Pricing} />}</Route>
-            <Route path="/stocks">{() => <LT component={Stocks} />}</Route>
-            <Route path="/status">{() => <LP component={StatusPage} />}</Route>
+            <Route path="/">{() => <LazyPage component={Home} />}</Route>
+            <Route path="/about">{() => <LazyPage component={About} />}</Route>
+            <Route path="/pricing">{() => <LazyPage component={Pricing} />}</Route>
+            <Route path="/stocks">{() => <LazyTable component={Stocks} />}</Route>
+            <Route path="/status">{() => <LazyPage component={StatusPage} />}</Route>
             <Route path="/sign-in/*?" component={() => <AuthPage mode="sign-in" />} />
             <Route path="/sign-up/*?" component={() => <AuthPage mode="sign-up" />} />
-            <Route path="/dashboard">{() => <LPr component={Dashboard} />}</Route>
-            <Route path="/charts">{() => <LC component={Charts} />}</Route>
-            <Route path="/technical">{() => <LC component={TechnicalAnalysis} />}</Route>
-            <Route path="/screener">{() => <LT component={Screener} />}</Route>
-            <Route path="/terminal">{() => <LPr component={Terminal} />}</Route>
-            <Route path="/options">{() => <LPr component={Options} />}</Route>
-            <Route path="/alerts">{() => <LPr component={AlertsPage} />}</Route>
-            <Route path="/tax">{() => <LPr component={Tax} />}</Route>
-            <Route path="/taxgpt">{() => <LPr component={TaxGPT} />}</Route>
-            <Route path="/tax-strategy">{() => <LPr component={TaxStrategy} />}</Route>
-            <Route path="/receipts">{() => <LPr component={Receipts} />}</Route>
-            <Route path="/leaderboard">{() => <LPr component={Leaderboard} />}</Route>
-            <Route path="/achievements">{() => <LPr component={Achievements} />}</Route>
-            <Route path="/gamification">{() => <LPr component={GamificationPage} />}</Route>
-            <Route path="/wallet">{() => <LPr component={TokenWallet} />}</Route>
-            <Route path="/profile">{() => <LPr component={Profile} />}</Route>
-            <Route path="/help">{() => <LP component={HelpPage} />}</Route>
-            <Route path="/submit-ticket">{() => <LPr component={SubmitTicketPage} />}</Route>
-            <Route path="/terms">{() => <LP component={Terms} />}</Route>
-            <Route path="/privacy">{() => <LP component={Privacy} />}</Route>
-            <Route path="/cookies">{() => <LP component={CookiesPage} />}</Route>
-            <Route path="/disclaimer">{() => <LP component={DisclaimerPage} />}</Route>
-            <Route path="/dmca">{() => <LP component={DmcaPage} />}</Route>
-            <Route path="/accessibility">{() => <LP component={AccessibilityPage} />}</Route>
-            <Route path="/admin/:rest*">{() => <LPr component={AdminHubPage} />}</Route>
-            <Route path="/admin">{() => <LPr component={AdminHubPage} />}</Route>
+            <Route path="/dashboard">{() => <LazyProtected component={Dashboard} />}</Route>
+            <Route path="/charts">{() => <LazyChart component={Charts} />}</Route>
+            <Route path="/technical">{() => <LazyChart component={TechnicalAnalysis} />}</Route>
+            <Route path="/screener">{() => <LazyTable component={Screener} />}</Route>
+            <Route path="/terminal">{() => <LazyProtected component={Terminal} />}</Route>
+            <Route path="/options">{() => <LazyProtected component={Options} />}</Route>
+            <Route path="/alerts">{() => <LazyProtected component={AlertsPage} />}</Route>
+            <Route path="/tax">{() => <LazyProtected component={Tax} />}</Route>
+            <Route path="/taxgpt">{() => <LazyProtected component={TaxGPT} />}</Route>
+            <Route path="/tax-strategy">{() => <LazyProtected component={TaxStrategy} />}</Route>
+            <Route path="/receipts">{() => <LazyProtected component={Receipts} />}</Route>
+            <Route path="/leaderboard">{() => <LazyProtected component={Leaderboard} />}</Route>
+            <Route path="/achievements">{() => <LazyProtected component={Achievements} />}</Route>
+            <Route path="/gamification">{() => <LazyProtected component={GamificationPage} />}</Route>
+            <Route path="/wallet">{() => <LazyProtected component={TokenWallet} />}</Route>
+            <Route path="/profile">{() => <LazyProtected component={Profile} />}</Route>
+            <Route path="/help">{() => <LazyPage component={HelpPage} />}</Route>
+            <Route path="/submit-ticket">{() => <LazyProtected component={SubmitTicketPage} />}</Route>
+            <Route path="/terms">{() => <LazyPage component={Terms} />}</Route>
+            <Route path="/privacy">{() => <LazyPage component={Privacy} />}</Route>
+            <Route path="/cookies">{() => <LazyPage component={CookiesPage} />}</Route>
+            <Route path="/disclaimer">{() => <LazyPage component={DisclaimerPage} />}</Route>
+            <Route path="/dmca">{() => <LazyPage component={DmcaPage} />}</Route>
+            <Route path="/accessibility">{() => <LazyPage component={AccessibilityPage} />}</Route>
+            <Route path="/admin/:rest*">{() => <LazyProtected component={AdminHubPage} />}</Route>
+            <Route path="/admin">{() => <LazyProtected component={AdminHubPage} />}</Route>
             <Route component={NotFound} />
           </Switch>
           </AuditErrorBoundary>

@@ -12,6 +12,7 @@ const SSE_THROTTLE_MS = 100;
 
 let activeConnections = 0;
 const connectionsByIp = new Map<string, number>();
+const MAX_TRACKED_IPS = 10_000;
 
 function getClientIp(req: Request): string {
   const forwarded = req.headers["x-forwarded-for"];
@@ -95,7 +96,11 @@ router.get("/price-stream", (req: Request, res: Response) => {
   }
 
   activeConnections++;
-  connectionsByIp.set(clientIp, ipCount + 1);
+  if (connectionsByIp.size >= MAX_TRACKED_IPS && !connectionsByIp.has(clientIp)) {
+    logger.warn({ size: connectionsByIp.size }, "IP tracking map at capacity — allowing without IP tracking");
+  } else {
+    connectionsByIp.set(clientIp, ipCount + 1);
+  }
 
   res.writeHead(200, {
     "Content-Type": "text/event-stream",

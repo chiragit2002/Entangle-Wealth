@@ -11,6 +11,10 @@ const WS_RECONNECT_BASE_MS = 1_000;
 const WS_RECONNECT_MAX_MS = 30_000;
 const WS_STALE_THRESHOLD_MS = 15_000;
 const WS_WATCHDOG_INTERVAL_MS = 5_000;
+const MAX_CACHED_SYMBOLS = 2_000;
+const MAX_SUBSCRIBERS = 5_000;
+const MAX_PERMANENT_SYMBOLS = 500;
+const MAX_WS_SUBSCRIPTIONS = 1_000;
 
 function getAlpacaHeaders(): Record<string, string> {
   const candidates = [
@@ -101,6 +105,15 @@ function upsertPrice(
   const priceChanged = !previous || Math.abs(previous.price - price) / previous.price > PRICE_CHANGE_THRESHOLD;
 
   if (!priceChanged) return null;
+
+  if (currentPrices.size >= MAX_CACHED_SYMBOLS && !currentPrices.has(symbol)) {
+    const oldest = Array.from(currentPrices.entries())
+      .sort((a, b) => a[1].timestamp - b[1].timestamp)[0];
+    if (oldest) {
+      currentPrices.delete(oldest[0]);
+      livePriceCache.delete(`price:${oldest[0]}`);
+    }
+  }
 
   const update: PriceUpdate = {
     symbol,
@@ -261,14 +274,21 @@ function wsSubscribeSymbols(symbols: string[]): void {
   const newSymbols = symbols.filter(s => !wsSubscribedSymbols.has(s));
   if (newSymbols.length === 0) return;
 
+  const remaining = MAX_WS_SUBSCRIPTIONS - wsSubscribedSymbols.size;
+  if (remaining <= 0) {
+    logger.warn({ size: wsSubscribedSymbols.size }, "WS subscription limit reached");
+    return;
+  }
+  const toSubscribe = newSymbols.slice(0, remaining);
+
   wsConnection.send(JSON.stringify({
     action: "subscribe",
-    trades: newSymbols,
-    bars: newSymbols,
+    trades: toSubscribe,
+    bars: toSubscribe,
   }));
 
-  for (const s of newSymbols) wsSubscribedSymbols.add(s);
-  logger.info({ count: newSymbols.length, total: wsSubscribedSymbols.size }, "WebSocket subscribed to symbols");
+  for (const s of toSubscribe) wsSubscribedSymbols.add(s);
+  logger.info({ count: toSubscribe.length, total: wsSubscribedSymbols.size }, "WebSocket subscribed to symbols");
 }
 
 function wsUnsubscribeSymbols(symbols: string[]): void {
@@ -317,7 +337,9 @@ function startWsWatchdog(): void {
       logger.warn({ staleSec: Math.round(elapsed / 1000) }, "WebSocket stale — forcing reconnect + REST fallback");
       activateFallback();
       if (wsConnection) {
-        try { wsConnection.close(); } catch (_) {}
+        try { wsConnection.close(); } catch (err) {
+          logger.debug({ err }, "Error closing stale WebSocket");
+        }
         wsConnection = null;
       }
       wsAuthenticated = false;
@@ -428,7 +450,9 @@ export function stopBroadcaster(): void {
   if (wsWatchdogTimer) { clearInterval(wsWatchdogTimer); wsWatchdogTimer = null; }
 
   if (wsConnection) {
-    try { wsConnection.close(); } catch (_) {}
+    try { wsConnection.close(); } catch (err) {
+      logger.debug({ err }, "Error closing WebSocket during shutdown");
+    }
     wsConnection = null;
   }
   wsAuthenticated = false;
@@ -440,6 +464,10 @@ export function stopBroadcaster(): void {
 export function subscribeToSymbols(symbols: string[], callback: PriceUpdateCallback): () => void {
   for (const symbol of symbols) {
     if (!subscribers.has(symbol)) {
+      if (subscribers.size >= MAX_SUBSCRIBERS) {
+        logger.warn({ size: subscribers.size }, "Subscriber map at capacity — rejecting new symbol subscription");
+        continue;
+      }
       subscribers.set(symbol, new Set());
     }
     subscribers.get(symbol)!.add(callback);
@@ -465,7 +493,7 @@ export function subscribeToSymbols(symbols: string[], callback: PriceUpdateCallb
       await fetchPricesFromAlpaca(uncached);
     }
   };
-  fetchNow().catch(() => {});
+  fetchNow().catch(err => logger.debug({ err }, "Background symbol fetch failed (non-fatal)"));
 
   return function unsubscribe() {
     const orphaned: string[] = [];
@@ -489,6 +517,10 @@ export function subscribeToSymbols(symbols: string[], callback: PriceUpdateCallb
 
 export function ensureSymbolsWatched(symbols: string[]): void {
   for (const sym of symbols) {
+    if (permanentSymbols.size >= MAX_PERMANENT_SYMBOLS) {
+      logger.warn({ size: permanentSymbols.size }, "Permanent symbols at capacity");
+      break;
+    }
     permanentSymbols.add(sym.toUpperCase());
   }
   if (wsAuthenticated) {

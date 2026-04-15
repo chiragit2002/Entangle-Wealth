@@ -49,10 +49,18 @@ export interface StrategyInsight {
   maxDrawdown: number;
 }
 
+export interface MemorySnapshot {
+  shortTerm: EpisodeRecord[];
+  episodes: { count: number; oldestTs: number | null; newestTs: number | null };
+  longTerm: Record<string, StrategyInsight>;
+}
+
+const SHORT_TERM_LIMIT = 50;
 const MAX_EPISODE_BUFFER = 5_000;
 const CONSOLIDATION_INTERVAL_MS = 5 * 60_000;
 const MIN_SAMPLES_FOR_SIGNAL = 3;
 const CONFIDENCE_SAMPLE_CAP = 500;
+const MAX_LONG_TERM_CACHE = 500;
 
 function regimeLabel(regime: string): string {
   return regime.replace(/_/g, " ");
@@ -102,7 +110,9 @@ function generateInsightText(
 }
 
 export class LearningAgent extends BaseAgent {
+  private shortTerm: EpisodeRecord[] = [];
   private episodes: EpisodeRecord[] = [];
+  private longTermCache = new Map<string, StrategyInsight>();
   private currentRegimes = new Map<string, string>();
   private intervalHandle: ReturnType<typeof setInterval> | null = null;
   private consolidationTimer: ReturnType<typeof setInterval> | null = null;
@@ -184,14 +194,20 @@ export class LearningAgent extends BaseAgent {
 
       const drawdown = payload.result?.drawdown ?? 0;
 
-      this.episodes.push({
+      const episode: EpisodeRecord = {
         strategyId,
         regime,
         pnl,
         drawdown,
         timestamp: Date.now(),
-      });
+      };
 
+      this.shortTerm.push(episode);
+      if (this.shortTerm.length > SHORT_TERM_LIMIT) {
+        this.shortTerm.shift();
+      }
+
+      this.episodes.push(episode);
       if (this.episodes.length > MAX_EPISODE_BUFFER) {
         this.episodes = this.episodes.slice(-MAX_EPISODE_BUFFER);
       }
@@ -303,7 +319,7 @@ export class LearningAgent extends BaseAgent {
         const confidence = computeConfidence(totalSamples, winRate, avgPnl);
         const insight = generateInsightText(strategyId, regime, signal, avgPnl, winRate, worstDrawdown);
 
-        generatedInsights.push({
+        const strategyInsight: StrategyInsight = {
           strategy_id: strategyId,
           regime,
           insight,
@@ -313,7 +329,16 @@ export class LearningAgent extends BaseAgent {
           avgPnl,
           winRate,
           maxDrawdown: worstDrawdown,
-        });
+        };
+
+        generatedInsights.push(strategyInsight);
+
+        const cacheKey = `${strategyId}|||${regime}`;
+        this.longTermCache.set(cacheKey, strategyInsight);
+        if (this.longTermCache.size > MAX_LONG_TERM_CACHE) {
+          const oldest = this.longTermCache.keys().next().value;
+          if (oldest) this.longTermCache.delete(oldest);
+        }
       } catch (err) {
         logger.warn({ err, strategyId, regime }, "[LearningAgent] Failed to upsert insight");
       }
@@ -352,6 +377,10 @@ export class LearningAgent extends BaseAgent {
   }
 
   async getInsight(strategyId: string, regime: string): Promise<StrategyInsight | null> {
+    const cacheKey = `${strategyId}|||${regime}`;
+    const cached = this.longTermCache.get(cacheKey);
+    if (cached) return cached;
+
     try {
       const rows = await db
         .select()
@@ -369,7 +398,7 @@ export class LearningAgent extends BaseAgent {
       const confidence = computeConfidence(row.samples, row.winRate, row.avgPnl);
       const insight = generateInsightText(strategyId, regime, signal, row.avgPnl, row.winRate, row.maxDrawdown || 0);
 
-      return {
+      const result: StrategyInsight = {
         strategy_id: strategyId,
         regime,
         insight,
@@ -380,6 +409,14 @@ export class LearningAgent extends BaseAgent {
         winRate: row.winRate,
         maxDrawdown: row.maxDrawdown || 0,
       };
+
+      this.longTermCache.set(cacheKey, result);
+      if (this.longTermCache.size > MAX_LONG_TERM_CACHE) {
+        const oldest = this.longTermCache.keys().next().value;
+        if (oldest) this.longTermCache.delete(oldest);
+      }
+
+      return result;
     } catch (err) {
       logger.warn({ err, strategyId, regime }, "[LearningAgent] Failed to get insight");
       return null;
@@ -443,6 +480,38 @@ export class LearningAgent extends BaseAgent {
       logger.warn({ err }, "[LearningAgent] Failed to get all insights");
       return [];
     }
+  }
+
+  getShortTermMemory(): EpisodeRecord[] {
+    return [...this.shortTerm];
+  }
+
+  getRecentContext(strategyId?: string, regime?: string): EpisodeRecord[] {
+    let filtered = this.shortTerm;
+    if (strategyId) {
+      filtered = filtered.filter(e => e.strategyId === strategyId);
+    }
+    if (regime) {
+      filtered = filtered.filter(e => e.regime === regime);
+    }
+    return [...filtered];
+  }
+
+  getMemorySnapshot(): MemorySnapshot {
+    const longTerm: Record<string, StrategyInsight> = {};
+    for (const [key, value] of this.longTermCache) {
+      longTerm[key.replace("|||", "→")] = value;
+    }
+
+    return {
+      shortTerm: [...this.shortTerm],
+      episodes: {
+        count: this.episodes.length,
+        oldestTs: this.episodes.length > 0 ? this.episodes[0].timestamp : null,
+        newestTs: this.episodes.length > 0 ? this.episodes[this.episodes.length - 1].timestamp : null,
+      },
+      longTerm,
+    };
   }
 
   getEpisodeCount(): number {

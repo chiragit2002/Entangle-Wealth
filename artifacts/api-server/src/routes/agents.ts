@@ -148,6 +148,38 @@ router.get("/agents/learning/insights", requireAuth, async (req: AuthenticatedRe
   }
 });
 
+router.get("/agents/learning/memory", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const learning = getLearningAgent();
+    if (!learning) {
+      res.status(503).json({ error: "LearningAgent not available" });
+      return;
+    }
+
+    const strategyId = req.query.strategy_id as string | undefined;
+    const regime = req.query.regime as string | undefined;
+
+    const snapshot = learning.getMemorySnapshot();
+    const recentContext = learning.getRecentContext(strategyId, regime);
+
+    res.json({
+      shortTerm: {
+        events: recentContext,
+        count: recentContext.length,
+        windowSize: snapshot.shortTerm.length,
+      },
+      episodes: snapshot.episodes,
+      longTerm: {
+        insights: snapshot.longTerm,
+        count: Object.keys(snapshot.longTerm).length,
+      },
+    });
+  } catch (err) {
+    logger.error({ err }, "Failed to fetch learning memory");
+    res.status(500).json({ error: "Failed to fetch learning memory" });
+  }
+});
+
 router.get("/agents/learning/insights/:strategyId/:regime", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const learning = getLearningAgent();

@@ -1,0 +1,166 @@
+SYSTEM MODE: MAX EXECUTION — MULTI-AGENT ORCHESTRATION — NO DRIFT
+
+OBJECTIVE:
+Transform Entangle Wealth into a multi-agent financial system where specialized AI agents operate in parallel to power trading, alerts, portfolio management, tax optimization, and user personalization.
+
+---
+
+CORE ARCHITECTURE:
+
+1. AGENT SYSTEM (MODULAR + SCALABLE)
+
+Create a system of independent AI agents, each with a defined role:
+
+- Market Data Agent → streams real-time stock data
+- Trading Agent → executes buy/sell/long/short logic
+- Portfolio Agent → calculates user holdings + P&L
+- Alert Agent → monitors triggers and sends notifications
+- Risk Agent → evaluates exposure, drawdown, volatility
+- Tax Agent → applies occupation-based deductions
+- Strategy Agent → suggests trades based on patterns
+- User Profile Agent → adapts dashboard per user
+- Sync Agent → ensures all modules stay consistent
+- Recovery Agent → handles failures + reconnections
+
+System must support scaling to 100+ agents.
+
+---
+
+2. AGENT COMMUNICATION (CRITICAL)
+
+- Agents must NOT operate in isolation
+- Use shared state (central database or state manager)
+- Event-driven architecture:
+    trade_executed → portfolio_update → UI_update
+    price_change → alert_check → notification
+
+- No conflicting writes allowed (use locking or atomic updates)
+
+---
+
+3. BACKEND = SINGLE SOURCE OF TRUTH
+
+- All agents read/write to backend only
+- No frontend calculations
+- Database schema must include:
+    users
+    balances
+    transactions
+    positions
+    alerts
+    agent_logs
+
+---
+
+4. REAL-TIME SYSTEM
+
+- Use WebSockets or streaming APIs
+- All agents react to live data:
+    price updates
+    user actions
+    system events
+
+- Dashboard must update instantly across:
+    portfolio
+    alerts
+    trading panel
+
+---
+
+5. TRADING ENGINE (CORE)
+
+- Central execution engine:
+    validate → execute → persist → broadcast
+
+- Support:
+    market orders
+    limit orders
+    stop orders
+    time-based orders
+    long / short positions
+
+---
+
+6. UI / UX (BLOOMBERG-STYLE)
+
+- Dense, fast, data-first interface
+- No gamified visuals (remove orange style)
+- Components:
+    live ticker strip
+    portfolio panel
+    trading panel
+    alert panel
+    system status indicator
+
+- UI reacts to backend events only
+
+---
+
+7. FAILURE HANDLING
+
+- No full-screen crashes
+- If agent fails:
+    isolate failure
+    retry automatically
+    log error
+
+- If data unavailable:
+    freeze last known value
+    show status: DELAYED / DISCONNECTED
+
+---
+
+8. USER PERSONALIZATION
+
+- On login:
+    detect occupation + business status
+
+- Agents collaborate to:
+    select top 4 financial modules
+    customize dashboard layout
+    prioritize tax strategies
+
+---
+
+9. PERFORMANCE + SCALE
+
+- Must handle:
+    thousands of stocks
+    multiple concurrent users
+    continuous data streams
+
+- Optimize:
+    caching
+    batching updates
+    minimizing re-renders
+
+---
+
+10. LOGGING + AUDIT
+
+- Every action must be traceable:
+    trade execution
+    balance change
+    alert trigger
+    agent decision
+
+---
+
+OUTPUT REQUIREMENT:
+
+- Generate full system architecture
+- Include:
+    backend structure (services + agents)
+    database schema
+    event flow diagram (text)
+    UI component structure
+    agent interaction model
+
+- Ensure:
+    zero fake data
+    zero desync
+    zero blocking errors
+
+FINAL RULE:
+This is a financial system simulator — NOT a UI demo.
+All logic must behave like real infrastructure.

@@ -56,16 +56,54 @@ interface RefinementSuggestion {
 }
 
 interface EvalJobResult {
-  score_total: number;
-  scores: EvalScores;
-  confidence: number;
+  strategy_id: number | null;
+  version: string | null;
+  version_hash: string | null;
+  score: {
+    total: number;
+    breakdown: EvalScores;
+    confidence: number;
+  };
+  decision: {
+    status: "ACTIVE" | "LIMITED" | "BLOCKED";
+    reason: string;
+  } | null;
   stress: {
     worst_drawdown: number;
     failure_regimes: string[];
     recovery_time: string;
     results?: StressResult[];
   } | null;
-  refinements: RefinementSuggestion[] | null;
+  failure_surface: {
+    conditions: { regime: string; confidence: number }[];
+  } | null;
+  refinement: {
+    before_score: number;
+    after_score: number;
+    change: number;
+    reason: string;
+    status: "ACCEPTED" | "REJECTED";
+    suggestions: RefinementSuggestion[];
+  } | null;
+  strategy_profile: {
+    type: string;
+    speed: string;
+    risk: string;
+    dependency: string;
+  } | null;
+  metadata: {
+    mode: "fast" | "deep";
+    timestamp: string;
+    engine_version: string;
+  } | null;
+  summary: {
+    summary: string;
+    strengths: string[];
+    weaknesses: string[];
+    best_conditions: string[];
+    break_conditions: string[];
+    score_drivers: Record<string, string>;
+  } | null;
 }
 
 interface SummaryData {
@@ -267,6 +305,7 @@ export default function EvalPipeline() {
   const [strategies, setStrategies] = useState<Strategy[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [evalMode, setEvalMode] = useState<"fast" | "deep">("deep");
   const [runStress, setRunStress] = useState(true);
   const [runRefinement, setRunRefinement] = useState(true);
   const [jobId, setJobId] = useState<string | null>(null);
@@ -316,6 +355,7 @@ export default function EvalPipeline() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           strategy_id: selectedId,
+          mode: evalMode,
           dataset: { range: "1y", resolution: "1m" },
           options: { run_stress: runStress, run_refinement: runRefinement },
         }),
@@ -347,7 +387,7 @@ export default function EvalPipeline() {
           if (pollRef.current) clearInterval(pollRef.current);
           setEvalResult(data.result);
           setView("results");
-          fetchSummary();
+          if (!data.result.summary) fetchSummary();
         } else if (data.status === "failed") {
           if (pollRef.current) clearInterval(pollRef.current);
           toast({ title: "Evaluation failed", description: data.error ?? "Unknown error", variant: "destructive" });
@@ -549,26 +589,47 @@ export default function EvalPipeline() {
                       animate={{ opacity: 1, y: 0 }}
                       className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4"
                     >
-                      <div className="text-xs font-semibold text-white/50 uppercase tracking-wider">Evaluation Options</div>
-                      <div className="flex gap-4">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" checked={runStress} onChange={e => setRunStress(e.target.checked)} className="accent-[#00D4FF]" />
-                          <span className="text-sm text-white/70">Run Stress Tests</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" checked={runRefinement} onChange={e => setRunRefinement(e.target.checked)} className="accent-[#00D4FF]" />
-                          <span className="text-sm text-white/70">Run Parameter Refinement</span>
-                        </label>
+                      <div className="text-xs font-semibold text-white/50 uppercase tracking-wider">Evaluation Mode</div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => setEvalMode("fast")}
+                          className={`p-3 rounded-xl border text-left transition-all ${evalMode === "fast" ? "border-[#00D4FF]/50 bg-[#00D4FF]/5" : "border-white/8 hover:border-white/15"}`}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <Zap className="w-4 h-4 text-yellow-400" />
+                            <span className="text-sm font-semibold text-white">Fast</span>
+                            {evalMode === "fast" && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#00D4FF]" />}
+                          </div>
+                          <p className="text-xs text-white/40">Scores only — no stress or refinement</p>
+                        </button>
+                        <button
+                          onClick={() => setEvalMode("deep")}
+                          className={`p-3 rounded-xl border text-left transition-all ${evalMode === "deep" ? "border-purple-500/50 bg-purple-500/5" : "border-white/8 hover:border-white/15"}`}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <BarChart3 className="w-4 h-4 text-purple-400" />
+                            <span className="text-sm font-semibold text-white">Deep</span>
+                            {evalMode === "deep" && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-purple-400" />}
+                          </div>
+                          <p className="text-xs text-white/40">Full pipeline with stress & refinement</p>
+                        </button>
                       </div>
+
+                      {evalMode === "deep" && (
+                        <div className="flex gap-2 text-xs text-white/35 bg-purple-500/5 border border-purple-500/15 rounded-lg px-3 py-2">
+                          <BarChart3 className="w-3.5 h-3.5 text-purple-400 flex-shrink-0 mt-0.5" />
+                          <span>Deep mode runs the full pipeline: M1–M6 scoring, stress testing (3 scenarios), and parameter refinement</span>
+                        </div>
+                      )}
 
                       <Button
                         onClick={submitEval}
                         disabled={submitting}
-                        style={{ background: "linear-gradient(135deg, #00D4FF, #0099cc)", color: "#000", boxShadow: "0 0 20px rgba(0,212,255,0.2)" }}
+                        style={{ background: evalMode === "fast" ? "linear-gradient(135deg, #f59e0b, #d97706)" : "linear-gradient(135deg, #00D4FF, #0099cc)", color: "#000", boxShadow: evalMode === "fast" ? "0 0 20px rgba(245,158,11,0.2)" : "0 0 20px rgba(0,212,255,0.2)" }}
                         className="font-semibold"
                       >
                         {submitting ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Play className="w-4 h-4 mr-1.5" />}
-                        Run Full Evaluation
+                        {evalMode === "fast" ? "Run Fast Evaluation" : "Run Deep Evaluation"}
                       </Button>
                     </motion.div>
                   )}
@@ -601,34 +662,65 @@ export default function EvalPipeline() {
 
               {view === "results" && evalResult && (
                 <motion.div key="results" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
+
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {evalResult.decision && (() => {
+                      const { status, reason } = evalResult.decision;
+                      const badgeConfig = {
+                        ACTIVE: { bg: "bg-green-500/10", border: "border-green-500/30", text: "text-green-400", glow: "rgba(34,197,94,0.15)", icon: <CheckCircle2 className="w-4 h-4" /> },
+                        LIMITED: { bg: "bg-yellow-500/10", border: "border-yellow-500/30", text: "text-yellow-400", glow: "rgba(234,179,8,0.15)", icon: <AlertTriangle className="w-4 h-4" /> },
+                        BLOCKED: { bg: "bg-red-500/10", border: "border-red-500/30", text: "text-red-400", glow: "rgba(239,68,68,0.15)", icon: <XCircle className="w-4 h-4" /> },
+                      }[status];
+                      return (
+                        <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${badgeConfig.bg} ${badgeConfig.border}`}
+                          style={{ boxShadow: `0 0 20px ${badgeConfig.glow}` }}>
+                          <span className={badgeConfig.text}>{badgeConfig.icon}</span>
+                          <span className={`font-bold font-mono text-sm ${badgeConfig.text}`}>{status}</span>
+                          <span className="text-white/40 text-xs ml-1 hidden sm:inline">— {reason}</span>
+                        </div>
+                      );
+                    })()}
+                    {evalResult.metadata && (
+                      <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/8 bg-white/[0.02]">
+                        {evalResult.metadata.mode === "fast"
+                          ? <Zap className="w-3.5 h-3.5 text-yellow-400" />
+                          : <BarChart3 className="w-3.5 h-3.5 text-purple-400" />}
+                        <span className="text-xs font-mono text-white/50 capitalize">{evalResult.metadata.mode} mode</span>
+                        <span className="text-white/20 text-xs">· v{evalResult.metadata.engine_version}</span>
+                      </div>
+                    )}
+                    {evalResult.version && (
+                      <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/8 bg-white/[0.02]">
+                        <Hash className="w-3.5 h-3.5 text-white/30" />
+                        <span className="text-xs font-mono text-white/40">v{evalResult.version}</span>
+                        {evalResult.version_hash && <span className="text-white/20 text-xs">{evalResult.version_hash}</span>}
+                      </div>
+                    )}
+                  </div>
+
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 flex flex-col items-center">
                       <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Total Score</div>
-                      <AnimatedGauge score={evalResult.score_total} label="TOTAL" size={180} />
+                      <AnimatedGauge score={evalResult.score.total} label="TOTAL" size={180} />
                       <div className="mt-4 text-center">
                         <div className="text-xs text-white/40 mb-1">Confidence</div>
                         <div className="text-2xl font-bold text-[#00D4FF] font-mono" style={{ textShadow: "0 0 12px rgba(0,212,255,0.4)" }}>
-                          {(evalResult.confidence * 100).toFixed(0)}%
+                          {(evalResult.score.confidence * 100).toFixed(0)}%
                         </div>
                       </div>
                     </div>
 
                     <div className="lg:col-span-2 bg-white/[0.02] border border-white/8 rounded-xl p-5">
                       <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Model Score Radar</div>
-                      <ModelRadar scores={evalResult.scores} />
+                      <ModelRadar scores={evalResult.score.breakdown} />
                       <div className="grid grid-cols-3 gap-2 mt-2">
-                        {Object.entries(evalResult.scores).map(([key, val]) => (
+                        {Object.entries(evalResult.score.breakdown).map(([key, val]) => (
                           <div key={key} className="flex items-center justify-between bg-white/[0.03] border border-white/6 rounded-lg px-3 py-2">
                             <div className="flex items-center gap-1.5">
                               <div className="w-1.5 h-1.5 rounded-full" style={{ background: MODEL_COLORS[key] }} />
                               <span className="text-xs text-white/40">{MODEL_LABELS[key]?.split(" ")[0]}</span>
                             </div>
-                            <span
-                              className="text-sm font-bold font-mono"
-                              style={{ color: MODEL_COLORS[key] }}
-                            >
-                              {val}
-                            </span>
+                            <span className="text-sm font-bold font-mono" style={{ color: MODEL_COLORS[key] }}>{val}</span>
                           </div>
                         ))}
                       </div>
@@ -638,17 +730,33 @@ export default function EvalPipeline() {
                   <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5">
                     <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Per-Model Rings</div>
                     <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
-                      {Object.entries(evalResult.scores).map(([key, val]) => (
-                        <ScoreRing
-                          key={key}
-                          score={val}
-                          size={80}
-                          label={`${key}\n${MODEL_LABELS[key]?.split(" ")[0]}`}
-                          color={MODEL_COLORS[key]}
-                        />
+                      {Object.entries(evalResult.score.breakdown).map(([key, val]) => (
+                        <ScoreRing key={key} score={val} size={80} label={`${key}\n${MODEL_LABELS[key]?.split(" ")[0]}`} color={MODEL_COLORS[key]} />
                       ))}
                     </div>
                   </div>
+
+                  {evalResult.strategy_profile && (
+                    <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-[#00D4FF]" />
+                        <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Strategy Profile</span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {[
+                          { label: "Type", value: evalResult.strategy_profile.type.replace(/_/g, " "), color: "#00d4ff" },
+                          { label: "Speed", value: evalResult.strategy_profile.speed, color: "#f59e0b" },
+                          { label: "Risk", value: evalResult.strategy_profile.risk.replace(/_/g, " "), color: evalResult.strategy_profile.risk === "low" ? "#10b981" : evalResult.strategy_profile.risk === "high" ? "#ef4444" : "#f59e0b" },
+                          { label: "Dependency", value: evalResult.strategy_profile.dependency.replace(/_/g, " "), color: "#a78bfa" },
+                        ].map(item => (
+                          <div key={item.label} className="bg-white/[0.03] border border-white/6 rounded-lg p-3">
+                            <div className="text-[10px] text-white/35 font-mono uppercase tracking-wider mb-1">{item.label}</div>
+                            <div className="text-sm font-semibold capitalize" style={{ color: item.color }}>{item.value}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {evalResult.stress && (
                     <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
@@ -683,59 +791,104 @@ export default function EvalPipeline() {
                     </div>
                   )}
 
-                  {evalResult.refinements && evalResult.refinements.length > 0 && (
-                    <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
+                  {evalResult.failure_surface && evalResult.failure_surface.conditions.length > 0 && (
+                    <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-3">
                       <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-purple-400" />
-                        <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Parameter Refinements</span>
-                        <span className="text-[10px] font-mono text-purple-400/60 bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 rounded ml-1">
-                          {evalResult.refinements.length} suggestions
+                        <AlertTriangle className="w-4 h-4 text-red-400" />
+                        <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Failure Surface</span>
+                        <span className="text-[10px] font-mono text-red-400/60 bg-red-500/10 border border-red-500/20 px-1.5 py-0.5 rounded ml-1">
+                          {evalResult.failure_surface.conditions.length} condition{evalResult.failure_surface.conditions.length !== 1 ? "s" : ""}
                         </span>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {evalResult.refinements.map((r, i) => (
-                          <BeforeAfterCard
-                            key={i}
-                            param={r.param}
-                            oldValue={r.old}
-                            newValue={r.new}
-                            impact={r.impact}
-                          />
+                      <div className="space-y-2">
+                        {evalResult.failure_surface.conditions.map((c, i) => (
+                          <div key={i} className="flex items-center gap-3 bg-red-500/5 border border-red-500/15 rounded-lg px-4 py-2.5">
+                            <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                            <span className="text-sm text-white/70 capitalize flex-1">{c.regime.replace(/_/g, " ")}</span>
+                            <div className="flex items-center gap-2">
+                              <div className="h-1.5 w-20 bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full rounded-full bg-red-400" style={{ width: `${(c.confidence * 100).toFixed(0)}%` }} />
+                              </div>
+                              <span className="text-xs font-mono text-red-400">{(c.confidence * 100).toFixed(0)}%</span>
+                            </div>
+                          </div>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {summaryData && (
+                  {evalResult.refinement && (
+                    <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Sparkles className="w-4 h-4 text-purple-400" />
+                        <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Parameter Refinement</span>
+                        <span className={`text-[10px] font-mono font-semibold px-2 py-0.5 rounded border ml-1 ${
+                          evalResult.refinement.status === "ACCEPTED"
+                            ? "bg-green-500/10 border-green-500/25 text-green-400"
+                            : "bg-red-500/10 border-red-500/25 text-red-400"
+                        }`}>
+                          {evalResult.refinement.status}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="bg-white/[0.02] border border-white/8 rounded-lg p-3 text-center">
+                          <div className="text-xs text-white/40 mb-1">Before</div>
+                          <div className="text-xl font-bold font-mono text-white/60">{evalResult.refinement.before_score.toFixed(1)}</div>
+                        </div>
+                        <div className="bg-white/[0.02] border border-white/8 rounded-lg p-3 text-center flex flex-col items-center justify-center">
+                          <div className="text-xs text-white/40 mb-1">Change</div>
+                          <div className={`text-lg font-bold font-mono ${evalResult.refinement.change >= 0 ? "text-green-400" : "text-red-400"}`}>
+                            {evalResult.refinement.change >= 0 ? "+" : ""}{evalResult.refinement.change.toFixed(1)}
+                          </div>
+                        </div>
+                        <div className="bg-white/[0.02] border border-white/8 rounded-lg p-3 text-center">
+                          <div className="text-xs text-white/40 mb-1">After</div>
+                          <div className="text-xl font-bold font-mono text-[#00D4FF]">{evalResult.refinement.after_score.toFixed(1)}</div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-white/40 italic">{evalResult.refinement.reason}</p>
+                      {evalResult.refinement.suggestions.length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {evalResult.refinement.suggestions.map((r, i) => (
+                            <BeforeAfterCard key={i} param={r.param} oldValue={r.old} newValue={r.new} impact={r.impact} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {(evalResult.summary ?? summaryData) && (() => {
+                    const sd = evalResult.summary ?? summaryData!;
+                    return (
                     <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
                       <div className="flex items-center gap-2">
                         <FileText className="w-4 h-4 text-[#00D4FF]" />
                         <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Strategy Summary</span>
                       </div>
-                      <p className="text-sm text-white/70 leading-relaxed">{summaryData.summary}</p>
+                      <p className="text-sm text-white/70 leading-relaxed">{sd.summary}</p>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <div className="text-xs font-semibold text-green-400 mb-1">Strengths</div>
                           <div className="flex flex-wrap gap-1">
-                            {summaryData.strengths.map(s => (
+                            {sd.strengths.map(s => (
                               <span key={s} className="px-2 py-0.5 rounded text-xs bg-green-500/10 border border-green-500/20 text-green-400 capitalize">{s}</span>
                             ))}
-                            {summaryData.strengths.length === 0 && <span className="text-xs text-white/30">None identified</span>}
+                            {sd.strengths.length === 0 && <span className="text-xs text-white/30">None identified</span>}
                           </div>
                         </div>
                         <div>
                           <div className="text-xs font-semibold text-red-400 mb-1">Weaknesses</div>
                           <div className="flex flex-wrap gap-1">
-                            {summaryData.weaknesses.map(w => (
+                            {sd.weaknesses.map(w => (
                               <span key={w} className="px-2 py-0.5 rounded text-xs bg-red-500/10 border border-red-500/20 text-red-400 capitalize">{w}</span>
                             ))}
-                            {summaryData.weaknesses.length === 0 && <span className="text-xs text-white/30">None identified</span>}
+                            {sd.weaknesses.length === 0 && <span className="text-xs text-white/30">None identified</span>}
                           </div>
                         </div>
                         <div>
                           <div className="text-xs font-semibold text-[#00D4FF] mb-1">Best Conditions</div>
                           <div className="flex flex-wrap gap-1">
-                            {summaryData.best_conditions.map(c => (
+                            {sd.best_conditions.map(c => (
                               <span key={c} className="px-2 py-0.5 rounded text-xs bg-[#00D4FF]/10 border border-[#00D4FF]/20 text-[#00D4FF] capitalize">{c}</span>
                             ))}
                           </div>
@@ -743,14 +896,15 @@ export default function EvalPipeline() {
                         <div>
                           <div className="text-xs font-semibold text-orange-400 mb-1">Break Conditions</div>
                           <div className="flex flex-wrap gap-1">
-                            {summaryData.break_conditions.map(c => (
+                            {sd.break_conditions.map(c => (
                               <span key={c} className="px-2 py-0.5 rounded text-xs bg-orange-500/10 border border-orange-500/20 text-orange-400 capitalize">{c}</span>
                             ))}
                           </div>
                         </div>
                       </div>
                     </div>
-                  )}
+                    );
+                  })()}
 
                   <div className="flex gap-3">
                     <Button variant="outline" size="sm" onClick={resetToSelect} className="border-white/10 text-white/60">

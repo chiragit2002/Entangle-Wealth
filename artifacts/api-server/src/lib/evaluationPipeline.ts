@@ -1,6 +1,6 @@
 import { db } from "@workspace/db";
-import { strategyEvaluationsTable, customStrategiesTable } from "@workspace/db/schema";
-import { eq } from "drizzle-orm";
+import { strategyEvaluationsTable, customStrategiesTable, strategyVersionsTable } from "@workspace/db/schema";
+import { desc, eq } from "drizzle-orm";
 import { logger } from "./logger.js";
 import {
   sma, ema, emaArray, rsi, macd, stochastic, bollinger,
@@ -54,6 +54,38 @@ export interface EvalSummary {
   break_conditions: string[];
   score_drivers: Record<string, string>;
 }
+
+export interface DecisionResult {
+  status: "ACTIVE" | "LIMITED" | "BLOCKED";
+  reason: string;
+}
+
+export interface FailureSurfaceCondition {
+  regime: string;
+  confidence: number;
+}
+
+export interface FailureSurface {
+  conditions: FailureSurfaceCondition[];
+}
+
+export interface StrategyProfile {
+  type: "trend_follower" | "mean_reverter" | "momentum" | "balanced";
+  speed: "fast" | "medium" | "slow";
+  risk: "low" | "moderate" | "moderate_high" | "high";
+  dependency: "momentum" | "volume" | "mean_reversion";
+}
+
+export interface EnrichedRefinement {
+  before_score: number;
+  after_score: number;
+  change: number;
+  reason: string;
+  status: "ACCEPTED" | "REJECTED";
+  suggestions: RefinementSuggestion[];
+}
+
+export type EvalMode = "fast" | "deep";
 
 const MODEL_NAMES: Record<string, string> = {
   M1: "Trend Alignment",
@@ -408,6 +440,161 @@ export function generateSummary(scores: EvalScores, stressResults: StressResult[
   return { summary, strengths, weaknesses, best_conditions, break_conditions, score_drivers };
 }
 
+export function computeDecision(
+  scoreTotal: number,
+  confidence: number,
+  stressResults: StressResult[],
+): DecisionResult {
+  const failureRegimes = stressResults.filter(s => s.failure).map(s => s.scenario);
+  const worstDD = stressResults.length > 0 ? Math.min(...stressResults.map(s => s.max_drawdown)) : 0;
+
+  if (scoreTotal < 60 || failureRegimes.length > 1 || worstDD < -25) {
+    const reasons: string[] = [];
+    if (scoreTotal < 60) reasons.push(`score ${scoreTotal.toFixed(1)} below threshold`);
+    if (failureRegimes.length > 1) reasons.push(`fails in ${failureRegimes.length} regimes`);
+    if (worstDD < -25) reasons.push(`${Math.abs(worstDD).toFixed(1)}% max drawdown detected`);
+    return { status: "BLOCKED", reason: reasons.join("; ") };
+  }
+
+  if (scoreTotal >= 75 && confidence >= 0.75 && failureRegimes.length === 0) {
+    return {
+      status: "ACTIVE",
+      reason: `High confidence (${(confidence * 100).toFixed(0)}%) with no failure regimes detected`,
+    };
+  }
+
+  const reasons: string[] = [];
+  if (scoreTotal < 75) reasons.push(`moderate score ${scoreTotal.toFixed(1)}`);
+  if (confidence < 0.75) reasons.push(`confidence ${(confidence * 100).toFixed(0)}%`);
+  if (failureRegimes.length === 1) reasons.push(`1 failure regime (${failureRegimes[0]!.replace(/_/g, " ")})`);
+  if (worstDD < -15) reasons.push(`drawdown risk ${Math.abs(worstDD).toFixed(1)}%`);
+  return { status: "LIMITED", reason: reasons.join("; ") || "moderate performance indicators" };
+}
+
+export function computeFailureSurface(stressResults: StressResult[]): FailureSurface {
+  const failedResults = stressResults.filter(s => s.failure);
+  const conditions: FailureSurfaceCondition[] = failedResults.map(r => {
+    const ddSeverity = Math.min(1.0, Math.abs(r.max_drawdown) / 30);
+    const scoreSeverity = Math.min(1.0, Math.max(0, (60 - r.score) / 30));
+    const confidence = +(Math.min(0.99, (ddSeverity + scoreSeverity) / 2)).toFixed(2);
+    return { regime: r.scenario, confidence };
+  });
+  return { conditions };
+}
+
+export function computeStrategyProfile(
+  scores: EvalScores,
+  config: CustomStrategyConfig,
+): StrategyProfile {
+  const { M1, M2, M3, M4, M5 } = scores;
+
+  let type: StrategyProfile["type"];
+  if (M1 >= 70 && M3 >= 65) {
+    type = "trend_follower";
+  } else if (M2 >= 70) {
+    type = "mean_reverter";
+  } else if (M3 >= 70) {
+    type = "momentum";
+  } else {
+    type = "balanced";
+  }
+
+  const timeframe = (config.timeframes[0] ?? "1Day").toLowerCase();
+  let speed: StrategyProfile["speed"];
+  if (timeframe.includes("min") || timeframe.includes("1h")) {
+    speed = "fast";
+  } else if (timeframe.includes("day") || timeframe.includes("1d")) {
+    speed = "medium";
+  } else {
+    speed = "slow";
+  }
+
+  let risk: StrategyProfile["risk"];
+  if (M4 >= 75) {
+    risk = "low";
+  } else if (M4 >= 60) {
+    risk = "moderate";
+  } else if (M4 >= 45) {
+    risk = "moderate_high";
+  } else {
+    risk = "high";
+  }
+
+  let dependency: StrategyProfile["dependency"];
+  if (M5 >= M1 && M5 >= M2) {
+    dependency = "volume";
+  } else if (M2 >= M1) {
+    dependency = "mean_reversion";
+  } else {
+    dependency = "momentum";
+  }
+
+  return { type, speed, risk, dependency };
+}
+
+export function computeEnrichedRefinement(
+  beforeScore: number,
+  changes: RefinementSuggestion[],
+  scoreDelta: number,
+  baseStressResults: StressResult[],
+  refinedStressResults: StressResult[],
+): EnrichedRefinement {
+  const afterScore = +(beforeScore + scoreDelta).toFixed(1);
+
+  if (changes.length === 0) {
+    return {
+      before_score: beforeScore,
+      after_score: beforeScore,
+      change: 0,
+      reason: "No parameter changes found — insufficient parameter variation",
+      status: "REJECTED",
+      suggestions: [],
+    };
+  }
+
+  if (scoreDelta < 1.0) {
+    return {
+      before_score: beforeScore,
+      after_score: afterScore,
+      change: scoreDelta,
+      reason: `Score improvement of ${scoreDelta.toFixed(1)} is below minimum threshold (1.0) — low robustness`,
+      status: "REJECTED",
+      suggestions: changes,
+    };
+  }
+
+  const baseFailures = baseStressResults.filter(s => s.failure).length;
+  const refinedFailures = refinedStressResults.filter(s => s.failure).length;
+  const avgBaseDD = baseStressResults.length > 0
+    ? baseStressResults.reduce((s, r) => s + r.max_drawdown, 0) / baseStressResults.length : 0;
+  const avgRefinedDD = refinedStressResults.length > 0
+    ? refinedStressResults.reduce((s, r) => s + r.max_drawdown, 0) / refinedStressResults.length : 0;
+  const drawdownWorsened = avgRefinedDD < avgBaseDD - 3;
+  const moreFailures = refinedFailures > baseFailures;
+
+  if (drawdownWorsened || moreFailures) {
+    return {
+      before_score: beforeScore,
+      after_score: afterScore,
+      change: scoreDelta,
+      reason: `Score improved but stress results worsened — possible overfit (drawdown delta: ${(avgRefinedDD - avgBaseDD).toFixed(1)}%)`,
+      status: "REJECTED",
+      suggestions: changes,
+    };
+  }
+
+  return {
+    before_score: beforeScore,
+    after_score: afterScore,
+    change: scoreDelta,
+    reason: `${changes.length} parameter${changes.length > 1 ? "s" : ""} optimized with verified stress improvement`,
+    status: "ACCEPTED",
+    suggestions: changes,
+  };
+}
+
+const ENGINE_VERSION = "2.1.0";
+
 const runningJobs = new Map<string, boolean>();
 
 export async function executeEvaluation(jobId: string): Promise<void> {
@@ -481,12 +668,16 @@ export async function executeEvaluation(jobId: string): Promise<void> {
     const scoreT = totalScore(scores);
     const confidence = computeConfidence(scores);
 
+    const mode: EvalMode = (!job.runStress && !job.runRefinement) ? "fast" : "deep";
+
+    let stressResults: StressResult[] = [];
     let stressJson: Record<string, unknown> | null = null;
+    let enrichedRefinement: EnrichedRefinement | null = null;
     let refinementsJson: RefinementSuggestion[] | null = null;
 
     if (job.runStress) {
       const scenarios = ["high_volatility", "low_liquidity", "range_bound"];
-      const stressResults = runStressTest(data, config, scenarios);
+      stressResults = runStressTest(data, config, scenarios);
       const worstDD = Math.min(...stressResults.map(s => s.max_drawdown));
       const failureRegimes = stressResults.filter(s => s.failure).map(s => s.scenario);
       const recoveryBars = Math.ceil(Math.abs(worstDD) / 5);
@@ -499,11 +690,61 @@ export async function executeEvaluation(jobId: string): Promise<void> {
     }
 
     if (job.runRefinement) {
+      const baseScoreT = scoreT;
+      const baseStress = job.runStress ? stressResults : runStressTest(data, config, ["high_volatility", "low_liquidity", "range_bound"]);
       const refResult = runRefinement(data, config, { min_score: 85 });
       refinementsJson = refResult.changes;
+
+      const refinedParams = { ...config.parameters };
+      for (const c of refResult.changes) refinedParams[c.param] = c.new;
+      const refinedConfig = { ...config, parameters: refinedParams };
+      const refinedStress = runStressTest(data, refinedConfig, ["high_volatility", "low_liquidity", "range_bound"]);
+
+      enrichedRefinement = computeEnrichedRefinement(
+        baseScoreT,
+        refResult.changes,
+        refResult.score_delta,
+        baseStress,
+        refinedStress,
+      );
     }
 
-    const summaryResult = generateSummary(scores, stressJson?.results as StressResult[] ?? []);
+    const decision = computeDecision(scoreT, confidence, stressResults);
+    const failureSurface = computeFailureSurface(stressResults);
+    const strategyProfile = computeStrategyProfile(scores, config);
+
+    const latestVersion = await db
+      .select()
+      .from(strategyVersionsTable)
+      .where(eq(strategyVersionsTable.strategyId, job.strategyId!))
+      .orderBy(desc(strategyVersionsTable.createdAt))
+      .limit(1);
+
+    const versionRecord = latestVersion[0] ?? null;
+
+    const summaryResult = generateSummary(scores, stressResults);
+
+    const unifiedEnvelope = {
+      strategy_id: job.strategyId,
+      version: versionRecord?.version ?? null,
+      version_hash: versionRecord?.versionHash ?? null,
+      score: {
+        total: scoreT,
+        breakdown: scores,
+        confidence,
+      },
+      decision,
+      stress: stressJson ?? null,
+      failure_surface: failureSurface,
+      refinement: enrichedRefinement,
+      strategy_profile: strategyProfile,
+      metadata: {
+        mode,
+        timestamp: new Date().toISOString(),
+        engine_version: ENGINE_VERSION,
+      },
+      summary: summaryResult,
+    };
 
     await db
       .update(strategyEvaluationsTable)
@@ -514,12 +755,12 @@ export async function executeEvaluation(jobId: string): Promise<void> {
         scoresJson: scores,
         stressJson,
         refinementsJson,
-        summaryJson: summaryResult,
+        summaryJson: unifiedEnvelope as unknown as Record<string, unknown>,
         completedAt: new Date(),
       })
       .where(eq(strategyEvaluationsTable.jobId, jobId));
 
-    logger.info({ jobId, scoreTotal: scoreT, confidence }, "Evaluation completed");
+    logger.info({ jobId, scoreTotal: scoreT, confidence, mode }, "Evaluation completed");
   } catch (err) {
     logger.error({ err, jobId }, "Evaluation pipeline error");
     await db

@@ -33,13 +33,14 @@ function generateJobId(): string {
 
 const submitEvalSchema = z.object({
   strategy_id: z.number(),
+  mode: z.enum(["fast", "deep"]).default("deep"),
   dataset: z.object({
     range: z.string().default("1y"),
     resolution: z.string().default("1m"),
   }).default({}),
   options: z.object({
-    run_stress: z.boolean().default(false),
-    run_refinement: z.boolean().default(false),
+    run_stress: z.boolean().default(true),
+    run_refinement: z.boolean().default(true),
   }).default({}),
 });
 
@@ -63,6 +64,8 @@ router.post("/evaluate", requireAuth, async (req: AuthenticatedRequest, res) => 
     }
 
     const jobId = generateJobId();
+    const isFast = body.mode === "fast";
+    const isDeep = body.mode === "deep";
 
     await db.insert(strategyEvaluationsTable).values({
       jobId,
@@ -71,8 +74,8 @@ router.post("/evaluate", requireAuth, async (req: AuthenticatedRequest, res) => 
       status: "queued",
       datasetRange: body.dataset.range,
       datasetResolution: body.dataset.resolution,
-      runStress: body.options.run_stress,
-      runRefinement: body.options.run_refinement,
+      runStress: isFast ? false : isDeep ? true : body.options.run_stress,
+      runRefinement: isFast ? false : isDeep ? true : body.options.run_refinement,
     });
 
     setImmediate(() => {
@@ -173,15 +176,35 @@ router.get("/evaluate/:jobId", requireAuth, async (req: AuthenticatedRequest, re
       return res.json({ job_id: job.jobId, status: "failed", error: job.errorMessage });
     }
 
+    const raw = job.summaryJson as Record<string, unknown> | null;
+    const isUnifiedEnvelope = raw != null && typeof raw.score === "object" && raw.score != null;
+
+    const legacyFallback = {
+      strategy_id: job.strategyId,
+      version: null,
+      version_hash: null,
+      score: {
+        total: job.scoreTotal,
+        breakdown: job.scoresJson,
+        confidence: job.confidence,
+      },
+      decision: null,
+      stress: job.stressJson,
+      failure_surface: null,
+      refinement: null,
+      strategy_profile: null,
+      metadata: {
+        mode: (!job.runStress && !job.runRefinement) ? "fast" : "deep",
+        timestamp: job.completedAt?.toISOString() ?? null,
+        engine_version: "legacy",
+      },
+      summary: isUnifiedEnvelope ? null : raw,
+    };
+
     res.json({
       status: "completed",
-      result: {
-        score_total: job.scoreTotal,
-        scores: job.scoresJson,
-        confidence: job.confidence,
-        stress: job.stressJson,
-        refinements: job.refinementsJson,
-      },
+      job_id: job.jobId,
+      result: isUnifiedEnvelope ? raw : legacyFallback,
     });
   } catch (err) {
     logger.error({ err }, "GET /evaluate/:jobId failed");

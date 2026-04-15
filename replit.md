@@ -85,6 +85,7 @@ I prefer concise and direct communication. When making changes, prioritize funct
   - `Strategy` — evaluates RSI/MACD/Bollinger signals on `price_update`; emits `strategy_signal`
   - `UserProfile` — selects top 4 dashboard modules based on occupation/business status on `user_session`; emits `dashboard_configured`
   - `Sync` — checks portfolio data consistency after trades and portfolio updates; emits `sync_discrepancy`
+  - `Learning` — aggregates trade outcomes by strategy×regime into long-term insights; subscribes to `trade_executed` + `regime_detected`, consolidates episodes every 5 min into `strategy_regime_insights` table with avg PnL, win rate, best/worst, and signal classification (favorable/unfavorable/neutral); emits `learning_updated`
   - `Recovery` — monitors all agent heartbeats, logs unhealthy agents every 2 minutes
 - **Event Chain**: Paper trading → `trade_executed` → Portfolio + Tax + Sync agents → `portfolio_updated` → Risk agent → `risk_assessed`
 - **Database Tables**: `agent_logs` (every action/error with metadata) and `agent_events` (every published event with subscribers). Auto-created on startup if not present.

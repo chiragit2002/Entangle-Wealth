@@ -50,6 +50,7 @@ import {
   AllocationAgent,
   KillSwitchAgent,
   ExecutionAgent,
+  LearningAgent,
 } from "./lib/agents";
 import { startScheduler, stopScheduler } from "./lib/quantEngine/index";
 import { pool, db } from "@workspace/db";
@@ -568,6 +569,7 @@ agentRegistry.register(new EnsembleAgent());
 agentRegistry.register(new AllocationAgent());
 agentRegistry.register(new KillSwitchAgent());
 agentRegistry.register(new ExecutionAgent());
+agentRegistry.register(new LearningAgent());
 
 await agentRegistry.startAll();
 logger.info("Agent orchestration framework started");

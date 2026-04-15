@@ -23,6 +23,7 @@ export { EnsembleAgent } from "./EnsembleAgent";
 export { AllocationAgent } from "./AllocationAgent";
 export { KillSwitchAgent } from "./KillSwitchAgent";
 export { ExecutionAgent } from "./ExecutionAgent";
+export { LearningAgent } from "./LearningAgent";
 export { Orchestrator } from "./Orchestrator";
 export { FinalArbiter } from "./FinalArbiter";
 export type { OrchestratorInput, OrchestratorResult } from "./Orchestrator";

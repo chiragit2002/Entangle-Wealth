@@ -424,14 +424,33 @@ export default function Dashboard() {
     }
   }, [getToken, toast, loadPortfolio]);
 
+  const historyQuery = useQuery({
+    queryKey: ["paper-trading-history"],
+    queryFn: async () => {
+      const res = await authFetch("/paper-trading/portfolio-history", getToken);
+      if (!res.ok) return { snapshots: [] };
+      return res.json() as Promise<{ snapshots: { snapshotDate: string; totalValue: number; cashBalance: number; positionsValue: number }[] }>;
+    },
+    enabled: !!isSignedIn,
+    staleTime: 60_000,
+  });
+
   const pnl = portfolio.totalValue - STARTING_CASH;
   const pnlPct = ((pnl / STARTING_CASH) * 100).toFixed(2);
-  const portfolioChartPoints = portfolio.trades.length > 0
-    ? portfolio.trades.slice().reverse().slice(0, 8).map((t, i) => ({
-        time: new Date(t.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        value: STARTING_CASH + (pnl * ((i + 1) / Math.max(portfolio.trades.length, 1))),
+
+  const snapshots = historyQuery.data?.snapshots ?? [];
+  const portfolioChartPoints = snapshots.length >= 2
+    ? snapshots.map(s => ({
+        time: new Date(s.snapshotDate).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        value: s.totalValue,
       }))
-    : [{ time: "Now", value: 0 }];
+    : portfolio.trades.length > 0
+      ? portfolio.trades.slice().reverse().slice(0, 8).map((t, i) => ({
+          time: new Date(t.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          value: STARTING_CASH + (pnl * ((i + 1) / Math.max(portfolio.trades.length, 1))),
+        }))
+      : [{ time: "Now", value: 0 }];
+  const hasRealHistory = snapshots.length >= 2;
 
   useEffect(() => {
     const update = () => {
@@ -827,7 +846,7 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <div>
-                    {portfolio.trades.length === 0 ? (
+                    {portfolio.trades.length === 0 && !hasRealHistory ? (
                       <div className="flex flex-col items-center justify-center py-12 text-center">
                         <TrendingUp className="w-10 h-10 text-white/10 mb-3" />
                         <p className="text-sm text-white/50 mb-1">$100,000 starting balance</p>
@@ -837,21 +856,26 @@ export default function Dashboard() {
                         </Button>
                       </div>
                     ) : (
-                      <ResponsiveContainer width="100%" height={200}>
-                        <AreaChart data={portfolioChartPoints}>
-                          <defs>
-                            <linearGradient id="pgGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor={pnl >= 0 ? "#00B4D8" : "#ff4757"} stopOpacity={0.2} />
-                              <stop offset="95%" stopColor={pnl >= 0 ? "#00B4D8" : "#ff4757"} stopOpacity={0} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
-                          <XAxis dataKey="time" tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} />
-                          <YAxis tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(1)}k`} domain={['dataMin - 500', 'dataMax + 500']} width={48} />
-                          <Tooltip contentStyle={{ background: '#0A0E1A', border: '1px solid rgba(0,180,216,0.15)', borderRadius: 12, color: '#fff', fontSize: 12 }} formatter={(value: number) => [`$${value.toLocaleString()}`, '']} />
-                          <Area type="monotone" dataKey="value" stroke={pnl >= 0 ? "#00B4D8" : "#ff4757"} strokeWidth={2} fill="url(#pgGrad)" />
-                        </AreaChart>
-                      </ResponsiveContainer>
+                      <>
+                        {hasRealHistory && (
+                          <p className="text-[10px] font-mono text-white/25 px-1 mb-1">Daily portfolio history · {snapshots.length} days</p>
+                        )}
+                        <ResponsiveContainer width="100%" height={200}>
+                          <AreaChart data={portfolioChartPoints}>
+                            <defs>
+                              <linearGradient id="pgGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor={pnl >= 0 ? "#00B4D8" : "#ff4757"} stopOpacity={0.2} />
+                                <stop offset="95%" stopColor={pnl >= 0 ? "#00B4D8" : "#ff4757"} stopOpacity={0} />
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.02)" />
+                            <XAxis dataKey="time" tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} />
+                            <YAxis tick={{ fill: '#444', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(1)}k`} domain={['dataMin - 500', 'dataMax + 500']} width={48} />
+                            <Tooltip contentStyle={{ background: '#0A0E1A', border: '1px solid rgba(0,180,216,0.15)', borderRadius: 12, color: '#fff', fontSize: 12 }} formatter={(value: number) => [`$${value.toLocaleString()}`, '']} />
+                            <Area type="monotone" dataKey="value" stroke={pnl >= 0 ? "#00B4D8" : "#ff4757"} strokeWidth={2} fill="url(#pgGrad)" />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      </>
                     )}
                     {portfolio.trades.length > 0 && (
                       <div className="mt-3">

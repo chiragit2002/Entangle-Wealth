@@ -14,7 +14,7 @@ import { ensureBacktesterBadgesExist } from "./routes/gamification";
 import { ensureSupportTables } from "./lib/supportTables";
 import { ensureBacktesterBadgesExist as ensureTask126BadgesExist } from "./lib/backtesterBadges";
 import { startAlertEvaluator, stopAlertEvaluator, closeAllSseConnections } from "./routes/alerts";
-import { startOrderEvaluator, stopOrderEvaluator } from "./routes/paperTrading";
+import { startOrderEvaluator, stopOrderEvaluator, startSnapshotScheduler, stopSnapshotScheduler } from "./routes/paperTrading";
 import { startDigestScheduler, stopDigestScheduler } from "./lib/emailDigest";
 import { startDailyContentScheduler, stopDailyContentScheduler } from "./routes/dailyContent";
 import { startDripScheduler, stopDripScheduler } from "./lib/dripEmails";
@@ -504,6 +504,7 @@ ensurePerformanceIndexes().catch((err) =>
 );
 bindAlertEvaluatorToAgent(startAlertEvaluator, stopAlertEvaluator);
 bindOrderEvaluatorToAgent(startOrderEvaluator, stopOrderEvaluator);
+startSnapshotScheduler();
 bindEmailDigestToAgent(startDigestScheduler, stopDigestScheduler);
 bindDailyContentToAgent(startDailyContentScheduler, stopDailyContentScheduler);
 bindDripEmailToAgent(startDripScheduler, stopDripScheduler);
@@ -563,6 +564,7 @@ async function gracefulShutdown(signal: string) {
   });
   logger.info("Step 3/5: Active request drain complete (or 10s timeout elapsed)");
 
+  stopSnapshotScheduler();
   logger.info("Step 4/5: Closing SSE connections and lingering sockets...");
   closeAllSseConnections();
   for (const socket of openSockets) {

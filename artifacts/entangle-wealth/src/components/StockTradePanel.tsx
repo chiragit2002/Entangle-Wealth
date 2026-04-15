@@ -126,8 +126,21 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
   useEffect(() => {
     if (livePrice && symbol) {
       const step = livePrice > 500 ? 10 : livePrice > 100 ? 5 : livePrice > 50 ? 2.5 : 1;
-      setStrike((Math.round(livePrice / step) * step).toFixed(2));
-      const estimatedPremium = livePrice * 0.03;
+      const atm = Math.round(livePrice / step) * step;
+      setStrike(atm.toFixed(2));
+      const T = 30 / 365;
+      const sigma = livePrice < 20 ? 0.60 : livePrice < 100 ? 0.40 : 0.30;
+      const sqrtT = Math.sqrt(T);
+      const d1 = (Math.log(livePrice / atm) + (0.05 + 0.5 * sigma * sigma) * T) / (sigma * sqrtT);
+      const d2 = d1 - sigma * sqrtT;
+      const N = (x: number) => {
+        const sign = x < 0 ? -1 : 1;
+        const t = 1 / (1 + 0.3275911 * Math.abs(x) / Math.SQRT2);
+        const poly = t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429))));
+        return 0.5 * (1 + sign * (1 - poly * Math.exp(-x * x / 2)));
+      };
+      const bsCall = livePrice * N(d1) - atm * Math.exp(-0.05 * T) * N(d2);
+      const estimatedPremium = Math.max(0.01, bsCall);
       setPremium(estimatedPremium.toFixed(2));
     }
   }, [livePrice, symbol]);

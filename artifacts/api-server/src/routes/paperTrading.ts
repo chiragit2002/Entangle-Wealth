@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, paperOptionsTradesTable, paperOptionsPositionsTable, paperOrdersTable, dailySpinsTable, userXpTable, xpTransactionsTable, streaksTable, usersTable, balanceTransactionsTable } from "@workspace/db/schema";
+import { paperPortfoliosTable, paperTradesTable, paperPositionsTable, paperOptionsTradesTable, paperOptionsPositionsTable, paperOrdersTable, dailySpinsTable, userXpTable, xpTransactionsTable, streaksTable, usersTable, balanceTransactionsTable, dailyPortfolioSnapshotsTable } from "@workspace/db/schema";
 import { eq, and, desc, sql, inArray } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
 import { resolveUserId } from "../lib/resolveUserId";
@@ -21,6 +21,79 @@ interface PositionWithLiveData extends DbPosition {
 const router = Router();
 
 const DEFAULT_STARTING_CASH = 100_000;
+
+function normalCDF(x: number): number {
+  const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741;
+  const a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+  const sign = x < 0 ? -1 : 1;
+  const t = 1 / (1 + p * Math.abs(x) / Math.SQRT2);
+  const poly = t * (a1 + t * (a2 + t * (a3 + t * (a4 + t * a5))));
+  const erf = 1 - poly * Math.exp(-x * x / 2);
+  return 0.5 * (1 + sign * erf);
+}
+
+function blackScholesPremium(
+  S: number,
+  K: number,
+  T: number,
+  r: number,
+  sigma: number,
+  optionType: "CALL" | "PUT",
+): number {
+  if (T <= 0) {
+    if (optionType === "CALL") return Math.max(0, S - K);
+    return Math.max(0, K - S);
+  }
+  const sqrtT = Math.sqrt(T);
+  const d1 = (Math.log(S / K) + (r + 0.5 * sigma * sigma) * T) / (sigma * sqrtT);
+  const d2 = d1 - sigma * sqrtT;
+  if (optionType === "CALL") {
+    return S * normalCDF(d1) - K * Math.exp(-r * T) * normalCDF(d2);
+  }
+  return K * Math.exp(-r * T) * normalCDF(-d2) - S * normalCDF(-d1);
+}
+
+function parseExpirationToYears(expiration: string): number {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const months: Record<string, number> = {
+    Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+    Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+  };
+  const parts = expiration.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    const monthName = parts[0];
+    const day = parseInt(parts[1], 10);
+    const yearStr = parts[2];
+    const month = months[monthName];
+    if (month !== undefined && !isNaN(day)) {
+      let year = currentYear;
+      if (yearStr) {
+        year = parseInt(yearStr, 10);
+      } else {
+        const exp = new Date(currentYear, month, day);
+        if (exp < now) year = currentYear + 1;
+      }
+      const expDate = new Date(year, month, day);
+      const daysToExp = Math.max(0, (expDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      return daysToExp / 365;
+    }
+  }
+  return 30 / 365;
+}
+
+function estimateImpliedVolatility(symbol: string, underlyingPrice: number): number {
+  const techGrowth = ["TSLA", "NVDA", "AMD", "MARA", "RIOT", "HOOD", "RIVN", "LCID", "SMCI", "CRWD", "NET"];
+  const midVol = ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "NFLX", "CRM", "SNOW", "SHOP", "COIN", "PLTR", "RKLB"];
+  const lowVol = ["JPM", "GS", "BAC", "V", "UNH", "JNJ", "PG", "WMT", "XOM", "CVX", "COST", "MCD"];
+  const sym = symbol.toUpperCase();
+  if (techGrowth.includes(sym)) return 0.55;
+  if (midVol.includes(sym)) return 0.35;
+  if (lowVol.includes(sym)) return 0.20;
+  if (underlyingPrice < 20) return 0.60;
+  if (underlyingPrice < 100) return 0.40;
+  return 0.30;
+}
 
 function getTodayUTC(): string {
   return new Date().toISOString().split("T")[0];
@@ -685,6 +758,99 @@ export function stopOrderEvaluator() {
   }
 }
 
+export async function takePortfolioSnapshots() {
+  try {
+    const today = getTodayUTC();
+    const portfolios = await db.select().from(paperPortfoliosTable);
+    if (portfolios.length === 0) return;
+
+    for (const portfolio of portfolios) {
+      const positions = await db
+        .select()
+        .from(paperPositionsTable)
+        .where(eq(paperPositionsTable.userId, portfolio.userId));
+
+      const activePositions = positions.filter(p => p.quantity !== 0);
+      const optionsPositions = await db
+        .select()
+        .from(paperOptionsPositionsTable)
+        .where(eq(paperOptionsPositionsTable.userId, portfolio.userId));
+      const activeOptions = optionsPositions.filter(p => p.contracts > 0);
+
+      let positionsValue = 0;
+      if (activePositions.length > 0) {
+        const symbols = activePositions.map(p => p.symbol);
+        const livePrices = await getLivePrices(symbols);
+        for (const pos of activePositions) {
+          const price = livePrices[pos.symbol] ?? pos.avgCost;
+          positionsValue += pos.quantity * price;
+        }
+      }
+
+      const optionsValue = activeOptions.reduce((sum, p) => sum + p.contracts * p.avgPremium * 100, 0);
+      const totalValue = portfolio.cashBalance + positionsValue + optionsValue;
+
+      await db
+        .insert(dailyPortfolioSnapshotsTable)
+        .values({
+          userId: portfolio.userId,
+          snapshotDate: today,
+          totalValue,
+          cashBalance: portfolio.cashBalance,
+          positionsValue,
+          optionsValue,
+        })
+        .onConflictDoUpdate({
+          target: [dailyPortfolioSnapshotsTable.userId, dailyPortfolioSnapshotsTable.snapshotDate],
+          set: { totalValue, cashBalance: portfolio.cashBalance, positionsValue, optionsValue },
+        });
+    }
+
+    logger.info({ date: today, count: portfolios.length }, "Daily portfolio snapshots taken");
+  } catch (err) {
+    logger.error({ err }, "Portfolio snapshot error");
+  }
+}
+
+let snapshotInterval: ReturnType<typeof setInterval> | null = null;
+
+export function startSnapshotScheduler() {
+  if (snapshotInterval) return;
+  logger.info("Starting daily portfolio snapshot scheduler (1h interval)");
+  snapshotInterval = setInterval(takePortfolioSnapshots, 60 * 60 * 1000);
+  setTimeout(takePortfolioSnapshots, 10_000);
+}
+
+export function stopSnapshotScheduler() {
+  if (snapshotInterval) {
+    clearInterval(snapshotInterval);
+    snapshotInterval = null;
+  }
+}
+
+router.get("/paper-trading/portfolio-history", requireAuth, async (req, res) => {
+  try {
+    const clerkId = (req as AuthenticatedRequest).userId;
+    const dbUserId = await resolveUserId(clerkId, req);
+    if (!dbUserId) {
+      res.json({ snapshots: [] });
+      return;
+    }
+
+    const snapshots = await db
+      .select()
+      .from(dailyPortfolioSnapshotsTable)
+      .where(eq(dailyPortfolioSnapshotsTable.userId, dbUserId))
+      .orderBy(dailyPortfolioSnapshotsTable.snapshotDate)
+      .limit(365);
+
+    res.json({ snapshots });
+  } catch (err) {
+    logger.error({ err }, "Portfolio history error");
+    res.status(500).json({ error: "Failed to load portfolio history" });
+  }
+});
+
 router.post("/paper-trading/reset", requireAuth, validateBody(z.object({}).strict()), async (req, res) => {
   try {
     const clerkId = (req as AuthenticatedRequest).userId;
@@ -764,7 +930,11 @@ router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTra
       return;
     }
 
-    const premium = Math.max(0.01, Math.abs(underlyingPrice - strike) * 0.05 + underlyingPrice * 0.005);
+    const T = parseExpirationToYears(expiration);
+    const sigma = estimateImpliedVolatility(upperSymbol, underlyingPrice);
+    const r = 0.05;
+    const bsPrice = blackScholesPremium(underlyingPrice, strike, T, r, sigma, optionType);
+    const premium = Math.max(0.01, bsPrice);
     const totalCost = contracts * premium * 100;
 
     const result = await db.transaction(async (tx) => {

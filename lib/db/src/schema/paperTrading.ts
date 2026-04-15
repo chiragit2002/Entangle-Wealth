@@ -96,3 +96,18 @@ export const paperOptionsPositionsTable = pgTable("paper_options_positions", {
 }, (table) => [
   index("idx_paper_options_positions_user_id").on(table.userId),
 ]);
+
+export const dailyPortfolioSnapshotsTable = pgTable("daily_portfolio_snapshots", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+  snapshotDate: text("snapshot_date").notNull(),
+  totalValue: real("total_value").notNull(),
+  cashBalance: real("cash_balance").notNull(),
+  positionsValue: real("positions_value").notNull(),
+  optionsValue: real("options_value").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+}, (table) => [
+  index("idx_daily_portfolio_snapshots_user_id").on(table.userId),
+  index("idx_daily_portfolio_snapshots_date").on(table.snapshotDate),
+  uniqueIndex("idx_daily_portfolio_snapshots_user_date").on(table.userId, table.snapshotDate),
+]);

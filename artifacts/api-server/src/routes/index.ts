@@ -54,6 +54,7 @@ import priceStreamRouter from "./priceStream";
 import strategiesRouter from "./strategies";
 import evaluateRouter from "./evaluate";
 import quantSignalsRouter from "./quantSignals";
+import strategyEventsRouter from "./strategyEvents";
 
 export function createRouter(app: Express): IRouter {
 const router: IRouter = Router();
@@ -113,6 +114,7 @@ router.use(priceStreamRouter);
 router.use(strategiesRouter);
 router.use(evaluateRouter);
 router.use(quantSignalsRouter);
+router.use(strategyEventsRouter);
 
 return router;
 }

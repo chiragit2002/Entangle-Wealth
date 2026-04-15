@@ -25,3 +25,4 @@ export * from "./customStrategies";
 export * from "./strategyEvaluations";
 export * from "./strategyVersions";
 export * from "./quantEvaluation";
+export * from "./strategyEvents";

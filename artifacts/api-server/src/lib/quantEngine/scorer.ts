@@ -22,28 +22,22 @@ export interface RawResult {
 }
 
 const WEIGHTS = {
-  expectedReturn: 0.30,
-  winRate: 0.25,
-  confidence: 0.20,
-  maxDrawdown: 0.15,
-  riskScore: 0.10,
+  expectedReturn: 0.40,
+  confidence: 0.30,
+  riskScore: 0.30,
 };
 
 export function scoreResult(result: StrategyResult): number {
   if (result.action === "HOLD") return 0;
 
   const returnScore = Math.min(100, Math.max(0, result.expectedReturn * 10 + 50));
-  const winRateScore = Math.min(100, Math.max(0, result.winRate));
   const confidenceScore = Math.min(100, Math.max(0, result.confidence));
-  const drawdownScore = Math.min(100, Math.max(0, 100 - result.maxDrawdown * 2));
-  const riskScore = Math.min(100, Math.max(0, 100 - result.riskScore));
+  const riskPenalty = Math.min(100, Math.max(0, 100 - result.riskScore));
 
   return (
     returnScore * WEIGHTS.expectedReturn +
-    winRateScore * WEIGHTS.winRate +
     confidenceScore * WEIGHTS.confidence +
-    drawdownScore * WEIGHTS.maxDrawdown +
-    riskScore * WEIGHTS.riskScore
+    riskPenalty * WEIGHTS.riskScore
   );
 }
 

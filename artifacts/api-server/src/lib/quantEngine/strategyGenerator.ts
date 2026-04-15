@@ -358,6 +358,22 @@ export function executeStrategy(descriptor: StrategyDescriptor, data: OHLCVData)
       action = "SELL";
       rawConfidence = Math.min(80, 55 + (pct - threshold) * 2);
     }
+  } else if (type === "RSI_EMA_GRID") {
+    const rsiPeriod = params.rsiPeriod || 14;
+    const emaShort = params.emaShort || 9;
+    const emaLong = params.emaLong || 50;
+    const oversold = params.oversold || 30;
+    const overbought = params.overbought || 70;
+    const currentRSI = rsi(closes, rsiPeriod);
+    const emaShortVal = ema(closes, emaShort);
+    const emaLongVal = ema(closes, emaLong);
+    if (currentRSI < oversold && emaShortVal > emaLongVal) {
+      action = "BUY";
+      rawConfidence = Math.min(90, 55 + (oversold - currentRSI) / oversold * 120 + (emaShortVal - emaLongVal) / emaLongVal * 200);
+    } else if (currentRSI > overbought && emaShortVal < emaLongVal) {
+      action = "SELL";
+      rawConfidence = Math.min(90, 55 + (currentRSI - overbought) / (100 - overbought) * 120 + (emaLongVal - emaShortVal) / emaLongVal * 200);
+    }
   }
 
   if (action === "HOLD") {
@@ -456,6 +472,13 @@ function executeStrategySlice(descriptor: StrategyDescriptor, data: OHLCVData): 
     const macdData = macdParams(closes, params.macdFast || 12, params.macdSlow || 26, params.macdSig || 9);
     if (price > emaVal && macdData.histogram > 0) return { action: "BUY" };
     if (price < emaVal && macdData.histogram < 0) return { action: "SELL" };
+  }
+  if (type === "RSI_EMA_GRID") {
+    const currentRSI = rsi(closes, params.rsiPeriod || 14);
+    const emaShortVal = ema(closes, params.emaShort || 9);
+    const emaLongVal = ema(closes, params.emaLong || 50);
+    if (currentRSI < (params.oversold || 30) && emaShortVal > emaLongVal) return { action: "BUY" };
+    if (currentRSI > (params.overbought || 70) && emaShortVal < emaLongVal) return { action: "SELL" };
   }
   return { action: "HOLD" };
 }
@@ -736,6 +759,40 @@ export function generateAllStrategies(): StrategyDescriptor[] {
           type: "PRICE_SMA_DISTANCE",
           params: { period, threshold, holdBars: hold },
         });
+      }
+    }
+  }
+
+  function seededRng(seed: number) {
+    let s = seed;
+    return () => {
+      s = (s * 1664525 + 1013904223) & 0xffffffff;
+      return (s >>> 0) / 0xffffffff;
+    };
+  }
+
+  const gridRsiPeriods = [7, 14, 21];
+  const gridEmaShort = [9, 12, 20];
+  const gridEmaLong = [50, 100, 200];
+  const GRID_VARIATIONS_PER_COMBO = 450;
+
+  for (const rsiPeriod of gridRsiPeriods) {
+    for (const emaShort of gridEmaShort) {
+      for (const emaLong of gridEmaLong) {
+        if (emaShort >= emaLong) continue;
+        const seed = rsiPeriod * 100000 + emaShort * 1000 + emaLong;
+        const rng = seededRng(seed);
+        for (let v = 0; v < GRID_VARIATIONS_PER_COMBO; v++) {
+          const oversold = Math.round(20 + rng() * 20);
+          const overbought = Math.round(60 + rng() * 20);
+          const hold = Math.round(3 + rng() * 22);
+          strategies.push({
+            id: `rsi_ema_grid_${rsiPeriod}_${emaShort}_${emaLong}_v${v}`,
+            name: `RSI(${rsiPeriod})<${oversold}+EMA(${emaShort}/${emaLong}) / hold ${hold}d`,
+            type: "RSI_EMA_GRID",
+            params: { rsiPeriod, emaShort, emaLong, oversold, overbought, holdBars: hold },
+          });
+        }
       }
     }
   }

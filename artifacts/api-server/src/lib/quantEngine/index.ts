@@ -81,7 +81,8 @@ export async function runQuantEngine(force: boolean = false): Promise<SignalOppo
 
   try {
     const strategies = generateAllStrategies();
-    logger.info({ strategies: strategies.length }, "Quant engine: system strategies loaded");
+    const gridCount = strategies.filter(s => s.type === "RSI_EMA_GRID").length;
+    logger.info({ strategies: strategies.length, gridStrategies: gridCount, baseStrategies: strategies.length - gridCount }, "Quant engine: system strategies loaded");
 
     const stockData = await fetchStockUniverse(STOCK_UNIVERSE);
     engineStatus.apiCallsMade += Math.ceil(STOCK_UNIVERSE.length / 10);

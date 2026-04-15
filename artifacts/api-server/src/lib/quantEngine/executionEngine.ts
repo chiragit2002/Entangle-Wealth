@@ -10,7 +10,7 @@ const __dirname = path.dirname(__currentFile);
 
 const ALPACA_DATA_URL = "https://data.alpaca.markets";
 const BATCH_SIZE = 10;
-const WORKER_COUNT = 4;
+const WORKER_COUNT = 8;
 const BARS_LIMIT = 200;
 
 function getAlpacaHeaders(): Record<string, string> {

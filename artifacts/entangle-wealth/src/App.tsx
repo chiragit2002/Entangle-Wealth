@@ -54,6 +54,33 @@ const SubmitTicketPage = lazy(() => import("@/pages/SubmitTicket"));
 const StatusPage = lazy(() => import("@/pages/Status"));
 const AdminHubPage = lazy(() => import("@/pages/AdminHub"));
 const QuantSignalsPage = lazy(() => import("@/pages/QuantSignals"));
+const WealthSim = lazy(() => import("@/pages/WealthSim"));
+const TimeMachine = lazy(() => import("@/pages/TimeMachine"));
+const AlternateTimeline = lazy(() => import("@/pages/AlternateTimeline"));
+const AICoach = lazy(() => import("@/pages/AICoach"));
+const HabitsDashboard = lazy(() => import("@/pages/HabitsDashboard"));
+const LifeOutcomes = lazy(() => import("@/pages/LifeOutcomes"));
+const Integrations = lazy(() => import("@/pages/Integrations"));
+const Giveaway = lazy(() => import("@/pages/Giveaway"));
+const Resume = lazy(() => import("@/pages/Resume"));
+const RewardHistory = lazy(() => import("@/pages/RewardHistory"));
+const TravelMarketplace = lazy(() => import("@/pages/TravelMarketplace"));
+const TaxYearSummary = lazy(() => import("@/pages/TaxYearSummary"));
+const BlogIndex = lazy(() => import("@/pages/BlogIndex"));
+const BlogPost = lazy(() => import("@/pages/BlogPost"));
+const Research = lazy(() => import("@/pages/Research"));
+const CommandCenter = lazy(() => import("@/pages/CommandCenter"));
+const Travel = lazy(() => import("@/pages/Travel"));
+const TrophyCase = lazy(() => import("@/pages/TrophyCase"));
+const Community = lazy(() => import("@/pages/Community"));
+const Earn = lazy(() => import("@/pages/Earn"));
+const VolatilityLab = lazy(() => import("@/pages/VolatilityLab"));
+const MarketOverview = lazy(() => import("@/pages/MarketOverview"));
+const SectorFlow = lazy(() => import("@/pages/SectorFlow"));
+const OpenSourceIntel = lazy(() => import("@/pages/OpenSourceIntel"));
+const Gigs = lazy(() => import("@/pages/Gigs"));
+const Jobs = lazy(() => import("@/pages/Jobs"));
+const CaseStudy = lazy(() => import("@/pages/CaseStudy"));
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -175,6 +202,34 @@ function ClerkProviderWithRoutes() {
             <Route path="/quant">{() => <LazyPage component={QuantSignalsPage} />}</Route>
             <Route path="/admin/:rest*">{() => <LazyAdmin component={AdminHubPage} />}</Route>
             <Route path="/admin">{() => <LazyAdmin component={AdminHubPage} />}</Route>
+            <Route path="/wealth-sim">{() => <LazyProtected component={WealthSim} />}</Route>
+            <Route path="/time-machine">{() => <LazyPage component={TimeMachine} />}</Route>
+            <Route path="/alternate-timeline">{() => <LazyPage component={AlternateTimeline} />}</Route>
+            <Route path="/ai-coach">{() => <LazyProtected component={AICoach} />}</Route>
+            <Route path="/habits">{() => <LazyProtected component={HabitsDashboard} />}</Route>
+            <Route path="/life-outcomes">{() => <LazyPage component={LifeOutcomes} />}</Route>
+            <Route path="/integrations">{() => <LazyProtected component={Integrations} />}</Route>
+            <Route path="/giveaway">{() => <LazyPage component={Giveaway} />}</Route>
+            <Route path="/resume">{() => <LazyPage component={Resume} />}</Route>
+            <Route path="/rewards">{() => <LazyProtected component={RewardHistory} />}</Route>
+            <Route path="/marketplace">{() => <LazyPage component={TravelMarketplace} />}</Route>
+            <Route path="/tax-summary">{() => <LazyProtected component={TaxYearSummary} />}</Route>
+            <Route path="/blog">{() => <LazyPage component={BlogIndex} />}</Route>
+            <Route path="/blog/:slug">{() => <LazyPage component={BlogPost} />}</Route>
+            <Route path="/research">{() => <LazyPage component={Research} />}</Route>
+            <Route path="/command-center">{() => <LazyProtected component={CommandCenter} />}</Route>
+            <Route path="/travel">{() => <LazyPage component={Travel} />}</Route>
+            <Route path="/trophy-case">{() => <LazyProtected component={TrophyCase} />}</Route>
+            <Route path="/community">{() => <LazyPage component={Community} />}</Route>
+            <Route path="/earn">{() => <LazyProtected component={Earn} />}</Route>
+            <Route path="/volatility-lab">{() => <LazyPage component={VolatilityLab} />}</Route>
+            <Route path="/market-overview">{() => <LazyPage component={MarketOverview} />}</Route>
+            <Route path="/sector-flow">{() => <LazyPage component={SectorFlow} />}</Route>
+            <Route path="/osint">{() => <LazyPage component={OpenSourceIntel} />}</Route>
+            <Route path="/gigs">{() => <LazyPage component={Gigs} />}</Route>
+            <Route path="/jobs">{() => <LazyPage component={Jobs} />}</Route>
+            <Route path="/case-study/:slug">{() => <LazyPage component={CaseStudy} />}</Route>
+            <Route path="/case-study">{() => <LazyPage component={CaseStudy} />}</Route>
             <Route component={NotFound} />
           </Switch>
           <CookieConsentBanner />

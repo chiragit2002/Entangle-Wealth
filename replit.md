@@ -12,7 +12,7 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **Theme**: Light/dark mode toggle (default dark) with electric blue, gold, and purple accents for dark mode; primary `#0099CC` for light mode. Utilizes `next-themes` and CSS variables.
 - **Typography**: JetBrains Mono for data displays and Inter for UI elements.
 - **Visuals**: Glassmorphism effects, blurred panels, gradient borders, custom scrollbars, and animations. Animated gradient orbs and a subtle dot grid overlay for background.
-- **Navigation**: Navbar with 4 dropdown groups (Trade, Analyze, Tax, Community) + Admin for admin users. Mobile bottom nav with 5 primary items + More. No boot sequence, no page transition animations, no profile completion gate overlay.
+- **Navigation**: Navbar with 5 flat links (Dashboard, Stocks, Tax, Leaderboard, Pricing) + Admin link for admin users. Mobile bottom nav with same 5 core items. No dropdowns, no boot sequence, no page transition animations, no profile completion gate overlay.
 - **Components**: Utilizes shadcn/ui.
 - **Auth Pages**: Bloomberg Terminal-grade sign-in/sign-up using `TerminalAuthShell` component (`src/components/TerminalAuthShell.tsx`). Dark navy (#0A0E1A) background, live scrolling ticker tape, split layout: left = brand panel with market stats + terminal status lines, right = Clerk auth form. Green terminal accent (#00FF41), monospace font, no boot sequence on auth pages. Clerk appearance customized in `App.tsx` (`clerkAppearanceDark`).
 

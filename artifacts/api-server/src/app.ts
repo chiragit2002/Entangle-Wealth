@@ -5,7 +5,7 @@ import compression from "compression";
 import rateLimit from "express-rate-limit";
 import pinoHttp from "pino-http";
 import { clerkMiddleware } from "@clerk/express";
-import { CLERK_PROXY_PATH, clerkProxyMiddleware } from "./middlewares/clerkProxyMiddleware";
+import { CLERK_PROXY_PATH, clerkProxyMiddleware, validateClerkEnv } from "./middlewares/clerkProxyMiddleware";
 import { inputSanitizer } from "./middlewares/inputSanitizer";
 import { bruteForceGuard } from "./middlewares/bruteForce";
 import { csrfProtection } from "./middlewares/csrfProtection";
@@ -28,6 +28,8 @@ import { getAuth } from "@clerk/express";
 import { standardTimeout, aiTimeout } from "./middlewares/requestTimeout";
 
 
+validateClerkEnv();
+
 const app: Express = express();
 
 app.set("trust proxy", 1);
@@ -49,6 +51,7 @@ app.use(
         connectSrc: [
           "'self'",
           "https://*.clerk.accounts.dev",
+          "https://clerk.browser-telemetry.com",
           "https://api.stripe.com",
           "https://data.alpaca.markets",
           "https://paper-api.alpaca.markets",
@@ -217,18 +220,19 @@ app.use((req, _res, next) => {
 app.use("/api/taxgpt", aiLimiter, aiTimeout);
 app.use("/api/analyze-document", aiLimiter, aiTimeout);
 app.use("/api/analyze", aiLimiter, aiTimeout);
-// app.use("/api/coaching", aiTimeout);
-// app.use("/api/marketing/generate", rateLimit({
-//   windowMs: 60 * 1000,
-//   limit: 5,
-//   standardHeaders: "draft-7",
-//   legacyHeaders: false,
-//   message: { error: "Marketing AI rate limit exceeded. Max 5 requests per minute." },
-// }), aiTimeout);
+app.use("/api/coaching", aiLimiter, aiTimeout);
+app.use("/api/marketing/generate", rateLimit({
+  windowMs: 60 * 1000,
+  limit: 5,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { error: "Marketing AI rate limit exceeded. Max 5 requests per minute." },
+}), aiTimeout);
 
 app.use("/api/taxgpt", userAiLimiter);
 app.use("/api/analyze-document", userAiLimiter);
 app.use("/api/analyze", userAiLimiter);
+app.use("/api/coaching", userAiLimiter);
 app.use("/api/paper-trading", userTradingLimiter);
 app.use("/api/kyc", userKycLimiter);
 app.use("/api", userApiLimiter);

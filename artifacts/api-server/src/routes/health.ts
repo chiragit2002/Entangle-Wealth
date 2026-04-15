@@ -51,12 +51,16 @@ router.get("/health", (_req, res) => {
   const anyCircuitOpen = circuits.some(c => c.state === "open");
   const anyCircuitHalfOpen = circuits.some(c => c.state === "half-open");
 
+  const isProduction = process.env.NODE_ENV === "production";
+  const clerkMisconfigured = isProduction && !process.env.CLERK_SECRET_KEY;
+
   const degraded =
     poolUtilization >= POOL_WARN_THRESHOLD ||
     queueUtilization >= QUEUE_WARN_THRESHOLD ||
     anyCircuitOpen ||
     anyCircuitHalfOpen ||
-    poolStats.waiting > 5;
+    poolStats.waiting > 5 ||
+    clerkMisconfigured;
 
   const status = degraded ? "degraded" : "ok";
 
@@ -77,6 +81,10 @@ router.get("/health", (_req, res) => {
       failureCount: c.failureCount,
     })),
     rateLimiter: getRateLimiterStats(),
+    auth: {
+      clerkConfigured: !clerkMisconfigured,
+      warning: clerkMisconfigured,
+    },
   });
 });
 
@@ -230,6 +238,36 @@ router.get("/health/dependencies", requireAuth, async (_req, res) => {
     dependencies: deps,
     timestamp: new Date().toISOString(),
   });
+});
+
+router.get("/status/services", async (_req, res) => {
+  const [dbCheck, clerkCheck, stripeCheck, alpacaCheck] = await Promise.all([
+    checkDb(),
+    checkClerk(),
+    checkStripe(),
+    checkAlpaca(),
+  ]);
+
+  function toServiceStatus(check: DependencyCheck): "operational" | "degraded" | "outage" {
+    if (check.status === "unavailable") return "outage";
+    if (check.status === "degraded") return "degraded";
+    return "operational";
+  }
+
+  const now = new Date().toISOString();
+  const services = [
+    { service_name: "API Server", status: "operational" as const, updated_at: now },
+    { service_name: "Market Data", status: toServiceStatus(alpacaCheck), updated_at: now },
+    { service_name: "AI Analysis", status: toServiceStatus(dbCheck), updated_at: now },
+    { service_name: "Authentication", status: toServiceStatus(clerkCheck), updated_at: now },
+    { service_name: "Payments", status: toServiceStatus(stripeCheck), updated_at: now },
+  ];
+
+  res.json({ services, timestamp: now });
+});
+
+router.get("/status/incidents", (_req, res) => {
+  res.json({ incidents: [], timestamp: new Date().toISOString() });
 });
 
 export default router;

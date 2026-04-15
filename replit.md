@@ -58,10 +58,29 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **GitHub Solution Finder**: Standalone GitHub intelligence platform using REST/GraphQL APIs and Claude AI analysis.
 - **Mobile Design**: Fully responsive, mobile-first design with bottom navigation.
 
+## Environment Variables
+
+### Required — Server-side
+- `CLERK_SECRET_KEY` — Clerk backend API key; required for auth in production. Missing → auth fails.
+- `DATABASE_URL` — PostgreSQL connection string.
+- `STRIPE_SECRET_KEY` — Stripe backend API key for checkout and webhook processing.
+
+### Required — Frontend (Vite `VITE_` prefix)
+- `VITE_CLERK_PUBLISHABLE_KEY` — Clerk publishable key; app throws on startup if missing.
+- `VITE_CLERK_PROXY_URL` — Clerk FAPI proxy URL (e.g. `https://{domain}/api/__clerk`); required for production deployments using the FAPI proxy to avoid CNAME requirements.
+
+### Optional
+- `API_INTERNAL_BASE_URL` — Override the base URL the API health monitor uses for self-pinging (default: `http://127.0.0.1:{PORT}`). Set in environments where 127.0.0.1 is not routable.
+- `ALPACA_KEY_ID` / `ALPACA_SECRET_KEY` — Alpaca Markets API credentials.
+- `RESEND_API_KEY` — Email delivery (digest, drip sequences).
+- `SENTRY_AUTH_TOKEN` — Sentry source map upload (production builds only).
+
 ## API Server
 - **Security**: Helmet, global and AI-specific rate limits, CSRF protection, CORS restricted.
-- **Authentication**: `requireAuth` middleware for AI, news, and Alpaca routes; `requireAdmin` for admin routes.
-- **Health Endpoint**: Public `/health` and `/healthz`, detailed `/health/detailed` behind auth.
+- **CSP**: `scriptSrc` and `connectSrc` include `*.clerk.accounts.dev` and `clerk.browser-telemetry.com`. Stripe, Alpaca WSS, and Replit preview domains are allowlisted.
+- **Authentication**: `requireAuth` middleware for AI, news, and Alpaca routes; `requireAdmin` for admin routes. Clerk env vars validated at startup via `validateClerkEnv()`.
+- **Health Endpoints**: Public `/health`, `/healthz`, `/status/services`, `/status/incidents`; detailed `/health/detailed` and `/health/dependencies` behind auth.
+- **Health Monitor**: Polls 10 endpoints every 60s; circuit breaker trips after 3 consecutive 500s; pings self via `http://127.0.0.1:{PORT}` (overridable via `API_INTERNAL_BASE_URL`).
 - **Integrations**: Stripe webhook endpoint, Zapier webhook.
 - **Data Proxies**: Alpaca Markets API proxy with circuit breaker and exponential backoff.
 - **Market Data Pipeline** (`livePriceBroadcaster.ts`): 3-layer architecture — Layer 1: Alpaca WebSocket (`wss://stream.data.alpaca.markets/v2/iex`) with auto-auth, watchdog, and exponential backoff reconnect. Layer 2: REST polling fallback (auto-activates when WS drops/errors). Layer 3: Unified in-memory price cache with monotonic version counter. `priceService.ts` reads from unified cache first, on-demand fetch on miss. SSE streaming via `/api/price-stream?symbols=` with 100ms throttle, per-IP connection limits, heartbeat. REST: `GET /api/prices?tickers=`, `GET /api/prices/pipeline` (status). `ws` package externalized in `build.mjs`.

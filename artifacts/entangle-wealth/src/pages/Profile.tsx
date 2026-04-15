@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useSearch } from "wouter";
 import { useUser, useAuth, useClerk } from "@clerk/react";
 import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target, Wallet, Coins, Users, Fingerprint, Upload, X, Image, Building2, MessageSquare, CheckCircle, Clock } from "lucide-react";
 import { OccupationDropdown } from "@/components/OccupationDropdown";
@@ -379,10 +379,23 @@ export default function Profile() {
   const idPhotoRef = useRef<HTMLInputElement>(null);
   const selfieRef = useRef<HTMLInputElement>(null);
   const { client: clerkClient } = useClerk();
+  const searchString = useSearch();
 
   const fetchAuth = useCallback((path: string, options: RequestInit = {}) => {
     return authFetch(path, getToken, options);
   }, [getToken]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchString);
+    const payment = params.get("payment");
+    if (payment === "success") {
+      toast({ title: "Payment successful!", description: "Your subscription has been activated. Welcome to the next tier." });
+      window.history.replaceState(null, "", window.location.pathname);
+    } else if (payment === "cancelled") {
+      toast({ title: "Payment cancelled", description: "Your checkout was cancelled. No charges were made.", variant: "destructive" });
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  }, [searchString, toast]);
 
   useEffect(() => {
     if (!userLoaded) return;

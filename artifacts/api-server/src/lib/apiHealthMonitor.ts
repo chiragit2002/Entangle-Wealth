@@ -8,11 +8,11 @@ export const MONITORED_ENDPOINTS: { path: string; label: string; expectStatus?: 
   { path: "/api/stocks", label: "Trading Data", expectStatus: 200 },
   { path: "/api/gamification/leaderboard", label: "Leaderboard", expectStatus: 200 },
   { path: "/api/health/detailed", label: "System Detail", expectStatus: 401 },
-  { path: "/api/status/services", label: "Service Status", expectStatus: 401 },
+  { path: "/api/status/services", label: "Service Status", expectStatus: 200 },
   { path: "/api/alpaca/positions", label: "Trading", expectStatus: 401 },
-  { path: "/api/taxgpt", label: "TaxFlow", expectStatus: 404 },
+  { path: "/api/taxgpt", label: "TaxGPT", expectStatus: 401 },
   { path: "/api/alerts", label: "Alerts", expectStatus: 401 },
-  { path: "/api/gamification/badges/all", label: "Gamification", expectStatus: 200 },
+  { path: "/api/gamification/badges", label: "Gamification", expectStatus: 200 },
 ];
 
 const SLOW_NEWS_THRESHOLD_MS = 3000;
@@ -48,8 +48,11 @@ function closeCircuit(path: string): void {
 }
 
 const BASE_URL = (() => {
+  if (process.env.API_INTERNAL_BASE_URL) {
+    return process.env.API_INTERNAL_BASE_URL.replace(/\/$/, "");
+  }
   const port = process.env.PORT || "3000";
-  return `http://localhost:${port}`;
+  return `http://127.0.0.1:${port}`;
 })();
 
 async function logAutoHealEvent(path: string, message: string): Promise<void> {

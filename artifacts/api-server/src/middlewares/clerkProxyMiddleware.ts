@@ -22,6 +22,22 @@ import type { RequestHandler } from "express";
 const CLERK_FAPI = "https://frontend-api.clerk.dev";
 export const CLERK_PROXY_PATH = "/api/__clerk";
 
+export function validateClerkEnv(): void {
+  const missingServer: string[] = [];
+  if (!process.env.CLERK_SECRET_KEY) missingServer.push("CLERK_SECRET_KEY");
+
+  if (missingServer.length > 0) {
+    console.warn(
+      `[Clerk] Missing server-side env vars: ${missingServer.join(", ")}. ` +
+      "Authentication will not function in production. " +
+      "Required variables: CLERK_SECRET_KEY (server), " +
+      "VITE_CLERK_PUBLISHABLE_KEY (frontend), VITE_CLERK_PROXY_URL (frontend)."
+    );
+  } else if (process.env.NODE_ENV === "production") {
+    console.info("[Clerk] CLERK_SECRET_KEY is set. FAPI proxy is active.");
+  }
+}
+
 export function clerkProxyMiddleware(): RequestHandler {
   // Only run proxy in production — Clerk proxying doesn't work for dev instances
   if (process.env.NODE_ENV !== "production") {
@@ -30,6 +46,7 @@ export function clerkProxyMiddleware(): RequestHandler {
 
   const secretKey = process.env.CLERK_SECRET_KEY;
   if (!secretKey) {
+    console.warn("[Clerk] CLERK_SECRET_KEY is not set — FAPI proxy disabled. Set CLERK_SECRET_KEY, VITE_CLERK_PUBLISHABLE_KEY, and VITE_CLERK_PROXY_URL for production auth.");
     return (_req, _res, next) => next();
   }
 

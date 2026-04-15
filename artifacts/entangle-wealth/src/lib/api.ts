@@ -53,22 +53,28 @@ async function fetchWithCache<T>(
   maxAttempts = 3
 ): Promise<CachedResult<T>> {
   const cacheKey = getCacheKey(input, init);
+  const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
 
   try {
     const res = await fetchWithRetry(input, init, maxAttempts);
     if (!res.ok) {
-      const cached = staleCache.get(cacheKey);
-      if (cached) {
-        return { data: cached.data as T, stale: true, lastUpdated: cached.timestamp };
-      }
+      // HTTP 4xx/5xx are definitive API errors — surface them to callers.
+      // Do not silently serve stale data; the caller should handle/display the error.
+      console.warn(`[fetchWithCache] HTTP ${res.status} for ${url} — throwing error (stale cache bypassed)`);
       throw new Error(`HTTP ${res.status}`);
     }
     const data = await res.json() as T;
     staleCache.set(cacheKey, { data, timestamp: Date.now() });
     return { data, stale: false, lastUpdated: Date.now() };
   } catch (err) {
+    // Only serve stale data on network-level failures (not HTTP errors above),
+    // since network blips are transient and stale data beats a hard crash.
+    if (err instanceof Error && err.message.startsWith("HTTP ")) {
+      throw err;
+    }
     const cached = staleCache.get(cacheKey);
     if (cached) {
+      console.warn(`[fetchWithCache] Network failure for ${url} — serving stale data from ${new Date(cached.timestamp).toISOString()}`, err);
       return { data: cached.data as T, stale: true, lastUpdated: cached.timestamp };
     }
     throw err;

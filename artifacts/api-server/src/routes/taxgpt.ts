@@ -207,6 +207,10 @@ interface TaxGptCompletion {
   choices: Array<{ message: { content: string | null } }>;
 }
 
+router.get("/taxgpt", requireAuth, (_req, res) => {
+  res.json({ status: "ready", service: "TaxGPT" });
+});
+
 router.post("/taxgpt", requireAuth, validateBody(TaxGptRequestSchema), async (req, res) => {
   if (!checkRateLimit(req)) {
     res.status(429).json({ error: "Rate limit exceeded. Please wait before sending another question." });

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { useUser, useAuth, useClerk } from "@clerk/react";
 import { User, MapPin, Mail, Phone, Edit2, Save, Shield, ShieldCheck, ShieldAlert, Loader2, FileText, Briefcase, Award, ExternalLink, TrendingUp, Zap, DollarSign, AlertTriangle, Eye, EyeOff, Bell, Globe, Trophy, Flame, Star, Target, Wallet, Coins, Users, Fingerprint, Upload, X, Image, Building2, MessageSquare, CheckCircle, Clock } from "lucide-react";
@@ -344,6 +345,7 @@ export default function Profile() {
   const { user, isLoaded: userLoaded } = useUser();
   const { getToken } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [profile, setProfile] = useState<ProfileData>({
     headline: "", occupationId: "", bio: "", phone: "", location: "",
     isPublicProfile: true, kycStatus: "not_started", subscriptionTier: "free",
@@ -508,6 +510,23 @@ export default function Profile() {
       if (!res.ok) throw new Error("Save failed");
       toast({ title: "Profile updated", description: "Your profile has been saved." });
       setEditing(false);
+
+      if (profile.occupationId) {
+        fetchAuth("/dashboard-modules/evaluate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            occupationId: profile.occupationId,
+            isBusinessOwner: profile.isBusinessOwner ?? false,
+          }),
+        })
+          .then((evalRes) => {
+            if (evalRes.ok) {
+              queryClient.invalidateQueries({ queryKey: ["dashboard-modules"] });
+            }
+          })
+          .catch(() => {});
+      }
     } catch {
       toast({ title: "Error", description: "Failed to save profile.", variant: "destructive" });
     } finally {

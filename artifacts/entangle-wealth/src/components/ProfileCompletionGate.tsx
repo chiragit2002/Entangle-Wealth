@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useUser, useAuth } from "@clerk/react";
 import { useLocation } from "wouter";
 import { User, MapPin, Loader2, ChevronRight, Briefcase, Building2, Upload, X, FileText, CheckCircle2, AlertCircle } from "lucide-react";
@@ -99,6 +100,7 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
   const { getToken } = useAuth();
   const [location] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [showGate, setShowGate] = useState(false);
   const [checking, setChecking] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -337,6 +339,23 @@ export function ProfileCompletionGate({ children }: { children: React.ReactNode 
 
       setShowGate(false);
       toast({ title: "Setup complete!", description: "Your plan is ready. Welcome to EntangleWealth." });
+
+      if (form.occupationId) {
+        authFetch("/dashboard-modules/evaluate", getToken, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            occupationId: form.occupationId,
+            isBusinessOwner: isBusinessOwner ?? false,
+          }),
+        })
+          .then((evalRes) => {
+            if (evalRes.ok) {
+              queryClient.invalidateQueries({ queryKey: ["dashboard-modules"] });
+            }
+          })
+          .catch(() => {});
+      }
     } catch {
       toast({ title: "Error", description: "Failed to save profile. Please try again.", variant: "destructive" });
     } finally {

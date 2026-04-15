@@ -76,6 +76,24 @@ export const crawlRunsTable = pgTable("crawl_runs", {
   index("idx_crawl_runs_started_at").on(table.startedAt),
 ]);
 
+export const dashboardModuleEventsTable = pgTable("dashboard_module_events", {
+  id: serial("id").primaryKey(),
+  clerkId: text("clerk_id").notNull(),
+  occupationId: text("occupation_id").notNull(),
+  isBusinessOwner: boolean("is_business_owner").notNull().default(false),
+  moduleIds: jsonb("module_ids").notNull(),
+  previousModuleIds: jsonb("previous_module_ids"),
+  changed: boolean("changed").notNull().default(false),
+  trigger: text("trigger").notNull().default("auto"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+}, (table) => [
+  index("idx_dashboard_module_events_clerk_id").on(table.clerkId),
+  index("idx_dashboard_module_events_created_at").on(table.createdAt),
+]);
+
+export type DashboardModuleEvent = typeof dashboardModuleEventsTable.$inferSelect;
+export type InsertDashboardModuleEvent = typeof dashboardModuleEventsTable.$inferInsert;
+
 export type AuditLog = typeof auditLogTable.$inferSelect;
 export type InsertAuditLog = typeof auditLogTable.$inferInsert;
 export type UxSignal = typeof uxSignalsTable.$inferSelect;

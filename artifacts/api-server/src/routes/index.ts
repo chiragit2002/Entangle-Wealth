@@ -46,6 +46,7 @@ import integrationsRouter from "./integrations";
 import taxflowRouter from "./taxflow";
 import auditRouter from "./audit";
 import stressTestRouter from "./stressTest";
+import dashboardModulesRouter from "./dashboardModules";
 
 export function createRouter(app: Express): IRouter {
 const router: IRouter = Router();
@@ -97,6 +98,7 @@ router.use(sentryRouter);
 router.use(integrationsRouter);
 router.use(taxflowRouter);
 router.use(stressTestRouter);
+router.use(dashboardModulesRouter);
 
 return router;
 }

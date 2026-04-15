@@ -40,6 +40,7 @@ import { SessionRecapOverlay } from "@/components/SessionRecapOverlay";
 import { CommitmentEscalationFlow } from "@/components/CommitmentEscalationFlow";
 import { generateEntanglementInsights, type UserEntanglementContext } from "@/lib/entanglementEngine";
 import { getActiveProfile } from "@/lib/taxflow-profile";
+import { DynamicModuleGrid } from "@/components/dashboard/DynamicModuleGrid";
 
 const DASHBOARD_STOCKS: { symbol: string; name: string }[] = [
   { symbol: "AAPL", name: "Apple Inc." }, { symbol: "MSFT", name: "Microsoft Corporation" },
@@ -712,6 +713,18 @@ export default function Dashboard() {
             </div>
           </Panel>
         )}
+
+        {/* Section: Personalized Financial Plan — primary module-driven view */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-4 rounded-full bg-primary" />
+              <span className="text-sm font-semibold text-white/70">Your Financial Plan</span>
+              <span className="text-[10px] text-white/30 font-mono">Personalized to your occupation</span>
+            </div>
+          </div>
+          <DynamicModuleGrid />
+        </div>
 
         {/* Behavioral nudges — stacked priority system */}
         <div className="grid grid-cols-12 gap-3">

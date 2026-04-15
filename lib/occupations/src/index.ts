@@ -1,5 +1,217 @@
 export type TaxCategory = "W-2" | "1099" | "Business Owner" | "Mixed";
 
+export type DashboardModuleId =
+  | "tax-savings"
+  | "business-deductions"
+  | "investment-strategy"
+  | "expense-tracking"
+  | "retirement-planning"
+  | "gig-income-optimizer"
+  | "real-estate-deductions"
+  | "capital-gains-planner";
+
+export interface DashboardModule {
+  id: DashboardModuleId;
+  label: string;
+  description: string;
+  icon: string;
+  priority: number;
+  deductionCategories: string[];
+}
+
+export const DASHBOARD_MODULES: Record<DashboardModuleId, Omit<DashboardModule, "priority">> = {
+  "tax-savings": {
+    id: "tax-savings",
+    label: "Tax Savings",
+    description: "Maximize W-2 deductions: HSA, 401(k), educator credits, and itemized analysis.",
+    icon: "shield-dollar",
+    deductionCategories: ["HSA", "401k", "IRA", "educator-expense", "student-loan-interest", "SALT", "standard-vs-itemized"],
+  },
+  "business-deductions": {
+    id: "business-deductions",
+    label: "Business Deductions",
+    description: "Unlock Section 179 expensing, QBI deduction, SE health insurance, and entity-level strategies.",
+    icon: "building",
+    deductionCategories: ["section-179", "QBI", "SE-health-insurance", "bonus-depreciation", "salary-vs-distribution", "entity-structure"],
+  },
+  "investment-strategy": {
+    id: "investment-strategy",
+    label: "Investment Strategy",
+    description: "Optimize your portfolio tax efficiency, asset location, and long-term growth.",
+    icon: "trending-up",
+    deductionCategories: ["tax-loss-harvesting", "qualified-dividends", "asset-location", "NIIT", "foreign-tax-credit"],
+  },
+  "expense-tracking": {
+    id: "expense-tracking",
+    label: "Expense Tracking",
+    description: "Track deductible business expenses, vehicle mileage, home office, and subscriptions.",
+    icon: "receipt",
+    deductionCategories: ["home-office", "vehicle-mileage", "business-travel", "meals", "professional-subscriptions", "equipment"],
+  },
+  "retirement-planning": {
+    id: "retirement-planning",
+    label: "Retirement Planning",
+    description: "Maximize contributions across 401(k), IRA, SEP-IRA, and HSA for long-term tax advantage.",
+    icon: "piggy-bank",
+    deductionCategories: ["401k", "IRA", "Roth-IRA", "SEP-IRA", "Solo-401k", "HSA", "SIMPLE-IRA"],
+  },
+  "gig-income-optimizer": {
+    id: "gig-income-optimizer",
+    label: "Gig Income Optimizer",
+    description: "Manage SE tax, quarterly estimated payments, QBI deduction, and 1099 income strategies.",
+    icon: "zap",
+    deductionCategories: ["SE-tax-deduction", "quarterly-estimates", "QBI", "SE-health-insurance", "mileage-1099", "platform-fees"],
+  },
+  "real-estate-deductions": {
+    id: "real-estate-deductions",
+    label: "Real Estate Deductions",
+    description: "Optimize mortgage interest, depreciation, 1031 exchanges, and rental property deductions.",
+    icon: "home",
+    deductionCategories: ["mortgage-interest", "depreciation", "1031-exchange", "rental-expenses", "passive-loss-rules", "REPS"],
+  },
+  "capital-gains-planner": {
+    id: "capital-gains-planner",
+    label: "Capital Gains Planner",
+    description: "Minimize capital gains taxes with harvesting, timing strategies, and qualified opportunity zones.",
+    icon: "bar-chart",
+    deductionCategories: ["long-term-vs-short-term", "tax-loss-harvesting", "wash-sale", "NIIT", "QOZ", "charitable-appreciated-stock"],
+  },
+};
+
+export interface AssignedModule extends DashboardModule {
+  assignedAt: string;
+  source: "rules-engine" | "business-owner-bonus";
+}
+
+export interface ModuleEvaluationResult {
+  modules: AssignedModule[];
+  occupationId: string;
+  isBusinessOwner: boolean;
+  evaluatedAt: string;
+}
+
+export function getModulesForOccupation(
+  occupationId: string,
+  isBusinessOwner: boolean,
+  maxModules = 4
+): ModuleEvaluationResult {
+  const occupation = getOccupationById(occupationId);
+  const now = new Date().toISOString();
+
+  if (!occupation) {
+    return { modules: [], occupationId, isBusinessOwner, evaluatedAt: now };
+  }
+
+  const { taxCategory, category } = occupation;
+
+  const priorityMap: Record<DashboardModuleId, number> = {
+    "tax-savings": 0,
+    "business-deductions": 0,
+    "investment-strategy": 0,
+    "expense-tracking": 0,
+    "retirement-planning": 0,
+    "gig-income-optimizer": 0,
+    "real-estate-deductions": 0,
+    "capital-gains-planner": 0,
+  };
+
+  if (taxCategory === "W-2") {
+    priorityMap["tax-savings"] = 100;
+    priorityMap["retirement-planning"] = 90;
+    priorityMap["investment-strategy"] = 70;
+    priorityMap["capital-gains-planner"] = 50;
+    priorityMap["expense-tracking"] = 20;
+  } else if (taxCategory === "1099") {
+    priorityMap["gig-income-optimizer"] = 100;
+    priorityMap["expense-tracking"] = 90;
+    priorityMap["retirement-planning"] = 80;
+    priorityMap["tax-savings"] = 70;
+    priorityMap["investment-strategy"] = 40;
+    priorityMap["business-deductions"] = 30;
+  } else if (taxCategory === "Business Owner") {
+    priorityMap["business-deductions"] = 100;
+    priorityMap["expense-tracking"] = 90;
+    priorityMap["retirement-planning"] = 80;
+    priorityMap["tax-savings"] = 70;
+    priorityMap["investment-strategy"] = 50;
+    priorityMap["gig-income-optimizer"] = 30;
+  } else if (taxCategory === "Mixed") {
+    priorityMap["tax-savings"] = 90;
+    priorityMap["gig-income-optimizer"] = 85;
+    priorityMap["expense-tracking"] = 80;
+    priorityMap["retirement-planning"] = 75;
+    priorityMap["investment-strategy"] = 60;
+    priorityMap["business-deductions"] = 40;
+  }
+
+  if (category === "Real Estate") {
+    priorityMap["real-estate-deductions"] = 110;
+    priorityMap["capital-gains-planner"] += 20;
+    priorityMap["investment-strategy"] += 15;
+  }
+
+  if (category === "Finance & Banking") {
+    priorityMap["capital-gains-planner"] = Math.max(priorityMap["capital-gains-planner"], 95);
+    priorityMap["investment-strategy"] += 20;
+    priorityMap["tax-savings"] += 10;
+  }
+
+  if (category === "Technology") {
+    priorityMap["investment-strategy"] += 15;
+    priorityMap["capital-gains-planner"] += 10;
+  }
+
+  if (category === "Healthcare") {
+    priorityMap["retirement-planning"] += 15;
+    priorityMap["tax-savings"] += 10;
+  }
+
+  if (category === "Education") {
+    priorityMap["tax-savings"] += 20;
+    priorityMap["retirement-planning"] += 5;
+  }
+
+  if (category === "Trades & Construction" || category === "Transportation & Logistics") {
+    priorityMap["expense-tracking"] += 20;
+    priorityMap["gig-income-optimizer"] += 15;
+  }
+
+  if (category === "Creative & Media" || category === "Freelance & Independent") {
+    priorityMap["gig-income-optimizer"] += 15;
+    priorityMap["expense-tracking"] += 15;
+  }
+
+  if (category === "Arts & Entertainment") {
+    priorityMap["gig-income-optimizer"] += 10;
+    priorityMap["expense-tracking"] += 10;
+  }
+
+  const sorted = (Object.keys(priorityMap) as DashboardModuleId[])
+    .filter((id) => priorityMap[id] > 0)
+    .sort((a, b) => priorityMap[b] - priorityMap[a]);
+
+  const baseModuleIds = sorted.slice(0, maxModules);
+
+  const bonusModuleIds: DashboardModuleId[] = [];
+  if (isBusinessOwner) {
+    bonusModuleIds.push("business-deductions");
+    bonusModuleIds.push("expense-tracking");
+  }
+
+  const allModuleIds = Array.from(new Set([...baseModuleIds, ...bonusModuleIds]));
+
+  const modules: AssignedModule[] = allModuleIds.map((id) => ({
+    ...DASHBOARD_MODULES[id],
+    priority: priorityMap[id],
+    assignedAt: now,
+    source: bonusModuleIds.includes(id) && !baseModuleIds.includes(id)
+      ? "business-owner-bonus"
+      : "rules-engine",
+  }));
+
+  return { modules, occupationId, isBusinessOwner, evaluatedAt: now };
+}
+
 export interface Occupation {
   id: string;
   name: string;

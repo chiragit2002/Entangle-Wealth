@@ -3,6 +3,7 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import { agentRegistry } from "../lib/agents";
+import { LearningAgent } from "../lib/agents/LearningAgent";
 import { pool } from "@workspace/db";
 import { logger } from "../lib/logger";
 
@@ -114,6 +115,59 @@ router.get("/agents/events", requireAuth, requireAdmin, async (req: Authenticate
   } catch (err) {
     logger.error({ err }, "Failed to fetch agent events");
     res.status(500).json({ error: "Failed to fetch agent events" });
+  }
+});
+
+function getLearningAgent(): LearningAgent | null {
+  const agent = agentRegistry.get("Learning");
+  if (agent instanceof LearningAgent) return agent;
+  return null;
+}
+
+router.get("/agents/learning/insights", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const learning = getLearningAgent();
+    if (!learning) {
+      res.status(503).json({ error: "LearningAgent not available" });
+      return;
+    }
+
+    const strategyId = req.query.strategy_id as string | undefined;
+
+    if (strategyId) {
+      const insights = await learning.getInsightsForStrategy(strategyId);
+      res.json({ strategy_id: strategyId, insights });
+      return;
+    }
+
+    const insights = await learning.getAllInsights();
+    res.json({ insights, count: insights.length });
+  } catch (err) {
+    logger.error({ err }, "Failed to fetch learning insights");
+    res.status(500).json({ error: "Failed to fetch learning insights" });
+  }
+});
+
+router.get("/agents/learning/insights/:strategyId/:regime", requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const learning = getLearningAgent();
+    if (!learning) {
+      res.status(503).json({ error: "LearningAgent not available" });
+      return;
+    }
+
+    const { strategyId, regime } = req.params;
+    const insight = await learning.getInsight(strategyId, regime);
+
+    if (!insight) {
+      res.status(404).json({ error: "No insight found for this strategy/regime pair" });
+      return;
+    }
+
+    res.json(insight);
+  } catch (err) {
+    logger.error({ err }, "Failed to fetch learning insight");
+    res.status(500).json({ error: "Failed to fetch learning insight" });
   }
 });
 

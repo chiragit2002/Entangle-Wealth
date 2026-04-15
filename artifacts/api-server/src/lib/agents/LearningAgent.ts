@@ -37,9 +37,69 @@ interface EpisodeRecord {
   timestamp: number;
 }
 
+export interface StrategyInsight {
+  strategy_id: string;
+  regime: string;
+  insight: string;
+  confidence: number;
+  samples: number;
+  signal: "favorable" | "unfavorable" | "neutral" | "insufficient_data";
+  avgPnl: number;
+  winRate: number;
+  maxDrawdown: number;
+}
+
 const MAX_EPISODE_BUFFER = 5_000;
 const CONSOLIDATION_INTERVAL_MS = 5 * 60_000;
 const MIN_SAMPLES_FOR_SIGNAL = 3;
+const CONFIDENCE_SAMPLE_CAP = 500;
+
+function regimeLabel(regime: string): string {
+  return regime.replace(/_/g, " ");
+}
+
+function computeConfidence(samples: number, winRate: number, avgPnl: number): number {
+  if (samples < MIN_SAMPLES_FOR_SIGNAL) return 0;
+  const sampleFactor = 1 - 1 / Math.sqrt(Math.min(samples, CONFIDENCE_SAMPLE_CAP));
+  const winDeviation = Math.abs(winRate - 50) / 50;
+  const pnlStrength = Math.min(Math.abs(avgPnl) / 5, 1);
+  const raw = sampleFactor * 0.5 + winDeviation * 0.3 + pnlStrength * 0.2;
+  return Math.round(raw * 100) / 100;
+}
+
+function generateInsightText(
+  strategyId: string,
+  regime: string,
+  signal: "favorable" | "unfavorable" | "neutral" | "insufficient_data",
+  avgPnl: number,
+  winRate: number,
+  maxDrawdown: number,
+): string {
+  const r = regimeLabel(regime);
+
+  if (signal === "insufficient_data") {
+    return `insufficient data in ${r}`;
+  }
+
+  if (signal === "unfavorable") {
+    const parts: string[] = [];
+    if (avgPnl < -2) parts.push(`avg loss ${avgPnl.toFixed(1)}`);
+    if (winRate < 35) parts.push(`${winRate.toFixed(0)}% win rate`);
+    if (maxDrawdown < -10) parts.push(`${maxDrawdown.toFixed(1)} max drawdown`);
+    const detail = parts.length > 0 ? ` (${parts.join(", ")})` : "";
+    return `fails in ${r}${detail}`;
+  }
+
+  if (signal === "favorable") {
+    const parts: string[] = [];
+    if (avgPnl > 2) parts.push(`avg gain +${avgPnl.toFixed(1)}`);
+    if (winRate > 65) parts.push(`${winRate.toFixed(0)}% win rate`);
+    const detail = parts.length > 0 ? ` (${parts.join(", ")})` : "";
+    return `excels in ${r}${detail}`;
+  }
+
+  return `mixed results in ${r}`;
+}
 
 export class LearningAgent extends BaseAgent {
   private episodes: EpisodeRecord[] = [];
@@ -155,21 +215,22 @@ export class LearningAgent extends BaseAgent {
     const snapshot = [...this.episodes];
     this.episodes = [];
 
-    const insights = new Map<string, { pnls: number[]; drawdowns: number[] }>();
+    const buckets = new Map<string, { pnls: number[]; drawdowns: number[] }>();
 
     for (const ep of snapshot) {
       const key = `${ep.strategyId}|||${ep.regime}`;
-      if (!insights.has(key)) {
-        insights.set(key, { pnls: [], drawdowns: [] });
+      if (!buckets.has(key)) {
+        buckets.set(key, { pnls: [], drawdowns: [] });
       }
-      const bucket = insights.get(key)!;
+      const bucket = buckets.get(key)!;
       bucket.pnls.push(ep.pnl);
       bucket.drawdowns.push(ep.drawdown);
     }
 
     let upserted = 0;
+    const generatedInsights: StrategyInsight[] = [];
 
-    for (const [key, data] of insights) {
+    for (const [key, data] of buckets) {
       const [strategyId, regime] = key.split("|||");
       const { pnls, drawdowns } = data;
 
@@ -237,6 +298,22 @@ export class LearningAgent extends BaseAgent {
         }
 
         upserted++;
+
+        const signal = this.classifySignal(totalSamples, avgPnl, winRate);
+        const confidence = computeConfidence(totalSamples, winRate, avgPnl);
+        const insight = generateInsightText(strategyId, regime, signal, avgPnl, winRate, worstDrawdown);
+
+        generatedInsights.push({
+          strategy_id: strategyId,
+          regime,
+          insight,
+          confidence,
+          samples: totalSamples,
+          signal,
+          avgPnl,
+          winRate,
+          maxDrawdown: worstDrawdown,
+        });
       } catch (err) {
         logger.warn({ err, strategyId, regime }, "[LearningAgent] Failed to upsert insight");
       }
@@ -252,20 +329,29 @@ export class LearningAgent extends BaseAgent {
       await eventBus.publish({
         eventType: "learning_updated",
         sourceAgent: this.name,
-        payload: { insightsUpdated: upserted, episodesProcessed: snapshot.length },
+        payload: {
+          insightsUpdated: upserted,
+          episodesProcessed: snapshot.length,
+          insights: generatedInsights,
+        },
       });
     }
 
     logger.info({ episodes: snapshot.length, insights: upserted, durationMs }, "[LearningAgent] Consolidation complete");
   }
 
-  async getInsight(strategyId: string, regime: string): Promise<{
-    avgPnl: number;
-    samples: number;
-    winRate: number;
-    maxDrawdown: number;
-    signal: "favorable" | "unfavorable" | "neutral" | "insufficient_data";
-  } | null> {
+  private classifySignal(
+    samples: number,
+    avgPnl: number,
+    winRate: number,
+  ): "favorable" | "unfavorable" | "neutral" | "insufficient_data" {
+    if (samples < MIN_SAMPLES_FOR_SIGNAL) return "insufficient_data";
+    if (avgPnl > 0 && winRate > 55) return "favorable";
+    if (avgPnl < 0 || winRate < 40) return "unfavorable";
+    return "neutral";
+  }
+
+  async getInsight(strategyId: string, regime: string): Promise<StrategyInsight | null> {
     try {
       const rows = await db
         .select()
@@ -279,24 +365,20 @@ export class LearningAgent extends BaseAgent {
       if (rows.length === 0) return null;
 
       const row = rows[0];
-      let signal: "favorable" | "unfavorable" | "neutral" | "insufficient_data";
-
-      if (row.samples < MIN_SAMPLES_FOR_SIGNAL) {
-        signal = "insufficient_data";
-      } else if (row.avgPnl > 0 && row.winRate > 55) {
-        signal = "favorable";
-      } else if (row.avgPnl < 0 || row.winRate < 40) {
-        signal = "unfavorable";
-      } else {
-        signal = "neutral";
-      }
+      const signal = this.classifySignal(row.samples, row.avgPnl, row.winRate);
+      const confidence = computeConfidence(row.samples, row.winRate, row.avgPnl);
+      const insight = generateInsightText(strategyId, regime, signal, row.avgPnl, row.winRate, row.maxDrawdown || 0);
 
       return {
-        avgPnl: row.avgPnl,
+        strategy_id: strategyId,
+        regime,
+        insight,
+        confidence,
         samples: row.samples,
+        signal,
+        avgPnl: row.avgPnl,
         winRate: row.winRate,
         maxDrawdown: row.maxDrawdown || 0,
-        signal,
       };
     } catch (err) {
       logger.warn({ err, strategyId, regime }, "[LearningAgent] Failed to get insight");
@@ -304,26 +386,61 @@ export class LearningAgent extends BaseAgent {
     }
   }
 
-  async getInsightsForStrategy(strategyId: string): Promise<Array<{
-    regime: string;
-    avgPnl: number;
-    samples: number;
-    winRate: number;
-    maxDrawdown: number;
-  }>> {
+  async getInsightsForStrategy(strategyId: string): Promise<StrategyInsight[]> {
     try {
-      return await db
-        .select({
-          regime: strategyRegimeInsightsTable.regime,
-          avgPnl: strategyRegimeInsightsTable.avgPnl,
-          samples: strategyRegimeInsightsTable.samples,
-          winRate: strategyRegimeInsightsTable.winRate,
-          maxDrawdown: strategyRegimeInsightsTable.maxDrawdown,
-        })
+      const rows = await db
+        .select()
         .from(strategyRegimeInsightsTable)
         .where(eq(strategyRegimeInsightsTable.strategyId, strategyId));
+
+      return rows.map(row => {
+        const signal = this.classifySignal(row.samples, row.avgPnl, row.winRate);
+        const confidence = computeConfidence(row.samples, row.winRate, row.avgPnl);
+        const insight = generateInsightText(strategyId, row.regime, signal, row.avgPnl, row.winRate, row.maxDrawdown || 0);
+
+        return {
+          strategy_id: strategyId,
+          regime: row.regime,
+          insight,
+          confidence,
+          samples: row.samples,
+          signal,
+          avgPnl: row.avgPnl,
+          winRate: row.winRate,
+          maxDrawdown: row.maxDrawdown || 0,
+        };
+      });
     } catch (err) {
       logger.warn({ err, strategyId }, "[LearningAgent] Failed to get strategy insights");
+      return [];
+    }
+  }
+
+  async getAllInsights(): Promise<StrategyInsight[]> {
+    try {
+      const rows = await db
+        .select()
+        .from(strategyRegimeInsightsTable);
+
+      return rows.map(row => {
+        const signal = this.classifySignal(row.samples, row.avgPnl, row.winRate);
+        const confidence = computeConfidence(row.samples, row.winRate, row.avgPnl);
+        const insight = generateInsightText(row.strategyId, row.regime, signal, row.avgPnl, row.winRate, row.maxDrawdown || 0);
+
+        return {
+          strategy_id: row.strategyId,
+          regime: row.regime,
+          insight,
+          confidence,
+          samples: row.samples,
+          signal,
+          avgPnl: row.avgPnl,
+          winRate: row.winRate,
+          maxDrawdown: row.maxDrawdown || 0,
+        };
+      });
+    } catch (err) {
+      logger.warn({ err }, "[LearningAgent] Failed to get all insights");
       return [];
     }
   }

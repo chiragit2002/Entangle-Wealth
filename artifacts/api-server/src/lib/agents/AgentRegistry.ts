@@ -48,6 +48,10 @@ class AgentRegistry {
     }
   }
 
+  get(name: string): BaseAgent | undefined {
+    return this.agents.get(name)?.agent;
+  }
+
   async getStatus(): Promise<Array<AgentHealthReport & { restartCount: number; lastRestartAt: Date | null }>> {
     const results = [];
     for (const [, entry] of this.agents) {

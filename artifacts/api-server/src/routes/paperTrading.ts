@@ -7,23 +7,22 @@ import { resolveUserId } from "../lib/resolveUserId";
 import { logger } from "../lib/logger";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { validateBody, z } from "../lib/validateRequest";
-import { getStockBySymbol } from "../data/nasdaq-stocks";
+import { getLivePrice, getLivePrices } from "../lib/priceService";
+import type { InferSelectModel } from "drizzle-orm";
+
+type DbPosition = InferSelectModel<typeof paperPositionsTable>;
+
+interface PositionWithLiveData extends DbPosition {
+  currentPrice?: number;
+  unrealizedPnl?: number;
+}
 
 const router = Router();
 
 const DEFAULT_STARTING_CASH = 100_000;
-const EARLY_ADOPTER_STARTING_CASH = 1_000_000;
 
 function getTodayUTC(): string {
   return new Date().toISOString().split("T")[0];
-}
-
-async function getStartingCash(userId: string): Promise<number> {
-  const [user] = await db
-    .select({ isEarlyAdopter: usersTable.isEarlyAdopter })
-    .from(usersTable)
-    .where(eq(usersTable.id, userId));
-  return user?.isEarlyAdopter ? EARLY_ADOPTER_STARTING_CASH : DEFAULT_STARTING_CASH;
 }
 
 async function ensurePortfolio(userId: string) {
@@ -34,10 +33,9 @@ async function ensurePortfolio(userId: string) {
 
   if (existing) return existing;
 
-  const startingCash = await getStartingCash(userId);
   const [created] = await db
     .insert(paperPortfoliosTable)
-    .values({ userId, cashBalance: startingCash })
+    .values({ userId, cashBalance: DEFAULT_STARTING_CASH })
     .returning();
   return created;
 }
@@ -54,7 +52,7 @@ router.get("/paper-trading/portfolio", requireAuth, async (req, res) => {
     const clerkId = (req as AuthenticatedRequest).userId;
     const dbUserId = await resolveUserId(clerkId, req);
     if (!dbUserId) {
-      res.json({ cashBalance: DEFAULT_STARTING_CASH, positions: [], trades: [], portfolioValue: 0, totalValue: DEFAULT_STARTING_CASH, startingCash: DEFAULT_STARTING_CASH });
+      res.json({ cashBalance: DEFAULT_STARTING_CASH, positions: [], trades: [], portfolioValue: 0, totalValue: DEFAULT_STARTING_CASH, startingCash: DEFAULT_STARTING_CASH, marketDataAvailable: false });
       return;
     }
 
@@ -68,14 +66,12 @@ router.get("/paper-trading/portfolio", requireAuth, async (req, res) => {
       .limit(50);
 
     const activePositions = positions.filter(p => p.quantity > 0);
-    const positionValue = activePositions.reduce((sum, p) => sum + (p.quantity * p.avgCost), 0);
 
     const optionsPositions = await db
       .select()
       .from(paperOptionsPositionsTable)
       .where(eq(paperOptionsPositionsTable.userId, dbUserId));
     const activeOptionsPositions = optionsPositions.filter(p => p.contracts > 0);
-    const optionsValue = activeOptionsPositions.reduce((sum, p) => sum + (p.contracts * p.avgPremium * 100), 0);
 
     const optionsTrades = await db
       .select()
@@ -84,21 +80,44 @@ router.get("/paper-trading/portfolio", requireAuth, async (req, res) => {
       .orderBy(desc(paperOptionsTradesTable.createdAt))
       .limit(20);
 
-    const [userRow] = await db
-      .select({ isEarlyAdopter: usersTable.isEarlyAdopter })
-      .from(usersTable)
-      .where(eq(usersTable.id, dbUserId));
-    const startingCash = userRow?.isEarlyAdopter ? EARLY_ADOPTER_STARTING_CASH : DEFAULT_STARTING_CASH;
+    let portfolioValue: number | null = null;
+    let marketDataAvailable = true;
+    let positionsWithLivePrice: PositionWithLiveData[] = [...activePositions];
+
+    if (activePositions.length > 0) {
+      const symbols = activePositions.map(p => p.symbol);
+      const livePrices = await getLivePrices(symbols);
+
+      if (Object.keys(livePrices).length === 0 && symbols.length > 0) {
+        marketDataAvailable = false;
+      } else {
+        portfolioValue = 0;
+        positionsWithLivePrice = activePositions.map(pos => {
+          const lp = livePrices[pos.symbol];
+          if (lp) {
+            portfolioValue = (portfolioValue ?? 0) + pos.quantity * lp;
+            return { ...pos, currentPrice: lp, unrealizedPnl: pos.quantity * (lp - pos.avgCost) };
+          }
+          portfolioValue = (portfolioValue ?? 0) + pos.quantity * pos.avgCost;
+          return pos;
+        });
+      }
+    } else {
+      portfolioValue = 0;
+    }
+
+    const optionsValue = activeOptionsPositions.reduce((sum, p) => sum + p.contracts * p.avgPremium * 100, 0);
 
     res.json({
       cashBalance: portfolio.cashBalance,
-      positions: activePositions,
+      positions: positionsWithLivePrice,
       trades,
-      portfolioValue: positionValue + optionsValue,
-      totalValue: portfolio.cashBalance + positionValue + optionsValue,
-      startingCash,
+      portfolioValue: portfolioValue !== null ? portfolioValue + optionsValue : null,
+      totalValue: portfolioValue !== null ? portfolio.cashBalance + portfolioValue + optionsValue : null,
+      startingCash: DEFAULT_STARTING_CASH,
       optionsPositions: activeOptionsPositions,
       optionsTrades,
+      marketDataAvailable,
     });
   } catch (err) {
     logger.error({ err }, "Paper trading portfolio error");
@@ -125,14 +144,16 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
     const qty = Math.floor(Number(quantity));
     const upperSymbol = symbol.toUpperCase();
 
-    const stockData = getStockBySymbol(upperSymbol);
-    if (!stockData || typeof stockData.price !== "number" || stockData.price <= 0) {
-      res.status(422).json({ error: `Cannot execute trade: market price unavailable for ${upperSymbol}` });
+    const px = await getLivePrice(upperSymbol);
+    if (!px || px <= 0) {
+      res.status(503).json({
+        error: `Market data temporarily unavailable — trading paused for ${upperSymbol}. Please try again shortly.`,
+        marketDataUnavailable: true,
+      });
       return;
     }
-    const px = stockData.price;
+
     const totalCost = qty * px;
-    const startingCash = await getStartingCash(dbUserId);
 
     const result = await db.transaction(async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${dbUserId.toString()} || '_paper_trade'))`);
@@ -149,7 +170,7 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
       } else {
         const [created] = await tx
           .insert(paperPortfoliosTable)
-          .values({ userId: dbUserId, cashBalance: startingCash })
+          .values({ userId: dbUserId, cashBalance: DEFAULT_STARTING_CASH })
           .returning();
         currentCash = created.cashBalance;
       }
@@ -171,7 +192,7 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
           balanceBefore: currentCash,
           balanceAfter: newCash,
           source: 'trade',
-          referenceId: `${side}_${upperSymbol}_${qty}`,
+          referenceId: `buy_${upperSymbol}_${qty}_@${px.toFixed(2)}`,
         });
 
         const [existingPos] = await tx
@@ -213,7 +234,7 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
           balanceBefore: currentCash,
           balanceAfter: newCash,
           source: 'trade',
-          referenceId: `${side}_${upperSymbol}_${qty}`,
+          referenceId: `sell_${upperSymbol}_${qty}_@${px.toFixed(2)}`,
         });
 
         const newQty = existingPos.quantity - qty;
@@ -259,21 +280,37 @@ router.post("/paper-trading/reset", requireAuth, validateBody(z.object({}).stric
       return;
     }
 
-    const startingCash = await getStartingCash(dbUserId);
-
     await db.transaction(async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${dbUserId} || '_paper_trade'))`);
+
+      const [portfolio] = await tx
+        .select({ cashBalance: paperPortfoliosTable.cashBalance })
+        .from(paperPortfoliosTable)
+        .where(eq(paperPortfoliosTable.userId, dbUserId));
+
+      const balanceBefore = portfolio?.cashBalance ?? DEFAULT_STARTING_CASH;
+
       await tx.delete(paperTradesTable).where(eq(paperTradesTable.userId, dbUserId));
       await tx.delete(paperPositionsTable).where(eq(paperPositionsTable.userId, dbUserId));
       await tx.delete(paperOptionsTradesTable).where(eq(paperOptionsTradesTable.userId, dbUserId));
       await tx.delete(paperOptionsPositionsTable).where(eq(paperOptionsPositionsTable.userId, dbUserId));
       await tx
         .update(paperPortfoliosTable)
-        .set({ cashBalance: startingCash, updatedAt: new Date() })
+        .set({ cashBalance: DEFAULT_STARTING_CASH, updatedAt: new Date() })
         .where(eq(paperPortfoliosTable.userId, dbUserId));
+
+      await tx.insert(balanceTransactionsTable).values({
+        userId: dbUserId,
+        transactionType: 'portfolio_reset',
+        amount: DEFAULT_STARTING_CASH - balanceBefore,
+        balanceBefore,
+        balanceAfter: DEFAULT_STARTING_CASH,
+        source: 'reset',
+        referenceId: `reset_${Date.now()}`,
+      });
     });
 
-    const formattedBalance = startingCash.toLocaleString("en-US");
+    const formattedBalance = DEFAULT_STARTING_CASH.toLocaleString("en-US");
     res.json({ success: true, message: `Portfolio reset to $${formattedBalance}` });
   } catch (err) {
     logger.error({ err }, "Paper trading reset error");
@@ -303,15 +340,17 @@ router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTra
     const { symbol, optionType, strike, expiration, side, contracts } = req.body;
     const upperSymbol = symbol.toUpperCase();
 
-    const stockData = getStockBySymbol(upperSymbol);
-    if (!stockData || typeof stockData.price !== "number" || stockData.price <= 0) {
-      res.status(422).json({ error: `Cannot execute options trade: market price unavailable for ${upperSymbol}` });
+    const underlyingPrice = await getLivePrice(upperSymbol);
+    if (!underlyingPrice || underlyingPrice <= 0) {
+      res.status(503).json({
+        error: `Market data temporarily unavailable — trading paused for ${upperSymbol}. Please try again shortly.`,
+        marketDataUnavailable: true,
+      });
       return;
     }
-    const underlyingPrice = stockData.price;
+
     const premium = Math.max(0.01, Math.abs(underlyingPrice - strike) * 0.05 + underlyingPrice * 0.005);
     const totalCost = contracts * premium * 100;
-    const startingCash = await getStartingCash(dbUserId);
 
     const result = await db.transaction(async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${dbUserId.toString()} || '_paper_trade'))`);
@@ -328,7 +367,7 @@ router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTra
       } else {
         const [created] = await tx
           .insert(paperPortfoliosTable)
-          .values({ userId: dbUserId, cashBalance: startingCash })
+          .values({ userId: dbUserId, cashBalance: DEFAULT_STARTING_CASH })
           .returning();
         currentCash = created.cashBalance;
       }
@@ -338,9 +377,20 @@ router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTra
           return { error: "> INSUFFICIENT FUNDS — ORDER REJECTED" };
         }
 
+        const newCash = currentCash - totalCost;
         await tx.execute(
           sql`UPDATE paper_portfolios SET cash_balance = cash_balance - ${totalCost}, updated_at = NOW() WHERE user_id = ${dbUserId}`
         );
+
+        await tx.insert(balanceTransactionsTable).values({
+          userId: dbUserId,
+          transactionType: 'options_buy',
+          amount: -totalCost,
+          balanceBefore: currentCash,
+          balanceAfter: newCash,
+          source: 'options_trade',
+          referenceId: `buy_${upperSymbol}_${strike}_${optionType}_${contracts}contracts`,
+        });
 
         const [existingPos] = await tx
           .select()
@@ -381,9 +431,20 @@ router.post("/paper-trading/options-trade", requireAuth, validateBody(OptionsTra
           return { error: "> INSUFFICIENT CONTRACTS — ORDER REJECTED" };
         }
 
+        const newCash = currentCash + totalCost;
         await tx.execute(
           sql`UPDATE paper_portfolios SET cash_balance = cash_balance + ${totalCost}, updated_at = NOW() WHERE user_id = ${dbUserId}`
         );
+
+        await tx.insert(balanceTransactionsTable).values({
+          userId: dbUserId,
+          transactionType: 'options_sell',
+          amount: totalCost,
+          balanceBefore: currentCash,
+          balanceAfter: newCash,
+          source: 'options_trade',
+          referenceId: `sell_${upperSymbol}_${strike}_${optionType}_${contracts}contracts`,
+        });
 
         const newContracts = existingPos.contracts - contracts;
         await tx

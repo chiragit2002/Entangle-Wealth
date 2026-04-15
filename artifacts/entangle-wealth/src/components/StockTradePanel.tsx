@@ -96,7 +96,14 @@ export function StockTradePanel({ symbol, currentPrice }: StockTradePanelProps) 
     if (!isSignedIn) return;
     try {
       const res = await authFetch("/paper-trading/portfolio", getToken);
-      if (res.ok) setPortfolio(await res.json());
+      if (res.ok) {
+        const data = await res.json();
+        setPortfolio({
+          ...data,
+          portfolioValue: data.portfolioValue ?? 0,
+          totalValue: data.totalValue ?? data.cashBalance,
+        });
+      }
     } catch (err) {
       console.error("Failed to load portfolio:", err);
     }

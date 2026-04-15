@@ -14,6 +14,7 @@ import {
   dailySpinsTable,
   founderStatusTable,
   usersTable,
+  balanceTransactionsTable,
 } from "@workspace/db/schema";
 import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
@@ -812,7 +813,7 @@ router.get("/gamification/spin/status", requireAuth, async (req, res) => {
     const canSpin = !todaySpin;
     const nextSpinAt = todaySpin ? new Date(new Date(now).setUTCHours(24, 0, 0, 0)).toISOString() : null;
 
-    res.json({ canSpin, nextSpinAt, lastReward: todaySpin?.reward || null, history, isFounder: !!founder, rewards: SPIN_REWARDS.map(r => ({ reward: r.reward, rewardType: r.rewardType })) });
+    res.json({ canSpin, nextSpinAt, lastReward: todaySpin?.reward || null, history, isFounder: !!founder, rewards: SPIN_REWARDS.map(r => ({ reward: r.reward, rewardType: r.rewardType, rewardValue: r.rewardValue })) });
   } catch (error) {
     logger.error({ err: error }, "Error checking spin status:");
     res.status(500).json({ error: "Failed to check spin status" });
@@ -881,12 +882,13 @@ router.post("/gamification/spin", requireAuth, validateBody(z.object({}).strict(
       if (newStreak >= 7) streakBonus = 200;
       else if (newStreak >= 3) streakBonus = 50;
 
+      let baseXp = 0;
       if (picked.rewardType === "xp") {
         let [xpRow] = await tx.select().from(userXpTable).where(eq(userXpTable.userId, userId));
         if (!xpRow) {
           [xpRow] = await tx.insert(userXpTable).values({ userId, totalXp: 0, level: 1, tier: "Bronze", monthlyXp: 0, weeklyXp: 0 }).returning();
         }
-        const baseXp = applyMultiplier(picked.rewardValue, founderMultiplier) + streakBonus;
+        baseXp = applyMultiplier(picked.rewardValue, founderMultiplier) + streakBonus;
         const newTotalXp = xpRow.totalXp + baseXp;
         const newLevel = calculateLevel(newTotalXp);
         const newTier = calculateTier(newLevel, newTotalXp);
@@ -905,7 +907,20 @@ router.post("/gamification/spin", requireAuth, validateBody(z.object({}).strict(
         await tx.update(streaksTable).set({ longestStreak: Math.max(streak.longestStreak, newStreak + 1), updatedAt: new Date() }).where(eq(streaksTable.userId, userId));
       }
 
-      return { alreadySpun: false as const, picked, founderMultiplier, streakBonus, newStreak };
+      const portfolioRows = await tx.execute<{ cash_balance: number }>(sql`SELECT cash_balance FROM paper_portfolios WHERE user_id = ${userId} LIMIT 1`);
+      const portfolioRowArr = Array.isArray(portfolioRows) ? portfolioRows : (portfolioRows as { rows?: { cash_balance: number }[] }).rows ?? [];
+      const currentCashBalance = Number(portfolioRowArr[0]?.cash_balance ?? 0);
+      await tx.insert(balanceTransactionsTable).values({
+        userId,
+        transactionType: 'spin_reward',
+        amount: 0,
+        balanceBefore: currentCashBalance,
+        balanceAfter: currentCashBalance,
+        source: 'daily_spin',
+        referenceId: `spin_${picked.rewardType}_${picked.rewardValue}_xp${baseXp}`,
+      });
+
+      return { alreadySpun: false as const, picked, founderMultiplier, streakBonus, newStreak, baseXp };
     });
 
     if (spinResult.alreadySpun) {
@@ -913,9 +928,9 @@ router.post("/gamification/spin", requireAuth, validateBody(z.object({}).strict(
       return;
     }
 
-    const { picked, founderMultiplier, streakBonus, newStreak } = spinResult;
+    const { picked, founderMultiplier, streakBonus, newStreak, baseXp } = spinResult;
     const nextSpinAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-    res.json({ reward: picked.reward, rewardType: picked.rewardType, rewardValue: picked.rewardValue, founderMultiplier, streakBonus, newStreak, nextSpinAt });
+    res.json({ reward: picked.reward, rewardType: picked.rewardType, rewardValue: picked.rewardValue, founderMultiplier, streakBonus, newStreak, nextSpinAt, baseXp });
     triggerGiveawaySync(userId, clerkId);
   } catch (error) {
     logger.error({ err: error }, "Error spinning wheel:");

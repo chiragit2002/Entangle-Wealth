@@ -11,7 +11,7 @@ import { RiskRadar } from "@/components/RiskRadar";
 import { SignalHistory } from "@/components/SignalHistory";
 import { Terminal as TerminalIcon, Calculator, TrendingUp, Shield, BarChart3, Clock, Keyboard, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { PaperTradingWidget } from "@/components/PaperTradingWidget";
-import { SpinWheel } from "@/components/SpinWheel";
+import { DailySpinWheel } from "@/components/DailySpinWheel";
 import { UpgradePrompt, useUpgradePrompt } from "@/components/UpgradePrompt";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
@@ -105,7 +105,7 @@ function MobilePanelTabs({ activeTab, onTabChange }: { activeTab: MobileTab; onT
   );
 }
 
-function MobileTerminalView({ portfolioRefreshKey, handleSpinBalanceChange }: { portfolioRefreshKey: number; handleSpinBalanceChange: () => void }) {
+function MobileTerminalView({ portfolioRefreshKey, handleSpinBalanceChange, onOpenSpinWheel }: { portfolioRefreshKey: number; handleSpinBalanceChange: () => void; onOpenSpinWheel: () => void }) {
   const [activeTab, setActiveTab] = useState<MobileTab>("terminal");
 
   return (
@@ -158,7 +158,18 @@ function MobileTerminalView({ portfolioRefreshKey, handleSpinBalanceChange }: { 
 
         {activeTab === "trade" && (
           <div className="space-y-2">
-            <SpinWheel onBalanceChange={handleSpinBalanceChange} />
+            <BloombergPanel>
+              <PanelHeader title="DAILY SPIN" icon={<Clock className="w-3 h-3" />} color="gold" />
+              <div className="p-4 flex flex-col items-center gap-3">
+                <p className="text-[10px] font-mono text-white/40 text-center">Spin the wheel daily to earn XP, multipliers, and streak protection.</p>
+                <button
+                  onClick={onOpenSpinWheel}
+                  className="px-6 py-2 bg-gradient-to-r from-[#FFB800] to-[#f59e0b] text-black text-[11px] font-bold font-mono rounded-lg tracking-wider shadow-lg shadow-[#FFB800]/20 hover:opacity-90 transition-opacity"
+                >
+                  OPEN SPIN WHEEL
+                </button>
+              </div>
+            </BloombergPanel>
             <BloombergPanel>
               <PanelHeader title="PAPER TRADING" icon={<TrendingUp className="w-3 h-3" />} color="green" />
               <div className="p-2">
@@ -184,6 +195,7 @@ export default function Terminal() {
   const [clock, setClock] = useState("");
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [portfolioRefreshKey, setPortfolioRefreshKey] = useState(0);
+  const [showSpinWheel, setShowSpinWheel] = useState(false);
   const [, navigate] = useLocation();
   const { getToken, isSignedIn, isLoaded } = useAuth();
   const { promptConfig, showUpgradePrompt, closePrompt } = useUpgradePrompt();
@@ -320,6 +332,7 @@ export default function Terminal() {
         <MobileTerminalView
           portfolioRefreshKey={portfolioRefreshKey}
           handleSpinBalanceChange={handleSpinBalanceChange}
+          onOpenSpinWheel={() => setShowSpinWheel(true)}
         />
       ) : (
         <div className="px-2 py-2 bg-[#020204]">
@@ -367,9 +380,18 @@ export default function Terminal() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-1.5 mb-1.5">
-            <div>
-              <SpinWheel onBalanceChange={handleSpinBalanceChange} />
-            </div>
+            <BloombergPanel>
+              <PanelHeader title="DAILY SPIN" icon={<Clock className="w-3 h-3" />} color="gold" />
+              <div className="p-4 flex flex-col items-center justify-center gap-3 min-h-[120px]">
+                <p className="text-[10px] font-mono text-white/40 text-center">Spin the wheel daily to earn XP, multipliers, and streak shields.</p>
+                <button
+                  onClick={() => setShowSpinWheel(true)}
+                  className="px-8 py-2.5 bg-gradient-to-r from-[#FFB800] to-[#f59e0b] text-black text-[11px] font-bold font-mono rounded-lg tracking-wider shadow-lg shadow-[#FFB800]/20 hover:opacity-90 transition-opacity"
+                >
+                  OPEN SPIN WHEEL
+                </button>
+              </div>
+            </BloombergPanel>
             <BloombergPanel>
               <PanelHeader title="PAPER TRADING" icon={<TrendingUp className="w-3 h-3" />} color="green" />
               <div className="p-2">
@@ -398,6 +420,12 @@ export default function Terminal() {
         </div>
       )}
       <PaperTradingWidget variant="floating" />
+      <DailySpinWheel
+        isOpen={showSpinWheel}
+        onClose={() => setShowSpinWheel(false)}
+        onReward={() => {}}
+        onBalanceChange={handleSpinBalanceChange}
+      />
     </Layout>
   );
 }

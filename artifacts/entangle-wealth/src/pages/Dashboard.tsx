@@ -20,7 +20,8 @@ import { authFetch } from "@/lib/authFetch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight, ArrowDownRight, Activity, Zap, Minus, TrendingUp, Shield, RefreshCw, Search, BarChart3, X, Terminal, Globe, Layers, Clock, Keyboard, ChevronUp, ChevronDown, Eye, Atom, GitBranch, Brain, FileSearch, ChevronRight } from "lucide-react";
-import { generateMockOHLCV, runAllIndicators, getOverallSignal } from "@/lib/indicators";
+import { runAllIndicators, getOverallSignal } from "@/lib/indicators";
+import { fetchBars, barsToStockData } from "@/lib/alpaca";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/trackEvent";
 import { Area, AreaChart, Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from "recharts";
@@ -80,39 +81,11 @@ interface QuickAnalysis {
   sellCount: number;
 }
 
-const MULTI_ASSET_DATA = {
-  crypto: [
-    { symbol: "BTC", name: "Bitcoin", price: 97450.20, change: 2.34 },
-    { symbol: "ETH", name: "Ethereum", price: 3842.15, change: 1.87 },
-    { symbol: "SOL", name: "Solana", price: 248.90, change: 4.12 },
-    { symbol: "XRP", name: "Ripple", price: 2.48, change: 0.95 },
-    { symbol: "ADA", name: "Cardano", price: 0.82, change: 1.23 },
-    { symbol: "DOGE", name: "Dogecoin", price: 0.187, change: 2.15 },
-  ],
-  forex: [
-    { symbol: "EUR/USD", price: 1.0842, change: 0.12 },
-    { symbol: "GBP/USD", price: 1.2715, change: 0.08 },
-    { symbol: "USD/JPY", price: 151.42, change: 0.34 },
-    { symbol: "USD/CHF", price: 0.8845, change: 0.05 },
-    { symbol: "AUD/USD", price: 0.6612, change: 0.22 },
-    { symbol: "USD/CAD", price: 1.3648, change: 0.18 },
-  ],
-  commodities: [
-    { symbol: "GOLD", name: "Gold", price: 2385.40, change: 0.42, unit: "/oz" },
-    { symbol: "SILVER", name: "Silver", price: 28.92, change: 1.15, unit: "/oz" },
-    { symbol: "WTI", name: "Crude Oil", price: 78.45, change: 1.23, unit: "/bbl" },
-    { symbol: "BRENT", name: "Brent", price: 82.30, change: 0.98, unit: "/bbl" },
-    { symbol: "NATGAS", name: "Nat Gas", price: 2.84, change: 3.45, unit: "/MMBtu" },
-    { symbol: "COPPER", name: "Copper", price: 4.52, change: 0.67, unit: "/lb" },
-  ],
-  bonds: [
-    { symbol: "US2Y", name: "2Y Treasury", yield: 4.72, change: 0.03 },
-    { symbol: "US5Y", name: "5Y Treasury", yield: 4.35, change: 0.02 },
-    { symbol: "US10Y", name: "10Y Treasury", yield: 4.28, change: 0.02 },
-    { symbol: "US30Y", name: "30Y Treasury", yield: 4.45, change: 0.01 },
-    { symbol: "TIPS10", name: "10Y TIPS", yield: 2.15, change: 0.01 },
-    { symbol: "HYG", name: "HY Spread", yield: 3.42, change: 0.05 },
-  ],
+const MULTI_ASSET_SYMBOLS = {
+  crypto: ["BTC", "ETH", "SOL", "XRP", "ADA", "DOGE"],
+  forex: ["EUR/USD", "GBP/USD", "USD/JPY", "USD/CHF", "AUD/USD", "USD/CAD"],
+  commodities: ["GOLD", "SILVER", "WTI Oil", "Brent", "Nat Gas", "Copper"],
+  bonds: ["US 2Y", "US 5Y", "US 10Y", "US 30Y", "TIPS 10Y", "HY Spread"],
 };
 
 const MARKET_INTERNALS = {
@@ -364,7 +337,12 @@ export default function Dashboard() {
     queryFn: async () => {
       const res = await authFetch("/paper-trading/portfolio", getToken);
       if (!res.ok) throw new Error("Failed to load portfolio");
-      return res.json() as Promise<PaperPortfolio>;
+      const data = await res.json();
+      return {
+        ...data,
+        portfolioValue: data.portfolioValue ?? 0,
+        totalValue: data.totalValue ?? data.cashBalance,
+      } as PaperPortfolio;
     },
     enabled: !!isSignedIn,
     staleTime: 30_000,
@@ -486,7 +464,7 @@ export default function Dashboard() {
     return DASHBOARD_STOCKS.filter(s => s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)).slice(0, 8);
   }, [searchQuery]);
 
-  const runQuickAnalysis = useCallback((sym: string) => {
+  const runQuickAnalysis = useCallback(async (sym: string) => {
     const info = DASHBOARD_STOCKS.find(s => s.symbol === sym);
     if (qaTimerRef.current) clearTimeout(qaTimerRef.current);
     const id = ++qaIdRef.current;
@@ -498,19 +476,39 @@ export default function Dashboard() {
       setShowFirstAnalysisWow(true);
     }
 
-    const delay = isFirstAnalysis ? 4200 : 700;
-    qaTimerRef.current = setTimeout(() => {
+    if (isFirstAnalysis) {
+      await new Promise(resolve => { qaTimerRef.current = setTimeout(resolve, 4200); });
+    }
+
+    if (qaIdRef.current !== id) return;
+
+    try {
+      const barsRes = await fetchBars(sym, { timeframe: "1Day", limit: 120 });
       if (qaIdRef.current !== id) return;
-      const bp = 50 + Math.abs([...sym].reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0) % 900) + Math.random() * 5;
-      const data = generateMockOHLCV(bp, 60);
-      const results = runAllIndicators(data);
-      const sig = getOverallSignal(results);
-      setQuickAnalysis({ symbol: sym, name: info?.name || sym, signal: sig.signal, confidence: sig.confidence, buyCount: sig.buyCount, sellCount: sig.sellCount });
-      setAnalyzingSymbol("");
-      if (!isFirstAnalysis) {
-        toast({ title: `${sym} Analysis Complete`, description: `${sig.signal.replace("_", " ")} — ${sig.confidence}% confidence` });
+
+      if (barsRes.bars && barsRes.bars.length >= 10) {
+        const sd = barsToStockData(barsRes.bars);
+        const results = runAllIndicators(sd);
+        const sig = getOverallSignal(results);
+        setQuickAnalysis({ symbol: sym, name: info?.name || sym, signal: sig.signal, confidence: sig.confidence, buyCount: sig.buyCount, sellCount: sig.sellCount });
+        if (!isFirstAnalysis) {
+          toast({ title: `${sym} Analysis Complete`, description: `${sig.signal.replace("_", " ")} — ${sig.confidence}% confidence` });
+        }
+      } else {
+        setQuickAnalysis({ symbol: sym, name: info?.name || sym, signal: "NO_DATA", confidence: 0, buyCount: 0, sellCount: 0 });
+        if (!isFirstAnalysis) {
+          toast({ title: `${sym} — No Data`, description: "Insufficient market data for this symbol", variant: "destructive" });
+        }
       }
-    }, delay);
+    } catch {
+      if (qaIdRef.current !== id) return;
+      setQuickAnalysis({ symbol: sym, name: info?.name || sym, signal: "NO_DATA", confidence: 0, buyCount: 0, sellCount: 0 });
+      if (!isFirstAnalysis) {
+        toast({ title: "Analysis unavailable", description: "Market data could not be retrieved", variant: "destructive" });
+      }
+    } finally {
+      if (qaIdRef.current === id) setAnalyzingSymbol("");
+    }
   }, [toast, isFirstAnalysis]);
 
   const todayOptionsIncome = optionsIncomeData[optionsIncomeData.length - 1].income;
@@ -869,18 +867,12 @@ export default function Dashboard() {
                   ))}
                 </div>
               } />
+              <div className="px-3 py-2 bg-white/[0.01] border-b border-white/[0.04]">
+                <p className="text-[9px] font-mono text-white/25">Live prices unavailable — crypto, forex, bonds &amp; commodities not supported by our equities data provider.</p>
+              </div>
               <div className="divide-y divide-white/[0.03]">
-                {activeAssetTab === "crypto" && MULTI_ASSET_DATA.crypto.map(c => (
-                  <DataRow key={c.symbol} label={c.symbol} value={c.price >= 100 ? `$${c.price.toLocaleString(undefined, { maximumFractionDigits: 0 })}` : `$${c.price.toFixed(c.price < 1 ? 3 : 2)}`} change={c.change} />
-                ))}
-                {activeAssetTab === "forex" && MULTI_ASSET_DATA.forex.map(f => (
-                  <DataRow key={f.symbol} label={f.symbol} value={f.price.toFixed(4)} change={f.change} />
-                ))}
-                {activeAssetTab === "commodities" && MULTI_ASSET_DATA.commodities.map(c => (
-                  <DataRow key={c.symbol} label={c.symbol} value={`$${c.price.toFixed(2)}`} change={c.change} />
-                ))}
-                {activeAssetTab === "bonds" && MULTI_ASSET_DATA.bonds.map(b => (
-                  <DataRow key={b.symbol} label={b.symbol} value={`${b.yield.toFixed(2)}%`} change={b.change} />
+                {MULTI_ASSET_SYMBOLS[activeAssetTab].map(sym => (
+                  <DataRow key={sym} label={sym} value="—" change={undefined} />
                 ))}
               </div>
             </Panel>

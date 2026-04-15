@@ -7,68 +7,73 @@ import { fireCelebration, CelebrationTier } from "@/lib/confetti";
 import { BigWinOverlay } from "@/components/BigWinOverlay";
 import { motion, useMotionValue, animate, AnimatePresence } from "framer-motion";
 
-const WHEEL_SEGMENTS = [
-  { label: "+500 XP", color: "#FF8C00", icon: "⚡" },
-  { label: "+250 XP", color: "#9c27b0", icon: "✨" },
-  { label: "+1,000 XP", color: "#FFB800", icon: "🔥" },
-  { label: "2x XP", color: "#FF8C00", icon: "⚡⚡" },
-  { label: "Streak Shield", color: "#ff3366", icon: "🛡️" },
-  { label: "+100 XP", color: "#6366f1", icon: "💫" },
-  { label: "+750 XP", color: "#f59e0b", icon: "⭐" },
+interface BackendReward {
+  reward: string;
+  rewardType: string;
+  rewardValue: number;
+}
+
+interface WheelSegment {
+  label: string;
+  color: string;
+  icon: string;
+  rewardType: string;
+  rewardValue: number;
+}
+
+const SEGMENT_COLORS: Record<string, string> = {
+  xp: "#FF8C00",
+  multiplier: "#FFB800",
+  streak_protection: "#ff3366",
+};
+
+const SEGMENT_ICONS: Record<string, string> = {
+  xp: "⚡",
+  multiplier: "⚡⚡",
+  streak_protection: "🛡️",
+};
+
+const DEFAULT_SEGMENTS: WheelSegment[] = [
+  { label: "+50 XP", color: "#FF8C00", icon: "⚡", rewardType: "xp", rewardValue: 50 },
+  { label: "+100 XP", color: "#9c27b0", icon: "✨", rewardType: "xp", rewardValue: 100 },
+  { label: "+250 XP", color: "#FFB800", icon: "🔥", rewardType: "xp", rewardValue: 250 },
+  { label: "2x XP", color: "#FF8C00", icon: "⚡⚡", rewardType: "multiplier", rewardValue: 2 },
+  { label: "Streak Shield", color: "#ff3366", icon: "🛡️", rewardType: "streak_protection", rewardValue: 1 },
 ];
+
+function rewardsToSegments(rewards: BackendReward[]): WheelSegment[] {
+  const colors = ["#FF8C00", "#9c27b0", "#FFB800", "#6366f1", "#f59e0b", "#ff3366"];
+  return rewards.map((r, i) => ({
+    label: r.reward,
+    color: SEGMENT_COLORS[r.rewardType] || colors[i % colors.length],
+    icon: SEGMENT_ICONS[r.rewardType] || "✨",
+    rewardType: r.rewardType,
+    rewardValue: r.rewardValue,
+  }));
+}
 
 interface DailySpinWheelProps {
   isOpen: boolean;
   onClose: () => void;
   onReward?: (reward: string) => void;
+  onBalanceChange?: () => void;
 }
 
-export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProps) {
+export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: DailySpinWheelProps) {
   const { getToken } = useAuth();
   const { toast } = useToast();
   const [spinning, setSpinning] = useState(false);
   const [canSpin, setCanSpin] = useState(false);
   const [nextSpinAt, setNextSpinAt] = useState<string | null>(null);
-  const [result, setResult] = useState<{ reward: string; rewardType: string; rewardValue: number } | null>(null);
+  const [result, setResult] = useState<{ reward: string; rewardType: string; rewardValue: number; baseXp?: number } | null>(null);
   const [countdown, setCountdown] = useState("");
   const [resultTier, setResultTier] = useState<CelebrationTier | null>(null);
   const [showBigWin, setShowBigWin] = useState(false);
+  const [segments, setSegments] = useState<WheelSegment[]>(DEFAULT_SEGMENTS);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rotationDeg = useMotionValue(0);
 
-  const checkStatus = useCallback(async () => {
-    try {
-      const res = await authFetch("/gamification/spin/status", getToken);
-      if (res.ok) {
-        const data = await res.json();
-        setCanSpin(data.canSpin);
-        setNextSpinAt(data.nextSpinAt);
-      }
-    } catch (err) {
-      console.error("[DailySpinWheel] Failed to check spin status:", err);
-    }
-  }, [getToken]);
-
-  useEffect(() => {
-    if (isOpen) checkStatus();
-  }, [isOpen, checkStatus]);
-
-  useEffect(() => {
-    if (!nextSpinAt || canSpin) { setCountdown(""); return; }
-    const update = () => {
-      const diff = new Date(nextSpinAt).getTime() - Date.now();
-      if (diff <= 0) { setCanSpin(true); setCountdown(""); return; }
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      setCountdown(`${h}h ${m}m ${s}s`);
-    };
-    update();
-    const t = setInterval(update, 1000);
-    return () => clearInterval(t);
-  }, [nextSpinAt, canSpin]);
-
-  useEffect(() => {
+  const drawWheel = useCallback((segs: WheelSegment[]) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -80,11 +85,11 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
     const cx = size / 2;
     const cy = size / 2;
     const r = size / 2 - 10;
-    const segAngle = (2 * Math.PI) / WHEEL_SEGMENTS.length;
+    const segAngle = (2 * Math.PI) / segs.length;
 
     ctx.clearRect(0, 0, size, size);
 
-    WHEEL_SEGMENTS.forEach((seg, i) => {
+    segs.forEach((seg, i) => {
       const startAngle = i * segAngle - Math.PI / 2;
       const endAngle = startAngle + segAngle;
 
@@ -150,6 +155,46 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
     ctx.stroke();
   }, []);
 
+  useEffect(() => {
+    drawWheel(segments);
+  }, [segments, drawWheel]);
+
+  const checkStatus = useCallback(async () => {
+    try {
+      const res = await authFetch("/gamification/spin/status", getToken);
+      if (res.ok) {
+        const data = await res.json();
+        setCanSpin(data.canSpin);
+        setNextSpinAt(data.nextSpinAt);
+        if (data.rewards && data.rewards.length > 0) {
+          const newSegments = rewardsToSegments(data.rewards);
+          setSegments(newSegments);
+        }
+      }
+    } catch (err) {
+      console.error("[DailySpinWheel] Failed to check spin status:", err);
+    }
+  }, [getToken]);
+
+  useEffect(() => {
+    if (isOpen) checkStatus();
+  }, [isOpen, checkStatus]);
+
+  useEffect(() => {
+    if (!nextSpinAt || canSpin) { setCountdown(""); return; }
+    const update = () => {
+      const diff = new Date(nextSpinAt).getTime() - Date.now();
+      if (diff <= 0) { setCanSpin(true); setCountdown(""); return; }
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setCountdown(`${h}h ${m}m ${s}s`);
+    };
+    update();
+    const t = setInterval(update, 1000);
+    return () => clearInterval(t);
+  }, [nextSpinAt, canSpin]);
+
   const spin = useCallback(async () => {
     if (spinning || !canSpin) return;
     setSpinning(true);
@@ -165,15 +210,13 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
         return;
       }
 
-      const rewardIndex = WHEEL_SEGMENTS.findIndex(s =>
-        s.label.includes(data.reward.replace("+", "").replace(",", ""))
-        || (data.rewardType === "multiplier" && s.label.includes("2x"))
-        || (data.rewardType === "streak_protection" && s.label.includes("Shield"))
+      const targetIdx = segments.findIndex(
+        s => s.rewardType === data.rewardType && s.rewardValue === data.rewardValue
       );
-      const targetIdx = rewardIndex >= 0 ? rewardIndex : 0;
+      const resolvedIdx = targetIdx >= 0 ? targetIdx : 0;
 
-      const segDeg = 360 / WHEEL_SEGMENTS.length;
-      const targetOffset = 360 - (targetIdx * segDeg + segDeg / 2);
+      const segDeg = 360 / segments.length;
+      const targetOffset = 360 - (resolvedIdx * segDeg + segDeg / 2);
       const currentDeg = rotationDeg.get();
       const normalizedCurrent = ((currentDeg % 360) + 360) % 360;
       let delta = targetOffset - normalizedCurrent;
@@ -194,13 +237,14 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
           setResultTier(tier);
           if (tier === "jackpot") setShowBigWin(true);
           onReward?.(data.reward);
+          onBalanceChange?.();
         },
       });
     } catch {
       toast({ title: "Spin failed", description: "Please try again", variant: "destructive" });
       setSpinning(false);
     }
-  }, [spinning, canSpin, getToken, toast, rotationDeg, onReward]);
+  }, [spinning, canSpin, getToken, toast, rotationDeg, onReward, onBalanceChange, segments]);
 
   if (!isOpen) return null;
 
@@ -262,7 +306,9 @@ export function DailySpinWheel({ isOpen, onClose, onReward }: DailySpinWheelProp
                 <p className="text-[10px] font-mono text-[#FFB800]/60 uppercase tracking-widest">YOU WON</p>
                 <p className="text-lg font-bold font-mono text-[#FFB800] mt-1">{result.reward}</p>
                 {result.rewardType === "xp" && (
-                  <p className="text-[10px] font-mono text-white/30 mt-1">+{result.rewardValue} XP added to your account</p>
+                  <p className="text-[10px] font-mono text-white/30 mt-1">
+                    {result.baseXp ? `+${result.baseXp} XP` : `+${result.rewardValue} XP`} added to your account
+                  </p>
                 )}
                 {result.rewardType === "multiplier" && (
                   <p className="text-[10px] font-mono text-white/30 mt-1">Your next session earns 2x XP</p>

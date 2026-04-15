@@ -18,7 +18,9 @@ import { startDigestScheduler, stopDigestScheduler } from "./lib/emailDigest";
 import { startDailyContentScheduler, stopDailyContentScheduler } from "./routes/dailyContent";
 import { startDripScheduler, stopDripScheduler } from "./lib/dripEmails";
 import { startApiHealthMonitor } from "./lib/apiHealthMonitor";
-import { pool } from "@workspace/db";
+import { pool, db } from "@workspace/db";
+import { paperPortfoliosTable } from "@workspace/db/schema";
+import { gt } from "drizzle-orm";
 
 (globalThis as Record<string, unknown>).__dbLogger = logger;
 
@@ -564,6 +566,19 @@ function trackOpenSockets(srv: import("http").Server): void {
   });
 }
 
+async function normalizePortfolioBalances() {
+  const DEFAULT_STARTING_CASH = 100_000;
+  try {
+    const result = await db
+      .update(paperPortfoliosTable)
+      .set({ cashBalance: DEFAULT_STARTING_CASH, updatedAt: new Date() })
+      .where(gt(paperPortfoliosTable.cashBalance, DEFAULT_STARTING_CASH));
+    logger.info({ result }, "Portfolio balance normalization complete (early-adopter advantage removed)");
+  } catch (err) {
+    logger.warn({ error: err }, "Portfolio balance normalization failed (non-fatal)");
+  }
+}
+
 let httpServer: ReturnType<typeof server.listen>;
 try {
   httpServer = await tryListen(port, 0);
@@ -594,6 +609,7 @@ ensureBacktesterBadgesExist().catch((err) =>
 ensureTask126BadgesExist().catch((err) =>
   logger.warn({ error: err }, "Failed to seed task-126 backtester badges (non-fatal)")
 );
+await normalizePortfolioBalances();
 await ensureHabitsTables();
 await ensureDailyContentTable();
 await ensureAlertTables();

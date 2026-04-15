@@ -8,7 +8,7 @@ import {
   RefreshCw, Download, ChevronDown, ChevronUp, Zap, Activity,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { generateMockOHLCV, runAllIndicators, getOverallSignal } from "@/lib/indicators";
+import { runAllIndicators, getOverallSignal } from "@/lib/indicators";
 import { fetchSnapshots, fetchBars, barsToStockData, type AlpacaSnapshot } from "@/lib/alpaca";
 import { trackEvent } from "@/lib/trackEvent";
 import { FinancialDisclaimerBanner } from "@/components/FinancialDisclaimerBanner";
@@ -31,49 +31,43 @@ interface ScreenerStock {
 type SortField = "symbol" | "price" | "change" | "volume" | "marketCap" | "pe" | "signal" | "confidence";
 type SortDir = "asc" | "desc";
 
-function mockPrice(sym: string): number {
-  let h = 0;
-  for (let i = 0; i < sym.length; i++) h = ((h << 5) - h + sym.charCodeAt(i)) | 0;
-  return 10 + Math.abs(h % 900) + Math.random() * 5;
-}
-
 const SCREENER_STOCKS: ScreenerStock[] = [
-  { symbol: "AAPL", name: "Apple Inc.", sector: "Technology", price: 175.84, change: -0.32, volume: "52.4M", marketCap: "$2.78T", pe: 28.5, week52High: 199.62, week52Low: 141.32 },
-  { symbol: "MSFT", name: "Microsoft", sector: "Technology", price: 412.30, change: 0.82, volume: "22.1M", marketCap: "$3.06T", pe: 35.2, week52High: 430.82, week52Low: 309.45 },
-  { symbol: "NVDA", name: "NVIDIA Corp.", sector: "Technology", price: 878.35, change: 4.22, volume: "48.7M", marketCap: "$2.16T", pe: 64.8, week52High: 974.00, week52Low: 373.56 },
-  { symbol: "GOOGL", name: "Alphabet Inc.", sector: "Technology", price: 485.90, change: 1.24, volume: "18.3M", marketCap: "$1.52T", pe: 24.1, week52High: 510.34, week52Low: 351.20 },
-  { symbol: "AMZN", name: "Amazon.com", sector: "Consumer Cyclical", price: 495.10, change: 1.12, volume: "31.2M", marketCap: "$1.56T", pe: 58.4, week52High: 520.75, week52Low: 336.56 },
-  { symbol: "META", name: "Meta Platforms", sector: "Communication", price: 485.20, change: 1.82, volume: "16.8M", marketCap: "$1.24T", pe: 32.7, week52High: 542.81, week52Low: 274.38 },
-  { symbol: "TSLA", name: "Tesla Inc.", sector: "Consumer Cyclical", price: 195.30, change: -1.78, volume: "68.4M", marketCap: "$622B", pe: 42.3, week52High: 278.98, week52Low: 152.37 },
-  { symbol: "AMD", name: "Adv. Micro Devices", sector: "Technology", price: 162.75, change: 2.84, volume: "42.1M", marketCap: "$263B", pe: 44.6, week52High: 227.30, week52Low: 93.12 },
-  { symbol: "RKLB", name: "Rocket Lab USA", sector: "Industrials", price: 18.45, change: 5.18, volume: "28.3M", marketCap: "$8.7B", pe: null, week52High: 22.10, week52Low: 4.18 },
-  { symbol: "PLTR", name: "Palantir Tech.", sector: "Technology", price: 24.50, change: 1.92, volume: "38.5M", marketCap: "$54B", pe: null, week52High: 27.50, week52Low: 13.68 },
-  { symbol: "SOFI", name: "SoFi Technologies", sector: "Financial", price: 8.42, change: 2.35, volume: "24.6M", marketCap: "$8.2B", pe: null, week52High: 11.24, week52Low: 6.01 },
-  { symbol: "COIN", name: "Coinbase Global", sector: "Financial", price: 245.30, change: 2.64, volume: "12.4M", marketCap: "$49B", pe: 38.2, week52High: 283.48, week52Low: 69.22 },
-  { symbol: "RIVN", name: "Rivian Automotive", sector: "Consumer Cyclical", price: 12.85, change: -1.42, volume: "22.8M", marketCap: "$12.8B", pe: null, week52High: 28.06, week52Low: 8.26 },
-  { symbol: "NFLX", name: "Netflix Inc.", sector: "Communication", price: 618.20, change: 2.85, volume: "8.2M", marketCap: "$267B", pe: 45.2, week52High: 639.00, week52Low: 344.73 },
-  { symbol: "JPM", name: "JPMorgan Chase", sector: "Financial", price: 198.45, change: 1.22, volume: "9.8M", marketCap: "$571B", pe: 11.8, week52High: 205.88, week52Low: 135.19 },
-  { symbol: "V", name: "Visa Inc.", sector: "Financial", price: 282.10, change: 0.42, volume: "6.4M", marketCap: "$578B", pe: 30.5, week52High: 290.96, week52Low: 227.80 },
-  { symbol: "AVGO", name: "Broadcom Inc.", sector: "Technology", price: 1345.60, change: 1.55, volume: "4.2M", marketCap: "$623B", pe: 56.8, week52High: 1438.25, week52Low: 794.13 },
-  { symbol: "SMCI", name: "Super Micro Comp.", sector: "Technology", price: 892.50, change: 8.42, volume: "18.6M", marketCap: "$52B", pe: 62.4, week52High: 1229.00, week52Low: 226.96 },
-  { symbol: "ARM", name: "Arm Holdings", sector: "Technology", price: 142.70, change: 2.31, volume: "8.9M", marketCap: "$148B", pe: 98.4, week52High: 164.00, week52Low: 46.50 },
-  { symbol: "CRWD", name: "CrowdStrike", sector: "Technology", price: 312.80, change: 1.18, volume: "5.1M", marketCap: "$74B", pe: null, week52High: 365.00, week52Low: 140.25 },
-  { symbol: "PANW", name: "Palo Alto Networks", sector: "Technology", price: 298.40, change: 0.85, volume: "4.8M", marketCap: "$98B", pe: 48.2, week52High: 380.84, week52Low: 196.52 },
-  { symbol: "UBER", name: "Uber Technologies", sector: "Technology", price: 78.20, change: 1.45, volume: "14.2M", marketCap: "$162B", pe: 72.5, week52High: 82.14, week52Low: 40.09 },
-  { symbol: "ABNB", name: "Airbnb Inc.", sector: "Consumer Cyclical", price: 168.30, change: -0.62, volume: "6.8M", marketCap: "$108B", pe: 22.8, week52High: 170.10, week52Low: 113.00 },
-  { symbol: "SNOW", name: "Snowflake Inc.", sector: "Technology", price: 162.40, change: -0.95, volume: "7.2M", marketCap: "$54B", pe: null, week52High: 237.72, week52Low: 107.13 },
-  { symbol: "SHOP", name: "Shopify Inc.", sector: "Technology", price: 78.50, change: 1.82, volume: "12.4M", marketCap: "$98B", pe: null, week52High: 91.57, week52Low: 45.50 },
-  { symbol: "LLY", name: "Eli Lilly", sector: "Healthcare", price: 785.20, change: 1.82, volume: "3.8M", marketCap: "$746B", pe: 62.4, week52High: 800.00, week52Low: 411.86 },
-  { symbol: "UNH", name: "UnitedHealth", sector: "Healthcare", price: 492.80, change: -1.24, volume: "4.1M", marketCap: "$455B", pe: 22.4, week52High: 554.70, week52Low: 436.38 },
-  { symbol: "XOM", name: "Exxon Mobil", sector: "Energy", price: 104.65, change: -1.48, volume: "15.2M", marketCap: "$425B", pe: 12.8, week52High: 120.70, week52Low: 95.77 },
-  { symbol: "GS", name: "Goldman Sachs", sector: "Financial", price: 412.50, change: 1.52, volume: "2.8M", marketCap: "$138B", pe: 15.2, week52High: 420.75, week52Low: 289.36 },
-  { symbol: "BA", name: "Boeing Co.", sector: "Industrials", price: 185.40, change: -0.82, volume: "8.4M", marketCap: "$114B", pe: null, week52High: 267.54, week52Low: 159.70 },
-  { symbol: "IONQ", name: "IonQ Inc.", sector: "Technology", price: 12.80, change: 3.42, volume: "8.2M", marketCap: "$2.8B", pe: null, week52High: 22.90, week52Low: 5.20 },
-  { symbol: "MARA", name: "Marathon Digital", sector: "Financial", price: 22.45, change: 4.15, volume: "32.1M", marketCap: "$6.4B", pe: null, week52High: 34.09, week52Low: 7.16 },
-  { symbol: "HOOD", name: "Robinhood Markets", sector: "Financial", price: 18.92, change: 2.12, volume: "14.8M", marketCap: "$16.8B", pe: null, week52High: 23.94, week52Low: 7.57 },
-  { symbol: "NET", name: "Cloudflare Inc.", sector: "Technology", price: 92.40, change: 1.62, volume: "6.2M", marketCap: "$31B", pe: null, week52High: 116.00, week52Low: 56.39 },
-  { symbol: "DDOG", name: "Datadog Inc.", sector: "Technology", price: 128.50, change: 0.95, volume: "4.8M", marketCap: "$42B", pe: null, week52High: 138.61, week52Low: 81.11 },
-  { symbol: "WMT", name: "Walmart Inc.", sector: "Consumer Defensive", price: 172.40, change: 0.45, volume: "8.2M", marketCap: "$464B", pe: 28.4, week52High: 175.25, week52Low: 141.20 },
+  { symbol: "AAPL", name: "Apple Inc.", sector: "Technology", price: 0, change: 0, volume: "52.4M", marketCap: "$2.78T", pe: 28.5, week52High: 199.62, week52Low: 141.32 },
+  { symbol: "MSFT", name: "Microsoft", sector: "Technology", price: 0, change: 0, volume: "22.1M", marketCap: "$3.06T", pe: 35.2, week52High: 430.82, week52Low: 309.45 },
+  { symbol: "NVDA", name: "NVIDIA Corp.", sector: "Technology", price: 0, change: 0, volume: "48.7M", marketCap: "$2.16T", pe: 64.8, week52High: 974.00, week52Low: 373.56 },
+  { symbol: "GOOGL", name: "Alphabet Inc.", sector: "Technology", price: 0, change: 0, volume: "18.3M", marketCap: "$1.52T", pe: 24.1, week52High: 510.34, week52Low: 351.20 },
+  { symbol: "AMZN", name: "Amazon.com", sector: "Consumer Cyclical", price: 0, change: 0, volume: "31.2M", marketCap: "$1.56T", pe: 58.4, week52High: 520.75, week52Low: 336.56 },
+  { symbol: "META", name: "Meta Platforms", sector: "Communication", price: 0, change: 0, volume: "16.8M", marketCap: "$1.24T", pe: 32.7, week52High: 542.81, week52Low: 274.38 },
+  { symbol: "TSLA", name: "Tesla Inc.", sector: "Consumer Cyclical", price: 0, change: 0, volume: "68.4M", marketCap: "$622B", pe: 42.3, week52High: 278.98, week52Low: 152.37 },
+  { symbol: "AMD", name: "Adv. Micro Devices", sector: "Technology", price: 0, change: 0, volume: "42.1M", marketCap: "$263B", pe: 44.6, week52High: 227.30, week52Low: 93.12 },
+  { symbol: "RKLB", name: "Rocket Lab USA", sector: "Industrials", price: 0, change: 0, volume: "28.3M", marketCap: "$8.7B", pe: null, week52High: 22.10, week52Low: 4.18 },
+  { symbol: "PLTR", name: "Palantir Tech.", sector: "Technology", price: 0, change: 0, volume: "38.5M", marketCap: "$54B", pe: null, week52High: 27.50, week52Low: 13.68 },
+  { symbol: "SOFI", name: "SoFi Technologies", sector: "Financial", price: 0, change: 0, volume: "24.6M", marketCap: "$8.2B", pe: null, week52High: 11.24, week52Low: 6.01 },
+  { symbol: "COIN", name: "Coinbase Global", sector: "Financial", price: 0, change: 0, volume: "12.4M", marketCap: "$49B", pe: 38.2, week52High: 283.48, week52Low: 69.22 },
+  { symbol: "RIVN", name: "Rivian Automotive", sector: "Consumer Cyclical", price: 0, change: 0, volume: "22.8M", marketCap: "$12.8B", pe: null, week52High: 28.06, week52Low: 8.26 },
+  { symbol: "NFLX", name: "Netflix Inc.", sector: "Communication", price: 0, change: 0, volume: "8.2M", marketCap: "$267B", pe: 45.2, week52High: 639.00, week52Low: 344.73 },
+  { symbol: "JPM", name: "JPMorgan Chase", sector: "Financial", price: 0, change: 0, volume: "9.8M", marketCap: "$571B", pe: 11.8, week52High: 205.88, week52Low: 135.19 },
+  { symbol: "V", name: "Visa Inc.", sector: "Financial", price: 0, change: 0, volume: "6.4M", marketCap: "$578B", pe: 30.5, week52High: 290.96, week52Low: 227.80 },
+  { symbol: "AVGO", name: "Broadcom Inc.", sector: "Technology", price: 0, change: 0, volume: "4.2M", marketCap: "$623B", pe: 56.8, week52High: 1438.25, week52Low: 794.13 },
+  { symbol: "SMCI", name: "Super Micro Comp.", sector: "Technology", price: 0, change: 0, volume: "18.6M", marketCap: "$52B", pe: 62.4, week52High: 1229.00, week52Low: 226.96 },
+  { symbol: "ARM", name: "Arm Holdings", sector: "Technology", price: 0, change: 0, volume: "8.9M", marketCap: "$148B", pe: 98.4, week52High: 164.00, week52Low: 46.50 },
+  { symbol: "CRWD", name: "CrowdStrike", sector: "Technology", price: 0, change: 0, volume: "5.1M", marketCap: "$74B", pe: null, week52High: 365.00, week52Low: 140.25 },
+  { symbol: "PANW", name: "Palo Alto Networks", sector: "Technology", price: 0, change: 0, volume: "4.8M", marketCap: "$98B", pe: 48.2, week52High: 380.84, week52Low: 196.52 },
+  { symbol: "UBER", name: "Uber Technologies", sector: "Technology", price: 0, change: 0, volume: "14.2M", marketCap: "$162B", pe: 72.5, week52High: 82.14, week52Low: 40.09 },
+  { symbol: "ABNB", name: "Airbnb Inc.", sector: "Consumer Cyclical", price: 0, change: 0, volume: "6.8M", marketCap: "$108B", pe: 22.8, week52High: 170.10, week52Low: 113.00 },
+  { symbol: "SNOW", name: "Snowflake Inc.", sector: "Technology", price: 0, change: 0, volume: "7.2M", marketCap: "$54B", pe: null, week52High: 237.72, week52Low: 107.13 },
+  { symbol: "SHOP", name: "Shopify Inc.", sector: "Technology", price: 0, change: 0, volume: "12.4M", marketCap: "$98B", pe: null, week52High: 91.57, week52Low: 45.50 },
+  { symbol: "LLY", name: "Eli Lilly", sector: "Healthcare", price: 0, change: 0, volume: "3.8M", marketCap: "$746B", pe: 62.4, week52High: 800.00, week52Low: 411.86 },
+  { symbol: "UNH", name: "UnitedHealth", sector: "Healthcare", price: 0, change: 0, volume: "4.1M", marketCap: "$455B", pe: 22.4, week52High: 554.70, week52Low: 436.38 },
+  { symbol: "XOM", name: "Exxon Mobil", sector: "Energy", price: 0, change: 0, volume: "15.2M", marketCap: "$425B", pe: 12.8, week52High: 120.70, week52Low: 95.77 },
+  { symbol: "GS", name: "Goldman Sachs", sector: "Financial", price: 0, change: 0, volume: "2.8M", marketCap: "$138B", pe: 15.2, week52High: 420.75, week52Low: 289.36 },
+  { symbol: "BA", name: "Boeing Co.", sector: "Industrials", price: 0, change: 0, volume: "8.4M", marketCap: "$114B", pe: null, week52High: 267.54, week52Low: 159.70 },
+  { symbol: "IONQ", name: "IonQ Inc.", sector: "Technology", price: 0, change: 0, volume: "8.2M", marketCap: "$2.8B", pe: null, week52High: 22.90, week52Low: 5.20 },
+  { symbol: "MARA", name: "Marathon Digital", sector: "Financial", price: 0, change: 0, volume: "32.1M", marketCap: "$6.4B", pe: null, week52High: 34.09, week52Low: 7.16 },
+  { symbol: "HOOD", name: "Robinhood Markets", sector: "Financial", price: 0, change: 0, volume: "14.8M", marketCap: "$16.8B", pe: null, week52High: 23.94, week52Low: 7.57 },
+  { symbol: "NET", name: "Cloudflare Inc.", sector: "Technology", price: 0, change: 0, volume: "6.2M", marketCap: "$31B", pe: null, week52High: 116.00, week52Low: 56.39 },
+  { symbol: "DDOG", name: "Datadog Inc.", sector: "Technology", price: 0, change: 0, volume: "4.8M", marketCap: "$42B", pe: null, week52High: 138.61, week52Low: 81.11 },
+  { symbol: "WMT", name: "Walmart Inc.", sector: "Consumer Defensive", price: 0, change: 0, volume: "8.2M", marketCap: "$464B", pe: 28.4, week52High: 175.25, week52Low: 141.20 },
 ];
 
 const SECTORS = [...new Set(SCREENER_STOCKS.map(s => s.sector))].sort();
@@ -145,14 +139,10 @@ export default function Screener() {
           const sig = getOverallSignal(results);
           setAnalyzedStocks(prev => new Map(prev).set(sym, { signal: sig.signal, confidence: sig.confidence }));
         } else {
-          throw new Error("insufficient bars");
+          setAnalyzedStocks(prev => new Map(prev).set(sym, { signal: "NO_DATA", confidence: 0 }));
         }
       } catch {
-        const bp = mockPrice(sym);
-        const data = generateMockOHLCV(bp, 60);
-        const results = runAllIndicators(data);
-        const sig = getOverallSignal(results);
-        setAnalyzedStocks(prev => new Map(prev).set(sym, { signal: sig.signal, confidence: sig.confidence }));
+        setAnalyzedStocks(prev => new Map(prev).set(sym, { signal: "NO_DATA", confidence: 0 }));
       } finally {
         setAnalyzing(prev => { const n = new Set(prev); n.delete(sym); return n; });
       }

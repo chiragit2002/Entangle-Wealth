@@ -52,13 +52,20 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
     if (initialPrice) setTradePrice(String(initialPrice));
   }, [initialPrice]);
 
+  const [marketDataUnavailable, setMarketDataUnavailable] = useState(false);
+
   const loadPortfolio = useCallback(async () => {
     if (!isSignedIn) return;
     try {
       const res = await authFetch("/paper-trading/portfolio", getToken);
       if (res.ok) {
         const data = await res.json();
-        setPortfolio(data);
+        setMarketDataUnavailable(data.marketDataAvailable === false);
+        setPortfolio({
+          ...data,
+          portfolioValue: data.portfolioValue ?? 0,
+          totalValue: data.totalValue ?? data.cashBalance,
+        });
       }
     } catch (err) {
       console.error("[PaperTradingWidget] Failed to load portfolio:", err);
@@ -146,6 +153,11 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
           </div>
         </div>
 
+        {marketDataUnavailable && (
+          <div className="px-2.5 py-1.5 bg-[#ff3366]/10 border-b border-[#ff3366]/20 flex items-center gap-1.5">
+            <span className="text-[8px] font-mono font-bold text-[#ff3366]">⚠ Market data temporarily unavailable — trading paused</span>
+          </div>
+        )}
         <div className="p-2.5 space-y-2">
           <div className="grid grid-cols-4 gap-1.5">
             <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
@@ -238,6 +250,11 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
     <>
       {showCashStore && <BuyCashStore onClose={() => setShowCashStore(false)} onPurchaseSuccess={loadPortfolio} />}
       <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
+      {marketDataUnavailable && (
+        <div className="px-2.5 py-1.5 bg-[#ff3366]/10 border-b border-[#ff3366]/20 flex items-center gap-1.5">
+          <span className="text-[8px] font-mono font-bold text-[#ff3366]">⚠ Market data temporarily unavailable — trading paused. Portfolio values shown are cash only.</span>
+        </div>
+      )}
       <div className="flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FF8C00]">
         <div className="flex items-center gap-1.5">
           <TrendingUp className="w-3 h-3 text-[#FF8C00]" />

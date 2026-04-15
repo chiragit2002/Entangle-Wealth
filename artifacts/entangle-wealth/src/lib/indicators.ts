@@ -770,3 +770,80 @@ export function getOverallSignal(results: IndicatorResult[]): { signal: Indicato
   else if (sellCount > buyCount) signal = "SELL";
   return { signal, buyCount, sellCount, neutralCount, confidence: +confidence.toFixed(0) };
 }
+
+export interface MarketCondition {
+  id: "low_liquidity" | "sideways";
+  label: string;
+  subtext: string;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+}
+
+export interface MarketConditionInput {
+  relativeVolume: number;
+  adRatio: number;
+  newHighs: number;
+  newLows: number;
+  above50sma: number;
+  tickCurrent: number;
+  tickHigh: number;
+  tickLow: number;
+  trinValue: number;
+}
+
+export function detectMarketConditions(data: MarketConditionInput): MarketCondition[] {
+  const conditions: MarketCondition[] = [];
+
+  const volPctBelow = (1 - data.relativeVolume) * 100;
+  // Frontend approximation: uses only volume ratio (< 0.5 = ≥50% below avg).
+  // The backend stress engine also checks absolute volume (> 200k) which is
+  // unavailable on the frontend without a dedicated feed.
+  const isLowLiquidity = data.relativeVolume < 0.5;
+  if (isLowLiquidity) {
+    conditions.push({
+      id: "low_liquidity",
+      label: "Low Liquidity",
+      subtext: `Volume ${volPctBelow.toFixed(0)}% below avg`,
+      color: "#F59E0B",
+      bgColor: "rgba(245,158,11,0.08)",
+      borderColor: "rgba(245,158,11,0.35)",
+    });
+  }
+
+  const adNearOne = data.adRatio >= 0.88 && data.adRatio <= 1.12;
+
+  const tickRange = data.tickHigh + Math.abs(data.tickLow);
+  const tickTrendStrength = tickRange > 0 ? Math.abs(data.tickCurrent) / (tickRange / 2) : 0;
+  const tickMuted = tickTrendStrength < 0.35;
+
+  const trinNeutral = data.trinValue >= 0.85 && data.trinValue <= 1.15;
+
+  const highLowBalanced = data.newHighs > 0 && data.newLows > 0 &&
+    Math.abs(data.newHighs / (data.newHighs + data.newLows) - 0.5) < 0.15;
+  const breadthNeutral = data.above50sma >= 45 && data.above50sma <= 60;
+
+  const priceActionTrendless = tickMuted && trinNeutral;
+
+  const isSideways =
+    adNearOne ||
+    (priceActionTrendless && (highLowBalanced || breadthNeutral));
+
+  if (isSideways) {
+    const subtext = adNearOne
+      ? "A/D ratio flat — no directional conviction"
+      : tickMuted
+      ? "TICK muted — range-bound price action"
+      : "Range-bound — no trend";
+    conditions.push({
+      id: "sideways",
+      label: "Sideways",
+      subtext,
+      color: "#94A3B8",
+      bgColor: "rgba(148,163,184,0.08)",
+      borderColor: "rgba(148,163,184,0.30)",
+    });
+  }
+
+  return conditions;
+}

@@ -19,7 +19,7 @@ import { authFetch } from "@/lib/authFetch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight, ArrowDownRight, Activity, Zap, Minus, TrendingUp, Shield, RefreshCw, Search, BarChart3, X, Terminal, Globe, Layers, Clock, Keyboard, ChevronUp, ChevronDown, Eye, Atom, GitBranch, Brain, FileSearch, ChevronRight } from "lucide-react";
-import { runAllIndicators, getOverallSignal } from "@/lib/indicators";
+import { runAllIndicators, getOverallSignal, detectMarketConditions, type MarketCondition } from "@/lib/indicators";
 import { fetchBars, barsToStockData } from "@/lib/alpaca";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/trackEvent";
@@ -97,6 +97,7 @@ const MARKET_INTERNALS = {
   putCall: { ratio: 0.72, equity: 0.65, index: 1.12 },
   vix: { current: 14.32, change: -5.6, percentile: 22 },
   breadth: { above50sma: 62.4, above200sma: 71.2, newHighs: 148, newLows: 42 },
+  volume: { relativeVolume: 0.38 },
 };
 
 const EDGE_PULSE_COUNT = 4;
@@ -267,6 +268,36 @@ const emptyPortfolio: PaperPortfolio = {
   totalValue: STARTING_CASH,
 };
 
+function MarketConditionBadges({ conditions }: { conditions: MarketCondition[] }) {
+  if (conditions.length === 0) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-2 px-4 pb-3">
+      {conditions.map((c) => (
+        <div
+          key={c.id}
+          className="flex items-center gap-1.5 rounded-md px-2.5 py-1"
+          style={{
+            background: c.bgColor,
+            border: `1px solid ${c.borderColor}`,
+          }}
+        >
+          <span
+            className="inline-block w-1.5 h-1.5 rounded-full flex-shrink-0"
+            style={{ background: c.color }}
+          />
+          <span
+            className="text-[11px] font-bold tracking-wide"
+            style={{ color: c.color }}
+          >
+            {c.label}
+          </span>
+          <span className="text-[10px] text-white/40 font-mono">{c.subtext}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Panel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <div className={`bloomberg-panel overflow-hidden ${className}`}>
@@ -374,6 +405,18 @@ export default function Dashboard() {
     () => generateEntanglementInsights(entanglementCtx),
     [entanglementCtx]
   );
+
+  const marketConditions = detectMarketConditions({
+    relativeVolume: MARKET_INTERNALS.volume.relativeVolume,
+    adRatio: MARKET_INTERNALS.advDecl.ratio,
+    newHighs: MARKET_INTERNALS.breadth.newHighs,
+    newLows: MARKET_INTERNALS.breadth.newLows,
+    above50sma: MARKET_INTERNALS.breadth.above50sma,
+    tickCurrent: MARKET_INTERNALS.tick.current,
+    tickHigh: MARKET_INTERNALS.tick.high,
+    tickLow: -Math.abs(MARKET_INTERNALS.tick.low),
+    trinValue: MARKET_INTERNALS.trin.value,
+  });
 
   useEffect(() => {
     trackEvent("dashboard_viewed");
@@ -1007,6 +1050,7 @@ export default function Dashboard() {
                 <div className="px-4 py-2.5">
                   <p className="text-xs text-white/50 font-semibold">Market Internals</p>
                 </div>
+                <MarketConditionBadges conditions={marketConditions} />
                 <DataRow label="Advancing / Declining" value={`${MARKET_INTERNALS.advDecl.advancing} / ${MARKET_INTERNALS.advDecl.declining}`} change={((MARKET_INTERNALS.advDecl.advancing / MARKET_INTERNALS.advDecl.declining) - 1) * 100} />
                 <DataRow label="TICK" value={`${MARKET_INTERNALS.tick.current > 0 ? '+' : ''}${Math.abs(MARKET_INTERNALS.tick.current)}`} />
                 <DataRow label="TRIN (ARMS)" value={MARKET_INTERNALS.trin.value.toFixed(2)} />

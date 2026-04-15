@@ -482,7 +482,7 @@ async function gracefulShutdown(signal: string) {
   logger.info("Step 4/5: Closing SSE connections and lingering sockets...");
   closeAllSseConnections();
   for (const socket of openSockets) {
-    try { socket.destroy(); } catch { /* already gone */ }
+    try { socket.destroy(); } catch (err) { logger.debug({ error: err }, "Socket already destroyed during shutdown"); }
   }
   openSockets.clear();
   logger.info("SSE connections and lingering sockets closed");

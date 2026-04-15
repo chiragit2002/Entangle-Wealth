@@ -274,7 +274,8 @@ router.get("/marketing/agents", requireAuth, requireAdmin, async (req, res) => {
     }));
 
     res.json({ agents });
-  } catch {
+  } catch (err) {
+    logger.error({ err, userId }, "Failed to fetch marketing agents");
     res.status(500).json({ error: "Failed to fetch agents" });
   }
 });

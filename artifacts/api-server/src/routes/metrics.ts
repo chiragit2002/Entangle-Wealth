@@ -68,7 +68,8 @@ router.get("/metrics", requireAuth, requireAdmin, async (req: Request, res: Resp
         pressureWarning,
       },
     });
-  } catch {
+  } catch (err) {
+    logger.error({ err }, "Failed to fetch metrics");
     res.status(500).json({ error: "Failed to fetch metrics" });
   }
 });

@@ -293,7 +293,8 @@ async function fetchArticleBody(url: string): Promise<string> {
     text = text.replace(/\s+/g, " ").trim();
     if (text.length > 1000) text = text.slice(0, 1000) + "...";
     return text;
-  } catch {
+  } catch (err) {
+    logger.debug({ url, error: err }, "Failed to fetch article body");
     return "";
   }
 }

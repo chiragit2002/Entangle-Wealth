@@ -225,7 +225,7 @@ export default function EvalPipeline() {
         }),
       });
       if (!res.ok) {
-        const d = await res.json().catch(() => ({})) as { error?: string };
+        const d = await res.json().catch((e: unknown) => { console.warn("Failed to parse error body:", e); return {}; }) as { error?: string };
         throw new Error(d.error ?? "Submit failed");
       }
       const data = await res.json() as { job_id: string; status: string };

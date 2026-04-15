@@ -9,6 +9,7 @@ import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { validateBody, z } from "../lib/validateRequest";
 import { getLivePrice, getLivePrices, getFreshPrice } from "../lib/priceService";
 import { eventBus } from "../lib/agents/EventBus";
+import { emitEvent, emitTradeEvents, EventTypes, maybeCreateSnapshot } from "../lib/eventSourcing/index.js";
 import type { InferSelectModel } from "drizzle-orm";
 
 type DbPosition = InferSelectModel<typeof paperPositionsTable>;
@@ -111,6 +112,19 @@ async function ensurePortfolio(userId: string) {
     .insert(paperPortfoliosTable)
     .values({ userId, cashBalance: DEFAULT_STARTING_CASH })
     .returning();
+
+  try {
+    await emitEvent({
+      userId,
+      portfolioId: created.id,
+      eventType: EventTypes.USER_CREATED,
+      payload: { amount: DEFAULT_STARTING_CASH },
+      idempotencyKey: `user_created_${userId}`,
+    });
+  } catch (err) {
+    logger.warn({ err, userId }, "Failed to emit USER_CREATED event (non-fatal)");
+  }
+
   return created;
 }
 
@@ -441,6 +455,24 @@ async function executeMarketOrder(
       orderType: "market",
       orderId: orderId ?? null,
     });
+
+    const portfolioId = lockedPortfolio?.id ?? 0;
+    const idempotencyKey = `trade_${dbUserId}_${upperSymbol}_${side}_${qty}_${px}_${Date.now()}`;
+    try {
+      await emitTradeEvents(
+        tx as any,
+        dbUserId,
+        portfolioId,
+        upperSymbol,
+        side,
+        qty,
+        px,
+        orderId,
+        idempotencyKey,
+      );
+    } catch (eventErr) {
+      logger.warn({ err: eventErr }, "Event emission failed (non-fatal)");
+    }
 
     return { success: true, message: `${side.toUpperCase().replace("_", " ")} ${qty} ${upperSymbol} @ $${px.toFixed(2)}`, executedPrice: px, executedAt: new Date().toISOString() };
   });

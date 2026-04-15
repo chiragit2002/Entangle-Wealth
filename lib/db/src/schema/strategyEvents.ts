@@ -1,33 +1,35 @@
-import { pgTable, serial, text, timestamp, integer, jsonb, index } from "drizzle-orm/pg-core";
-import { customStrategiesTable } from "./customStrategies";
+import { pgTable, serial, text, timestamp, integer, jsonb, real, index, uniqueIndex } from "drizzle-orm/pg-core";
+import { usersTable } from "./users";
 
 export const strategyEventsTable = pgTable("strategy_events", {
   id: serial("id").primaryKey(),
-  strategyId: integer("strategy_id").notNull().references(() => customStrategiesTable.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+  portfolioId: integer("portfolio_id").notNull(),
   eventType: text("event_type").notNull(),
   payload: jsonb("payload").notNull().default({}),
+  marketPrice: real("market_price"),
   timestamp: timestamp("timestamp", { withTimezone: true }).defaultNow().notNull(),
+  idempotencyKey: text("idempotency_key"),
 }, (table) => [
-  index("idx_strategy_events_strategy_id").on(table.strategyId),
+  index("idx_strategy_events_portfolio_event").on(table.portfolioId, table.id),
+  index("idx_strategy_events_user_ts").on(table.userId, table.timestamp),
   index("idx_strategy_events_type").on(table.eventType),
-  index("idx_strategy_events_strategy_ts").on(table.strategyId, table.timestamp),
+  uniqueIndex("idx_strategy_events_idempotency").on(table.idempotencyKey),
 ]);
 
 export type StrategyEvent = typeof strategyEventsTable.$inferSelect;
 export type InsertStrategyEvent = typeof strategyEventsTable.$inferInsert;
 
-export const strategySnapshotsTable = pgTable("strategy_snapshots", {
+export const portfolioSnapshotsTable = pgTable("portfolio_snapshots", {
   id: serial("id").primaryKey(),
-  strategyId: integer("strategy_id").notNull().references(() => customStrategiesTable.id, { onDelete: "cascade" }),
-  version: text("version").notNull(),
+  portfolioId: integer("portfolio_id").notNull(),
+  lastEventId: integer("last_event_id").notNull(),
   state: jsonb("state").notNull().default({}),
-  lastEventId: integer("last_event_id").references(() => strategyEventsTable.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 }, (table) => [
-  index("idx_strategy_snapshots_strategy_id").on(table.strategyId),
-  index("idx_strategy_snapshots_strategy_version").on(table.strategyId, table.version),
-  index("idx_strategy_snapshots_last_event").on(table.lastEventId),
+  index("idx_portfolio_snapshots_portfolio").on(table.portfolioId),
+  index("idx_portfolio_snapshots_last_event").on(table.lastEventId),
 ]);
 
-export type StrategySnapshot = typeof strategySnapshotsTable.$inferSelect;
-export type InsertStrategySnapshot = typeof strategySnapshotsTable.$inferInsert;
+export type PortfolioSnapshot = typeof portfolioSnapshotsTable.$inferSelect;
+export type InsertPortfolioSnapshot = typeof portfolioSnapshotsTable.$inferInsert;

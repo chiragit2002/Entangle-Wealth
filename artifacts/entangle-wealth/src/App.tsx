@@ -116,6 +116,7 @@ function RequireAuth({ component: Component }: Wrap) {
 
 function RequireAdmin({ component: Component }: Wrap) {
   const isAdmin = useIsAdmin();
+  if (isAdmin === null) return <PageSkeleton />;
   return isAdmin ? <Component /> : <Redirect to="/dashboard" />;
 }
 

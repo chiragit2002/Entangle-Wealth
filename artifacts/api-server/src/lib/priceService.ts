@@ -86,7 +86,9 @@ export async function getFreshPrice(symbol: string): Promise<number | null> {
     await fetchPricesFromAlpaca([upperSymbol]);
     const fresh = getLatestPrice(upperSymbol);
     if (fresh && fresh.price > 0) return fresh.price;
-  } catch (_) {}
+  } catch (err) {
+    logger.debug({ err, symbol: upperSymbol }, "getFreshPrice broadcaster fetch failed (non-fatal)");
+  }
 
   try {
     const res = await fetch(`${ALPACA_DATA_URL}/v2/stocks/${upperSymbol}/snapshot`, {

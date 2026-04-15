@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import {
   Loader2, Play, ChevronLeft, Trophy, Shield, Wrench, FileText,
   BarChart3, Zap, AlertTriangle, CheckCircle2, XCircle, Target,
-  TrendingUp, Activity, Gauge,
+  TrendingUp, Activity, Gauge, GitBranch, GitCommit, ArrowLeftRight,
+  Clock, Hash, Plus,
 } from "lucide-react";
 import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
@@ -79,6 +80,34 @@ interface RankingEntry {
   strategy_name: string;
   score: number;
   confidence: number;
+}
+
+interface StrategyVersionEntry {
+  id: number;
+  version: string;
+  version_hash: string;
+  origin: "manual" | "refinement_engine";
+  parent_version: string | null;
+  parameters: Record<string, unknown>;
+  score_snapshot: { score_total: number | null; confidence: number | null };
+  scores: Record<string, number> | null;
+  changes: { field: string; old: unknown; new: unknown }[] | null;
+  stress_delta: { drawdown_change?: string; recovery_speed?: string } | null;
+  notes: string | null;
+  created_at: string;
+}
+
+interface VersionComparison {
+  version_a: { version: string; version_hash: string; origin: string; score_total: number | null; confidence: number | null; created_at: string };
+  version_b: { version: string; version_hash: string; origin: string; score_total: number | null; confidence: number | null; created_at: string };
+  diff: {
+    score_total: string | null;
+    confidence: string | null;
+    model_scores: Record<string, string | null>;
+    parameter_changes: { field: string; old: unknown; new: unknown }[];
+    stress_delta_a: Record<string, string>;
+    stress_delta_b: Record<string, string>;
+  };
 }
 
 const MODEL_LABELS: Record<string, string> = {
@@ -169,7 +198,7 @@ function StressChart({ results }: { results: StressResult[] }) {
   );
 }
 
-type ViewMode = "select" | "running" | "results" | "rankings";
+type ViewMode = "select" | "running" | "results" | "rankings" | "versions";
 
 export default function EvalPipeline() {
   const { toast } = useToast();
@@ -186,6 +215,12 @@ export default function EvalPipeline() {
   const [rankingsLoading, setRankingsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [versions, setVersions] = useState<StrategyVersionEntry[]>([]);
+  const [versionsLoading, setVersionsLoading] = useState(false);
+  const [compareA, setCompareA] = useState<string | null>(null);
+  const [compareB, setCompareB] = useState<string | null>(null);
+  const [comparison, setComparison] = useState<VersionComparison | null>(null);
+  const [comparingLoading, setComparingLoading] = useState(false);
 
   const fetchStrategies = useCallback(async () => {
     try {
@@ -286,6 +321,39 @@ export default function EvalPipeline() {
     }
   }
 
+  async function fetchVersions(strategyId: number) {
+    setVersionsLoading(true);
+    setComparison(null);
+    setCompareA(null);
+    setCompareB(null);
+    try {
+      const res = await fetch(`${BASE_URL}/api/evaluate/${strategyId}/versions`);
+      if (!res.ok) throw new Error("Failed");
+      const data = await res.json() as { versions: StrategyVersionEntry[] };
+      setVersions(data.versions);
+      setView("versions");
+    } catch {
+      toast({ title: "Failed to load version history", variant: "destructive" });
+    } finally {
+      setVersionsLoading(false);
+    }
+  }
+
+  async function compareVersions() {
+    if (!selectedId || !compareA || !compareB) return;
+    setComparingLoading(true);
+    try {
+      const res = await fetch(`${BASE_URL}/api/evaluate/${selectedId}/versions/compare?a=${encodeURIComponent(compareA)}&b=${encodeURIComponent(compareB)}`);
+      if (!res.ok) throw new Error("Failed");
+      const data = await res.json() as VersionComparison;
+      setComparison(data);
+    } catch {
+      toast({ title: "Failed to compare versions", variant: "destructive" });
+    } finally {
+      setComparingLoading(false);
+    }
+  }
+
   function resetToSelect() {
     if (pollRef.current) clearInterval(pollRef.current);
     setView("select");
@@ -318,14 +386,23 @@ export default function EvalPipeline() {
                     {view === "select" ? "6-model scoring pipeline with stress testing & refinement" :
                      view === "running" ? "Evaluation in progress..." :
                      view === "rankings" ? "Strategy Rankings" :
+                     view === "versions" ? `Version History${selectedStrategy ? ` — ${selectedStrategy.name}` : ""}` :
                      "Evaluation Results"}
                   </p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" onClick={fetchRankings} disabled={rankingsLoading} className="border-white/10 text-white/60">
-                <Trophy className="w-4 h-4 mr-1.5" />
-                Rankings
-              </Button>
+              <div className="flex gap-2">
+                {selectedId && (
+                  <Button variant="outline" size="sm" onClick={() => fetchVersions(selectedId)} disabled={versionsLoading} className="border-white/10 text-white/60">
+                    <GitBranch className="w-4 h-4 mr-1.5" />
+                    Versions
+                  </Button>
+                )}
+                <Button variant="outline" size="sm" onClick={fetchRankings} disabled={rankingsLoading} className="border-white/10 text-white/60">
+                  <Trophy className="w-4 h-4 mr-1.5" />
+                  Rankings
+                </Button>
+              </div>
             </div>
 
             {view === "select" && (
@@ -633,6 +710,271 @@ export default function EvalPipeline() {
                       ))}
                     </div>
                   )}
+                </div>
+              </div>
+            )}
+
+            {view === "versions" && (
+              <div className="space-y-6">
+                <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <GitBranch className="w-4 h-4 text-purple-400" />
+                      <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Version Timeline</span>
+                    </div>
+                    <span className="text-xs text-white/30">{versions.length} version{versions.length !== 1 ? "s" : ""}</span>
+                  </div>
+
+                  {versionsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin text-[#00D4FF]" />
+                    </div>
+                  ) : versions.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-white/40 text-sm">No versions recorded yet. Run a refinement to auto-create versions.</p>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <div className="absolute left-[19px] top-4 bottom-4 w-px bg-white/10" />
+                      <div className="space-y-3">
+                        {versions.map((v, idx) => (
+                          <div key={v.id} className="relative flex gap-4">
+                            <div className="flex-shrink-0 z-10">
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
+                                idx === versions.length - 1
+                                  ? "border-[#00D4FF] bg-[#00D4FF]/10"
+                                  : v.origin === "refinement_engine"
+                                    ? "border-purple-400 bg-purple-400/10"
+                                    : "border-white/20 bg-white/5"
+                              }`}>
+                                {v.origin === "refinement_engine" ? (
+                                  <Wrench className="w-4 h-4 text-purple-400" />
+                                ) : (
+                                  <GitCommit className="w-4 h-4 text-white/40" />
+                                )}
+                              </div>
+                            </div>
+                            <div className={`flex-1 bg-white/[0.02] border rounded-xl p-4 transition-all ${
+                              (compareA === v.version || compareB === v.version)
+                                ? "border-[#00D4FF]/50 bg-[#00D4FF]/5"
+                                : "border-white/8 hover:border-white/15"
+                            }`}>
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="font-mono font-bold text-white text-sm">v{v.version}</span>
+                                    <span className="text-[10px] font-mono text-white/20 bg-white/5 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                      <Hash className="w-3 h-3" />{v.version_hash}
+                                    </span>
+                                    <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                                      v.origin === "refinement_engine"
+                                        ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
+                                        : "bg-white/5 text-white/30 border border-white/10"
+                                    }`}>
+                                      {v.origin === "refinement_engine" ? "refinement" : "manual"}
+                                    </span>
+                                    {v.parent_version && (
+                                      <span className="text-[10px] text-white/20 flex items-center gap-0.5">
+                                        <ChevronLeft className="w-3 h-3" /> v{v.parent_version}
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {v.notes && (
+                                    <p className="text-xs text-white/40 mt-1">{v.notes}</p>
+                                  )}
+
+                                  <div className="flex items-center gap-4 mt-2 text-xs text-white/30">
+                                    <span className="flex items-center gap-1">
+                                      <Clock className="w-3 h-3" />
+                                      {new Date(v.created_at).toLocaleDateString()} {new Date(v.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                    </span>
+                                    {v.score_snapshot.score_total != null && (
+                                      <span className={`font-mono font-bold ${(v.score_snapshot.score_total ?? 0) >= 80 ? "text-[#00FF41]" : (v.score_snapshot.score_total ?? 0) >= 60 ? "text-[#FFD700]" : "text-red-400"}`}>
+                                        {v.score_snapshot.score_total?.toFixed(1)}
+                                      </span>
+                                    )}
+                                    {v.score_snapshot.confidence != null && (
+                                      <span className="text-[#00D4FF]">{((v.score_snapshot.confidence ?? 0) * 100).toFixed(0)}% conf</span>
+                                    )}
+                                  </div>
+
+                                  {v.changes && v.changes.length > 0 && (
+                                    <div className="mt-2 flex flex-wrap gap-1.5">
+                                      {v.changes.map((c, ci) => (
+                                        <span key={ci} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40 font-mono">
+                                          {c.field.replace("parameters.", "")}: {String(c.old)} → {String(c.new)}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+
+                                  {v.stress_delta && (v.stress_delta.drawdown_change || v.stress_delta.recovery_speed) && (
+                                    <div className="mt-2 flex gap-2">
+                                      {v.stress_delta.drawdown_change && (
+                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20 text-orange-400">
+                                          DD: {v.stress_delta.drawdown_change}
+                                        </span>
+                                      )}
+                                      {v.stress_delta.recovery_speed && (
+                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#00D4FF]/10 border border-[#00D4FF]/20 text-[#00D4FF]">
+                                          Recovery: {v.stress_delta.recovery_speed}
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+
+                                <button
+                                  onClick={() => {
+                                    if (!compareA || (compareA && compareB)) {
+                                      setCompareA(v.version);
+                                      setCompareB(null);
+                                      setComparison(null);
+                                    } else if (compareA !== v.version) {
+                                      setCompareB(v.version);
+                                    }
+                                  }}
+                                  className={`flex-shrink-0 p-1.5 rounded-lg border transition-all text-xs ${
+                                    compareA === v.version ? "border-[#00D4FF]/50 bg-[#00D4FF]/10 text-[#00D4FF]" :
+                                    compareB === v.version ? "border-purple-400/50 bg-purple-400/10 text-purple-400" :
+                                    "border-white/10 text-white/30 hover:border-white/20 hover:text-white/50"
+                                  }`}
+                                  title={compareA === v.version ? "Selected as A" : compareB === v.version ? "Selected as B" : "Select for comparison"}
+                                >
+                                  <ArrowLeftRight className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {compareA && compareB && (
+                  <div className="flex justify-center">
+                    <Button
+                      onClick={compareVersions}
+                      disabled={comparingLoading}
+                      className="bg-[#00D4FF] hover:bg-[#00D4FF]/80 text-black font-semibold"
+                    >
+                      {comparingLoading ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <ArrowLeftRight className="w-4 h-4 mr-1.5" />}
+                      Compare v{compareA} vs v{compareB}
+                    </Button>
+                  </div>
+                )}
+
+                {comparison && (
+                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5 space-y-5">
+                    <div className="flex items-center gap-2">
+                      <ArrowLeftRight className="w-4 h-4 text-[#00D4FF]" />
+                      <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
+                        Comparison: v{comparison.version_a.version} vs v{comparison.version_b.version}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-xs font-semibold text-[#00D4FF]">v{comparison.version_a.version}</span>
+                          <span className="text-[10px] font-mono text-white/20">{comparison.version_a.version_hash}</span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded ${comparison.version_a.origin === "refinement_engine" ? "bg-purple-500/10 text-purple-400" : "bg-white/5 text-white/30"}`}>
+                            {comparison.version_a.origin === "refinement_engine" ? "refinement" : "manual"}
+                          </span>
+                        </div>
+                        <div className="space-y-1 text-xs">
+                          <div className="flex justify-between">
+                            <span className="text-white/40">Score</span>
+                            <span className="font-mono font-bold text-white">{comparison.version_a.score_total?.toFixed(1) ?? "—"}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-white/40">Confidence</span>
+                            <span className="font-mono text-white">{comparison.version_a.confidence != null ? `${(comparison.version_a.confidence * 100).toFixed(0)}%` : "—"}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-xs font-semibold text-purple-400">v{comparison.version_b.version}</span>
+                          <span className="text-[10px] font-mono text-white/20">{comparison.version_b.version_hash}</span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded ${comparison.version_b.origin === "refinement_engine" ? "bg-purple-500/10 text-purple-400" : "bg-white/5 text-white/30"}`}>
+                            {comparison.version_b.origin === "refinement_engine" ? "refinement" : "manual"}
+                          </span>
+                        </div>
+                        <div className="space-y-1 text-xs">
+                          <div className="flex justify-between">
+                            <span className="text-white/40">Score</span>
+                            <span className="font-mono font-bold text-white">{comparison.version_b.score_total?.toFixed(1) ?? "—"}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-white/40">Confidence</span>
+                            <span className="font-mono text-white">{comparison.version_b.confidence != null ? `${(comparison.version_b.confidence * 100).toFixed(0)}%` : "—"}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 space-y-3">
+                      <div className="text-xs font-semibold text-white/40 uppercase tracking-wider">Score Delta</div>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-white/40">Total</span>
+                          <span className={`font-mono font-bold text-lg ${!comparison.diff.score_total ? "text-white/20" : comparison.diff.score_total.startsWith("+") ? "text-[#00FF41]" : comparison.diff.score_total.startsWith("-") ? "text-red-400" : "text-white/40"}`}>
+                            {comparison.diff.score_total ?? "N/A"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-white/40">Confidence</span>
+                          <span className={`font-mono text-sm ${!comparison.diff.confidence ? "text-white/20" : comparison.diff.confidence.startsWith("+") ? "text-[#00D4FF]" : comparison.diff.confidence.startsWith("-") ? "text-orange-400" : "text-white/40"}`}>
+                            {comparison.diff.confidence ?? "N/A"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {Object.keys(comparison.diff.model_scores).length > 0 && (
+                      <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 space-y-3">
+                        <div className="text-xs font-semibold text-white/40 uppercase tracking-wider">Model Score Changes</div>
+                        <div className="grid grid-cols-3 gap-2">
+                          {Object.entries(comparison.diff.model_scores).map(([key, delta]) => (
+                            <div key={key} className="flex items-center justify-between bg-white/[0.03] rounded-lg px-3 py-2">
+                              <span className="text-xs text-white/40">{MODEL_LABELS[key] ?? key}</span>
+                              <span className={`text-sm font-bold font-mono ${!delta ? "text-white/20" : delta.startsWith("+") && delta !== "+0.0" ? "text-[#00FF41]" : delta.startsWith("-") ? "text-red-400" : "text-white/20"}`}>
+                                {delta ?? "—"}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {comparison.diff.parameter_changes.length > 0 && (
+                      <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 space-y-3">
+                        <div className="text-xs font-semibold text-white/40 uppercase tracking-wider">Parameter Changes</div>
+                        <div className="space-y-2">
+                          {comparison.diff.parameter_changes.map((c, i) => (
+                            <div key={i} className="flex items-center justify-between bg-white/[0.02] border border-white/8 rounded-lg px-4 py-3">
+                              <span className="text-sm font-mono text-white/70">{c.field.replace("parameters.", "")}</span>
+                              <div className="flex items-center gap-2 text-xs">
+                                <span className="text-white/30">{String(c.old ?? "—")}</span>
+                                <span className="text-white/20">→</span>
+                                <span className="text-[#00D4FF] font-semibold">{String(c.new ?? "—")}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex gap-3">
+                  <Button variant="outline" size="sm" onClick={resetToSelect} className="border-white/10 text-white/60">
+                    <ChevronLeft className="w-4 h-4 mr-1" /> Back
+                  </Button>
                 </div>
               </div>
             )}

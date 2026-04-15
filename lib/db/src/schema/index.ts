@@ -23,3 +23,4 @@ export * from "./dailyContent";
 export * from "./agents";
 export * from "./customStrategies";
 export * from "./strategyEvaluations";
+export * from "./strategyVersions";

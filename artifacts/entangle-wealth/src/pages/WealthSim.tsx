@@ -4,6 +4,8 @@ import { Layout } from "@/components/layout/Layout";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
 import { fireConfetti } from "@/lib/confetti";
+import { JourneyBridgeCard } from "@/components/journey/JourneyBridgeCard";
+import { useJourney } from "@/hooks/useJourney";
 import { showBacktestXpToast, showBadgeUnlockToast } from "@/components/BloombergToast";
 import {
   LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -232,6 +234,7 @@ function HealthScoreBar({ profile }: { profile: SimProfile }) {
 export default function WealthSim() {
   const { isSignedIn, isLoaded, getToken } = useAuth();
   const { toast } = useToast();
+  const { onEvent } = useJourney();
 
   const [wizardStep, setWizardStep] = useState(0);
   const [tryWithoutAccount, setTryWithoutAccount] = useState(false);
@@ -372,6 +375,7 @@ export default function WealthSim() {
         simCountRef.current += 1;
         const finalNetWorth = data.projections?.[data.projections.length - 1]?.netWorth ?? 0;
         awardSimXp(finalNetWorth, simCountRef.current);
+        onEvent("wealthsim_run");
       } else {
         const localProjections = calcLocalProjections(p);
         setProjections(localProjections);
@@ -865,6 +869,16 @@ export default function WealthSim() {
                     )}
                   </div>
                 </>
+              )}
+
+              {wizardStep === 4 && simulated && (
+                <JourneyBridgeCard
+                  title="Now see how taxes affect this projection"
+                  desc="TaxFlow can show you how much of your projected growth you'll actually keep after taxes — and where to save more."
+                  href="/tax"
+                  phaseColor="#FFB800"
+                  cta="Open TaxFlow →"
+                />
               )}
 
               {wizardStep < 4 && (

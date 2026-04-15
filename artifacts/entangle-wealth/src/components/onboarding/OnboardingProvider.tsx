@@ -4,6 +4,7 @@ import { WelcomeModal } from "./WelcomeModal";
 import { PersonalizedResultScreen } from "./PersonalizedResultScreen";
 import { GettingStartedChecklist } from "./GettingStartedChecklist";
 import { FirstVisitTooltips } from "./FirstVisitTooltips";
+import { JourneyMap } from "@/components/journey/JourneyMap";
 
 export function OnboardingProvider() {
   const { state, loading, markWelcomeComplete, isSignedIn } = useOnboarding();
@@ -56,6 +57,7 @@ export function OnboardingProvider() {
       )}
       {!showWelcome && !showResult && <GettingStartedChecklist />}
       {!showWelcome && !showResult && <FirstVisitTooltips />}
+      {!showWelcome && !showResult && <JourneyMap />}
     </>
   );
 }

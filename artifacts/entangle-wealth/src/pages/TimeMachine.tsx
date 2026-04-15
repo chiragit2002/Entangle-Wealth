@@ -1,6 +1,8 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "@clerk/react";
 import { trackEvent } from "@/lib/trackEvent";
+import { JourneyBridgeCard } from "@/components/journey/JourneyBridgeCard";
+import { useJourney } from "@/hooks/useJourney";
 import { Layout } from "@/components/layout/Layout";
 import { fetchAlpacaBars, type AlpacaBar } from "@/lib/api";
 import { authFetch } from "@/lib/authFetch";
@@ -162,6 +164,7 @@ const PRESETS = [
 
 export default function TimeMachine() {
   const { isSignedIn, getToken } = useAuth();
+  const { onEvent } = useJourney();
   const [symbol, setSymbol] = useState("NVDA");
   const [startDate, setStartDate] = useState("2020-01-02");
   const [amount, setAmount] = useState("10000");
@@ -225,6 +228,7 @@ export default function TimeMachine() {
       const computed = computeResult(s, d, a, data.bars);
       setResult(computed);
       awardBacktestXp(computed);
+      onEvent("time_machine_run");
     } catch {
       setError("Failed to fetch data. Check your symbol and try again.");
     } finally {
@@ -335,6 +339,14 @@ export default function TimeMachine() {
                 <div className="text-[10px] text-muted-foreground">{result.worstDay.date}</div>
               </div>
             </div>
+
+            <JourneyBridgeCard
+              title="Apply these insights to your live strategy"
+              desc={`You've seen what ${result.symbol} did historically. Now project forward — use WealthSim to model what consistent investing looks like over your time horizon.`}
+              href="/wealth-sim"
+              phaseColor="#0099cc"
+              cta="Open WealthSim →"
+            />
           </div>
         )}
 

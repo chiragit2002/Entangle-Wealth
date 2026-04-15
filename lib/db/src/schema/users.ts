@@ -51,6 +51,7 @@ export const usersTable = pgTable("users", {
   businessDocVerifiedAt: timestamp("business_doc_verified_at", { withTimezone: true }),
   dashboardModules: jsonb("dashboard_modules").default([]),
   dashboardModulesAssignedAt: timestamp("dashboard_modules_assigned_at", { withTimezone: true }),
+  journeyState: jsonb("journey_state"),
 });
 
 export type User = typeof usersTable.$inferSelect;

@@ -6,122 +6,59 @@ import { fireCelebration } from "@/lib/confetti";
 import { BigWinOverlay } from "@/components/BigWinOverlay";
 import { trackEvent } from "@/lib/trackEvent";
 import { Link } from "wouter";
+import { useJourney } from "@/hooks/useJourney";
+import { JOURNEY_PHASES } from "@/lib/journeyConfig";
 
-interface ChecklistItem {
-  id: string;
-  label: string;
-  href: string;
-  desc?: string;
-}
-
-const ITEMS: ChecklistItem[] = [
-  { id: "view_signal", label: "View a signal", href: "/dashboard" },
-  { id: "run_tax_scan", label: "Run a tax scan", href: "/tax" },
-  { id: "set_alert", label: "Set a price alert", href: "/alerts" },
-  { id: "join_community", label: "Join a community group", href: "/community" },
-  { id: "enable_notifications", label: "Enable notifications", href: "/profile" },
-];
-
-const EVENTS_TO_CHECKLIST: Record<string, string> = {
-  signal_viewed: "view_signal",
-  dashboard_viewed: "view_signal",
-  taxflow_scan: "run_tax_scan",
-  alert_created: "set_alert",
-  community_post: "join_community",
-  notifications_enabled: "enable_notifications",
-};
-
-interface OnboardingEventDetail {
-  event: string;
-}
-
-function isFirstSession(): boolean {
-  try {
-    const visited = localStorage.getItem("ew_visited_before");
-    if (!visited) {
-      localStorage.setItem("ew_visited_before", "true");
-      return true;
-    }
-    return false;
-  } catch {
-    return false;
-  }
-}
+const DISCOVER_PHASE = JOURNEY_PHASES[0];
+const MAX_DAYS_VISIBLE = 14;
 
 export function GettingStartedChecklist() {
-  const { getToken, isSignedIn } = useAuth();
-  const [checklist, setChecklist] = useState<Record<string, boolean>>({});
-  const [collapsed, setCollapsed] = useState(() => isFirstSession());
-  const [dismissed, setDismissed] = useState(false);
-  const [daysSinceSignup, setDaysSinceSignup] = useState(0);
-  const [loaded, setLoaded] = useState(false);
+  const { isSignedIn, getToken } = useAuth();
+  const { state, loading } = useJourney();
+  const [collapsed, setCollapsed] = useState(false);
+  const [dismissed, setDismissed] = useState(() =>
+    typeof window !== "undefined" && localStorage.getItem("ew_checklist_dismissed") === "true"
+  );
   const [showBigWin, setShowBigWin] = useState(false);
+  const [daysSinceSignup, setDaysSinceSignup] = useState<number | null>(null);
+  const [daysLoaded, setDaysLoaded] = useState(false);
 
-  const fetchState = useCallback(async () => {
-    if (!isSignedIn) return;
+  const fetchDays = useCallback(async () => {
+    if (!isSignedIn) { setDaysLoaded(true); return; }
     try {
       const res = await authFetch("/onboarding", getToken);
-      if (!res.ok) return;
-      const data = await res.json();
-      setChecklist(data.checklist ?? {});
-      setDaysSinceSignup(data.daysSinceSignup ?? 0);
-      setLoaded(true);
+      if (res.ok) {
+        const data = await res.json();
+        setDaysSinceSignup(data.daysSinceSignup ?? 0);
+      }
     } catch {
-      setLoaded(true);
+    } finally {
+      setDaysLoaded(true);
     }
-  }, [getToken, isSignedIn]);
+  }, [isSignedIn, getToken]);
+
+  useEffect(() => { fetchDays(); }, [fetchDays]);
+
+  const milestones = DISCOVER_PHASE.milestones;
+  const completedCount = milestones.filter(m => state.completedMilestones[m.id]).length;
+  const allDone = completedCount === milestones.length || state.completedPhases.includes(DISCOVER_PHASE.id);
+  const progressPct = (completedCount / milestones.length) * 100;
 
   useEffect(() => {
-    fetchState();
-  }, [fetchState]);
-
-  const markItem = useCallback(async (itemId: string) => {
-    setChecklist((prev) => {
-      const updated = { ...prev, [itemId]: true };
-      const allDone = ITEMS.every((item) => updated[item.id]);
-      if (allDone) {
-        fireCelebration(1000, "xp");
-        setShowBigWin(true);
-        trackEvent("onboarding_checklist_completed");
-      }
-      return updated;
-    });
-
-    try {
-      await authFetch("/onboarding/checklist", getToken, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ item: itemId, completed: true }),
-      });
-    } catch {
+    if (allDone && !showBigWin && completedCount === milestones.length) {
+      fireCelebration(1000, "xp");
+      setShowBigWin(true);
+      trackEvent("onboarding_checklist_completed");
     }
-  }, [getToken]);
+  }, [allDone, completedCount, milestones.length, showBigWin]);
 
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent<OnboardingEventDetail>).detail;
-      const checklistKey = EVENTS_TO_CHECKLIST[detail.event];
-      if (checklistKey && !checklist[checklistKey]) {
-        markItem(checklistKey);
-      }
-    };
-    window.addEventListener("onboarding-event", handler);
-    return () => window.removeEventListener("onboarding-event", handler);
-  }, [checklist, markItem]);
+  const tooOld = daysSinceSignup !== null && daysSinceSignup > MAX_DAYS_VISIBLE;
 
-  const completedCount = ITEMS.filter((item) => checklist[item.id]).length;
-  const allDone = completedCount === ITEMS.length;
-  const progressPct = (completedCount / ITEMS.length) * 100;
-
-  const localDismissed = typeof window !== "undefined" && localStorage.getItem("ew_checklist_dismissed") === "true";
-
-  if (!loaded || !isSignedIn || dismissed || localDismissed || daysSinceSignup > 14 || allDone) {
-    return null;
-  }
+  if (loading || !daysLoaded || !isSignedIn || dismissed || allDone || tooOld) return null;
 
   return (
     <>
-      <BigWinOverlay show={showBigWin} label="ALL DONE!" onDone={() => setShowBigWin(false)} />
+      <BigWinOverlay show={showBigWin} label="CHAPTER 1 COMPLETE!" onDone={() => setShowBigWin(false)} />
       <div
         className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-50 w-72 animate-in slide-in-from-bottom-4 fade-in duration-300"
         role="complementary"
@@ -139,9 +76,12 @@ export function GettingStartedChecklist() {
           >
             <div className="flex items-center gap-2">
               <Rocket className="w-4 h-4 text-[#FF8C00]" aria-hidden="true" />
-              <span className="text-xs font-bold text-white/80">Getting Started</span>
-              <span className="text-[10px] font-mono text-[#FF8C00]" aria-label={`${completedCount} of ${ITEMS.length} complete`}>
-                {completedCount}/{ITEMS.length}
+              <span className="text-xs font-bold text-white/80">Chapter 1: Discover</span>
+              <span
+                className="text-[10px] font-mono text-[#FF8C00]"
+                aria-label={`${completedCount} of ${milestones.length} complete`}
+              >
+                {completedCount}/{milestones.length}
               </span>
             </div>
             <div className="flex items-center gap-1">
@@ -165,9 +105,16 @@ export function GettingStartedChecklist() {
           </div>
 
           <div className="px-4 pb-1">
-            <div className="h-1 bg-white/5 rounded-full overflow-hidden" role="progressbar" aria-valuenow={progressPct} aria-valuemin={0} aria-valuemax={100} aria-label={`${Math.round(progressPct)}% complete`}>
+            <div
+              className="h-1 bg-white/5 rounded-full overflow-hidden"
+              role="progressbar"
+              aria-valuenow={progressPct}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`${Math.round(progressPct)}% complete`}
+            >
               <div
-                className="h-full bg-gradient-to-r from-[#FF8C00] to-[#FF8C00] transition-all duration-500 ease-out rounded-full"
+                className="h-full bg-gradient-to-r from-[#FF8C00] to-[#FFB800] transition-all duration-500 ease-out rounded-full"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
@@ -175,15 +122,15 @@ export function GettingStartedChecklist() {
 
           {!collapsed && (
             <div id="checklist-items" className="px-4 py-2 space-y-0.5 animate-in slide-in-from-top-2 duration-200">
-              {ITEMS.map((item) => {
-                const done = checklist[item.id];
+              {milestones.map((milestone) => {
+                const done = !!state.completedMilestones[milestone.id];
                 return (
                   <Link
-                    key={item.id}
-                    href={item.href}
+                    key={milestone.id}
+                    href={milestone.href}
                     className={`flex items-center gap-2.5 px-2 py-2 rounded-lg transition-colors group ${
                       done
-                        ? "opacity-50 cursor-default"
+                        ? "opacity-50 cursor-default pointer-events-none"
                         : "hover:bg-white/[0.04] cursor-pointer"
                     }`}
                     aria-disabled={done}
@@ -199,8 +146,11 @@ export function GettingStartedChecklist() {
                           done ? "text-white/30 line-through" : "text-white/70 group-hover:text-white/90 transition-colors"
                         }`}
                       >
-                        {item.label}
+                        {milestone.label}
                       </span>
+                      {!done && milestone.desc && (
+                        <span className="text-[9px] text-white/30 block mt-0.5">{milestone.desc}</span>
+                      )}
                     </div>
                     {!done && (
                       <ArrowRight className="w-3 h-3 text-white/10 group-hover:text-white/30 transition-colors shrink-0" aria-hidden="true" />
@@ -209,7 +159,7 @@ export function GettingStartedChecklist() {
                 );
               })}
               <div className="pt-1 pb-2">
-                <p className="text-[9px] text-white/40 text-center">Complete all 5 to earn a bonus reward!</p>
+                <p className="text-[9px] text-white/40 text-center">Complete all 4 to unlock Chapter 2 — Analyze</p>
               </div>
             </div>
           )}

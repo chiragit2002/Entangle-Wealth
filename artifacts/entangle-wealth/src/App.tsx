@@ -13,6 +13,7 @@ import { PageSkeleton, ChartSkeleton, TableSkeleton } from "@/components/pwa/Pag
 import { captureReferralCode } from "@/lib/referral";
 import { trackEvent } from "@/lib/trackEvent";
 import { usePageTracking } from "@/hooks/usePageTracking";
+import { JourneyProvider } from "@/contexts/JourneyContext";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { TerminalAuthShell } from "@/components/TerminalAuthShell";
 import { AuthErrorHandler } from "@/components/AuthErrorHandler";
@@ -134,6 +135,7 @@ function ClerkProviderWithRoutes() {
   return (
     <ClerkProvider publishableKey={clerkPubKey} proxyUrl={clerkProxyUrl} routerPush={(to) => navigate(stripBasePath(to))} routerReplace={(to) => navigate(stripBasePath(to), { replace: true })} appearance={appearance}>
       <QueryClientProvider client={queryClient}>
+        <JourneyProvider>
         <CacheInvalidator /><PageTracker /><AuthErrorHandler />
         <TooltipProvider>
           <Switch>
@@ -175,6 +177,7 @@ function ClerkProviderWithRoutes() {
           <CookieConsentBanner />
           <Toaster />
         </TooltipProvider>
+        </JourneyProvider>
       </QueryClientProvider>
     </ClerkProvider>
   );

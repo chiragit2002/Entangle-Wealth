@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@/components/layout/Layout";
 import { Link } from "wouter";
@@ -19,6 +19,8 @@ import {
   getActiveProfile, isOnboardingDone, getDeductionCategories,
   saveDeductionCategories, getPlanStrategies, getTaxYear,
 } from "@/lib/taxflow-profile";
+import { useJourney } from "@/hooks/useJourney";
+import { JourneyBridgeCard } from "@/components/journey/JourneyBridgeCard";
 import { ALL_STRATEGIES, getStrategiesForEntity } from "@/lib/taxflow-strategies";
 import {
   TAX_RATES, calculateIncomeTax, calculateSETax, calculateQBIDeduction, getMarginalRate,
@@ -30,6 +32,7 @@ function formatDollar(n: number): string {
 
 export default function Tax() {
   const { toast } = useToast();
+  const { onEvent } = useJourney();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [categories, setCategories] = useState<DeductionCategory[]>(getDeductionCategories());
@@ -41,7 +44,13 @@ export default function Tax() {
   useEffect(() => {
     const p = getActiveProfile();
     setProfile(p);
-    if (!isOnboardingDone()) setShowOnboarding(true);
+    if (!isOnboardingDone()) {
+      setShowOnboarding(true);
+    } else {
+      onEvent("run_tax_scan");
+      onEvent("taxflow_setup");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const referralQuery = useQuery({
@@ -739,6 +748,16 @@ export default function Tax() {
             <FileText className="w-4 h-4" /> PDF Report
           </Button>
         </div>
+
+        {profile && (
+          <JourneyBridgeCard
+            title="See how tax savings compound over time"
+            desc="You've optimized your tax picture. Now use WealthSim to project how reinvesting those savings grows your net worth over 10–20 years."
+            href="/wealth-sim"
+            phaseColor="#FFB800"
+            cta="Open WealthSim →"
+          />
+        )}
 
         <div className="p-4 rounded-lg border border-white/5 bg-white/[0.01]">
           <p className="text-[11px] text-muted-foreground/50 text-center">

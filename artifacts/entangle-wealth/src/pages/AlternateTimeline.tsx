@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
+import { JourneyBridgeCard } from "@/components/journey/JourneyBridgeCard";
+import { useJourney } from "@/hooks/useJourney";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import {
   LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -573,6 +575,7 @@ const DEFAULT_PARAMS_B: TimelineParams = {
 export default function AlternateTimeline() {
   const { getToken, isSignedIn } = useAuth();
   const { toast } = useToast();
+  const { onEvent } = useJourney();
 
   const [paramsA, setParamsA] = useState<TimelineParams>(DEFAULT_PARAMS_A);
   const [paramsB, setParamsB] = useState<TimelineParams>(DEFAULT_PARAMS_B);
@@ -719,12 +722,13 @@ export default function AlternateTimeline() {
       if (isSignedIn) {
         fetchStage();
       }
+      onEvent("alternate_timeline_run");
     } catch {
       toast({ title: "Simulation failed", description: "Could not run the timeline simulation. Please try again.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
-  }, [isSignedIn, getToken, fetchStage, toast]);
+  }, [isSignedIn, getToken, fetchStage, toast, onEvent]);
 
   const runMonteCarloSim = useCallback(async () => {
     setMcLoading(true);
@@ -1422,6 +1426,18 @@ export default function AlternateTimeline() {
             </div>
           )}
         </div>
+
+        {(resultA || resultB) && (
+          <div className="mt-4">
+            <JourneyBridgeCard
+              title="Apply these insights to your live strategy"
+              desc="You've mapped two financial futures. Now head to your Dashboard to execute a paper trade informed by this simulation data."
+              href="/dashboard"
+              phaseColor="#00D4FF"
+              cta="Go to Dashboard →"
+            />
+          </div>
+        )}
 
         <div className="mt-4 rounded-xl px-4 py-3"
           style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>

@@ -38,6 +38,8 @@ import { FreshStartPrompt } from "@/components/FreshStartPrompt";
 import { VariableSurpriseReward } from "@/components/VariableSurpriseReward";
 import { SessionRecapOverlay } from "@/components/SessionRecapOverlay";
 import { CommitmentEscalationFlow } from "@/components/CommitmentEscalationFlow";
+import { useJourney } from "@/hooks/useJourney";
+import { JourneyBridgeCard } from "@/components/journey/JourneyBridgeCard";
 import { generateEntanglementInsights, type UserEntanglementContext } from "@/lib/entanglementEngine";
 import { getActiveProfile } from "@/lib/taxflow-profile";
 import { DynamicModuleGrid } from "@/components/dashboard/DynamicModuleGrid";
@@ -308,6 +310,7 @@ type SecondaryTab = "signals" | "options" | "market" | "calendar";
 export default function Dashboard() {
   const { toast } = useToast();
   const { isSignedIn, getToken } = useAuth();
+  const { onEvent } = useJourney();
   const [tradeSymbol, setTradeSymbol] = useState("");
   const [tradeQty, setTradeQty] = useState("");
   const [tradePrice, setTradePrice] = useState("");
@@ -374,7 +377,11 @@ export default function Dashboard() {
     [entanglementCtx]
   );
 
-  useEffect(() => { trackEvent("dashboard_viewed"); }, []);
+  useEffect(() => {
+    trackEvent("dashboard_viewed");
+    onEvent("view_signal");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const executeTrade = useCallback(async () => {
     if (!tradeSymbol.trim() || !tradeQty || !tradePrice) {
@@ -391,6 +398,7 @@ export default function Dashboard() {
       const data = await res.json();
       if (res.ok) {
         toast({ title: "Trade Executed", description: data.message });
+        onEvent("trade_executed");
         setTradeSymbol("");
         setTradeQty("");
         setTradePrice("");
@@ -403,7 +411,7 @@ export default function Dashboard() {
     } finally {
       setTradeLoading(false);
     }
-  }, [tradeSymbol, tradeQty, tradePrice, tradeSide, getToken, toast, loadPortfolio]);
+  }, [tradeSymbol, tradeQty, tradePrice, tradeSide, getToken, toast, loadPortfolio, onEvent]);
 
   const resetPortfolio = useCallback(async () => {
     try {
@@ -846,6 +854,17 @@ export default function Dashboard() {
                           <Area type="monotone" dataKey="value" stroke={pnl >= 0 ? "#FF8C00" : "#ff4757"} strokeWidth={2} fill="url(#pgGrad)" />
                         </AreaChart>
                       </ResponsiveContainer>
+                    )}
+                    {portfolio.trades.length > 0 && (
+                      <div className="mt-3">
+                        <JourneyBridgeCard
+                          title="Test this thesis in history"
+                          desc="How would this trade have performed in 2020 or 2022? Use Time Machine to backtest and strengthen your conviction."
+                          href="/time-machine"
+                          phaseColor="#00D4FF"
+                          cta="Open Time Machine →"
+                        />
+                      </div>
                     )}
                   </div>
                 )}

@@ -1,5 +1,8 @@
 import { logger } from "../logger.js";
 import { TTLCache } from "../cache.js";
+import { db } from "@workspace/db";
+import { quantEngineRunsTable } from "@workspace/db/schema";
+import { desc } from "drizzle-orm";
 import { generateAllStrategies } from "./strategyGenerator.js";
 import { fetchStockUniverse, runStrategiesOnUniverse } from "./executionEngine.js";
 import { rankOpportunities } from "./scorer.js";
@@ -52,19 +55,48 @@ let schedulerInterval: ReturnType<typeof setInterval> | null = null;
 
 function isMarketHours(): boolean {
   const now = new Date();
-  const etOffset = -5;
-  const utcHours = now.getUTCHours();
-  const etHours = (utcHours + 24 + etOffset) % 24;
-  const etMinutes = now.getUTCMinutes();
   const day = now.getUTCDay();
-
   if (day === 0 || day === 6) return false;
+
+  const etFormatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: false,
+  });
+  const parts = etFormatter.formatToParts(now);
+  const etHours = parseInt(parts.find(p => p.type === "hour")?.value ?? "0", 10);
+  const etMinutes = parseInt(parts.find(p => p.type === "minute")?.value ?? "0", 10);
 
   const marketOpen = 9 * 60 + 30;
   const marketClose = 16 * 60;
   const currentMinutes = etHours * 60 + etMinutes;
 
   return currentMinutes >= marketOpen - 30 && currentMinutes <= marketClose + 30;
+}
+
+async function persistRunResult(
+  stocksScanned: number,
+  strategiesEvaluated: number,
+  signalsGenerated: number,
+  errorCount: number,
+  runTimeMs: number,
+  topSignals: SignalOpportunity[],
+  timeframesUsed: string[],
+): Promise<void> {
+  try {
+    await db.insert(quantEngineRunsTable).values({
+      stocksScanned,
+      strategiesEvaluated,
+      signalsGenerated,
+      errorCount,
+      runTimeMs,
+      topSignals: topSignals.slice(0, 20) as object[],
+      timeframesUsed,
+    });
+  } catch (err) {
+    logger.warn({ err }, "Quant engine: failed to persist run result to DB");
+  }
 }
 
 export async function runQuantEngine(force: boolean = false): Promise<SignalOpportunity[]> {
@@ -81,35 +113,59 @@ export async function runQuantEngine(force: boolean = false): Promise<SignalOppo
 
   engineStatus.isRunning = true;
   const startTime = Date.now();
+  let errorCount = 0;
 
   const FULL_UNIVERSE_SIZE = STOCK_UNIVERSE.length + CRYPTO_UNIVERSE.length;
   logger.info({ stockUniverse: STOCK_UNIVERSE.length, cryptoUniverse: CRYPTO_UNIVERSE.length, total: FULL_UNIVERSE_SIZE, force }, "Quant engine: starting run");
 
   try {
-    const strategies = generateAllStrategies();
-    const gridCount = strategies.filter(s => s.type === "RSI_EMA_GRID").length;
-    logger.info({ strategies: strategies.length, gridStrategies: gridCount, baseStrategies: strategies.length - gridCount }, "Quant engine: system strategies loaded");
+    const allStrategies = generateAllStrategies();
+    const dailyStrategies = allStrategies.filter(s => !s.timeframe || s.timeframe === "1Day");
+    const hourlyStrategies = allStrategies.filter(s => s.timeframe === "1Hour");
+    const gridCount = allStrategies.filter(s => s.type === "RSI_EMA_GRID").length;
+    logger.info(
+      { total: allStrategies.length, daily: dailyStrategies.length, hourly: hourlyStrategies.length, gridStrategies: gridCount },
+      "Quant engine: strategies loaded",
+    );
 
     const FULL_UNIVERSE = [...STOCK_UNIVERSE, ...CRYPTO_UNIVERSE];
-    const stockData = await fetchStockUniverse(FULL_UNIVERSE);
-    engineStatus.apiCallsMade += Math.ceil(FULL_UNIVERSE.length / 10);
+    const timeframesUsed: string[] = ["1Day"];
+    const [dailyStockData, hourlyStockData] = await Promise.all([
+      fetchStockUniverse(FULL_UNIVERSE, "1Day"),
+      hourlyStrategies.length > 0 ? fetchStockUniverse(STOCK_UNIVERSE, "1Hour") : Promise.resolve(new Map()),
+    ]);
+    engineStatus.apiCallsMade += Math.ceil(FULL_UNIVERSE.length / 10) + (hourlyStrategies.length > 0 ? Math.ceil(STOCK_UNIVERSE.length / 10) : 0);
 
-    if (stockData.size === 0) {
+    if (hourlyStockData.size > 0) timeframesUsed.push("1Hour");
+
+    if (dailyStockData.size === 0 && hourlyStockData.size === 0) {
       logger.warn("Quant engine: no stock data fetched, aborting");
-      engineStatus.errors++;
+      errorCount++;
+      engineStatus.errors += errorCount;
       return signalsCache.get(SIGNALS_CACHE_KEY) ?? [];
     }
 
-    const rawResults = await runStrategiesOnUniverse(stockData, strategies);
+    const [dailyRawResults, hourlyRawResults] = await Promise.all([
+      dailyStockData.size > 0 && dailyStrategies.length > 0
+        ? runStrategiesOnUniverse(dailyStockData, dailyStrategies)
+        : Promise.resolve([]),
+      hourlyStockData.size > 0 && hourlyStrategies.length > 0
+        ? runStrategiesOnUniverse(hourlyStockData, hourlyStrategies)
+        : Promise.resolve([]),
+    ]);
 
-    const signals = rankOpportunities(rawResults, 3, 100);
+    const allRawResults = [...dailyRawResults, ...hourlyRawResults];
+    const signals = rankOpportunities(allRawResults, 3, 100);
 
     const elapsed = Date.now() - startTime;
+    const totalStocksScanned = dailyStockData.size;
+    const totalStrategiesEvaluated = (dailyStrategies.length * dailyStockData.size) + (hourlyStrategies.length * hourlyStockData.size);
+    const signalsGenerated = allRawResults.filter(r => r.result.action !== "HOLD").length;
 
     engineStatus.lastRunAt = new Date().toISOString();
-    engineStatus.stocksScanned = stockData.size;
-    engineStatus.strategiesEvaluated = strategies.length * stockData.size;
-    engineStatus.signalsGenerated = rawResults.filter(r => r.result.action !== "HOLD").length;
+    engineStatus.stocksScanned = totalStocksScanned;
+    engineStatus.strategiesEvaluated = totalStrategiesEvaluated;
+    engineStatus.signalsGenerated = signalsGenerated;
     engineStatus.totalRunTimeMs = elapsed;
     engineStatus.runCount++;
 
@@ -120,14 +176,26 @@ export async function runQuantEngine(force: boolean = false): Promise<SignalOppo
 
     logger.info({
       elapsed,
-      stocksScanned: stockData.size,
-      strategiesEvaluated: engineStatus.strategiesEvaluated,
-      signalsGenerated: engineStatus.signalsGenerated,
+      stocksScanned: totalStocksScanned,
+      strategiesEvaluated: totalStrategiesEvaluated,
+      signalsGenerated,
       topSignals: signals.length,
+      timeframesUsed,
     }, "Quant engine: run complete");
+
+    persistRunResult(
+      totalStocksScanned,
+      totalStrategiesEvaluated,
+      signalsGenerated,
+      errorCount,
+      elapsed,
+      signals,
+      timeframesUsed,
+    ).catch(() => {});
 
     return signals;
   } catch (err) {
+    errorCount++;
     engineStatus.errors++;
     logger.error({ err }, "Quant engine: fatal error during run");
     return signalsCache.get(SIGNALS_CACHE_KEY) ?? [];
@@ -142,6 +210,19 @@ export function getEngineStatus(): EngineStatus {
 
 export function getCachedSignals(): SignalOpportunity[] {
   return signalsCache.get(SIGNALS_CACHE_KEY) ?? [];
+}
+
+export async function getHistoricalRuns(limit = 20) {
+  try {
+    return await db
+      .select()
+      .from(quantEngineRunsTable)
+      .orderBy(desc(quantEngineRunsTable.runAt))
+      .limit(limit);
+  } catch (err) {
+    logger.error({ err }, "Quant engine: failed to fetch historical runs");
+    return [];
+  }
 }
 
 export function startScheduler(): void {

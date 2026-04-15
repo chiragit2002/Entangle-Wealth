@@ -42,8 +42,9 @@ async function run() {
             maxDrawdown: result.maxDrawdown,
           });
         }
-      } catch {
-        // Skip failed strategies silently
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(`[strategyWorker ${workerId}] strategy=${strategy.id} symbol=${symbol} error: ${msg}`);
       }
     }
   }

@@ -7,7 +7,7 @@ import { customStrategiesTable } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
 import { resolveUserId } from "../lib/resolveUserId.js";
-import { runQuantEngine, getEngineStatus, getCachedSignals } from "../lib/quantEngine/index.js";
+import { runQuantEngine, getEngineStatus, getCachedSignals, getHistoricalRuns } from "../lib/quantEngine/index.js";
 import { fetchStockUniverse } from "../lib/quantEngine/executionEngine.js";
 import { buildCustomSignal } from "../lib/quantEngine/strategyBridge.js";
 import type { CustomStrategyConfig } from "../lib/quantEngine/strategyBridge.js";
@@ -312,6 +312,17 @@ router.post("/quant/orchestrate", async (req, res) => {
   } catch (err) {
     logger.error({ err }, "POST /quant/orchestrate failed");
     res.status(500).json({ error: "Orchestration failed" });
+  }
+});
+
+router.get("/quant/runs", async (req, res) => {
+  try {
+    const limit = Math.min(100, parseInt((req.query.limit as string) || "20", 10));
+    const runs = await getHistoricalRuns(limit);
+    res.json({ runs, count: runs.length });
+  } catch (err) {
+    logger.error({ err }, "GET /quant/runs failed");
+    res.status(500).json({ error: "Failed to fetch historical runs" });
   }
 });
 

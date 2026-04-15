@@ -26,3 +26,4 @@ export * from "./strategyEvaluations";
 export * from "./strategyVersions";
 export * from "./quantEvaluation";
 export * from "./strategyEvents";
+export * from "./quantEngineRuns";

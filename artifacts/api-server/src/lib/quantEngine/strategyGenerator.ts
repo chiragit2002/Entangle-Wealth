@@ -1,6 +1,7 @@
 import {
-  sma, ema, emaArray, rsi, macd, macdParams, stochastic, bollinger,
-  atr, obv, williamsr, cci, roc, cmf, adx,
+  sma, ema, emaArray, rsiArray, smaArray, bollingerArray, stochasticArray,
+  williamsRArray, cciArray, rocArray, cmfArray, obvArray, macdParamsArray, adxArray,
+  macd, macdParams, bollinger, rsi,
 } from "./indicators.js";
 
 export interface OHLCVData {
@@ -27,21 +28,240 @@ export interface StrategyDescriptor {
   name: string;
   type: string;
   params: Record<string, number>;
+  timeframe?: string;
+}
+
+function computeVolatility(closes: number[]): number {
+  const returns: number[] = [];
+  for (let i = 1; i < closes.length; i++) {
+    returns.push(Math.log(closes[i] / closes[i - 1]));
+  }
+  const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
+  const variance = returns.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / returns.length;
+  return Math.sqrt(variance) * Math.sqrt(252) * 100;
+}
+
+function generateSignalsArray(descriptor: StrategyDescriptor, data: OHLCVData): StrategyAction[] {
+  const { closes, highs, lows, volumes } = data;
+  const n = closes.length;
+  const { type, params } = descriptor;
+  const signals: StrategyAction[] = new Array(n).fill("HOLD") as StrategyAction[];
+
+  if (type === "RSI_OVERSOLD") {
+    const period = params.period || 14;
+    const threshold = params.threshold || 30;
+    const rsiArr = rsiArray(closes, period);
+    for (let i = period + 1; i < n; i++) {
+      if (rsiArr[i] < threshold) signals[i] = "BUY";
+    }
+  } else if (type === "RSI_OVERBOUGHT") {
+    const period = params.period || 14;
+    const threshold = params.threshold || 70;
+    const rsiArr = rsiArray(closes, period);
+    for (let i = period + 1; i < n; i++) {
+      if (rsiArr[i] > threshold) signals[i] = "SELL";
+    }
+  } else if (type === "EMA_CROSSOVER") {
+    const fast = params.fast || 9;
+    const slow = params.slow || 21;
+    const fastArr = emaArray(closes, fast);
+    const slowArr = emaArray(closes, slow);
+    for (let i = slow + 1; i < n; i++) {
+      if (fastArr[i] > slowArr[i] && fastArr[i - 1] <= slowArr[i - 1]) signals[i] = "BUY";
+      else if (fastArr[i] < slowArr[i] && fastArr[i - 1] >= slowArr[i - 1]) signals[i] = "SELL";
+    }
+  } else if (type === "SMA_CROSSOVER") {
+    const fast = params.fast || 10;
+    const slow = params.slow || 20;
+    const fastArr = smaArray(closes, fast);
+    const slowArr = smaArray(closes, slow);
+    for (let i = slow + 1; i < n; i++) {
+      if (fastArr[i] > slowArr[i] && fastArr[i - 1] <= slowArr[i - 1]) signals[i] = "BUY";
+      else if (fastArr[i] < slowArr[i] && fastArr[i - 1] >= slowArr[i - 1]) signals[i] = "SELL";
+    }
+  } else if (type === "MACD_SIGNAL") {
+    const fast = params.fast || 12;
+    const slow = params.slow || 26;
+    const sig = params.signal || 9;
+    const macdArr = macdParamsArray(closes, fast, slow, sig);
+    for (let i = slow + sig + 1; i < n; i++) {
+      if (macdArr[i].histogram > 0 && macdArr[i - 1].histogram <= 0) signals[i] = "BUY";
+      else if (macdArr[i].histogram < 0 && macdArr[i - 1].histogram >= 0) signals[i] = "SELL";
+    }
+  } else if (type === "BOLLINGER_BOUNCE") {
+    const period = params.period || 20;
+    const mult = params.mult || 2;
+    const bbArr = bollingerArray(closes, period, mult);
+    for (let i = period; i < n; i++) {
+      if (bbArr[i].pctB < 15) signals[i] = "BUY";
+      else if (bbArr[i].pctB > 85) signals[i] = "SELL";
+    }
+  } else if (type === "BOLLINGER_BREAKOUT") {
+    const period = params.period || 20;
+    const mult = params.mult || 2;
+    const bbArr = bollingerArray(closes, period, mult);
+    for (let i = period + 1; i < n; i++) {
+      if (closes[i] > bbArr[i].upper && closes[i - 1] <= bbArr[i - 1].upper) signals[i] = "BUY";
+      else if (closes[i] < bbArr[i].lower && closes[i - 1] >= bbArr[i - 1].lower) signals[i] = "SELL";
+    }
+  } else if (type === "STOCHASTIC_OVERSOLD") {
+    const period = params.period || 14;
+    const threshold = params.threshold || 20;
+    const stochArr = stochasticArray(highs, lows, closes, period);
+    for (let i = period; i < n; i++) {
+      if (stochArr[i] < threshold) signals[i] = "BUY";
+    }
+  } else if (type === "STOCHASTIC_OVERBOUGHT") {
+    const period = params.period || 14;
+    const threshold = params.threshold || 80;
+    const stochArr = stochasticArray(highs, lows, closes, period);
+    for (let i = period; i < n; i++) {
+      if (stochArr[i] > threshold) signals[i] = "SELL";
+    }
+  } else if (type === "WILLIAMS_R_OVERSOLD") {
+    const period = params.period || 14;
+    const wrArr = williamsRArray(highs, lows, closes, period);
+    for (let i = period; i < n; i++) {
+      if (wrArr[i] < -80) signals[i] = "BUY";
+    }
+  } else if (type === "CCI_EXTREME") {
+    const period = params.period || 20;
+    const threshold = params.threshold || 100;
+    const cciArr = cciArray(highs, lows, closes, period);
+    for (let i = period; i < n; i++) {
+      if (cciArr[i] < -threshold) signals[i] = "BUY";
+      else if (cciArr[i] > threshold) signals[i] = "SELL";
+    }
+  } else if (type === "ROC_MOMENTUM") {
+    const period = params.period || 12;
+    const threshold = params.threshold || 5;
+    const rocArr = rocArray(closes, period);
+    for (let i = period; i < n; i++) {
+      if (rocArr[i] > threshold) signals[i] = "BUY";
+      else if (rocArr[i] < -threshold) signals[i] = "SELL";
+    }
+  } else if (type === "CMF_FLOW") {
+    const period = params.period || 20;
+    const cmfArr = cmfArray(highs, lows, closes, volumes, period);
+    for (let i = period; i < n; i++) {
+      if (cmfArr[i] > 0.05) signals[i] = "BUY";
+      else if (cmfArr[i] < -0.05) signals[i] = "SELL";
+    }
+  } else if (type === "OBV_TREND") {
+    const obvArr = obvArray(closes, volumes);
+    for (let i = 6; i < n; i++) {
+      const priceUp = closes[i] > closes[i - 5];
+      if (obvArr[i] > obvArr[i - 5] && priceUp) signals[i] = "BUY";
+      else if (obvArr[i] < obvArr[i - 5] && !priceUp) signals[i] = "SELL";
+    }
+  } else if (type === "RSI_MACD_COMBO") {
+    const rsiPeriod = params.rsiPeriod || 14;
+    const rsiThreshold = params.rsiThreshold || 35;
+    const rsiArr = rsiArray(closes, rsiPeriod);
+    const macdArr = macdParamsArray(closes, 12, 26, 9);
+    for (let i = 35; i < n; i++) {
+      if (rsiArr[i] < rsiThreshold && macdArr[i].histogram > 0) signals[i] = "BUY";
+      else if (rsiArr[i] > (100 - rsiThreshold) && macdArr[i].histogram < 0) signals[i] = "SELL";
+    }
+  } else if (type === "EMA_RSI_COMBO") {
+    const rsiPeriod = params.rsiPeriod || 14;
+    const emaPeriod = params.emaPeriod || 21;
+    const rsiArr = rsiArray(closes, rsiPeriod);
+    const emaArr = emaArray(closes, emaPeriod);
+    for (let i = emaPeriod; i < n; i++) {
+      if (closes[i] > emaArr[i] && rsiArr[i] < 50 && rsiArr[i] > 30) signals[i] = "BUY";
+      else if (closes[i] < emaArr[i] && rsiArr[i] > 50 && rsiArr[i] < 70) signals[i] = "SELL";
+    }
+  } else if (type === "BOLLINGER_RSI_COMBO") {
+    const bbPeriod = params.bbPeriod || 20;
+    const rsiPeriod = params.rsiPeriod || 14;
+    const bbArr = bollingerArray(closes, bbPeriod, 2);
+    const rsiArr = rsiArray(closes, rsiPeriod);
+    for (let i = Math.max(bbPeriod, rsiPeriod); i < n; i++) {
+      if (bbArr[i].pctB < 20 && rsiArr[i] < 40) signals[i] = "BUY";
+      else if (bbArr[i].pctB > 80 && rsiArr[i] > 60) signals[i] = "SELL";
+    }
+  } else if (type === "STOCH_RSI_COMBO") {
+    const stochPeriod = params.stochPeriod || 14;
+    const rsiPeriod = params.rsiPeriod || 14;
+    const stochArr = stochasticArray(highs, lows, closes, stochPeriod);
+    const rsiArr = rsiArray(closes, rsiPeriod);
+    for (let i = Math.max(stochPeriod, rsiPeriod); i < n; i++) {
+      if (stochArr[i] < 25 && rsiArr[i] < 40) signals[i] = "BUY";
+      else if (stochArr[i] > 75 && rsiArr[i] > 60) signals[i] = "SELL";
+    }
+  } else if (type === "EMA_MACD_COMBO") {
+    const emaPeriod = params.emaPeriod || 50;
+    const fast = params.macdFast || 12;
+    const slow = params.macdSlow || 26;
+    const sig = params.macdSig || 9;
+    const emaArr = emaArray(closes, emaPeriod);
+    const macdArr = macdParamsArray(closes, fast, slow, sig);
+    for (let i = emaPeriod; i < n; i++) {
+      if (closes[i] > emaArr[i] && macdArr[i].histogram > 0) signals[i] = "BUY";
+      else if (closes[i] < emaArr[i] && macdArr[i].histogram < 0) signals[i] = "SELL";
+    }
+  } else if (type === "TRIPLE_EMA") {
+    const fast = params.fast || 9;
+    const mid = params.mid || 21;
+    const slow = params.slow || 50;
+    const fastArr = emaArray(closes, fast);
+    const midArr = emaArray(closes, mid);
+    const slowArr = emaArray(closes, slow);
+    for (let i = slow; i < n; i++) {
+      if (fastArr[i] > midArr[i] && midArr[i] > slowArr[i]) signals[i] = "BUY";
+      else if (fastArr[i] < midArr[i] && midArr[i] < slowArr[i]) signals[i] = "SELL";
+    }
+  } else if (type === "ADX_TREND") {
+    const period = params.period || 14;
+    const threshold = params.threshold || 25;
+    const adxArr = adxArray(highs, lows, closes, period);
+    const emaFastArr = emaArray(closes, 9);
+    const emaSlowArr = emaArray(closes, 21);
+    for (let i = period + 1; i < n; i++) {
+      if (adxArr[i] > threshold && emaFastArr[i] > emaSlowArr[i]) signals[i] = "BUY";
+      else if (adxArr[i] > threshold && emaFastArr[i] < emaSlowArr[i]) signals[i] = "SELL";
+    }
+  } else if (type === "PRICE_SMA_DISTANCE") {
+    const period = params.period || 50;
+    const threshold = params.threshold || 5;
+    const smaArr = smaArray(closes, period);
+    for (let i = period; i < n; i++) {
+      if (smaArr[i] === 0) continue;
+      const pct = ((closes[i] - smaArr[i]) / smaArr[i]) * 100;
+      if (pct < -threshold) signals[i] = "BUY";
+      else if (pct > threshold) signals[i] = "SELL";
+    }
+  } else if (type === "RSI_EMA_GRID") {
+    const rsiPeriod = params.rsiPeriod || 14;
+    const emaShort = params.emaShort || 9;
+    const emaLong = params.emaLong || 50;
+    const oversold = params.oversold || 30;
+    const overbought = params.overbought || 70;
+    const rsiArr = rsiArray(closes, rsiPeriod);
+    const emaShortArr = emaArray(closes, emaShort);
+    const emaLongArr = emaArray(closes, emaLong);
+    for (let i = Math.max(rsiPeriod + 1, emaLong + 1); i < n; i++) {
+      if (rsiArr[i] < oversold && emaShortArr[i] > emaLongArr[i]) signals[i] = "BUY";
+      else if (rsiArr[i] > overbought && emaShortArr[i] < emaLongArr[i]) signals[i] = "SELL";
+    }
+  }
+
+  return signals;
 }
 
 function backtest(
   closes: number[],
-  generateSignal: (idx: number) => StrategyAction,
+  signals: StrategyAction[],
   holdBars: number,
 ): { winRate: number; avgReturn: number; maxDrawdown: number; trades: number } {
   const trades: number[] = [];
-  let peak = -Infinity;
-  let maxDD = 0;
   let equity = 100;
   let equity_peak = 100;
+  let maxDD = 0;
 
   for (let i = 50; i < closes.length - holdBars; i++) {
-    const action = generateSignal(i);
+    const action = signals[i];
     if (action !== "HOLD") {
       const entryPrice = closes[i];
       const exitPrice = closes[i + holdBars];
@@ -69,16 +289,6 @@ function backtest(
   };
 }
 
-function computeVolatility(closes: number[]): number {
-  const returns: number[] = [];
-  for (let i = 1; i < closes.length; i++) {
-    returns.push(Math.log(closes[i] / closes[i - 1]));
-  }
-  const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
-  const variance = returns.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / returns.length;
-  return Math.sqrt(variance) * Math.sqrt(252) * 100;
-}
-
 export function executeStrategy(descriptor: StrategyDescriptor, data: OHLCVData): StrategyResult {
   const { closes, highs, lows, volumes } = data;
 
@@ -88,10 +298,17 @@ export function executeStrategy(descriptor: StrategyDescriptor, data: OHLCVData)
 
   const vol = computeVolatility(closes);
   const { type, params } = descriptor;
+  const holdBars = params.holdBars || 10;
 
-  let action: StrategyAction = "HOLD";
+  const signals = generateSignalsArray(descriptor, data);
+  const lastSignal = signals[signals.length - 1];
+  const action = lastSignal;
+
+  if (action === "HOLD") {
+    return { action, confidence: 0, expectedReturn: 0, riskScore: Math.min(100, vol), winRate: 50, maxDrawdown: 0 };
+  }
+
   let rawConfidence = 0;
-  let holdBars = params.holdBars || 10;
 
   if (type === "RSI_OVERSOLD") {
     const period = params.period || 14;
@@ -99,265 +316,124 @@ export function executeStrategy(descriptor: StrategyDescriptor, data: OHLCVData)
     const currentRSI = rsi(closes, period);
     const prevRSI = rsi(closes.slice(0, -1), period);
     if (currentRSI < threshold && currentRSI > prevRSI) {
-      action = "BUY";
       rawConfidence = Math.min(100, (threshold - currentRSI) / threshold * 150 + 40);
-    } else if (currentRSI < threshold) {
-      action = "BUY";
+    } else {
       rawConfidence = Math.min(80, (threshold - currentRSI) / threshold * 100 + 30);
     }
   } else if (type === "RSI_OVERBOUGHT") {
     const period = params.period || 14;
     const threshold = params.threshold || 70;
     const currentRSI = rsi(closes, period);
-    if (currentRSI > threshold) {
-      action = "SELL";
-      rawConfidence = Math.min(80, (currentRSI - threshold) / (100 - threshold) * 100 + 30);
-    }
+    rawConfidence = Math.min(80, (currentRSI - threshold) / (100 - threshold) * 100 + 30);
   } else if (type === "EMA_CROSSOVER") {
     const fast = params.fast || 9;
     const slow = params.slow || 21;
     const fastArr = emaArray(closes, fast);
     const slowArr = emaArray(closes, slow);
     const fastCurr = fastArr[fastArr.length - 1];
-    const fastPrev = fastArr[fastArr.length - 2] ?? fastCurr;
     const slowCurr = slowArr[slowArr.length - 1];
-    const slowPrev = slowArr[slowArr.length - 2] ?? slowCurr;
-    if (fastCurr > slowCurr && fastPrev <= slowPrev) {
-      action = "BUY";
-      rawConfidence = 65 + Math.abs(fastCurr - slowCurr) / slowCurr * 200;
-    } else if (fastCurr < slowCurr && fastPrev >= slowPrev) {
-      action = "SELL";
-      rawConfidence = 65 + Math.abs(fastCurr - slowCurr) / slowCurr * 200;
-    }
+    rawConfidence = 65 + Math.abs(fastCurr - slowCurr) / slowCurr * 200;
   } else if (type === "SMA_CROSSOVER") {
     const fast = params.fast || 10;
     const slow = params.slow || 20;
-    if (closes.length < slow + 2) return { action: "HOLD", confidence: 0, expectedReturn: 0, riskScore: vol, winRate: 50, maxDrawdown: 0 };
     const fastCurr = sma(closes, fast);
-    const fastPrev = sma(closes.slice(0, -1), fast);
     const slowCurr = sma(closes, slow);
-    const slowPrev = sma(closes.slice(0, -1), slow);
-    if (fastCurr > slowCurr && fastPrev <= slowPrev) {
-      action = "BUY";
-      rawConfidence = 60 + Math.abs(fastCurr - slowCurr) / slowCurr * 150;
-    } else if (fastCurr < slowCurr && fastPrev >= slowPrev) {
-      action = "SELL";
-      rawConfidence = 60 + Math.abs(fastCurr - slowCurr) / slowCurr * 150;
-    }
+    rawConfidence = 60 + Math.abs(fastCurr - slowCurr) / slowCurr * 150;
   } else if (type === "MACD_SIGNAL") {
     const fast = params.fast || 12;
     const slow = params.slow || 26;
     const sig = params.signal || 9;
     const curr = macdParams(closes, fast, slow, sig);
-    const prev = macdParams(closes.slice(0, -1), fast, slow, sig);
-    if (curr.histogram > 0 && prev.histogram <= 0) {
-      action = "BUY";
-      rawConfidence = 60 + Math.min(30, Math.abs(curr.histogram) * 10);
-    } else if (curr.histogram < 0 && prev.histogram >= 0) {
-      action = "SELL";
-      rawConfidence = 60 + Math.min(30, Math.abs(curr.histogram) * 10);
-    }
+    rawConfidence = 60 + Math.min(30, Math.abs(curr.histogram) * 10);
   } else if (type === "BOLLINGER_BOUNCE") {
     const period = params.period || 20;
     const mult = params.mult || 2;
     const bands = bollinger(closes, period, mult);
-    if (bands.pctB < 5) {
-      action = "BUY";
-      rawConfidence = Math.min(85, 70 + (5 - bands.pctB) * 2);
-    } else if (bands.pctB > 95) {
-      action = "SELL";
-      rawConfidence = Math.min(85, 70 + (bands.pctB - 95) * 2);
-    } else if (bands.pctB < 15) {
-      action = "BUY";
-      rawConfidence = 55 + (15 - bands.pctB) * 2;
-    } else if (bands.pctB > 85) {
-      action = "SELL";
-      rawConfidence = 55 + (bands.pctB - 85) * 2;
-    }
+    if (bands.pctB < 5) rawConfidence = Math.min(85, 70 + (5 - bands.pctB) * 2);
+    else if (bands.pctB > 95) rawConfidence = Math.min(85, 70 + (bands.pctB - 95) * 2);
+    else if (bands.pctB < 15) rawConfidence = 55 + (15 - bands.pctB) * 2;
+    else rawConfidence = 55 + (bands.pctB - 85) * 2;
   } else if (type === "BOLLINGER_BREAKOUT") {
-    const period = params.period || 20;
-    const mult = params.mult || 2;
-    const bands = bollinger(closes, period, mult);
-    const prevBands = bollinger(closes.slice(0, -1), period, mult);
-    const price = closes[closes.length - 1];
-    const prevPrice = closes[closes.length - 2];
-    if (price > bands.upper && prevPrice <= prevBands.upper) {
-      action = "BUY";
-      rawConfidence = 65;
-    } else if (price < bands.lower && prevPrice >= prevBands.lower) {
-      action = "SELL";
-      rawConfidence = 65;
-    }
+    rawConfidence = 65;
   } else if (type === "STOCHASTIC_OVERSOLD") {
     const period = params.period || 14;
     const threshold = params.threshold || 20;
-    const k = stochastic(highs, lows, closes, period);
-    if (k < threshold) {
-      action = "BUY";
-      rawConfidence = Math.min(80, 50 + (threshold - k) * 1.5);
-    }
+    const stochArr = stochasticArray(highs, lows, closes, period);
+    const k = stochArr[stochArr.length - 1];
+    rawConfidence = Math.min(80, 50 + (threshold - k) * 1.5);
   } else if (type === "STOCHASTIC_OVERBOUGHT") {
     const period = params.period || 14;
     const threshold = params.threshold || 80;
-    const k = stochastic(highs, lows, closes, period);
-    if (k > threshold) {
-      action = "SELL";
-      rawConfidence = Math.min(80, 50 + (k - threshold) * 1.5);
-    }
+    const stochArr = stochasticArray(highs, lows, closes, period);
+    const k = stochArr[stochArr.length - 1];
+    rawConfidence = Math.min(80, 50 + (k - threshold) * 1.5);
   } else if (type === "WILLIAMS_R_OVERSOLD") {
     const period = params.period || 14;
-    const wr = williamsr(highs, lows, closes, period);
-    if (wr < -80) {
-      action = "BUY";
-      rawConfidence = Math.min(80, 50 + Math.abs(wr + 80) * 2);
-    }
+    const wrArr = williamsRArray(highs, lows, closes, period);
+    const wr = wrArr[wrArr.length - 1];
+    rawConfidence = Math.min(80, 50 + Math.abs(wr + 80) * 2);
   } else if (type === "CCI_EXTREME") {
     const period = params.period || 20;
     const threshold = params.threshold || 100;
-    const c = cci(highs, lows, closes, period);
-    if (c < -threshold) {
-      action = "BUY";
-      rawConfidence = Math.min(80, 50 + (Math.abs(c) - threshold) / threshold * 30);
-    } else if (c > threshold) {
-      action = "SELL";
-      rawConfidence = Math.min(80, 50 + (c - threshold) / threshold * 30);
-    }
+    const cciArr = cciArray(highs, lows, closes, period);
+    const c = cciArr[cciArr.length - 1];
+    rawConfidence = Math.min(80, 50 + (Math.abs(c) - threshold) / threshold * 30);
   } else if (type === "ROC_MOMENTUM") {
     const period = params.period || 12;
     const threshold = params.threshold || 5;
-    const r = roc(closes, period);
-    if (r > threshold) {
-      action = "BUY";
-      rawConfidence = Math.min(75, 50 + (r - threshold) * 2);
-    } else if (r < -threshold) {
-      action = "SELL";
-      rawConfidence = Math.min(75, 50 + (Math.abs(r) - threshold) * 2);
-    }
+    const rocArr = rocArray(closes, period);
+    const r = rocArr[rocArr.length - 1];
+    rawConfidence = Math.min(75, 50 + (Math.abs(r) - threshold) * 2);
   } else if (type === "CMF_FLOW") {
     const period = params.period || 20;
-    const c = cmf(highs, lows, closes, volumes, period);
-    if (c > 0.05) {
-      action = "BUY";
-      rawConfidence = Math.min(80, 50 + c * 200);
-    } else if (c < -0.05) {
-      action = "SELL";
-      rawConfidence = Math.min(80, 50 + Math.abs(c) * 200);
-    }
+    const cmfArr = cmfArray(highs, lows, closes, volumes, period);
+    const c = cmfArr[cmfArr.length - 1];
+    rawConfidence = Math.min(80, 50 + Math.abs(c) * 200);
   } else if (type === "OBV_TREND") {
-    const obvVal = obv(closes, volumes);
-    const prevObv = obv(closes.slice(0, -5), volumes.slice(0, -5));
-    const priceUp = closes[closes.length - 1] > closes[closes.length - 6];
-    if (obvVal > prevObv && priceUp) {
-      action = "BUY";
-      rawConfidence = 60;
-    } else if (obvVal < prevObv && !priceUp) {
-      action = "SELL";
-      rawConfidence = 60;
-    }
+    rawConfidence = 60;
   } else if (type === "RSI_MACD_COMBO") {
     const rsiPeriod = params.rsiPeriod || 14;
     const rsiThreshold = params.rsiThreshold || 35;
     const currentRSI = rsi(closes, rsiPeriod);
     const macdData = macd(closes);
-    if (currentRSI < rsiThreshold && macdData.histogram > 0) {
-      action = "BUY";
-      rawConfidence = Math.min(90, 60 + (rsiThreshold - currentRSI) * 1.5 + Math.abs(macdData.histogram) * 5);
-    } else if (currentRSI > (100 - rsiThreshold) && macdData.histogram < 0) {
-      action = "SELL";
-      rawConfidence = Math.min(90, 60 + (currentRSI - (100 - rsiThreshold)) * 1.5 + Math.abs(macdData.histogram) * 5);
-    }
+    rawConfidence = Math.min(90, 60 + Math.abs(currentRSI - (action === "BUY" ? rsiThreshold : 100 - rsiThreshold)) * 1.5 + Math.abs(macdData.histogram) * 5);
   } else if (type === "EMA_RSI_COMBO") {
     const rsiPeriod = params.rsiPeriod || 14;
-    const emaPeriod = params.emaPeriod || 21;
     const currentRSI = rsi(closes, rsiPeriod);
-    const emaVal = ema(closes, emaPeriod);
-    const price = closes[closes.length - 1];
-    if (price > emaVal && currentRSI < 50 && currentRSI > 30) {
-      action = "BUY";
-      rawConfidence = 65 + (50 - currentRSI) * 0.5;
-    } else if (price < emaVal && currentRSI > 50 && currentRSI < 70) {
-      action = "SELL";
-      rawConfidence = 65 + (currentRSI - 50) * 0.5;
-    }
+    rawConfidence = 65 + (action === "BUY" ? (50 - currentRSI) * 0.5 : (currentRSI - 50) * 0.5);
   } else if (type === "BOLLINGER_RSI_COMBO") {
     const bbPeriod = params.bbPeriod || 20;
     const rsiPeriod = params.rsiPeriod || 14;
     const bands = bollinger(closes, bbPeriod, 2);
     const currentRSI = rsi(closes, rsiPeriod);
-    if (bands.pctB < 20 && currentRSI < 40) {
-      action = "BUY";
-      rawConfidence = Math.min(90, 70 + (40 - currentRSI) * 0.5 + (20 - bands.pctB) * 0.5);
-    } else if (bands.pctB > 80 && currentRSI > 60) {
-      action = "SELL";
-      rawConfidence = Math.min(90, 70 + (currentRSI - 60) * 0.5 + (bands.pctB - 80) * 0.5);
-    }
+    rawConfidence = Math.min(90, 70 + Math.abs(currentRSI - 50) * 0.5 + Math.abs(bands.pctB - 50) * 0.5);
   } else if (type === "STOCH_RSI_COMBO") {
     const stochPeriod = params.stochPeriod || 14;
     const rsiPeriod = params.rsiPeriod || 14;
-    const k = stochastic(highs, lows, closes, stochPeriod);
+    const stochArr = stochasticArray(highs, lows, closes, stochPeriod);
+    const k = stochArr[stochArr.length - 1];
     const currentRSI = rsi(closes, rsiPeriod);
-    if (k < 25 && currentRSI < 40) {
-      action = "BUY";
-      rawConfidence = Math.min(88, 65 + (40 - currentRSI) + (25 - k) * 0.5);
-    } else if (k > 75 && currentRSI > 60) {
-      action = "SELL";
-      rawConfidence = Math.min(88, 65 + (currentRSI - 60) + (k - 75) * 0.5);
-    }
+    rawConfidence = Math.min(88, 65 + Math.abs(currentRSI - 50) + Math.abs(k - 50) * 0.5);
   } else if (type === "EMA_MACD_COMBO") {
-    const emaPeriod = params.emaPeriod || 50;
-    const fast = params.macdFast || 12;
-    const slow = params.macdSlow || 26;
-    const sig = params.macdSig || 9;
-    const emaVal = ema(closes, emaPeriod);
-    const price = closes[closes.length - 1];
-    const macdData = macdParams(closes, fast, slow, sig);
-    if (price > emaVal && macdData.histogram > 0) {
-      action = "BUY";
-      rawConfidence = 72;
-    } else if (price < emaVal && macdData.histogram < 0) {
-      action = "SELL";
-      rawConfidence = 72;
-    }
+    rawConfidence = 72;
   } else if (type === "TRIPLE_EMA") {
     const fast = params.fast || 9;
-    const mid = params.mid || 21;
     const slow = params.slow || 50;
     const fastVal = ema(closes, fast);
-    const midVal = ema(closes, mid);
     const slowVal = ema(closes, slow);
-    if (fastVal > midVal && midVal > slowVal) {
-      action = "BUY";
-      rawConfidence = 70 + (fastVal - slowVal) / slowVal * 100;
-    } else if (fastVal < midVal && midVal < slowVal) {
-      action = "SELL";
-      rawConfidence = 70 + (slowVal - fastVal) / slowVal * 100;
-    }
+    rawConfidence = 70 + Math.abs(fastVal - slowVal) / slowVal * 100;
   } else if (type === "ADX_TREND") {
     const period = params.period || 14;
     const threshold = params.threshold || 25;
-    const adxVal = adx(highs, lows, closes, period);
-    const emaFast = ema(closes, 9);
-    const emaSlow = ema(closes, 21);
-    if (adxVal > threshold && emaFast > emaSlow) {
-      action = "BUY";
-      rawConfidence = Math.min(85, 55 + (adxVal - threshold) * 1.2);
-    } else if (adxVal > threshold && emaFast < emaSlow) {
-      action = "SELL";
-      rawConfidence = Math.min(85, 55 + (adxVal - threshold) * 1.2);
-    }
+    const adxArr = adxArray(highs, lows, closes, period);
+    const adxVal = adxArr[adxArr.length - 1];
+    rawConfidence = Math.min(85, 55 + (adxVal - threshold) * 1.2);
   } else if (type === "PRICE_SMA_DISTANCE") {
     const period = params.period || 50;
     const threshold = params.threshold || 5;
     const smaVal = sma(closes, period);
-    const price = closes[closes.length - 1];
-    const pct = ((price - smaVal) / smaVal) * 100;
-    if (pct < -threshold) {
-      action = "BUY";
-      rawConfidence = Math.min(80, 55 + Math.abs(pct - threshold) * 2);
-    } else if (pct > threshold) {
-      action = "SELL";
-      rawConfidence = Math.min(80, 55 + (pct - threshold) * 2);
-    }
+    const pct = ((closes[closes.length - 1] - smaVal) / smaVal) * 100;
+    rawConfidence = Math.min(80, 55 + Math.abs(Math.abs(pct) - threshold) * 2);
   } else if (type === "RSI_EMA_GRID") {
     const rsiPeriod = params.rsiPeriod || 14;
     const emaShort = params.emaShort || 9;
@@ -367,40 +443,18 @@ export function executeStrategy(descriptor: StrategyDescriptor, data: OHLCVData)
     const currentRSI = rsi(closes, rsiPeriod);
     const emaShortVal = ema(closes, emaShort);
     const emaLongVal = ema(closes, emaLong);
-    if (currentRSI < oversold && emaShortVal > emaLongVal) {
-      action = "BUY";
+    if (action === "BUY") {
       rawConfidence = Math.min(90, 55 + (oversold - currentRSI) / oversold * 120 + (emaShortVal - emaLongVal) / emaLongVal * 200);
-    } else if (currentRSI > overbought && emaShortVal < emaLongVal) {
-      action = "SELL";
+    } else if (action === "SELL") {
       rawConfidence = Math.min(90, 55 + (currentRSI - overbought) / (100 - overbought) * 120 + (emaLongVal - emaShortVal) / emaLongVal * 200);
     }
-  }
-
-  if (action === "HOLD") {
-    return { action, confidence: 0, expectedReturn: 0, riskScore: Math.min(100, vol), winRate: 50, maxDrawdown: 0 };
+  } else {
+    rawConfidence = 55;
   }
 
   const confidence = Math.min(100, Math.max(0, rawConfidence));
 
-  const bt = backtest(
-    closes,
-    (idx) => {
-      const slicedCloses = closes.slice(0, idx + 1);
-      const slicedHighs = highs.slice(0, idx + 1);
-      const slicedLows = lows.slice(0, idx + 1);
-      const slicedVols = volumes.slice(0, idx + 1);
-      if (slicedCloses.length < 60) return "HOLD";
-
-      return executeStrategySlice(descriptor, {
-        opens: data.opens.slice(0, idx + 1),
-        highs: slicedHighs,
-        lows: slicedLows,
-        closes: slicedCloses,
-        volumes: slicedVols,
-      }).action;
-    },
-    holdBars,
-  );
+  const bt = backtest(closes, signals, holdBars);
 
   const expectedReturn = action === "BUY" ? bt.avgReturn : -bt.avgReturn;
   const riskScore = Math.min(100, vol * 0.7 + bt.maxDrawdown * 0.3);
@@ -413,74 +467,6 @@ export function executeStrategy(descriptor: StrategyDescriptor, data: OHLCVData)
     winRate: bt.winRate,
     maxDrawdown: bt.maxDrawdown,
   };
-}
-
-function executeStrategySlice(descriptor: StrategyDescriptor, data: OHLCVData): { action: StrategyAction } {
-  const { closes, highs, lows, volumes } = data;
-  const { type, params } = descriptor;
-
-  if (type === "RSI_OVERSOLD") {
-    const currentRSI = rsi(closes, params.period || 14);
-    return { action: currentRSI < (params.threshold || 30) ? "BUY" : "HOLD" };
-  }
-  if (type === "RSI_OVERBOUGHT") {
-    const currentRSI = rsi(closes, params.period || 14);
-    return { action: currentRSI > (params.threshold || 70) ? "SELL" : "HOLD" };
-  }
-  if (type === "EMA_CROSSOVER") {
-    const fastArr = emaArray(closes, params.fast || 9);
-    const slowArr = emaArray(closes, params.slow || 21);
-    const fc = fastArr[fastArr.length - 1], fp = fastArr[fastArr.length - 2] ?? fc;
-    const sc = slowArr[slowArr.length - 1], sp = slowArr[slowArr.length - 2] ?? sc;
-    if (fc > sc && fp <= sp) return { action: "BUY" };
-    if (fc < sc && fp >= sp) return { action: "SELL" };
-  }
-  if (type === "SMA_CROSSOVER") {
-    const fc = sma(closes, params.fast || 10), fp = sma(closes.slice(0, -1), params.fast || 10);
-    const sc = sma(closes, params.slow || 20), sp = sma(closes.slice(0, -1), params.slow || 20);
-    if (fc > sc && fp <= sp) return { action: "BUY" };
-    if (fc < sc && fp >= sp) return { action: "SELL" };
-  }
-  if (type === "MACD_SIGNAL") {
-    const curr = macdParams(closes, params.fast || 12, params.slow || 26, params.signal || 9);
-    const prev = macdParams(closes.slice(0, -1), params.fast || 12, params.slow || 26, params.signal || 9);
-    if (curr.histogram > 0 && prev.histogram <= 0) return { action: "BUY" };
-    if (curr.histogram < 0 && prev.histogram >= 0) return { action: "SELL" };
-  }
-  if (type === "BOLLINGER_BOUNCE") {
-    const bands = bollinger(closes, params.period || 20, params.mult || 2);
-    if (bands.pctB < 15) return { action: "BUY" };
-    if (bands.pctB > 85) return { action: "SELL" };
-  }
-  if (type === "STOCHASTIC_OVERSOLD") {
-    const k = stochastic(highs, lows, closes, params.period || 14);
-    return { action: k < (params.threshold || 20) ? "BUY" : "HOLD" };
-  }
-  if (type === "STOCHASTIC_OVERBOUGHT") {
-    const k = stochastic(highs, lows, closes, params.period || 14);
-    return { action: k > (params.threshold || 80) ? "SELL" : "HOLD" };
-  }
-  if (type === "RSI_MACD_COMBO") {
-    const currentRSI = rsi(closes, params.rsiPeriod || 14);
-    const macdData = macd(closes);
-    if (currentRSI < (params.rsiThreshold || 35) && macdData.histogram > 0) return { action: "BUY" };
-    if (currentRSI > (100 - (params.rsiThreshold || 35)) && macdData.histogram < 0) return { action: "SELL" };
-  }
-  if (type === "EMA_MACD_COMBO") {
-    const emaVal = ema(closes, params.emaPeriod || 50);
-    const price = closes[closes.length - 1];
-    const macdData = macdParams(closes, params.macdFast || 12, params.macdSlow || 26, params.macdSig || 9);
-    if (price > emaVal && macdData.histogram > 0) return { action: "BUY" };
-    if (price < emaVal && macdData.histogram < 0) return { action: "SELL" };
-  }
-  if (type === "RSI_EMA_GRID") {
-    const currentRSI = rsi(closes, params.rsiPeriod || 14);
-    const emaShortVal = ema(closes, params.emaShort || 9);
-    const emaLongVal = ema(closes, params.emaLong || 50);
-    if (currentRSI < (params.oversold || 30) && emaShortVal > emaLongVal) return { action: "BUY" };
-    if (currentRSI > (params.overbought || 70) && emaShortVal < emaLongVal) return { action: "SELL" };
-  }
-  return { action: "HOLD" };
 }
 
 export function generateAllStrategies(): StrategyDescriptor[] {
@@ -794,6 +780,68 @@ export function generateAllStrategies(): StrategyDescriptor[] {
           });
         }
       }
+    }
+  }
+
+  const intradayEmaConfigs: [number, number][] = [[9, 21], [12, 26], [20, 50]];
+  for (const [fast, slow] of intradayEmaConfigs) {
+    for (const hold of [3, 6, 12]) {
+      strategies.push({
+        id: `1h_ema_cross_${fast}_${slow}_h${hold}`,
+        name: `1H EMA(${fast}/${slow}) Crossover / hold ${hold}h`,
+        type: "EMA_CROSSOVER",
+        params: { fast, slow, holdBars: hold },
+        timeframe: "1Hour",
+      });
+    }
+  }
+
+  for (const period of [7, 14]) {
+    for (const threshold of [25, 30]) {
+      for (const hold of [3, 6]) {
+        strategies.push({
+          id: `1h_rsi_os_${period}_${threshold}_h${hold}`,
+          name: `1H RSI(${period}) Oversold < ${threshold} / hold ${hold}h`,
+          type: "RSI_OVERSOLD",
+          params: { period, threshold, holdBars: hold },
+          timeframe: "1Hour",
+        });
+      }
+    }
+    for (const threshold of [70, 75]) {
+      for (const hold of [3, 6]) {
+        strategies.push({
+          id: `1h_rsi_ob_${period}_${threshold}_h${hold}`,
+          name: `1H RSI(${period}) Overbought > ${threshold} / hold ${hold}h`,
+          type: "RSI_OVERBOUGHT",
+          params: { period, threshold, holdBars: hold },
+          timeframe: "1Hour",
+        });
+      }
+    }
+  }
+
+  for (const [fast, slow, sig] of [[12, 26, 9], [8, 21, 5]] as [number, number, number][]) {
+    for (const hold of [3, 6]) {
+      strategies.push({
+        id: `1h_macd_${fast}_${slow}_${sig}_h${hold}`,
+        name: `1H MACD(${fast},${slow},${sig}) Signal / hold ${hold}h`,
+        type: "MACD_SIGNAL",
+        params: { fast, slow, signal: sig, holdBars: hold },
+        timeframe: "1Hour",
+      });
+    }
+  }
+
+  for (const period of [14, 20]) {
+    for (const hold of [3, 6]) {
+      strategies.push({
+        id: `1h_bb_bounce_${period}_h${hold}`,
+        name: `1H Bollinger(${period}) Bounce / hold ${hold}h`,
+        type: "BOLLINGER_BOUNCE",
+        params: { period, mult: 2, holdBars: hold },
+        timeframe: "1Hour",
+      });
     }
   }
 

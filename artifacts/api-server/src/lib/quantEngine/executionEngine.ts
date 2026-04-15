@@ -19,13 +19,8 @@ export function isCryptoSymbol(symbol: string): boolean {
 }
 
 function getAlpacaHeaders(): Record<string, string> {
-  const candidates = [
-    process.env.ALPACA_KEY_ID || "",
-    process.env.ALPACA_API_KEY || "",
-    process.env.ALPACA_API_SECRET || "",
-  ].filter(Boolean);
-  const keyId = candidates.find(v => v.startsWith("PK")) || candidates[0] || "";
-  const secretKey = candidates.find(v => !v.startsWith("PK") && v.length > 30) || candidates[1] || "";
+  const keyId = process.env.ALPACA_KEY_ID || process.env.ALPACA_API_KEY || "";
+  const secretKey = process.env.ALPACA_SECRET_KEY || process.env.ALPACA_API_SECRET || "";
   return {
     "APCA-API-KEY-ID": keyId,
     "APCA-API-SECRET-KEY": secretKey,
@@ -168,7 +163,7 @@ function runWorker(
   workerId: number,
 ): Promise<RawResult[]> {
   return new Promise((resolve, reject) => {
-    const workerPath = path.resolve(__dirname, "lib", "quantEngine", "strategyWorker.mjs");
+    const workerPath = path.resolve(__dirname, "strategyWorker.mjs");
 
     const worker = new Worker(workerPath, {
       workerData: { stocks, strategies, workerId },
@@ -233,12 +228,6 @@ export async function runStrategiesOnUniverse(
   const chunks: { symbol: string; data: OHLCVData }[][] = [];
   for (let i = 0; i < stocks.length; i += chunkSize) {
     chunks.push(stocks.slice(i, i + chunkSize));
-  }
-
-  const strategyChunkSize = Math.ceil(strategies.length / WORKER_COUNT);
-  const strategyChunks: StrategyDescriptor[][] = [];
-  for (let i = 0; i < strategies.length; i += strategyChunkSize) {
-    strategyChunks.push(strategies.slice(i, i + strategyChunkSize));
   }
 
   logger.info({

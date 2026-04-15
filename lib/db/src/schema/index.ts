@@ -21,3 +21,4 @@ export * from "./balanceTransactions";
 export * from "./pushSubscriptions";
 export * from "./dailyContent";
 export * from "./agents";
+export * from "./customStrategies";

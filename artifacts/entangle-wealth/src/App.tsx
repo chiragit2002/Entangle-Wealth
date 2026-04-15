@@ -55,6 +55,7 @@ const SubmitTicketPage = lazy(() => import("@/pages/SubmitTicket"));
 const StatusPage = lazy(() => import("@/pages/Status"));
 const AdminHubPage = lazy(() => import("@/pages/AdminHub"));
 const QuantSignalsPage = lazy(() => import("@/pages/QuantSignals"));
+const StrategyBuilderPage = lazy(() => import("@/pages/StrategyBuilder"));
 const WealthSim = lazy(() => import("@/pages/WealthSim"));
 const TimeMachine = lazy(() => import("@/pages/TimeMachine"));
 const AlternateTimeline = lazy(() => import("@/pages/AlternateTimeline"));
@@ -201,6 +202,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/dmca">{() => <LazyPage component={DmcaPage} />}</Route>
             <Route path="/accessibility">{() => <LazyPage component={AccessibilityPage} />}</Route>
             <Route path="/quant">{() => <LazyPage component={QuantSignalsPage} />}</Route>
+            <Route path="/strategy-builder">{() => <LazyProtected component={StrategyBuilderPage} />}</Route>
             <Route path="/admin/:rest*">{() => <LazyAdmin component={AdminHubPage} />}</Route>
             <Route path="/admin">{() => <LazyAdmin component={AdminHubPage} />}</Route>
             <Route path="/wealth-sim">{() => <LazyProtected component={WealthSim} />}</Route>

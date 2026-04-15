@@ -32,11 +32,18 @@ async function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function fetchBarsForSymbols(symbols: string[]): Promise<Map<string, OHLCVData>> {
+function alpacaTimeframe(tf: string): string {
+  if (tf === "1Hour") return "1Hour";
+  if (tf === "1Week") return "1Week";
+  return "1Day";
+}
+
+async function fetchBarsForSymbols(symbols: string[], timeframe = "1Day"): Promise<Map<string, OHLCVData>> {
   const result = new Map<string, OHLCVData>();
   if (symbols.length === 0) return result;
 
-  const url = `${ALPACA_DATA_URL}/v2/stocks/bars?symbols=${encodeURIComponent(symbols.join(","))}&timeframe=1Day&limit=${BARS_LIMIT}&adjustment=split&feed=iex&sort=asc`;
+  const tf = alpacaTimeframe(timeframe);
+  const url = `${ALPACA_DATA_URL}/v2/stocks/bars?symbols=${encodeURIComponent(symbols.join(","))}&timeframe=${tf}&limit=${BARS_LIMIT}&adjustment=split&feed=iex&sort=asc`;
 
   try {
     const res = await fetch(url, {
@@ -71,7 +78,7 @@ async function fetchBarsForSymbols(symbols: string[]): Promise<Map<string, OHLCV
   return result;
 }
 
-export async function fetchStockUniverse(symbols: string[]): Promise<Map<string, OHLCVData>> {
+export async function fetchStockUniverse(symbols: string[], timeframe = "1Day"): Promise<Map<string, OHLCVData>> {
   const allData = new Map<string, OHLCVData>();
   const batches: string[][] = [];
 
@@ -79,11 +86,11 @@ export async function fetchStockUniverse(symbols: string[]): Promise<Map<string,
     batches.push(symbols.slice(i, i + BATCH_SIZE));
   }
 
-  logger.info({ totalSymbols: symbols.length, batches: batches.length }, "Quant engine: fetching OHLCV data");
+  logger.info({ totalSymbols: symbols.length, batches: batches.length, timeframe }, "Quant engine: fetching OHLCV data");
 
   for (let i = 0; i < batches.length; i++) {
     const batch = batches[i];
-    const batchData = await fetchBarsForSymbols(batch);
+    const batchData = await fetchBarsForSymbols(batch, timeframe);
     for (const [sym, data] of batchData) allData.set(sym, data);
 
     if (i < batches.length - 1) {

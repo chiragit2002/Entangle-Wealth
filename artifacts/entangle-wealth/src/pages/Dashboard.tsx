@@ -347,7 +347,7 @@ export default function Dashboard() {
       } as PaperPortfolio;
     },
     enabled: !!isSignedIn,
-    staleTime: 30_000,
+    staleTime: 5_000,
   });
 
   const loadPortfolio = useCallback(() => {
@@ -386,12 +386,41 @@ export default function Dashboard() {
       toast({ title: "Missing fields", description: "Enter symbol, quantity, and price", variant: "destructive" });
       return;
     }
+    const sym = tradeSymbol.toUpperCase();
+    const qty = Number(tradeQty);
+    const px = Number(tradePrice);
+    const totalCost = qty * px;
+
     setTradeLoading(true);
+
+    const prevPortfolio = queryClient.getQueryData<PaperPortfolio>(["paper-trading-portfolio"]);
+    if (prevPortfolio) {
+      const optimistic: PaperPortfolio = { ...prevPortfolio };
+      if (tradeSide === "buy") {
+        optimistic.cashBalance = Math.max(0, prevPortfolio.cashBalance - totalCost);
+        const existingPos = prevPortfolio.positions.find(p => p.symbol === sym);
+        if (existingPos) {
+          optimistic.positions = prevPortfolio.positions.map(p =>
+            p.symbol === sym ? { ...p, quantity: p.quantity + qty } : p
+          );
+        } else {
+          optimistic.positions = [...prevPortfolio.positions, { id: -1, symbol: sym, quantity: qty, avgCost: px }];
+        }
+      } else if (tradeSide === "sell") {
+        optimistic.cashBalance = prevPortfolio.cashBalance + totalCost;
+        optimistic.positions = prevPortfolio.positions
+          .map(p => p.symbol === sym ? { ...p, quantity: p.quantity - qty } : p)
+          .filter(p => p.quantity > 0);
+      }
+      optimistic.totalValue = optimistic.cashBalance + (optimistic.portfolioValue || 0);
+      queryClient.setQueryData(["paper-trading-portfolio"], optimistic);
+    }
+
     try {
       const res = await authFetch("/paper-trading/trade", getToken, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ symbol: tradeSymbol.toUpperCase(), side: tradeSide, quantity: Number(tradeQty), price: Number(tradePrice) }),
+        body: JSON.stringify({ symbol: sym, side: tradeSide, quantity: qty }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -402,14 +431,16 @@ export default function Dashboard() {
         setTradePrice("");
         loadPortfolio();
       } else {
+        if (prevPortfolio) queryClient.setQueryData(["paper-trading-portfolio"], prevPortfolio);
         toast({ title: "Trade Failed", description: data.error, variant: "destructive" });
       }
     } catch {
+      if (prevPortfolio) queryClient.setQueryData(["paper-trading-portfolio"], prevPortfolio);
       toast({ title: "Trade Failed", description: "Please sign in to trade", variant: "destructive" });
     } finally {
       setTradeLoading(false);
     }
-  }, [tradeSymbol, tradeQty, tradePrice, tradeSide, getToken, toast, loadPortfolio, onEvent]);
+  }, [tradeSymbol, tradeQty, tradePrice, tradeSide, getToken, toast, loadPortfolio, onEvent, queryClient]);
 
   const resetPortfolio = useCallback(async () => {
     try {

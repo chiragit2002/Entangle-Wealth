@@ -1,5 +1,6 @@
 import { TTLCache } from "./cache";
 import { logger } from "./logger";
+import { getLatestPrice, getLatestPrices } from "./livePriceBroadcaster";
 
 const ALPACA_DATA_URL = "https://data.alpaca.markets";
 
@@ -22,8 +23,14 @@ function getAlpacaHeaders(): Record<string, string> {
 
 export async function getLivePrice(symbol: string): Promise<number | null> {
   const upperSymbol = symbol.toUpperCase();
-  const cacheKey = `price:${upperSymbol}`;
 
+  const broadcasted = getLatestPrice(upperSymbol);
+  if (broadcasted && broadcasted.price > 0 && Date.now() - broadcasted.timestamp < 10_000) {
+    PRICE_CACHE.set(`price:${upperSymbol}`, broadcasted.price);
+    return broadcasted.price;
+  }
+
+  const cacheKey = `price:${upperSymbol}`;
   const cached = PRICE_CACHE.get(cacheKey);
   if (cached !== undefined) return cached;
 
@@ -56,6 +63,34 @@ export async function getLivePrice(symbol: string): Promise<number | null> {
   }
 }
 
+export async function getFreshPrice(symbol: string): Promise<number | null> {
+  const upperSymbol = symbol.toUpperCase();
+  try {
+    const res = await fetch(`${ALPACA_DATA_URL}/v2/stocks/${upperSymbol}/snapshot`, {
+      headers: getAlpacaHeaders(),
+      signal: AbortSignal.timeout(4_000),
+    });
+    if (!res.ok) {
+      logger.warn({ symbol: upperSymbol, status: res.status }, "Alpaca fresh-price snapshot non-OK");
+      return getLivePrice(symbol);
+    }
+    const data = await res.json() as Record<string, any>;
+    const price: number | null =
+      data.latestTrade?.p ||
+      data.minuteBar?.c ||
+      data.dailyBar?.c ||
+      null;
+    if (price && price > 0) {
+      PRICE_CACHE.set(`price:${upperSymbol}`, price);
+      return price;
+    }
+    return null;
+  } catch (err) {
+    logger.warn({ err, symbol: upperSymbol }, "getFreshPrice failed, falling back to getLivePrice");
+    return getLivePrice(symbol);
+  }
+}
+
 export async function getLivePrices(symbols: string[]): Promise<Record<string, number>> {
   if (symbols.length === 0) return {};
 
@@ -64,6 +99,13 @@ export async function getLivePrices(symbols: string[]): Promise<Record<string, n
   const uncached: string[] = [];
 
   for (const symbol of upperSymbols) {
+    const broadcasted = getLatestPrice(symbol);
+    if (broadcasted && broadcasted.price > 0 && Date.now() - broadcasted.timestamp < 10_000) {
+      result[symbol] = broadcasted.price;
+      PRICE_CACHE.set(`price:${symbol}`, broadcasted.price);
+      continue;
+    }
+
     const cached = PRICE_CACHE.get(`price:${symbol}`);
     if (cached !== undefined) {
       result[symbol] = cached;

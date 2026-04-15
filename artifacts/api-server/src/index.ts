@@ -13,8 +13,9 @@ import { ensureReferralBadgesExist } from "./lib/referralRewards";
 import { ensureBacktesterBadgesExist } from "./routes/gamification";
 import { ensureSupportTables } from "./lib/supportTables";
 import { ensureBacktesterBadgesExist as ensureTask126BadgesExist } from "./lib/backtesterBadges";
-import { startAlertEvaluator, stopAlertEvaluator, closeAllSseConnections } from "./routes/alerts";
+import { startAlertEvaluator, stopAlertEvaluator, closeAllSseConnections, createInstantAlertHandler } from "./routes/alerts";
 import { startOrderEvaluator, stopOrderEvaluator, startSnapshotScheduler, stopSnapshotScheduler } from "./routes/paperTrading";
+import { startBroadcaster, stopBroadcaster, registerGlobalPriceHandler, ensureSymbolsWatched } from "./lib/livePriceBroadcaster";
 import { startDigestScheduler, stopDigestScheduler } from "./lib/emailDigest";
 import { startDailyContentScheduler, stopDailyContentScheduler } from "./routes/dailyContent";
 import { startDripScheduler, stopDripScheduler } from "./lib/dripEmails";
@@ -44,8 +45,8 @@ import {
 } from "./lib/agents";
 import { startScheduler, stopScheduler } from "./lib/quantEngine/index";
 import { pool, db } from "@workspace/db";
-import { paperPortfoliosTable } from "@workspace/db/schema";
-import { gt } from "drizzle-orm";
+import { paperPortfoliosTable, alertsTable } from "@workspace/db/schema";
+import { gt, eq } from "drizzle-orm";
 
 (globalThis as Record<string, unknown>).__dbLogger = logger;
 
@@ -503,6 +504,32 @@ await seedHabitDefinitions();
 ensurePerformanceIndexes().catch((err) =>
   logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
 );
+startBroadcaster();
+
+const instantAlertHandler = createInstantAlertHandler();
+registerGlobalPriceHandler(instantAlertHandler);
+logger.info("Instant price-based alert handler registered with broadcaster");
+
+async function syncAlertSymbolsToBroadcaster(): Promise<void> {
+  try {
+    const activeAlerts = await db
+      .select({ symbol: alertsTable.symbol })
+      .from(alertsTable)
+      .where(eq(alertsTable.enabled, true));
+    const symbols = [...new Set(activeAlerts.map(a => a.symbol))];
+    if (symbols.length > 0) {
+      ensureSymbolsWatched(symbols);
+      logger.debug({ count: symbols.length }, "Alert symbols synced to broadcaster watch list");
+    }
+  } catch (err) {
+    logger.debug({ err }, "Alert symbol sync failed (non-fatal)");
+  }
+}
+
+syncAlertSymbolsToBroadcaster().catch(() => {});
+const alertSymbolSyncInterval = setInterval(syncAlertSymbolsToBroadcaster, 60_000);
+alertSymbolSyncInterval.unref();
+
 bindAlertEvaluatorToAgent(startAlertEvaluator, stopAlertEvaluator);
 bindOrderEvaluatorToAgent(startOrderEvaluator, stopOrderEvaluator);
 startSnapshotScheduler();
@@ -545,6 +572,7 @@ async function gracefulShutdown(signal: string) {
   }, 30_000);
   forceExitTimer.unref();
 
+  stopBroadcaster();
   logger.info("Step 1/5: Stopping agent orchestration framework...");
   stopScheduler();
   await agentRegistry.stopAll().catch((err) => logger.warn({ error: err }, "Error stopping agents"));

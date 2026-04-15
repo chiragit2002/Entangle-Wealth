@@ -1,4 +1,11 @@
 import { memo, useEffect, useState } from "react";
+import { useSymbolPrices } from "@/contexts/LivePriceContext";
+
+const TICKER_SYMBOLS = [
+  "AAPL","MSFT","NVDA","GOOGL","AMZN","META","TSLA","AMD","NFLX",
+  "RKLB","PLTR","SOFI","COIN","SMCI","ARM","AVGO","CRM","UBER",
+  "SHOP","SNOW","JPM","V","BA","CRWD","PANW","LLY","UNH","XOM","GS","RIVN",
+];
 
 interface TickerItem {
   symbol: string;
@@ -8,7 +15,8 @@ interface TickerItem {
 }
 
 function MarketTickerBase() {
-  const [items, setItems] = useState<TickerItem[]>([]);
+  const { prices } = useSymbolPrices(TICKER_SYMBOLS);
+  const [baseItems, setBaseItems] = useState<TickerItem[]>([]);
 
   useEffect(() => {
     fetch("/api/alpaca/movers")
@@ -21,10 +29,23 @@ function MarketTickerBase() {
           changePercent: m.change,
           isPositive: m.change >= 0,
         }));
-        setItems(mapped);
+        setBaseItems(mapped);
       })
       .catch(() => {});
   }, []);
+
+  const items: TickerItem[] = baseItems.map(item => {
+    const live = prices[item.symbol];
+    if (live) {
+      return {
+        ...item,
+        price: live.price,
+        changePercent: live.changePercent,
+        isPositive: live.changePercent >= 0,
+      };
+    }
+    return item;
+  });
 
   if (items.length === 0) return null;
 

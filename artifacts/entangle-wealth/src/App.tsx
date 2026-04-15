@@ -22,6 +22,7 @@ import { useUxTracker } from "@/hooks/useUxTracker";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { clerkAppearanceDark, clerkAppearanceLight } from "@/lib/clerkAppearance";
 import { ConnectionProvider } from "@/contexts/ConnectionContext";
+import { LivePriceProvider } from "@/contexts/LivePriceContext";
 
 const Home = lazy(() => import("@/pages/Home"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -246,11 +247,13 @@ export default function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="ew-theme">
       <ConnectionProvider>
-        <ErrorBoundary FallbackComponent={ErrorFallback} onError={(error, info) => {
-          SentryReact.withScope((scope) => { scope.setExtras({ componentStack: info.componentStack }); SentryReact.captureException(error); });
-        }}>
-          <WouterRouter base={basePath}><ClerkProviderWithRoutes /></WouterRouter>
-        </ErrorBoundary>
+        <LivePriceProvider>
+          <ErrorBoundary FallbackComponent={ErrorFallback} onError={(error, info) => {
+            SentryReact.withScope((scope) => { scope.setExtras({ componentStack: info.componentStack }); SentryReact.captureException(error); });
+          }}>
+            <WouterRouter base={basePath}><ClerkProviderWithRoutes /></WouterRouter>
+          </ErrorBoundary>
+        </LivePriceProvider>
       </ConnectionProvider>
     </ThemeProvider>
   );

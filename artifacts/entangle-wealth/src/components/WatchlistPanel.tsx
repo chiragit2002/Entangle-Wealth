@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { X, Bell, BellOff, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSymbolPrices } from "@/contexts/LivePriceContext";
 
 export type WatchlistItem = { symbol: string; signal: string; confidence: number };
 
@@ -10,11 +11,6 @@ const defaultWatchlist: WatchlistItem[] = [
   { symbol: "TSLA", signal: "SELL", confidence: 74 },
   { symbol: "PLTR", signal: "BUY", confidence: 79 },
 ];
-
-interface LivePrice {
-  price: number;
-  changePercent: number;
-}
 
 interface WatchlistPanelProps {
   externalItems?: WatchlistItem[];
@@ -26,27 +22,9 @@ export function WatchlistPanel({ externalItems, onRemove }: WatchlistPanelProps 
   const [internalItems, setInternalItems] = useState(defaultWatchlist);
   const items = externalItems ?? internalItems;
   const [alerts, setAlerts] = useState<string[]>(["NVDA"]);
-  const [prices, setPrices] = useState<Record<string, LivePrice>>({});
 
-  useEffect(() => {
-    if (items.length === 0) return;
-    const symbols = items.map(i => i.symbol).join(",");
-    fetch(`/api/alpaca/snapshots?symbols=${encodeURIComponent(symbols)}`)
-      .then(r => r.ok ? r.json() : null)
-      .then((data: Record<string, any> | null) => {
-        if (!data) return;
-        const result: Record<string, LivePrice> = {};
-        for (const [sym, snap] of Object.entries(data)) {
-          const price = snap?.minuteBar?.c || snap?.dailyBar?.c || snap?.latestTrade?.p || 0;
-          const changePercent = snap?.dailyBar
-            ? ((snap.dailyBar.c - snap.dailyBar.o) / snap.dailyBar.o) * 100
-            : 0;
-          result[sym] = { price, changePercent };
-        }
-        setPrices(result);
-      })
-      .catch(() => {});
-  }, [items.length]);
+  const symbols = items.map(i => i.symbol);
+  const { prices } = useSymbolPrices(symbols);
 
   const removeItem = (symbol: string) => {
     if (onRemove) {

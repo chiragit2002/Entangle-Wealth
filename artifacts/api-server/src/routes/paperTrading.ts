@@ -7,7 +7,7 @@ import { resolveUserId } from "../lib/resolveUserId";
 import { logger } from "../lib/logger";
 import type { AuthenticatedRequest } from "../types/authenticatedRequest";
 import { validateBody, z } from "../lib/validateRequest";
-import { getLivePrice, getLivePrices } from "../lib/priceService";
+import { getLivePrice, getLivePrices, getFreshPrice } from "../lib/priceService";
 import { eventBus } from "../lib/agents/EventBus";
 import type { InferSelectModel } from "drizzle-orm";
 
@@ -223,7 +223,9 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
     const qty = Math.floor(Number(quantity));
     const upperSymbol = symbol.toUpperCase();
 
-    const px = await getLivePrice(upperSymbol);
+    const px = orderType === "market"
+      ? await getFreshPrice(upperSymbol)
+      : await getLivePrice(upperSymbol);
     if (!px || px <= 0) {
       res.status(503).json({
         error: `Market data temporarily unavailable — trading paused for ${upperSymbol}. Please try again shortly.`,
@@ -440,7 +442,7 @@ async function executeMarketOrder(
       orderId: orderId ?? null,
     });
 
-    return { success: true, message: `${side.toUpperCase().replace("_", " ")} ${qty} ${upperSymbol} @ $${px.toFixed(2)}` };
+    return { success: true, message: `${side.toUpperCase().replace("_", " ")} ${qty} ${upperSymbol} @ $${px.toFixed(2)}`, executedPrice: px, executedAt: new Date().toISOString() };
   });
 }
 

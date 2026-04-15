@@ -9,7 +9,9 @@ import { PositionCalculator } from "@/components/PositionCalculator";
 import { PLSimulator } from "@/components/PLSimulator";
 import { RiskRadar } from "@/components/RiskRadar";
 import { SignalHistory } from "@/components/SignalHistory";
-import { Terminal as TerminalIcon, Calculator, TrendingUp, Shield, BarChart3, Clock, Keyboard, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Terminal as TerminalIcon, Calculator, TrendingUp, Shield, BarChart3, Clock, Keyboard, X, ChevronLeft, ChevronRight, Wifi, WifiOff, RefreshCw } from "lucide-react";
+import { useLivePriceContext } from "@/contexts/LivePriceContext";
+import type { ConnectionStatus } from "@/hooks/useLivePrices";
 import { PaperTradingWidget } from "@/components/PaperTradingWidget";
 import { DailySpinWheel } from "@/components/DailySpinWheel";
 import { UpgradePrompt, useUpgradePrompt } from "@/components/UpgradePrompt";
@@ -191,6 +193,39 @@ function MobileTerminalView({ portfolioRefreshKey, handleSpinBalanceChange, onOp
   );
 }
 
+function ConnectionStatusBadge({ status }: { status: ConnectionStatus }) {
+  if (status === "connected") {
+    return (
+      <div className="hidden sm:flex items-center gap-1.5" title="Live prices connected">
+        <Wifi className="w-3 h-3 text-[#00B4D8]" />
+        <span className="text-[9px] font-mono font-bold text-[#00B4D8] uppercase tracking-wider">LIVE</span>
+      </div>
+    );
+  }
+  if (status === "reconnecting") {
+    return (
+      <div className="hidden sm:flex items-center gap-1.5" title="Reconnecting...">
+        <RefreshCw className="w-3 h-3 text-[#FFB800] animate-spin" />
+        <span className="text-[9px] font-mono font-bold text-[#FFB800] uppercase tracking-wider">RECONNECTING</span>
+      </div>
+    );
+  }
+  if (status === "offline") {
+    return (
+      <div className="hidden sm:flex items-center gap-1.5" title="Price stream offline">
+        <WifiOff className="w-3 h-3 text-red-400" />
+        <span className="text-[9px] font-mono font-bold text-red-400 uppercase tracking-wider">OFFLINE</span>
+      </div>
+    );
+  }
+  return (
+    <div className="hidden sm:flex items-center gap-1.5" title="Connecting...">
+      <RefreshCw className="w-3 h-3 text-white/30 animate-spin" />
+      <span className="text-[9px] font-mono text-white/30 uppercase tracking-wider">CONNECTING</span>
+    </div>
+  );
+}
+
 export default function Terminal() {
   const [clock, setClock] = useState("");
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -200,6 +235,7 @@ export default function Terminal() {
   const { getToken, isSignedIn, isLoaded } = useAuth();
   const { promptConfig, showUpgradePrompt, closePrompt } = useUpgradePrompt();
   const isMobile = useIsMobile();
+  const { status: priceStatus } = useLivePriceContext();
 
   const handleSpinBalanceChange = useCallback(() => {
     trackEvent("terminal_spin_wheel_used");
@@ -294,6 +330,7 @@ export default function Terminal() {
           <span className="text-[9px] font-mono text-white/30 hidden lg:inline">7 AI MODELS · MULTI-PANEL</span>
         </div>
         <div className="flex items-center gap-3 shrink-0">
+          <ConnectionStatusBadge status={priceStatus} />
           <button onClick={() => setShowShortcuts(v => !v)} aria-label="Show keyboard shortcuts" className="hidden sm:flex items-center gap-1 text-[9px] font-mono text-white/40 hover:text-white/40 transition-colors">
             <Keyboard className="w-3 h-3" />
             <span>?</span>

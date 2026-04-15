@@ -50,6 +50,7 @@ import dashboardModulesRouter from "./dashboardModules";
 import journeyRouter from "./journey";
 import agentsRouter from "./agents";
 import quantRouter from "./quant";
+import priceStreamRouter from "./priceStream";
 
 export function createRouter(app: Express): IRouter {
 const router: IRouter = Router();
@@ -105,6 +106,7 @@ router.use(dashboardModulesRouter);
 router.use(journeyRouter);
 router.use(agentsRouter);
 router.use(quantRouter);
+router.use(priceStreamRouter);
 
 return router;
 }

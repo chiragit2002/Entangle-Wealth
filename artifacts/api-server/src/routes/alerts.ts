@@ -765,4 +765,113 @@ export function stopAlertEvaluator() {
   }
 }
 
+const SIMPLE_ALERT_TYPES = new Set(["price_above", "price_below", "pct_change"]);
+
+async function evaluateInstantAlerts(symbol: string, price: number, changePercent: number): Promise<void> {
+  try {
+    const activeAlerts = await db
+      .select()
+      .from(alertsTable)
+      .where(and(
+        eq(alertsTable.symbol, symbol),
+        eq(alertsTable.enabled, true),
+      ));
+
+    for (const alert of activeAlerts) {
+      if (!SIMPLE_ALERT_TYPES.has(alert.alertType)) continue;
+
+      let triggered = false;
+      let triggeredValue = price;
+      let message = "";
+
+      switch (alert.alertType) {
+        case "price_above":
+          if (alert.threshold && price >= alert.threshold) {
+            triggered = true;
+            message = `${symbol} price $${price.toFixed(2)} crossed above $${alert.threshold.toFixed(2)}`;
+          }
+          break;
+        case "price_below":
+          if (alert.threshold && price <= alert.threshold) {
+            triggered = true;
+            message = `${symbol} price $${price.toFixed(2)} dropped below $${alert.threshold.toFixed(2)}`;
+          }
+          break;
+        case "pct_change": {
+          triggeredValue = changePercent;
+          const threshold = alert.threshold ?? 5;
+          if (Math.abs(changePercent) >= Math.abs(threshold)) {
+            triggered = true;
+            const dir = changePercent >= 0 ? "up" : "down";
+            message = `${symbol} moved ${dir} ${Math.abs(changePercent).toFixed(2)}% (threshold: ${Math.abs(threshold).toFixed(1)}%)`;
+          }
+          break;
+        }
+      }
+
+      if (!triggered) continue;
+
+      const tier = await getUserTier(alert.userId);
+      if (tier === "free" && !isPromoActive()) {
+        const dailyCount = await getDailyAlertCount(alert.userId);
+        if (dailyCount >= FREE_DAILY_LIMIT) continue;
+      }
+
+      const recentDupe = await db
+        .select({ id: alertHistoryTable.id })
+        .from(alertHistoryTable)
+        .where(and(
+          eq(alertHistoryTable.alertId, alert.id),
+          gte(alertHistoryTable.triggeredAt, new Date(Date.now() - 5 * 60 * 1000))
+        ))
+        .limit(1);
+
+      if (recentDupe.length > 0) continue;
+
+      const [histEntry] = await db
+        .insert(alertHistoryTable)
+        .values({
+          userId: alert.userId,
+          alertId: alert.id,
+          symbol,
+          alertType: alert.alertType,
+          triggeredValue,
+          message,
+          read: false,
+        })
+        .returning();
+
+      pushAlertToUser(alert.userId, {
+        type: "alert",
+        id: histEntry.id,
+        symbol,
+        alertType: alert.alertType,
+        triggeredValue,
+        message,
+        triggeredAt: histEntry.triggeredAt?.toISOString(),
+      });
+
+      sendZapierWebhook("alert_triggered", {
+        userId: alert.userId,
+        alertType: alert.alertType,
+        symbol,
+        condition: message,
+        triggeredValue,
+      }).catch(() => {});
+
+      logger.info({ userId: alert.userId, symbol, alertType: alert.alertType, price }, "Instant alert triggered via live stream");
+    }
+  } catch (err) {
+    logger.debug({ err, symbol }, "Instant alert evaluation error (non-fatal)");
+  }
+}
+
+export function createInstantAlertHandler() {
+  return async (updates: Array<{ symbol: string; price: number; changePercent: number }>) => {
+    for (const update of updates) {
+      await evaluateInstantAlerts(update.symbol, update.price, update.changePercent);
+    }
+  };
+}
+
 export default router;

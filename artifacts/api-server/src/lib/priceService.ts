@@ -1,6 +1,6 @@
 import { TTLCache } from "./cache";
 import { logger } from "./logger";
-import { getLatestPrice, getLatestPrices, fetchPricesFromAlpaca } from "./livePriceBroadcaster";
+import { getLatestPrice, getLatestPrices, fetchPricesFromAlpaca, isCryptoSymbol } from "./livePriceBroadcaster";
 
 const ALPACA_DATA_URL = "https://data.alpaca.markets";
 
@@ -46,21 +46,32 @@ export async function getLivePrice(symbol: string): Promise<number | null> {
   }
 
   try {
-    const res = await fetch(`${ALPACA_DATA_URL}/v2/stocks/${upperSymbol}/snapshot`, {
-      headers: getAlpacaHeaders(),
-      signal: AbortSignal.timeout(5_000),
-    });
-
-    if (!res.ok) {
-      logger.warn({ symbol: upperSymbol, status: res.status }, "Alpaca snapshot returned non-OK for price lookup");
-      return null;
+    let data: Record<string, any>;
+    if (isCryptoSymbol(upperSymbol)) {
+      const res = await fetch(`${ALPACA_DATA_URL}/v1beta3/crypto/us/snapshots?symbols=${encodeURIComponent(upperSymbol)}`, {
+        headers: getAlpacaHeaders(),
+        signal: AbortSignal.timeout(5_000),
+      });
+      if (!res.ok) return null;
+      const json = await res.json() as { snapshots?: Record<string, any> };
+      data = (json.snapshots ?? json as Record<string, any>)[upperSymbol] ?? {};
+    } else {
+      const res = await fetch(`${ALPACA_DATA_URL}/v2/stocks/${upperSymbol}/snapshot`, {
+        headers: getAlpacaHeaders(),
+        signal: AbortSignal.timeout(5_000),
+      });
+      if (!res.ok) {
+        logger.warn({ symbol: upperSymbol, status: res.status }, "Alpaca snapshot returned non-OK for price lookup");
+        return null;
+      }
+      data = await res.json() as Record<string, any>;
     }
 
-    const data = await res.json() as Record<string, any>;
     const price: number | null =
       data.minuteBar?.c ||
       data.latestTrade?.p ||
       data.dailyBar?.c ||
+      data.latestQuote?.ap ||
       null;
 
     if (price && price > 0) {
@@ -91,19 +102,31 @@ export async function getFreshPrice(symbol: string): Promise<number | null> {
   }
 
   try {
-    const res = await fetch(`${ALPACA_DATA_URL}/v2/stocks/${upperSymbol}/snapshot`, {
-      headers: getAlpacaHeaders(),
-      signal: AbortSignal.timeout(4_000),
-    });
-    if (!res.ok) {
-      logger.warn({ symbol: upperSymbol, status: res.status }, "Alpaca fresh-price snapshot non-OK");
-      return getLivePrice(symbol);
+    let data: Record<string, any>;
+    if (isCryptoSymbol(upperSymbol)) {
+      const res = await fetch(`${ALPACA_DATA_URL}/v1beta3/crypto/us/snapshots?symbols=${encodeURIComponent(upperSymbol)}`, {
+        headers: getAlpacaHeaders(),
+        signal: AbortSignal.timeout(4_000),
+      });
+      if (!res.ok) return getLivePrice(symbol);
+      const json = await res.json() as { snapshots?: Record<string, any> };
+      data = (json.snapshots ?? json as Record<string, any>)[upperSymbol] ?? {};
+    } else {
+      const res = await fetch(`${ALPACA_DATA_URL}/v2/stocks/${upperSymbol}/snapshot`, {
+        headers: getAlpacaHeaders(),
+        signal: AbortSignal.timeout(4_000),
+      });
+      if (!res.ok) {
+        logger.warn({ symbol: upperSymbol, status: res.status }, "Alpaca fresh-price snapshot non-OK");
+        return getLivePrice(symbol);
+      }
+      data = await res.json() as Record<string, any>;
     }
-    const data = await res.json() as Record<string, any>;
     const price: number | null =
       data.latestTrade?.p ||
       data.minuteBar?.c ||
       data.dailyBar?.c ||
+      data.latestQuote?.ap ||
       null;
     if (price && price > 0) {
       PRICE_CACHE.set(`price:${upperSymbol}`, price);

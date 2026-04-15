@@ -4,6 +4,11 @@ import WebSocket from "ws";
 
 const ALPACA_DATA_URL = "https://data.alpaca.markets";
 const ALPACA_WS_URL = "wss://stream.data.alpaca.markets/v2/iex";
+const ALPACA_CRYPTO_WS_URL = "wss://stream.data.alpaca.markets/v1beta3/crypto/us";
+
+export function isCryptoSymbol(symbol: string): boolean {
+  return symbol.includes("/");
+}
 
 const POLL_INTERVAL_MS = 2_000;
 const PRICE_CHANGE_THRESHOLD = 0.0001;
@@ -77,6 +82,12 @@ let wsWatchdogTimer: ReturnType<typeof setInterval> | null = null;
 let lastWsMessageTime = 0;
 let wsSubscribedSymbols = new Set<string>();
 let fallbackActive = false;
+
+let cryptoWsConnection: WebSocket | null = null;
+let cryptoWsAuthenticated = false;
+let cryptoWsReconnectAttempts = 0;
+let cryptoWsReconnectTimer: ReturnType<typeof setTimeout> | null = null;
+let cryptoWsSubscribedSymbols = new Set<string>();
 
 function getWatchedSymbolsAll(): string[] {
   const fromSubscribers = Array.from(subscribers.keys()).filter(sym => {
@@ -193,7 +204,7 @@ function connectWebSocket(): void {
 
           deactivateFallback();
 
-          const symbols = getWatchedSymbolsAll();
+          const symbols = getWatchedSymbolsAll().filter(s => !isCryptoSymbol(s));
           if (symbols.length > 0) {
             wsSubscribeSymbols(symbols);
           }
@@ -271,7 +282,7 @@ function connectWebSocket(): void {
 function wsSubscribeSymbols(symbols: string[]): void {
   if (!wsConnection || !wsAuthenticated) return;
 
-  const newSymbols = symbols.filter(s => !wsSubscribedSymbols.has(s));
+  const newSymbols = symbols.filter(s => !wsSubscribedSymbols.has(s) && !isCryptoSymbol(s));
   if (newSymbols.length === 0) return;
 
   const remaining = MAX_WS_SUBSCRIPTIONS - wsSubscribedSymbols.size;
@@ -366,7 +377,7 @@ function deactivateFallback(): void {
   logger.info("REST fallback deactivated — WebSocket is primary");
 }
 
-async function fetchPricesFromAlpaca(symbols: string[]): Promise<void> {
+async function fetchEquityPricesFromAlpaca(symbols: string[]): Promise<void> {
   if (symbols.length === 0) return;
 
   const chunks: string[][] = [];
@@ -383,7 +394,7 @@ async function fetchPricesFromAlpaca(symbols: string[]): Promise<void> {
       });
 
       if (!res.ok) {
-        logger.debug({ status: res.status }, "Alpaca snapshot non-OK in broadcaster");
+        logger.debug({ status: res.status }, "Alpaca equity snapshot non-OK in broadcaster");
         continue;
       }
 
@@ -411,9 +422,196 @@ async function fetchPricesFromAlpaca(symbols: string[]): Promise<void> {
         dispatchUpdates(changedUpdates);
       }
     } catch (err) {
-      logger.debug({ err, symbols: chunk }, "Broadcaster REST fetch error (non-fatal)");
+      logger.debug({ err, symbols: chunk }, "Broadcaster equity REST fetch error (non-fatal)");
     }
   }
+}
+
+async function fetchCryptoPricesFromAlpaca(symbols: string[]): Promise<void> {
+  if (symbols.length === 0) return;
+
+  const chunks: string[][] = [];
+  for (let i = 0; i < symbols.length; i += 20) {
+    chunks.push(symbols.slice(i, i + 20));
+  }
+
+  for (const chunk of chunks) {
+    try {
+      const url = `${ALPACA_DATA_URL}/v1beta3/crypto/us/snapshots?symbols=${encodeURIComponent(chunk.join(","))}`;
+      const res = await fetch(url, {
+        headers: getAlpacaHeaders(),
+        signal: AbortSignal.timeout(4_000),
+      });
+
+      if (!res.ok) {
+        logger.debug({ status: res.status }, "Alpaca crypto snapshot non-OK in broadcaster");
+        continue;
+      }
+
+      const data = await res.json() as { snapshots?: Record<string, any> };
+      const snapshots = data.snapshots ?? data as Record<string, any>;
+      const changedUpdates: PriceUpdate[] = [];
+
+      for (const [symbol, snap] of Object.entries(snapshots)) {
+        const s = snap as Record<string, any>;
+        const price: number =
+          s.minuteBar?.c ||
+          s.latestTrade?.p ||
+          s.dailyBar?.c ||
+          s.latestQuote?.ap ||
+          0;
+
+        const open = s.dailyBar?.o || price;
+        const high = s.dailyBar?.h || price;
+        const low = s.dailyBar?.l || price;
+        const volume = s.dailyBar?.v || s.minuteBar?.v || 0;
+
+        const changed = upsertPrice(symbol, price, open, high, low, volume, "rest_fallback");
+        if (changed) changedUpdates.push(changed);
+      }
+
+      if (changedUpdates.length > 0) {
+        dispatchUpdates(changedUpdates);
+      }
+    } catch (err) {
+      logger.debug({ err, symbols: chunk }, "Broadcaster crypto REST fetch error (non-fatal)");
+    }
+  }
+}
+
+async function fetchPricesFromAlpaca(symbols: string[]): Promise<void> {
+  if (symbols.length === 0) return;
+  const equitySymbols = symbols.filter(s => !isCryptoSymbol(s));
+  const cryptoSymbols = symbols.filter(s => isCryptoSymbol(s));
+  await Promise.all([
+    fetchEquityPricesFromAlpaca(equitySymbols),
+    fetchCryptoPricesFromAlpaca(cryptoSymbols),
+  ]);
+}
+
+function connectCryptoWebSocket(): void {
+  const creds = getAlpacaCredentials();
+  if (!creds.key || !creds.secret) return;
+
+  try {
+    cryptoWsConnection = new WebSocket(ALPACA_CRYPTO_WS_URL);
+  } catch (err) {
+    logger.warn({ err }, "Crypto WebSocket construction failed");
+    return;
+  }
+
+  cryptoWsConnection.on("open", () => {
+    logger.info("Alpaca Crypto WebSocket connected — authenticating");
+    cryptoWsConnection?.send(JSON.stringify({
+      action: "auth",
+      key: creds.key,
+      secret: creds.secret,
+    }));
+  });
+
+  cryptoWsConnection.on("message", (raw: WebSocket.Data) => {
+    try {
+      const messages = JSON.parse(raw.toString()) as any[];
+      if (!Array.isArray(messages)) return;
+
+      for (const msg of messages) {
+        if (msg.T === "success" && msg.msg === "authenticated") {
+          cryptoWsAuthenticated = true;
+          cryptoWsReconnectAttempts = 0;
+          logger.info("Alpaca Crypto WebSocket authenticated");
+
+          const cryptoSymbols = getWatchedSymbolsAll().filter(s => isCryptoSymbol(s));
+          if (cryptoSymbols.length > 0) {
+            cryptoWsSubscribeSymbols(cryptoSymbols);
+          }
+          continue;
+        }
+
+        if (msg.T === "error") {
+          logger.error({ code: msg.code, msg: msg.msg }, "Alpaca Crypto WebSocket error");
+          continue;
+        }
+
+        if (msg.T === "t") {
+          const symbol = msg.S as string;
+          const prev = currentPrices.get(symbol);
+          const changed = upsertPrice(
+            symbol, msg.p as number, prev?.open,
+            prev?.high ? Math.max(prev.high, msg.p) : msg.p,
+            prev?.low ? Math.min(prev.low, msg.p) : msg.p,
+            (prev?.volume || 0) + (msg.s || 0), "websocket",
+          );
+          if (changed) dispatchUpdates([changed]);
+        }
+
+        if (msg.T === "b") {
+          const symbol = msg.S as string;
+          const changed = upsertPrice(
+            symbol, msg.c as number, msg.o as number,
+            msg.h as number, msg.l as number, msg.v as number, "websocket",
+          );
+          if (changed) dispatchUpdates([changed]);
+        }
+
+        if (msg.T === "q") {
+          const symbol = msg.S as string;
+          const midPrice = ((msg.bp || 0) + (msg.ap || 0)) / 2;
+          if (midPrice > 0) {
+            const changed = upsertPrice(symbol, midPrice, undefined, undefined, undefined, undefined, "websocket");
+            if (changed) dispatchUpdates([changed]);
+          }
+        }
+      }
+    } catch (err) {
+      logger.debug({ err }, "Crypto WebSocket message parse error");
+    }
+  });
+
+  cryptoWsConnection.on("error", (err: Error) => {
+    logger.warn({ err: err.message }, "Alpaca Crypto WebSocket error");
+  });
+
+  cryptoWsConnection.on("close", (code: number) => {
+    logger.warn({ code }, "Alpaca Crypto WebSocket closed");
+    cryptoWsAuthenticated = false;
+    cryptoWsConnection = null;
+    if (!isRunning) return;
+    scheduleCryptoWsReconnect();
+  });
+}
+
+function cryptoWsSubscribeSymbols(symbols: string[]): void {
+  if (!cryptoWsConnection || !cryptoWsAuthenticated) return;
+
+  const newSymbols = symbols.filter(s => !cryptoWsSubscribedSymbols.has(s));
+  if (newSymbols.length === 0) return;
+
+  cryptoWsConnection.send(JSON.stringify({
+    action: "subscribe",
+    trades: newSymbols,
+    bars: newSymbols,
+  }));
+
+  for (const s of newSymbols) cryptoWsSubscribedSymbols.add(s);
+  logger.info({ count: newSymbols.length }, "Crypto WebSocket subscribed to symbols");
+}
+
+function scheduleCryptoWsReconnect(): void {
+  if (cryptoWsReconnectTimer) return;
+
+  const delay = Math.min(
+    WS_RECONNECT_BASE_MS * Math.pow(2, cryptoWsReconnectAttempts),
+    WS_RECONNECT_MAX_MS,
+  );
+  cryptoWsReconnectAttempts++;
+
+  cryptoWsReconnectTimer = setTimeout(() => {
+    cryptoWsReconnectTimer = null;
+    if (isRunning) {
+      cryptoWsSubscribedSymbols.clear();
+      connectCryptoWebSocket();
+    }
+  }, delay);
 }
 
 function scheduleRestPoll(): void {
@@ -434,11 +632,12 @@ export function startBroadcaster(): void {
   isRunning = true;
 
   connectWebSocket();
+  connectCryptoWebSocket();
   startWsWatchdog();
 
   activateFallback();
 
-  logger.info("Live price broadcaster started (WebSocket + REST fallback)");
+  logger.info("Live price broadcaster started (WebSocket + Crypto WebSocket + REST fallback)");
 }
 
 export function stopBroadcaster(): void {
@@ -448,15 +647,24 @@ export function stopBroadcaster(): void {
   if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
   if (wsReconnectTimer) { clearTimeout(wsReconnectTimer); wsReconnectTimer = null; }
   if (wsWatchdogTimer) { clearInterval(wsWatchdogTimer); wsWatchdogTimer = null; }
+  if (cryptoWsReconnectTimer) { clearTimeout(cryptoWsReconnectTimer); cryptoWsReconnectTimer = null; }
 
   if (wsConnection) {
     try { wsConnection.close(); } catch (err) {
-      logger.debug({ err }, "Error closing WebSocket during shutdown");
+      logger.debug({ err }, "Error closing equity WebSocket during shutdown");
     }
     wsConnection = null;
   }
+  if (cryptoWsConnection) {
+    try { cryptoWsConnection.close(); } catch (err) {
+      logger.debug({ err }, "Error closing crypto WebSocket during shutdown");
+    }
+    cryptoWsConnection = null;
+  }
   wsAuthenticated = false;
+  cryptoWsAuthenticated = false;
   wsSubscribedSymbols.clear();
+  cryptoWsSubscribedSymbols.clear();
 
   logger.info("Live price broadcaster stopped");
 }
@@ -483,8 +691,14 @@ export function subscribeToSymbols(symbols: string[], callback: PriceUpdateCallb
     }
   }
 
-  if (wsAuthenticated) {
-    wsSubscribeSymbols(symbols);
+  const equitySymbols = symbols.filter(s => !isCryptoSymbol(s));
+  const cryptoSymbols = symbols.filter(s => isCryptoSymbol(s));
+
+  if (wsAuthenticated && equitySymbols.length > 0) {
+    wsSubscribeSymbols(equitySymbols);
+  }
+  if (cryptoWsAuthenticated && cryptoSymbols.length > 0) {
+    cryptoWsSubscribeSymbols(cryptoSymbols);
   }
 
   const fetchNow = async () => {
@@ -509,8 +723,9 @@ export function subscribeToSymbols(symbols: string[], callback: PriceUpdateCallb
         }
       }
     }
-    if (orphaned.length > 0) {
-      wsUnsubscribeSymbols(orphaned);
+    const orphanedEquity = orphaned.filter(s => !isCryptoSymbol(s));
+    if (orphanedEquity.length > 0) {
+      wsUnsubscribeSymbols(orphanedEquity);
     }
   };
 }
@@ -523,8 +738,13 @@ export function ensureSymbolsWatched(symbols: string[]): void {
     }
     permanentSymbols.add(sym.toUpperCase());
   }
-  if (wsAuthenticated) {
-    wsSubscribeSymbols(symbols.map(s => s.toUpperCase()));
+  const equitySymbols = symbols.map(s => s.toUpperCase()).filter(s => !isCryptoSymbol(s));
+  const cryptoSymbols = symbols.map(s => s.toUpperCase()).filter(s => isCryptoSymbol(s));
+  if (wsAuthenticated && equitySymbols.length > 0) {
+    wsSubscribeSymbols(equitySymbols);
+  }
+  if (cryptoWsAuthenticated && cryptoSymbols.length > 0) {
+    cryptoWsSubscribeSymbols(cryptoSymbols);
   }
 }
 

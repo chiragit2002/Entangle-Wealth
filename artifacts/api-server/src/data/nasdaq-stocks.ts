@@ -787,6 +787,38 @@ export function getAllSymbols(): Set<string> {
   return new Set(KNOWN_STOCKS.map(([symbol]) => symbol));
 }
 
+export interface CryptoAsset {
+  symbol: string;
+  name: string;
+  sector: string;
+}
+
+export const CRYPTO_ASSETS: CryptoAsset[] = [
+  { symbol: "BTC/USD", name: "Bitcoin", sector: "Cryptocurrency" },
+  { symbol: "ETH/USD", name: "Ethereum", sector: "Cryptocurrency" },
+  { symbol: "SOL/USD", name: "Solana", sector: "Cryptocurrency" },
+  { symbol: "XRP/USD", name: "Ripple", sector: "Cryptocurrency" },
+  { symbol: "DOGE/USD", name: "Dogecoin", sector: "Cryptocurrency" },
+  { symbol: "AVAX/USD", name: "Avalanche", sector: "Cryptocurrency" },
+  { symbol: "LINK/USD", name: "Chainlink", sector: "Cryptocurrency" },
+  { symbol: "DOT/USD", name: "Polkadot", sector: "Cryptocurrency" },
+  { symbol: "LTC/USD", name: "Litecoin", sector: "Cryptocurrency" },
+  { symbol: "UNI/USD", name: "Uniswap", sector: "Cryptocurrency" },
+  { symbol: "ADA/USD", name: "Cardano", sector: "Cryptocurrency" },
+  { symbol: "MATIC/USD", name: "Polygon", sector: "Cryptocurrency" },
+  { symbol: "SHIB/USD", name: "Shiba Inu", sector: "Cryptocurrency" },
+  { symbol: "BCH/USD", name: "Bitcoin Cash", sector: "Cryptocurrency" },
+  { symbol: "AAVE/USD", name: "Aave", sector: "Cryptocurrency" },
+];
+
+export function getAllCryptoSymbols(): Set<string> {
+  return new Set(CRYPTO_ASSETS.map(a => a.symbol));
+}
+
+export function isCryptoSymbol(symbol: string): boolean {
+  return symbol.includes("/");
+}
+
 export function getSectorSummary(): { sector: string; count: number; avgChange: number }[] {
   getAllStocks();
   return _sectorSummary!;

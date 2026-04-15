@@ -84,10 +84,15 @@ interface QuickAnalysis {
 }
 
 const MULTI_ASSET_SYMBOLS = {
-  crypto: ["BTC", "ETH", "SOL", "XRP", "ADA", "DOGE"],
+  crypto: ["BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD", "ADA/USD", "DOGE/USD"],
   forex: ["EUR/USD", "GBP/USD", "USD/JPY", "USD/CHF", "AUD/USD", "USD/CAD"],
   commodities: ["GOLD", "SILVER", "WTI Oil", "Brent", "Nat Gas", "Copper"],
   bonds: ["US 2Y", "US 5Y", "US 10Y", "US 30Y", "TIPS 10Y", "HY Spread"],
+};
+
+const CRYPTO_DISPLAY_NAMES: Record<string, string> = {
+  "BTC/USD": "Bitcoin", "ETH/USD": "Ethereum", "SOL/USD": "Solana",
+  "XRP/USD": "Ripple", "ADA/USD": "Cardano", "DOGE/USD": "Dogecoin",
 };
 
 const MARKET_INTERNALS = {
@@ -353,6 +358,8 @@ export default function Dashboard() {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [activeAssetTab, setActiveAssetTab] = useState<"crypto" | "forex" | "commodities" | "bonds">("crypto");
   const [secondaryTab, setSecondaryTab] = useState<SecondaryTab>("signals");
+  const [cryptoPrices, setCryptoPrices] = useState<Record<string, { price: number; changePercent: number }>>({});
+  const [cryptoPricesLoading, setCryptoPricesLoading] = useState(false);
   const [clock, setClock] = useState("");
   const [expandedSignal, setExpandedSignal] = useState<number | null>(null);
   const [, navigate] = useLocation();
@@ -423,6 +430,39 @@ export default function Dashboard() {
     onEvent("view_signal");
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
+
+  const fetchCryptoPrices = useCallback(async () => {
+    setCryptoPricesLoading(true);
+    try {
+      const symbols = MULTI_ASSET_SYMBOLS.crypto.join(",");
+      const res = await fetch(`${BASE_URL}/api/alpaca/snapshots?symbols=${encodeURIComponent(symbols)}`);
+      if (!res.ok) return;
+      const data = await res.json() as Record<string, { latestTrade?: { p: number }; minuteBar?: { c: number; o: number }; dailyBar?: { c: number; o: number } }>;
+      const prices: Record<string, { price: number; changePercent: number }> = {};
+      for (const sym of MULTI_ASSET_SYMBOLS.crypto) {
+        const snap = data[sym];
+        if (!snap) continue;
+        const price = snap.latestTrade?.p ?? snap.minuteBar?.c ?? snap.dailyBar?.c ?? 0;
+        const open = snap.minuteBar?.o ?? snap.dailyBar?.o ?? price;
+        const changePercent = open > 0 ? ((price - open) / open) * 100 : 0;
+        if (price > 0) prices[sym] = { price, changePercent };
+      }
+      setCryptoPrices(prices);
+    } catch {
+    } finally {
+      setCryptoPricesLoading(false);
+    }
+  }, [BASE_URL]);
+
+  useEffect(() => {
+    if (activeAssetTab === "crypto") {
+      fetchCryptoPrices();
+      const interval = setInterval(fetchCryptoPrices, 15_000);
+      return () => clearInterval(interval);
+    }
+  }, [activeAssetTab, fetchCryptoPrices]);
 
   const executeTrade = useCallback(async () => {
     if (!tradeSymbol.trim() || !tradeQty || !tradePrice) {
@@ -995,13 +1035,31 @@ export default function Dashboard() {
                   ))}
                 </div>
               } />
-              <div className="px-3 py-2 bg-white/[0.01] border-b border-white/[0.04]">
-                <p className="text-[9px] font-mono text-white/25">Live prices unavailable — crypto, forex, bonds &amp; commodities not supported by our equities data provider.</p>
-              </div>
+              {activeAssetTab !== "crypto" && (
+                <div className="px-3 py-2 bg-white/[0.01] border-b border-white/[0.04]">
+                  <p className="text-[9px] font-mono text-white/25">Forex, bonds &amp; commodities prices coming soon.</p>
+                </div>
+              )}
+              {activeAssetTab === "crypto" && cryptoPricesLoading && Object.keys(cryptoPrices).length === 0 && (
+                <div className="px-3 py-3 text-[9px] font-mono text-white/30 text-center">Loading crypto prices…</div>
+              )}
               <div className="divide-y divide-white/[0.03]">
-                {MULTI_ASSET_SYMBOLS[activeAssetTab].map(sym => (
-                  <DataRow key={sym} label={sym} value="—" change={undefined} />
-                ))}
+                {MULTI_ASSET_SYMBOLS[activeAssetTab].map(sym => {
+                  if (activeAssetTab === "crypto") {
+                    const p = cryptoPrices[sym];
+                    const display = sym.replace("/USD", "");
+                    const label = CRYPTO_DISPLAY_NAMES[sym] ?? display;
+                    return (
+                      <DataRow
+                        key={sym}
+                        label={`${display} · ${label}`}
+                        value={p ? `$${p.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: p.price >= 1000 ? 0 : 4 })}` : "—"}
+                        change={p ? p.changePercent : undefined}
+                      />
+                    );
+                  }
+                  return <DataRow key={sym} label={sym} value="—" change={undefined} />;
+                })}
               </div>
             </Panel>
           </div>

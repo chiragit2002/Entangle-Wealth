@@ -8,15 +8,15 @@ import { alpacaCircuit } from "../lib/circuitBreaker";
 import { BoundedRateLimitMap } from "../lib/boundedMap";
 
 const AlpacaSymbolParamsSchema = z.object({
-  symbol: z.string().min(1).max(10).regex(/^[A-Za-z]+$/),
+  symbol: z.string().min(1).max(15).regex(/^[A-Za-z]+(?:\/[A-Za-z]+)?$/),
 });
 
 const AlpacaSymbolsQuerySchema = z.object({
-  symbols: z.string().min(1).max(500),
+  symbols: z.string().min(1).max(1000),
 });
 
 const AlpacaBarsParamsSchema = z.object({
-  symbol: z.string().min(1).max(10).regex(/^[A-Za-z]+$/),
+  symbol: z.string().min(1).max(15).regex(/^[A-Za-z]+(?:\/[A-Za-z]+)?$/),
 });
 
 const AlpacaBarsQuerySchema = z.object({
@@ -109,6 +109,10 @@ async function alpacaFetch(url: string, cacheKey?: string): Promise<Record<strin
   );
 }
 
+function isCryptoSymbol(symbol: string): boolean {
+  return symbol.includes("/");
+}
+
 router.get("/alpaca/snapshot/:symbol", validateParams(AlpacaSymbolParamsSchema), async (req, res) => {
   try {
     const symbol = (req.params.symbol as string).toUpperCase();
@@ -118,10 +122,16 @@ router.get("/alpaca/snapshot/:symbol", validateParams(AlpacaSymbolParamsSchema),
       res.json(cached);
       return;
     }
-    const data = await alpacaFetch(
-      `${ALPACA_DATA_URL}/v2/stocks/${symbol}/snapshot`,
-      cacheKey
-    );
+    let data: Record<string, unknown>;
+    if (isCryptoSymbol(symbol)) {
+      const raw = await alpacaFetch(
+        `${ALPACA_DATA_URL}/v1beta3/crypto/us/snapshots?symbols=${encodeURIComponent(symbol)}`,
+        cacheKey,
+      ) as { snapshots?: Record<string, unknown> };
+      data = (raw.snapshots ?? raw as Record<string, unknown>)[symbol] ?? raw;
+    } else {
+      data = await alpacaFetch(`${ALPACA_DATA_URL}/v2/stocks/${symbol}/snapshot`, cacheKey);
+    }
     alpacaCache.set(cacheKey, data);
     res.json(data);
   } catch (err: any) {
@@ -143,12 +153,26 @@ router.get("/alpaca/snapshots", validateQuery(AlpacaSymbolsQuerySchema), async (
       res.json(cached);
       return;
     }
-    const data = await alpacaFetch(
-      `${ALPACA_DATA_URL}/v2/stocks/snapshots?symbols=${encodeURIComponent(symbols)}`,
-      cacheKey
-    );
-    alpacaCache.set(cacheKey, data);
-    res.json(data);
+    const symbolList = symbols.split(",").map((s: string) => s.trim().toUpperCase()).filter(Boolean);
+    const equitySymbols = symbolList.filter((s: string) => !isCryptoSymbol(s));
+    const cryptoSymbols = symbolList.filter((s: string) => isCryptoSymbol(s));
+    const combined: Record<string, unknown> = {};
+    if (equitySymbols.length > 0) {
+      const equityData = await alpacaFetch(
+        `${ALPACA_DATA_URL}/v2/stocks/snapshots?symbols=${encodeURIComponent(equitySymbols.join(","))}`,
+        `snapshots:equity:${equitySymbols.join(",")}`,
+      ) as Record<string, unknown>;
+      Object.assign(combined, equityData);
+    }
+    if (cryptoSymbols.length > 0) {
+      const cryptoRaw = await alpacaFetch(
+        `${ALPACA_DATA_URL}/v1beta3/crypto/us/snapshots?symbols=${encodeURIComponent(cryptoSymbols.join(","))}`,
+        `snapshots:crypto:${cryptoSymbols.join(",")}`,
+      ) as { snapshots?: Record<string, unknown> };
+      Object.assign(combined, cryptoRaw.snapshots ?? cryptoRaw);
+    }
+    alpacaCache.set(cacheKey, combined);
+    res.json(combined);
   } catch (err: any) {
     logger.error({ err }, "Alpaca snapshots fetch failed");
     res.status(502).json({ error: "Failed to fetch snapshots" });
@@ -163,7 +187,12 @@ router.get("/alpaca/bars/:symbol", validateParams(AlpacaBarsParamsSchema), valid
     const start = req.query.start as string | undefined;
     const end = req.query.end as string | undefined;
 
-    let url = `${ALPACA_DATA_URL}/v2/stocks/${symbol}/bars?timeframe=${timeframe}&limit=${limit}&adjustment=split&feed=iex&sort=asc`;
+    let url: string;
+    if (isCryptoSymbol(symbol)) {
+      url = `${ALPACA_DATA_URL}/v1beta3/crypto/us/bars?symbols=${encodeURIComponent(symbol)}&timeframe=${timeframe}&limit=${limit}&sort=asc`;
+    } else {
+      url = `${ALPACA_DATA_URL}/v2/stocks/${symbol}/bars?timeframe=${timeframe}&limit=${limit}&adjustment=split&feed=iex&sort=asc`;
+    }
     if (start) url += `&start=${encodeURIComponent(start)}`;
     if (end) url += `&end=${encodeURIComponent(end)}`;
 
@@ -210,9 +239,21 @@ router.get("/alpaca/multibars", validateQuery(AlpacaMultiBarsQuerySchema), async
       res.status(400).json({ error: "symbols query param required" });
       return;
     }
-    const url = `${ALPACA_DATA_URL}/v2/stocks/bars?symbols=${encodeURIComponent(symbols)}&timeframe=${timeframe}&limit=${limit}&adjustment=split&feed=iex&sort=asc`;
-    const data = await alpacaFetch(url);
-    res.json(data);
+    const symbolList = symbols.split(",").map((s: string) => s.trim().toUpperCase()).filter(Boolean);
+    const equitySymbols = symbolList.filter((s: string) => !isCryptoSymbol(s));
+    const cryptoSymbols = symbolList.filter((s: string) => isCryptoSymbol(s));
+    const combinedBars: Record<string, unknown> = {};
+    if (equitySymbols.length > 0) {
+      const equityUrl = `${ALPACA_DATA_URL}/v2/stocks/bars?symbols=${encodeURIComponent(equitySymbols.join(","))}&timeframe=${timeframe}&limit=${limit}&adjustment=split&feed=iex&sort=asc`;
+      const equityData = await alpacaFetch(equityUrl) as { bars?: Record<string, unknown> };
+      Object.assign(combinedBars, equityData.bars ?? equityData);
+    }
+    if (cryptoSymbols.length > 0) {
+      const cryptoUrl = `${ALPACA_DATA_URL}/v1beta3/crypto/us/bars?symbols=${encodeURIComponent(cryptoSymbols.join(","))}&timeframe=${timeframe}&limit=${limit}&sort=asc`;
+      const cryptoData = await alpacaFetch(cryptoUrl) as { bars?: Record<string, unknown> };
+      Object.assign(combinedBars, cryptoData.bars ?? cryptoData);
+    }
+    res.json({ bars: combinedBars });
   } catch (err: any) {
     logger.error({ err }, "Alpaca multi bars fetch failed");
     res.status(502).json({ error: "Failed to fetch multi bars" });

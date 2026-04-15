@@ -14,6 +14,11 @@ const STOCK_UNIVERSE = [
   "SMCI", "IONQ", "RGTI", "AI", "PATH", "U", "RBLX", "TTWO", "EA", "SPOT",
 ];
 
+const CRYPTO_UNIVERSE = [
+  "BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD", "DOGE/USD",
+  "AVAX/USD", "LINK/USD", "DOT/USD", "LTC/USD", "UNI/USD",
+];
+
 export interface EngineStatus {
   lastRunAt: string | null;
   nextRunAt: string | null;
@@ -77,15 +82,17 @@ export async function runQuantEngine(force: boolean = false): Promise<SignalOppo
   engineStatus.isRunning = true;
   const startTime = Date.now();
 
-  logger.info({ stockUniverse: STOCK_UNIVERSE.length, force }, "Quant engine: starting run");
+  const FULL_UNIVERSE_SIZE = STOCK_UNIVERSE.length + CRYPTO_UNIVERSE.length;
+  logger.info({ stockUniverse: STOCK_UNIVERSE.length, cryptoUniverse: CRYPTO_UNIVERSE.length, total: FULL_UNIVERSE_SIZE, force }, "Quant engine: starting run");
 
   try {
     const strategies = generateAllStrategies();
     const gridCount = strategies.filter(s => s.type === "RSI_EMA_GRID").length;
     logger.info({ strategies: strategies.length, gridStrategies: gridCount, baseStrategies: strategies.length - gridCount }, "Quant engine: system strategies loaded");
 
-    const stockData = await fetchStockUniverse(STOCK_UNIVERSE);
-    engineStatus.apiCallsMade += Math.ceil(STOCK_UNIVERSE.length / 10);
+    const FULL_UNIVERSE = [...STOCK_UNIVERSE, ...CRYPTO_UNIVERSE];
+    const stockData = await fetchStockUniverse(FULL_UNIVERSE);
+    engineStatus.apiCallsMade += Math.ceil(FULL_UNIVERSE.length / 10);
 
     if (stockData.size === 0) {
       logger.warn("Quant engine: no stock data fetched, aborting");

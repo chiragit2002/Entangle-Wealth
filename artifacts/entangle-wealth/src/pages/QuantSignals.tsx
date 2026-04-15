@@ -60,6 +60,7 @@ type SortField = "score" | "confidence" | "expectedReturn" | "riskScore" | "winR
 type SortDir = "asc" | "desc";
 type FilterAction = "all" | "BUY" | "SELL";
 type FilterRisk = "all" | "LOW" | "MEDIUM" | "HIGH";
+type FilterAsset = "all" | "equity" | "crypto";
 
 function riskBadge(level: string) {
   if (level === "LOW") return "bg-green-500/15 text-green-400 border-green-500/20";
@@ -110,6 +111,7 @@ function SignalsTab() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filterAction, setFilterAction] = useState<FilterAction>("all");
   const [filterRisk, setFilterRisk] = useState<FilterRisk>("all");
+  const [filterAsset, setFilterAsset] = useState<FilterAsset>("all");
   const [search, setSearch] = useState("");
 
   const fetchSignals = useCallback(async () => {
@@ -177,6 +179,8 @@ function SignalsTab() {
     let result = [...signals];
     if (filterAction !== "all") result = result.filter(s => s.action === filterAction);
     if (filterRisk !== "all") result = result.filter(s => s.riskLevel === filterRisk);
+    if (filterAsset === "crypto") result = result.filter(s => s.symbol.includes("/"));
+    if (filterAsset === "equity") result = result.filter(s => !s.symbol.includes("/"));
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(s =>
@@ -195,7 +199,7 @@ function SignalsTab() {
       return 0;
     });
     return result;
-  }, [signals, sortField, sortDir, filterAction, filterRisk, search]);
+  }, [signals, sortField, sortDir, filterAction, filterRisk, filterAsset, search]);
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return <ChevronsUpDown className="w-3 h-3 opacity-30" />;
@@ -247,7 +251,7 @@ function SignalsTab() {
             pulse: status?.isRunning,
           },
           { icon: Clock, label: "Last Run", value: formatRelative(status?.lastRunAt ?? null), cls: "text-white/70", pulse: false },
-          { icon: BarChart3, label: "Stocks Scanned", value: status?.stocksScanned?.toLocaleString() ?? "—", cls: "text-[#00d4ff]/80", pulse: false },
+          { icon: BarChart3, label: "Assets Scanned", value: status?.stocksScanned?.toLocaleString() ?? "—", cls: "text-[#00d4ff]/80", pulse: false },
           {
             icon: Zap,
             label: "Strategies Run",
@@ -313,6 +317,17 @@ function SignalsTab() {
           {(["all", "LOW", "MEDIUM", "HIGH"] as FilterRisk[]).map(f => (
             <button key={f} onClick={() => setFilterRisk(f)} className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${filterRisk === f ? "bg-white/10 border-white/20 text-white" : "bg-transparent border-white/10 text-white/50 hover:text-white/80"}`}>
               {f === "all" ? "All Risk" : f}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-1">
+          {([["all", "All Assets"], ["equity", "Equities"], ["crypto", "Crypto"]] as [FilterAsset, string][]).map(([f, label]) => (
+            <button
+              key={f}
+              onClick={() => setFilterAsset(f)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${filterAsset === f ? f === "crypto" ? "bg-orange-500/15 border-orange-500/30 text-orange-400" : "bg-white/10 border-white/20 text-white" : "bg-transparent border-white/10 text-white/50 hover:text-white/80"}`}
+            >
+              {label}
             </button>
           ))}
         </div>
@@ -806,9 +821,279 @@ function PipelineTab() {
   );
 }
 
+// ─── On-Demand Evaluation Tab ────────────────────────────────────────────────
+
+interface OnDemandResult {
+  strategy_id: number;
+  asset: string;
+  timeframe: string;
+  market_state: string;
+  evaluated_at: string;
+  scores: { M1: number; M2: number; M3: number; M4: number; M5: number; M6: number };
+  model_details: Record<string, { score: number; name: string }>;
+  score_total: number;
+  confidence: number;
+  stress: {
+    results: { scenario: string; score: number; max_drawdown: number; failure: boolean }[];
+    worst_drawdown: number;
+    failure_regimes: string[];
+    passed: number;
+    total: number;
+  };
+  recommendation: string;
+  data_points: number;
+}
+
+interface UserStrategy {
+  id: number;
+  name: string;
+  description?: string | null;
+}
+
+const CRYPTO_ASSET_OPTIONS = [
+  "BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD", "DOGE/USD",
+  "AVAX/USD", "LINK/USD", "DOT/USD", "LTC/USD", "UNI/USD",
+];
+
+const EQUITY_ASSET_OPTIONS = [
+  "AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META", "TSLA", "AMD",
+  "COIN", "PLTR", "CRWD", "SNOW", "MDB", "PANW", "NET",
+];
+
+const RECOMMENDATION_STYLES: Record<string, { label: string; cls: string }> = {
+  strong_buy: { label: "STRONG BUY", cls: "bg-emerald-500/20 border-emerald-500/40 text-emerald-300" },
+  buy: { label: "BUY", cls: "bg-[#00d4ff]/15 border-[#00d4ff]/30 text-[#00d4ff]" },
+  hold: { label: "HOLD", cls: "bg-yellow-500/15 border-yellow-500/30 text-yellow-300" },
+  reduce: { label: "REDUCE", cls: "bg-orange-500/15 border-orange-500/30 text-orange-400" },
+  avoid: { label: "AVOID", cls: "bg-red-500/15 border-red-500/30 text-red-400" },
+};
+
+function OnDemandTab() {
+  const { getToken } = useAuth();
+  const [strategies, setStrategies] = useState<UserStrategy[]>([]);
+  const [loadingStrategies, setLoadingStrategies] = useState(false);
+  const [selectedStrategy, setSelectedStrategy] = useState<string>("");
+  const [asset, setAsset] = useState("BTC/USD");
+  const [customAsset, setCustomAsset] = useState("");
+  const [useCustomAsset, setUseCustomAsset] = useState(false);
+  const [timeframe, setTimeframe] = useState("1Day");
+  const [marketState, setMarketState] = useState<"trending" | "ranging" | "volatile" | "unknown">("unknown");
+  const [running, setRunning] = useState(false);
+  const [result, setResult] = useState<OnDemandResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchStrategies = useCallback(async () => {
+    setLoadingStrategies(true);
+    try {
+      const res = await authFetch("/api/evaluate/strategies", getToken, {});
+      if (!res.ok) return;
+      const data = await res.json() as { strategies: UserStrategy[] };
+      setStrategies(data.strategies ?? []);
+      if (data.strategies?.length > 0) setSelectedStrategy(String(data.strategies[0].id));
+    } catch {
+    } finally {
+      setLoadingStrategies(false);
+    }
+  }, [getToken]);
+
+  useEffect(() => { fetchStrategies(); }, [fetchStrategies]);
+
+  const handleEvaluate = useCallback(async () => {
+    if (!selectedStrategy) return;
+    const resolvedAsset = useCustomAsset ? customAsset.trim().toUpperCase() : asset;
+    if (!resolvedAsset) return;
+    setRunning(true);
+    setError(null);
+    setResult(null);
+    try {
+      const res = await authFetch("/api/evaluate/on-demand", getToken, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          strategy_id: parseInt(selectedStrategy),
+          context: { asset: resolvedAsset, timeframe, market_state: marketState },
+        }),
+      });
+      if (!res.ok) {
+        const d = await res.json() as { error?: string; detail?: string };
+        throw new Error(d.detail ?? d.error ?? `Error ${res.status}`);
+      }
+      const data = await res.json() as OnDemandResult;
+      setResult(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Evaluation failed");
+    } finally {
+      setRunning(false);
+    }
+  }, [getToken, selectedStrategy, asset, customAsset, useCustomAsset, timeframe, marketState]);
+
+  const resolvedAsset = useCustomAsset ? customAsset.trim().toUpperCase() : asset;
+
+  return (
+    <div className="space-y-6 max-w-3xl">
+      <div>
+        <p className="text-[11px] text-white/40">Evaluate a single strategy against any asset — equities or crypto — and get instant M1–M6 scores, stress results, and a recommendation.</p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white/[0.02] border border-white/8 rounded-xl p-4">
+        {/* Strategy selector */}
+        <div>
+          <label className="block text-[10px] font-mono text-white/50 mb-1.5 uppercase tracking-wider">Your Strategy</label>
+          {loadingStrategies ? (
+            <div className="text-[11px] text-white/30">Loading strategies…</div>
+          ) : strategies.length === 0 ? (
+            <div className="text-[11px] text-white/30">No custom strategies found. Create one in the Strategy Builder.</div>
+          ) : (
+            <select
+              value={selectedStrategy}
+              onChange={e => setSelectedStrategy(e.target.value)}
+              className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50"
+            >
+              {strategies.map(s => (
+                <option key={s.id} value={String(s.id)}>{s.name} (#{s.id})</option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        {/* Asset selector */}
+        <div>
+          <label className="block text-[10px] font-mono text-white/50 mb-1.5 uppercase tracking-wider">Asset</label>
+          <div className="flex items-center gap-2 mb-2">
+            <button
+              onClick={() => setUseCustomAsset(false)}
+              className={`text-[10px] font-mono px-2 py-0.5 rounded border ${!useCustomAsset ? "bg-white/10 border-white/20 text-white" : "border-white/10 text-white/40"}`}
+            >Preset</button>
+            <button
+              onClick={() => setUseCustomAsset(true)}
+              className={`text-[10px] font-mono px-2 py-0.5 rounded border ${useCustomAsset ? "bg-white/10 border-white/20 text-white" : "border-white/10 text-white/40"}`}
+            >Custom</button>
+          </div>
+          {useCustomAsset ? (
+            <input
+              value={customAsset}
+              onChange={e => setCustomAsset(e.target.value)}
+              placeholder="e.g. BTC/USD or AAPL"
+              className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono placeholder-white/20 focus:outline-none focus:border-purple-400/50"
+            />
+          ) : (
+            <select
+              value={asset}
+              onChange={e => setAsset(e.target.value)}
+              className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-purple-400/50"
+            >
+              <optgroup label="Crypto">
+                {CRYPTO_ASSET_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+              </optgroup>
+              <optgroup label="Equities">
+                {EQUITY_ASSET_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+              </optgroup>
+            </select>
+          )}
+        </div>
+
+        {/* Timeframe */}
+        <div>
+          <label className="block text-[10px] font-mono text-white/50 mb-1.5 uppercase tracking-wider">Timeframe</label>
+          <select
+            value={timeframe}
+            onChange={e => setTimeframe(e.target.value)}
+            className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50"
+          >
+            <option value="1Day">Daily (1D)</option>
+            <option value="1Hour">Hourly (1H)</option>
+            <option value="4Hour">4-Hour (4H)</option>
+            <option value="1Week">Weekly (1W)</option>
+          </select>
+        </div>
+
+        {/* Market state */}
+        <div>
+          <label className="block text-[10px] font-mono text-white/50 mb-1.5 uppercase tracking-wider">Market Regime</label>
+          <select
+            value={marketState}
+            onChange={e => setMarketState(e.target.value as typeof marketState)}
+            className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50"
+          >
+            <option value="unknown">Auto-detect</option>
+            <option value="trending">Trending</option>
+            <option value="ranging">Ranging / Sideways</option>
+            <option value="volatile">High Volatility</option>
+          </select>
+        </div>
+      </div>
+
+      <Button
+        onClick={handleEvaluate}
+        disabled={running || !selectedStrategy || !resolvedAsset}
+        className="bg-purple-600 hover:bg-purple-700 text-white"
+      >
+        {running ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Evaluating…</> : <><Zap className="w-4 h-4 mr-2" />Evaluate Strategy</>}
+      </Button>
+
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-sm text-red-400">{error}</div>
+      )}
+
+      {result && (
+        <div className="space-y-4 bg-white/[0.02] border border-white/8 rounded-xl p-5">
+          <div className="flex items-start justify-between flex-wrap gap-3">
+            <div>
+              <div className="text-xs text-white/40 font-mono">{result.asset} · {result.timeframe} · {result.data_points} bars</div>
+              <div className="text-xs text-white/25 font-mono mt-0.5">{new Date(result.evaluated_at).toLocaleString()}</div>
+            </div>
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border ${RECOMMENDATION_STYLES[result.recommendation]?.cls ?? "border-white/10 text-white/50"}`}>
+              {RECOMMENDATION_STYLES[result.recommendation]?.label ?? result.recommendation.toUpperCase()}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-black/30 rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold font-mono" style={{ color: result.score_total >= 70 ? "#00C49F" : result.score_total >= 50 ? "#FFB800" : "#ff3366" }}>{result.score_total.toFixed(1)}</div>
+              <div className="text-[10px] text-white/40 font-mono mt-0.5">Score Total</div>
+            </div>
+            <div className="bg-black/30 rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold font-mono text-purple-400">{(result.confidence * 100).toFixed(0)}%</div>
+              <div className="text-[10px] text-white/40 font-mono mt-0.5">Confidence</div>
+            </div>
+          </div>
+
+          <div>
+            <div className="text-[9px] font-mono text-white/30 uppercase tracking-wider mb-2">M1–M6 Model Scores</div>
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+              {(Object.entries(result.scores) as [string, number][]).map(([k, v]) => (
+                <div key={k} className="text-center">
+                  <div className="text-xs font-bold font-mono" style={{ color: MODEL_COLORS[k] ?? "#888" }}>{Math.round(v)}</div>
+                  <div className="text-[9px] text-white/30 font-mono">{k}</div>
+                  <div className="text-[8px] text-white/20 leading-tight">{result.model_details[k]?.name?.replace(/\s+/g, "\u00A0") ?? ""}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-[9px] font-mono text-white/30 uppercase tracking-wider mb-2">Stress Test · {result.stress.passed}/{result.stress.total} passed · worst DD: -{result.stress.worst_drawdown.toFixed(1)}%</div>
+            <div className="flex flex-wrap gap-1.5">
+              {result.stress.results.map(s => (
+                <div
+                  key={s.scenario}
+                  className={`flex items-center gap-1 px-2 py-1 rounded text-[9px] font-mono font-bold uppercase tracking-wider border ${s.failure ? "border-red-500/40 text-red-400 bg-red-500/10" : "border-emerald-500/40 text-emerald-400 bg-emerald-500/10"}`}
+                >
+                  {s.failure ? <AlertTriangle className="w-2.5 h-2.5" /> : <ShieldCheck className="w-2.5 h-2.5" />}
+                  {s.scenario.replace(/_/g, " ")} · {s.score}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Unified Page ─────────────────────────────────────────────────────────────
 
-type Tab = "signals" | "pipeline";
+type Tab = "signals" | "pipeline" | "on-demand";
 
 export default function QuantSignals() {
   const [tab, setTab] = useState<Tab>("signals");
@@ -826,7 +1111,7 @@ export default function QuantSignals() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">Quant Signals</h1>
-                <p className="text-sm text-white/50">Automated strategy-discovery engine · Multi-model evaluation pipeline</p>
+                <p className="text-sm text-white/50">Automated strategy-discovery engine · Multi-model evaluation pipeline · On-demand crypto & equity analysis</p>
               </div>
             </div>
 
@@ -835,6 +1120,7 @@ export default function QuantSignals() {
               {([
                 { id: "signals" as Tab, label: "Strategy Signals", icon: Activity },
                 { id: "pipeline" as Tab, label: "Evaluation Pipeline", icon: Layers },
+                { id: "on-demand" as Tab, label: "On-Demand Eval", icon: Zap },
               ]).map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
@@ -848,7 +1134,7 @@ export default function QuantSignals() {
             </div>
 
             {/* Tab content */}
-            {tab === "signals" ? <SignalsTab /> : <PipelineTab />}
+            {tab === "signals" ? <SignalsTab /> : tab === "pipeline" ? <PipelineTab /> : <OnDemandTab />}
 
           </div>
         </div>

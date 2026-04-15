@@ -653,4 +653,136 @@ router.get("/evaluate/:strategyId/versions/compare", requireAuth, async (req: Au
   }
 });
 
+router.get("/evaluate/strategies", requireAuth, async (req: AuthenticatedRequest, res) => {
+  try {
+    const userId = await resolveUserId(req.userId, req);
+    const strategies = await db
+      .select({
+        id: customStrategiesTable.id,
+        name: customStrategiesTable.name,
+        description: customStrategiesTable.description,
+        createdAt: customStrategiesTable.createdAt,
+        updatedAt: customStrategiesTable.updatedAt,
+      })
+      .from(customStrategiesTable)
+      .where(eq(customStrategiesTable.userId, userId))
+      .orderBy(desc(customStrategiesTable.updatedAt))
+      .limit(100);
+    res.json({ strategies });
+  } catch (err) {
+    logger.error({ err }, "GET /evaluate/strategies failed");
+    res.status(500).json({ error: "Failed to fetch strategies" });
+  }
+});
+
+const onDemandEvalSchema = z.object({
+  strategy_id: z.number().int().positive(),
+  context: z.object({
+    asset: z.string().min(1).max(20),
+    timeframe: z.string().default("1Day"),
+    market_state: z.enum(["trending", "ranging", "volatile", "unknown"]).default("unknown"),
+    timestamp: z.string().optional(),
+  }),
+});
+
+function deriveRecommendation(scoreTotal: number, confidence: number, stressResults: { failure: boolean; scenario: string }[]): string {
+  const failedCount = stressResults.filter(s => s.failure).length;
+  const stressRatio = stressResults.length > 0 ? failedCount / stressResults.length : 0;
+
+  if (scoreTotal >= 78 && confidence >= 0.75 && stressRatio < 0.3) return "strong_buy";
+  if (scoreTotal >= 65 && confidence >= 0.60 && stressRatio < 0.5) return "buy";
+  if (scoreTotal >= 50 && stressRatio < 0.7) return "hold";
+  if (scoreTotal >= 40) return "reduce";
+  return "avoid";
+}
+
+router.post("/evaluate/on-demand", requireAuth, validateBody(onDemandEvalSchema), async (req: AuthenticatedRequest, res) => {
+  try {
+    const userId = await resolveUserId(req.userId, req);
+    const { strategy_id, context } = req.body as z.infer<typeof onDemandEvalSchema>;
+    const asset = context.asset.toUpperCase();
+    const timeframe = context.timeframe ?? "1Day";
+
+    const [strategy] = await db
+      .select()
+      .from(customStrategiesTable)
+      .where(and(eq(customStrategiesTable.id, strategy_id), eq(customStrategiesTable.userId, userId)))
+      .limit(1);
+
+    if (!strategy) {
+      return res.status(404).json({ error: "Strategy not found or access denied" });
+    }
+
+    const config = strategy.config as CustomStrategyConfig | null;
+    if (!config || typeof config !== "object") {
+      return res.status(400).json({ error: "Strategy has no evaluable configuration" });
+    }
+
+    const ohlcvMap = await fetchStockUniverse([asset], timeframe);
+    const ohlcv = ohlcvMap.get(asset);
+    if (!ohlcv || ohlcv.closes.length < 60) {
+      return res.status(422).json({
+        error: "Insufficient market data",
+        detail: `Fetched ${ohlcv?.closes.length ?? 0} bars for ${asset}; need at least 60`,
+      });
+    }
+
+    const scores = computeModelScores(ohlcv, config);
+    const score_total = parseFloat(totalScore(scores));
+    const confidence = computeConfidence(scores);
+
+    const stressScenarios = ["high_volatility", "low_liquidity", "flash_crash", "trend_reversal", "sideways"];
+    const stressResults = runStressTest(ohlcv, config, stressScenarios);
+
+    const recommendation = deriveRecommendation(score_total, confidence, stressResults);
+
+    const modelDetails = (Object.keys(scores) as (keyof typeof scores)[]).reduce(
+      (acc, key) => {
+        acc[key] = { score: scores[key], name: MODEL_NAMES[key] };
+        return acc;
+      },
+      {} as Record<string, { score: number; name: string }>,
+    );
+
+    const worstDrawdown = stressResults.reduce((max, s) => Math.max(max, s.max_drawdown), 0);
+    const failureRegimes = stressResults.filter(s => s.failure).map(s => s.scenario);
+
+    logger.info(
+      { userId, strategy_id, asset, timeframe, score_total, confidence, recommendation },
+      "On-demand evaluation complete",
+    );
+
+    res.json({
+      strategy_id,
+      asset,
+      timeframe,
+      market_state: context.market_state,
+      evaluated_at: new Date().toISOString(),
+      scores: {
+        M1: scores.M1,
+        M2: scores.M2,
+        M3: scores.M3,
+        M4: scores.M4,
+        M5: scores.M5,
+        M6: scores.M6,
+      },
+      model_details: modelDetails,
+      score_total,
+      confidence,
+      stress: {
+        results: stressResults,
+        worst_drawdown: +(worstDrawdown.toFixed(2)),
+        failure_regimes: failureRegimes,
+        passed: stressResults.length - failureRegimes.length,
+        total: stressResults.length,
+      },
+      recommendation,
+      data_points: ohlcv.closes.length,
+    });
+  } catch (err) {
+    logger.error({ err }, "POST /evaluate/on-demand failed");
+    res.status(500).json({ error: "On-demand evaluation failed" });
+  }
+});
+
 export default router;

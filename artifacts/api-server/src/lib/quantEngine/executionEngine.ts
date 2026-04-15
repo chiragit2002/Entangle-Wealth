@@ -10,8 +10,13 @@ const __dirname = path.dirname(__currentFile);
 
 const ALPACA_DATA_URL = "https://data.alpaca.markets";
 const BATCH_SIZE = 10;
+const CRYPTO_BATCH_SIZE = 5;
 const WORKER_COUNT = 8;
 const BARS_LIMIT = 200;
+
+export function isCryptoSymbol(symbol: string): boolean {
+  return symbol.includes("/");
+}
 
 function getAlpacaHeaders(): Record<string, string> {
   const candidates = [
@@ -72,7 +77,47 @@ async function fetchBarsForSymbols(symbols: string[], timeframe = "1Day"): Promi
       result.set(symbol, ohlcv);
     }
   } catch (err) {
-    logger.error({ err, symbols: symbols.slice(0, 3) }, "Quant engine: bars fetch failed");
+    logger.error({ err, symbols: symbols.slice(0, 3) }, "Quant engine: equity bars fetch failed");
+  }
+
+  return result;
+}
+
+async function fetchCryptoBarsForSymbols(symbols: string[], timeframe = "1Day"): Promise<Map<string, OHLCVData>> {
+  const result = new Map<string, OHLCVData>();
+  if (symbols.length === 0) return result;
+
+  const tf = alpacaTimeframe(timeframe);
+  const url = `${ALPACA_DATA_URL}/v1beta3/crypto/us/bars?symbols=${encodeURIComponent(symbols.join(","))}&timeframe=${tf}&limit=${BARS_LIMIT}&sort=asc`;
+
+  try {
+    const res = await fetch(url, {
+      headers: getAlpacaHeaders(),
+      signal: AbortSignal.timeout(15_000),
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      logger.warn({ status: res.status, body }, "Quant engine: crypto bars fetch non-OK");
+      return result;
+    }
+
+    const data = await res.json() as { bars?: Record<string, { o: number; h: number; l: number; c: number; v: number; t: string }[]> };
+    const bars = data.bars ?? {};
+
+    for (const [symbol, barList] of Object.entries(bars)) {
+      if (barList.length < 60) continue;
+      const ohlcv: OHLCVData = {
+        opens: barList.map(b => b.o),
+        highs: barList.map(b => b.h),
+        lows: barList.map(b => b.l),
+        closes: barList.map(b => b.c),
+        volumes: barList.map(b => b.v),
+      };
+      result.set(symbol, ohlcv);
+    }
+  } catch (err) {
+    logger.error({ err, symbols: symbols.slice(0, 3) }, "Quant engine: crypto bars fetch failed");
   }
 
   return result;
@@ -80,22 +125,37 @@ async function fetchBarsForSymbols(symbols: string[], timeframe = "1Day"): Promi
 
 export async function fetchStockUniverse(symbols: string[], timeframe = "1Day"): Promise<Map<string, OHLCVData>> {
   const allData = new Map<string, OHLCVData>();
-  const batches: string[][] = [];
 
-  for (let i = 0; i < symbols.length; i += BATCH_SIZE) {
-    batches.push(symbols.slice(i, i + BATCH_SIZE));
+  const equitySymbols = symbols.filter(s => !isCryptoSymbol(s));
+  const cryptoSymbols = symbols.filter(s => isCryptoSymbol(s));
+
+  const equityBatches: string[][] = [];
+  for (let i = 0; i < equitySymbols.length; i += BATCH_SIZE) {
+    equityBatches.push(equitySymbols.slice(i, i + BATCH_SIZE));
   }
 
-  logger.info({ totalSymbols: symbols.length, batches: batches.length, timeframe }, "Quant engine: fetching OHLCV data");
+  const cryptoBatches: string[][] = [];
+  for (let i = 0; i < cryptoSymbols.length; i += CRYPTO_BATCH_SIZE) {
+    cryptoBatches.push(cryptoSymbols.slice(i, i + CRYPTO_BATCH_SIZE));
+  }
 
-  for (let i = 0; i < batches.length; i++) {
-    const batch = batches[i];
-    const batchData = await fetchBarsForSymbols(batch, timeframe);
+  logger.info({
+    totalSymbols: symbols.length,
+    equityBatches: equityBatches.length,
+    cryptoBatches: cryptoBatches.length,
+    timeframe,
+  }, "Quant engine: fetching OHLCV data");
+
+  for (let i = 0; i < equityBatches.length; i++) {
+    const batchData = await fetchBarsForSymbols(equityBatches[i], timeframe);
     for (const [sym, data] of batchData) allData.set(sym, data);
+    if (i < equityBatches.length - 1) await sleep(300);
+  }
 
-    if (i < batches.length - 1) {
-      await sleep(300);
-    }
+  for (let i = 0; i < cryptoBatches.length; i++) {
+    const batchData = await fetchCryptoBarsForSymbols(cryptoBatches[i], timeframe);
+    for (const [sym, data] of batchData) allData.set(sym, data);
+    if (i < cryptoBatches.length - 1) await sleep(300);
   }
 
   logger.info({ fetched: allData.size, requested: symbols.length }, "Quant engine: OHLCV fetch complete");

@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { logger } from "../logger";
 import { RegimeAgent } from "./RegimeAgent";
 import { VolatilityAgent } from "./VolatilityAgent";
@@ -23,6 +24,8 @@ import { runStressEngine } from "../quant/stressEngine";
 import { runAllModels } from "../quant/models";
 import { ingestStrategy } from "../quant/ingest";
 import type { OHLCVData } from "../quantEngine/strategyGenerator";
+import { checkAndMarkIdempotency } from "./TradeExecutionGuard";
+import type { IdempotencyGuardResult } from "./TradeExecutionGuard";
 
 export interface OrchestratorInput {
   strategyId: string;
@@ -49,6 +52,7 @@ export interface OrchestratorResult {
   driftRecommendation: string;
   learnedBlock: boolean;
   learnedInsight: string | null;
+  idempotencyGuard: IdempotencyGuardResult;
   stageTimings: {
     marketAnalysisMs: number;
     evaluationMs: number;
@@ -107,6 +111,43 @@ export class Orchestrator {
   async runCycle(input: OrchestratorInput): Promise<OrchestratorResult> {
     const totalStart = Date.now();
     const { strategyId, symbol, timeframe, action, ohlcv } = input;
+
+    // Step 0: Idempotency guard — key = hash(strategyId + closesFingerprint) per spec; closes array fingerprint is the stable per-candle discriminator (OHLCVData has no raw timestamps)
+    const closesFingerprint = ohlcv.closes.length > 0
+      ? crypto.createHash("sha256").update(ohlcv.closes.join(",")).digest("hex").slice(0, 16)
+      : `ts:${totalStart}`;
+    const idempotencyGuard = await checkAndMarkIdempotency(`orch:${strategyId}:${closesFingerprint}`, 0);
+    if (!idempotencyGuard.allowed) {
+      logger.info({ strategyId, symbol, key: idempotencyGuard.key }, "[Orchestrator] Idempotency guard: returning rejection for already-processed execution");
+      const stubDecision: ExecutionDecision = {
+        strategyId,
+        symbol,
+        action: "HOLD",
+        score: 0,
+        confidence: 0,
+        rationale: `[IDEMPOTENCY] ${idempotencyGuard.reason} — key: ${idempotencyGuard.key}`,
+        inputs: { evaluationScore: 0, stressResilienceScore: 0, riskLevel: "HIGH", regimeBonus: 0, liquidityPenalty: 0, volatilityPenalty: 0 },
+      };
+      const stubKillSwitch: KillSwitchResult = { decision: "ALLOW", triggered: false, reasons: [], stressScore: 0, contextScore: 0, overallRiskScore: 0 };
+      const stubRegime: RegimeResult = { symbol, regime: "sideways", confidence: 0, adx: 0, trendStrength: 0, volatilityRatio: 0 };
+      const stubVolatility: VolatilityMetrics = { symbol, atr: 0, atrPct: 0, stdDev20: 0, stdDevPct: 0, bollingerWidth: 0, bollingerWidthPct: 0, regime: "moderate", score: 0 };
+      const stubLiquidity: LiquidityScore = { symbol, volumeRatio: 0, averageVolume: 0, currentVolume: 0, estimatedSpreadBps: 0, liquidityTier: "medium", score: 0, tradeable: true };
+      return {
+        strategyId,
+        symbol,
+        timeframe,
+        decision: stubDecision,
+        killSwitch: stubKillSwitch,
+        allocation: null,
+        marketContext: { regime: stubRegime, volatility: stubVolatility, liquidity: stubLiquidity },
+        ensembleConsensus: "none",
+        driftRecommendation: "none",
+        learnedBlock: false,
+        learnedInsight: null,
+        idempotencyGuard,
+        stageTimings: { marketAnalysisMs: 0, evaluationMs: 0, riskMs: 0, executionMs: 0, killSwitchMs: 0, totalMs: Date.now() - totalStart },
+      };
+    }
 
     // Step 1: Parallel market analysis — Regime, Volatility, Liquidity
     const t1 = Date.now();
@@ -296,6 +337,7 @@ export class Orchestrator {
       driftRecommendation: driftReport.recommendation,
       learnedBlock,
       learnedInsight,
+      idempotencyGuard,
       stageTimings: {
         marketAnalysisMs,
         evaluationMs,

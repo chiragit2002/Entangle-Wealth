@@ -10,6 +10,7 @@ import { validateBody, z } from "../lib/validateRequest";
 import { getLivePrice, getLivePrices, getFreshPrice } from "../lib/priceService";
 import { eventBus } from "../lib/agents/EventBus";
 import { emitEvent, emitTradeEvents, EventTypes, maybeCreateSnapshot } from "../lib/eventSourcing/index.js";
+import { checkPositionDedup, checkExposureBreaker, checkAndMarkIdempotency } from "../lib/agents/TradeExecutionGuard";
 import type { InferSelectModel } from "drizzle-orm";
 
 type DbPosition = InferSelectModel<typeof paperPositionsTable>;
@@ -222,6 +223,7 @@ const TradeSchema = z.object({
   limitPrice: z.number().positive().optional(),
   stopPrice: z.number().positive().optional(),
   expiresAt: z.string().datetime().optional(),
+  idempotencyKey: z.string().min(1).max(128).optional(),
 });
 
 router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), async (req, res) => {
@@ -233,7 +235,7 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
       return;
     }
 
-    const { symbol, side, quantity, orderType = "market", limitPrice, stopPrice, expiresAt } = req.body;
+    const { symbol, side, quantity, orderType = "market", limitPrice, stopPrice, expiresAt, idempotencyKey: clientIdempotencyKey } = req.body;
     const qty = Math.floor(Number(quantity));
     const upperSymbol = symbol.toUpperCase();
 
@@ -245,6 +247,32 @@ router.post("/paper-trading/trade", requireAuth, validateBody(TradeSchema), asyn
         error: `Market data temporarily unavailable — trading paused for ${upperSymbol}. Please try again shortly.`,
         marketDataUnavailable: true,
       });
+      return;
+    }
+
+    const tradeSide = side as "buy" | "sell" | "short_sell" | "short_cover";
+
+    const scopedKey = clientIdempotencyKey
+      ? `trade:${dbUserId}:${clientIdempotencyKey}`
+      : `trade:${dbUserId}:${upperSymbol}:${tradeSide}:${Math.floor(Date.now() / 60000)}`;
+    const idempotencyResult = await checkAndMarkIdempotency(scopedKey, 0);
+    if (!idempotencyResult.allowed) {
+      res.status(200).json({ status: "rejected", reason: "already processed", symbol: upperSymbol, side, idempotencyKey: idempotencyResult.key });
+      return;
+    }
+
+    const [positionCheck, exposureCheck] = await Promise.all([
+      checkPositionDedup(dbUserId, upperSymbol, tradeSide),
+      checkExposureBreaker(dbUserId, tradeSide),
+    ]);
+
+    if (!positionCheck.allowed) {
+      res.status(200).json({ status: "skipped", reason: "already in position", symbol: upperSymbol, side, existingQuantity: positionCheck.existingQuantity });
+      return;
+    }
+
+    if (!exposureCheck.allowed) {
+      res.status(200).json({ status: "blocked", reason: exposureCheck.reason, symbol: upperSymbol, side, exposurePct: exposureCheck.exposurePct });
       return;
     }
 
@@ -299,6 +327,28 @@ async function executeMarketOrder(
         .values({ userId: dbUserId, cashBalance: DEFAULT_STARTING_CASH })
         .returning();
       currentCash = created.cashBalance;
+    }
+
+    if (side === "buy" || side === "short_sell") {
+      const posResult = await tx.execute<{ quantity: string }>(
+        sql`SELECT quantity FROM paper_positions WHERE user_id = ${dbUserId} AND symbol = ${upperSymbol} FOR UPDATE`
+      );
+      const posRows = Array.isArray(posResult) ? posResult : (posResult as { rows: { quantity: string }[] }).rows ?? [];
+      const existingQty = posRows.length > 0 ? Number(posRows[0].quantity) : 0;
+      if (existingQty !== 0) {
+        return { error: "> POSITION ALREADY EXISTS — duplicate position open blocked", guardRejected: "position_dedup" };
+      }
+
+      const expResult = await tx.execute<{ positions_value: string }>(
+        sql`SELECT COALESCE(SUM(ABS(quantity) * avg_cost), 0)::numeric AS positions_value
+            FROM paper_positions WHERE user_id = ${dbUserId} AND quantity != 0`
+      );
+      const expRows = Array.isArray(expResult) ? expResult : (expResult as { rows: { positions_value: string }[] }).rows ?? [];
+      const posVal = Number(expRows[0]?.positions_value ?? 0);
+      const total = currentCash + posVal;
+      if (total > 0 && posVal / total >= 0.80) {
+        return { error: `> EXPOSURE LIMIT REACHED — portfolio exposure ${(posVal / total * 100).toFixed(1)}% exceeds 80%`, guardRejected: "exposure_breaker" };
+      }
     }
 
     if (side === "buy") {
@@ -742,6 +792,26 @@ export async function evaluatePendingOrders() {
       }
 
       if (!shouldFill) continue;
+
+      const fillSide = order.side as "buy" | "sell" | "short_sell" | "short_cover";
+      const [fillPosCheck, fillExpCheck] = await Promise.all([
+        checkPositionDedup(order.userId, order.symbol, fillSide),
+        checkExposureBreaker(order.userId, fillSide),
+      ]);
+
+      if (!fillPosCheck.allowed || !fillExpCheck.allowed) {
+        const guardReason = !fillPosCheck.allowed ? "position_dedup" : "exposure_breaker";
+        logger.info({ orderId: order.id, symbol: order.symbol, side: order.side, guardReason }, "Pending order fill blocked by pre-trade guard — rejecting");
+        await db.update(paperOrdersTable)
+          .set({ status: "rejected", updatedAt: now })
+          .where(eq(paperOrdersTable.id, order.id));
+        if (order.reservedCash > 0) {
+          await db.execute(
+            sql`UPDATE paper_portfolios SET cash_balance = cash_balance + ${order.reservedCash}, updated_at = NOW() WHERE user_id = ${order.userId}`
+          );
+        }
+        continue;
+      }
 
       await db.update(paperOrdersTable)
         .set({ status: "filled", filledAt: now, filledPrice: price, updatedAt: now })

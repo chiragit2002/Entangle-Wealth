@@ -56,6 +56,7 @@
     "rss-parser": "^3.13.0",
     "sharp": "^0.34.5",
     "web-push": "^3.6.7",
+    "ws": "^8.20.0",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -65,6 +66,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "catalog:",
     "@types/web-push": "^3.6.4",
+    "@types/ws": "^8.18.1",
     "autocannon": "^8.0.0",
     "esbuild": "^0.27.3",
     "esbuild-plugin-pino": "^2.3.3",

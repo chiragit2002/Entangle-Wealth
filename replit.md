@@ -63,6 +63,7 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **Health Endpoint**: Public `/health` and `/healthz`, detailed `/health/detailed` behind auth.
 - **Integrations**: Stripe webhook endpoint, Zapier webhook.
 - **Data Proxies**: Alpaca Markets API proxy with circuit breaker and exponential backoff.
+- **Market Data Pipeline** (`livePriceBroadcaster.ts`): 3-layer architecture — Layer 1: Alpaca WebSocket (`wss://stream.data.alpaca.markets/v2/iex`) with auto-auth, watchdog, and exponential backoff reconnect. Layer 2: REST polling fallback (auto-activates when WS drops/errors). Layer 3: Unified in-memory price cache with monotonic version counter. `priceService.ts` reads from unified cache first, on-demand fetch on miss. SSE streaming via `/api/price-stream?symbols=` with 100ms throttle, per-IP connection limits, heartbeat. REST: `GET /api/prices?tickers=`, `GET /api/prices/pipeline` (status). `ws` package externalized in `build.mjs`.
 - **News Intelligence**: `/api/news` endpoint with RSS scraping, sentiment analysis, caching.
 - **Performance**: Metrics middleware, AI request queuing, circuit breakers for external APIs, image compression.
 - **Routes**: Comprehensive API routes for all platform features.

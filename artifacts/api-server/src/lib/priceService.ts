@@ -1,6 +1,6 @@
 import { TTLCache } from "./cache";
 import { logger } from "./logger";
-import { getLatestPrice, getLatestPrices } from "./livePriceBroadcaster";
+import { getLatestPrice, getLatestPrices, fetchPricesFromAlpaca } from "./livePriceBroadcaster";
 
 const ALPACA_DATA_URL = "https://data.alpaca.markets";
 
@@ -35,6 +35,17 @@ export async function getLivePrice(symbol: string): Promise<number | null> {
   if (cached !== undefined) return cached;
 
   try {
+    await fetchPricesFromAlpaca([upperSymbol]);
+    const fresh = getLatestPrice(upperSymbol);
+    if (fresh && fresh.price > 0) {
+      PRICE_CACHE.set(cacheKey, fresh.price);
+      return fresh.price;
+    }
+  } catch (err) {
+    logger.debug({ err, symbol: upperSymbol }, "On-demand price fetch failed");
+  }
+
+  try {
     const res = await fetch(`${ALPACA_DATA_URL}/v2/stocks/${upperSymbol}/snapshot`, {
       headers: getAlpacaHeaders(),
       signal: AbortSignal.timeout(5_000),
@@ -65,6 +76,18 @@ export async function getLivePrice(symbol: string): Promise<number | null> {
 
 export async function getFreshPrice(symbol: string): Promise<number | null> {
   const upperSymbol = symbol.toUpperCase();
+
+  const broadcasted = getLatestPrice(upperSymbol);
+  if (broadcasted && broadcasted.price > 0 && Date.now() - broadcasted.timestamp < 5_000) {
+    return broadcasted.price;
+  }
+
+  try {
+    await fetchPricesFromAlpaca([upperSymbol]);
+    const fresh = getLatestPrice(upperSymbol);
+    if (fresh && fresh.price > 0) return fresh.price;
+  } catch (_) {}
+
   try {
     const res = await fetch(`${ALPACA_DATA_URL}/v2/stocks/${upperSymbol}/snapshot`, {
       headers: getAlpacaHeaders(),
@@ -117,34 +140,16 @@ export async function getLivePrices(symbols: string[]): Promise<Record<string, n
   if (uncached.length === 0) return result;
 
   try {
-    const res = await fetch(
-      `${ALPACA_DATA_URL}/v2/stocks/snapshots?symbols=${encodeURIComponent(uncached.join(","))}`,
-      {
-        headers: getAlpacaHeaders(),
-        signal: AbortSignal.timeout(8_000),
-      },
-    );
-
-    if (!res.ok) {
-      logger.warn({ status: res.status }, "Alpaca multi-snapshot returned non-OK for price lookup");
-      return result;
-    }
-
-    const data = await res.json() as Record<string, any>;
-    for (const [symbol, snap] of Object.entries(data)) {
-      const s = snap as Record<string, any>;
-      const price: number | null =
-        s.minuteBar?.c ||
-        s.latestTrade?.p ||
-        s.dailyBar?.c ||
-        null;
-      if (price && price > 0) {
-        PRICE_CACHE.set(`price:${symbol}`, price);
-        result[symbol] = price;
+    await fetchPricesFromAlpaca(uncached);
+    for (const sym of uncached) {
+      const fresh = getLatestPrice(sym);
+      if (fresh && fresh.price > 0) {
+        result[sym] = fresh.price;
+        PRICE_CACHE.set(`price:${sym}`, fresh.price);
       }
     }
   } catch (err) {
-    logger.error({ err }, "Failed to batch-fetch live prices from Alpaca");
+    logger.error({ err }, "Failed to batch-fetch live prices");
   }
 
   return result;

@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { logger } from "../lib/logger";
-import { subscribeToSymbols, type PriceUpdate } from "../lib/livePriceBroadcaster";
+import { subscribeToSymbols, getCachedPricesWithVersion, getPipelineStatus, fetchPricesFromAlpaca, type PriceUpdate } from "../lib/livePriceBroadcaster";
 
 const router = Router();
 
@@ -8,6 +8,7 @@ const MAX_SYMBOLS = 50;
 const HEARTBEAT_MS = 20_000;
 const STREAM_MAX_CONNECTIONS = 2000;
 const MAX_CONNECTIONS_PER_IP = 5;
+const SSE_THROTTLE_MS = 100;
 
 let activeConnections = 0;
 const connectionsByIp = new Map<string, number>();
@@ -33,6 +34,39 @@ function sanitizeSymbols(raw: string): string[] {
     .filter(s => s.length > 0)
     .slice(0, MAX_SYMBOLS);
 }
+
+router.get("/prices", async (req: Request, res: Response) => {
+  const tickersRaw = (req.query.tickers as string) || (req.query.symbols as string) || "";
+
+  if (!tickersRaw.trim()) {
+    res.status(400).json({ error: "tickers query param required (comma-separated)" });
+    return;
+  }
+
+  const tickers = sanitizeSymbols(tickersRaw);
+  if (tickers.length === 0) {
+    res.status(400).json({ error: "No valid tickers provided" });
+    return;
+  }
+
+  let prices = getCachedPricesWithVersion(tickers);
+
+  const uncached = tickers.filter(t => !(t in prices));
+  if (uncached.length > 0) {
+    try {
+      await fetchPricesFromAlpaca(uncached);
+      prices = getCachedPricesWithVersion(tickers);
+    } catch (err) {
+      logger.debug({ err }, "On-demand price fetch for /prices endpoint failed");
+    }
+  }
+
+  res.json(prices);
+});
+
+router.get("/prices/pipeline", (_req: Request, res: Response) => {
+  res.json(getPipelineStatus());
+});
 
 router.get("/price-stream", (req: Request, res: Response) => {
   const symbolsRaw = (req.query.symbols as string) || "";
@@ -76,15 +110,39 @@ router.get("/price-stream", (req: Request, res: Response) => {
   flushSse(res);
 
   let closed = false;
+  let pendingUpdates: PriceUpdate[] = [];
+  let throttleTimer: ReturnType<typeof setTimeout> | null = null;
 
-  const unsubscribe = subscribeToSymbols(symbols, (updates: PriceUpdate[]) => {
-    if (closed) return;
+  function flushPending() {
+    if (closed || pendingUpdates.length === 0) return;
+
+    const latestBySymbol = new Map<string, PriceUpdate>();
+    for (const u of pendingUpdates) {
+      latestBySymbol.set(u.symbol, u);
+    }
+    pendingUpdates = [];
+
     try {
-      const payload = JSON.stringify({ type: "prices", data: updates });
+      const payload = JSON.stringify({
+        type: "prices",
+        data: Array.from(latestBySymbol.values()),
+      });
       res.write(`data: ${payload}\n\n`);
       flushSse(res);
     } catch (err) {
       logger.debug({ err }, "Price stream write error");
+    }
+  }
+
+  const unsubscribe = subscribeToSymbols(symbols, (updates: PriceUpdate[]) => {
+    if (closed) return;
+    pendingUpdates.push(...updates);
+
+    if (!throttleTimer) {
+      throttleTimer = setTimeout(() => {
+        throttleTimer = null;
+        flushPending();
+      }, SSE_THROTTLE_MS);
     }
   });
 
@@ -100,6 +158,7 @@ router.get("/price-stream", (req: Request, res: Response) => {
 
   req.on("close", () => {
     closed = true;
+    if (throttleTimer) { clearTimeout(throttleTimer); throttleTimer = null; }
     clearInterval(heartbeat);
     unsubscribe();
     activeConnections = Math.max(0, activeConnections - 1);

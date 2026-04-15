@@ -20,7 +20,7 @@ export function Layout({ children }: LayoutProps) {
       </a>
       <SystemStatusBar />
       <Navbar />
-      <main id="main-content" role="main" className="flex-1 flex flex-col z-10 w-full relative pb-20 lg:pb-0">
+      <main id="main-content" role="main" className="flex-1 flex flex-col z-10 w-full relative main-content-mobile-pad">
         {children}
       </main>
       <Footer />

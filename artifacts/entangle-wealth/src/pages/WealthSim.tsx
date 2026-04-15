@@ -173,14 +173,14 @@ function WizardStep({ step, title, subtitle, children, onNext, onBack, isLast = 
       <div className="space-y-5">{children}</div>
       <div className="flex items-center gap-3 pt-2">
         {onBack && (
-          <button onClick={onBack} className="flex items-center gap-1 px-4 py-2.5 text-[11px] font-mono font-bold text-white/40 hover:text-white/70 transition-colors">
+          <button onClick={onBack} className="flex items-center gap-1 px-4 min-h-[44px] text-[11px] font-mono font-bold text-white/40 hover:text-white/70 transition-colors">
             <ChevronLeft className="w-3.5 h-3.5" /> Back
           </button>
         )}
         <button
           onClick={onNext}
           disabled={!canProceed}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#00B4D8] text-black font-bold text-[11px] font-mono uppercase tracking-widest rounded-sm hover:bg-[#00B4D8]/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex-1 flex items-center justify-center gap-2 min-h-[44px] bg-[#00B4D8] text-black font-bold text-[11px] font-mono uppercase tracking-widest rounded-sm hover:bg-[#00B4D8]/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isLast ? (
             <><Sparkles className="w-3.5 h-3.5" /> Run Simulation</>
@@ -501,10 +501,13 @@ export default function WealthSim() {
           )}
         </div>
 
-        {isOfflineMode && (
+        {(isOfflineMode || !isSignedIn) && (
           <div className="flex items-center gap-2 px-4 py-2 bg-yellow-500/5 border-b border-yellow-500/15 text-[11px] font-mono text-yellow-400/80">
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-            <span>Running in offline mode — projections are calculated locally. Your XP and milestones will sync when the connection is restored.</span>
+            {isOfflineMode
+              ? <span><span className="font-bold text-yellow-400">OFFLINE — ESTIMATED</span> · Projections are calculated locally using your inputs. Results are estimates only. Your XP and milestones will sync when the connection is restored.</span>
+              : <span><span className="font-bold text-yellow-400">ESTIMATED · GUEST MODE</span> · Projections are calculated locally using example values. Sign in to save your profile and earn XP.</span>
+            }
           </div>
         )}
 
@@ -552,6 +555,12 @@ export default function WealthSim() {
                   onNext={() => setWizardStep(2)}
                   onBack={() => setWizardStep(0)}
                 >
+                  {!isSignedIn && (
+                    <div className="flex items-start gap-2 bg-white/[0.03] border border-white/[0.06] rounded-sm p-2.5">
+                      <Info className="w-3 h-3 text-white/30 shrink-0 mt-0.5" />
+                      <span className="text-[9px] font-mono text-white/40 leading-relaxed">These are <span className="text-white/60 font-bold">example starting values</span> — adjust all sliders to match your actual situation for accurate projections.</span>
+                    </div>
+                  )}
                   <Slider label="Annual Income" value={profile.annualIncome} min={20000} max={500000} step={1000} unit="$" onChange={v => handleProfileChange("annualIncome", v)} color="#00B4D8" tip="Your gross annual income before taxes" />
                   <Slider label="Monthly Expenses" value={profile.monthlyExpenses} min={500} max={20000} step={100} unit="$" onChange={v => handleProfileChange("monthlyExpenses", v)} color="#ff6b35" tip="Total monthly spending excluding savings/investments" />
                   <Slider label="Current Savings" value={profile.currentSavings} min={0} max={500000} step={1000} unit="$" onChange={v => handleProfileChange("currentSavings", v)} color="#00B4D8" tip="Your current savings/investment account balance" />
@@ -691,6 +700,12 @@ export default function WealthSim() {
                     </div>
                   )}
 
+                  {(isOfflineMode || !isSignedIn) && (
+                    <div className="flex items-center gap-1.5 px-2 py-1 bg-yellow-500/[0.06] border border-yellow-500/20 rounded-sm">
+                      <AlertCircle className="w-3 h-3 text-yellow-400/70 shrink-0" />
+                      <span className="text-[9px] font-mono text-yellow-400/70">ESTIMATED — these figures are simulated projections, not financial advice</span>
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 gap-3">
                     {[
                       { label: "Projected Net Worth", value: formatCurrency(finalNetWorth), color: "#00B4D8", icon: <TrendingUp className="w-3.5 h-3.5" />, sub: `in ${profile.timeHorizonYears} years` },
@@ -702,6 +717,7 @@ export default function WealthSim() {
                         <div className="flex items-center gap-1.5 mb-1">
                           <span style={{ color: card.color }}>{card.icon}</span>
                           <span className="text-[9px] font-mono text-white/40 uppercase tracking-widest">{card.label}</span>
+                          {(isOfflineMode || !isSignedIn) && <span className="text-[7px] font-mono font-bold text-yellow-400/60 border border-yellow-400/20 px-1 rounded-sm">EST</span>}
                         </div>
                         <div className="text-xl font-black font-mono" style={{ color: card.color }}>{card.value}</div>
                         <div className="text-[9px] text-white/25 font-mono">{card.sub}</div>

@@ -121,9 +121,9 @@ export default function Stocks() {
                   Search {totalCount > 0 ? totalCount.toLocaleString() : "5,000"} stocks — click any to run an analysis.
                 </p>
               </div>
-              <div className="flex items-center gap-2 text-xs text-white/25">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                Simulated prices
+              <div className="flex items-center gap-1.5 text-xs px-2 py-1 rounded bg-amber-500/5 border border-amber-500/20 text-amber-400/70">
+                <Globe className="w-3 h-3" />
+                <span className="font-mono text-[11px]">DELAYED · Reference catalog prices — not live market data</span>
               </div>
             </div>
 
@@ -221,6 +221,9 @@ export default function Stocks() {
                         <div className={`text-sm font-mono ${selectedStock.changePercent >= 0 ? "text-green-400" : "text-red-400"}`}>
                           {selectedStock.change >= 0 ? "+" : ""}{Math.abs(selectedStock.change).toFixed(2)} ({selectedStock.changePercent >= 0 ? "+" : ""}{Math.abs(selectedStock.changePercent).toFixed(2)}%)
                         </div>
+                        <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400/70">
+                          DELAYED
+                        </span>
                       </div>
                     </div>
 

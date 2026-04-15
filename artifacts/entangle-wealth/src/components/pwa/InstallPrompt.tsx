@@ -77,7 +77,7 @@ export function InstallPrompt() {
           </p>
           <button
             onClick={handleInstall}
-            className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-black transition-opacity hover:opacity-90"
+            className="mt-3 inline-flex items-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-lg text-xs font-semibold text-black transition-opacity hover:opacity-90"
             style={{ background: "linear-gradient(135deg, #00B4D8, #0099cc)" }}
           >
             <Download className="w-3.5 h-3.5" />
@@ -86,8 +86,8 @@ export function InstallPrompt() {
         </div>
         <button
           onClick={handleDismiss}
-          className="flex-shrink-0 p-1 rounded-lg text-white/40 hover:text-white/80 hover:bg-white/5 transition-colors"
-          aria-label="Dismiss"
+          className="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-lg text-white/40 hover:text-white/80 hover:bg-white/5 transition-colors"
+          aria-label="Dismiss install prompt"
         >
           <X className="w-4 h-4" />
         </button>

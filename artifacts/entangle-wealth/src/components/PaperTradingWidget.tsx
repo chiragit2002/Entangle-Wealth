@@ -147,7 +147,7 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
             <span className={`text-[10px] font-mono font-bold ${pnl >= 0 ? 'text-[#00B4D8]' : 'text-[#ff3366]'}`}>
               {pnl >= 0 ? '+' : ''}{pnlPct}%
             </span>
-            <button onClick={(e) => { e.stopPropagation(); setIsMinimized(true); }} className="text-white/50 hover:text-white/50 transition-colors">
+            <button onClick={(e) => { e.stopPropagation(); setIsMinimized(true); }} className="w-11 h-11 flex items-center justify-center text-white/50 hover:text-white/80 hover:bg-white/5 rounded transition-colors" aria-label="Minimize paper trading widget">
               <X className="w-3 h-3" />
             </button>
           </div>

@@ -64,24 +64,24 @@ function MobilePanelTabs({ activeTab, onTabChange }: { activeTab: MobileTab; onT
   };
 
   return (
-    <div className="flex items-center bg-[#040408] border-b border-white/[0.06] px-1 py-1 gap-0.5">
+    <div className="flex items-center bg-[#040408] border-b border-white/[0.06] px-1 gap-0.5 min-h-[44px]">
       <button
         onClick={goPrev}
         disabled={activeIndex === 0}
-        className="p-1.5 text-white/30 disabled:opacity-20 hover:text-white/60 transition-colors"
+        className="w-11 h-11 flex items-center justify-center text-white/30 disabled:opacity-20 hover:text-white/60 transition-colors flex-shrink-0"
         aria-label="Previous panel"
       >
         <ChevronLeft className="w-3.5 h-3.5" />
       </button>
       <div className="flex-1 flex overflow-x-auto no-scrollbar gap-0.5">
-        {MOBILE_TABS.map((tab, i) => {
+        {MOBILE_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = tab.key === activeTab;
           return (
             <button
               key={tab.key}
               onClick={() => onTabChange(tab.key)}
-              className={`flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-sm text-[9px] font-mono font-bold uppercase tracking-widest transition-all ${
+              className={`flex-shrink-0 flex items-center gap-1 px-2.5 min-h-[44px] rounded-sm text-[9px] font-mono font-bold uppercase tracking-widest transition-all ${
                 isActive
                   ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/30"
                   : "text-white/35 hover:text-white/60 border border-transparent"
@@ -97,7 +97,7 @@ function MobilePanelTabs({ activeTab, onTabChange }: { activeTab: MobileTab; onT
       <button
         onClick={goNext}
         disabled={activeIndex === MOBILE_TABS.length - 1}
-        className="p-1.5 text-white/30 disabled:opacity-20 hover:text-white/60 transition-colors"
+        className="w-11 h-11 flex items-center justify-center text-white/30 disabled:opacity-20 hover:text-white/60 transition-colors flex-shrink-0"
         aria-label="Next panel"
       >
         <ChevronRight className="w-3.5 h-3.5" />

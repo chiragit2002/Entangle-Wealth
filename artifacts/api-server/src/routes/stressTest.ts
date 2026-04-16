@@ -12,7 +12,7 @@ import { logger } from "../lib/logger";
 const router = Router();
 
 if (process.env.NODE_ENV === "production") {
-  router.all("*", (_req, res) => {
+  router.all("/{*path}", (_req, res) => {
     res.status(404).json({ error: "Not found" });
   });
 } else {

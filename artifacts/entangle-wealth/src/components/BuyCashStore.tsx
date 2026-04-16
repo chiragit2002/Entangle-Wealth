@@ -58,10 +58,10 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
         const data = await res.json();
         setPurchases(data);
       }
-    } catch (err) {
-      console.error("[BuyCashStore] Failed to load purchases:", err);
+    } catch {
+      toast({ title: "> HISTORY UNAVAILABLE", description: "Could not load purchase history.", variant: "destructive" });
     }
-  }, [isSignedIn, getToken]);
+  }, [isSignedIn, getToken, toast]);
 
   useEffect(() => {
     loadProducts();

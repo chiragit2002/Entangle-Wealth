@@ -33,7 +33,7 @@ export function WeeklyProgressCard() {
     authFetch("/gamification/weekly-summary", getToken)
       .then(r => r.ok ? r.json() : null)
       .then(data => { if (data) setSummary(data); })
-      .catch((err) => { console.error("[WeeklyProgressCard] Failed to load weekly summary:", err); });
+      .catch(() => {});
   }, [isLoaded, isSignedIn, getToken]);
 
   if (!isLoaded || !isSignedIn || !summary || dismissed) return null;

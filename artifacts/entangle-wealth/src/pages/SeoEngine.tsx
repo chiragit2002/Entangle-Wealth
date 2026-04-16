@@ -688,8 +688,7 @@ export default function SeoEngine() {
     try {
       const res = await authFetch("/marketing/agents", getToken);
       if (res.ok) setAuthorized(true);
-    } catch (err) {
-      console.error("[SeoEngine] Failed to check access:", err);
+    } catch {
     }
     setLoading(false);
   }, [getToken]);

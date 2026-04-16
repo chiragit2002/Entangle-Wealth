@@ -629,8 +629,7 @@ export default function AlternateTimeline() {
         const data = await res.json();
         setStage(data.stage as Stage);
       }
-    } catch (err) {
-      console.error("[AlternateTimeline] Failed to fetch identity stage:", err);
+    } catch {
     }
   }, [isSignedIn, getToken]);
 
@@ -641,21 +640,19 @@ export default function AlternateTimeline() {
       const res = await fetch(`${API_BASE}/timeline/saved`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) {
-        const data = await res.json();
-        setSavedTimelines(data);
-      }
-    } catch (err) {
-      console.error("[AlternateTimeline] Failed to fetch saved timelines:", err);
+      if (!res.ok) throw new Error("Failed");
+      const data = await res.json();
+      setSavedTimelines(data);
+    } catch {
+      toast({ title: "> TIMELINE FEED ERROR", description: "Could not load saved timelines. Your data is safe.", variant: "destructive" });
     }
-  }, [isSignedIn, getToken]);
+  }, [isSignedIn, getToken, toast]);
 
   const fetchWhatIfDecisions = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE}/timeline/what-if/decisions`);
       if (res.ok) setWhatIfDecisions(await res.json());
-    } catch (err) {
-      console.error("[AlternateTimeline] Failed to fetch what-if decisions:", err);
+    } catch {
     }
   }, []);
 

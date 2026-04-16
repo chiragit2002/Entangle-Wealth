@@ -428,8 +428,7 @@ export default function MarketingCenter() {
           setAiQueueStatus(data.aiQueue);
         }
       }
-    } catch (err) {
-      console.error("[MarketingCenter] Failed to fetch queue status:", err);
+    } catch {
     }
   }, [getToken]);
 
@@ -440,8 +439,7 @@ export default function MarketingCenter() {
         setAuthorized(true);
         fetchQueueStatus();
       }
-    } catch (err) {
-      console.error("[MarketingCenter] Failed to check access:", err);
+    } catch {
     }
     setLoading(false);
   }, [getToken, fetchQueueStatus]);

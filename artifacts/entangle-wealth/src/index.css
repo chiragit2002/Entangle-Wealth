@@ -1092,15 +1092,6 @@ a[href*="accounts.dev"] {
   display: none !important;
 }
 
-.cl-signIn-root .cl-footer,
-.cl-signUp-root .cl-footer {
-  background: transparent !important;
-}
-
-.cl-signIn-root .cl-footer > :last-child:not(:first-child),
-.cl-signUp-root .cl-footer > :last-child:not(:first-child) {
-  display: none !important;
-}
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

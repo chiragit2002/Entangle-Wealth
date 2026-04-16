@@ -172,8 +172,7 @@ export default function Achievements() {
       if (!anySuccess) {
         setLoadError("Failed to load your achievements. Showing demo data — your progress is safe.");
       }
-    } catch (err) {
-      console.error("[Achievements] Failed to load achievements data:", err);
+    } catch {
       setLoadError("Network error — couldn't reach the server. Your progress is saved and will appear when reconnected.");
     } finally {
       setIsLoading(false);

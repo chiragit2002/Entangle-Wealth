@@ -914,7 +914,7 @@ export default function Dashboard() {
               <div className="p-4">
                 {showTradePanel ? (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {[
                         { label: "Cash", value: `$${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: "text-primary" },
                         { label: "Positions", value: `$${portfolio.portfolioValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: "text-white/70" },
@@ -1058,7 +1058,7 @@ export default function Dashboard() {
                       />
                     );
                   }
-                  return <DataRow key={sym} label={sym} value="—" change={undefined} />;
+                  return <DataRow key={sym} label={sym} value="NO FEED" change={undefined} />;
                 })}
               </div>
             </Panel>

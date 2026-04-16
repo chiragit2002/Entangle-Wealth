@@ -171,8 +171,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
           setSegments(newSegments);
         }
       }
-    } catch (err) {
-      console.error("[DailySpinWheel] Failed to check spin status:", err);
+    } catch {
     }
   }, [getToken]);
 
@@ -252,7 +251,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
     <>
     <BigWinOverlay show={showBigWin} label="BIG WIN" onDone={() => setShowBigWin(false)} />
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 ">
-      <div className="relative w-[360px] bg-[#0A0E1A] border border-white/[0.1] rounded-xl shadow-2xl overflow-hidden">
+      <div className="relative w-[min(360px,calc(100vw-24px))] bg-[#0A0E1A] border border-white/[0.1] rounded-xl shadow-2xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#00B4D8]/5 via-transparent to-[#FFB800]/5 pointer-events-none" />
 
         <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">

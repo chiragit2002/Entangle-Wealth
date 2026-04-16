@@ -58,8 +58,7 @@ export function MilestoneCelebrationModal() {
             setReferralLink(`${window.location.origin}?ref=${data.code}`);
           }
         }
-      } catch (err) {
-        console.error("[MilestoneCelebrationModal] Failed to load milestone data:", err);
+      } catch {
       }
     };
     load();
@@ -74,8 +73,7 @@ export function MilestoneCelebrationModal() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ keys: [current.key] }),
       });
-    } catch (err) {
-      console.error("[MilestoneCelebrationModal] Failed to mark milestones seen:", err);
+    } catch {
     }
     setQueue((prev) => prev.slice(1));
     setCopied(false);

@@ -34,6 +34,8 @@ export const clerkAppearanceDark = {
     badge: "hidden",
     tagPrimaryButton: "hidden",
     devModeNotice: "hidden",
+    footer: "!bg-transparent",
+    footerPages: "!hidden",
   },
 };
 

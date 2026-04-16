@@ -67,8 +67,7 @@ export function PaperTradingWidget({ initialSymbol = "", initialPrice, variant =
           totalValue: data.totalValue ?? data.cashBalance,
         });
       }
-    } catch (err) {
-      console.error("[PaperTradingWidget] Failed to load portfolio:", err);
+    } catch {
     }
   }, [isSignedIn, getToken]);
 

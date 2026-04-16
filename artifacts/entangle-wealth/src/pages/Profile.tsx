@@ -181,8 +181,7 @@ function DataManagementSection() {
       a.click();
       URL.revokeObjectURL(url);
       toast({ title: "Export Complete", description: "Your data has been downloaded." });
-    } catch (err) {
-      console.error("Export error:", err);
+    } catch {
       toast({ title: "Export Failed", description: "Could not export your data. Please try again.", variant: "destructive" });
     } finally {
       setExporting(false);
@@ -201,8 +200,7 @@ function DataManagementSection() {
       if (!res.ok) throw new Error("Deletion failed");
       toast({ title: "Account Deleted", description: "Your account has been permanently deleted." });
       setTimeout(() => signOut(), 1500);
-    } catch (err) {
-      console.error("Account deletion error:", err);
+    } catch {
       toast({ title: "Deletion Failed", description: "Could not delete your account. Please try again.", variant: "destructive" });
     } finally {
       setDeleting(false);
@@ -306,7 +304,7 @@ function AlertDigestSettings() {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ frequency: val }),
-    }).catch((err: unknown) => console.error("Failed to update digest preference:", err));
+    }).catch(() => {});
   };
 
   if (!loaded) return null;
@@ -358,6 +356,7 @@ export default function Profile() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [profileLoadError, setProfileLoadError] = useState(false);
   const [kycForm, setKycForm] = useState({ fullLegalName: "", dateOfBirth: "", address: "", idType: "drivers_license", idNumber: "" });
   const [showKyc, setShowKyc] = useState(false);
   const [submittingKyc, setSubmittingKyc] = useState(false);
@@ -412,7 +411,7 @@ export default function Profile() {
           if (amb?.unlocked) setIsAmbassador(true);
         }
       })
-      .catch((err) => { console.error("[Profile] Failed to load referral milestones:", err); });
+      .catch(() => {});
   }, [userLoaded]);
 
   const loadProfile = async () => {
@@ -455,8 +454,8 @@ export default function Profile() {
           });
         }
       }
-    } catch (err) {
-      console.error("Failed to load profile:", err);
+    } catch {
+      setProfileLoadError(true);
     }
     setLoading(false);
   };
@@ -465,8 +464,7 @@ export default function Profile() {
     try {
       const res = await fetchAuth("/jobs/saved");
       if (res.ok) setSavedJobs(await res.json());
-    } catch (err) {
-      console.error("Failed to load saved jobs:", err);
+    } catch {
     }
   };
 
@@ -480,8 +478,7 @@ export default function Profile() {
           if (detailRes.ok) setResume(await detailRes.json());
         }
       }
-    } catch (err) {
-      console.error("Failed to load resume:", err);
+    } catch {
     }
   };
 
@@ -498,8 +495,7 @@ export default function Profile() {
         const data = await rankRes.value.json();
         setMyRank(data.rank);
       }
-    } catch (err) {
-      console.error("[Profile] Failed to load gamification data:", err);
+    } catch {
     }
   };
 
@@ -507,8 +503,7 @@ export default function Profile() {
     try {
       const res = await fetchAuth("/token/balance");
       if (res.ok) setTokenData(await res.json());
-    } catch (err) {
-      console.error("[Profile] Failed to load token balance:", err);
+    } catch {
     }
   };
 
@@ -769,11 +764,14 @@ export default function Profile() {
   };
 
   const removeSavedJob = async (jobId: number) => {
+    const prev = savedJobs.find(j => j.id === jobId);
+    setSavedJobs(jobs => jobs.filter(j => j.id !== jobId));
     try {
-      await fetchAuth(`/jobs/saved/${jobId}`, { method: "DELETE" });
-      setSavedJobs(prev => prev.filter(j => j.id !== jobId));
-    } catch (err) {
-      console.error("Failed to remove saved job:", err);
+      const res = await fetchAuth(`/jobs/saved/${jobId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed");
+    } catch {
+      if (prev) setSavedJobs(jobs => [...jobs, prev]);
+      toast({ title: "Error", description: "Failed to remove saved job. Please try again.", variant: "destructive" });
     }
   };
 
@@ -835,6 +833,20 @@ export default function Profile() {
     <div className="min-h-screen bg-black text-white pb-20 lg:pb-0">
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-8 max-w-4xl">
+        {profileLoadError && (
+          <div className="mb-4 px-4 py-3 border border-[#ff3366]/30 bg-[#ff3366]/5 flex items-center justify-between gap-4 rounded-none">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-[#ff3366] font-mono text-[10px] shrink-0">&gt;</span>
+              <span className="text-[10px] font-mono text-[#ff3366] uppercase tracking-wider truncate">ERROR: PROFILE FEED UNAVAILABLE — DISPLAYING CACHED DATA</span>
+            </div>
+            <button
+              onClick={() => { setProfileLoadError(false); loadProfile(); }}
+              className="text-[10px] font-mono text-[#00B4D8] uppercase tracking-wider hover:text-[#00B4D8]/80 shrink-0 border border-[#00B4D8]/30 px-2 py-1"
+            >
+              RETRY
+            </button>
+          </div>
+        )}
         <div className="glass-panel p-8 mb-6">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-4">

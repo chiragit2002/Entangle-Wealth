@@ -1,6 +1,7 @@
 import { useEffect, useRef, useMemo, lazy, Suspense } from "react";
 import { Switch, Route, useLocation, Router as WouterRouter, Redirect, useSearch } from "wouter";
 import { ClerkProvider, SignIn, SignUp, Show, useClerk } from "@clerk/react";
+import { ui } from "@clerk/ui";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 import * as SentryReact from "@sentry/react";
@@ -166,7 +167,7 @@ function ClerkProviderWithRoutes() {
   const queryClient = useMemo(createQueryClient, []);
   const appearance = useClerkAppearance();
   return (
-    <ClerkProvider publishableKey={clerkPubKey} proxyUrl={clerkProxyUrl} routerPush={(to) => navigate(stripBasePath(to))} routerReplace={(to) => navigate(stripBasePath(to), { replace: true })} appearance={appearance}>
+    <ClerkProvider publishableKey={clerkPubKey} proxyUrl={clerkProxyUrl} routerPush={(to) => navigate(stripBasePath(to))} routerReplace={(to) => navigate(stripBasePath(to), { replace: true })} appearance={appearance} ui={ui}>
       <QueryClientProvider client={queryClient}>
         <JourneyProvider>
         <CacheInvalidator /><PageTracker /><AuthErrorHandler />

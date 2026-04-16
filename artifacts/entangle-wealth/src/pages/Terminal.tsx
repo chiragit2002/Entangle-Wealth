@@ -261,7 +261,7 @@ export default function Terminal() {
           ],
         });
       })
-      .catch((err) => { console.error("[Terminal] Failed to load subscription tier:", err); });
+      .catch(() => {});
   }, [isLoaded, isSignedIn, getToken, showUpgradePrompt]);
 
   useEffect(() => {

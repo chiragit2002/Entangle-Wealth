@@ -87,6 +87,7 @@ export default function Alerts() {
   const [historyTotal, setHistoryTotal] = useState(0);
   const [loadingMore, setLoadingMore] = useState(false);
   const [marketDataUnavailable, setMarketDataUnavailable] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
 
   const [selectedSymbol, setSelectedSymbol] = useState("");
   const [selectedSymbolName, setSelectedSymbolName] = useState("");
@@ -105,9 +106,10 @@ export default function Alerts() {
         setTier(data.tier);
         setDailyLimit(data.dailyLimit);
         setDailyUsed(data.dailyUsed);
+        setFetchError(false);
       }
-    } catch (err) {
-      console.error("Failed to fetch alert rules:", err);
+    } catch {
+      if (!append) setFetchError(true);
     }
   }, [getToken, rules.length]);
 
@@ -120,8 +122,7 @@ export default function Alerts() {
         setHistory(prev => append ? [...prev, ...data.history] : (data.history ?? []));
         setHistoryTotal(data.total || 0);
       }
-    } catch (err) {
-      console.error("Failed to fetch alert history:", err);
+    } catch {
     }
   }, [getToken, history.length]);
 
@@ -337,6 +338,20 @@ export default function Alerts() {
               <p className="text-sm font-bold text-[#ff3366]">Market Data Unavailable</p>
               <p className="text-xs text-white/50">Alert creation requires live price validation. Trading and alert creation are disabled until data is restored.</p>
             </div>
+          </div>
+        )}
+        {fetchError && (
+          <div className="mb-4 px-4 py-3 border border-[#ff3366]/30 bg-[#ff3366]/5 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-[#ff3366] font-mono text-[10px] shrink-0">&gt;</span>
+              <span className="text-[10px] font-mono text-[#ff3366] uppercase tracking-wider truncate">ERROR: ALERT FEED UNAVAILABLE — CONNECTION REFUSED</span>
+            </div>
+            <button
+              onClick={() => { setFetchError(false); fetchRules(); fetchHistory(); }}
+              className="text-[10px] font-mono text-[#00B4D8] uppercase tracking-wider hover:text-[#00B4D8]/80 shrink-0 border border-[#00B4D8]/30 px-2 py-1"
+            >
+              RETRY
+            </button>
           </div>
         )}
 

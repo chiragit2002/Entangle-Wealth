@@ -115,8 +115,7 @@ export function ZeigarnikProgressBar({ compact = false }: ZeigarnikProgressBarPr
 
         setItems(progressItems);
         setLoaded(true);
-      } catch (err) {
-        console.error("[ZeigarnikProgressBar] Failed to load progress:", err);
+      } catch {
         setLoaded(true);
       }
     };

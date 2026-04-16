@@ -4,6 +4,7 @@ import { Bell, X, Trash2, Settings, TrendingUp, TrendingDown, AlertTriangle, Zap
 import { Button } from "@/components/ui/button";
 import { authFetch } from "@/lib/authFetch";
 import { Link } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 
 export interface AppNotification {
   id: number;
@@ -71,6 +72,7 @@ function needsThreshold(type: string): boolean {
 
 export default function NotificationCenter() {
   const { getToken, isSignedIn } = useAuth();
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<"notifications" | "alerts">("notifications");
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
@@ -90,8 +92,7 @@ export default function NotificationCenter() {
         const data = await res.json();
         setUnreadCount(data.count);
       }
-    } catch (err) {
-      console.error("Failed to fetch unread count:", err);
+    } catch {
     }
   }, [getToken, isSignedIn]);
 
@@ -112,8 +113,7 @@ export default function NotificationCenter() {
         setNotifications(items);
         setUnreadCount(items.filter(n => !n.read).length);
       }
-    } catch (err) {
-      console.error("Failed to fetch notification history:", err);
+    } catch {
     }
   }, [getToken, isSignedIn]);
 
@@ -126,8 +126,7 @@ export default function NotificationCenter() {
         const data = await res.json();
         setAlerts(data.alerts);
       }
-    } catch (err) {
-      console.error("Failed to fetch alert rules:", err);
+    } catch {
     } finally {
       setLoadingAlerts(false);
     }
@@ -185,12 +184,12 @@ export default function NotificationCenter() {
                   setUnreadCount(prev => prev + 1);
                 }
               } catch (parseErr) {
-                console.warn("SSE parse error:", parseErr);
+                if (import.meta.env.DEV) console.warn("SSE parse error:", parseErr);
               }
             }
           }
         } catch (connErr) {
-          console.warn("SSE connection error:", connErr);
+          if (import.meta.env.DEV) console.warn("SSE connection error:", connErr);
         }
         if (!aborted) await new Promise(r => setTimeout(r, 5_000));
       }
@@ -213,7 +212,7 @@ export default function NotificationCenter() {
         }).then(() => {
           setNotifications(prev => prev.map(n => ({ ...n, read: true })));
           setUnreadCount(0);
-        }).catch((err: unknown) => console.error("Failed to mark read:", err));
+        }).catch(() => {});
       }
     }
   }, [open, tab, fetchHistory, fetchAlertRules, unreadCount, getToken]);
@@ -234,18 +233,23 @@ export default function NotificationCenter() {
   }, [open]);
 
   const markAllRead = useCallback(async () => {
+    const prevNotifs = notifications;
+    const prevUnread = unreadCount;
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     setUnreadCount(0);
     try {
-      await authFetch("/alerts/mark-read", getToken, {
+      const res = await authFetch("/alerts/mark-read", getToken, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       });
-    } catch (err) {
-      console.error("Failed to mark all read:", err);
+      if (!res.ok) throw new Error("Failed");
+    } catch {
+      setNotifications(prevNotifs);
+      setUnreadCount(prevUnread);
+      toast({ title: "> ACTION FAILED", description: "Could not mark notifications as read.", variant: "destructive" });
     }
-  }, [getToken]);
+  }, [getToken, notifications, unreadCount, toast]);
 
   const clearAll = useCallback(() => {
     setNotifications([]);
@@ -292,22 +296,27 @@ export default function NotificationCenter() {
     if (!alert) return;
     setAlerts(prev => prev.map(a => a.id === id ? { ...a, enabled: !a.enabled } : a));
     try {
-      await authFetch(`/alerts/${id}`, getToken, {
+      const res = await authFetch(`/alerts/${id}`, getToken, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ enabled: !alert.enabled }),
       });
-    } catch (err) {
-      console.error("Failed to toggle alert:", err);
+      if (!res.ok) throw new Error("Failed");
+    } catch {
+      setAlerts(prev => prev.map(a => a.id === id ? { ...a, enabled: alert.enabled } : a));
+      setAlertError("Failed to update alert. Please try again.");
     }
   };
 
   const removeAlert = async (id: number) => {
-    setAlerts(prev => prev.filter(a => a.id !== id));
+    const prev = alerts.find(a => a.id === id);
+    setAlerts(alerts => alerts.filter(a => a.id !== id));
     try {
-      await authFetch(`/alerts/${id}`, getToken, { method: "DELETE" });
-    } catch (err) {
-      console.error("Failed to remove alert:", err);
+      const res = await authFetch(`/alerts/${id}`, getToken, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed");
+    } catch {
+      if (prev) setAlerts(alerts => [...alerts, prev].sort((a, b) => a.id - b.id));
+      setAlertError("Failed to remove alert. Please try again.");
     }
   };
 

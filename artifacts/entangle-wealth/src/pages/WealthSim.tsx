@@ -271,10 +271,10 @@ export default function WealthSim() {
           riskTolerance: data.riskTolerance ?? DEFAULT_PROFILE.riskTolerance,
         });
       }
-    }).catch((err) => { console.error("[WealthSim] Failed to load simulation profile:", err); });
+    }).catch(() => {});
     authFetch("/simulation/milestones", getToken).then(async r => {
       if (r.ok) setMilestones(await r.json());
-    }).catch((err) => { console.error("[WealthSim] Failed to load milestones:", err); });
+    }).catch(() => {});
   }, [isLoaded, isSignedIn, getToken]);
 
   const calcLocalProjections = (p: SimProfile): ProjectionPoint[] => {
@@ -437,7 +437,7 @@ export default function WealthSim() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
-    }).then(async r => { if (r.ok) { const d = await r.json(); setComparing(d.projections); } }).catch((err) => { console.error("[WealthSim] Failed to load comparison projections:", err); });
+    }).then(async r => { if (r.ok) { const d = await r.json(); setComparing(d.projections); } }).catch(() => {});
   };
 
   const chartData = projections.map(p => ({

@@ -134,8 +134,7 @@ export default function Leaderboard() {
       } else {
         setLoadError("Could not load leaderboard data. Check your connection.");
       }
-    } catch (err) {
-      console.error("[Leaderboard] Failed to load leaderboard:", err);
+    } catch {
       setLoadError("Network error — couldn't reach the leaderboard server. Showing demo data.");
     }
     setLoading(false);
@@ -145,8 +144,7 @@ export default function Leaderboard() {
     try {
       const res = await fetchAuth("/gamification/leaderboard/rank");
       if (res.ok) setMyRank(await res.json());
-    } catch (err) {
-      console.error("[Leaderboard] Failed to load my rank:", err);
+    } catch {
     }
   };
 

@@ -153,8 +153,7 @@ export default function Giveaway() {
         const data = await lbRes.json();
         setLeaderboard(data.leaderboard || []);
       }
-    } catch (err) {
-      console.error("[Giveaway] Failed to load public giveaway info:", err);
+    } catch {
       toast({ title: "Could not load giveaway info", description: "Please refresh to try again.", variant: "destructive" });
     }
   }, [toast]);
@@ -177,8 +176,7 @@ export default function Giveaway() {
         const data = await codeRes.json();
         if (data.code) setReferralLink(`${window.location.origin}?ref=${data.code}`);
       }
-    } catch (err) {
-      console.error("[Giveaway] Failed to load my giveaway data:", err);
+    } catch {
       toast({ title: "Could not load your entries", description: "Please refresh to try again.", variant: "destructive" });
     }
     setLoading(false);

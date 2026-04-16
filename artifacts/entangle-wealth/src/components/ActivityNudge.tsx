@@ -3,6 +3,7 @@ import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { Flame, X, Zap, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 
 interface StreakData {
   currentStreak: number;
@@ -27,6 +28,7 @@ type NudgeType = "streak" | "setup" | null;
 
 export function ActivityNudge() {
   const { getToken, isSignedIn, isLoaded } = useAuth();
+  const { toast } = useToast();
   const [nudgeType, setNudgeType] = useState<NudgeType>(null);
   const [streak, setStreak] = useState(0);
   const [incompleteItems, setIncompleteItems] = useState<ChecklistItem[]>([]);
@@ -77,8 +79,7 @@ export function ActivityNudge() {
             }
           }
         }
-      } catch (err) {
-        console.error("[ActivityNudge] Failed to load activity data:", err);
+      } catch {
       }
     };
 
@@ -94,9 +95,10 @@ export function ActivityNudge() {
 
   const checkin = async () => {
     try {
-      await authFetch("/gamification/streak/checkin", getToken, { method: "POST" });
-    } catch (err) {
-      console.error("[ActivityNudge] Failed to check in:", err);
+      const res = await authFetch("/gamification/streak/checkin", getToken, { method: "POST" });
+      if (!res.ok) throw new Error("Checkin failed");
+    } catch {
+      toast({ title: "> STREAK CHECKIN FAILED", description: "Your streak could not be recorded.", variant: "destructive" });
     }
     dismiss();
   };

@@ -100,6 +100,10 @@ export default function TravelMarketplace() {
           <span className="inline-block mt-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-semibold">
             Powered by EntangleCoin · Bookings recorded on-platform
           </span>
+          <div className="mt-3 flex items-center gap-2">
+            <span className="text-[#00B4D8] font-mono text-[10px]">&gt;</span>
+            <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">LIVE FEED NOT CONNECTED · SHOWING DEMO LISTINGS</span>
+          </div>
         </div>
 
         <div className="glass-panel p-1.5 inline-flex gap-1 mb-8 rounded-xl">

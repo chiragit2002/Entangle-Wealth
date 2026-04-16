@@ -111,8 +111,7 @@ export function LossAversionNudge() {
         } else if (lossData.missedSignals > 0) {
           setActiveNudge("signals");
         }
-      } catch (err) {
-        console.error("[LossAversionNudge] Failed to load data:", err);
+      } catch {
       }
     };
 

@@ -186,8 +186,7 @@ export default function TrophyCase() {
         const data: BadgeData[] = await res.json();
         if (data.length > 0) setBadges(data);
       }
-    } catch (err) {
-      console.error("[TrophyCase] Failed to load badges:", err);
+    } catch {
     }
     setLoading(false);
   };

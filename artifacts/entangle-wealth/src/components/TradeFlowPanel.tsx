@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
+import { useToast } from "@/hooks/use-toast";
 import { getMarginalRate, TAX_RATES } from "@/lib/taxflow-rates";
 import { XPBar } from "@/components/XPBar";
 import {
@@ -181,6 +182,7 @@ function buildStockInfo(symbol: string, snap: AlpacaSnapshot | undefined): Stock
 
 export function TradeFlowPanel() {
   const { isSignedIn, getToken } = useAuth();
+  const { toast } = useToast();
   const [step, setStep] = useState(1);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -317,8 +319,9 @@ export function TradeFlowPanel() {
         }),
       });
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.error("Trade failed:", err);
+        const errData = await res.json().catch(() => ({}));
+        const message = errData?.error || errData?.message || "Trade execution failed. Please try again.";
+        toast({ title: "> TRADE FAILED", description: message, variant: "destructive" });
         setTradeLoading(false);
         return;
       }
@@ -358,12 +361,12 @@ export function TradeFlowPanel() {
       setStep(6);
       setBannerVisible(true);
       setTimeout(() => setBannerVisible(false), 6000);
-    } catch (err) {
-      console.error("Trade error:", err);
+    } catch {
+      toast({ title: "> EXECUTION ERROR", description: "An unexpected error occurred. Please try again.", variant: "destructive" });
     } finally {
       setTradeLoading(false);
     }
-  }, [selectedStock, side, quantity, execPrice, estimatedCost, getToken, gamification]);
+  }, [selectedStock, side, quantity, execPrice, estimatedCost, getToken, gamification, toast]);
 
   const resetFlow = () => {
     setStep(1);

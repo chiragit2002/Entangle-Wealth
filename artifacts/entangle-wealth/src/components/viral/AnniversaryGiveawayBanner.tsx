@@ -55,7 +55,7 @@ export function AnniversaryGiveawayBanner() {
           setCountdown(d.countdown);
         }
       })
-      .catch((err) => { console.error("[AnniversaryGiveawayBanner] Failed to load giveaway info:", err); });
+      .catch(() => {});
   }, []);
 
   const fetchMyEntries = useCallback(async () => {
@@ -66,8 +66,7 @@ export function AnniversaryGiveawayBanner() {
         const data = await res.json();
         setMyEntries(data.entries?.totalEntries || 0);
       }
-    } catch (err) {
-      console.error("[AnniversaryGiveawayBanner] Failed to load my entries:", err);
+    } catch {
     }
   }, [isSignedIn, getToken]);
 

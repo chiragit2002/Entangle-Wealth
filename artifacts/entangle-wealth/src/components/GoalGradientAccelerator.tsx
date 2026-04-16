@@ -106,8 +106,7 @@ export function GoalGradientAccelerator() {
         } else {
           localStorage.removeItem("ew_near_milestone");
         }
-      } catch (err) {
-        console.error("[GoalGradientAccelerator] Failed to load data:", err);
+      } catch {
       }
     };
 

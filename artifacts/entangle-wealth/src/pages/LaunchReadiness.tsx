@@ -172,8 +172,7 @@ export default function LaunchReadiness() {
         const json = await res.json();
         setData(json);
       }
-    } catch (err) {
-      console.error("[LaunchReadiness] Failed to fetch launch checks:", err);
+    } catch {
     }
     setLoading(false);
     setRefreshing(false);

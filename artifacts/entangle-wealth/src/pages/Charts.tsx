@@ -222,9 +222,7 @@ export default function Charts() {
         }));
         setBars(mapped);
       }
-    }).catch((err) => {
-      console.error("[Charts] Failed to load chart data:", err);
-    });
+    }).catch(() => {});
   }, []);
 
   useEffect(() => { loadChart(symbol, timeframe); }, [symbol, timeframe, loadChart]);
@@ -366,8 +364,7 @@ export default function Charts() {
       if (markers.length > 0 && typeof (candleSeries as any).setMarkers === "function") {
         (candleSeries as any).setMarkers(markers.sort((a: any, b: any) => (a.time > b.time ? 1 : -1)));
       }
-    } catch (err) {
-      console.error("[Charts] Failed to set candlestick pattern markers:", err);
+    } catch {
     }
 
     for (const d of drawings) {
@@ -601,7 +598,7 @@ export default function Charts() {
 
         {/* Indicator Panel Dropdown */}
         {showIndicatorPanel && (
-          <div className="absolute top-[104px] left-1/2 -translate-x-1/2 w-[400px] bg-[#1E222D] border border-[#363A45] rounded-lg shadow-2xl z-50 max-h-[60vh] overflow-hidden">
+          <div className="absolute top-[104px] left-1/2 -translate-x-1/2 w-[min(400px,calc(100vw-32px))] bg-[#1E222D] border border-[#363A45] rounded-lg shadow-2xl z-50 max-h-[60vh] overflow-hidden">
             <div className="p-3 border-b border-[#363A45]">
               <div className="flex items-center bg-[#2A2E39] rounded px-2 h-8">
                 <Search className="w-3 h-3 text-[#787B86] mr-2" />
@@ -1004,7 +1001,7 @@ export default function Charts() {
         {/* Claude Analysis Modal */}
         {showClaudeModal && claudeAnalysis && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setShowClaudeModal(false)}>
-            <div className="bg-[#1E222D] border border-[#363A45] rounded-lg w-[500px] max-h-[80vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="bg-[#1E222D] border border-[#363A45] rounded-lg w-full max-w-[500px] mx-4 max-h-[80vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
               <div className="p-4 border-b border-[#363A45] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Brain className="w-4 h-4 text-[#CE93D8]" />

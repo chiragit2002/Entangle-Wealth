@@ -40,8 +40,7 @@ export default function TokenAdmin() {
     try {
       const res = await fetchAuth("/token/admin/stats");
       if (res.ok) setStats(await res.json());
-    } catch (err) {
-      console.error("[TokenAdmin] Failed to load stats:", err);
+    } catch {
     }
     setLoading(false);
   }, [fetchAuth]);

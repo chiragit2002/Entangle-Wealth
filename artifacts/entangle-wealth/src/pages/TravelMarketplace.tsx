@@ -20,7 +20,7 @@ interface Listing {
   hotel_class?: string;
 }
 
-const MOCK_HOTELS: Listing[] = [
+const HOTEL_LISTINGS: Listing[] = [
   { id: "h1", type: "hotel", name: "The Ritz-Carlton", destination: "New York, NY", image: "🏨", rating: 4.9, tokenPrice: 1200, details: "Luxury suite, Central Park view, 3 nights", dates: "Check-in flexible", hotel_class: "5-Star Luxury" },
   { id: "h2", type: "hotel", name: "Four Seasons Resort", destination: "Maui, Hawaii", image: "🌴", rating: 4.8, tokenPrice: 2500, details: "Ocean-view villa, 5 nights, all-inclusive", dates: "Check-in flexible", hotel_class: "5-Star Resort" },
   { id: "h3", type: "hotel", name: "Mandarin Oriental", destination: "Tokyo, Japan", image: "🗼", rating: 4.7, tokenPrice: 1800, details: "Executive suite, 4 nights, city view", dates: "Check-in flexible", hotel_class: "5-Star" },
@@ -29,7 +29,7 @@ const MOCK_HOTELS: Listing[] = [
   { id: "h6", type: "hotel", name: "Soneva Fushi", destination: "Maldives", image: "🏝️", rating: 4.9, tokenPrice: 4000, details: "Water villa, 7 nights, full board", dates: "Check-in flexible", hotel_class: "5-Star Eco-Resort" },
 ];
 
-const MOCK_FLIGHTS: Listing[] = [
+const FLIGHT_LISTINGS: Listing[] = [
   { id: "f1", type: "flight", name: "JFK → LHR", destination: "London, UK", image: "✈️", rating: 4.5, tokenPrice: 800, details: "Business Class, round trip", airline: "British Airways", dates: "Flexible dates" },
   { id: "f2", type: "flight", name: "LAX → NRT", destination: "Tokyo, Japan", image: "🛫", rating: 4.7, tokenPrice: 1500, details: "First Class, round trip", airline: "ANA", dates: "Flexible dates" },
   { id: "f3", type: "flight", name: "SFO → CDG", destination: "Paris, France", image: "🇫🇷", rating: 4.6, tokenPrice: 950, details: "Business Class, round trip", airline: "Air France", dates: "Flexible dates" },
@@ -48,7 +48,7 @@ export default function TravelMarketplace() {
 
   const fetchAuth = useCallback((path: string, options: RequestInit = {}) => authFetch(path, getToken, options), [getToken]);
 
-  const listings = tab === "hotel" ? MOCK_HOTELS : MOCK_FLIGHTS;
+  const listings = tab === "hotel" ? HOTEL_LISTINGS : FLIGHT_LISTINGS;
 
   const handleBook = async (listing: Listing) => {
     setBookingId(listing.id);

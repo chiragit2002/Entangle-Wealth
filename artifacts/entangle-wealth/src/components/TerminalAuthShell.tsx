@@ -4,8 +4,8 @@ import { Link } from "wouter";
 const MARKET_STATS = [
   { label: "S&P 500", value: "5,127.45", change: "+1.2%", positive: true },
   { label: "NASDAQ", value: "16,438.12", change: "+1.5%", positive: true },
-  { label: "BTC/USD", value: "—", change: "—", positive: true },
-  { label: "VIX", value: "—", change: "—", positive: false },
+  { label: "BTC/USD", value: "97,420.00", change: "+2.46%", positive: true },
+  { label: "VIX", value: "14.32", change: "-0.8%", positive: false },
 ];
 
 const TERMINAL_LINES = [

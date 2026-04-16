@@ -197,10 +197,10 @@ export default function Gigs() {
           <div className="flex justify-center py-16"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
         ) : gigs.length === 0 ? (
           <div className="text-center py-16 border border-white/[0.06] rounded-lg bg-white/[0.02]">
-            <Wrench className="w-12 h-12 mx-auto mb-4 opacity-30" />
-            <p className="text-muted-foreground text-lg font-medium">No gigs available yet</p>
-            <p className="text-muted-foreground/50 text-sm mt-2 max-w-md mx-auto">
-              Be the first to post a gig and offer your services to the community.
+            <Wrench className="w-12 h-12 mx-auto mb-4 text-white/10" />
+            <p className="text-[11px] font-mono text-white/30">&gt; NO GIGS IN MARKETPLACE</p>
+            <p className="text-[9px] font-mono text-white/15 mt-2 max-w-md mx-auto">
+              Post a gig to offer your services to the community
             </p>
           </div>
         ) : (

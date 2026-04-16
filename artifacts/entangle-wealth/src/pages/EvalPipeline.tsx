@@ -544,8 +544,8 @@ export default function EvalPipeline() {
                         <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
                           <Target className="w-7 h-7 text-white/20" />
                         </div>
-                        <p className="text-white/40 text-sm">No strategies found.</p>
-                        <p className="text-white/25 text-xs mt-1">Create one in the Strategy Builder first.</p>
+                        <p className="text-[11px] font-mono text-white/25">&gt; NO STRATEGIES FOUND</p>
+                        <p className="text-[9px] font-mono text-white/15 mt-1">Create one in the Strategy Builder first</p>
                         <a href="/strategy-builder" className="inline-block mt-3 text-xs text-[#00D4FF] hover:underline">Go to Strategy Builder →</a>
                       </div>
                     ) : (

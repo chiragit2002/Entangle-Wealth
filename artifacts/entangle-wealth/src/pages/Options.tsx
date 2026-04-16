@@ -98,7 +98,7 @@ export default function Options() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Options Flow</h1>
             <p className="text-muted-foreground mt-1 text-sm">
-              Unusual options activity — no data available yet
+              Unusual options activity scanner — real-time flow analysis
             </p>
           </div>
           

@@ -247,9 +247,9 @@ export default function Research() {
           </div>
         ) : items.length === 0 ? (
           <div className="text-center py-16">
-            <Newspaper className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-muted-foreground mb-1">No articles found</h3>
-            <p className="text-sm text-muted-foreground/60">
+            <Newspaper className="w-12 h-12 text-white/10 mx-auto mb-3" />
+            <p className="text-[11px] font-mono text-white/25">&gt; NO ARTICLES IN FEED</p>
+            <p className="text-[9px] font-mono text-white/15 mt-1">
               {search ? "Try a different search term or clear the filter" : "Feeds are being scraped — check back shortly"}
             </p>
           </div>

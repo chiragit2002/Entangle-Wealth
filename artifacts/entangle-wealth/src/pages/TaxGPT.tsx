@@ -84,7 +84,7 @@ const DEFAULT_CHIPS = [
   { emoji: "🏦", text: "Best order to fund retirement accounts?" },
 ];
 
-const MOCK_ANSWERS: Record<string, string> = {
+const FALLBACK_ANSWERS: Record<string, string> = {
   "meals": "Per IRS Publication 463, business meals are 50% deductible if:\n\n1. The meal is not lavish or extravagant\n2. You or your employee is present\n3. The meal has a clear business purpose\n\nYou MUST document: date, place, amount, business purpose, and who attended.\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice.",
   "home office": "Per IRS Publication 587, you can deduct home office expenses if the space is used:\n\n1. Regularly (not occasionally)\n2. Exclusively for business (no personal use)\n\nTwo methods:\n• Simplified: $5 per sq ft, max 300 sq ft = $1,500\n• Regular: Actual expenses x business use percentage\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice.",
   "vehicle": "Per IRS Publication 463, you can deduct vehicle expenses using:\n\n1. Standard mileage rate: 70 cents/mile (2026)\n2. Actual expenses: gas, insurance, repairs, depreciation x business use %\n\nYou MUST keep a contemporaneous mileage log.\n\n**⚠️ Disclaimer:** This is educational information only, not professional tax advice.",
@@ -93,10 +93,10 @@ const MOCK_ANSWERS: Record<string, string> = {
 
 function getLocalResponse(q: string): string {
   const lower = q.toLowerCase();
-  if (lower.includes("meal") || lower.includes("food")) return MOCK_ANSWERS["meals"];
-  if (lower.includes("home") || lower.includes("office")) return MOCK_ANSWERS["home office"];
-  if (lower.includes("vehicle") || lower.includes("mileage") || lower.includes("car")) return MOCK_ANSWERS["vehicle"];
-  return MOCK_ANSWERS["default"];
+  if (lower.includes("meal") || lower.includes("food")) return FALLBACK_ANSWERS["meals"];
+  if (lower.includes("home") || lower.includes("office")) return FALLBACK_ANSWERS["home office"];
+  if (lower.includes("vehicle") || lower.includes("mileage") || lower.includes("car")) return FALLBACK_ANSWERS["vehicle"];
+  return FALLBACK_ANSWERS["default"];
 }
 
 const RATE_LIMIT_MAX = 10;

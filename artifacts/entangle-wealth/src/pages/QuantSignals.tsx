@@ -808,7 +808,7 @@ function PipelineTab() {
             {filtered.map(strategy => (
               <StrategyCard key={strategy.strategy_id} strategy={strategy} expanded={expandedId === strategy.strategy_id} onToggle={() => setExpandedId(expandedId === strategy.strategy_id ? null : strategy.strategy_id)} />
             ))}
-            {filtered.length === 0 && <div className="text-center text-white/30 text-[11px] py-8">No {filter} signals found</div>}
+            {filtered.length === 0 && <div className="text-center text-[10px] font-mono text-white/25 py-8">&gt; NO {filter.toUpperCase()} SIGNALS IN QUEUE</div>}
           </div>
           <div className="mt-4 p-3 bg-[#0A0E1A] border border-white/[0.04] rounded">
             <p className="text-[9px] text-white/20 text-center">
@@ -942,7 +942,7 @@ function OnDemandTab() {
           {loadingStrategies ? (
             <div className="text-[11px] text-white/30">Loading strategies…</div>
           ) : strategies.length === 0 ? (
-            <div className="text-[11px] text-white/30">No custom strategies found. Create one in the Strategy Builder.</div>
+            <div className="text-[10px] font-mono text-white/25">&gt; NO STRATEGIES — build one in Strategy Builder</div>
           ) : (
             <select
               value={selectedStrategy}

@@ -209,11 +209,10 @@ export default function Jobs() {
 
           {!loading && hasSearched && jobs.length === 0 && (
             <div className="text-center py-16 border border-white/[0.06] rounded-lg bg-white/[0.02]">
-              <Briefcase className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-              <p className="text-muted-foreground text-lg font-medium">No job listings available</p>
-              <p className="text-muted-foreground/50 text-sm mt-2 max-w-md mx-auto">
-                Real-time job listings will appear here when a job search API is connected.
-                Save jobs you find elsewhere to track them in your profile.
+              <Briefcase className="w-12 h-12 text-white/10 mx-auto mb-4" />
+              <p className="text-[11px] font-mono text-white/30">&gt; NO JOB LISTINGS IN FEED</p>
+              <p className="text-[9px] font-mono text-white/15 mt-2 max-w-md mx-auto">
+                Search above to find positions matching your profile
               </p>
             </div>
           )}

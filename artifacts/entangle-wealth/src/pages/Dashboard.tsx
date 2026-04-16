@@ -1037,7 +1037,7 @@ export default function Dashboard() {
               } />
               {activeAssetTab !== "crypto" && (
                 <div className="px-3 py-2 bg-white/[0.01] border-b border-white/[0.04]">
-                  <p className="text-[9px] font-mono text-white/25">Forex, bonds &amp; commodities prices coming soon.</p>
+                  <p className="text-[9px] font-mono text-white/25">&gt; AWAITING DATA FEED — {activeAssetTab.toUpperCase()} prices require market connection</p>
                 </div>
               )}
               {activeAssetTab === "crypto" && cryptoPricesLoading && Object.keys(cryptoPrices).length === 0 && (
@@ -1087,18 +1087,16 @@ export default function Dashboard() {
           </div>
 
           {secondaryTab === "signals" && (
-            <div className="flex flex-col items-center justify-center py-12 text-center gap-2">
-              <Activity className="w-8 h-8 text-white/10 mb-1" />
-              <p className="text-sm font-medium text-white/30">No signals available</p>
-              <p className="text-xs text-white/20 max-w-xs">Stock signals will appear here when the analysis engine generates them.</p>
+            <div className="px-4 py-8 text-center">
+              <p className="text-[10px] font-mono text-white/25">&gt; NO SIGNALS IN QUEUE — analysis engine idle</p>
+              <p className="text-[9px] font-mono text-white/15 mt-1">Run a stock analysis to generate signals</p>
             </div>
           )}
 
           {secondaryTab === "options" && (
-            <div className="flex flex-col items-center justify-center py-12 text-center gap-2">
-              <BarChart3 className="w-8 h-8 text-white/10 mb-1" />
-              <p className="text-sm font-medium text-white/30">No options flow data</p>
-              <p className="text-xs text-white/20 max-w-xs">Options alerts and income data will appear here when available.</p>
+            <div className="px-4 py-8 text-center">
+              <p className="text-[10px] font-mono text-white/25">&gt; OPTIONS FLOW OFFLINE — awaiting market feed</p>
+              <p className="text-[9px] font-mono text-white/15 mt-1">Unusual activity alerts will appear here when detected</p>
             </div>
           )}
 

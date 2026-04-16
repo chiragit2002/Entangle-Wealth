@@ -337,12 +337,12 @@ export default function HabitsDashboard() {
               <Target className="w-10 h-10 text-white/10 mx-auto mb-3" />
               {activeCategory === "all" ? (
                 <>
-                  <p className="text-white/50 text-sm font-medium">No habits available</p>
-                  <p className="text-white/50 text-xs mt-1">Check back later — habits are refreshed regularly.</p>
+                  <p className="text-[11px] font-mono text-white/25">&gt; NO HABITS TRACKED</p>
+                  <p className="text-[9px] font-mono text-white/15 mt-1">Habits refresh regularly — check back soon</p>
                 </>
               ) : (
                 <>
-                  <p className="text-white/50 text-sm font-medium">No habits in "{activeCategory}"</p>
+                  <p className="text-[11px] font-mono text-white/25">&gt; NO HABITS IN "{activeCategory.toUpperCase()}"</p>
                   <button onClick={() => setActiveCategory("all")} className="mt-3 text-xs text-[#00B4D8] hover:underline">View all habits</button>
                 </>
               )}

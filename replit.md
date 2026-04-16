@@ -57,6 +57,8 @@ I prefer concise and direct communication. When making changes, prioritize funct
 - **EntangleCoin Token System**: ERC-20 token wallet, transaction history, reward system.
 - **GitHub Solution Finder**: Standalone GitHub intelligence platform using REST/GraphQL APIs and Claude AI analysis.
 - **Mobile Design**: Fully responsive, mobile-first design with bottom navigation.
+- **TerminalError Component** (`src/components/TerminalError.tsx`): Reusable terminal-style error display with compact and full variants, red accent (#ff3366) styling, monospace "SYSTEM ERROR" header, descriptive message, and optional RETRY button. Used as the standard error state across pages.
+- **Empty State Convention**: All empty/no-data states use terminal-style monospace formatting: `> NO X IN QUEUE` pattern with `text-[10px] font-mono text-white/25` styling for consistency with Bloomberg Terminal aesthetic.
 
 ## Environment Variables
 

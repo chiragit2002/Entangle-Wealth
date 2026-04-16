@@ -54,12 +54,15 @@ export default function BlogIndex() {
           </div>
         ) : (
           <div className="text-center py-16 max-w-2xl mx-auto">
-            <div className="w-16 h-16 rounded-sm bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
-              <BookOpen className="w-8 h-8 text-primary" />
+            <div className="w-16 h-16 rounded-sm flex items-center justify-center mx-auto mb-5" style={{ background: "rgba(0,212,255,0.08)", border: "1px solid rgba(0,212,255,0.2)" }}>
+              <BookOpen className="w-8 h-8" style={{ color: "#00D4FF" }} />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Articles Coming Soon</h2>
-            <p className="text-muted-foreground mb-8 leading-relaxed">
-              While we prepare our first articles, explore the tools and resources already available on EntangleWealth.
+            <h2 className="text-lg font-mono font-bold mb-2" style={{ color: "#00D4FF" }}>&gt; NO ARTICLES IN FEED</h2>
+            <p className="text-sm font-mono mb-1" style={{ color: "rgba(255,255,255,0.5)" }}>
+              STATUS: Content pipeline initializing
+            </p>
+            <p className="text-sm font-mono mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>
+              Explore available tools while the editorial feed connects.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
               <Link href="/research">

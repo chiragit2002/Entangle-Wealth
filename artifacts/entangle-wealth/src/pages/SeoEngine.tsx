@@ -242,7 +242,7 @@ function KeywordsTab() {
           </table>
         </div>
         {filtered.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground text-sm">No keywords found</div>
+          <div className="text-center py-12 text-[10px] font-mono text-white/25">&gt; NO KEYWORDS FOUND — adjust search parameters</div>
         )}
       </div>
     </div>

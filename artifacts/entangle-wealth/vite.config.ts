@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+// import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 
 const rawPort = process.env.PORT;
@@ -21,7 +21,7 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    runtimeErrorOverlay(),
+    // runtimeErrorOverlay(),
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
       ? [
@@ -61,7 +61,6 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: process.env.NODE_ENV === "production" ? "hidden" : false,
     rollupOptions: {
-      external: ["@solana/web3.js"],
       output: {
         manualChunks: (id) => {
           if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-")) {
@@ -92,14 +91,7 @@ export default defineConfig({
       },
     },
   },
-  optimizeDeps: {
-    exclude: [
-      "@solana/web3.js",
-      "@solana/wallet-adapter-react",
-      "@solana/wallet-standard-wallet-adapter-base",
-      "@solana-mobile/wallet-adapter-mobile",
-    ],
-  },
+  optimizeDeps: {},
   server: {
     port,
     host: "0.0.0.0",

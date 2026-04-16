@@ -189,7 +189,7 @@ async function ensureAgentTables() {
   }
 }
 
-async function verifySchemaReady() {
+async function verifySchemaReady(retries = 3) {
   const requiredTables = [
     "users", "alerts", "alert_history", "analytics_events", "api_health_checks",
     "push_subscriptions", "email_subscribers", "daily_content_posts",
@@ -198,24 +198,36 @@ async function verifySchemaReady() {
     "paper_portfolios", "paper_trades", "paper_positions",
     "user_xp", "xp_transactions", "badges", "streaks",
   ];
-  const client = await pool.connect();
-  try {
-    const { rows } = await client.query(
-      `SELECT tablename FROM pg_tables WHERE schemaname = 'public'`
-    );
-    const existing = new Set(rows.map((r: { tablename: string }) => r.tablename));
-    const missing = requiredTables.filter((t) => !existing.has(t));
-    if (missing.length > 0) {
-      logger.fatal(
-        { missingTables: missing },
-        "SCHEMA CHECK FAILED: Required tables missing. Run 'drizzle-kit migrate' in lib/db to apply migrations."
-      );
-      process.exit(1);
-    } else {
-      logger.info("Schema readiness check passed — all required tables present");
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const client = await pool.connect();
+      try {
+        const { rows } = await client.query(
+          `SELECT tablename FROM pg_tables WHERE schemaname = 'public'`
+        );
+        const existing = new Set(rows.map((r: { tablename: string }) => r.tablename));
+        const missing = requiredTables.filter((t) => !existing.has(t));
+        if (missing.length > 0) {
+          logger.fatal(
+            { missingTables: missing },
+            "SCHEMA CHECK FAILED: Required tables missing. Run 'drizzle-kit migrate' in lib/db to apply migrations."
+          );
+          process.exit(1);
+        } else {
+          logger.info("Schema readiness check passed — all required tables present");
+        }
+        return;
+      } finally {
+        client.release();
+      }
+    } catch (err) {
+      logger.warn({ error: err, attempt, retries }, "Schema readiness check failed, retrying...");
+      if (attempt < retries) {
+        await new Promise((r) => setTimeout(r, attempt * 3000));
+      } else {
+        logger.warn({ error: err }, "Schema readiness check failed after all retries (non-fatal, continuing)");
+      }
     }
-  } finally {
-    client.release();
   }
 }
 
@@ -506,11 +518,11 @@ ensureTask126BadgesExist().catch((err) =>
   logger.warn({ error: err }, "Failed to seed task-126 backtester badges (non-fatal)")
 );
 await verifySchemaReady();
-await ensureAgentTables();
-await normalizePortfolioBalances();
-await ensureGamificationTables();
-await ensureSupportTables();
-await seedHabitDefinitions();
+await ensureAgentTables().catch((err) => logger.warn({ error: err }, "ensureAgentTables failed (non-fatal)"));
+await normalizePortfolioBalances().catch((err) => logger.warn({ error: err }, "normalizePortfolioBalances failed (non-fatal)"));
+await ensureGamificationTables().catch((err) => logger.warn({ error: err }, "ensureGamificationTables failed (non-fatal)"));
+await ensureSupportTables().catch((err) => logger.warn({ error: err }, "ensureSupportTables failed (non-fatal)"));
+await seedHabitDefinitions().catch((err) => logger.warn({ error: err }, "seedHabitDefinitions failed (non-fatal)"));
 ensurePerformanceIndexes().catch((err) =>
   logger.warn({ error: err }, "Performance indexes setup failed (non-fatal)")
 );

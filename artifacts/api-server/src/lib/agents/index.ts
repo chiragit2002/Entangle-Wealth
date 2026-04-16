@@ -26,6 +26,7 @@ export { ExecutionAgent } from "./ExecutionAgent";
 export { LearningAgent } from "./LearningAgent";
 export { PatternAgent } from "./PatternAgent";
 export { Orchestrator } from "./Orchestrator";
+export { CapitalAllocator } from "./CapitalAllocator";
 export { FinalArbiter } from "./FinalArbiter";
 export type { OrchestratorInput, OrchestratorResult } from "./Orchestrator";
 export type { ArbiteredDecision, ArbiterOutput } from "./FinalArbiter";

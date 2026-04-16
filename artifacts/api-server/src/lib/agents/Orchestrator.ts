@@ -26,6 +26,8 @@ import { ingestStrategy } from "../quant/ingest";
 import type { OHLCVData } from "../quantEngine/strategyGenerator";
 import { checkAndMarkIdempotency } from "./TradeExecutionGuard";
 import type { IdempotencyGuardResult } from "./TradeExecutionGuard";
+import { CapitalAllocator } from "./CapitalAllocator";
+import type { CapitalAllocationResult, PortfolioAllocation } from "./CapitalAllocator";
 
 export interface OrchestratorInput {
   strategyId: string;
@@ -43,6 +45,7 @@ export interface OrchestratorResult {
   decision: ExecutionDecision;
   killSwitch: KillSwitchResult;
   allocation: AllocationDecision | null;
+  portfolioAllocation?: PortfolioAllocation | null;
   marketContext: {
     regime: RegimeResult;
     volatility: VolatilityMetrics;
@@ -64,6 +67,7 @@ export interface OrchestratorResult {
 }
 
 export class Orchestrator {
+  private capitalAllocator: CapitalAllocator;
   private regimeAgent: RegimeAgent;
   private volatilityAgent: VolatilityAgent;
   private liquidityAgent: LiquidityAgent;
@@ -96,6 +100,7 @@ export class Orchestrator {
     this.driftAgent = driftAgent;
     this.ensembleAgent = ensembleAgent;
     this.allocationAgent = allocationAgent;
+    this.capitalAllocator = new CapitalAllocator();
   }
 
   private getLearning(): LearningAgent | null {
@@ -352,7 +357,7 @@ export class Orchestrator {
   async runMulti(inputs: OrchestratorInput[]): Promise<OrchestratorResult[]> {
     logger.info({ count: inputs.length }, "[Orchestrator] Running multi-strategy orchestration");
     this.allocationAgent.resetBudget();
-    const results = await Promise.all(
+    const rawResults = await Promise.all(
       inputs.map(input =>
         this.runCycle(input).catch(err => {
           logger.error({ err, strategyId: input.strategyId, symbol: input.symbol }, "[Orchestrator] Cycle failed");
@@ -360,7 +365,41 @@ export class Orchestrator {
         }),
       ),
     );
-    return results.filter((r): r is OrchestratorResult => r !== null);
+    const results = rawResults.filter((r): r is OrchestratorResult => r !== null);
+
+    const candidates = results.map(r => ({
+      strategyId: r.strategyId,
+      symbol: r.symbol,
+      score: r.decision.score,
+      confidence: r.decision.confidence,
+      decision: r.decision.action,
+      drawdown: r.marketContext.volatility?.stdDevPct
+        ? -(r.marketContext.volatility.stdDevPct)
+        : undefined,
+    }));
+
+    const portfolioResult = this.capitalAllocator.allocate(candidates);
+    const allocationMap = new Map<string, PortfolioAllocation>();
+    for (const a of portfolioResult.allocations) {
+      allocationMap.set(`${a.strategyId}:${a.symbol}`, a);
+    }
+
+    for (const r of results) {
+      const key = `${r.strategyId}:${r.symbol}`;
+      r.portfolioAllocation = allocationMap.get(key) ?? null;
+    }
+
+    logger.info(
+      {
+        total: results.length,
+        active: portfolioResult.activeCount,
+        skipped: portfolioResult.skippedCount,
+        exposure: portfolioResult.totalExposure,
+      },
+      "[Orchestrator] Portfolio capital allocation applied",
+    );
+
+    return results;
   }
 
   async runMultiTimeframe(

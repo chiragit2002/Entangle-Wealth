@@ -17,6 +17,7 @@ const basePath = process.env.BASE_PATH ?? "/";
 
 export default defineConfig({
   base: basePath,
+  envDir: path.resolve(import.meta.dirname, "..", ".."),
   envPrefix: "VITE_",
   plugins: [
     react(),
@@ -91,11 +92,23 @@ export default defineConfig({
       },
     },
   },
-  optimizeDeps: {},
+  optimizeDeps: {
+    exclude: [
+      "@solana/web3.js",
+      "@solana/wallet-adapter-react",
+      "@solana/wallet-adapter-base",
+      "@solana/wallet-standard",
+      "@solana-mobile/wallet-adapter-mobile",
+      "@solana/wallet-standard-wallet-adapter-base",
+    ],
+  },
   server: {
     port,
     host: "0.0.0.0",
     allowedHosts: true,
+    proxy: {
+      "/api": "http://localhost:8080",
+    },
     hmr: process.env.REPL_ID
       ? { clientPort: 443, protocol: "wss" }
       : true,

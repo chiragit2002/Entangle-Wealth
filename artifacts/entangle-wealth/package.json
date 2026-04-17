@@ -92,5 +92,8 @@
     "lightweight-charts-react-wrapper": "^2.1.1",
     "marked": "^18.0.0",
     "react-error-boundary": "^6.1.1"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.60.1"
   }
 }

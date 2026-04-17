@@ -4,16 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "export NODE_ENV=development && pnpm run build && pnpm run start",
+    "dev": "pnpm run build && cross-env NODE_ENV=development pnpm run start",
     "build": "node ./build.mjs",
-    "start": "node --enable-source-maps ./dist/index.mjs",
+    "start": "node --env-file=../../.env --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "stress": "STRESS_BASE_URL=${STRESS_BASE_URL:-http://localhost:8080} node stress/run-all.mjs",
-    "stress:01": "STRESS_BASE_URL=${STRESS_BASE_URL:-http://localhost:8080} node stress/01-endpoint-saturation.mjs",
-    "stress:02": "STRESS_BASE_URL=${STRESS_BASE_URL:-http://localhost:8080} node stress/02-resilience-mechanisms.mjs",
-    "stress:03": "STRESS_BASE_URL=${STRESS_BASE_URL:-http://localhost:8080} node stress/03-db-pool-saturation.mjs",
-    "stress:04": "STRESS_BASE_URL=${STRESS_BASE_URL:-http://localhost:8080} node stress/04-lru-map-bounds.mjs",
-    "stress:05": "STRESS_BASE_URL=${STRESS_BASE_URL:-http://localhost:8080} node stress/05-request-timeout.mjs"
+    "stress": "cross-env STRESS_BASE_URL=http://localhost:8080 node stress/run-all.mjs",
+    "stress:01": "cross-env STRESS_BASE_URL=http://localhost:8080 node stress/01-endpoint-saturation.mjs",
+    "stress:02": "cross-env STRESS_BASE_URL=http://localhost:8080 node stress/02-resilience-mechanisms.mjs",
+    "stress:03": "cross-env STRESS_BASE_URL=http://localhost:8080 node stress/03-db-pool-saturation.mjs",
+    "stress:04": "cross-env STRESS_BASE_URL=http://localhost:8080 node stress/04-lru-map-bounds.mjs",
+    "stress:05": "cross-env STRESS_BASE_URL=http://localhost:8080 node stress/05-request-timeout.mjs"
   },
   "dependencies": {
     "@clerk/express": "^2.0.8",
@@ -68,6 +68,7 @@
     "@types/web-push": "^3.6.4",
     "@types/ws": "^8.18.1",
     "autocannon": "^8.0.0",
+    "cross-env": "^10.1.0",
     "esbuild": "^0.27.3",
     "esbuild-plugin-pino": "^2.3.3",
     "pino-pretty": "^13",

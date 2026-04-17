@@ -62,6 +62,7 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: process.env.NODE_ENV === "production" ? "hidden" : false,
     rollupOptions: {
+      external: ["@solana/web3.js"],
       output: {
         manualChunks: (id) => {
           if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-")) {

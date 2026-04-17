@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "pnpm run build && cross-env NODE_ENV=development pnpm run start",
     "build": "node ./build.mjs",
-    "start": "node --env-file=../../.env --enable-source-maps ./dist/index.mjs",
+    "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "stress": "cross-env STRESS_BASE_URL=http://localhost:8080 node stress/run-all.mjs",
     "stress:01": "cross-env STRESS_BASE_URL=http://localhost:8080 node stress/01-endpoint-saturation.mjs",

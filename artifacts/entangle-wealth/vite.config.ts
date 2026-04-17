@@ -53,6 +53,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
       "@assets": path.resolve(import.meta.dirname, "..", "..", "attached_assets"),
+      "@solana/web3.js": path.resolve(import.meta.dirname, "src/stubs/solana.ts"),
     },
     dedupe: ["react", "react-dom"],
   },
@@ -62,7 +63,6 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: process.env.NODE_ENV === "production" ? "hidden" : false,
     rollupOptions: {
-      external: ["@solana/web3.js"],
       output: {
         manualChunks: (id) => {
           if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-")) {

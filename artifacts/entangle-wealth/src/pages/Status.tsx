@@ -85,7 +85,7 @@ export default function Status() {
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-3">
             System <span className="electric-text">Status</span>
           </h1>
-          <p className="text-white/50 text-sm">
+          <p className="text-muted-foreground text-sm">
             Current operational status of EntangleWealth services
           </p>
         </div>
@@ -99,7 +99,7 @@ export default function Status() {
               ? "Some Systems Experiencing Issues"
               : "Service Disruption Detected"}
           </h2>
-          <p className="text-white/30 text-xs mt-2 flex items-center justify-center gap-1.5">
+          <p className="text-muted-foreground/50 text-xs mt-2 flex items-center justify-center gap-1.5">
             <Clock className="w-3 h-3" />
             Last checked: {lastRefresh.toLocaleTimeString()}
             <button onClick={fetchData} disabled={loading} className="ml-2 text-[#00B4D8] hover:text-[#00B4D8]/80">
@@ -116,11 +116,11 @@ export default function Status() {
             return (
               <div
                 key={svc.service_name}
-                className="flex items-center justify-between px-5 py-4 bg-white/[0.02] border border-white/[0.06] rounded-xl"
+                className="flex items-center justify-between px-5 py-4 bg-muted/30 border border-border rounded-xl"
               >
                 <div className="flex items-center gap-3">
-                  <Icon className="w-5 h-5 text-white/30" />
-                  <span className="text-sm font-semibold text-white/80">{svc.service_name}</span>
+                  <Icon className="w-5 h-5 text-muted-foreground/50" />
+                  <span className="text-sm font-semibold text-foreground/80">{svc.service_name}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <StatusIcon className="w-4 h-4" style={{ color: cfg.color }} />
@@ -134,22 +134,22 @@ export default function Status() {
         </div>
 
         <div>
-          <h2 className="text-lg font-bold text-white mb-4">Incident History (Last 30 Days)</h2>
+          <h2 className="text-lg font-bold text-foreground mb-4">Incident History (Last 30 Days)</h2>
           {incidents.length === 0 ? (
-            <div className="text-center py-12 bg-white/[0.01] border border-white/[0.06] rounded-xl">
+            <div className="text-center py-12 bg-muted/30 border border-border rounded-xl">
               <CheckCircle2 className="w-8 h-8 text-[#00B4D8]/40 mx-auto mb-3" />
-              <p className="text-white/30 text-sm">No incidents in the last 30 days</p>
+              <p className="text-muted-foreground/50 text-sm">No incidents in the last 30 days</p>
             </div>
           ) : (
             <div className="space-y-3">
               {incidents.map((inc) => {
                 const severityColor = inc.severity === "major" ? "#ff3366" : inc.severity === "minor" ? "#FFB800" : "#00B4D8";
                 return (
-                  <div key={inc.id} className="px-5 py-4 bg-white/[0.02] border border-white/[0.06] rounded-xl">
+                  <div key={inc.id} className="px-5 py-4 bg-muted/30 border border-border rounded-xl">
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <h3 className="text-sm font-semibold text-white/80">{inc.title}</h3>
-                        <p className="text-[10px] text-white/50 font-mono mt-0.5">{inc.service_name}</p>
+                        <h3 className="text-sm font-semibold text-foreground/80">{inc.title}</h3>
+                        <p className="text-[10px] text-muted-foreground font-mono mt-0.5">{inc.service_name}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border" style={{ color: severityColor, borderColor: `${severityColor}33`, backgroundColor: `${severityColor}10` }}>
@@ -160,8 +160,8 @@ export default function Status() {
                         </span>
                       </div>
                     </div>
-                    {inc.description && <p className="text-xs text-white/50">{inc.description}</p>}
-                    <p className="text-[10px] text-white/50 mt-2 font-mono">
+                    {inc.description && <p className="text-xs text-muted-foreground">{inc.description}</p>}
+                    <p className="text-[10px] text-muted-foreground mt-2 font-mono">
                       {new Date(inc.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                       {inc.resolved_at && <> | Resolved {new Date(inc.resolved_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</>}
                     </p>
@@ -173,7 +173,7 @@ export default function Status() {
         </div>
 
         <div className="mt-8 text-center">
-          <Link href="/help" className="text-xs text-white/50 hover:text-[#00B4D8] transition-colors">
+          <Link href="/help" className="text-xs text-muted-foreground hover:text-[#00B4D8] transition-colors">
             Need help? Visit the Help Center
           </Link>
         </div>

@@ -59,15 +59,15 @@ export default function TripItinerary({ activities, dayCount, startDate, onAdd, 
               className={`rounded-xl border mb-3 overflow-hidden transition-all cursor-pointer ${
                 isHighlighted
                   ? "border-primary/40 bg-primary/[0.04] shadow-lg shadow-primary/5"
-                  : "border-white/[0.06] bg-white/[0.015] hover:border-white/15"
+                  : "border-border bg-white/[0.015] hover:border-white/15"
               }`}
               onClick={() => onHighlightDay(isHighlighted ? null : day)}
             >
-              <div className="flex items-center justify-between px-4 py-3 bg-white/[0.02] border-b border-white/[0.06]">
+              <div className="flex items-center justify-between px-4 py-3 bg-muted/30 border-b border-border">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-primary/60" />
                   <span className="text-[16px] font-black text-primary">Day {day}</span>
-                  <span className="text-[11px] text-white/30">{dateStr}</span>
+                  <span className="text-[11px] text-muted-foreground/50">{dateStr}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {pacingWarn && (
@@ -81,49 +81,49 @@ export default function TripItinerary({ activities, dayCount, startDate, onAdd, 
 
               <div className="p-3 space-y-2" onClick={e => e.stopPropagation()}>
                 {dayActivities.length === 0 && (
-                  <p className="text-[12px] text-white/50 text-center py-2">No activities planned yet</p>
+                  <p className="text-[12px] text-muted-foreground text-center py-2">No activities planned yet</p>
                 )}
                 {dayActivities.map(a => (
-                  <div key={a.id} className="rounded-lg bg-white/[0.03] border border-white/[0.05] p-3">
+                  <div key={a.id} className="rounded-lg bg-muted/50 border border-border p-3">
                     <div className="flex gap-2 mb-2">
                       <input type="time" value={a.time}
                         onChange={e => onUpdate(a.id, { time: e.target.value })}
-                        className="bg-white/[0.05] border border-white/10 rounded-lg px-2.5 py-2 text-[12px] text-white w-[100px] focus:outline-none focus:border-primary/30"
+                        className="bg-muted/50 border border-border rounded-lg px-2.5 py-2 text-[12px] text-foreground w-[100px] focus:outline-none focus:border-primary/30"
                         aria-label="Activity time" />
                       <input type="text" placeholder="Activity name" value={a.title}
                         onChange={e => onUpdate(a.id, { title: e.target.value.slice(0, 200) })}
                         maxLength={200}
-                        className="flex-1 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-[13px] text-white focus:outline-none focus:border-primary/30 placeholder:text-white/40 min-w-0" />
+                        className="flex-1 bg-muted/50 border border-border rounded-lg px-3 py-2 text-[13px] text-foreground focus:outline-none focus:border-primary/30 placeholder:text-muted-foreground/70 min-w-0" />
                       <button onClick={() => onRemove(a.id)}
-                        className="p-2 text-white/40 hover:text-[#ff3366] transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
+                        className="p-2 text-muted-foreground/70 hover:text-[#ff3366] transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
                         aria-label="Remove activity">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                     <div className="flex gap-2 items-center flex-wrap">
                       <select value={a.type} onChange={e => onUpdate(a.id, { type: e.target.value as PersonalActivity["type"] })}
-                        className="bg-[#0d0d1a] border border-white/10 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/30 min-h-[34px] [&>option]:bg-[#0d0d1a] [&>option]:text-white">
+                        className="bg-card border border-border rounded-lg px-2.5 py-1.5 text-[11px] text-foreground focus:outline-none focus:border-primary/30 min-h-[34px] [&>option]:bg-card [&>option]:text-foreground">
                         {ACTIVITY_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                       </select>
                       <div className="relative flex items-center">
-                        <DollarSign className="absolute left-2 w-3 h-3 text-white/40" />
+                        <DollarSign className="absolute left-2 w-3 h-3 text-muted-foreground/70" />
                         <input type="number" min={0} max={99999} value={a.cost || ""}
                           onChange={e => onUpdate(a.id, { cost: Math.max(0, parseInt(e.target.value) || 0) })}
                           placeholder="Cost"
-                          className="bg-white/[0.05] border border-white/10 rounded-lg pl-6 pr-2 py-1.5 text-[11px] text-white w-[90px] focus:outline-none focus:border-primary/30 font-mono" />
+                          className="bg-muted/50 border border-border rounded-lg pl-6 pr-2 py-1.5 text-[11px] text-foreground w-[90px] focus:outline-none focus:border-primary/30 font-mono" />
                       </div>
                       <div className="relative flex items-center flex-1 min-w-[120px]">
-                        <MapPin className="absolute left-2 w-3 h-3 text-white/40" />
+                        <MapPin className="absolute left-2 w-3 h-3 text-muted-foreground/70" />
                         <input type="text" placeholder="Location (for map)" value={a.location}
                           onChange={e => onUpdate(a.id, { location: e.target.value.slice(0, 100) })}
                           maxLength={100}
-                          className="w-full bg-transparent border-none text-[11px] text-white/40 focus:outline-none placeholder:text-white/40 pl-6 min-w-0" />
+                          className="w-full bg-transparent border-none text-[11px] text-muted-foreground/70 focus:outline-none placeholder:text-muted-foreground/70 pl-6 min-w-0" />
                       </div>
                     </div>
                   </div>
                 ))}
                 <button onClick={() => onAdd(day)}
-                  className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-dashed border-white/10 text-white/25 hover:text-primary hover:border-primary/30 text-[12px] transition-colors min-h-[40px]">
+                  className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-dashed border-border text-muted-foreground/40 hover:text-primary hover:border-primary/30 text-[12px] transition-colors min-h-[40px]">
                   <Plus className="w-3.5 h-3.5" /> Add Activity
                 </button>
               </div>

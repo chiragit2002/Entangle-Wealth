@@ -132,6 +132,7 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
       },
       {
         id: "timeline",
+        icon: GitBranch,
         color: "#00B4D8",
         text: "Alternate Timeline — see how one savings decision today branches into radically different 10-year futures.",
         subtext: "Alternate Timeline Simulator",
@@ -191,7 +192,7 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
         borderRight: `1px solid ${insight.color}25`,
         borderBottom: `1px solid ${insight.color}25`,
         borderLeft: `3px solid ${insight.color}`,
-        background: "rgba(8,8,18,0.97)",
+        background: "var(--glass-bg)",
       }}
     >
       <div
@@ -218,10 +219,10 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
             >
               Edge Pulse
             </span>
-            <span className="text-[9px] text-white/25 font-mono">·</span>
-            <span className="text-[9px] text-white/35 font-mono">{insight.subtext}</span>
+            <span className="text-[9px] text-muted-foreground/40 font-mono">·</span>
+            <span className="text-[9px] text-muted-foreground/60 font-mono">{insight.subtext}</span>
           </div>
-          <p className="text-xs text-white/70 leading-snug truncate">{insight.text}</p>
+          <p className="text-xs text-foreground/70 leading-snug truncate">{insight.text}</p>
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -244,7 +245,7 @@ function EdgePulseCard({ consensusAccuracy, vixLevel, adRatio }: {
               rotateInsight();
               intervalRef.current = setInterval(rotateInsight, 7000);
             }}
-            className="text-white/20 hover:text-white/50 transition-colors"
+            className="text-muted-foreground/40 hover:text-muted-foreground transition-colors"
             title="Next insight"
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -296,7 +297,7 @@ function MarketConditionBadges({ conditions }: { conditions: MarketCondition[] }
           >
             {c.label}
           </span>
-          <span className="text-[10px] text-white/40 font-mono">{c.subtext}</span>
+          <span className="text-[10px] text-muted-foreground/70 font-mono">{c.subtext}</span>
         </div>
       ))}
     </div>
@@ -313,10 +314,10 @@ function Panel({ children, className = "" }: { children: React.ReactNode; classN
 
 function PanelHeader({ title, icon, rightContent }: { title: string; icon?: React.ReactNode; rightContent?: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+    <div className="flex items-center justify-between px-4 py-3 border-b border-border">
       <div className="flex items-center gap-2">
-        {icon && <span className="text-white/35">{icon}</span>}
-        <span className="text-sm font-semibold text-white/60">{title}</span>
+        {icon && <span className="text-muted-foreground/60">{icon}</span>}
+        <span className="text-sm font-semibold text-muted-foreground">{title}</span>
       </div>
       {rightContent}
     </div>
@@ -325,10 +326,10 @@ function PanelHeader({ title, icon, rightContent }: { title: string; icon?: Reac
 
 function DataRow({ label, value, change }: { label: string; value: string; change?: number }) {
   return (
-    <div className="flex items-center justify-between px-4 py-2 hover:bg-white/[0.02] transition-colors">
-      <span className="text-xs text-white/50 font-mono">{label}</span>
+    <div className="flex items-center justify-between px-4 py-2 hover:bg-muted/30 transition-colors">
+      <span className="text-xs text-muted-foreground font-mono">{label}</span>
       <div className="flex items-center gap-2">
-        <span className="text-xs font-mono font-medium text-white/80">{value}</span>
+        <span className="text-xs font-mono font-medium text-foreground/80">{value}</span>
         {change !== undefined && (
           <span className={`text-[10px] font-mono font-semibold ${change >= 0 ? 'text-[#00B4D8]' : 'text-red-400'}`}>
             {change >= 0 ? '+' : ''}{Math.abs(change).toFixed(2)}%
@@ -678,65 +679,65 @@ export default function Dashboard() {
       <FinancialDisclaimerBanner pageKey="dashboard" />
 
       {/* Command Bar */}
-      <div className="bg-[#040408] border-b border-white/[0.05] px-4 py-2 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
+      <div className="bg-background border-b border-border px-3 sm:px-4 py-2">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <div className="flex items-center gap-1.5">
             <span className={`relative flex h-2 w-2`}>
               <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isMarketOpen ? 'bg-[#00B4D8]' : 'bg-[#FFB800]'} opacity-60`} />
               <span className={`relative inline-flex rounded-full h-2 w-2 ${isMarketOpen ? 'bg-[#00B4D8]' : 'bg-[#FFB800]'}`} />
             </span>
-            <span role="status" aria-live="polite" className={`text-[10px] font-mono font-semibold tracking-wider ${isMarketOpen ? 'text-[#00B4D8]' : 'text-[#FFB800]'}`}>
+            <span role="status" aria-live="polite" className={`text-[10px] font-mono font-semibold tracking-wider whitespace-nowrap ${isMarketOpen ? 'text-[#00B4D8]' : 'text-[#FFB800]'}`}>
               {isMarketOpen ? "Market Open" : "Market Closed"}
             </span>
           </div>
-          <span className="text-[9px] font-mono text-white/50">Simulated data · for practice only</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
-            <input
-              data-cmd-search
-              placeholder="Search ticker..."
-              aria-label="Search stock ticker symbol"
-              role="combobox"
-              aria-expanded={showSearchDropdown && searchResults.length > 0}
-              aria-autocomplete="list"
-              value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setShowSearchDropdown(true); }}
-              onFocus={() => setShowSearchDropdown(true)}
-              onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
-              onKeyDown={(e) => { if (e.key === "Enter" && searchQuery.trim()) { e.preventDefault(); runQuickAnalysis(searchQuery.toUpperCase().trim()); } }}
-              className="w-44 h-7 pl-7 pr-2 text-xs bg-white/[0.04] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-primary/40 transition-colors"
-            />
-            {showSearchDropdown && searchResults.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-[#0A0E1A] border border-white/10 rounded-xl z-50 shadow-2xl overflow-hidden">
-                {searchResults.map(s => (
-                  <Button key={s.symbol} onClick={() => { setSearchQuery(s.symbol); runQuickAnalysis(s.symbol); }}
-                    variant="ghost"
-                    className="w-full justify-start px-3 py-2 h-auto rounded-none text-left flex items-center gap-2 hover:bg-primary/[0.06] border-b border-white/[0.03] last:border-0">
-                    <span className="text-xs font-bold font-mono text-primary">{s.symbol}</span>
-                    <span className="text-[10px] text-white/30 truncate">{s.name}</span>
-                  </Button>
-                ))}
-              </div>
-            )}
-          </div>
-          <Button onClick={() => setShowShortcuts(v => !v)} aria-label="Keyboard shortcuts" size="icon" variant="ghost" className="w-7 h-7 text-white/25 hover:text-white/50">
-            <Keyboard className="w-3.5 h-3.5" />
-          </Button>
+          <span className="text-[9px] font-mono text-muted-foreground">Simulated data · for practice only</span>
           <div className="flex items-center gap-1.5">
-            <Clock className="w-3 h-3 text-white/40" />
-            <span className="text-[11px] font-mono font-semibold text-white/50 tabular-nums">{clock}</span>
+            <Clock className="w-3 h-3 text-muted-foreground/70" />
+            <span className="text-[11px] font-mono font-semibold text-muted-foreground tabular-nums">{clock}</span>
+          </div>
+          <div className="flex items-center gap-2 sm:ml-auto w-full sm:w-auto">
+            <div className="relative flex-1 sm:flex-none">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/70" />
+              <input
+                data-cmd-search
+                placeholder="Search ticker..."
+                aria-label="Search stock ticker symbol"
+                role="combobox"
+                aria-expanded={showSearchDropdown && searchResults.length > 0}
+                aria-autocomplete="list"
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setShowSearchDropdown(true); }}
+                onFocus={() => setShowSearchDropdown(true)}
+                onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
+                onKeyDown={(e) => { if (e.key === "Enter" && searchQuery.trim()) { e.preventDefault(); runQuickAnalysis(searchQuery.toUpperCase().trim()); } }}
+                className="w-full sm:w-44 h-7 pl-7 pr-2 text-xs bg-muted/50 border border-border rounded-lg text-foregroundplaceholder:text-muted-foreground/70 focus:outline-none focus:border-primary/40 transition-colors"
+              />
+              {showSearchDropdown && searchResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl z-50 shadow-2xl overflow-hidden">
+                  {searchResults.map(s => (
+                    <Button key={s.symbol} onClick={() => { setSearchQuery(s.symbol); runQuickAnalysis(s.symbol); }}
+                      variant="ghost"
+                      className="w-full justify-start px-3 py-2 h-auto rounded-none text-left flex items-center gap-2 hover:bg-primary/[0.06] border-b border-border/50 last:border-0">
+                      <span className="text-xs font-bold font-mono text-primary">{s.symbol}</span>
+                      <span className="text-[10px] text-muted-foreground/50 truncate">{s.name}</span>
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <Button onClick={() => setShowShortcuts(v => !v)} aria-label="Keyboard shortcuts" size="icon" variant="ghost" className="w-7 h-7 shrink-0 text-muted-foreground/40 hover:text-muted-foreground">
+              <Keyboard className="w-3.5 h-3.5" />
+            </Button>
           </div>
         </div>
       </div>
 
       {showShortcuts && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 " onClick={() => setShowShortcuts(false)} role="dialog" aria-modal="true" aria-labelledby="shortcuts-dialog-title">
-          <div className="bg-[#0A0E1A] border border-white/10 rounded-sm p-6 max-w-sm w-full mx-4" onClick={e => e.stopPropagation()}>
+          <div className="bg-card border border-border rounded-sm p-6 max-w-sm w-full mx-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <span id="shortcuts-dialog-title" className="text-sm font-bold text-white">Keyboard Shortcuts</span>
-              <Button onClick={() => setShowShortcuts(false)} aria-label="Close" size="icon" variant="ghost" className="w-7 h-7 text-white/30 hover:text-white/60"><X className="w-4 h-4" /></Button>
+              <span id="shortcuts-dialog-title" className="text-sm font-bold text-foreground">Keyboard Shortcuts</span>
+              <Button onClick={() => setShowShortcuts(false)} aria-label="Close" size="icon" variant="ghost" className="w-7 h-7 text-muted-foreground/50 hover:text-muted-foreground"><X className="w-4 h-4" /></Button>
             </div>
             <div className="space-y-2">
               {[
@@ -751,8 +752,8 @@ export default function Dashboard() {
                 ["Esc", "Close / Dismiss"],
               ].map(([key, desc]) => (
                 <div key={key} className="flex items-center gap-3">
-                  <kbd className="min-w-[28px] text-center px-1.5 py-0.5 bg-white/[0.06] border border-white/10 rounded text-[10px] font-mono font-bold text-white/50">{key}</kbd>
-                  <span className="text-xs text-white/50">{desc}</span>
+                  <kbd className="min-w-[28px] text-center px-1.5 py-0.5 bg-muted border border-border rounded text-[10px] font-mono font-bold text-muted-foreground">{key}</kbd>
+                  <span className="text-xs text-muted-foreground">{desc}</span>
                 </div>
               ))}
             </div>
@@ -780,10 +781,10 @@ export default function Dashboard() {
               isPositive: true,
             },
           ].map((stat) => (
-            <div key={stat.label} className="bg-[#0A0E1A] border border-white/[0.06] rounded-xl px-4 py-4">
-              <p className="text-xs font-medium text-white/50 mb-1.5">{stat.label}</p>
+            <div key={stat.label} className="bg-card border border-border rounded-xl px-4 py-4">
+              <p className="text-xs font-medium text-muted-foreground mb-1.5">{stat.label}</p>
               <p className="text-2xl font-bold tabular-nums" style={{ color: stat.color }}>{stat.value}</p>
-              <p className="text-xs text-white/35 mt-1">{stat.sub}</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">{stat.sub}</p>
             </div>
           ))}
         </div>
@@ -814,26 +815,26 @@ export default function Dashboard() {
         {(quickAnalysis || analyzingSymbol) && (
           <Panel>
             <PanelHeader title="Quick Analysis" icon={<BarChart3 className="w-3.5 h-3.5" />} rightContent={
-              <Button onClick={() => { setQuickAnalysis(null); setAnalyzingSymbol(""); }} size="icon" variant="ghost" className="w-7 h-7 text-white/30 hover:text-white/60"><X className="w-4 h-4" /></Button>
+              <Button onClick={() => { setQuickAnalysis(null); setAnalyzingSymbol(""); }} size="icon" variant="ghost" className="w-7 h-7 text-muted-foreground/50 hover:text-muted-foreground"><X className="w-4 h-4" /></Button>
             } />
             <div className="px-4 py-4">
               {analyzingSymbol ? (
                 <div className="flex items-center gap-2">
                   <RefreshCw className="w-4 h-4 text-primary animate-spin" />
-                  <span className="text-sm text-white/60">Running 55+ indicators on {analyzingSymbol}...</span>
+                  <span className="text-sm text-muted-foreground">Running 55+ indicators on {analyzingSymbol}...</span>
                 </div>
               ) : quickAnalysis && (
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div className="flex items-center gap-6">
                     <div className="text-center">
                       <p className={`text-3xl font-bold ${quickAnalysis.signal.includes("BUY") ? "text-[#00B4D8]" : quickAnalysis.signal.includes("SELL") ? "text-red-400" : "text-[#FFB800]"}`}>{quickAnalysis.confidence}%</p>
-                      <p className="text-xs text-white/35 mt-0.5">Confidence</p>
+                      <p className="text-xs text-muted-foreground/60 mt-0.5">Confidence</p>
                     </div>
-                    <div className="h-10 w-px bg-white/10" />
+                    <div className="h-10 w-px bg-muted" />
                     <div>
                       <div className="flex items-center gap-3 mb-1">
-                        <span className="text-lg font-bold text-white">{quickAnalysis.symbol}</span>
-                        <span className="text-sm text-white/30">{quickAnalysis.name}</span>
+                        <span className="text-lg font-bold text-foreground">{quickAnalysis.symbol}</span>
+                        <span className="text-sm text-muted-foreground/50">{quickAnalysis.name}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className={`px-2 py-0.5 text-xs font-semibold rounded-lg ${quickAnalysis.signal.includes("BUY") ? "bg-primary/10 text-primary" : quickAnalysis.signal.includes("SELL") ? "bg-red-400/10 text-red-400" : "bg-[#FFB800]/10 text-[#FFB800]"}`}>
@@ -858,8 +859,8 @@ export default function Dashboard() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-4 rounded-full bg-primary" />
-              <span className="text-sm font-semibold text-white/70">Your Financial Plan</span>
-              <span className="text-[10px] text-white/30 font-mono">Personalized to your occupation</span>
+              <span className="text-sm font-semibold text-foreground/70">Your Financial Plan</span>
+              <span className="text-[10px] text-muted-foreground/50 font-mono">Personalized to your occupation</span>
             </div>
           </div>
           <DynamicModuleGrid />
@@ -893,7 +894,7 @@ export default function Dashboard() {
           <div className="lg:col-span-2 space-y-4">
             <Panel>
               <PanelHeader title="Signal Matrix" icon={<Activity className="w-3.5 h-3.5" />} rightContent={
-                <span className="text-xs text-white/30">6 models · consensus view</span>
+                <span className="text-xs text-muted-foreground/50">6 models · consensus view</span>
               } />
               <div className="p-4">
                 <QuantumViz />
@@ -917,41 +918,41 @@ export default function Dashboard() {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {[
                         { label: "Cash", value: `$${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: "text-primary" },
-                        { label: "Positions", value: `$${portfolio.portfolioValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: "text-white/70" },
-                        { label: "Total", value: `$${portfolio.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: "text-white" },
+                        { label: "Positions", value: `$${portfolio.portfolioValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: "text-foreground/70" },
+                        { label: "Total", value: `$${portfolio.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: "text-foreground" },
                         { label: "P&L", value: `${pnl >= 0 ? '+' : ''}$${Math.abs(pnl).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: pnl >= 0 ? "text-primary" : "text-red-400" },
                       ].map(s => (
-                        <div key={s.label} className="bg-white/[0.03] rounded-xl p-3 text-center">
-                          <p className="text-xs text-white/35 mb-1">{s.label}</p>
+                        <div key={s.label} className="bg-muted/50 rounded-xl p-3 text-center">
+                          <p className="text-xs text-muted-foreground/60 mb-1">{s.label}</p>
                           <p className={`text-sm font-semibold font-mono ${s.color}`}>{s.value}</p>
                         </div>
                       ))}
                     </div>
                     <div className="flex gap-2">
-                      <Button onClick={() => setTradeSide("buy")} variant="ghost" className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-colors ${tradeSide === "buy" ? "bg-primary/15 text-primary border border-primary/30" : "bg-white/[0.03] text-white/40 border border-white/[0.06]"}`}>Buy</Button>
-                      <Button onClick={() => setTradeSide("sell")} variant="ghost" className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-colors ${tradeSide === "sell" ? "bg-red-500/15 text-red-400 border border-red-500/30" : "bg-white/[0.03] text-white/40 border border-white/[0.06]"}`}>Sell</Button>
+                      <Button onClick={() => setTradeSide("buy")} variant="ghost" className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-colors ${tradeSide === "buy" ? "bg-primary/15 text-primary border border-primary/30" : "bg-muted/50 text-muted-foreground/70 border border-border"}`}>Buy</Button>
+                      <Button onClick={() => setTradeSide("sell")} variant="ghost" className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-colors ${tradeSide === "sell" ? "bg-red-500/15 text-red-400 border border-red-500/30" : "bg-muted/50 text-muted-foreground/70 border border-border"}`}>Sell</Button>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
-                      <input aria-label="Ticker symbol" value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-primary/40 transition-colors" />
-                      <input aria-label="Quantity" value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" min="1" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-primary/40 transition-colors" />
-                      <input aria-label="Price per share" value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" min="0.01" className="h-9 px-3 text-sm bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-primary/40 transition-colors" />
+                      <input aria-label="Ticker symbol" value={tradeSymbol} onChange={e => setTradeSymbol(e.target.value.toUpperCase())} placeholder="AAPL" className="h-9 px-3 text-sm bg-muted/50 border border-border rounded-xl text-foregroundplaceholder:text-muted-foreground/70 focus:outline-none focus:border-primary/40 transition-colors" />
+                      <input aria-label="Quantity" value={tradeQty} onChange={e => setTradeQty(e.target.value)} placeholder="Qty" type="number" min="1" className="h-9 px-3 text-sm bg-muted/50 border border-border rounded-xl text-foregroundplaceholder:text-muted-foreground/70 focus:outline-none focus:border-primary/40 transition-colors" />
+                      <input aria-label="Price per share" value={tradePrice} onChange={e => setTradePrice(e.target.value)} placeholder="Price" type="number" step="0.01" min="0.01" className="h-9 px-3 text-sm bg-muted/50 border border-border rounded-xl text-foregroundplaceholder:text-muted-foreground/70 focus:outline-none focus:border-primary/40 transition-colors" />
                     </div>
                     <div className="flex gap-2">
-                      <Button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} aria-label={`${tradeSide === "buy" ? "Buy" : "Sell"} order`} className={`flex-1 h-10 text-sm font-bold rounded-xl active:scale-[0.97] gap-1.5 ${tradeSide === "buy" ? "bg-primary text-black hover:bg-primary/90" : "bg-red-500 text-white hover:bg-red-500/90"}`}>
+                      <Button onClick={executeTrade} disabled={tradeLoading || !isSignedIn} aria-label={`${tradeSide === "buy" ? "Buy" : "Sell"} order`} className={`flex-1 h-10 text-sm font-bold rounded-xl active:scale-[0.97] gap-1.5 ${tradeSide === "buy" ? "bg-primary text-black hover:bg-primary/90" : "bg-red-500 text-foregroundhover:bg-red-500/90"}`}>
                         {tradeLoading ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Executing...</> : `${tradeSide === "buy" ? "Buy" : "Sell"} Order`}
                       </Button>
-                      <Button onClick={resetPortfolio} variant="outline" title="Reset portfolio to $100,000" className="px-4 h-10 text-sm font-medium text-white/40 border-white/[0.06] rounded-xl hover:text-white/60 hover:border-white/10">
+                      <Button onClick={resetPortfolio} variant="outline" title="Reset portfolio to $100,000" className="px-4 h-10 text-sm font-medium text-muted-foreground/70 border-border rounded-xl hover:text-muted-foreground hover:border-border">
                         Reset
                       </Button>
                     </div>
                     {portfolio.positions.length > 0 && (
-                      <div className="border-t border-white/[0.06] pt-3">
-                        <p className="text-xs text-white/35 mb-2">Open Positions</p>
+                      <div className="border-t border-border pt-3">
+                        <p className="text-xs text-muted-foreground/60 mb-2">Open Positions</p>
                         {portfolio.positions.map(p => (
-                          <div key={p.id} className="flex items-center justify-between py-1.5 border-b border-white/[0.03] last:border-0">
+                          <div key={p.id} className="flex items-center justify-between py-1.5 border-b border-border/50 last:border-0">
                             <span className="text-sm font-semibold text-primary">{p.symbol}</span>
-                            <span className="text-xs text-white/50">{p.quantity} @ ${p.avgCost.toFixed(2)}</span>
-                            <span className="text-sm font-mono text-white/70">${(p.quantity * p.avgCost).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                            <span className="text-xs text-muted-foreground">{p.quantity} @ ${p.avgCost.toFixed(2)}</span>
+                            <span className="text-sm font-mono text-foreground/70">${(p.quantity * p.avgCost).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                           </div>
                         ))}
                       </div>
@@ -962,9 +963,9 @@ export default function Dashboard() {
                   <div>
                     {portfolio.trades.length === 0 && !hasRealHistory ? (
                       <div className="flex flex-col items-center justify-center py-12 text-center">
-                        <TrendingUp className="w-10 h-10 text-white/10 mb-3" />
-                        <p className="text-sm text-white/50 mb-1">$100,000 starting balance</p>
-                        <p className="text-xs text-white/25 mb-4">Place your first paper trade to start tracking</p>
+                        <TrendingUp className="w-10 h-10 text-muted-foreground/20 mb-3" />
+                        <p className="text-sm text-muted-foreground mb-1">$100,000 starting balance</p>
+                        <p className="text-xs text-muted-foreground/40 mb-4">Place your first paper trade to start tracking</p>
                         <Button onClick={() => setShowTradePanel(true)} variant="outline" className="text-sm font-semibold text-primary bg-primary/10 rounded-xl hover:bg-primary/20 border-primary/20">
                           Place your first trade
                         </Button>
@@ -972,7 +973,7 @@ export default function Dashboard() {
                     ) : (
                       <>
                         {hasRealHistory && (
-                          <p className="text-[10px] font-mono text-white/25 px-1 mb-1">Daily portfolio history · {snapshots.length} days</p>
+                          <p className="text-[10px] font-mono text-muted-foreground/40 px-1 mb-1">Daily portfolio history · {snapshots.length} days</p>
                         )}
                         <ResponsiveContainer width="100%" height={200}>
                           <AreaChart data={portfolioChartPoints}>
@@ -1029,21 +1030,21 @@ export default function Dashboard() {
                 <div className="flex gap-1">
                   {(["crypto", "forex", "commodities", "bonds"] as const).map(tab => (
                     <Button key={tab} onClick={() => setActiveAssetTab(tab)} variant="ghost" size="sm"
-                      className={`px-2 py-0.5 h-auto text-xs font-semibold rounded-lg ${activeAssetTab === tab ? 'bg-[#FFB800]/15 text-[#FFB800]' : 'text-white/30 hover:text-white/60'}`}>
+                      className={`px-2 py-0.5 h-auto text-xs font-semibold rounded-lg ${activeAssetTab === tab ? 'bg-[#FFB800]/15 text-[#FFB800]' : 'text-muted-foreground/50 hover:text-muted-foreground'}`}>
                       {tab === "commodities" ? "Cmdty" : tab.charAt(0).toUpperCase() + tab.slice(1)}
                     </Button>
                   ))}
                 </div>
               } />
               {activeAssetTab !== "crypto" && (
-                <div className="px-3 py-2 bg-white/[0.01] border-b border-white/[0.04]">
-                  <p className="text-[9px] font-mono text-white/25">&gt; AWAITING DATA FEED — {activeAssetTab.toUpperCase()} prices require market connection</p>
+                <div className="px-3 py-2 bg-muted/30 border-b border-white/[0.04]">
+                  <p className="text-[9px] font-mono text-muted-foreground/40">&gt; AWAITING DATA FEED — {activeAssetTab.toUpperCase()} prices require market connection</p>
                 </div>
               )}
               {activeAssetTab === "crypto" && cryptoPricesLoading && Object.keys(cryptoPrices).length === 0 && (
-                <div className="px-3 py-3 text-[9px] font-mono text-white/30 text-center">Loading crypto prices…</div>
+                <div className="px-3 py-3 text-[9px] font-mono text-muted-foreground/50 text-center">Loading crypto prices…</div>
               )}
-              <div className="divide-y divide-white/[0.03]">
+              <div className="divide-y divide-border/50">
                 {MULTI_ASSET_SYMBOLS[activeAssetTab].map(sym => {
                   if (activeAssetTab === "crypto") {
                     const p = cryptoPrices[sym];
@@ -1053,7 +1054,7 @@ export default function Dashboard() {
                       <DataRow
                         key={sym}
                         label={`${display} · ${label}`}
-                        value={p ? `$${p.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: p.price >= 1000 ? 0 : 4 })}` : "—"}
+                        value={p ? `$${p.price.toLocaleString(undefined, { minimumFractionDigits: p.price >= 1000 ? 0 : 2, maximumFractionDigits: p.price >= 1000 ? 0 : 4 })}` : "—"}
                         change={p ? p.changePercent : undefined}
                       />
                     );
@@ -1067,7 +1068,7 @@ export default function Dashboard() {
 
         {/* Section 3: Tabbed secondary data */}
         <Panel>
-          <div className="border-b border-white/[0.06]">
+          <div className="border-b border-border">
             <div className="flex px-2 py-1 gap-1">
               {SECONDARY_TABS.map(t => (
                 <Button
@@ -1077,7 +1078,7 @@ export default function Dashboard() {
                   className={`px-4 py-2.5 h-auto text-sm font-semibold rounded-lg ${
                     secondaryTab === t.key
                       ? "bg-primary/10 text-primary"
-                      : "text-white/40 hover:text-white/70 hover:bg-white/[0.03]"
+                      : "text-muted-foreground/70 hover:text-foreground/70 hover:bg-muted/50"
                   }`}
                 >
                   {t.label}
@@ -1088,23 +1089,23 @@ export default function Dashboard() {
 
           {secondaryTab === "signals" && (
             <div className="px-4 py-8 text-center">
-              <p className="text-[10px] font-mono text-white/25">&gt; NO SIGNALS IN QUEUE — analysis engine idle</p>
-              <p className="text-[9px] font-mono text-white/15 mt-1">Run a stock analysis to generate signals</p>
+              <p className="text-[10px] font-mono text-muted-foreground/40">&gt; NO SIGNALS IN QUEUE — analysis engine idle</p>
+              <p className="text-[9px] font-mono text-muted-foreground/30 mt-1">Run a stock analysis to generate signals</p>
             </div>
           )}
 
           {secondaryTab === "options" && (
             <div className="px-4 py-8 text-center">
-              <p className="text-[10px] font-mono text-white/25">&gt; OPTIONS FLOW OFFLINE — awaiting market feed</p>
-              <p className="text-[9px] font-mono text-white/15 mt-1">Unusual activity alerts will appear here when detected</p>
+              <p className="text-[10px] font-mono text-muted-foreground/40">&gt; OPTIONS FLOW OFFLINE — awaiting market feed</p>
+              <p className="text-[9px] font-mono text-muted-foreground/30 mt-1">Unusual activity alerts will appear here when detected</p>
             </div>
           )}
 
           {secondaryTab === "market" && (
             <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
-              <div className="divide-y divide-white/[0.03]">
+              <div className="divide-y divide-border/50">
                 <div className="px-4 py-2.5">
-                  <p className="text-xs text-white/50 font-semibold">Market Internals</p>
+                  <p className="text-xs text-muted-foreground font-semibold">Market Internals</p>
                 </div>
                 <MarketConditionBadges conditions={marketConditions} />
                 <DataRow label="Advancing / Declining" value={`${MARKET_INTERNALS.advDecl.advancing} / ${MARKET_INTERNALS.advDecl.declining}`} change={((MARKET_INTERNALS.advDecl.advancing / MARKET_INTERNALS.advDecl.declining) - 1) * 100} />
@@ -1117,12 +1118,12 @@ export default function Dashboard() {
                 <DataRow label="Above 200 SMA" value={`${MARKET_INTERNALS.breadth.above200sma}%`} />
                 <DataRow label="New Highs / Lows" value={`${MARKET_INTERNALS.breadth.newHighs} / ${MARKET_INTERNALS.breadth.newLows}`} />
               </div>
-              <div className="divide-y divide-white/[0.03]">
+              <div className="divide-y divide-border/50">
                 <div className="px-4 py-2.5">
-                  <p className="text-xs text-white/50 font-semibold">Unusual Options Activity</p>
+                  <p className="text-xs text-muted-foreground font-semibold">Unusual Options Activity</p>
                 </div>
                 <div className="flex flex-col items-center justify-center py-6 text-center gap-1">
-                  <p className="text-xs text-white/20">No unusual activity detected</p>
+                  <p className="text-xs text-muted-foreground/40">No unusual activity detected</p>
                 </div>
               </div>
             </div>
@@ -1131,11 +1132,11 @@ export default function Dashboard() {
           {secondaryTab === "calendar" && (
             <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
               <div className="p-4">
-                <p className="text-xs text-white/50 font-semibold mb-3">Signal History</p>
+                <p className="text-xs text-muted-foreground font-semibold mb-3">Signal History</p>
                 <SignalHistory />
               </div>
               <div className="p-4">
-                <p className="text-xs text-white/50 font-semibold mb-3">Economic Calendar</p>
+                <p className="text-xs text-muted-foreground font-semibold mb-3">Economic Calendar</p>
                 <EconomicCalendar />
               </div>
             </div>

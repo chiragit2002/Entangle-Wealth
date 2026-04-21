@@ -19,7 +19,7 @@ export function PutItToWorkCard({ savingsAmount, className = "" }: PutItToWorkCa
   return (
     <div
       className={`relative rounded-xl overflow-hidden ${className}`}
-      style={{ border: `1px solid ${color}25`, background: "rgba(8,8,18,0.97)" }}
+      style={{ border: `1px solid ${color}25`, background: "var(--glass-bg)" }}
     >
       <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(135deg, ${color}06 0%, transparent 60%)` }} />
       <div className="absolute top-0 left-0 right-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${color}50, transparent)` }} />
@@ -30,30 +30,30 @@ export function PutItToWorkCard({ savingsAmount, className = "" }: PutItToWorkCa
             <Sparkles className="w-3.5 h-3.5" style={{ color }} />
           </div>
           <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color }}>Put It To Work</span>
-          <span className="text-[9px] text-white/25 font-mono ml-1">TaxGPT → Simulator</span>
+          <span className="text-[9px] text-muted-foreground/40 font-mono ml-1">TaxGPT → Simulator</span>
         </div>
 
-        <p className="text-xs text-white/70 mb-3 leading-relaxed">
+        <p className="text-xs text-foreground/70 mb-3 leading-relaxed">
           You identified <span className="font-semibold" style={{ color }}>${savingsAmount.toLocaleString()}</span> in potential tax savings.
           Invested annually, that compounds significantly over time.
         </p>
 
         <div className="grid grid-cols-2 gap-2 mb-3">
           <div className="rounded-lg p-2.5 text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-            <p className="text-[9px] text-white/40 uppercase tracking-wider mb-1">10-Year Growth</p>
+            <p className="text-[9px] text-muted-foreground/70 uppercase tracking-wider mb-1">10-Year Growth</p>
             <p className="text-sm font-bold font-mono text-emerald-400">${projection10.toLocaleString()}</p>
-            <p className="text-[9px] text-white/30 mt-0.5">@ 8% avg return</p>
+            <p className="text-[9px] text-muted-foreground/50 mt-0.5">@ 8% avg return</p>
           </div>
           <div className="rounded-lg p-2.5 text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-            <p className="text-[9px] text-white/40 uppercase tracking-wider mb-1">20-Year Growth</p>
+            <p className="text-[9px] text-muted-foreground/70 uppercase tracking-wider mb-1">20-Year Growth</p>
             <p className="text-sm font-bold font-mono text-emerald-400">${projection20.toLocaleString()}</p>
-            <p className="text-[9px] text-white/30 mt-0.5">@ 8% avg return</p>
+            <p className="text-[9px] text-muted-foreground/50 mt-0.5">@ 8% avg return</p>
           </div>
         </div>
 
         <div className="flex items-center gap-1.5 mb-3">
           <TrendingUp className="w-3 h-3" style={{ color }} />
-          <p className="text-[11px] text-white/45">Reinvesting your tax savings accelerates wealth compounding</p>
+          <p className="text-[11px] text-muted-foreground/70">Reinvesting your tax savings accelerates wealth compounding</p>
         </div>
 
         <Link

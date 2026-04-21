@@ -140,7 +140,7 @@ export function CityAutocomplete({
           ref={dropdownRef}
           id={id ? `${id}-listbox` : undefined}
           role="listbox"
-          className="absolute z-50 w-full mt-1 max-h-[240px] overflow-y-auto border border-[#00B4D8]/30 bg-[#0D1321] shadow-xl shadow-black/60"
+          className="absolute z-50 w-full mt-1 max-h-[240px] overflow-y-auto border border-[#00B4D8]/30 bg-card shadow-xl shadow-black/60"
           style={{ borderRadius: 4 }}
         >
           {suggestions.map((entry, idx) => (

@@ -65,19 +65,19 @@ export default function BudgetSummary({ form, activities, dayCount }: Props) {
         </p>
 
         <div className="rounded-xl bg-gradient-to-br from-primary/[0.08] to-[#00B4D8]/[0.04] border border-primary/20 p-5 mb-5 text-center">
-          <p className="text-[11px] uppercase tracking-wider text-white/30 font-semibold mb-1">Estimated Trip Total</p>
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground/50 font-semibold mb-1">Estimated Trip Total</p>
           <p className="text-[36px] font-black text-primary font-mono">${tripTotal.toLocaleString()}</p>
-          <p className="text-[12px] text-white/50 mt-1">{form.budgetLevel.charAt(0).toUpperCase() + form.budgetLevel.slice(1)} · {form.travelers} traveler{form.travelers > 1 ? "s" : ""} · {dayCount} day{dayCount > 1 ? "s" : ""}</p>
+          <p className="text-[12px] text-muted-foreground mt-1">{form.budgetLevel.charAt(0).toUpperCase() + form.budgetLevel.slice(1)} · {form.travelers} traveler{form.travelers > 1 ? "s" : ""} · {dayCount} day{dayCount > 1 ? "s" : ""}</p>
         </div>
 
         <div className="space-y-3 mb-5">
           {breakdown.map(cat => (
             <div key={cat.key}>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[12px] text-white/60">{cat.label}</span>
+                <span className="text-[12px] text-muted-foreground">{cat.label}</span>
                 <span className="text-[13px] font-bold font-mono" style={{ color: cat.color }}>${cat.amount.toLocaleString()}</span>
               </div>
-              <div className="h-2 rounded-full bg-white/[0.04] overflow-hidden">
+              <div className="h-2 rounded-full bg-muted/50 overflow-hidden">
                 <div className="h-full rounded-full transition-all duration-500"
                   style={{ width: maxAmount > 0 ? `${(cat.amount / maxAmount) * 100}%` : "0%", background: cat.color }} />
               </div>
@@ -89,8 +89,8 @@ export default function BudgetSummary({ form, activities, dayCount }: Props) {
           {breakdown.map(cat => (
             <div key={cat.key} className="rounded-xl p-3 text-center" style={{ background: `${cat.color}08`, border: `1px solid ${cat.color}20` }}>
               <p className="text-[14px] font-black font-mono" style={{ color: cat.color }}>${cat.amount.toLocaleString()}</p>
-              <p className="text-[9px] text-white/30 mt-0.5">{cat.label}</p>
-              <p className="text-[9px] text-white/40">{tripTotal > 0 ? ((cat.amount / tripTotal) * 100).toFixed(0) : 0}%</p>
+              <p className="text-[9px] text-muted-foreground/50 mt-0.5">{cat.label}</p>
+              <p className="text-[9px] text-muted-foreground/70">{tripTotal > 0 ? ((cat.amount / tripTotal) * 100).toFixed(0) : 0}%</p>
             </div>
           ))}
         </div>
@@ -107,22 +107,22 @@ export default function BudgetSummary({ form, activities, dayCount }: Props) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
           <div>
-            <label className="text-[11px] uppercase tracking-wider text-white/30 font-semibold mb-2 block">Monthly Income</label>
+            <label className="text-[11px] uppercase tracking-wider text-muted-foreground/50 font-semibold mb-2 block">Monthly Income</label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
               <input type="number" min={0} max={999999} value={monthlyIncome}
                 onChange={e => setMonthlyIncome(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-9 pr-4 py-3 text-white text-[14px] font-mono focus:outline-none focus:border-primary/50"
+                className="w-full bg-muted/50 border border-border rounded-xl pl-9 pr-4 py-3 text-foreground text-[14px] font-mono focus:outline-none focus:border-primary/50"
                 aria-label="Monthly income" />
             </div>
           </div>
           <div>
-            <label className="text-[11px] uppercase tracking-wider text-white/30 font-semibold mb-2 block">Monthly Savings for Travel</label>
+            <label className="text-[11px] uppercase tracking-wider text-muted-foreground/50 font-semibold mb-2 block">Monthly Savings for Travel</label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
               <input type="number" min={0} max={999999} value={monthlySavings}
                 onChange={e => setMonthlySavings(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-9 pr-4 py-3 text-white text-[14px] font-mono focus:outline-none focus:border-primary/50"
+                className="w-full bg-muted/50 border border-border rounded-xl pl-9 pr-4 py-3 text-foreground text-[14px] font-mono focus:outline-none focus:border-primary/50"
                 aria-label="Monthly savings" />
             </div>
           </div>
@@ -132,14 +132,14 @@ export default function BudgetSummary({ form, activities, dayCount }: Props) {
           <div className="rounded-xl p-4 bg-primary/[0.06] border border-primary/15 text-center">
             <TrendingUp className="w-5 h-5 text-primary mx-auto mb-2" />
             <p className="text-[24px] font-black text-primary font-mono">{costAsPercent}%</p>
-            <p className="text-[10px] text-white/30 mt-1">of monthly income</p>
+            <p className="text-[10px] text-muted-foreground/50 mt-1">of monthly income</p>
           </div>
           <div className="rounded-xl p-4 bg-[#00B4D8]/[0.06] border border-[#00B4D8]/15 text-center">
             <PiggyBank className="w-5 h-5 text-[#00B4D8] mx-auto mb-2" />
             <p className="text-[24px] font-black text-[#00B4D8] font-mono">
               {monthsToFund > 0 ? `${monthsToFund} mo` : "—"}
             </p>
-            <p className="text-[10px] text-white/30 mt-1">
+            <p className="text-[10px] text-muted-foreground/50 mt-1">
               {monthlySavings > 0
                 ? `saving $${monthlySavings.toLocaleString()}/mo`
                 : "enter savings amount"}

@@ -75,7 +75,7 @@ const STATUS_STYLES: Record<string, string> = {
   draft: "bg-yellow-500/20 text-yellow-400 border-yellow-500/20",
   approved: "bg-emerald-500/20 text-emerald-400 border-emerald-500/20",
   posted: "bg-blue-500/20 text-blue-400 border-blue-500/20",
-  archived: "bg-white/10 text-white/40 border-white/10",
+  archived: "bg-muted text-muted-foreground/70 border-border",
 };
 
 function PostCard({
@@ -118,7 +118,7 @@ function PostCard({
 
   return (
     <div
-      className="rounded-xl border border-white/[0.06] overflow-hidden"
+      className="rounded-xl border border-border overflow-hidden"
       style={{ background: "rgba(8,8,20,0.6)" }}
     >
       <div className="p-4 flex items-start justify-between gap-3">
@@ -130,7 +130,7 @@ function PostCard({
             <span style={{ color: meta.color }}>{meta.icon}</span>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-white">{meta.label}</h3>
+            <h3 className="text-sm font-semibold text-foreground">{meta.label}</h3>
             <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${STATUS_STYLES[post.status]}`}>
               {post.status}
             </span>
@@ -141,7 +141,7 @@ function PostCard({
           {!editing && (
             <button
               onClick={() => setEditing(true)}
-              className="p-1.5 rounded-lg text-white/40 hover:text-white/80 hover:bg-white/[0.05] transition-colors"
+              className="p-1.5 rounded-lg text-muted-foreground/70 hover:text-foreground/80 hover:bg-muted/50 transition-colors"
               title="Edit"
             >
               <Edit3 className="w-3.5 h-3.5" />
@@ -149,7 +149,7 @@ function PostCard({
           )}
           <button
             onClick={copyToClipboard}
-            className="p-1.5 rounded-lg text-white/40 hover:text-white/80 hover:bg-white/[0.05] transition-colors"
+            className="p-1.5 rounded-lg text-muted-foreground/70 hover:text-foreground/80 hover:bg-muted/50 transition-colors"
             title="Copy to clipboard"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -163,7 +163,7 @@ function PostCard({
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white/90 placeholder:text-white/40 resize-none focus:outline-none focus:border-primary/40 transition-colors font-sans leading-relaxed"
+              className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground/90 placeholder:text-muted-foreground/70 resize-none focus:outline-none focus:border-primary/40 transition-colors font-sans leading-relaxed"
               rows={8}
             />
             <div className="flex gap-2">
@@ -180,15 +180,15 @@ function PostCard({
                 size="sm"
                 variant="ghost"
                 onClick={handleCancelEdit}
-                className="text-white/50 hover:text-white/70 gap-1.5 text-xs"
+                className="text-muted-foreground hover:text-foreground/70 gap-1.5 text-xs"
               >
                 <X className="w-3.5 h-3.5" /> Cancel
               </Button>
             </div>
           </div>
         ) : (
-          <div className="bg-white/[0.02] border border-white/[0.05] rounded-lg p-3 max-h-64 overflow-y-auto">
-            <pre className="text-sm text-white/85 whitespace-pre-wrap font-sans leading-relaxed">{post.content}</pre>
+          <div className="bg-muted/30 border border-border rounded-lg p-3 max-h-64 overflow-y-auto">
+            <pre className="text-sm text-foreground/85 whitespace-pre-wrap font-sans leading-relaxed">{post.content}</pre>
           </div>
         )}
       </div>
@@ -215,7 +215,7 @@ function PostCard({
         {post.status !== "archived" && (
           <Button
             size="sm"
-            className="bg-white/5 text-white/40 hover:bg-white/10 border border-white/10 text-[10px] h-7 px-2"
+            className="bg-muted/50 text-muted-foreground/70 hover:bg-muted border border-border text-[10px] h-7 px-2"
             onClick={() => onStatusChange(post.id, "archived")}
           >
             <Archive className="w-3 h-3 mr-1" /> Archive
@@ -249,15 +249,15 @@ function HistoryBatchCard({ batch }: { batch: HistoryBatch }) {
   }, {});
 
   return (
-    <div className="rounded-lg border border-white/[0.06] overflow-hidden" style={{ background: "rgba(8,8,20,0.5)" }}>
+    <div className="rounded-lg border border-border overflow-hidden" style={{ background: "rgba(8,8,20,0.5)" }}>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-3 text-left hover:bg-white/[0.02] transition-colors"
+        className="w-full flex items-center justify-between p-3 text-left hover:bg-muted/30 transition-colors"
       >
         <div className="flex items-center gap-3">
           <CalendarDays className="w-4 h-4 text-muted-foreground shrink-0" />
           <div>
-            <p className="text-sm font-medium text-white">{formatDate(batch.date)}</p>
+            <p className="text-sm font-medium text-foreground">{formatDate(batch.date)}</p>
             <p className="text-[11px] text-muted-foreground">{batch.theme}</p>
           </div>
         </div>
@@ -274,20 +274,20 @@ function HistoryBatchCard({ batch }: { batch: HistoryBatch }) {
       </button>
 
       {expanded && (
-        <div className="border-t border-white/[0.04] p-3 space-y-2">
+        <div className="border-t border-border p-3 space-y-2">
           {batch.posts.map((post) => {
             const meta = PLATFORM_META[post.platform];
             return (
-              <div key={post.id} className="flex items-start gap-2 p-2 rounded-lg bg-white/[0.02]">
+              <div key={post.id} className="flex items-start gap-2 p-2 rounded-lg bg-muted/30">
                 <span style={{ color: meta?.color || "#aaa" }}>{meta?.icon}</span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[11px] font-semibold text-white/80">{meta?.label || post.platform}</span>
+                    <span className="text-[11px] font-semibold text-foreground/80">{meta?.label || post.platform}</span>
                     <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${STATUS_STYLES[post.status]}`}>
                       {post.status}
                     </span>
                   </div>
-                  <p className="text-[11px] text-white/50 truncate">{post.content.split("\n")[0]}</p>
+                  <p className="text-[11px] text-muted-foreground truncate">{post.content.split("\n")[0]}</p>
                 </div>
               </div>
             );
@@ -463,7 +463,7 @@ export default function DailyContent() {
           <div className="w-16 h-16 rounded-sm bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
             <Shield className="w-8 h-8 text-red-400" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Access Denied</h1>
           <p className="text-muted-foreground max-w-md">
             The Daily Content Engine is restricted to admin-tier accounts.
           </p>
@@ -493,7 +493,7 @@ export default function DailyContent() {
               onClick={handleRegenerate}
               disabled={regenerating || generating}
               variant="outline"
-              className="border-white/10 gap-2 shrink-0"
+              className="border-border gap-2 shrink-0"
             >
               {regenerating || generating ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -511,7 +511,7 @@ export default function DailyContent() {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               activeTab === "today"
                 ? "bg-primary/20 text-primary border border-primary/30"
-                : "bg-white/[0.03] text-white/50 border border-white/[0.06] hover:bg-white/[0.06]"
+                : "bg-muted/50 text-muted-foreground border border-border hover:bg-muted"
             }`}
           >
             <CalendarDays className="w-4 h-4 inline mr-1.5" />
@@ -522,7 +522,7 @@ export default function DailyContent() {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               activeTab === "history"
                 ? "bg-primary/20 text-primary border border-primary/30"
-                : "bg-white/[0.03] text-white/50 border border-white/[0.06] hover:bg-white/[0.06]"
+                : "bg-muted/50 text-muted-foreground border border-border hover:bg-muted"
             }`}
           >
             <History className="w-4 h-4 inline mr-1.5" />
@@ -532,11 +532,11 @@ export default function DailyContent() {
 
         {activeTab === "today" && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 rounded-lg border border-white/[0.06] bg-white/[0.02]">
+            <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/30">
               <div className="flex items-center gap-3">
                 <Clock className="w-4 h-4 text-muted-foreground" />
                 <div>
-                  <p className="text-sm font-medium text-white">{todayFormatted}</p>
+                  <p className="text-sm font-medium text-foreground">{todayFormatted}</p>
                   {today && (
                     <p className="text-[11px] text-muted-foreground">
                       Theme: <span className="text-primary/80">{today.theme}</span>
@@ -555,7 +555,7 @@ export default function DailyContent() {
               <div className="flex items-center gap-3 p-4 rounded-xl border border-primary/20 bg-primary/[0.04]">
                 <Loader2 className="w-5 h-5 animate-spin text-primary shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-white">Generating today's batch...</p>
+                  <p className="text-sm font-semibold text-foreground">Generating today's batch...</p>
                   <p className="text-xs text-muted-foreground">AI is crafting your posts | typically takes 30-60 seconds</p>
                 </div>
               </div>
@@ -567,14 +567,14 @@ export default function DailyContent() {
                   <Sparkles className="w-8 h-8 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white">No batch yet for today</h3>
+                  <h3 className="text-lg font-semibold text-foreground">No batch yet for today</h3>
                   <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
                     The auto-generator runs once per day. Generate now to get your batch immediately.
                   </p>
                 </div>
                 <Button
                   onClick={handleGenerateNow}
-                  className="bg-gradient-to-r from-primary/80 to-blue-600/80 text-white hover:from-primary hover:to-blue-600 gap-2"
+                  className="bg-gradient-to-r from-primary/80 to-blue-600/80 text-foreground hover:from-primary hover:to-blue-600 gap-2"
                 >
                   <Sparkles className="w-4 h-4" /> Generate Today's Batch
                 </Button>

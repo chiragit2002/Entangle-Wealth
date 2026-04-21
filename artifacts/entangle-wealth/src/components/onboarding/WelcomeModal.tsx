@@ -62,7 +62,7 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
       aria-modal="true"
       aria-labelledby="welcome-modal-title"
     >
-      <div className="bg-[#0a0a14] border border-white/10 rounded-sm w-full max-w-sm overflow-hidden shadow-2xl shadow-[#00B4D8]/5 animate-in fade-in zoom-in-95 duration-300">
+      <div className="bg-card border border-border rounded-sm w-full max-w-sm overflow-hidden shadow-2xl shadow-[#00B4D8]/5 animate-in fade-in zoom-in-95 duration-300">
 
         <div className="px-6 pt-6 pb-4">
           <div className="flex items-center gap-2.5 mb-1">
@@ -70,16 +70,16 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
               <Sparkles className="w-4.5 h-4.5 text-[#00B4D8]" />
             </div>
             <div>
-              <h2 id="welcome-modal-title" className="text-lg font-bold text-white leading-tight">
+              <h2 id="welcome-modal-title" className="text-lg font-bold text-foreground leading-tight">
                 {firstName ? `Welcome, ${firstName}!` : "Welcome!"}
               </h2>
-              <p className="text-xs text-white/50 mt-0.5">One question. Thirty seconds. Then we get to work.</p>
+              <p className="text-xs text-muted-foreground mt-0.5">One question. Thirty seconds. Then we get to work.</p>
             </div>
           </div>
         </div>
 
         <div className="px-6 pb-6 flex flex-col">
-          <p className="text-sm font-semibold text-white mb-4">What's the actual problem you're trying to solve?</p>
+          <p className="text-sm font-semibold text-foreground mb-4">What's the actual problem you're trying to solve?</p>
 
           <div className="space-y-2 mb-6">
             {GOAL_OPTIONS.map((opt) => (
@@ -88,8 +88,8 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
                 onClick={() => setGoal(opt.id)}
                 className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl border text-left transition-all duration-200 active:scale-[0.98] ${
                   goal === opt.id
-                    ? "border-[#00B4D8]/50 bg-[#00B4D8]/8 text-white"
-                    : "border-white/8 bg-white/[0.02] text-white/70 hover:border-white/15 hover:bg-white/[0.04]"
+                    ? "border-[#00B4D8]/50 bg-[#00B4D8]/8 text-foreground"
+                    : "border-white/8 bg-muted/30 text-foreground/70 hover:border-white/15 hover:bg-muted/50"
                 }`}
                 aria-pressed={goal === opt.id}
               >
@@ -119,7 +119,7 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
 
           <button
             onClick={handleSkip}
-            className="w-full mt-2 text-[11px] text-white/25 hover:text-white/50 transition-colors py-1"
+            className="w-full mt-2 text-[11px] text-muted-foreground/40 hover:text-muted-foreground transition-colors py-1"
             aria-label="Skip onboarding"
           >
             Skip for now

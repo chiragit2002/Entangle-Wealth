@@ -122,9 +122,9 @@ function QuantumVizBase() {
             <div key={node.id} className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <div className={`w-1.5 h-1.5 rounded-full ${node.status === "active" ? "bg-primary" : "bg-secondary"}`} />
-                <span className="text-xs text-white/70">{node.label}</span>
+                <span className="text-xs text-foreground/70">{node.label}</span>
               </div>
-              <span className={`text-xs font-mono font-bold text-white/40`}>—</span>
+              <span className={`text-xs font-mono font-bold text-muted-foreground/70`}>—</span>
             </div>
           ))}
           <div className="border-t border-white/5 pt-3 mt-1">
@@ -132,7 +132,7 @@ function QuantumVizBase() {
               <span className="text-[10px] uppercase text-muted-foreground">Consensus</span>
               <span className="text-sm font-mono font-bold text-primary stat-value">{consensusValue}%</span>
             </div>
-            <div className="w-full h-1.5 bg-white/5 rounded-full mt-2 overflow-hidden">
+            <div className="w-full h-1.5 bg-muted/50 rounded-full mt-2 overflow-hidden">
               <div className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full transition-all duration-1000" style={{ width: `${consensusValue}%` }} />
             </div>
           </div>

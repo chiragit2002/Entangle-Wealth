@@ -22,17 +22,17 @@ interface LeaderboardEntry {
 
 const TRADER_TIER_COLORS: Record<string, string> = {
   Diamond: "text-[#00B4D8]",
-  Platinum: "text-white/70",
+  Platinum: "text-foreground/70",
   Gold: "text-[#FFB800]",
-  Silver: "text-white/50",
+  Silver: "text-muted-foreground",
   Bronze: "text-orange-400",
 };
 
 const TRADER_TIER_BG: Record<string, string> = {
   Diamond: "bg-[#00D4FF]/10 border-[#00D4FF]/30 text-[#00D4FF]",
-  Platinum: "bg-white/10 border-white/20 text-white/70",
+  Platinum: "bg-muted border-border text-foreground/70",
   Gold: "bg-[#FFB800]/10 border-[#FFB800]/30 text-[#FFB800]",
-  Silver: "bg-white/5 border-white/15 text-white/50",
+  Silver: "bg-muted/50 border-white/15 text-muted-foreground",
   Bronze: "bg-orange-400/10 border-orange-400/30 text-orange-400",
 };
 
@@ -60,9 +60,9 @@ const RANK_TIER_CONFIG: Record<string, { label: string; color: string; bg: strin
   },
   Rookie: {
     label: "ROOKIE",
-    color: "text-white/40",
-    bg: "bg-white/5",
-    border: "border-white/10",
+    color: "text-muted-foreground/70",
+    bg: "bg-muted/50",
+    border: "border-border",
     icon: "◆",
   },
 };
@@ -87,9 +87,9 @@ const DEMO_LEADERBOARD: LeaderboardEntry[] = [
 
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1) return <Crown className="w-4 h-4 text-[#FFB800]" />;
-  if (rank === 2) return <Medal className="w-4 h-4 text-white/60" />;
+  if (rank === 2) return <Medal className="w-4 h-4 text-muted-foreground" />;
   if (rank === 3) return <Medal className="w-4 h-4 text-orange-400" />;
-  return <span className="text-xs font-mono font-bold text-white/30 w-4 text-center">{rank}</span>;
+  return <span className="text-xs font-mono font-bold text-muted-foreground/50 w-4 text-center">{rank}</span>;
 }
 
 function RankTierPill({ rank }: { rank: number }) {
@@ -156,9 +156,9 @@ export default function Leaderboard() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Trophy className="w-7 h-7 text-[#FFB800]" />
-            <h1 className="text-3xl font-bold tracking-tight text-white">Leaderboard</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Leaderboard</h1>
           </div>
-          <p className="text-white/50 text-sm">Top 100 traders ranked by performance</p>
+          <p className="text-muted-foreground text-sm">Top 100 traders ranked by performance</p>
 
           {/* Rank Tier Legend */}
           <div className="flex flex-wrap gap-2 mt-4">
@@ -169,7 +169,7 @@ export default function Leaderboard() {
                 <div key={tier} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono border ${config.bg} ${config.border}`}>
                   <span>{config.icon}</span>
                   <span className={`font-bold ${config.color}`}>{config.label}</span>
-                  <span className="text-white/30">{ranges[tier]}</span>
+                  <span className="text-muted-foreground/50">{ranges[tier]}</span>
                 </div>
               );
             })}
@@ -193,7 +193,7 @@ export default function Leaderboard() {
         )}
 
         {/* Period Tabs */}
-        <div className="flex gap-1.5 mb-6 bg-white/[0.03] rounded-xl p-1 border border-white/[0.06] w-fit">
+        <div className="flex gap-1.5 mb-6 bg-muted/50 rounded-xl p-1 border border-border w-fit">
           {periods.map(p => (
             <Button
               key={p}
@@ -202,7 +202,7 @@ export default function Leaderboard() {
               className={`px-4 py-1.5 h-auto rounded-lg text-sm font-medium ${
                 period === p
                   ? "bg-primary/15 text-primary"
-                  : "text-white/40 hover:text-white/70"
+                  : "text-muted-foreground/70 hover:text-foreground/70"
               }`}
             >
               {p === "all-time" ? "All Time" : p.charAt(0).toUpperCase() + p.slice(1)}
@@ -212,15 +212,15 @@ export default function Leaderboard() {
 
         {/* My Rank Card */}
         {myRank && myRank.rank && (
-          <div className="bg-[#0A0E1A] border border-primary/20 rounded-xl p-4 mb-6 flex items-center justify-between">
+          <div className="bg-card border border-primary/20 rounded-xl p-4 mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Star className="w-4 h-4 text-primary" />
-              <span className="text-sm text-white/50">Your ranking</span>
+              <span className="text-sm text-muted-foreground">Your ranking</span>
             </div>
             <div className="flex items-center gap-3">
               <RankTierPill rank={myRank.rank} />
               <span className="text-2xl font-bold font-mono text-primary">#{myRank.rank}</span>
-              <span className="text-xs text-white/30">of {myRank.totalUsers} traders</span>
+              <span className="text-xs text-muted-foreground/50">of {myRank.totalUsers} traders</span>
             </div>
           </div>
         )}
@@ -231,7 +231,7 @@ export default function Leaderboard() {
             {leaderboard.slice(0, 3).map((entry) => (
               <div
                 key={entry.userId}
-                className={`bg-[#0A0E1A] border rounded-xl p-4 text-center ${
+                className={`bg-card border rounded-xl p-4 text-center ${
                   entry.rank === 1 ? "border-[#FFB800]/25 bg-[#FFB800]/[0.03]" :
                   entry.rank === 2 ? "border-white/15" :
                   "border-orange-500/20"
@@ -244,13 +244,13 @@ export default function Leaderboard() {
                   <RankTierPill rank={entry.rank} />
                 </div>
                 {entry.photoUrl ? (
-                  <img src={entry.photoUrl} alt="" className="w-12 h-12 rounded-full mx-auto mb-2 border-2 border-white/10" />
+                  <img src={entry.photoUrl} alt="" className="w-12 h-12 rounded-full mx-auto mb-2 border-2 border-border" />
                 ) : (
-                  <div className="w-12 h-12 rounded-full mx-auto mb-2 bg-white/[0.04] border-2 border-white/10 flex items-center justify-center">
-                    <User className="w-6 h-6 text-white/40" />
+                  <div className="w-12 h-12 rounded-full mx-auto mb-2 bg-muted/50 border-2 border-border flex items-center justify-center">
+                    <User className="w-6 h-6 text-muted-foreground/70" />
                   </div>
                 )}
-                <p className="font-semibold text-sm text-white mb-0.5">{entry.firstName || "Trader"} {entry.lastName?.charAt(0) || ""}</p>
+                <p className="font-semibold text-sm text-foreground mb-0.5">{entry.firstName || "Trader"} {entry.lastName?.charAt(0) || ""}</p>
                 <span className={`text-[10px] font-semibold ${TRADER_TIER_COLORS[entry.tier]}`}>{entry.tier} · Lv {entry.level}</span>
                 <div className="flex items-center justify-center gap-1 mt-2">
                   <TrendingUp className={`w-3 h-3 ${entry.gainPercent >= 0 ? "text-primary" : "text-red-400"}`} />
@@ -264,15 +264,15 @@ export default function Leaderboard() {
                     <span className="text-[10px] font-mono text-orange-400">{entry.winStreak}d streak</span>
                   </div>
                 )}
-                <p className="text-[10px] text-white/30 mt-1">{entry.totalXp.toLocaleString()} XP</p>
+                <p className="text-[10px] text-muted-foreground/50 mt-1">{entry.totalXp.toLocaleString()} XP</p>
               </div>
             ))}
           </div>
         )}
 
         {/* Full table */}
-        <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-xl overflow-hidden" role="table" aria-label="Leaderboard rankings sorted by XP">
-          <div role="row" className="grid grid-cols-12 gap-2 px-4 py-3 bg-white/[0.02] border-b border-white/[0.06] text-[10px] font-semibold text-white/30 uppercase tracking-wider">
+        <div className="bg-card border border-border rounded-xl overflow-hidden" role="table" aria-label="Leaderboard rankings sorted by XP">
+          <div role="row" className="grid grid-cols-12 gap-2 px-4 py-3 bg-muted/30 border-b border-border text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">
             <div role="columnheader" aria-sort="ascending" className="col-span-1">#</div>
             <div role="columnheader" className="col-span-4">Trader</div>
             <div role="columnheader" className="col-span-2 text-center">Rank</div>
@@ -290,16 +290,16 @@ export default function Leaderboard() {
           ) : leaderboard.length === 0 ? (
             <div>
               {DEMO_LEADERBOARD.map((entry) => (
-                <div key={entry.userId} className="grid grid-cols-12 gap-2 px-4 py-3 hover:bg-white/[0.02] transition-colors items-center opacity-40">
+                <div key={entry.userId} className="grid grid-cols-12 gap-2 px-4 py-3 hover:bg-muted/30 transition-colors items-center opacity-40">
                   <div className="col-span-1">
                     <RankBadge rank={entry.rank} />
                   </div>
                   <div className="col-span-4 flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-white/[0.05] flex items-center justify-center flex-shrink-0">
-                      <User className="w-3.5 h-3.5 text-white/20" />
+                    <div className="w-7 h-7 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0">
+                      <User className="w-3.5 h-3.5 text-muted-foreground/40" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-white/80 truncate">{entry.firstName}</p>
+                      <p className="text-sm font-medium text-foreground/80 truncate">{entry.firstName}</p>
                       <span className={`text-[10px] ${TRADER_TIER_COLORS[entry.tier]}`}>{entry.tier} · Lv {entry.level}</span>
                     </div>
                   </div>
@@ -310,7 +310,7 @@ export default function Leaderboard() {
                     {entry.winStreak > 0 ? (
                       <span className="text-[10px] font-mono text-orange-400 font-bold">{entry.winStreak}</span>
                     ) : (
-                      <span className="text-[10px] text-white/20">—</span>
+                      <span className="text-[10px] text-muted-foreground/40">—</span>
                     )}
                   </div>
                   <div className="col-span-2 text-right">
@@ -319,18 +319,18 @@ export default function Leaderboard() {
                     </span>
                   </div>
                   <div className="col-span-2 text-right">
-                    <span className="text-sm font-mono text-white/40">{entry.totalXp.toLocaleString()}</span>
+                    <span className="text-sm font-mono text-muted-foreground/70">{entry.totalXp.toLocaleString()}</span>
                   </div>
                 </div>
               ))}
-              <div className="text-center py-6 border-t border-white/[0.04]">
-                <p className="text-sm text-white/30">Be the first to earn real XP and claim your spot!</p>
+              <div className="text-center py-6 border-t border-border">
+                <p className="text-sm text-muted-foreground/50">Be the first to earn real XP and claim your spot!</p>
               </div>
             </div>
           ) : (
             <div className="divide-y divide-white/[0.04]">
               {leaderboard.map((entry) => (
-                <div key={entry.userId} className="grid grid-cols-12 gap-2 px-4 py-3 hover:bg-white/[0.02] transition-colors items-center">
+                <div key={entry.userId} className="grid grid-cols-12 gap-2 px-4 py-3 hover:bg-muted/30 transition-colors items-center">
                   <div className="col-span-1">
                     <RankBadge rank={entry.rank} />
                   </div>
@@ -338,12 +338,12 @@ export default function Leaderboard() {
                     {entry.photoUrl ? (
                       <img src={entry.photoUrl} alt="" className="w-7 h-7 rounded-full flex-shrink-0" />
                     ) : (
-                      <div className="w-7 h-7 rounded-full bg-white/[0.05] flex items-center justify-center flex-shrink-0">
-                        <User className="w-3.5 h-3.5 text-white/40" />
+                      <div className="w-7 h-7 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0">
+                        <User className="w-3.5 h-3.5 text-muted-foreground/70" />
                       </div>
                     )}
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-white/80 truncate">{entry.firstName || "Trader"} {entry.lastName?.charAt(0) || ""}</p>
+                      <p className="text-sm font-medium text-foreground/80 truncate">{entry.firstName || "Trader"} {entry.lastName?.charAt(0) || ""}</p>
                       <span className={`text-[10px] ${TRADER_TIER_COLORS[entry.tier]}`}>{entry.tier} · Lv {entry.level}</span>
                     </div>
                   </div>
@@ -354,7 +354,7 @@ export default function Leaderboard() {
                     {entry.winStreak > 0 ? (
                       <span className="text-[11px] font-mono text-orange-400 font-bold">{entry.winStreak}</span>
                     ) : (
-                      <span className="text-[10px] text-white/20">—</span>
+                      <span className="text-[10px] text-muted-foreground/40">—</span>
                     )}
                   </div>
                   <div className="col-span-2 text-right">
@@ -363,7 +363,7 @@ export default function Leaderboard() {
                     </span>
                   </div>
                   <div className="col-span-2 text-right">
-                    <span className="text-sm font-mono text-white/40">
+                    <span className="text-sm font-mono text-muted-foreground/70">
                       {(period === "monthly" ? entry.monthlyXp : period === "weekly" ? entry.weeklyXp : entry.totalXp).toLocaleString()}
                     </span>
                   </div>

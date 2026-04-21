@@ -111,7 +111,7 @@ export default function TokenAdmin() {
             </h1>
             <p className="text-muted-foreground mt-1">Manage EntangleCoin supply, distributions, and valuation</p>
           </div>
-          <Button variant="outline" className="border-white/10 gap-2" onClick={loadStats}>
+          <Button variant="outline" className="border-border gap-2" onClick={loadStats}>
             <RefreshCw className="w-4 h-4" /> Refresh
           </Button>
         </div>
@@ -120,7 +120,7 @@ export default function TokenAdmin() {
           <div className="glass-panel p-4 text-center">
             <Users className="w-5 h-5 text-primary mx-auto mb-2" />
             <p className="text-xs text-muted-foreground uppercase">Total Users</p>
-            <p className="text-xl font-bold font-mono text-white">{stats?.totalUsers || 0}</p>
+            <p className="text-xl font-bold font-mono text-foreground">{stats?.totalUsers || 0}</p>
           </div>
           <div className="glass-panel p-4 text-center">
             <Shield className="w-5 h-5 text-emerald-400 mx-auto mb-2" />
@@ -147,11 +147,11 @@ export default function TokenAdmin() {
             <div className="space-y-3">
               <div className="flex justify-between items-center py-2 border-b border-white/5">
                 <span className="text-sm text-muted-foreground">Total Supply</span>
-                <span className="font-mono font-bold text-white">{(stats?.totalSupply || 0).toLocaleString()} ENTGL</span>
+                <span className="font-mono font-bold text-foreground">{(stats?.totalSupply || 0).toLocaleString()} ENTGL</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-white/5">
                 <span className="text-sm text-muted-foreground">Founder (75%)</span>
-                <span className="font-mono text-white">{(stats?.founderAllocation || 0).toLocaleString()}</span>
+                <span className="font-mono text-foreground">{(stats?.founderAllocation || 0).toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-white/5">
                 <span className="text-sm text-muted-foreground">Rewards Pool (25%)</span>
@@ -185,7 +185,7 @@ export default function TokenAdmin() {
                   type="month"
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
-                  className="bg-white/5 border-white/10 font-mono"
+                  className="bg-muted/50 border-border font-mono"
                 />
                 <Button
                   onClick={triggerDistribution}
@@ -212,7 +212,7 @@ export default function TokenAdmin() {
                   placeholder={`Current: $${(stats?.sharePrice || 40).toFixed(2)}`}
                   value={newSharePrice}
                   onChange={(e) => setNewSharePrice(e.target.value)}
-                  className="bg-white/5 border-white/10 font-mono"
+                  className="bg-muted/50 border-border font-mono"
                 />
                 <Button
                   onClick={updateSharePrice}
@@ -232,15 +232,15 @@ export default function TokenAdmin() {
             <BarChart3 className="w-5 h-5 text-primary" /> Marketplace Stats
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white/[0.02] rounded-lg p-4 text-center border border-white/5">
+            <div className="bg-muted/30 rounded-lg p-4 text-center border border-white/5">
               <p className="text-xs text-muted-foreground uppercase mb-1">Total Bookings</p>
-              <p className="text-2xl font-bold font-mono text-white">{stats?.bookings || 0}</p>
+              <p className="text-2xl font-bold font-mono text-foreground">{stats?.bookings || 0}</p>
             </div>
-            <div className="bg-white/[0.02] rounded-lg p-4 text-center border border-white/5">
+            <div className="bg-muted/30 rounded-lg p-4 text-center border border-white/5">
               <p className="text-xs text-muted-foreground uppercase mb-1">Booking Volume</p>
               <p className="text-2xl font-bold font-mono text-yellow-400">{(stats?.bookingVolume || 0).toLocaleString()} ENTGL</p>
             </div>
-            <div className="bg-white/[0.02] rounded-lg p-4 text-center border border-white/5">
+            <div className="bg-muted/30 rounded-lg p-4 text-center border border-white/5">
               <p className="text-xs text-muted-foreground uppercase mb-1">Booking USD Value</p>
               <p className="text-2xl font-bold font-mono text-emerald-400">
                 ${((stats?.bookingVolume || 0) * (stats?.tokenValue || 10)).toLocaleString()}

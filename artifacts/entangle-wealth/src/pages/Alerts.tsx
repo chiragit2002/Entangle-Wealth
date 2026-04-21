@@ -326,7 +326,7 @@ export default function Alerts() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020204] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {promptConfig && <UpgradePrompt config={promptConfig} onClose={closePrompt} />}
       <Navbar />
       <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
@@ -336,7 +336,7 @@ export default function Alerts() {
             <WifiOff className="w-5 h-5 text-[#ff3366] flex-shrink-0" />
             <div>
               <p className="text-sm font-bold text-[#ff3366]">Market Data Unavailable</p>
-              <p className="text-xs text-white/50">Alert creation requires live price validation. Trading and alert creation are disabled until data is restored.</p>
+              <p className="text-xs text-muted-foreground">Alert creation requires live price validation. Trading and alert creation are disabled until data is restored.</p>
             </div>
           </div>
         )}
@@ -360,16 +360,16 @@ export default function Alerts() {
             <h1 className="text-3xl font-bold tracking-tight font-[family-name:var(--font-mono)]">
               <span className="text-[#00B4D8]">Real-Time</span> Alerts
             </h1>
-            <p className="text-white/50 text-sm mt-1">
+            <p className="text-muted-foreground text-sm mt-1">
               Configure price, % change, volume, RSI, MACD, and Bollinger alerts with live evaluation
             </p>
           </div>
           <div className="flex items-center gap-3">
             {dailyLimit && (
-              <div className="text-xs text-white/30 bg-white/[0.04] rounded-lg px-3 py-2 border border-white/[0.06]">
+              <div className="text-xs text-muted-foreground/50 bg-muted/50 rounded-lg px-3 py-2 border border-border">
                 <span className="text-[#FFB800] font-bold">{dailyUsed}</span>
-                <span className="text-white/50">/{dailyLimit} daily alerts</span>
-                <span className="text-white/50 ml-1">(Free)</span>
+                <span className="text-muted-foreground">/{dailyLimit} daily alerts</span>
+                <span className="text-muted-foreground ml-1">(Free)</span>
               </div>
             )}
             {tier === "pro" && (
@@ -384,19 +384,19 @@ export default function Alerts() {
           <Button
             onClick={() => setTab("rules")}
             variant="ghost"
-            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "rules" ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/20" : "text-white/40 hover:text-white/60"}`}
+            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "rules" ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/20" : "text-muted-foreground/70 hover:text-muted-foreground"}`}
           >
             <Settings className="w-4 h-4" /> Alert Rules
-            <span className="text-xs bg-white/[0.06] px-2 py-0.5 rounded-full">{rules.length}</span>
+            <span className="text-xs bg-muted px-2 py-0.5 rounded-full">{rules.length}</span>
           </Button>
           <Button
             onClick={() => setTab("history")}
             variant="ghost"
-            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "history" ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/20" : "text-white/40 hover:text-white/60"}`}
+            className={`flex items-center gap-2 px-4 py-2.5 h-auto rounded-xl text-sm font-semibold ${tab === "history" ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/20" : "text-muted-foreground/70 hover:text-muted-foreground"}`}
           >
             <History className="w-4 h-4" /> Triggered History
             {history.filter(h => !h.read).length > 0 && (
-              <span className="text-xs bg-[#ff3366] text-white px-2 py-0.5 rounded-full">
+              <span className="text-xs bg-[#ff3366] text-foreground px-2 py-0.5 rounded-full">
                 {history.filter(h => !h.read).length}
               </span>
             )}
@@ -406,7 +406,7 @@ export default function Alerts() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-32 rounded-xl bg-white/[0.02] border border-white/[0.06] animate-pulse" />
+              <div key={i} className="h-32 rounded-xl bg-muted/30 border border-border animate-pulse" />
             ))}
           </div>
         ) : tab === "rules" ? (
@@ -421,13 +421,13 @@ export default function Alerts() {
                   <Plus className="w-4 h-4 mr-2" /> New Alert Rule
                 </Button>
               ) : (
-                <form onSubmit={createAlert} className="rounded-xl bg-white/[0.03] border border-[#00B4D8]/20 p-4">
+                <form onSubmit={createAlert} className="rounded-xl bg-muted/50 border border-[#00B4D8]/20 p-4">
                   <p className="text-sm font-bold text-[#00B4D8] mb-1 font-[family-name:var(--font-mono)]">Create Alert Rule</p>
-                  <p className="text-xs text-white/30 mb-4">Search for a stock and configure your condition. All alerts are validated against live prices.</p>
+                  <p className="text-xs text-muted-foreground/50 mb-4">Search for a stock and configure your condition. All alerts are validated against live prices.</p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                     <div>
-                      <label className="text-[10px] font-mono text-white/30 uppercase mb-1.5 block">Stock Symbol</label>
+                      <label className="text-[10px] font-mono text-muted-foreground/50 uppercase mb-1.5 block">Stock Symbol</label>
                       <StockSearchDropdown
                         onSelect={(sym, name) => {
                           setSelectedSymbol(sym);
@@ -439,17 +439,17 @@ export default function Alerts() {
                         disabled={marketDataUnavailable}
                       />
                       {selectedSymbol && (
-                        <p className="text-[10px] text-white/30 mt-1 font-mono">{selectedSymbolName}</p>
+                        <p className="text-[10px] text-muted-foreground/50 mt-1 font-mono">{selectedSymbolName}</p>
                       )}
                     </div>
 
                     <div>
-                      <label className="text-[10px] font-mono text-white/30 uppercase mb-1.5 block">Alert Type</label>
+                      <label className="text-[10px] font-mono text-muted-foreground/50 uppercase mb-1.5 block">Alert Type</label>
                       <select
                         value={alertType}
                         onChange={e => { setAlertType(e.target.value); setThreshold(""); }}
                         aria-label="Alert type"
-                        className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none [&>option]:bg-[#0d0d1a] [&>option]:text-white"
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2.5 text-sm text-foreground focus:outline-none [&>option]:bg-card [&>option]:text-foreground"
                       >
                         {ALERT_TYPE_OPTIONS.map(o => (
                           <option key={o.value} value={o.value}>{o.label}</option>
@@ -460,12 +460,12 @@ export default function Alerts() {
 
                   {needsThreshold(alertType) && (
                     <div className="mb-3">
-                      <label className="text-[10px] font-mono text-white/30 uppercase mb-1.5 block">{getThresholdLabel(alertType)}</label>
+                      <label className="text-[10px] font-mono text-muted-foreground/50 uppercase mb-1.5 block">{getThresholdLabel(alertType)}</label>
                       <input
                         value={threshold}
                         onChange={e => setThreshold(e.target.value.replace(/[^0-9.]/g, ""))}
                         placeholder={alertType === "pct_change" ? "e.g. 5 (= 5%)" : alertType === "volume_spike" ? "e.g. 2 (= 2x avg)" : "e.g. 185.00"}
-                        className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#00B4D8]/30 font-mono"
+                        className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-[#00B4D8]/30 font-mono"
                       />
                     </div>
                   )}
@@ -486,7 +486,7 @@ export default function Alerts() {
                       type="button"
                       onClick={() => { setShowForm(false); setSelectedSymbol(""); setThreshold(""); setFormError(""); }}
                       variant="ghost"
-                      className="text-white/50 hover:text-white"
+                      className="text-muted-foreground hover:text-foreground"
                     >
                       Cancel
                     </Button>
@@ -496,10 +496,10 @@ export default function Alerts() {
             </div>
 
             {rules.length === 0 ? (
-              <div className="text-center py-20 rounded-xl bg-white/[0.02] border border-white/[0.06]">
-                <Bell className="w-12 h-12 mx-auto mb-3 text-white/10" />
-                <p className="text-white/30 text-sm font-semibold">No alert rules yet</p>
-                <p className="text-white/50 text-xs mt-1 max-w-xs mx-auto">Set up your first price alert to get notified when stocks hit your target levels.</p>
+              <div className="text-center py-20 rounded-xl bg-muted/30 border border-border">
+                <Bell className="w-12 h-12 mx-auto mb-3 text-muted-foreground/20" />
+                <p className="text-muted-foreground/50 text-sm font-semibold">No alert rules yet</p>
+                <p className="text-muted-foreground text-xs mt-1 max-w-xs mx-auto">Set up your first price alert to get notified when stocks hit your target levels.</p>
                 <Button onClick={() => setShowForm(true)} disabled={marketDataUnavailable} className="mt-4 bg-gradient-to-r from-[#00B4D8] to-[#0099cc] text-black text-xs font-bold hover:opacity-90">
                   Create Your First Alert
                 </Button>
@@ -512,21 +512,21 @@ export default function Alerts() {
                   return (
                     <div
                       key={rule.id}
-                      className={`rounded-xl border p-4 transition-all ${rule.enabled ? "bg-white/[0.02] border-white/[0.08]" : "bg-white/[0.01] border-white/[0.04] opacity-50"}`}
+                      className={`rounded-xl border p-4 transition-all ${rule.enabled ? "bg-muted/30 border-border" : "bg-muted/30 border-border opacity-50"}`}
                       style={{ borderLeftWidth: "3px", borderLeftColor: rule.enabled ? color : "transparent" }}
                     >
                       {isEditing ? (
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-bold text-[#00B4D8] font-[family-name:var(--font-mono)]">Edit: {rule.symbol}</p>
-                            <Button onClick={() => setEditingId(null)} size="icon" variant="ghost" className="w-7 h-7 text-white/30 hover:text-white">
+                            <Button onClick={() => setEditingId(null)} size="icon" variant="ghost" className="w-7 h-7 text-muted-foreground/50 hover:text-foreground">
                               <X className="w-4 h-4" />
                             </Button>
                           </div>
                           <select
                             value={editType}
                             onChange={e => setEditType(e.target.value)}
-                            className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none [&>option]:bg-[#0d0d1a] [&>option]:text-white"
+                            className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none [&>option]:bg-card [&>option]:text-foreground"
                           >
                             {ALERT_TYPE_OPTIONS.map(o => (
                               <option key={o.value} value={o.value}>{o.label}</option>
@@ -537,12 +537,12 @@ export default function Alerts() {
                               placeholder={getThresholdLabel(editType)}
                               value={editThreshold}
                               onChange={e => setEditThreshold(e.target.value.replace(/[^0-9.]/g, ""))}
-                              className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/30 font-[family-name:var(--font-mono)]"
+                              className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-[#00B4D8]/30 font-[family-name:var(--font-mono)]"
                             />
                           )}
                           <div className="flex gap-2">
                             <Button onClick={() => saveEdit(rule.id)} className="flex-1 bg-[#00B4D8] text-black font-bold text-xs">Save</Button>
-                            <Button onClick={() => setEditingId(null)} variant="ghost" className="text-white/50 text-xs">Cancel</Button>
+                            <Button onClick={() => setEditingId(null)} variant="ghost" className="text-muted-foreground text-xs">Cancel</Button>
                           </div>
                         </div>
                       ) : (
@@ -554,8 +554,8 @@ export default function Alerts() {
                               </span>
                             </div>
                             <div className="min-w-0">
-                              <p className="text-sm font-bold text-white font-[family-name:var(--font-mono)]">{rule.symbol}</p>
-                              <p className="text-xs text-white/30">
+                              <p className="text-sm font-bold text-foreground font-[family-name:var(--font-mono)]">{rule.symbol}</p>
+                              <p className="text-xs text-muted-foreground/50">
                                 {getAlertTypeLabel(rule.alertType)}
                                 {rule.threshold != null ? ` @ ${rule.threshold}` : ""}
                               </p>
@@ -566,7 +566,7 @@ export default function Alerts() {
                               onClick={() => startEdit(rule)}
                               size="icon"
                               variant="ghost"
-                              className="w-7 h-7 text-white/30 hover:text-[#00B4D8]"
+                              className="w-7 h-7 text-muted-foreground/50 hover:text-[#00B4D8]"
                               aria-label="Edit alert"
                             >
                               <Pencil className="w-4 h-4" />
@@ -576,12 +576,12 @@ export default function Alerts() {
                               size="icon"
                               variant="ghost"
                               className="w-7 h-7"
-                              style={{ color: rule.enabled ? "#00B4D8" : "rgba(255,255,255,0.3)" }}
+                              style={{ color: rule.enabled ? "#00B4D8" : "hsl(var(--muted-foreground) / 0.4)" }}
                               aria-label={rule.enabled ? "Disable alert" : "Enable alert"}
                             >
                               {rule.enabled ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
                             </Button>
-                            <Button onClick={() => deleteAlert(rule.id)} size="icon" variant="ghost" className="w-7 h-7 text-white/30 hover:text-[#ff3366]" aria-label="Delete alert">
+                            <Button onClick={() => deleteAlert(rule.id)} size="icon" variant="ghost" className="w-7 h-7 text-muted-foreground/50 hover:text-[#ff3366]" aria-label="Delete alert">
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
@@ -614,10 +614,10 @@ export default function Alerts() {
               </div>
             )}
             {history.length === 0 ? (
-              <div className="text-center py-20 rounded-xl bg-white/[0.02] border border-white/[0.06]">
-                <History className="w-12 h-12 mx-auto mb-3 text-white/10" />
-                <p className="text-white/30 text-sm font-semibold">No triggered alerts yet</p>
-                <p className="text-white/50 text-xs mt-1 max-w-xs mx-auto">When your alert conditions are met, triggered notifications will appear here.</p>
+              <div className="text-center py-20 rounded-xl bg-muted/30 border border-border">
+                <History className="w-12 h-12 mx-auto mb-3 text-muted-foreground/20" />
+                <p className="text-muted-foreground/50 text-sm font-semibold">No triggered alerts yet</p>
+                <p className="text-muted-foreground text-xs mt-1 max-w-xs mx-auto">When your alert conditions are met, triggered notifications will appear here.</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -626,7 +626,7 @@ export default function Alerts() {
                   return (
                     <div
                       key={h.id}
-                      className={`rounded-xl border p-4 flex items-start gap-3 transition-all ${!h.read ? "bg-white/[0.03] border-white/[0.1]" : "bg-white/[0.01] border-white/[0.05]"}`}
+                      className={`rounded-xl border p-4 flex items-start gap-3 transition-all ${!h.read ? "bg-muted/50 border-border" : "bg-muted/30 border-border"}`}
                       style={{ borderLeftWidth: "3px", borderLeftColor: color }}
                     >
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: `${color}15` }}>
@@ -635,11 +635,11 @@ export default function Alerts() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-bold font-[family-name:var(--font-mono)]" style={{ color }}>{h.symbol}</span>
-                          <span className="text-xs text-white/50">{getAlertTypeLabel(h.alertType)}</span>
+                          <span className="text-xs text-muted-foreground">{getAlertTypeLabel(h.alertType)}</span>
                           {!h.read && <div className="w-2 h-2 rounded-full bg-[#00B4D8]" />}
                         </div>
-                        <p className="text-xs text-white/50 mt-1">{h.message}</p>
-                        <p className="text-[10px] text-white/50 mt-1 font-[family-name:var(--font-mono)]">
+                        <p className="text-xs text-muted-foreground mt-1">{h.message}</p>
+                        <p className="text-[10px] text-muted-foreground mt-1 font-[family-name:var(--font-mono)]">
                           {formatTime(h.triggeredAt)}
                           {h.triggeredValue != null && (
                             <span className="ml-2">Value: {h.triggeredValue.toFixed(2)}</span>
@@ -662,27 +662,27 @@ export default function Alerts() {
         )}
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-4">
-            <p className="text-xs font-bold text-white/30 mb-2 font-[family-name:var(--font-mono)]">SUPPORTED ALERT TYPES</p>
+          <div className="rounded-xl bg-muted/30 border border-border p-4">
+            <p className="text-xs font-bold text-muted-foreground/50 mb-2 font-[family-name:var(--font-mono)]">SUPPORTED ALERT TYPES</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {ALERT_TYPE_OPTIONS.map(opt => {
                 const Icon = opt.icon;
                 return (
-                  <div key={opt.value} className="rounded-lg bg-white/[0.02] border border-white/[0.04] p-3 text-center">
+                  <div key={opt.value} className="rounded-lg bg-muted/30 border border-border p-3 text-center">
                     <Icon className="w-5 h-5 mx-auto mb-1" style={{ color: opt.color }} />
-                    <p className="text-[10px] font-semibold text-white/60 leading-tight">{opt.label}</p>
+                    <p className="text-[10px] font-semibold text-muted-foreground leading-tight">{opt.label}</p>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-4">
+          <div className="rounded-xl bg-muted/30 border border-border p-4">
             <div className="flex items-center gap-2 mb-3">
               <Mail className="w-4 h-4 text-[#00B4D8]" />
-              <p className="text-xs font-bold text-white/30 font-[family-name:var(--font-mono)]">EMAIL DIGEST</p>
+              <p className="text-xs font-bold text-muted-foreground/50 font-[family-name:var(--font-mono)]">EMAIL DIGEST</p>
             </div>
-            <p className="text-xs text-white/30 mb-3">Receive a summary of your triggered alerts via email</p>
+            <p className="text-xs text-muted-foreground/50 mb-3">Receive a summary of your triggered alerts via email</p>
             <div className="flex gap-2">
               {[
                 { value: "off", label: "Off" },
@@ -693,7 +693,7 @@ export default function Alerts() {
                   key={opt.value}
                   onClick={() => updateDigestPref(opt.value)}
                   variant="ghost"
-                  className={`flex-1 h-auto py-2.5 rounded-lg text-xs font-semibold ${digestFrequency === opt.value ? "bg-[#00B4D8]/15 text-[#00B4D8] border border-[#00B4D8]/30" : "bg-white/[0.03] text-white/30 border border-white/[0.06] hover:text-white/50"}`}
+                  className={`flex-1 h-auto py-2.5 rounded-lg text-xs font-semibold ${digestFrequency === opt.value ? "bg-[#00B4D8]/15 text-[#00B4D8] border border-[#00B4D8]/30" : "bg-muted/50 text-muted-foreground/50 border border-border hover:text-muted-foreground"}`}
                 >
                   {opt.label}
                 </Button>

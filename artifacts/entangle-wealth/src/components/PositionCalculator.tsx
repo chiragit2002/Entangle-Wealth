@@ -43,7 +43,7 @@ export function PositionCalculator() {
           <Input
             value={accountSize}
             onChange={(e) => setAccountSize(e.target.value)}
-            className="h-8 bg-black/50 border-white/10 font-mono text-sm text-primary"
+            className="h-8 bg-black/50 border-border font-mono text-sm text-primary"
             type="number"
           />
         </div>
@@ -52,7 +52,7 @@ export function PositionCalculator() {
           <Input
             value={riskPercent}
             onChange={(e) => setRiskPercent(e.target.value)}
-            className="h-8 bg-black/50 border-white/10 font-mono text-sm text-secondary"
+            className="h-8 bg-black/50 border-border font-mono text-sm text-secondary"
             type="number"
             step="0.5"
           />
@@ -62,7 +62,7 @@ export function PositionCalculator() {
           <Input
             value={entryPrice}
             onChange={(e) => setEntryPrice(e.target.value)}
-            className="h-8 bg-black/50 border-white/10 font-mono text-sm"
+            className="h-8 bg-black/50 border-border font-mono text-sm"
             type="number"
             step="0.01"
           />
@@ -72,7 +72,7 @@ export function PositionCalculator() {
           <Input
             value={stopLoss}
             onChange={(e) => setStopLoss(e.target.value)}
-            className="h-8 bg-black/50 border-white/10 font-mono text-sm text-red-400"
+            className="h-8 bg-black/50 border-border font-mono text-sm text-red-400"
             type="number"
             step="0.01"
           />
@@ -81,18 +81,18 @@ export function PositionCalculator() {
 
       <div className="border-t border-white/5 pt-3">
         <div className="grid grid-cols-2 gap-3 mb-3">
-          <div className="bg-white/[0.02] rounded-lg p-2.5 text-center">
+          <div className="bg-muted/30 rounded-lg p-2.5 text-center">
             <div className="text-[9px] font-mono text-muted-foreground uppercase">Shares</div>
             <div className="text-xl font-mono font-bold text-primary stat-value">{shares}</div>
           </div>
-          <div className="bg-white/[0.02] rounded-lg p-2.5 text-center">
+          <div className="bg-muted/30 rounded-lg p-2.5 text-center">
             <div className="text-[9px] font-mono text-muted-foreground uppercase">Risk Amount</div>
             <div className="text-xl font-mono font-bold text-secondary stat-value">${riskAmount.toFixed(0)}</div>
           </div>
         </div>
         <div className="flex items-center justify-between text-xs font-mono mb-2">
           <span className="text-muted-foreground">Position Value:</span>
-          <span className="text-white">${positionValue.toLocaleString()}</span>
+          <span className="text-foreground">${positionValue.toLocaleString()}</span>
         </div>
         <div className="flex items-center justify-between text-xs font-mono mb-3">
           <span className="text-muted-foreground">% of Account:</span>
@@ -100,7 +100,7 @@ export function PositionCalculator() {
         </div>
         <button
           onClick={handleCopy}
-          className="w-full text-[10px] font-mono uppercase tracking-wider py-1.5 rounded border border-white/10 text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors"
+          className="w-full text-[10px] font-mono uppercase tracking-wider py-1.5 rounded border border-border text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors"
         >
           Copy Position Details
         </button>

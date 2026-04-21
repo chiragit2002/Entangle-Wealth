@@ -201,19 +201,19 @@ function RevealSection({
 function SectionBridge({ children }: { children: ReactNode }) {
   return (
     <div className="flex flex-col items-center py-6 px-4 select-none" aria-hidden="true">
-      <div className="w-px h-8 bg-gradient-to-b from-white/5 to-white/15" />
-      <p className="mt-3 text-[11px] font-semibold tracking-widest uppercase text-white/25 text-center max-w-xs">
+      <div className="w-px h-8 bg-gradient-to-b from-transparent to-border" />
+      <p className="mt-3 text-[11px] font-semibold tracking-widest uppercase text-muted-foreground/40 text-center max-w-xs">
         {children}
       </p>
-      <div className="mt-3 w-px h-8 bg-gradient-to-b from-white/15 to-white/5" />
+      <div className="mt-3 w-px h-8 bg-gradient-to-b from-border to-transparent" />
     </div>
   );
 }
 
 function InlineError({ message, retry }: { message: string; retry?: () => void }) {
   return (
-    <div className="flex items-center gap-2 text-xs text-white/40 px-3 py-2 rounded-lg border border-white/[0.06] bg-white/[0.02]">
-      <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-white/30" />
+    <div className="flex items-center gap-2 text-xs text-muted-foreground/70 px-3 py-2 rounded-lg border border-border bg-muted/30">
+      <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground/50" />
       <span>{message}</span>
       {retry && (
         <button
@@ -245,12 +245,12 @@ class HomeErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundary
     if (this.state.hasError) {
       return (
         <div className="flex flex-col items-center justify-center py-20 px-4 text-center space-y-4">
-          <AlertCircle className="w-10 h-10 text-white/40" />
-          <p className="text-base text-white/50 font-medium">Something went wrong loading this page.</p>
-          <p className="text-sm text-white/30">Please refresh to try again.</p>
+          <AlertCircle className="w-10 h-10 text-muted-foreground/70" />
+          <p className="text-base text-muted-foreground font-medium">Something went wrong loading this page.</p>
+          <p className="text-sm text-muted-foreground/50">Please refresh to try again.</p>
           <Button
             variant="outline"
-            className="border-white/10 text-white/50 hover:bg-white/5"
+            className="border-border text-muted-foreground hover:bg-muted/50"
             onClick={() => window.location.reload()}
           >
             Refresh page
@@ -280,9 +280,9 @@ function RecentSignupTicker({
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/[0.06] bg-white/[0.03]" aria-hidden="true">
-        <div className="w-3 h-3 rounded-full bg-white/10 animate-pulse flex-shrink-0" />
-        <div className="w-36 h-2.5 rounded-full bg-white/10 animate-pulse" />
+      <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-muted/50" aria-hidden="true">
+        <div className="w-3 h-3 rounded-full bg-muted animate-pulse flex-shrink-0" />
+        <div className="w-36 h-2.5 rounded-full bg-muted animate-pulse" />
       </div>
     );
   }
@@ -320,7 +320,7 @@ function GoalSelector({ onSelect }: { onSelect: (goal: string) => void }) {
 
   return (
     <div className="w-full max-w-sm mx-auto space-y-3">
-      <p className="text-sm text-white/70 mb-4">What's the real problem right now?</p>
+      <p className="text-sm text-foreground/70 mb-4">What's the real problem right now?</p>
       {GOAL_OPTIONS.map(({ id, label, icon: Icon }) => (
         <button
           key={id}
@@ -328,12 +328,12 @@ function GoalSelector({ onSelect }: { onSelect: (goal: string) => void }) {
           className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border text-left transition-all duration-200 text-sm font-medium
             ${
               selected === id
-                ? "border-[#00B4D8] bg-[#00B4D8]/10 text-white"
-                : "border-white/10 bg-white/[0.03] text-white/80 hover:border-white/20 hover:bg-white/[0.06]"
+                ? "border-[#00B4D8] bg-[#00B4D8]/10 text-foreground"
+                : "border-border bg-muted/50 text-foreground/80 hover:border-border hover:bg-muted"
             }`}
         >
           <Icon
-            className={`w-4 h-4 flex-shrink-0 ${selected === id ? "text-[#00B4D8]" : "text-white/40"}`}
+            className={`w-4 h-4 flex-shrink-0 ${selected === id ? "text-[#00B4D8]" : "text-muted-foreground/70"}`}
           />
           <span>{label}</span>
           {selected === id && <CheckCircle className="w-4 h-4 text-[#00B4D8] ml-auto" />}
@@ -379,14 +379,14 @@ function LanguageSelector() {
     <div ref={ref} className="relative inline-block">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/70 hover:text-white text-xs font-medium transition-all"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-muted/50 hover:bg-muted text-foreground/70 hover:text-foreground text-xs font-medium transition-all"
       >
         <Globe className="w-3.5 h-3.5 text-[#00B4D8]" />
         <span>{current.flag}</span>
         <span>{current.label}</span>
       </button>
       {open && (
-        <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 z-50 w-44 bg-[#0A0E1A] border border-white/10 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
+        <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 z-50 w-44 bg-card border border-border rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
           {LANGUAGES.map((lang) => (
             <button
               key={lang.code}
@@ -399,7 +399,7 @@ function LanguageSelector() {
               className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
                 selected === lang.code
                   ? "bg-[#00B4D8]/10 text-[#00B4D8]"
-                  : "text-white/70 hover:bg-white/[0.06] hover:text-white"
+                  : "text-foreground/70 hover:bg-muted hover:text-foreground"
               }`}
             >
               <span className="text-base">{lang.flag}</span>
@@ -501,15 +501,15 @@ function EdgeInsightCard({
       onFocus={onFocus}
       onKeyDown={handleKeyDown}
       tabIndex={tabIndex}
-      className={`relative p-5 flex flex-col gap-3 cursor-default transition-all duration-300 group outline-none focus-visible:ring-2 focus-visible:ring-white/30 ${
+      className={`relative p-5 flex flex-col gap-3 cursor-default transition-all duration-300 group outline-none focus-visible:ring-2 focus-visible:ring-foreground/30 bg-card border border-border rounded-lg ${
         active ? "scale-[1.01]" : "opacity-80 hover:opacity-100"
       }`}
       style={{
-        background: "rgba(10,10,20,0.85)",
-        borderTop: `1px solid ${active ? insight.borderColor : "rgba(255,255,255,0.07)"}`,
-        borderRight: `1px solid ${active ? insight.borderColor : "rgba(255,255,255,0.07)"}`,
-        borderBottom: `1px solid ${active ? insight.borderColor : "rgba(255,255,255,0.07)"}`,
-        borderLeft: `3px solid ${active ? insight.iconColor : "rgba(255,255,255,0.07)"}`,
+        borderTopColor: active ? insight.borderColor : undefined,
+        borderRightColor: active ? insight.borderColor : undefined,
+        borderBottomColor: active ? insight.borderColor : undefined,
+        borderLeftWidth: "3px",
+        borderLeftColor: active ? insight.iconColor : undefined,
         transition: "border-color 0.35s ease, opacity 0.35s ease, transform 0.35s ease",
       }}
     >
@@ -549,8 +549,8 @@ function EdgeInsightCard({
       </p>
 
       <div>
-        <p className="text-sm font-bold text-white mb-1">{insight.headline}</p>
-        <p className="text-xs text-white/50 leading-relaxed">{insight.body}</p>
+        <p className="text-sm font-bold text-foreground mb-1">{insight.headline}</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">{insight.body}</p>
       </div>
 
       <Link
@@ -617,10 +617,10 @@ function YourEdgeSection() {
             <Atom className="w-3 h-3" aria-hidden="true" />
             Your Edge
           </span>
-          <h2 className="text-2xl md:text-4xl font-bold text-white leading-tight">
+          <h2 className="text-2xl md:text-4xl font-bold text-foreground leading-tight">
             Tools your brokerage doesn't want you to have
           </h2>
-          <p className="text-sm text-white/40 mt-3 max-w-lg mx-auto leading-relaxed">
+          <p className="text-sm text-muted-foreground/70 mt-3 max-w-lg mx-auto leading-relaxed">
             We built what we couldn't find anywhere else — consensus AI that kills single-model bias, timeline simulation no other platform offers, and behavioral coaching that actually changes habits.
           </p>
         </div>
@@ -661,14 +661,14 @@ function YourEdgeSection() {
               aria-selected={activeIdx === idx}
               aria-label={`View ${insight.headline}`}
               onClick={() => { setActiveIdx(idx); setPaused(true); }}
-              className="transition-all duration-300 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/40"
+              className="transition-all duration-300 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-foreground/40"
               style={{
                 width: activeIdx === idx ? "20px" : "6px",
                 height: "6px",
                 background:
                   activeIdx === idx
                     ? EDGE_INSIGHTS[idx].iconColor
-                    : "rgba(255,255,255,0.15)",
+                    : "hsl(var(--muted-foreground) / 0.25)",
               }}
             />
           ))}
@@ -760,13 +760,13 @@ export default function Home() {
           <div className="container relative z-10 max-w-3xl mx-auto flex flex-col items-center text-center space-y-6">
             <RecentSignupTicker signups={signupsState.data} error={signupsState.error} loading={signupsState.loading} />
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground leading-[1.08]">
               Stop guessing with
               <br />
               <span className="text-[#00B4D8]">your financial future.</span>
             </h1>
 
-            <p className="max-w-lg text-base md:text-lg text-white/60 leading-relaxed">
+            <p className="max-w-lg text-base md:text-lg text-muted-foreground leading-relaxed">
               Most people have the income. What they're missing is clarity. We built the tool that tells you exactly what to do next — not eventually, right now.
             </p>
 
@@ -777,12 +777,12 @@ export default function Home() {
             )}
 
             <div className="flex flex-wrap items-center justify-center gap-5 pt-1">
-              <span className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium">
+              <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 font-medium">
                 <Lock className="w-3.5 h-3.5 text-[#00B4D8]" />
                 Your data stays yours
               </span>
               {stats.members > 0 && (
-                <span className="text-[11px] text-white/30 font-medium">
+                <span className="text-[11px] text-muted-foreground/50 font-medium">
                   {animatedMembers.toLocaleString()}+ members
                 </span>
               )}
@@ -803,7 +803,7 @@ export default function Home() {
               <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00B4D8]/60">
                 The real problem
               </p>
-              <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
+              <h2 className="text-2xl md:text-4xl font-bold text-foreground leading-snug">
                 The information isn't the problem. The paralysis is.
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
@@ -819,7 +819,7 @@ export default function Home() {
                   },
                 ].map((item, i) => (
                   <RevealSection key={i} delay={i * 80}>
-                    <div className="glass-panel rounded-2xl p-5 text-sm text-white/60 leading-relaxed text-left h-full">
+                    <div className="glass-panel rounded-2xl p-5 text-sm text-muted-foreground leading-relaxed text-left h-full">
                       {item.text}
                     </div>
                   </RevealSection>
@@ -839,10 +839,10 @@ export default function Home() {
               <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00B4D8]/60">
                 The fix
               </p>
-              <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
+              <h2 className="text-2xl md:text-4xl font-bold text-foreground leading-snug">
                 Not more information. Your next move.
               </h2>
-              <p className="text-base text-white/50 max-w-lg mx-auto leading-relaxed">
+              <p className="text-base text-muted-foreground max-w-lg mx-auto leading-relaxed">
                 We analyze your actual situation — not a generic user profile — and surface one clear, specific action. Not a list of options. Not "it depends." The thing to do next.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
@@ -869,7 +869,7 @@ export default function Home() {
                   <RevealSection key={item.title} delay={i * 80}>
                     <div className={`glass-panel rounded-2xl p-5 text-left border ${item.border} h-full`}>
                       <p className={`text-base font-bold mb-2 ${item.color}`}>{item.title}</p>
-                      <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
                     </div>
                   </RevealSection>
                 ))}
@@ -886,10 +886,10 @@ export default function Home() {
           <RevealSection>
             <div className="container mx-auto max-w-3xl">
               <div className="text-center mb-12">
-                <p className="text-[11px] font-semibold tracking-widest uppercase text-white/30 mb-3">
+                <p className="text-[11px] font-semibold tracking-widest uppercase text-muted-foreground/50 mb-3">
                   How it works
                 </p>
-                <h2 className="text-2xl md:text-4xl font-bold text-white">
+                <h2 className="text-2xl md:text-4xl font-bold text-foreground">
                   Three steps. Zero guessing.
                 </h2>
               </div>
@@ -924,8 +924,8 @@ export default function Home() {
                       >
                         {step.num}
                       </div>
-                      <h3 className="text-base font-bold text-white mb-2">{step.title}</h3>
-                      <p className="text-sm text-white/50 leading-relaxed">{step.desc}</p>
+                      <h3 className="text-base font-bold text-foreground mb-2">{step.title}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
                     </div>
                   </RevealSection>
                 ))}
@@ -953,18 +953,18 @@ export default function Home() {
                 <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00B4D8]/60 mb-3">
                   The shift
                 </p>
-                <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
+                <h2 className="text-2xl md:text-4xl font-bold text-foreground leading-snug">
                   From frozen to moving
                 </h2>
-                <p className="mt-3 text-sm text-white/50 max-w-md mx-auto leading-relaxed">
+                <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
                   Here's the difference one clear next step makes — according to people who actually used it.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <RevealSection delay={0}>
-                  <div className="glass-panel rounded-2xl p-6 border border-white/[0.08] h-full">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-5">Before</p>
+                  <div className="glass-panel rounded-2xl p-6 border border-border h-full">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-5">Before</p>
                     <div className="space-y-4">
                       {[
                         "Avoiding your bank app because you don't want to know",
@@ -974,7 +974,7 @@ export default function Home() {
                       ].map((text) => (
                         <div key={text} className="flex items-start gap-3">
                           <div className="w-4 h-4 rounded-full border border-white/15 flex-shrink-0 mt-0.5" />
-                          <p className="text-sm text-white/40 leading-relaxed">{text}</p>
+                          <p className="text-sm text-muted-foreground/70 leading-relaxed">{text}</p>
                         </div>
                       ))}
                     </div>
@@ -993,7 +993,7 @@ export default function Home() {
                       ].map((text) => (
                         <div key={text} className="flex items-start gap-3">
                           <CheckCircle className="w-4 h-4 text-[#00B4D8] flex-shrink-0 mt-0.5" />
-                          <p className="text-sm text-white/70 leading-relaxed">{text}</p>
+                          <p className="text-sm text-foreground/70 leading-relaxed">{text}</p>
                         </div>
                       ))}
                     </div>
@@ -1002,9 +1002,9 @@ export default function Home() {
               </div>
 
               <RevealSection delay={200}>
-                <div className="mt-6 flex items-center justify-center gap-3 px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <div className="mt-6 flex items-center justify-center gap-3 px-5 py-3 rounded-xl bg-muted/50 border border-border">
                   <ArrowRight className="w-4 h-4 text-[#00B4D8] flex-shrink-0" />
-                  <p className="text-sm text-white/50 leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     Members consistently report that the first session is the moment something finally clicks.
                   </p>
                 </div>
@@ -1021,10 +1021,10 @@ export default function Home() {
           <RevealSection>
             <div className="container mx-auto max-w-3xl">
               <div className="text-center mb-10">
-                <h2 className="text-2xl md:text-4xl font-bold text-white mb-3">
+                <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3">
                   Real members. Real clarity.
                 </h2>
-                <p className="text-sm text-white/50">Unfiltered experiences from people who were exactly where you are now.</p>
+                <p className="text-sm text-muted-foreground">Unfiltered experiences from people who were exactly where you are now.</p>
               </div>
 
               {testimonialsState.error && (
@@ -1032,7 +1032,7 @@ export default function Home() {
               )}
 
               {!testimonialsState.error && !testimonialsState.loading && testimonialsState.data === null && (
-                <p className="text-center text-sm text-white/30">No reviews yet — be the first!</p>
+                <p className="text-center text-sm text-muted-foreground/50">No reviews yet — be the first!</p>
               )}
 
               {testimonialsState.data && testimonialsState.data.length > 0 && (
@@ -1047,19 +1047,19 @@ export default function Home() {
                               className={`w-3.5 h-3.5 ${
                                 j < t.rating
                                   ? "text-[#FFD700] fill-[#FFD700]"
-                                  : "text-white/10 fill-white/10"
+                                  : "text-muted-foreground/20 fill-muted-foreground/20"
                               }`}
                             />
                           ))}
                         </div>
-                        <p className="text-sm text-white/70 leading-relaxed flex-1">"{t.message}"</p>
+                        <p className="text-sm text-foreground/70 leading-relaxed flex-1">"{t.message}"</p>
                         <div className="flex items-center gap-2 pt-3 border-t border-white/5">
                           <div className="w-7 h-7 rounded-full bg-[#00B4D8]/20 flex items-center justify-center text-xs font-bold text-[#00B4D8]">
                             {t.name.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <p className="text-xs font-semibold text-white">{t.name}</p>
-                            {t.role && <p className="text-[10px] text-white/30">{t.role}</p>}
+                            <p className="text-xs font-semibold text-foreground">{t.name}</p>
+                            {t.role && <p className="text-[10px] text-muted-foreground/50">{t.role}</p>}
                           </div>
                         </div>
                       </div>
@@ -1078,10 +1078,10 @@ export default function Home() {
         <section className="py-16 lg:py-24 px-4">
           <RevealSection>
             <div className="container mx-auto max-w-2xl text-center space-y-6">
-              <p className="text-[11px] font-semibold tracking-widest uppercase text-white/30 mb-3">
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-muted-foreground/50 mb-3">
                 Built with intention
               </p>
-              <h2 className="text-2xl md:text-4xl font-bold text-white">
+              <h2 className="text-2xl md:text-4xl font-bold text-foreground">
                 No tricks. No jargon. No excuses.
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 text-left">
@@ -1115,14 +1115,14 @@ export default function Home() {
                     <div className="glass-panel rounded-2xl p-5 flex gap-4 h-full">
                       <item.icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${item.color}`} />
                       <div>
-                        <p className="text-sm font-semibold text-white mb-1">{item.title}</p>
-                        <p className="text-xs text-white/50 leading-relaxed">{item.desc}</p>
+                        <p className="text-sm font-semibold text-foreground mb-1">{item.title}</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
                       </div>
                     </div>
                   </RevealSection>
                 ))}
               </div>
-              <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-sm text-white/30 font-medium">
+              <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-sm text-muted-foreground/50 font-medium">
                 <span>{stats.accuracy}% guidance accuracy</span>
                 <span>·</span>
                 <span>{animatedMembers.toLocaleString()}+ members</span>
@@ -1152,10 +1152,10 @@ export default function Home() {
         <section className="py-16 lg:py-24 px-4 border-t border-white/5">
           <div className="container mx-auto max-w-3xl">
             <div className="text-center mb-10">
-              <h2 className="text-2xl md:text-4xl font-bold text-white mb-3">
+              <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3">
                 Real members. Real clarity.
               </h2>
-              <p className="text-sm text-white/50">Unfiltered experiences from people who were exactly where you are now.</p>
+              <p className="text-sm text-muted-foreground">Unfiltered experiences from people who were exactly where you are now.</p>
             </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1168,19 +1168,19 @@ export default function Home() {
                           className={`w-3.5 h-3.5 ${
                             i < t.rating
                               ? "text-[#FFB800] fill-[#FFB800]"
-                              : "text-white/10 fill-white/10"
+                              : "text-muted-foreground/20 fill-muted-foreground/20"
                           }`}
                         />
                       ))}
                     </div>
-                    <p className="text-sm text-white/70 leading-relaxed flex-1">"{t.message}"</p>
+                    <p className="text-sm text-foreground/70 leading-relaxed flex-1">"{t.message}"</p>
                     <div className="flex items-center gap-2 pt-3 border-t border-white/5">
                       <div className="w-7 h-7 rounded-full bg-[#00B4D8]/20 flex items-center justify-center text-xs font-bold text-[#00B4D8]">
                         {t.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-white">{t.name}</p>
-                        {t.role && <p className="text-[10px] text-white/30">{t.role}</p>}
+                        <p className="text-xs font-semibold text-foreground">{t.name}</p>
+                        {t.role && <p className="text-[10px] text-muted-foreground/50">{t.role}</p>}
                       </div>
                     </div>
                   </div>
@@ -1196,16 +1196,16 @@ export default function Home() {
               <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00B4D8]/60">
                 You already know something has to change.
               </p>
-              <h2 className="text-2xl md:text-4xl font-bold text-white leading-snug">
+              <h2 className="text-2xl md:text-4xl font-bold text-foreground leading-snug">
                 Start with one honest look.
               </h2>
-              <p className="text-base text-white/50 max-w-md leading-relaxed">
+              <p className="text-base text-muted-foreground max-w-md leading-relaxed">
                 Two minutes. Zero credit card. A real, specific recommendation for your situation — not a template. Do it now.
               </p>
 
               <MicroConversionFlow referralCode={referralCode || undefined} />
 
-              <p className="text-[11px] text-white/25 max-w-xs leading-relaxed">
+              <p className="text-[11px] text-muted-foreground/40 max-w-xs leading-relaxed">
                 For guidance and education. Not a substitute for professional financial advice.
               </p>
             </div>

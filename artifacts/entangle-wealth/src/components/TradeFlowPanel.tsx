@@ -110,7 +110,7 @@ interface StepIndicatorProps {
 
 function StepIndicator({ currentStep }: StepIndicatorProps) {
   return (
-    <div className="flex items-center gap-0 w-full px-2 py-2 border-b border-white/[0.06]">
+    <div className="flex items-center gap-0 w-full px-2 py-2 border-b border-border">
       {STEP_LABELS.map((label, idx) => {
         const stepNum = idx + 1;
         const isActive = stepNum === currentStep;
@@ -123,18 +123,18 @@ function StepIndicator({ currentStep }: StepIndicatorProps) {
                   ? "bg-[#00ff88] text-black"
                   : isActive
                   ? "bg-[#00B4D8] text-black ring-2 ring-[#00B4D8]/30"
-                  : "bg-white/[0.06] text-white/30"
+                  : "bg-muted text-muted-foreground/50"
               }`}>
                 {isDone ? "✓" : stepNum}
               </div>
               <span className={`text-[7px] font-mono mt-0.5 truncate max-w-[60px] text-center transition-colors ${
-                isActive ? "text-[#00B4D8]" : isDone ? "text-[#00ff88]" : "text-white/20"
+                isActive ? "text-[#00B4D8]" : isDone ? "text-[#00ff88]" : "text-muted-foreground/40"
               }`}>
                 {label}
               </span>
             </div>
             {idx < STEP_LABELS.length - 1 && (
-              <div className={`h-px flex-1 mx-0.5 transition-colors ${isDone ? "bg-[#00ff88]/50" : "bg-white/[0.06]"}`} />
+              <div className={`h-px flex-1 mx-0.5 transition-colors ${isDone ? "bg-[#00ff88]/50" : "bg-muted"}`} />
             )}
           </div>
         );
@@ -383,21 +383,21 @@ export function TradeFlowPanel() {
   };
 
   return (
-    <div className="bg-[#0a0a0f] border border-white/[0.06] rounded-sm overflow-hidden flex flex-col">
-      <div className="flex items-center justify-between px-3 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#00B4D8]">
+    <div className="bg-[#0a0a0f] border border-border rounded-sm overflow-hidden flex flex-col">
+      <div className="flex items-center justify-between px-3 py-1.5 bg-muted/30 border-b border-border border-l-2 border-l-[#00B4D8]">
         <div className="flex items-center gap-1.5">
           <Activity className="w-3 h-3 text-[#00B4D8]" />
           <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00B4D8]">TRADE FLOW</span>
-          <span className="text-[8px] font-mono text-white/20 ml-1">6-STEP TERMINAL</span>
+          <span className="text-[8px] font-mono text-muted-foreground/40 ml-1">6-STEP TERMINAL</span>
         </div>
         {selectedStock && (
           <div className="flex items-center gap-2 text-[9px] font-mono">
             <span className="text-[#00B4D8] font-bold">{selectedStock.symbol}</span>
-            <span className="text-white/40">${selectedStock.price.toFixed(2)}</span>
+            <span className="text-muted-foreground/70">${selectedStock.price.toFixed(2)}</span>
             <span className={selectedStock.isPositive ? "text-[#00ff88]" : "text-[#ff3366]"}>
               {selectedStock.changePercent >= 0 ? "+" : ""}{selectedStock.changePercent.toFixed(2)}%
             </span>
-            <button onClick={resetFlow} className="text-white/20 hover:text-white/40 transition-colors text-[8px] ml-2 border border-white/10 px-1 py-0.5 rounded-sm">
+            <button onClick={resetFlow} className="text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors text-[8px] ml-2 border border-border px-1 py-0.5 rounded-sm">
               RESET
             </button>
           </div>
@@ -419,7 +419,7 @@ export function TradeFlowPanel() {
             {step === 1 && (
               <div className="p-3 space-y-3">
                 <div className="relative">
-                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/50" />
                   <input
                     ref={searchRef}
                     value={searchQuery}
@@ -428,13 +428,13 @@ export function TradeFlowPanel() {
                       if (e.key === "Enter" && filteredTickers.length > 0) selectStock(filteredTickers[0].symbol);
                     }}
                     placeholder="Search ticker or company name..."
-                    className="w-full h-8 pl-7 pr-3 text-[11px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/25 focus:outline-none focus:border-[#00B4D8]/40"
+                    className="w-full h-8 pl-7 pr-3 text-[11px] font-mono bg-muted/50 border border-border rounded-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[#00B4D8]/40"
                     autoFocus
                   />
                 </div>
 
                 <div>
-                  <p className="text-[8px] font-mono text-white/25 uppercase mb-1.5">
+                  <p className="text-[8px] font-mono text-muted-foreground/40 uppercase mb-1.5">
                     {searchQuery ? `Results for "${searchQuery.toUpperCase()}"` : "Popular Stocks"}
                   </p>
                   <div className="grid grid-cols-2 gap-1">
@@ -448,15 +448,15 @@ export function TradeFlowPanel() {
                         <button
                           key={t.symbol}
                           onClick={() => selectStock(t.symbol)}
-                          className="flex items-center justify-between px-2.5 py-2 bg-white/[0.02] hover:bg-[#00B4D8]/[0.06] border border-white/[0.04] hover:border-[#00B4D8]/20 rounded-sm transition-all group"
+                          className="flex items-center justify-between px-2.5 py-2 bg-muted/30 hover:bg-[#00B4D8]/[0.06] border border-border hover:border-[#00B4D8]/20 rounded-sm transition-all group"
                         >
                           <div className="text-left">
-                            <p className="text-[10px] font-mono font-bold text-white group-hover:text-[#00B4D8] transition-colors">{t.symbol}</p>
-                            <p className="text-[8px] font-mono text-white/30 truncate max-w-[80px]">{t.name}</p>
+                            <p className="text-[10px] font-mono font-bold text-foreground group-hover:text-[#00B4D8] transition-colors">{t.symbol}</p>
+                            <p className="text-[8px] font-mono text-muted-foreground/50 truncate max-w-[80px]">{t.name}</p>
                           </div>
                           {price != null && price > 0 ? (
                             <div className="text-right">
-                              <p className="text-[10px] font-mono text-white/60">${price.toFixed(0)}</p>
+                              <p className="text-[10px] font-mono text-muted-foreground">${price.toFixed(0)}</p>
                               {changePercent != null && (
                                 <p className={`text-[8px] font-mono ${changePercent >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
                                   {changePercent >= 0 ? "+" : ""}{changePercent.toFixed(1)}%
@@ -464,7 +464,7 @@ export function TradeFlowPanel() {
                               )}
                             </div>
                           ) : (
-                            <div className="text-right text-[8px] font-mono text-white/20">—</div>
+                            <div className="text-right text-[8px] font-mono text-muted-foreground/40">—</div>
                           )}
                         </button>
                       );
@@ -479,42 +479,42 @@ export function TradeFlowPanel() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[13px] font-mono font-bold text-white">{selectedStock.symbol}</span>
+                      <span className="text-[13px] font-mono font-bold text-foreground">{selectedStock.symbol}</span>
                       <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-sm ${selectedStock.isPositive ? "bg-[#00ff88]/10 text-[#00ff88]" : "bg-[#ff3366]/10 text-[#ff3366]"}`}>
                         {selectedStock.changePercent >= 0 ? "+" : ""}{selectedStock.changePercent.toFixed(2)}%
                       </span>
                     </div>
-                    <p className="text-[9px] font-mono text-white/35">{selectedStock.name}</p>
-                    <p className="text-[18px] font-mono font-bold text-white mt-0.5">${selectedStock.price.toFixed(2)}</p>
+                    <p className="text-[9px] font-mono text-muted-foreground/60">{selectedStock.name}</p>
+                    <p className="text-[18px] font-mono font-bold text-foreground mt-0.5">${selectedStock.price.toFixed(2)}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-right">
                     <div>
-                      <p className="text-[7px] font-mono text-white/25">DAY HIGH</p>
-                      <p className="text-[9px] font-mono font-bold text-white/70">{selectedStock.dayHigh > 0 ? `$${selectedStock.dayHigh.toFixed(2)}` : "—"}</p>
+                      <p className="text-[7px] font-mono text-muted-foreground/40">DAY HIGH</p>
+                      <p className="text-[9px] font-mono font-bold text-foreground/70">{selectedStock.dayHigh > 0 ? `$${selectedStock.dayHigh.toFixed(2)}` : "—"}</p>
                     </div>
                     <div>
-                      <p className="text-[7px] font-mono text-white/25">VOLUME</p>
-                      <p className="text-[9px] font-mono font-bold text-white/70">{selectedStock.volume}</p>
+                      <p className="text-[7px] font-mono text-muted-foreground/40">VOLUME</p>
+                      <p className="text-[9px] font-mono font-bold text-foreground/70">{selectedStock.volume}</p>
                     </div>
                     <div>
-                      <p className="text-[7px] font-mono text-white/25">DAY LOW</p>
+                      <p className="text-[7px] font-mono text-muted-foreground/40">DAY LOW</p>
                       <p className="text-[9px] font-mono font-bold text-[#ff3366]">{selectedStock.dayLow > 0 ? `$${selectedStock.dayLow.toFixed(2)}` : "—"}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="rounded-sm overflow-hidden border border-white/[0.04]">
-                  <Suspense fallback={<div className="h-[160px] flex items-center justify-center text-[9px] font-mono text-white/20">LOADING CHART...</div>}>
+                <div className="rounded-sm overflow-hidden border border-border">
+                  <Suspense fallback={<div className="h-[160px] flex items-center justify-center text-[9px] font-mono text-muted-foreground/40">LOADING CHART...</div>}>
                     <LightweightChart data={chartData} height={160} showVolume={false} />
                   </Suspense>
                 </div>
 
                 {orderBook && (
                   <div>
-                    <p className="text-[8px] font-mono text-white/25 uppercase mb-1">ORDER BOOK DEPTH</p>
+                    <p className="text-[8px] font-mono text-muted-foreground/40 uppercase mb-1">ORDER BOOK DEPTH</p>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <div className="flex justify-between text-[7px] font-mono text-white/20 mb-0.5 px-1">
+                        <div className="flex justify-between text-[7px] font-mono text-muted-foreground/40 mb-0.5 px-1">
                           <span>PRICE</span><span>SIZE</span>
                         </div>
                         {orderBook.bids.slice(0, 5).map((b, i) => {
@@ -524,13 +524,13 @@ export function TradeFlowPanel() {
                             <div key={i} className="relative flex justify-between text-[8px] font-mono px-1 py-0.5">
                               <div className="absolute inset-0 bg-[#00ff88]/[0.04]" style={{ width: `${barW}%` }} />
                               <span className="relative text-[#00ff88]">${b.price}</span>
-                              <span className="relative text-white/40">{b.size.toLocaleString()}</span>
+                              <span className="relative text-muted-foreground/70">{b.size.toLocaleString()}</span>
                             </div>
                           );
                         })}
                       </div>
                       <div>
-                        <div className="flex justify-between text-[7px] font-mono text-white/20 mb-0.5 px-1">
+                        <div className="flex justify-between text-[7px] font-mono text-muted-foreground/40 mb-0.5 px-1">
                           <span>PRICE</span><span>SIZE</span>
                         </div>
                         {orderBook.asks.slice(0, 5).map((a, i) => {
@@ -540,18 +540,18 @@ export function TradeFlowPanel() {
                             <div key={i} className="relative flex justify-between text-[8px] font-mono px-1 py-0.5">
                               <div className="absolute inset-0 bg-[#ff3366]/[0.04]" style={{ width: `${barW}%` }} />
                               <span className="relative text-[#ff3366]">${a.price}</span>
-                              <span className="relative text-white/40">{a.size.toLocaleString()}</span>
+                              <span className="relative text-muted-foreground/70">{a.size.toLocaleString()}</span>
                             </div>
                           );
                         })}
                       </div>
                     </div>
-                    <div className="flex items-center justify-center gap-2 mt-1 py-1 bg-white/[0.02] border-t border-b border-white/[0.04]">
-                      <span className="text-[7px] font-mono text-white/25">BID/ASK SPREAD</span>
+                    <div className="flex items-center justify-center gap-2 mt-1 py-1 bg-muted/30 border-t border-b border-border">
+                      <span className="text-[7px] font-mono text-muted-foreground/40">BID/ASK SPREAD</span>
                       <span className="text-[8px] font-mono text-[#FFD700] font-bold">
                         ${orderBook.bids[0].price} / ${orderBook.asks[0].price}
                       </span>
-                      <span className="text-[7px] font-mono text-white/25">
+                      <span className="text-[7px] font-mono text-muted-foreground/40">
                         (${(orderBook.asks[0].price - orderBook.bids[0].price).toFixed(2)})
                       </span>
                     </div>
@@ -559,16 +559,16 @@ export function TradeFlowPanel() {
                 )}
 
                 {gamification && (
-                  <div className="border border-white/[0.04] rounded-sm p-2 space-y-1.5 bg-white/[0.01]">
+                  <div className="border border-border rounded-sm p-2 space-y-1.5 bg-muted/30">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <Star className="w-3 h-3 text-[#FFD700]" />
-                        <span className="text-[8px] font-mono text-white/40 uppercase">Your Status</span>
+                        <span className="text-[8px] font-mono text-muted-foreground/70 uppercase">Your Status</span>
                       </div>
                       <div className="flex items-center gap-2 text-[8px] font-mono">
                         <span className="text-[#FFD700] font-bold">{gamification.xp.tier}</span>
-                        <span className="text-white/30">Lv.{gamification.xp.level}</span>
-                        <span className="text-white/20">{gamification.xp.totalXp.toLocaleString()} XP</span>
+                        <span className="text-muted-foreground/50">Lv.{gamification.xp.level}</span>
+                        <span className="text-muted-foreground/40">{gamification.xp.totalXp.toLocaleString()} XP</span>
                       </div>
                     </div>
                     <XPBar
@@ -581,27 +581,27 @@ export function TradeFlowPanel() {
                     <div className="flex items-center gap-3 text-[8px] font-mono">
                       <div className="flex items-center gap-1">
                         <Flame className="w-2.5 h-2.5 text-[#ff7f00]" />
-                        <span className="text-white/40">Streak:</span>
+                        <span className="text-muted-foreground/70">Streak:</span>
                         <span className="text-[#ff7f00] font-bold">{gamification.streak.currentStreak}d</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Zap className="w-2.5 h-2.5 text-[#00B4D8]" />
-                        <span className="text-white/40">Multiplier:</span>
+                        <span className="text-muted-foreground/70">Multiplier:</span>
                         <span className="text-[#00B4D8] font-bold">{gamification.streak.multiplier.toFixed(1)}x</span>
                       </div>
                     </div>
                     {challenges.length > 0 && (
                       <div className="space-y-1">
-                        <p className="text-[7px] font-mono text-white/20 uppercase">Active Challenges</p>
+                        <p className="text-[7px] font-mono text-muted-foreground/40 uppercase">Active Challenges</p>
                         {challenges.map(c => (
                           <div key={c.id} className="flex items-center gap-2">
                             <Target className="w-2.5 h-2.5 text-[#9c27b0] flex-shrink-0" />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
-                                <span className="text-[8px] font-mono text-white/50 truncate">{c.title}</span>
+                                <span className="text-[8px] font-mono text-muted-foreground truncate">{c.title}</span>
                                 <span className="text-[7px] font-mono text-[#FFD700]">+{c.xpReward} XP</span>
                               </div>
-                              <div className="w-full h-0.5 bg-white/[0.04] rounded-full mt-0.5">
+                              <div className="w-full h-0.5 bg-muted/50 rounded-full mt-0.5">
                                 <div className="h-full bg-[#9c27b0] rounded-full" style={{ width: `${(c.progress / c.target) * 100}%` }} />
                               </div>
                             </div>
@@ -613,7 +613,7 @@ export function TradeFlowPanel() {
                 )}
 
                 <div className="flex gap-2">
-                  <button onClick={() => setStep(1)} className="flex items-center gap-1 px-2 py-1.5 text-[9px] font-mono text-white/40 bg-white/[0.02] border border-white/[0.06] rounded-sm hover:text-white/60 transition-colors">
+                  <button onClick={() => setStep(1)} className="flex items-center gap-1 px-2 py-1.5 text-[9px] font-mono text-muted-foreground/70 bg-muted/30 border border-border rounded-sm hover:text-muted-foreground transition-colors">
                     <ChevronLeft className="w-3 h-3" />Back
                   </button>
                   <button onClick={() => setStep(3)} className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[9px] font-mono font-bold text-black bg-[#00B4D8] hover:bg-[#00B4D8]/80 rounded-sm transition-colors">
@@ -625,7 +625,7 @@ export function TradeFlowPanel() {
 
             {step === 3 && selectedStock && (
               <div className="p-3 space-y-3">
-                <div className="flex items-center gap-2 text-[9px] font-mono text-white/40">
+                <div className="flex items-center gap-2 text-[9px] font-mono text-muted-foreground/70">
                   <span className="text-[#00B4D8] font-bold">{selectedStock.symbol}</span>
                   <span>${selectedStock.price.toFixed(2)}</span>
                 </div>
@@ -640,7 +640,7 @@ export function TradeFlowPanel() {
                           ? s === "buy"
                             ? "bg-[#00ff88]/15 text-[#00ff88] border border-[#00ff88]/40"
                             : "bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/40"
-                          : "bg-white/[0.02] text-white/30 border border-white/[0.06] hover:text-white/50"
+                          : "bg-muted/30 text-muted-foreground/50 border border-border hover:text-muted-foreground"
                       }`}
                     >
                       {s === "buy" ? <TrendingUp className="w-3 h-3 inline mr-1" /> : <TrendingDown className="w-3 h-3 inline mr-1" />}
@@ -650,7 +650,7 @@ export function TradeFlowPanel() {
                 </div>
 
                 <div>
-                  <p className="text-[7px] font-mono text-white/25 uppercase mb-1">Order Type</p>
+                  <p className="text-[7px] font-mono text-muted-foreground/40 uppercase mb-1">Order Type</p>
                   <div className="flex gap-1">
                     {(["Market", "Limit", "Stop"] as const).map(ot => (
                       <button
@@ -659,7 +659,7 @@ export function TradeFlowPanel() {
                         className={`flex-1 py-1.5 text-[9px] font-mono font-bold rounded-sm transition-all ${
                           orderType === ot
                             ? "bg-[#00B4D8]/15 text-[#00B4D8] border border-[#00B4D8]/40"
-                            : "bg-white/[0.02] text-white/30 border border-white/[0.06] hover:text-white/50"
+                            : "bg-muted/30 text-muted-foreground/50 border border-border hover:text-muted-foreground"
                         }`}
                       >
                         {ot}
@@ -670,18 +670,18 @@ export function TradeFlowPanel() {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[7px] font-mono text-white/25 uppercase block mb-1">Quantity (Shares)</label>
+                    <label className="text-[7px] font-mono text-muted-foreground/40 uppercase block mb-1">Quantity (Shares)</label>
                     <input
                       type="number"
                       value={quantity}
                       onChange={e => setQuantity(e.target.value)}
                       placeholder="100"
-                      className="w-full h-8 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/40"
+                      className="w-full h-8 px-2 text-[10px] font-mono bg-muted/50 border border-border rounded-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[#00B4D8]/40"
                     />
                   </div>
                   {orderType !== "Market" && (
                     <div>
-                      <label className="text-[7px] font-mono text-white/25 uppercase block mb-1">
+                      <label className="text-[7px] font-mono text-muted-foreground/40 uppercase block mb-1">
                         {orderType === "Limit" ? "Limit Price" : "Stop Price"}
                       </label>
                       <input
@@ -690,28 +690,28 @@ export function TradeFlowPanel() {
                         value={limitPrice}
                         onChange={e => setLimitPrice(e.target.value)}
                         placeholder={selectedStock.price.toFixed(2)}
-                        className="w-full h-8 px-2 text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] rounded-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/40"
+                        className="w-full h-8 px-2 text-[10px] font-mono bg-muted/50 border border-border rounded-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[#00B4D8]/40"
                       />
                     </div>
                   )}
                 </div>
 
                 {estimatedCost > 0 && (
-                  <div className="space-y-1 border border-white/[0.04] rounded-sm p-2 bg-white/[0.01]">
+                  <div className="space-y-1 border border-border rounded-sm p-2 bg-muted/30">
                     <div className="flex justify-between text-[9px] font-mono">
-                      <span className="text-white/40">Exec Price</span>
-                      <span className="text-white font-bold">${execPrice.toFixed(2)}</span>
+                      <span className="text-muted-foreground/70">Exec Price</span>
+                      <span className="text-foreground font-bold">${execPrice.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-[9px] font-mono">
-                      <span className="text-white/40">Shares</span>
-                      <span className="text-white">{parseInt(quantity) || 0}</span>
+                      <span className="text-muted-foreground/70">Shares</span>
+                      <span className="text-foreground">{parseInt(quantity) || 0}</span>
                     </div>
-                    <div className="flex justify-between text-[9px] font-mono border-t border-white/[0.04] pt-1 mt-1">
-                      <span className="text-white/40">Estimated Total</span>
+                    <div className="flex justify-between text-[9px] font-mono border-t border-border pt-1 mt-1">
+                      <span className="text-muted-foreground/70">Estimated Total</span>
                       <span className="text-[#00B4D8] font-bold text-[10px]">${estimatedCost.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                     </div>
                     <div className="flex justify-between text-[9px] font-mono">
-                      <span className="text-white/40">Portfolio P&L Impact</span>
+                      <span className="text-muted-foreground/70">Portfolio P&L Impact</span>
                       <span className={`font-bold ${pnlImpact >= 0 ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
                         {pnlImpact >= 0 ? "+" : ""}${pnlImpact.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                       </span>
@@ -720,7 +720,7 @@ export function TradeFlowPanel() {
                 )}
 
                 <div className="flex gap-2">
-                  <button onClick={() => setStep(2)} className="flex items-center gap-1 px-2 py-1.5 text-[9px] font-mono text-white/40 bg-white/[0.02] border border-white/[0.06] rounded-sm hover:text-white/60 transition-colors">
+                  <button onClick={() => setStep(2)} className="flex items-center gap-1 px-2 py-1.5 text-[9px] font-mono text-muted-foreground/70 bg-muted/30 border border-border rounded-sm hover:text-muted-foreground transition-colors">
                     <ChevronLeft className="w-3 h-3" />Back
                   </button>
                   <button
@@ -736,23 +736,23 @@ export function TradeFlowPanel() {
 
             {step === 4 && selectedStock && (
               <div className="p-3 space-y-3">
-                <div className="flex items-center gap-2 text-[8px] font-mono text-white/40 mb-2">
+                <div className="flex items-center gap-2 text-[8px] font-mono text-muted-foreground/70 mb-2">
                   <Shield className="w-3 h-3 text-[#FFD700]" />
                   <span className="text-[#FFD700] font-bold uppercase">Tax Impact Analysis</span>
-                  <span className="ml-auto text-white/20">2026 Tax Year</span>
+                  <span className="ml-auto text-muted-foreground/40">2026 Tax Year</span>
                 </div>
 
-                <div className="border border-white/[0.04] rounded-sm p-2.5 bg-white/[0.01] space-y-2">
+                <div className="border border-border rounded-sm p-2.5 bg-muted/30 space-y-2">
                   <div className="flex justify-between items-center text-[9px] font-mono">
-                    <span className="text-white/40">Trade</span>
-                    <span className="text-white font-bold uppercase">{side} {parseInt(quantity) || 0} {selectedStock.symbol} @ ${execPrice.toFixed(2)}</span>
+                    <span className="text-muted-foreground/70">Trade</span>
+                    <span className="text-foreground font-bold uppercase">{side} {parseInt(quantity) || 0} {selectedStock.symbol} @ ${execPrice.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center text-[9px] font-mono">
-                    <span className="text-white/40">Estimated Cost</span>
-                    <span className="text-white">${estimatedCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                    <span className="text-muted-foreground/70">Estimated Cost</span>
+                    <span className="text-foreground">${estimatedCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                   </div>
                   <div className="flex justify-between items-center text-[9px] font-mono">
-                    <span className="text-white/40">Your Marginal Rate</span>
+                    <span className="text-muted-foreground/70">Your Marginal Rate</span>
                     <span className="text-[#FFD700] font-bold">{(marginalRate * 100).toFixed(0)}%</span>
                   </div>
                 </div>
@@ -764,13 +764,13 @@ export function TradeFlowPanel() {
                         <AlertTriangle className="w-3 h-3 text-[#ff3366]" />
                         <span className="text-[8px] font-mono text-[#ff3366] font-bold uppercase">Short-Term Capital Gains</span>
                       </div>
-                      <p className="text-[8px] font-mono text-white/30 mb-1">If held &lt; 1 year — taxed as ordinary income</p>
+                      <p className="text-[8px] font-mono text-muted-foreground/50 mb-1">If held &lt; 1 year — taxed as ordinary income</p>
                       <div className="flex justify-between text-[9px] font-mono">
-                        <span className="text-white/40">Est. Gain</span>
-                        <span className="text-white">${(estimatedCost * 0.1).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                        <span className="text-muted-foreground/70">Est. Gain</span>
+                        <span className="text-foreground">${(estimatedCost * 0.1).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                       </div>
                       <div className="flex justify-between text-[9px] font-mono">
-                        <span className="text-white/40">Tax Owed</span>
+                        <span className="text-muted-foreground/70">Tax Owed</span>
                         <span className="text-[#ff3366] font-bold">${shortTermGain.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                       </div>
                     </div>
@@ -780,17 +780,17 @@ export function TradeFlowPanel() {
                         <CheckCircle className="w-3 h-3 text-[#00ff88]" />
                         <span className="text-[8px] font-mono text-[#00ff88] font-bold uppercase">Long-Term Capital Gains</span>
                       </div>
-                      <p className="text-[8px] font-mono text-white/30 mb-1">If held &gt; 1 year — 15% preferential rate</p>
+                      <p className="text-[8px] font-mono text-muted-foreground/50 mb-1">If held &gt; 1 year — 15% preferential rate</p>
                       <div className="flex justify-between text-[9px] font-mono">
-                        <span className="text-white/40">Est. Gain</span>
-                        <span className="text-white">${(estimatedCost * 0.1).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                        <span className="text-muted-foreground/70">Est. Gain</span>
+                        <span className="text-foreground">${(estimatedCost * 0.1).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                       </div>
                       <div className="flex justify-between text-[9px] font-mono">
-                        <span className="text-white/40">Tax Owed</span>
+                        <span className="text-muted-foreground/70">Tax Owed</span>
                         <span className="text-[#00ff88] font-bold">${longTermGain.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                       </div>
-                      <div className="flex justify-between text-[9px] font-mono mt-1 pt-1 border-t border-white/[0.04]">
-                        <span className="text-white/40">Potential Saving</span>
+                      <div className="flex justify-between text-[9px] font-mono mt-1 pt-1 border-t border-border">
+                        <span className="text-muted-foreground/70">Potential Saving</span>
                         <span className="text-[#FFD700] font-bold">${(shortTermGain - longTermGain).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                       </div>
                     </div>
@@ -801,19 +801,19 @@ export function TradeFlowPanel() {
                       <DollarSign className="w-3 h-3 text-[#00B4D8]" />
                       <span className="text-[8px] font-mono text-[#00B4D8] font-bold uppercase">Buy Order — No Immediate Tax Event</span>
                     </div>
-                    <p className="text-[8px] font-mono text-white/35 leading-relaxed">
+                    <p className="text-[8px] font-mono text-muted-foreground/60 leading-relaxed">
                       Buying shares creates a cost basis. Capital gains tax is only triggered when you sell.
                       Hold for &gt;1 year to qualify for the long-term rate (15% vs {(marginalRate * 100).toFixed(0)}% short-term).
                     </p>
-                    <div className="mt-2 pt-2 border-t border-white/[0.04] flex justify-between text-[9px] font-mono">
-                      <span className="text-white/40">Cost Basis Created</span>
+                    <div className="mt-2 pt-2 border-t border-border flex justify-between text-[9px] font-mono">
+                      <span className="text-muted-foreground/70">Cost Basis Created</span>
                       <span className="text-[#00B4D8] font-bold">${estimatedCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                     </div>
                   </div>
                 )}
 
                 <div className="flex gap-2">
-                  <button onClick={() => setStep(3)} className="flex items-center gap-1 px-2 py-1.5 text-[9px] font-mono text-white/40 bg-white/[0.02] border border-white/[0.06] rounded-sm hover:text-white/60 transition-colors">
+                  <button onClick={() => setStep(3)} className="flex items-center gap-1 px-2 py-1.5 text-[9px] font-mono text-muted-foreground/70 bg-muted/30 border border-border rounded-sm hover:text-muted-foreground transition-colors">
                     <ChevronLeft className="w-3 h-3" />Back
                   </button>
                   <button onClick={() => setStep(5)} className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[9px] font-mono font-bold text-black bg-[#00B4D8] hover:bg-[#00B4D8]/80 rounded-sm transition-colors">
@@ -826,11 +826,11 @@ export function TradeFlowPanel() {
             {step === 5 && selectedStock && (
               <div className="p-3 space-y-3">
                 <div className="flex items-center justify-between text-[8px] font-mono">
-                  <span className="text-white/30 uppercase">Order Summary</span>
-                  <span className="text-white/20">Press ⌘+Enter to execute</span>
+                  <span className="text-muted-foreground/50 uppercase">Order Summary</span>
+                  <span className="text-muted-foreground/40">Press ⌘+Enter to execute</span>
                 </div>
 
-                <div className="border border-white/[0.06] rounded-sm p-3 space-y-1.5 bg-white/[0.01]">
+                <div className="border border-border rounded-sm p-3 space-y-1.5 bg-muted/30">
                   {[
                     ["Symbol", selectedStock.symbol],
                     ["Side", side.toUpperCase()],
@@ -841,18 +841,18 @@ export function TradeFlowPanel() {
                     ["Tax Note", side === "sell" ? `~$${shortTermGain.toFixed(0)} ST gain tax` : "No immediate tax event"],
                   ].map(([label, value]) => (
                     <div key={label} className="flex justify-between items-center text-[9px] font-mono">
-                      <span className="text-white/40">{label}</span>
+                      <span className="text-muted-foreground/70">{label}</span>
                       <span className={`font-bold ${
                         label === "Side" ? (side === "buy" ? "text-[#00ff88]" : "text-[#ff3366]")
                         : label === "Est. Cost" ? "text-[#00B4D8]"
-                        : "text-white"
+                        : "text-foreground"
                       }`}>{value}</span>
                     </div>
                   ))}
                 </div>
 
                 <div className="flex gap-2">
-                  <button onClick={() => setStep(4)} className="flex items-center gap-1 px-2 py-2 text-[9px] font-mono text-white/40 bg-white/[0.02] border border-white/[0.06] rounded-sm hover:text-white/60 transition-colors">
+                  <button onClick={() => setStep(4)} className="flex items-center gap-1 px-2 py-2 text-[9px] font-mono text-muted-foreground/70 bg-muted/30 border border-border rounded-sm hover:text-muted-foreground transition-colors">
                     <ChevronLeft className="w-3 h-3" />Back
                   </button>
                   <button
@@ -861,7 +861,7 @@ export function TradeFlowPanel() {
                     className={`flex-1 flex items-center justify-center gap-2 py-3 text-[11px] font-mono font-bold rounded-sm transition-all disabled:opacity-30 ${
                       side === "buy"
                         ? "bg-[#00ff88] text-black hover:bg-[#00ff88]/80"
-                        : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"
+                        : "bg-[#ff3366] text-foreground hover:bg-[#ff3366]/80"
                     }`}
                   >
                     {side === "buy" ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
@@ -890,13 +890,13 @@ export function TradeFlowPanel() {
                       }`}
                     >
                       <div className="flex items-center gap-1.5 mb-1">
-                        <span className="text-[8px] text-white/30">FILL NOTIFICATION</span>
-                        <span className="text-[8px] text-white/20 ml-auto">{new Date().toLocaleTimeString("en-US", { hour12: false })}</span>
+                        <span className="text-[8px] text-muted-foreground/50">FILL NOTIFICATION</span>
+                        <span className="text-[8px] text-muted-foreground/40 ml-auto">{new Date().toLocaleTimeString("en-US", { hour12: false })}</span>
                       </div>
                       <p className={`text-[11px] font-bold ${tradeResult.side === "buy" ? "text-[#00ff88]" : "text-[#ff3366]"}`}>
                         ▶ ORDER FILLED: {tradeResult.side.toUpperCase()} {tradeResult.quantity} {tradeResult.symbol} @ ${tradeResult.price.toFixed(2)}
                       </p>
-                      <p className="text-[9px] text-white/40 mt-0.5">
+                      <p className="text-[9px] text-muted-foreground/70 mt-0.5">
                         Total: ${tradeResult.totalCost.toLocaleString(undefined, { maximumFractionDigits: 2 })} · Paper Trading
                       </p>
                     </motion.div>
@@ -906,8 +906,8 @@ export function TradeFlowPanel() {
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-[#00ff88]" />
                   <div>
-                    <p className="text-[11px] font-mono font-bold text-white">Trade Confirmed</p>
-                    <p className="text-[8px] font-mono text-white/30">Paper trading order filled successfully</p>
+                    <p className="text-[11px] font-mono font-bold text-foreground">Trade Confirmed</p>
+                    <p className="text-[8px] font-mono text-muted-foreground/50">Paper trading order filled successfully</p>
                   </div>
                 </div>
 
@@ -925,7 +925,7 @@ export function TradeFlowPanel() {
                       <p className="text-[11px] font-bold text-[#FFD700] mt-0.5">+{tradeResult.xpEarned} XP EARNED</p>
                     )}
                     {tradeResult.leveledUp && (
-                      <p className="text-[9px] text-white/60 mt-0.5">▶ LEVEL UP — Congratulations on advancing!</p>
+                      <p className="text-[9px] text-muted-foreground mt-0.5">▶ LEVEL UP — Congratulations on advancing!</p>
                     )}
                     {gamification && (
                       <div className="mt-1.5">
@@ -953,7 +953,7 @@ export function TradeFlowPanel() {
                       <span className="text-lg">{badge.icon}</span>
                       <div>
                         <p className="text-[8px] text-[#9c27b0] font-bold uppercase">BADGE UNLOCKED</p>
-                        <p className="text-[9px] text-white font-bold">{badge.name}</p>
+                        <p className="text-[9px] text-foreground font-bold">{badge.name}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -985,7 +985,7 @@ export function TradeFlowPanel() {
               initial={{ scale: 0.95, y: 10 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 10 }}
-              className="bg-[#0a0a14] border border-white/10 rounded-sm p-5 w-[340px]"
+              className="bg-card border border-border rounded-sm p-5 w-[340px]"
               onClick={e => e.stopPropagation()}
             >
               <div className="flex items-center gap-2 mb-4">
@@ -1002,11 +1002,11 @@ export function TradeFlowPanel() {
                   ["Tax Note", side === "sell" ? `~$${shortTermGain.toFixed(0)} short-term gain tax` : "No immediate tax event"],
                 ].map(([label, value]) => (
                   <div key={label} className="flex justify-between text-[9px] font-mono">
-                    <span className="text-white/40">{label}</span>
+                    <span className="text-muted-foreground/70">{label}</span>
                     <span className={`font-bold ${
                       label === "Action" ? (side === "buy" ? "text-[#00ff88]" : "text-[#ff3366]")
                       : label === "Est. Total" ? "text-[#00B4D8]"
-                      : "text-white"
+                      : "text-foreground"
                     }`}>{value}</span>
                   </div>
                 ))}
@@ -1014,7 +1014,7 @@ export function TradeFlowPanel() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowConfirmDialog(false)}
-                  className="flex-1 py-2 text-[9px] font-mono text-white/40 border border-white/[0.08] rounded-sm hover:text-white/60 transition-colors"
+                  className="flex-1 py-2 text-[9px] font-mono text-muted-foreground/70 border border-border rounded-sm hover:text-muted-foreground transition-colors"
                 >
                   CANCEL
                 </button>
@@ -1024,7 +1024,7 @@ export function TradeFlowPanel() {
                   className={`flex-1 py-2 text-[9px] font-mono font-bold rounded-sm transition-all disabled:opacity-40 ${
                     side === "buy"
                       ? "bg-[#00ff88] text-black hover:bg-[#00ff88]/80"
-                      : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"
+                      : "bg-[#ff3366] text-foreground hover:bg-[#ff3366]/80"
                   }`}
                 >
                   {tradeLoading ? "EXECUTING..." : `CONFIRM ${side.toUpperCase()}`}

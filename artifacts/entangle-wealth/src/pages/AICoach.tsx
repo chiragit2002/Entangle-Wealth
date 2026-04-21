@@ -180,7 +180,7 @@ export default function AICoach() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#0a0a14] text-white">
+      <div className="min-h-screen bg-card text-foreground">
         <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -188,8 +188,8 @@ export default function AICoach() {
                 <Brain className="w-6 h-6 text-[#00B4D8]" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">AI Financial Coach</h1>
-                <p className="text-white/50 text-xs">Personalized behavioral finance guidance</p>
+                <h1 className="text-2xl font-bold text-foreground">AI Financial Coach</h1>
+                <p className="text-muted-foreground text-xs">Personalized behavioral finance guidance</p>
               </div>
             </div>
 
@@ -197,7 +197,7 @@ export default function AICoach() {
               <button
                 onClick={fetchWeeklySummary}
                 disabled={!isSignedIn || loadingSummary}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.06] border border-white/10 text-sm text-white/70 hover:text-white hover:bg-white/[0.10] transition-all disabled:opacity-40"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted border border-border text-sm text-foreground/70 hover:text-foreground hover:bg-white/[0.10] transition-all disabled:opacity-40"
               >
                 {loadingSummary ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Calendar className="w-4 h-4" />}
                 Weekly Summary
@@ -206,9 +206,9 @@ export default function AICoach() {
           </div>
 
           {loadingNudge ? (
-            <div className="border border-white/10 rounded-xl p-4 animate-pulse h-16 bg-white/[0.02]" aria-label="Loading daily nudge" />
+            <div className="border border-border rounded-xl p-4 animate-pulse h-16 bg-muted/30" aria-label="Loading daily nudge" />
           ) : nudgeError ? (
-            <div className="border border-white/10 rounded-xl p-3 flex items-center gap-2 text-xs text-white/30">
+            <div className="border border-border rounded-xl p-3 flex items-center gap-2 text-xs text-muted-foreground/50">
               <AlertCircle className="w-3.5 h-3.5 shrink-0" />
               <span>Daily nudge unavailable — couldn't reach the server.</span>
               <button onClick={fetchNudge} className="ml-auto text-primary/60 hover:text-primary shrink-0">Retry</button>
@@ -218,9 +218,9 @@ export default function AICoach() {
               <Sparkles className="w-5 h-5 text-[#00B4D8] mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-xs text-[#00B4D8] font-semibold mb-1">Daily Nudge</p>
-                <p className="text-sm text-white/80">{nudge.nudge}</p>
+                <p className="text-sm text-foreground/80">{nudge.nudge}</p>
                 {nudge.context && (
-                  <div className="flex items-center gap-3 mt-2 text-xs text-white/40">
+                  <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground/70">
                     <span className="flex items-center gap-1"><Trophy className="w-3 h-3" />Level {nudge.context.level}</span>
                     <span className="flex items-center gap-1"><Zap className="w-3 h-3" />{nudge.context.weeklyXp} XP this week</span>
                     <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3" />{nudge.context.habitsToday} habits today</span>
@@ -235,14 +235,14 @@ export default function AICoach() {
               <div className="p-4 border-b border-amber-500/10 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-amber-400" />
-                  <span className="font-semibold text-white text-sm">Weekly Coaching Summary</span>
+                  <span className="font-semibold text-foreground text-sm">Weekly Coaching Summary</span>
                 </div>
-                <button onClick={() => setShowSummary(false)} className="text-white/50 hover:text-white transition-colors">
+                <button onClick={() => setShowSummary(false)} className="text-muted-foreground hover:text-foreground transition-colors">
                   <ChevronUp className="w-4 h-4" />
                 </button>
               </div>
               <div className="p-4 space-y-4">
-                <p className="text-white/70 text-sm">{weeklySummary.summary}</p>
+                <p className="text-foreground/70 text-sm">{weeklySummary.summary}</p>
 
                 {Array.isArray(weeklySummary.topWins) && weeklySummary.topWins.length > 0 && (
                   <div>
@@ -251,7 +251,7 @@ export default function AICoach() {
                     </p>
                     <ul className="space-y-1.5">
                       {weeklySummary.topWins.map((win, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-white/70">
+                        <li key={i} className="flex items-start gap-2 text-sm text-foreground/70">
                           <CheckCircle className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                           {win}
                         </li>
@@ -267,7 +267,7 @@ export default function AICoach() {
                     </p>
                     <ul className="space-y-1.5">
                       {weeklySummary.suggestedActions.map((action, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-white/70">
+                        <li key={i} className="flex items-start gap-2 text-sm text-foreground/70">
                           <TrendingUp className="w-4 h-4 text-[#00B4D8] mt-0.5 flex-shrink-0" />
                           {action}
                         </li>
@@ -280,7 +280,7 @@ export default function AICoach() {
           )}
 
           {entanglementInsights.length > 0 && (
-            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+            <div className="bg-muted/30 border border-border rounded-xl p-4">
               <EntangledInsightsFeed
                 insights={entanglementInsights}
                 title="Cross-Domain Context"
@@ -289,12 +289,12 @@ export default function AICoach() {
             </div>
           )}
 
-          <div className="bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden flex flex-col" style={{ height: "500px" }}>
+          <div className="bg-muted/50 border border-border rounded-xl overflow-hidden flex flex-col" style={{ height: "500px" }}>
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.length === 0 && !isSignedIn && (
                 <div className="flex flex-col items-center justify-center h-full text-center gap-4">
                   <Brain className="w-12 h-12 text-[#00B4D8]/50" />
-                  <p className="text-white/50 text-sm">Sign in to chat with your personalized AI coach</p>
+                  <p className="text-muted-foreground text-sm">Sign in to chat with your personalized AI coach</p>
                 </div>
               )}
 
@@ -307,20 +307,20 @@ export default function AICoach() {
                     className={`w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center ${
                       msg.role === "assistant"
                         ? "bg-gradient-to-br from-[#00B4D8]/20 to-purple-500/20 border border-[#00B4D8]/30"
-                        : "bg-white/10"
+                        : "bg-muted"
                     }`}
                   >
                     {msg.role === "assistant" ? (
                       <Brain className="w-4 h-4 text-[#00B4D8]" />
                     ) : (
-                      <span className="text-white/60 text-xs">You</span>
+                      <span className="text-muted-foreground text-xs">You</span>
                     )}
                   </div>
                   <div
                     className={`max-w-[80%] rounded-sm px-4 py-3 text-sm leading-relaxed ${
                       msg.role === "assistant"
-                        ? "bg-white/[0.06] text-white/80 border border-white/[0.08] rounded-tl-sm"
-                        : "bg-[#00B4D8]/15 text-white border border-[#00B4D8]/20 rounded-tr-sm"
+                        ? "bg-muted text-foreground/80 border border-border rounded-tl-sm"
+                        : "bg-[#00B4D8]/15 text-foreground border border-[#00B4D8]/20 rounded-tr-sm"
                     }`}
                   >
                     {msg.content}
@@ -333,7 +333,7 @@ export default function AICoach() {
                   <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#00B4D8]/20 to-purple-500/20 border border-[#00B4D8]/30 flex items-center justify-center flex-shrink-0">
                     <Brain className="w-4 h-4 text-[#00B4D8]" />
                   </div>
-                  <div className="bg-white/[0.06] border border-white/[0.08] rounded-sm rounded-tl-sm px-4 py-3 flex items-center gap-2">
+                  <div className="bg-muted border border-border rounded-sm rounded-tl-sm px-4 py-3 flex items-center gap-2">
                     <div className="flex gap-1">
                       {[0, 1, 2].map(i => (
                         <div
@@ -351,12 +351,12 @@ export default function AICoach() {
             </div>
 
             {messages.length > 0 && messages.length < 4 && (
-              <div className="px-4 py-2 border-t border-white/[0.06] flex gap-2 flex-wrap">
+              <div className="px-4 py-2 border-t border-border flex gap-2 flex-wrap">
                 {SUGGESTED_PROMPTS.slice(0, 3).map(prompt => (
                   <button
                     key={prompt}
                     onClick={() => sendMessage(prompt)}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-white/[0.05] border border-white/10 text-white/50 hover:text-white hover:bg-white/[0.08] transition-all"
+                    className="text-xs px-3 py-1.5 rounded-lg bg-muted/50 border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
                   >
                     {prompt}
                   </button>
@@ -364,7 +364,7 @@ export default function AICoach() {
               </div>
             )}
 
-            <div className="p-4 border-t border-white/[0.08]">
+            <div className="p-4 border-t border-border">
               <div className="flex gap-3 items-end">
                 <textarea
                   value={input}
@@ -372,7 +372,7 @@ export default function AICoach() {
                   onKeyDown={handleKeyDown}
                   placeholder={isSignedIn ? "Ask your coach anything..." : "Sign in to chat with your AI coach"}
                   disabled={!isSignedIn || sending}
-                  className="flex-1 bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 resize-none focus:outline-none focus:border-[#00B4D8]/40 transition-colors disabled:opacity-40"
+                  className="flex-1 bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder-white/30 resize-none focus:outline-none focus:border-[#00B4D8]/40 transition-colors disabled:opacity-40"
                   rows={1}
                   style={{ minHeight: "44px", maxHeight: "120px" }}
                 />
@@ -384,7 +384,7 @@ export default function AICoach() {
                   {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-xs text-white/50 mt-2 flex items-center gap-1">
+              <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
                 <Info className="w-3 h-3" />
                 Educational guidance only, not financial advice. Press Enter to send.
               </p>
@@ -393,13 +393,13 @@ export default function AICoach() {
 
           {messages.length === 0 && isSignedIn && (
             <div>
-              <p className="text-xs text-white/50 mb-3">Try asking:</p>
+              <p className="text-xs text-muted-foreground mb-3">Try asking:</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {SUGGESTED_PROMPTS.map(prompt => (
                   <button
                     key={prompt}
                     onClick={() => sendMessage(prompt)}
-                    className="text-left text-sm px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white/60 hover:text-white hover:bg-white/[0.08] hover:border-white/20 transition-all"
+                    className="text-left text-sm px-4 py-3 rounded-xl bg-muted/50 border border-border text-muted-foreground hover:text-foreground hover:bg-muted hover:border-border transition-all"
                   >
                     {prompt}
                   </button>

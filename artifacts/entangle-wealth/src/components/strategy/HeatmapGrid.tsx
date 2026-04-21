@@ -31,24 +31,24 @@ export function HeatmapCell({ label, score, drawdown, failure }: HeatmapCellProp
         }}
       />
       <div className="relative z-10">
-        <div className="text-[10px] text-white/50 font-mono uppercase tracking-wider mb-2 truncate">
+        <div className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider mb-2 truncate">
           {label.replace(/_/g, " ")}
         </div>
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-xs text-white/40 mb-0.5">Score</div>
+            <div className="text-xs text-muted-foreground/70 mb-0.5">Score</div>
             <div className="text-lg font-bold font-mono" style={{ color: textCol }}>
               {score.toFixed(0)}
             </div>
           </div>
           <div className="text-right">
-            <div className="text-xs text-white/40 mb-0.5">Max DD</div>
+            <div className="text-xs text-muted-foreground/70 mb-0.5">Max DD</div>
             <div className="text-sm font-semibold font-mono" style={{ color: textCol }}>
               {drawdown.toFixed(1)}%
             </div>
           </div>
         </div>
-        <div className="mt-2 h-1.5 rounded-full bg-white/5 overflow-hidden">
+        <div className="mt-2 h-1.5 rounded-full bg-muted/50 overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-1000"
             style={{ width: `${Math.min(100, score)}%`, background: bg }}

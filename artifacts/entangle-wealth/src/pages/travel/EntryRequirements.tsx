@@ -135,12 +135,12 @@ export default function EntryRequirements({ destinations }: Props) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="text-[13px] font-bold text-white">{req.title}</p>
+                    <p className="text-[13px] font-bold text-foreground">{req.title}</p>
                     {req.severity === "warning" && (
                       <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-[#FFB800]/15 text-[#FFB800]">Action Needed</span>
                     )}
                   </div>
-                  <p className="text-[12px] text-white/50 leading-relaxed mb-2">{req.description}</p>
+                  <p className="text-[12px] text-muted-foreground leading-relaxed mb-2">{req.description}</p>
                   <a href={req.link} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 font-semibold transition-colors">
                     <ExternalLink className="w-3 h-3" /> {req.linkLabel}
@@ -152,7 +152,7 @@ export default function EntryRequirements({ destinations }: Props) {
         })}
       </div>
 
-      <div className="mt-4 rounded-xl bg-white/[0.02] border border-white/[0.06] p-4">
+      <div className="mt-4 rounded-xl bg-muted/30 border border-border p-4">
         <div className="flex items-center gap-2 mb-2">
           <CheckCircle2 className="w-4 h-4 text-[#00B4D8]" />
           <p className="text-[12px] font-bold text-[#00B4D8]">Pre-Travel Checklist</p>
@@ -168,8 +168,8 @@ export default function EntryRequirements({ destinations }: Props) {
             "Emergency contacts registered",
             "Local currency or travel card ready",
           ].map((item, i) => (
-            <label key={i} className="flex items-center gap-2 text-[11px] text-white/40 cursor-pointer hover:text-white/60 py-1">
-              <input type="checkbox" className="rounded border-white/20 bg-transparent accent-primary w-3.5 h-3.5" />
+            <label key={i} className="flex items-center gap-2 text-[11px] text-muted-foreground/70 cursor-pointer hover:text-muted-foreground py-1">
+              <input type="checkbox" className="rounded border-border bg-transparent accent-primary w-3.5 h-3.5" />
               {item}
             </label>
           ))}

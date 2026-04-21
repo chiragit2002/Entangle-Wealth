@@ -92,8 +92,8 @@ export default function AdminTickets() {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-20 text-center">
-          <RefreshCw className="w-6 h-6 text-white/40 animate-spin mx-auto mb-3" />
-          <p className="text-white/30 text-sm">Checking access...</p>
+          <RefreshCw className="w-6 h-6 text-muted-foreground/70 animate-spin mx-auto mb-3" />
+          <p className="text-muted-foreground/50 text-sm">Checking access...</p>
         </div>
       </Layout>
     );
@@ -114,16 +114,16 @@ export default function AdminTickets() {
             <Ticket className="w-6 h-6 text-[#00B4D8]" />
             <div>
               <h1 className="text-2xl font-bold">Support Tickets</h1>
-              <p className="text-xs text-white/30">{tickets.length} tickets</p>
+              <p className="text-xs text-muted-foreground/50">{tickets.length} tickets</p>
             </div>
           </div>
-          <button onClick={() => fetchTickets()} disabled={loading} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white/[0.05] border border-white/10 rounded-lg hover:bg-white/10 transition-colors text-white/60">
+          <button onClick={() => fetchTickets()} disabled={loading} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-muted/50 border border-border rounded-lg hover:bg-muted transition-colors text-muted-foreground">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
           </button>
         </div>
 
         <div className="flex items-center gap-2 mb-6">
-          <Filter className="w-4 h-4 text-white/40" />
+          <Filter className="w-4 h-4 text-muted-foreground/70" />
           {STATUS_OPTIONS.map((s) => (
             <button
               key={s}
@@ -131,7 +131,7 @@ export default function AdminTickets() {
               className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
                 statusFilter === s
                   ? "bg-[#00B4D8]/10 text-[#00B4D8] border-[#00B4D8]/30"
-                  : "bg-white/[0.03] text-white/40 border-white/[0.06] hover:bg-white/[0.06]"
+                  : "bg-muted/50 text-muted-foreground/70 border-border hover:bg-muted"
               }`}
             >
               {s === "all" ? "All" : STATUS_CONFIG[s]?.label || s}
@@ -142,13 +142,13 @@ export default function AdminTickets() {
 
         {loading && tickets.length === 0 ? (
           <div className="text-center py-20">
-            <RefreshCw className="w-6 h-6 text-white/40 animate-spin mx-auto mb-3" />
-            <p className="text-white/30 text-sm">Loading tickets...</p>
+            <RefreshCw className="w-6 h-6 text-muted-foreground/70 animate-spin mx-auto mb-3" />
+            <p className="text-muted-foreground/50 text-sm">Loading tickets...</p>
           </div>
         ) : tickets.length === 0 ? (
-          <div className="text-center py-20 bg-white/[0.01] border border-white/[0.06] rounded-xl">
-            <Ticket className="w-10 h-10 text-white/10 mx-auto mb-3" />
-            <p className="text-white/30">No tickets found</p>
+          <div className="text-center py-20 bg-muted/30 border border-border rounded-xl">
+            <Ticket className="w-10 h-10 text-muted-foreground/20 mx-auto mb-3" />
+            <p className="text-muted-foreground/50">No tickets found</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -157,42 +157,42 @@ export default function AdminTickets() {
               const cfg = STATUS_CONFIG[ticket.status] || STATUS_CONFIG.open;
               const StatusIcon = cfg.icon;
               return (
-                <div key={ticket.id} className={`border rounded-xl overflow-hidden transition-colors ${isExpanded ? "border-[#00B4D8]/20 bg-white/[0.02]" : "border-white/[0.06] bg-white/[0.01]"}`}>
+                <div key={ticket.id} className={`border rounded-xl overflow-hidden transition-colors ${isExpanded ? "border-[#00B4D8]/20 bg-muted/30" : "border-border bg-muted/30"}`}>
                   <button onClick={() => setExpandedId(isExpanded ? null : ticket.id)} className="w-full flex items-center justify-between px-5 py-4 text-left">
                     <div className="flex items-center gap-4 min-w-0 flex-1">
-                      <span className="text-xs font-mono text-white/40 shrink-0">#{ticket.id}</span>
+                      <span className="text-xs font-mono text-muted-foreground/70 shrink-0">#{ticket.id}</span>
                       <StatusIcon className="w-4 h-4 shrink-0" style={{ color: cfg.color }} />
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold text-white/80 truncate">{ticket.subject}</p>
-                        <p className="text-[10px] text-white/50 font-mono">{ticket.user_email} · {ticket.category} · {new Date(ticket.created_at).toLocaleDateString()}</p>
+                        <p className="text-sm font-semibold text-foreground/80 truncate">{ticket.subject}</p>
+                        <p className="text-[10px] text-muted-foreground font-mono">{ticket.user_email} · {ticket.category} · {new Date(ticket.created_at).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 shrink-0 ml-4">
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border" style={{ color: cfg.color, borderColor: `${cfg.color}33`, backgroundColor: `${cfg.color}10` }}>
                         {cfg.label}
                       </span>
-                      {isExpanded ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+                      {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground/70" /> : <ChevronDown className="w-4 h-4 text-muted-foreground/70" />}
                     </div>
                   </button>
 
                   {isExpanded && (
-                    <div className="px-5 pb-5 border-t border-white/[0.04]">
+                    <div className="px-5 pb-5 border-t border-border">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                         <div>
-                          <h4 className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-2">Description</h4>
-                          <p className="text-sm text-white/50 whitespace-pre-wrap leading-relaxed bg-white/[0.02] border border-white/[0.04] rounded-lg p-4">{ticket.description}</p>
+                          <h4 className="text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider mb-2">Description</h4>
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed bg-muted/30 border border-border rounded-lg p-4">{ticket.description}</p>
                           <div className="grid grid-cols-2 gap-3 mt-4 text-xs">
                             <div>
-                              <span className="text-white/50">Created:</span>
-                              <span className="text-white/50 ml-1 font-mono">{new Date(ticket.created_at).toLocaleString()}</span>
+                              <span className="text-muted-foreground">Created:</span>
+                              <span className="text-muted-foreground ml-1 font-mono">{new Date(ticket.created_at).toLocaleString()}</span>
                             </div>
                             <div>
-                              <span className="text-white/50">Updated:</span>
-                              <span className="text-white/50 ml-1 font-mono">{new Date(ticket.updated_at).toLocaleString()}</span>
+                              <span className="text-muted-foreground">Updated:</span>
+                              <span className="text-muted-foreground ml-1 font-mono">{new Date(ticket.updated_at).toLocaleString()}</span>
                             </div>
                             {ticket.resolved_at && (
                               <div>
-                                <span className="text-white/50">Resolved:</span>
+                                <span className="text-muted-foreground">Resolved:</span>
                                 <span className="text-[#00B4D8] ml-1 font-mono">{new Date(ticket.resolved_at).toLocaleString()}</span>
                               </div>
                             )}
@@ -200,10 +200,10 @@ export default function AdminTickets() {
                         </div>
 
                         <div>
-                          <h4 className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-2">Admin Actions</h4>
+                          <h4 className="text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider mb-2">Admin Actions</h4>
                           <div className="space-y-3">
                             <div>
-                              <label className="text-[10px] text-white/50 uppercase tracking-wider">Status</label>
+                              <label className="text-[10px] text-muted-foreground uppercase tracking-wider">Status</label>
                               <div className="flex gap-2 mt-1 flex-wrap">
                                 {(["open", "in_progress", "resolved", "closed"] as const).map((s) => (
                                   <button
@@ -212,8 +212,8 @@ export default function AdminTickets() {
                                     disabled={ticket.status === s}
                                     className={`px-3 py-1 text-[10px] font-semibold rounded-lg border transition-colors ${
                                       ticket.status === s
-                                        ? "opacity-40 cursor-not-allowed bg-white/[0.03] border-white/[0.06] text-white/30"
-                                        : "bg-white/[0.03] border-white/[0.06] text-white/50 hover:bg-white/[0.06]"
+                                        ? "opacity-40 cursor-not-allowed bg-muted/50 border-border text-muted-foreground/50"
+                                        : "bg-muted/50 border-border text-muted-foreground hover:bg-muted"
                                     }`}
                                   >
                                     {STATUS_CONFIG[s]?.label || s}
@@ -222,12 +222,12 @@ export default function AdminTickets() {
                               </div>
                             </div>
                             <div>
-                              <label className="text-[10px] text-white/50 uppercase tracking-wider">Internal Notes</label>
+                              <label className="text-[10px] text-muted-foreground uppercase tracking-wider">Internal Notes</label>
                               <textarea
                                 value={editNotes[ticket.id] ?? ticket.admin_notes ?? ""}
                                 onChange={(e) => setEditNotes((prev) => ({ ...prev, [ticket.id]: e.target.value }))}
                                 rows={3}
-                                className="w-full mt-1 px-3 py-2 text-xs bg-white/[0.03] border border-white/[0.06] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/30 resize-none"
+                                className="w-full mt-1 px-3 py-2 text-xs bg-muted/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-[#00B4D8]/30 resize-none"
                                 placeholder="Add internal notes..."
                               />
                               <button

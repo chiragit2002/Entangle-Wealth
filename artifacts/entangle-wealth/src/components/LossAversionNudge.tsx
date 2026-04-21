@@ -138,7 +138,7 @@ export function LossAversionNudge() {
               <p className="text-[12px] font-bold text-red-300">
                 Your {data.streakDaysLeft}-day streak will reset in {countdown || "soon"}
               </p>
-              <p className="text-[10px] text-white/30">Don't lose your progress — check in to protect it</p>
+              <p className="text-[10px] text-muted-foreground/50">Don't lose your progress — check in to protect it</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -149,7 +149,7 @@ export function LossAversionNudge() {
               <ArrowRight className="w-3 h-3" />
               Protect streak
             </Link>
-            <button onClick={dismiss} className="text-white/30 hover:text-white/50 transition-colors p-0.5" aria-label="Dismiss">
+            <button onClick={dismiss} className="text-muted-foreground/50 hover:text-muted-foreground transition-colors p-0.5" aria-label="Dismiss">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -170,7 +170,7 @@ export function LossAversionNudge() {
               <p className="text-[12px] font-bold text-[#00D4FF]">
                 {data.missedSignals} signals fired while you were away
               </p>
-              <p className="text-[10px] text-white/30">Upgrade to Pro to never miss a real-time signal again</p>
+              <p className="text-[10px] text-muted-foreground/50">Upgrade to Pro to never miss a real-time signal again</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -181,7 +181,7 @@ export function LossAversionNudge() {
               <ArrowRight className="w-3 h-3" />
               Go Pro
             </Link>
-            <button onClick={dismiss} className="text-white/30 hover:text-white/50 transition-colors p-0.5" aria-label="Dismiss">
+            <button onClick={dismiss} className="text-muted-foreground/50 hover:text-muted-foreground transition-colors p-0.5" aria-label="Dismiss">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -202,7 +202,7 @@ export function LossAversionNudge() {
               <p className="text-[12px] font-bold text-amber-300">
                 You have ~${data.unclaimed.toLocaleString()} in unclaimed deductions
               </p>
-              <p className="text-[10px] text-white/30">Run a tax scan to find what you're missing before the deadline</p>
+              <p className="text-[10px] text-muted-foreground/50">Run a tax scan to find what you're missing before the deadline</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -213,7 +213,7 @@ export function LossAversionNudge() {
               <ArrowRight className="w-3 h-3" />
               Claim now
             </Link>
-            <button onClick={dismiss} className="text-white/30 hover:text-white/50 transition-colors p-0.5" aria-label="Dismiss">
+            <button onClick={dismiss} className="text-muted-foreground/50 hover:text-muted-foreground transition-colors p-0.5" aria-label="Dismiss">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>

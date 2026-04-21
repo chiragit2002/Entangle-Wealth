@@ -85,7 +85,7 @@ export function FreshStartPrompt() {
           </div>
           <div>
             <p className="text-[12px] font-bold text-[#a855f7]">{copy.title}</p>
-            <p className="text-[10px] text-white/40">{copy.subtitle}</p>
+            <p className="text-[10px] text-muted-foreground/70">{copy.subtitle}</p>
           </div>
         </div>
         <div className="relative flex items-center gap-2 flex-shrink-0">
@@ -97,7 +97,7 @@ export function FreshStartPrompt() {
             {copy.cta}
             <ArrowRight className="w-3 h-3" />
           </Link>
-          <button onClick={dismiss} className="text-white/30 hover:text-white/50 transition-colors p-0.5" aria-label="Dismiss">
+          <button onClick={dismiss} className="text-muted-foreground/50 hover:text-muted-foreground transition-colors p-0.5" aria-label="Dismiss">
             <X className="w-3.5 h-3.5" />
           </button>
         </div>

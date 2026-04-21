@@ -42,7 +42,7 @@ function ScoreBadge({ score }: { score: number }) {
     score >= 15 ? "text-[#00B4D8] bg-[rgba(0,180,216,0.15)]" :
     score >= 8 ? "text-[#FFB800] bg-[rgba(245,200,66,0.15)]" :
     score >= 3 ? "text-[#00B4D8] bg-[rgba(0,180,216,0.15)]" :
-    "text-muted-foreground bg-white/5";
+    "text-muted-foreground bg-muted/50";
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${color}`}>
       <Zap className="w-3 h-3" />
@@ -72,7 +72,7 @@ function TickerLink({ ticker }: { ticker: string }) {
 
 function NewsCard({ item }: { item: NewsItem }) {
   const [expanded, setExpanded] = useState(false);
-  const topicColor = TOPIC_COLORS[item.topic] || "text-muted-foreground bg-white/5 border-white/10";
+  const topicColor = TOPIC_COLORS[item.topic] || "text-muted-foreground bg-muted/50 border-border";
   const TopicIcon = TOPIC_ICONS[item.topic] || Newspaper;
 
   return (
@@ -87,12 +87,12 @@ function NewsCard({ item }: { item: NewsItem }) {
             <ScoreBadge score={item.score} />
             <SentimentDot sentiment={item.sentiment} />
           </div>
-          <h3 className="text-sm font-bold text-white leading-snug">{item.title}</h3>
+          <h3 className="text-sm font-bold text-foreground leading-snug">{item.title}</h3>
         </div>
       </div>
 
       <div className="flex items-center gap-2 text-[10px] text-muted-foreground mb-2">
-        <span className="font-semibold text-white/50">{item.source}</span>
+        <span className="font-semibold text-muted-foreground">{item.source}</span>
         <span>·</span>
         <Clock className="w-3 h-3" />
         <span>{timeAgo(item.published)}</span>
@@ -136,12 +136,12 @@ function SkeletonCard() {
   return (
     <div className="signal-card mb-3 animate-pulse">
       <div className="flex gap-2 mb-2">
-        <div className="h-4 w-28 bg-white/5 rounded-full" />
-        <div className="h-4 w-10 bg-white/5 rounded-full" />
+        <div className="h-4 w-28 bg-muted/50 rounded-full" />
+        <div className="h-4 w-10 bg-muted/50 rounded-full" />
       </div>
-      <div className="h-4 w-full bg-white/5 rounded mb-1.5" />
-      <div className="h-4 w-3/4 bg-white/5 rounded mb-2" />
-      <div className="h-3 w-1/2 bg-white/5 rounded" />
+      <div className="h-4 w-full bg-muted/50 rounded mb-1.5" />
+      <div className="h-4 w-3/4 bg-muted/50 rounded mb-2" />
+      <div className="h-3 w-1/2 bg-muted/50 rounded" />
     </div>
   );
 }
@@ -204,7 +204,7 @@ export default function Research() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search articles, tickers, sources..."
-              className="pl-10 h-11 bg-black/50 border-white/10 focus-visible:ring-primary"
+              className="pl-10 h-11 bg-black/50 border-border focus-visible:ring-primary"
             />
           </div>
         </form>
@@ -220,7 +220,7 @@ export default function Research() {
                 className={`filter-pill flex-shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                   active
                     ? "bg-primary/15 border-primary/40 text-primary"
-                    : "bg-white/[0.03] border-white/[0.08] text-muted-foreground hover:bg-white/[0.06]"
+                    : "bg-muted/50 border-border text-muted-foreground hover:bg-muted"
                 }`}
               >
                 {t}
@@ -247,9 +247,9 @@ export default function Research() {
           </div>
         ) : items.length === 0 ? (
           <div className="text-center py-16">
-            <Newspaper className="w-12 h-12 text-white/10 mx-auto mb-3" />
-            <p className="text-[11px] font-mono text-white/25">&gt; NO ARTICLES IN FEED</p>
-            <p className="text-[9px] font-mono text-white/15 mt-1">
+            <Newspaper className="w-12 h-12 text-muted-foreground/20 mx-auto mb-3" />
+            <p className="text-[11px] font-mono text-muted-foreground/40">&gt; NO ARTICLES IN FEED</p>
+            <p className="text-[9px] font-mono text-muted-foreground/30 mt-1">
               {search ? "Try a different search term or clear the filter" : "Feeds are being scraped — check back shortly"}
             </p>
           </div>

@@ -136,12 +136,12 @@ function InsightCard({ insight }: { insight: InsightItem }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="font-medium text-sm text-white">{insight.title}</span>
+            <span className="font-medium text-sm text-foreground">{insight.title}</span>
             <SeverityBadge severity={insight.severity} />
           </div>
-          <p className="text-xs text-white/50 mb-2">{insight.description}</p>
+          <p className="text-xs text-muted-foreground mb-2">{insight.description}</p>
           <div className="flex items-center gap-4">
-            <span className="text-xs font-mono text-white/60 bg-white/5 px-2 py-0.5 rounded">{insight.metric}</span>
+            <span className="text-xs font-mono text-muted-foreground bg-muted/50 px-2 py-0.5 rounded">{insight.metric}</span>
             <button
               onClick={() => setExpanded(!expanded)}
               className="flex items-center gap-1 text-xs text-[#00B4D8]/70 hover:text-[#00B4D8] transition-colors"
@@ -151,7 +151,7 @@ function InsightCard({ insight }: { insight: InsightItem }) {
             </button>
           </div>
           {expanded && (
-            <p className="mt-2 text-xs text-white/60 bg-[#00B4D8]/5 border border-[#00B4D8]/10 rounded-lg px-3 py-2">
+            <p className="mt-2 text-xs text-muted-foreground bg-[#00B4D8]/5 border border-[#00B4D8]/10 rounded-lg px-3 py-2">
               {insight.recommendation}
             </p>
           )}
@@ -178,7 +178,7 @@ function HealthScoreGauge({ score }: { score: number }) {
           style={{ background: "#020204" }}
         >
           <span className="text-3xl font-bold font-mono" style={{ color }}>{score}</span>
-          <span className="text-[10px] text-white/50">/ 100</span>
+          <span className="text-[10px] text-muted-foreground">/ 100</span>
         </div>
       </div>
       <span className="mt-2 text-sm font-medium" style={{ color }}>{label}</span>
@@ -194,8 +194,8 @@ function FunnelViz({ funnel }: { funnel: FunnelData }) {
       style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}
     >
       <div className="mb-3">
-        <h3 className="text-sm font-semibold text-white">{funnel.name}</h3>
-        <p className="text-xs text-white/50">{funnel.description}</p>
+        <h3 className="text-sm font-semibold text-foreground">{funnel.name}</h3>
+        <p className="text-xs text-muted-foreground">{funnel.description}</p>
       </div>
       <div className="space-y-3">
         {funnel.steps.map((step, i) => {
@@ -205,16 +205,16 @@ function FunnelViz({ funnel }: { funnel: FunnelData }) {
             <div key={step.id}>
               <div className="flex items-center justify-between text-xs mb-1">
                 <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-white/10 text-white/50 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
+                  <span className="w-5 h-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-[10px] font-bold flex-shrink-0">
                     {i + 1}
                   </span>
-                  <span className="text-white/70">{step.label}</span>
+                  <span className="text-foreground/70">{step.label}</span>
                   {isDropOff && <AlertTriangle className="w-3 h-3 text-[#FFB800]" />}
                 </div>
                 <div className="flex items-center gap-2 text-right">
-                  <span className="text-white font-mono">{step.count.toLocaleString()}</span>
+                  <span className="text-foreground font-mono">{step.count.toLocaleString()}</span>
                   {i > 0 && (
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${step.dropoffFromPrev > 30 ? "text-[#ff3366] bg-[#ff3366]/10" : "text-white/40 bg-white/5"}`}>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${step.dropoffFromPrev > 30 ? "text-[#ff3366] bg-[#ff3366]/10" : "text-muted-foreground/70 bg-muted/50"}`}>
                       -{step.dropoffFromPrev}%
                     </span>
                   )}
@@ -237,7 +237,7 @@ function FunnelViz({ funnel }: { funnel: FunnelData }) {
         })}
       </div>
       <div className="mt-3 flex items-center justify-between text-xs border-t border-white/5 pt-3">
-        <span className="text-white/50">Overall conversion</span>
+        <span className="text-muted-foreground">Overall conversion</span>
         <span
           className="font-mono font-bold"
           style={{ color: funnel.overallConversion >= 50 ? "#00B4D8" : funnel.overallConversion >= 20 ? "#FFB800" : "#ff3366" }}
@@ -314,11 +314,11 @@ export default function EvolutionDashboard() {
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
               <Zap className="w-8 h-8 text-[#FFB800]" />
               Evolution Dashboard
             </h1>
-            <p className="text-white/50 text-sm mt-1">UX intelligence, friction signals & system health</p>
+            <p className="text-muted-foreground text-sm mt-1">UX intelligence, friction signals & system health</p>
           </div>
           <div className="flex items-center gap-3">
             <a
@@ -357,18 +357,18 @@ export default function EvolutionDashboard() {
             <div className="grid grid-cols-1 gap-4 md:col-span-3 md:grid-cols-3">
               <div className="rounded-xl border p-5" style={{ background: "rgba(255,51,102,0.05)", borderColor: "rgba(255,51,102,0.15)" }}>
                 <div className="text-3xl font-bold font-mono text-[#ff3366]">{insightsSummary.critical}</div>
-                <div className="text-xs text-white/50 mt-1">Critical Issues</div>
-                <div className="mt-2 text-xs text-white/30">{insightsSummary.warning} warnings · {insightsSummary.info} info</div>
+                <div className="text-xs text-muted-foreground mt-1">Critical Issues</div>
+                <div className="mt-2 text-xs text-muted-foreground/50">{insightsSummary.warning} warnings · {insightsSummary.info} info</div>
               </div>
               <div className="rounded-xl border p-5" style={{ background: "rgba(255,215,0,0.05)", borderColor: "rgba(255,215,0,0.15)" }}>
                 <div className="text-3xl font-bold font-mono text-[#FFB800]">{insightsSummary.rageClickTotal}</div>
-                <div className="text-xs text-white/50 mt-1">Rage Clicks (7d)</div>
-                <div className="mt-2 text-xs text-white/30">{insightsSummary.totalEvents7d.toLocaleString()} total events</div>
+                <div className="text-xs text-muted-foreground mt-1">Rage Clicks (7d)</div>
+                <div className="mt-2 text-xs text-muted-foreground/50">{insightsSummary.totalEvents7d.toLocaleString()} total events</div>
               </div>
               <div className="rounded-xl border p-5" style={{ background: "rgba(0,180,216,0.05)", borderColor: "rgba(0,180,216,0.15)" }}>
                 <div className="text-3xl font-bold font-mono text-[#00B4D8]">{insightsSummary.avgSatisfaction}%</div>
-                <div className="text-xs text-white/50 mt-1">Avg Satisfaction</div>
-                <div className="mt-2 text-xs text-white/30">Micro-feedback score</div>
+                <div className="text-xs text-muted-foreground mt-1">Avg Satisfaction</div>
+                <div className="mt-2 text-xs text-muted-foreground/50">Micro-feedback score</div>
               </div>
             </div>
           </div>
@@ -384,7 +384,7 @@ export default function EvolutionDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div>
-            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <TrendingDown className="w-5 h-5 text-[#FFB800]" />
               Funnel Analysis
             </h2>
@@ -396,8 +396,8 @@ export default function EvolutionDashboard() {
               </div>
             ) : funnels.length === 0 ? (
               <div className="rounded-xl border p-8 text-center" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}>
-                <Activity className="w-8 h-8 mx-auto mb-2 text-white/40" />
-                <p className="text-white/30 text-sm">No funnel data yet — events will populate as users flow through the app</p>
+                <Activity className="w-8 h-8 mx-auto mb-2 text-muted-foreground/70" />
+                <p className="text-muted-foreground/50 text-sm">No funnel data yet — events will populate as users flow through the app</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -409,11 +409,11 @@ export default function EvolutionDashboard() {
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-[#ff3366]" />
               Friction Insights
               {insightsSummary && (
-                <span className="ml-auto text-xs font-normal text-white/30">{insightsSummary.total} detected</span>
+                <span className="ml-auto text-xs font-normal text-muted-foreground/50">{insightsSummary.total} detected</span>
               )}
             </h2>
             {loading && insights.length === 0 ? (
@@ -425,8 +425,8 @@ export default function EvolutionDashboard() {
             ) : insights.length === 0 ? (
               <div className="rounded-xl border p-8 text-center" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}>
                 <CheckCircle className="w-8 h-8 mx-auto mb-2 text-[#00B4D8]" />
-                <p className="text-white/50 text-sm">No friction patterns detected</p>
-                <p className="text-white/30 text-xs mt-1">The system will surface issues as data accumulates</p>
+                <p className="text-muted-foreground text-sm">No friction patterns detected</p>
+                <p className="text-muted-foreground/50 text-xs mt-1">The system will surface issues as data accumulates</p>
               </div>
             ) : (
               <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
@@ -440,7 +440,7 @@ export default function EvolutionDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div className="rounded-xl border p-5" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}>
-            <h2 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wider flex items-center gap-2">
+            <h2 className="text-sm font-semibold text-foreground/70 mb-4 uppercase tracking-wider flex items-center gap-2">
               <Gauge className="w-4 h-4 text-[#00B4D8]" />
               Feature Satisfaction Scores
             </h2>
@@ -462,9 +462,9 @@ export default function EvolutionDashboard() {
             ) : (
               <div className="h-64 flex items-center justify-center">
                 <div className="text-center">
-                  <ThumbsUp className="w-8 h-8 mx-auto mb-2 text-white/40" />
-                  <p className="text-white/30 text-sm">No feedback collected yet</p>
-                  <p className="text-white/50 text-xs mt-1">Micro-feedback prompts appear after key flows</p>
+                  <ThumbsUp className="w-8 h-8 mx-auto mb-2 text-muted-foreground/70" />
+                  <p className="text-muted-foreground/50 text-sm">No feedback collected yet</p>
+                  <p className="text-muted-foreground text-xs mt-1">Micro-feedback prompts appear after key flows</p>
                 </div>
               </div>
             )}
@@ -473,9 +473,9 @@ export default function EvolutionDashboard() {
               <div className="mt-4 space-y-2">
                 {feedback.map((f) => (
                   <div key={f.context} className="flex items-center justify-between text-xs">
-                    <span className="text-white/60 capitalize">{f.context.replace(/_/g, " ")}</span>
+                    <span className="text-muted-foreground capitalize">{f.context.replace(/_/g, " ")}</span>
                     <div className="flex items-center gap-3">
-                      <span className="text-white/50">{f.total} responses</span>
+                      <span className="text-muted-foreground">{f.total} responses</span>
                       <div className="flex items-center gap-1">
                         <ThumbsUp className="w-3 h-3 text-[#00B4D8]" />
                         <span className="text-[#00B4D8] font-mono">{f.helpfulCount}</span>
@@ -490,7 +490,7 @@ export default function EvolutionDashboard() {
           </div>
 
           <div className="rounded-xl border p-5" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}>
-            <h2 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wider flex items-center gap-2">
+            <h2 className="text-sm font-semibold text-foreground/70 mb-4 uppercase tracking-wider flex items-center gap-2">
               <Info className="w-4 h-4 text-[#00B4D8]" />
               Recent User Comments
             </h2>
@@ -504,21 +504,21 @@ export default function EvolutionDashboard() {
                       ) : (
                         <ThumbsDown className="w-3 h-3 text-[#ff3366] flex-shrink-0" />
                       )}
-                      <span className="text-[10px] text-white/50 capitalize">{c.context.replace(/_/g, " ")}</span>
-                      <span className="text-[10px] text-white/50 ml-auto">
+                      <span className="text-[10px] text-muted-foreground capitalize">{c.context.replace(/_/g, " ")}</span>
+                      <span className="text-[10px] text-muted-foreground ml-auto">
                         {new Date(c.created_at).toLocaleDateString()}
                       </span>
                     </div>
-                    <p className="text-xs text-white/60 leading-relaxed">{c.comment}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{c.comment}</p>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="h-72 flex items-center justify-center">
                 <div className="text-center">
-                  <Info className="w-8 h-8 mx-auto mb-2 text-white/40" />
-                  <p className="text-white/30 text-sm">No comments yet</p>
-                  <p className="text-white/50 text-xs mt-1">Users can leave optional comments with their feedback</p>
+                  <Info className="w-8 h-8 mx-auto mb-2 text-muted-foreground/70" />
+                  <p className="text-muted-foreground/50 text-sm">No comments yet</p>
+                  <p className="text-muted-foreground text-xs mt-1">Users can leave optional comments with their feedback</p>
                 </div>
               </div>
             )}
@@ -526,20 +526,20 @@ export default function EvolutionDashboard() {
         </div>
 
         <div className="rounded-xl border p-5" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}>
-          <h2 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wider flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-foreground/70 mb-4 uppercase tracking-wider flex items-center gap-2">
             <Activity className="w-4 h-4 text-[#9c27b0]" />
             Session Replay & Behavior Observation
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="rounded-lg border p-4 text-center" style={{ background: "rgba(156,39,176,0.05)", borderColor: "rgba(156,39,176,0.15)" }}>
               <div className="text-2xl font-bold font-mono text-[#9c27b0] mb-1">10%</div>
-              <div className="text-xs text-white/50">Session Replay Sampling</div>
-              <div className="text-[10px] text-white/25 mt-1">1 in 10 sessions recorded</div>
+              <div className="text-xs text-muted-foreground">Session Replay Sampling</div>
+              <div className="text-[10px] text-muted-foreground/40 mt-1">1 in 10 sessions recorded</div>
             </div>
             <div className="rounded-lg border p-4 text-center" style={{ background: "rgba(0,180,216,0.05)", borderColor: "rgba(0,180,216,0.15)" }}>
               <div className="text-2xl font-bold font-mono text-[#00B4D8] mb-1">100%</div>
-              <div className="text-xs text-white/50">Error Session Capture</div>
-              <div className="text-[10px] text-white/25 mt-1">All error sessions recorded</div>
+              <div className="text-xs text-muted-foreground">Error Session Capture</div>
+              <div className="text-[10px] text-muted-foreground/40 mt-1">All error sessions recorded</div>
             </div>
             <div className="flex items-center justify-center">
               <a
@@ -554,7 +554,7 @@ export default function EvolutionDashboard() {
               </a>
             </div>
           </div>
-          <div className="mt-4 p-3 rounded-lg text-xs text-white/30" style={{ background: "rgba(255,255,255,0.02)" }}>
+          <div className="mt-4 p-3 rounded-lg text-xs text-muted-foreground/50" style={{ background: "rgba(255,255,255,0.02)" }}>
             All replays have text masking and media blocking enabled to protect user privacy. Sensitive fields are never recorded.
           </div>
         </div>

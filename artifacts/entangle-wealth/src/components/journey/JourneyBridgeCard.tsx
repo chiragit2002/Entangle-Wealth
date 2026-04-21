@@ -31,8 +31,8 @@ export function JourneyBridgeCard({ title, desc, href, phaseColor = "#0099cc", c
         <div className="text-[9px] font-bold uppercase tracking-widest mb-0.5" style={{ color: phaseColor }}>
           Next Step · Your Journey
         </div>
-        <p className="text-sm font-bold text-white/90 mb-0.5">{title}</p>
-        <p className="text-xs text-white/50 mb-2">{desc}</p>
+        <p className="text-sm font-bold text-foreground/90 mb-0.5">{title}</p>
+        <p className="text-xs text-muted-foreground mb-2">{desc}</p>
         <Link
           href={href}
           className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-90"

@@ -47,7 +47,7 @@ function ModuleContent({ moduleId, occupationCategory, taxCategory }: ModuleCont
       return <CapitalGainsPlannerModule />;
     default:
       return (
-        <div className="flex items-center justify-center py-8 text-white/30 text-sm">
+        <div className="flex items-center justify-center py-8 text-muted-foreground/50 text-sm">
           Module not available
         </div>
       );
@@ -57,16 +57,16 @@ function ModuleContent({ moduleId, occupationCategory, taxCategory }: ModuleCont
 function ModuleDataUnavailable({ moduleLabel, onRetry }: { moduleLabel: string; onRetry: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-8 gap-3 text-center">
-      <div className="w-10 h-10 rounded-full bg-white/[0.04] border border-white/10 flex items-center justify-center">
-        <AlertTriangle className="w-5 h-5 text-white/25" />
+      <div className="w-10 h-10 rounded-full bg-muted/50 border border-border flex items-center justify-center">
+        <AlertTriangle className="w-5 h-5 text-muted-foreground/40" />
       </div>
       <div>
-        <p className="text-sm font-medium text-white/50">{moduleLabel}</p>
-        <p className="text-xs text-white/30 mt-0.5">Data unavailable</p>
+        <p className="text-sm font-medium text-muted-foreground">{moduleLabel}</p>
+        <p className="text-xs text-muted-foreground/50 mt-0.5">Data unavailable</p>
       </div>
       <button
         onClick={onRetry}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-xs text-white/50 hover:text-white/70 transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 border border-border text-xs text-muted-foreground hover:text-foreground/70 transition-colors"
       >
         <RefreshCw className="w-3 h-3" />
         Retry
@@ -92,8 +92,8 @@ function ProfileIncompleteGate() {
         <UserCircle className="w-6 h-6 text-primary/60" />
       </div>
       <div>
-        <p className="text-sm font-semibold text-white/70 mb-1">Complete your profile to unlock personalized insights</p>
-        <p className="text-xs text-white/40 max-w-sm">
+        <p className="text-sm font-semibold text-foreground/70 mb-1">Complete your profile to unlock personalized insights</p>
+        <p className="text-xs text-muted-foreground/70 max-w-sm">
           Your occupation and business owner status determine which tax strategies and financial modules are most relevant to you.
         </p>
       </div>
@@ -129,7 +129,7 @@ export function DynamicModuleGrid({ isRecalculating = false }: { isRecalculating
     return (
       <div className="col-span-full bloomberg-panel p-6 flex items-center justify-center gap-3">
         <Loader2 className="w-4 h-4 animate-spin text-primary/60" />
-        <span className="text-sm text-white/50">
+        <span className="text-sm text-muted-foreground">
           {isRecalculating ? "Recalculating your modules..." : "Loading your personalized plan..."}
         </span>
       </div>

@@ -265,7 +265,7 @@ function sigColor(s: IndicatorResult["signal"]) {
   return s === "STRONG_BUY" ? "#00B4D8" : s === "BUY" ? "#00d4ff" : s === "SELL" ? "#FFB800" : s === "STRONG_SELL" ? "#ff3366" : "#666";
 }
 function sigBg(s: IndicatorResult["signal"]) {
-  return s === "STRONG_BUY" ? "bg-[#00B4D8]/10 text-[#00B4D8] border-[#00B4D8]/20" : s === "BUY" ? "bg-primary/10 text-primary border-primary/20" : s === "SELL" ? "bg-[#FFB800]/10 text-[#FFB800] border-[#FFB800]/20" : s === "STRONG_SELL" ? "bg-[#ff3366]/10 text-[#ff3366] border-[#ff3366]/20" : "bg-white/5 text-white/40 border-white/10";
+  return s === "STRONG_BUY" ? "bg-[#00B4D8]/10 text-[#00B4D8] border-[#00B4D8]/20" : s === "BUY" ? "bg-primary/10 text-primary border-primary/20" : s === "SELL" ? "bg-[#FFB800]/10 text-[#FFB800] border-[#FFB800]/20" : s === "STRONG_SELL" ? "bg-[#ff3366]/10 text-[#ff3366] border-[#ff3366]/20" : "bg-muted/50 text-muted-foreground/70 border-border";
 }
 
 export default function TechnicalAnalysis() {
@@ -660,39 +660,39 @@ export default function TechnicalAnalysis() {
     <Layout>
       <PageErrorBoundary fallbackTitle="Technical Analysis encountered an error">
       <FinancialDisclaimerBanner pageKey="technical-analysis" />
-      <div className="w-full border-b border-white/[0.06] bg-[#060610]">
+      <div className="w-full border-b border-border bg-[#060610]">
         <div className="container mx-auto px-4 max-w-[1400px]">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3">
               <BarChart3 className="w-5 h-5 text-primary" />
               <div>
                 <h1 className="text-[15px] font-bold leading-tight">Technical Analysis</h1>
-                <p className="text-[10px] text-white/25 leading-tight">55+ indicators · 6 AI agents</p>
+                <p className="text-[10px] text-muted-foreground/40 leading-tight">55+ indicators · 6 AI agents</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="relative">
-                <div className="flex items-center bg-white/[0.04] border border-white/[0.08] rounded-lg overflow-hidden">
-                  <Search className="w-3.5 h-3.5 text-white/40 ml-3" />
+                <div className="flex items-center bg-muted/50 border border-border rounded-lg overflow-hidden">
+                  <Search className="w-3.5 h-3.5 text-muted-foreground/70 ml-3" />
                   <input value={search} onChange={e => { setSearch(e.target.value.toUpperCase().slice(0, 10)); setShowSearch(true); }}
                     onFocus={() => setShowSearch(true)} onBlur={() => setTimeout(() => setShowSearch(false), 200)}
                     onKeyDown={e => { if (e.key === "Enter" && search.trim()) { e.preventDefault(); analyze(search); } }}
                     placeholder="Search any ticker or name..." maxLength={30}
-                    className="bg-transparent px-2 py-2 text-[13px] text-white w-[220px] md:w-[300px] focus:outline-none placeholder:text-white/40 font-mono" aria-label="Search stocks" />
+                    className="bg-transparent px-2 py-2 text-[13px] text-foreground w-[220px] md:w-[300px] focus:outline-none placeholder:text-muted-foreground/70 font-mono" aria-label="Search stocks" />
                 </div>
                 {showSearch && searchResults.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-[#0c0c1a] border border-white/10 rounded-xl z-50 max-h-[400px] overflow-y-auto shadow-2xl shadow-black/80">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-[#0c0c1a] border border-border rounded-xl z-50 max-h-[400px] overflow-y-auto shadow-2xl shadow-black/80">
                     {searchResults.map(s => (
-                      <div key={s.symbol} className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-primary/[0.06] transition-colors border-b border-white/[0.03] last:border-0 min-h-[44px] cursor-pointer"
+                      <div key={s.symbol} className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-primary/[0.06] transition-colors border-b border-border/50 last:border-0 min-h-[44px] cursor-pointer"
                         role="option" onClick={() => { analyze(s.symbol); }}>
-                        <div className="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center text-[11px] font-bold text-primary/60 font-mono flex-shrink-0">{s.symbol.slice(0, 2)}</div>
+                        <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-[11px] font-bold text-primary/60 font-mono flex-shrink-0">{s.symbol.slice(0, 2)}</div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[13px] font-bold font-mono truncate">{s.symbol}</p>
-                          <p className="text-[10px] text-white/30 truncate">{s.name}</p>
+                          <p className="text-[10px] text-muted-foreground/50 truncate">{s.name}</p>
                         </div>
-                        <span className="text-[9px] text-white/40 px-2 py-0.5 rounded border border-white/[0.06]">{s.sector}</span>
+                        <span className="text-[9px] text-muted-foreground/70 px-2 py-0.5 rounded border border-border">{s.sector}</span>
                         <button onClick={e => { e.stopPropagation(); addToWatchlist(s.symbol); }}
-                          className={`p-1.5 rounded-lg transition-colors ${isInWatchlist(s.symbol) ? "text-[#FFB800]" : "text-white/40 hover:text-white/40"}`}>
+                          className={`p-1.5 rounded-lg transition-colors ${isInWatchlist(s.symbol) ? "text-[#FFB800]" : "text-muted-foreground/70 hover:text-muted-foreground/70"}`}>
                           {isInWatchlist(s.symbol) ? <BookmarkCheck className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
                         </button>
                       </div>
@@ -702,10 +702,10 @@ export default function TechnicalAnalysis() {
               </div>
               {activeSymbol && (
                 <>
-                  <Button variant="outline" size="sm" className="border-white/[0.08] text-white/40 text-[11px] h-8 gap-1 hidden md:flex" onClick={() => analyze(activeSymbol)}>
+                  <Button variant="outline" size="sm" className="border-border text-muted-foreground/70 text-[11px] h-8 gap-1 hidden md:flex" onClick={() => analyze(activeSymbol)}>
                     <RefreshCw className="w-3 h-3" /> Refresh
                   </Button>
-                  <Button variant="outline" size="sm" className="border-white/[0.08] text-white/40 text-[11px] h-8 gap-1 hidden md:flex" onClick={exportCSV}>
+                  <Button variant="outline" size="sm" className="border-border text-muted-foreground/70 text-[11px] h-8 gap-1 hidden md:flex" onClick={exportCSV}>
                     <Download className="w-3 h-3" /> Export
                   </Button>
                 </>
@@ -720,41 +720,41 @@ export default function TechnicalAnalysis() {
           {showWatchlist && (
             <div className="hidden lg:block w-[260px] flex-shrink-0">
               <div className="sticky top-20">
-                <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden">
-                  <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/[0.04]">
+                <div className="bg-card border border-border rounded-xl overflow-hidden">
+                  <div className="flex items-center justify-between px-3 py-2.5 border-b border-border">
                     <div className="flex items-center gap-2">
                       <Star className="w-3.5 h-3.5 text-[#FFB800]/60" />
-                      <span className="text-[11px] font-bold text-white/60 uppercase tracking-wider">Watchlist</span>
+                      <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Watchlist</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <button onClick={refreshWatchlist} className="p-1 text-white/40 hover:text-primary transition-colors" title="Refresh all signals"><RefreshCw className="w-3 h-3" /></button>
-                      <span className="text-[9px] text-white/40 font-mono">{watchlist.length}</span>
+                      <button onClick={refreshWatchlist} className="p-1 text-muted-foreground/70 hover:text-primary transition-colors" title="Refresh all signals"><RefreshCw className="w-3 h-3" /></button>
+                      <span className="text-[9px] text-muted-foreground/70 font-mono">{watchlist.length}</span>
                     </div>
                   </div>
                   {watchlist.length === 0 ? (
                     <div className="px-3 py-8 text-center">
-                      <Plus className="w-6 h-6 text-white/10 mx-auto mb-2" />
-                      <p className="text-[11px] text-white/50">Search and add stocks</p>
-                      <p className="text-[9px] text-white/10 mt-1">AI agents auto-analyze your watchlist</p>
+                      <Plus className="w-6 h-6 text-muted-foreground/20 mx-auto mb-2" />
+                      <p className="text-[11px] text-muted-foreground">Search and add stocks</p>
+                      <p className="text-[9px] text-muted-foreground/20 mt-1">AI agents auto-analyze your watchlist</p>
                     </div>
                   ) : (
                     <div className="max-h-[calc(100vh-180px)] overflow-y-auto">
                       {watchlist.map(w => (
                         <div key={w.symbol} onClick={() => analyze(w.symbol)} role="button" tabIndex={0} onKeyDown={e => { if (e.key === "Enter") analyze(w.symbol); }}
-                          className={`w-full text-left px-3 py-2.5 flex items-center gap-2.5 hover:bg-white/[0.02] transition-colors border-b border-white/[0.02] group cursor-pointer ${activeSymbol === w.symbol ? "bg-primary/[0.04] border-l-2 border-l-primary" : ""}`}>
+                          className={`w-full text-left px-3 py-2.5 flex items-center gap-2.5 hover:bg-muted/30 transition-colors border-b border-white/[0.02] group cursor-pointer ${activeSymbol === w.symbol ? "bg-primary/[0.04] border-l-2 border-l-primary" : ""}`}>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="text-[13px] font-bold font-mono">{w.symbol}</span>
                               {w.signal && <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded border ${sigBg(w.signal)}`}>{w.signal.replace("_", " ")}</span>}
                             </div>
                             <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-[11px] text-white/50 font-mono">${w.price.toFixed(2)}</span>
+                              <span className="text-[11px] text-muted-foreground font-mono">${w.price.toFixed(2)}</span>
                               <span className={`text-[10px] font-mono font-bold ${w.change >= 0 ? "text-[#00B4D8]" : "text-[#ff3366]"}`}>{w.change >= 0 ? "+" : ""}{Math.abs(w.change).toFixed(2)}%</span>
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-0.5">
-                            {w.confidence != null && <span className="text-[10px] font-mono text-white/25">{w.confidence}%</span>}
-                            <button onClick={e => { e.stopPropagation(); removeFromWatchlist(w.symbol); }} className="p-0.5 text-white/0 group-hover:text-white/20 hover:!text-[#ff3366] transition-colors"><X className="w-3 h-3" /></button>
+                            {w.confidence != null && <span className="text-[10px] font-mono text-muted-foreground/40">{w.confidence}%</span>}
+                            <button onClick={e => { e.stopPropagation(); removeFromWatchlist(w.symbol); }} className="p-0.5 text-transparent group-hover:text-muted-foreground/40 hover:!text-[#ff3366] transition-colors"><X className="w-3 h-3" /></button>
                           </div>
                         </div>
                       ))}
@@ -770,23 +770,23 @@ export default function TechnicalAnalysis() {
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">
                   <Loader2 className="w-10 h-10 text-primary animate-spin mx-auto mb-3" />
-                  <p className="text-[14px] font-bold text-white/60">Analyzing {activeSymbol}</p>
-                  <p className="text-[11px] text-white/50">Running 55+ indicators...</p>
+                  <p className="text-[14px] font-bold text-muted-foreground">Analyzing {activeSymbol}</p>
+                  <p className="text-[11px] text-muted-foreground">Running 55+ indicators...</p>
                 </div>
               </div>
             )}
 
             {!loading && !activeSymbol && (
               <div className="py-16 text-center">
-                <div className="w-20 h-20 rounded-sm bg-gradient-to-br from-[#a855f7]/10 to-primary/10 border border-white/[0.06] flex items-center justify-center mx-auto mb-5">
-                  <BarChart3 className="w-10 h-10 text-white/40" />
+                <div className="w-20 h-20 rounded-sm bg-gradient-to-br from-[#a855f7]/10 to-primary/10 border border-border flex items-center justify-center mx-auto mb-5">
+                  <BarChart3 className="w-10 h-10 text-muted-foreground/70" />
                 </div>
-                <h2 className="text-xl font-bold text-white/40 mb-2">Search any stock to begin</h2>
-                <p className="text-[13px] text-white/40 mb-8 max-w-md mx-auto">Type a ticker symbol or company name. 55+ technical indicators analyzed by 6 AI agents with buy/sell signals.</p>
+                <h2 className="text-xl font-bold text-muted-foreground/70 mb-2">Search any stock to begin</h2>
+                <p className="text-[13px] text-muted-foreground/70 mb-8 max-w-md mx-auto">Type a ticker symbol or company name. 55+ technical indicators analyzed by 6 AI agents with buy/sell signals.</p>
                 <div className="flex flex-wrap gap-2 justify-center max-w-xl mx-auto">
                   {["RKLB", "NVDA", "AAPL", "TSLA", "AMD", "PLTR", "SOFI", "COIN", "META", "MSFT", "AMZN", "GOOGL"].map(s => (
                     <button key={s} onClick={() => analyze(s)}
-                      className="px-4 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-[12px] text-white/30 hover:text-primary hover:border-primary/20 font-mono transition-all min-h-[40px]">
+                      className="px-4 py-2 rounded-lg bg-muted/50 border border-border text-[12px] text-muted-foreground/50 hover:text-primary hover:border-primary/20 font-mono transition-all min-h-[40px]">
                       {s}
                     </button>
                   ))}
@@ -796,7 +796,7 @@ export default function TechnicalAnalysis() {
 
             {!loading && overall && activeSymbol && (
               <>
-                <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl p-4 md:p-5 mb-4">
+                <div className="bg-card border border-border rounded-xl p-4 md:p-5 mb-4">
                   <div className="flex flex-col md:flex-row items-start gap-5">
                     <div className="flex items-center gap-4 flex-1 min-w-0">
                       <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${sigColor(overall.signal)}08`, border: `1px solid ${sigColor(overall.signal)}25` }}>
@@ -808,9 +808,9 @@ export default function TechnicalAnalysis() {
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <h2 className="text-xl font-black font-mono">{activeSymbol}</h2>
-                          {stockInfo && <span className="text-[11px] text-white/25">{stockInfo.name}</span>}
+                          {stockInfo && <span className="text-[11px] text-muted-foreground/40">{stockInfo.name}</span>}
                           <button onClick={() => isInWatchlist(activeSymbol) ? removeFromWatchlist(activeSymbol) : addToWatchlist(activeSymbol)}
-                            className={`p-1.5 rounded-lg transition-colors ml-1 ${isInWatchlist(activeSymbol) ? "text-[#FFB800]" : "text-white/40 hover:text-white/30"}`} title={isInWatchlist(activeSymbol) ? "Remove from watchlist" : "Add to watchlist"}>
+                            className={`p-1.5 rounded-lg transition-colors ml-1 ${isInWatchlist(activeSymbol) ? "text-[#FFB800]" : "text-muted-foreground/70 hover:text-muted-foreground/50"}`} title={isInWatchlist(activeSymbol) ? "Remove from watchlist" : "Add to watchlist"}>
                             {isInWatchlist(activeSymbol) ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                           </button>
                         </div>
@@ -818,7 +818,7 @@ export default function TechnicalAnalysis() {
                           <span className={`px-3 py-1 rounded-md text-[11px] font-black border ${sigBg(overall.signal)}`}>
                             {overall.signal.replace("_", " ")}
                           </span>
-                          <span className="text-[11px] text-white/50 font-mono">{indicators.length} indicators</span>
+                          <span className="text-[11px] text-muted-foreground font-mono">{indicators.length} indicators</span>
                         </div>
                       </div>
                     </div>
@@ -828,9 +828,9 @@ export default function TechnicalAnalysis() {
                         <p className="text-[18px] font-black text-[#00B4D8] font-mono leading-none">{overall.buyCount}</p>
                         <p className="text-[8px] text-[#00B4D8]/40 font-bold mt-1">BUY</p>
                       </div>
-                      <div className="text-center px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] min-w-[60px]">
-                        <p className="text-[18px] font-black text-white/30 font-mono leading-none">{overall.neutralCount}</p>
-                        <p className="text-[8px] text-white/40 font-bold mt-1">HOLD</p>
+                      <div className="text-center px-3 py-2 rounded-lg bg-muted/30 border border-border min-w-[60px]">
+                        <p className="text-[18px] font-black text-muted-foreground/50 font-mono leading-none">{overall.neutralCount}</p>
+                        <p className="text-[8px] text-muted-foreground/70 font-bold mt-1">HOLD</p>
                       </div>
                       <div className="text-center px-3 py-2 rounded-lg bg-[#ff3366]/[0.04] border border-[#ff3366]/10 min-w-[60px]">
                         <p className="text-[18px] font-black text-[#ff3366] font-mono leading-none">{overall.sellCount}</p>
@@ -846,15 +846,15 @@ export default function TechnicalAnalysis() {
                       const Icon = cat.icon;
                       return (
                         <button key={cat.key} onClick={() => setCategory(cat.key)}
-                          className={`rounded-lg p-2.5 border transition-all text-left ${category === cat.key ? "border-primary/20 bg-primary/[0.04]" : "border-white/[0.04] bg-white/[0.01] hover:border-white/10"}`}>
+                          className={`rounded-lg p-2.5 border transition-all text-left ${category === cat.key ? "border-primary/20 bg-primary/[0.04]" : "border-border bg-muted/30 hover:border-border"}`}>
                           <div className="flex items-center gap-1.5 mb-1">
-                            <Icon className="w-3 h-3 text-white/40" />
-                            <span className="text-[10px] font-bold text-white/40">{cat.label}</span>
+                            <Icon className="w-3 h-3 text-muted-foreground/70" />
+                            <span className="text-[10px] font-bold text-muted-foreground/70">{cat.label}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="text-[#00B4D8] text-[11px] font-bold font-mono">{c.buy}↑</span>
                             <span className="text-[#ff3366] text-[11px] font-bold font-mono">{c.sell}↓</span>
-                            <span className="text-white/10 text-[9px] font-mono ml-auto">{c.total}</span>
+                            <span className="text-muted-foreground/20 text-[9px] font-mono ml-auto">{c.total}</span>
                           </div>
                         </button>
                       );
@@ -879,10 +879,10 @@ export default function TechnicalAnalysis() {
 
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <button onClick={() => setAgentView(true)} className={`text-[12px] font-bold px-3 py-1.5 rounded-lg transition-colors ${agentView ? "bg-[#a855f7]/10 text-[#a855f7]" : "text-white/25 hover:text-white/40"}`}>
+                    <button onClick={() => setAgentView(true)} className={`text-[12px] font-bold px-3 py-1.5 rounded-lg transition-colors ${agentView ? "bg-[#a855f7]/10 text-[#a855f7]" : "text-muted-foreground/40 hover:text-muted-foreground/70"}`}>
                       <Brain className="w-3.5 h-3.5 inline mr-1.5" />AI Agents
                     </button>
-                    <button onClick={() => setAgentView(false)} className={`text-[12px] font-bold px-3 py-1.5 rounded-lg transition-colors ${!agentView ? "bg-primary/10 text-primary" : "text-white/25 hover:text-white/40"}`}>
+                    <button onClick={() => setAgentView(false)} className={`text-[12px] font-bold px-3 py-1.5 rounded-lg transition-colors ${!agentView ? "bg-primary/10 text-primary" : "text-muted-foreground/40 hover:text-muted-foreground/70"}`}>
                       <BarChart3 className="w-3.5 h-3.5 inline mr-1.5" />Indicators
                     </button>
                     {agentView && (
@@ -899,7 +899,7 @@ export default function TechnicalAnalysis() {
                     <div className="flex gap-1">
                       {CATEGORIES.map(c => (
                         <button key={c.key} onClick={() => setCategory(c.key)}
-                          className={`px-2.5 py-1 rounded text-[10px] font-bold transition-colors ${category === c.key ? "bg-primary/10 text-primary" : "text-white/40 hover:text-white/30"}`}>
+                          className={`px-2.5 py-1 rounded text-[10px] font-bold transition-colors ${category === c.key ? "bg-primary/10 text-primary" : "text-muted-foreground/70 hover:text-muted-foreground/50"}`}>
                           {c.label === "All Indicators" ? "All" : c.label}
                         </button>
                       ))}
@@ -912,14 +912,14 @@ export default function TechnicalAnalysis() {
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                       <span className="text-[11px] font-bold text-amber-400/70">Flash Council — Live AI Feed</span>
-                      {streamStatus === "done" && <span className="text-[9px] text-white/30 ml-auto">Analysis complete</span>}
+                      {streamStatus === "done" && <span className="text-[9px] text-muted-foreground/50 ml-auto">Analysis complete</span>}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                       {streamingAgents.map((agent, i) => {
                         const sigColor2 = agent.signal === "BULLISH" ? "#00ff88" : agent.signal === "BEARISH" ? "#ff3366" : "#666";
-                        const sigBg2 = agent.signal === "BULLISH" ? "bg-[#00ff88]/10 text-[#00ff88] border-[#00ff88]/20" : agent.signal === "BEARISH" ? "bg-[#ff3366]/10 text-[#ff3366] border-[#ff3366]/20" : "bg-white/5 text-white/40 border-white/10";
+                        const sigBg2 = agent.signal === "BULLISH" ? "bg-[#00ff88]/10 text-[#00ff88] border-[#00ff88]/20" : agent.signal === "BEARISH" ? "bg-[#ff3366]/10 text-[#ff3366] border-[#ff3366]/20" : "bg-muted/50 text-muted-foreground/70 border-border";
                         return (
-                          <div key={i} className="bg-[#0a0a16] border border-white/[0.06] rounded-xl p-3.5 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                          <div key={i} className="bg-card border border-border rounded-xl p-3.5 animate-in fade-in slide-in-from-bottom-2 duration-500">
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 rounded-full bg-amber-400/60" />
@@ -928,25 +928,25 @@ export default function TechnicalAnalysis() {
                               <span className={`text-[9px] font-black px-2 py-0.5 rounded border ${sigBg2}`}>{agent.signal}</span>
                             </div>
                             <p className="text-[10px] text-primary/50 mb-1">{agent.domain}</p>
-                            <p className="text-[11px] text-white/50">{agent.reasoning}</p>
+                            <p className="text-[11px] text-muted-foreground">{agent.reasoning}</p>
                             <div className="flex items-center gap-2 mt-2">
-                              <span className="text-[9px] font-mono text-white/30">{agent.keyMetric}</span>
+                              <span className="text-[9px] font-mono text-muted-foreground/50">{agent.keyMetric}</span>
                               <span className="text-[9px] font-bold font-mono ml-auto" style={{ color: sigColor2 }}>{agent.confidence}% conf</span>
                             </div>
                           </div>
                         );
                       })}
                       {streamStatus === "streaming" && (
-                        <div className="bg-[#0a0a16] border border-white/[0.04] rounded-xl p-3.5 flex items-center gap-2">
+                        <div className="bg-card border border-border rounded-xl p-3.5 flex items-center gap-2">
                           <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
-                          <span className="text-[11px] text-white/30">Agent analyzing...</span>
+                          <span className="text-[11px] text-muted-foreground/50">Agent analyzing...</span>
                         </div>
                       )}
                     </div>
                     {streamSummary && (
                       <div className="rounded-xl px-4 py-3" style={{ background: "rgba(250,190,60,0.04)", border: "1px solid rgba(250,190,60,0.15)" }}>
                         <div className="text-[10px] text-amber-400/60 font-mono uppercase tracking-wider mb-1">Flash Council Consensus</div>
-                        <p className="text-[12px] text-white/70">{streamSummary}</p>
+                        <p className="text-[12px] text-foreground/70">{streamSummary}</p>
                       </div>
                     )}
                   </div>
@@ -957,7 +957,7 @@ export default function TechnicalAnalysis() {
                     {agents.map(agent => {
                       const isExp = expandedAgent === agent.name;
                       return (
-                        <div key={agent.name} className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden hover:border-white/10 transition-all">
+                        <div key={agent.name} className="bg-card border border-border rounded-xl overflow-hidden hover:border-border transition-all">
                           <button className="w-full p-3.5 text-left" onClick={() => setExpandedAgent(isExp ? null : agent.name)}>
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-2">
@@ -966,16 +966,16 @@ export default function TechnicalAnalysis() {
                               </div>
                               <span className={`text-[9px] font-black px-2 py-0.5 rounded border ${sigBg(agent.signal)}`}>{agent.signal.replace("_", " ")}</span>
                             </div>
-                            <p className="text-[10px] text-white/50 mb-1">{agent.role}</p>
-                            <p className="text-[11px] text-white/45 line-clamp-2">{agent.verdict}</p>
+                            <p className="text-[10px] text-muted-foreground mb-1">{agent.role}</p>
+                            <p className="text-[11px] text-muted-foreground/70 line-clamp-2">{agent.verdict}</p>
                           </button>
                           {isExp && (
-                            <div className="px-3.5 pb-3.5 border-t border-white/[0.04] pt-3 space-y-2">
-                              <p className="text-[11px] text-white/35">{agent.reasoning}</p>
+                            <div className="px-3.5 pb-3.5 border-t border-border pt-3 space-y-2">
+                              <p className="text-[11px] text-muted-foreground/60">{agent.reasoning}</p>
                               {agent.keyMetrics.map((m, i) => (
                                 <div key={i} className="flex items-center gap-2">
                                   <div className="w-1 h-1 rounded-full" style={{ backgroundColor: agent.color, opacity: 0.4 }} />
-                                  <span className="text-[10px] text-white/25 font-mono">{m}</span>
+                                  <span className="text-[10px] text-muted-foreground/40 font-mono">{m}</span>
                                 </div>
                               ))}
                             </div>
@@ -985,23 +985,23 @@ export default function TechnicalAnalysis() {
                     })}
                   </div>
                 ) : (
-                  <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden mb-6">
-                    <div className="grid grid-cols-[1fr_100px_90px] md:grid-cols-[1fr_120px_100px] items-center px-4 py-2 border-b border-white/[0.04] text-[9px] font-bold text-white/40 uppercase tracking-wider">
+                  <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
+                    <div className="grid grid-cols-[1fr_100px_90px] md:grid-cols-[1fr_120px_100px] items-center px-4 py-2 border-b border-border text-[9px] font-bold text-muted-foreground/70 uppercase tracking-wider">
                       <span>Indicator</span>
                       <span className="text-right">Value</span>
                       <span className="text-right">Signal</span>
                     </div>
                     <div className="max-h-[600px] overflow-y-auto">
                       {filteredIndicators.map((ind, i) => (
-                        <div key={i} className="grid grid-cols-[1fr_100px_90px] md:grid-cols-[1fr_120px_100px] items-center px-4 py-2 border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors">
+                        <div key={i} className="grid grid-cols-[1fr_100px_90px] md:grid-cols-[1fr_120px_100px] items-center px-4 py-2 border-b border-white/[0.02] hover:bg-muted/30 transition-colors">
                           <div className="flex items-center gap-2 min-w-0">
                             <div className="w-1 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: sigColor(ind.signal), opacity: 0.6 }} />
                             <div className="min-w-0">
                               <p className="text-[12px] font-semibold truncate">{ind.name}</p>
-                              <p className="text-[9px] text-white/40 truncate hidden md:block">{ind.description}</p>
+                              <p className="text-[9px] text-muted-foreground/70 truncate hidden md:block">{ind.description}</p>
                             </div>
                           </div>
-                          <span className="text-[12px] font-mono font-bold text-white/50 text-right truncate">{typeof ind.value === "number" ? Math.abs(ind.value) : ind.value}</span>
+                          <span className="text-[12px] font-mono font-bold text-muted-foreground text-right truncate">{typeof ind.value === "number" ? Math.abs(ind.value) : ind.value}</span>
                           <div className="flex justify-end">
                             <span className={`text-[9px] font-black px-2 py-0.5 rounded border ${sigBg(ind.signal)}`}>{ind.signal.replace("_", " ")}</span>
                           </div>
@@ -1014,25 +1014,25 @@ export default function TechnicalAnalysis() {
                 <div className="mb-6 rounded-2xl overflow-hidden" style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(168,85,247,0.25)" }}>
                   <button
                     onClick={() => setShowStrategyLab(v => !v)}
-                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/[0.02] transition-colors"
+                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors"
                   >
                     <div className="flex items-center gap-2">
                       <FlaskConical className="w-4 h-4 text-[#a855f7]" />
                       <span className="font-bold text-sm text-[#a855f7]">Strategy Builder &amp; Backtester</span>
                       <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#a855f7]/10 border border-[#a855f7]/20 text-[#a855f7] font-bold">LAB</span>
                     </div>
-                    {showStrategyLab ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+                    {showStrategyLab ? <ChevronUp className="w-4 h-4 text-muted-foreground/70" /> : <ChevronDown className="w-4 h-4 text-muted-foreground/70" />}
                   </button>
 
                   {showStrategyLab && (
                     <div className="px-4 pb-5 space-y-4">
-                      <p className="text-xs text-white/50">Build an entry rule using a technical indicator and backtest it against {activeSymbol}'s price history. Results show win rate, Sharpe ratio, max drawdown, and equity curve.</p>
+                      <p className="text-xs text-muted-foreground">Build an entry rule using a technical indicator and backtest it against {activeSymbol}'s price history. Results show win rate, Sharpe ratio, max drawdown, and equity curve.</p>
 
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         <div>
-                          <label className="text-[10px] text-white/40 font-mono uppercase tracking-wider block mb-1">Indicator</label>
+                          <label className="text-[10px] text-muted-foreground/70 font-mono uppercase tracking-wider block mb-1">Indicator</label>
                           <select value={stratIndicator} onChange={e => setStratIndicator(e.target.value as any)}
-                            className="w-full bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#a855f7]/40">
+                            className="w-full bg-muted/50 border border-border rounded px-2 py-1.5 text-[11px] text-foreground focus:outline-none focus:border-[#a855f7]/40">
                             <option value="RSI">RSI</option>
                             <option value="SMA">SMA</option>
                             <option value="EMA">EMA</option>
@@ -1040,9 +1040,9 @@ export default function TechnicalAnalysis() {
                           </select>
                         </div>
                         <div>
-                          <label className="text-[10px] text-white/40 font-mono uppercase tracking-wider block mb-1">Condition</label>
+                          <label className="text-[10px] text-muted-foreground/70 font-mono uppercase tracking-wider block mb-1">Condition</label>
                           <select value={stratCondition} onChange={e => setStratCondition(e.target.value as any)}
-                            className="w-full bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#a855f7]/40">
+                            className="w-full bg-muted/50 border border-border rounded px-2 py-1.5 text-[11px] text-foreground focus:outline-none focus:border-[#a855f7]/40">
                             <option value="below">Below threshold (BUY)</option>
                             <option value="above">Above threshold (BUY)</option>
                             <option value="crossAbove">Crosses above</option>
@@ -1050,14 +1050,14 @@ export default function TechnicalAnalysis() {
                           </select>
                         </div>
                         <div>
-                          <label className="text-[10px] text-white/40 font-mono uppercase tracking-wider block mb-1">Threshold</label>
+                          <label className="text-[10px] text-muted-foreground/70 font-mono uppercase tracking-wider block mb-1">Threshold</label>
                           <input type="number" value={stratThreshold} onChange={e => setStratThreshold(Number(e.target.value))}
-                            className="w-full bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#a855f7]/40" />
+                            className="w-full bg-muted/50 border border-border rounded px-2 py-1.5 text-[11px] text-foreground focus:outline-none focus:border-[#a855f7]/40" />
                         </div>
                         <div>
-                          <label className="text-[10px] text-white/40 font-mono uppercase tracking-wider block mb-1">Period</label>
+                          <label className="text-[10px] text-muted-foreground/70 font-mono uppercase tracking-wider block mb-1">Period</label>
                           <input type="number" value={stratPeriod} onChange={e => setStratPeriod(Math.max(2, Number(e.target.value)))} min={2} max={50}
-                            className="w-full bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#a855f7]/40" />
+                            className="w-full bg-muted/50 border border-border rounded px-2 py-1.5 text-[11px] text-foreground focus:outline-none focus:border-[#a855f7]/40" />
                         </div>
                       </div>
 
@@ -1084,13 +1084,13 @@ export default function TechnicalAnalysis() {
                               { label: "Total Return", value: `${stratResult.totalReturn >= 0 ? "+" : ""}${stratResult.totalReturn.toFixed(1)}%`, color: stratResult.totalReturn >= 0 ? "#00ff88" : "#ff3366" },
                             ].map(m => (
                               <div key={m.label} className="text-center rounded-xl p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                                <div className="text-[9px] text-white/40 font-mono uppercase tracking-wider">{m.label}</div>
+                                <div className="text-[9px] text-muted-foreground/70 font-mono uppercase tracking-wider">{m.label}</div>
                                 <div className="text-lg font-black font-mono mt-1" style={{ color: m.color }}>{m.value}</div>
                               </div>
                             ))}
                           </div>
 
-                          <div className="text-[10px] text-white/40 mb-1">Trades: {stratResult.trades.length} | Winners: {stratResult.trades.filter(t => t.pnl > 0).length} | Losers: {stratResult.trades.filter(t => t.pnl <= 0).length}</div>
+                          <div className="text-[10px] text-muted-foreground/70 mb-1">Trades: {stratResult.trades.length} | Winners: {stratResult.trades.filter(t => t.pnl > 0).length} | Losers: {stratResult.trades.filter(t => t.pnl <= 0).length}</div>
 
                           {stratResult.equityCurve.length > 1 && (
                             <div className="h-40">
@@ -1116,9 +1116,9 @@ export default function TechnicalAnalysis() {
                   )}
                 </div>
 
-                <div className="rounded-lg bg-white/[0.01] border border-white/[0.04] p-3 flex items-start gap-2.5">
+                <div className="rounded-lg bg-muted/30 border border-border p-3 flex items-start gap-2.5">
                   <AlertTriangle className="w-3.5 h-3.5 text-[#FFB800]/30 mt-0.5 flex-shrink-0" />
-                  <p className="text-[10px] text-white/50 leading-relaxed">
+                  <p className="text-[10px] text-muted-foreground leading-relaxed">
                     Technical indicators use simulated data and should not be the sole basis for investment decisions. Past performance does not guarantee future results. Always do your own research.
                   </p>
                 </div>

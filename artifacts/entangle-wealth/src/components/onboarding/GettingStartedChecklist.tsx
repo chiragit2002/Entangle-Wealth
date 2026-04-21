@@ -64,9 +64,9 @@ export function GettingStartedChecklist() {
         role="complementary"
         aria-label="Getting started checklist"
       >
-        <div className="bg-[#0a0a14] border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden">
+        <div className="bg-card border border-border rounded-xl shadow-2xl shadow-black/50 overflow-hidden">
           <div
-            className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-white/[0.02] transition-colors"
+            className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors"
             onClick={() => setCollapsed((c) => !c)}
             role="button"
             aria-expanded={!collapsed}
@@ -76,7 +76,7 @@ export function GettingStartedChecklist() {
           >
             <div className="flex items-center gap-2">
               <Rocket className="w-4 h-4 text-[#00B4D8]" aria-hidden="true" />
-              <span className="text-xs font-bold text-white/80">Chapter 1: Discover</span>
+              <span className="text-xs font-bold text-foreground/80">Chapter 1: Discover</span>
               <span
                 className="text-[10px] font-mono text-[#00B4D8]"
                 aria-label={`${completedCount} of ${milestones.length} complete`}
@@ -91,22 +91,22 @@ export function GettingStartedChecklist() {
                   setDismissed(true);
                   localStorage.setItem("ew_checklist_dismissed", "true");
                 }}
-                className="text-white/50 hover:text-white/40 transition-colors p-1 rounded min-w-[28px] min-h-[28px] flex items-center justify-center"
+                className="text-muted-foreground hover:text-muted-foreground/70 transition-colors p-1 rounded min-w-[28px] min-h-[28px] flex items-center justify-center"
                 aria-label="Dismiss checklist"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
               {collapsed ? (
-                <ChevronUp className="w-4 h-4 text-white/30" aria-hidden="true" />
+                <ChevronUp className="w-4 h-4 text-muted-foreground/50" aria-hidden="true" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-white/30" aria-hidden="true" />
+                <ChevronDown className="w-4 h-4 text-muted-foreground/50" aria-hidden="true" />
               )}
             </div>
           </div>
 
           <div className="px-4 pb-1">
             <div
-              className="h-1 bg-white/5 rounded-full overflow-hidden"
+              className="h-1 bg-muted/50 rounded-full overflow-hidden"
               role="progressbar"
               aria-valuenow={progressPct}
               aria-valuemin={0}
@@ -131,35 +131,35 @@ export function GettingStartedChecklist() {
                     className={`flex items-center gap-2.5 px-2 py-2 rounded-lg transition-colors group ${
                       done
                         ? "opacity-50 cursor-default pointer-events-none"
-                        : "hover:bg-white/[0.04] cursor-pointer"
+                        : "hover:bg-muted/50 cursor-pointer"
                     }`}
                     aria-disabled={done}
                   >
                     {done ? (
                       <CheckCircle2 className="w-4 h-4 text-[#00B4D8] shrink-0" aria-hidden="true" />
                     ) : (
-                      <Circle className="w-4 h-4 text-white/40 shrink-0 group-hover:text-white/40 transition-colors" aria-hidden="true" />
+                      <Circle className="w-4 h-4 text-muted-foreground/70 shrink-0 group-hover:text-muted-foreground/70 transition-colors" aria-hidden="true" />
                     )}
                     <div className="flex-1 min-w-0">
                       <span
                         className={`text-xs block ${
-                          done ? "text-white/30 line-through" : "text-white/70 group-hover:text-white/90 transition-colors"
+                          done ? "text-muted-foreground/50 line-through" : "text-foreground/70 group-hover:text-foreground/90 transition-colors"
                         }`}
                       >
                         {milestone.label}
                       </span>
                       {!done && milestone.desc && (
-                        <span className="text-[9px] text-white/30 block mt-0.5">{milestone.desc}</span>
+                        <span className="text-[9px] text-muted-foreground/50 block mt-0.5">{milestone.desc}</span>
                       )}
                     </div>
                     {!done && (
-                      <ArrowRight className="w-3 h-3 text-white/10 group-hover:text-white/30 transition-colors shrink-0" aria-hidden="true" />
+                      <ArrowRight className="w-3 h-3 text-muted-foreground/20 group-hover:text-muted-foreground/50 transition-colors shrink-0" aria-hidden="true" />
                     )}
                   </Link>
                 );
               })}
               <div className="pt-1 pb-2">
-                <p className="text-[9px] text-white/40 text-center">Complete all 4 to unlock Chapter 2 — Analyze</p>
+                <p className="text-[9px] text-muted-foreground/70 text-center">Complete all 4 to unlock Chapter 2 — Analyze</p>
               </div>
             </div>
           )}

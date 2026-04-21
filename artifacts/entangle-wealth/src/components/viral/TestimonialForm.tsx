@@ -61,14 +61,14 @@ export function TestimonialForm() {
             value={name}
             onChange={(e) => setName(e.target.value.slice(0, 100))}
             maxLength={100}
-            className="bg-white/5 border-white/10"
+            className="bg-muted/50 border-border"
           />
           <Input
             placeholder="Your role (optional)"
             value={role}
             onChange={(e) => setRole(e.target.value.slice(0, 100))}
             maxLength={100}
-            className="bg-white/5 border-white/10"
+            className="bg-muted/50 border-border"
           />
         </div>
         <textarea
@@ -77,7 +77,7 @@ export function TestimonialForm() {
           onChange={(e) => setMessage(e.target.value.slice(0, 500))}
           maxLength={500}
           rows={3}
-          className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm resize-none focus:outline-none focus:border-primary/50 placeholder:text-[#444]"
+          className="w-full bg-muted/50 border border-border rounded-lg p-3 text-foreground text-sm resize-none focus:outline-none focus:border-primary/50 placeholder:text-[#444]"
         />
         <p className="text-[10px] text-[#444] text-right">{message.length}/500</p>
         <div className="flex items-center gap-3">
@@ -90,7 +90,7 @@ export function TestimonialForm() {
                 className="p-1 transition-transform hover:scale-110"
               >
                 <Star
-                  className={`w-5 h-5 ${s <= rating ? "text-[#FFB800] fill-[#FFB800]" : "text-white/40"}`}
+                  className={`w-5 h-5 ${s <= rating ? "text-[#FFB800] fill-[#FFB800]" : "text-muted-foreground/70"}`}
                 />
               </button>
             ))}

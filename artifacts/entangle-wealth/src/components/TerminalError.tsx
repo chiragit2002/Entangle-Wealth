@@ -28,7 +28,7 @@ export function TerminalError({ message = "CONNECTION REFUSED", onRetry, compact
         <AlertTriangle className="w-6 h-6" style={{ color: "#ff3366" }} />
       </div>
       <p className="font-mono text-sm font-bold mb-1" style={{ color: "#ff3366" }}>&gt; ERROR: {message}</p>
-      <p className="font-mono text-xs mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>Check connection and try again</p>
+      <p className="font-mono text-xs mb-4 text-muted-foreground/70">Check connection and try again</p>
       {onRetry && (
         <Button
           variant="outline"

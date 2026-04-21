@@ -310,33 +310,33 @@ export default function Receipts() {
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Receipts & Docs</h1>
-            <p className="text-[12px] text-white/50">Upload receipts, log mileage, track deductions — all in one place.</p>
+            <p className="text-[12px] text-muted-foreground">Upload receipts, log mileage, track deductions — all in one place.</p>
           </div>
         </div>
 
         <Link href="/integrations">
           <div className="glass-panel rounded-xl p-3 mb-4 border border-primary/10 hover:border-primary/30 cursor-pointer transition-all group flex items-center gap-3">
             <Link2 className="w-4 h-4 text-primary flex-shrink-0" />
-            <p className="text-[12px] text-white/50 group-hover:text-white/70 transition-colors flex-1">
+            <p className="text-[12px] text-muted-foreground group-hover:text-foreground/70 transition-colors flex-1">
               Connect QuickBooks, Xero, H&R Block & more to auto-import expenses
             </p>
-            <ChevronRightIcon className="w-4 h-4 text-white/20 group-hover:text-primary flex-shrink-0" />
+            <ChevronRightIcon className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary flex-shrink-0" />
           </div>
         </Link>
 
-        <div className="glass-panel rounded-xl p-3 mb-6 border border-white/[0.06]">
-          <p className="text-[11px] text-white/30 leading-relaxed">
+        <div className="glass-panel rounded-xl p-3 mb-6 border border-border">
+          <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
             AI auto-categorizes by IRS expense type. Keep originals for 7 years.
           </p>
         </div>
 
         <div className="flex gap-2 mb-6">
           <button onClick={() => setDocTab("documents")}
-            className={`flex-1 py-2 rounded-xl text-[13px] font-semibold transition-all ${docTab === "documents" ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/30" : "text-white/40 border border-transparent"}`}>
+            className={`flex-1 py-2 rounded-xl text-[13px] font-semibold transition-all ${docTab === "documents" ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/30" : "text-muted-foreground/70 border border-transparent"}`}>
             <FileText className="w-4 h-4 inline mr-1" /> Documents
           </button>
           <button onClick={() => setDocTab("mileage")}
-            className={`flex-1 py-2 rounded-xl text-[13px] font-semibold transition-all ${docTab === "mileage" ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/30" : "text-white/40 border border-transparent"}`}>
+            className={`flex-1 py-2 rounded-xl text-[13px] font-semibold transition-all ${docTab === "mileage" ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/30" : "text-muted-foreground/70 border border-transparent"}`}>
             <Car className="w-4 h-4 inline mr-1" /> Mileage Log
           </button>
         </div>
@@ -366,7 +366,7 @@ export default function Receipts() {
                 >
                   <Upload className="w-8 h-8 mb-2 text-primary/50" />
                   <p className="font-bold text-[14px] mb-1">Upload File</p>
-                  <p className="text-[12px] text-white/30">Drop or click · PDF, JPG, PNG</p>
+                  <p className="text-[12px] text-muted-foreground/50">Drop or click · PDF, JPG, PNG</p>
                   <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/jpg,application/pdf" multiple className="hidden"
                     onChange={e => handleFileUpload(e.target.files)} />
                 </div>
@@ -380,7 +380,7 @@ export default function Receipts() {
                 >
                   <Camera className="w-8 h-8 mb-2 text-secondary/50" />
                   <p className="font-bold text-[14px] mb-1">Snap Receipt</p>
-                  <p className="text-[12px] text-white/30">Use camera to capture receipt</p>
+                  <p className="text-[12px] text-muted-foreground/50">Use camera to capture receipt</p>
                   <input ref={cameraRef} type="file" accept="image/jpeg,image/png,image/jpg" capture="environment" className="hidden"
                     onChange={e => handleFileUpload(e.target.files)} />
                 </div>
@@ -390,17 +390,17 @@ export default function Receipts() {
             <div className="glass-panel rounded-xl p-5 mb-6">
               <h3 className="text-sm font-bold text-primary mb-3">Manual Entry</h3>
               <div className="grid grid-cols-2 gap-2.5">
-                <Input placeholder="Vendor" value={form.vendor} onChange={e => setForm(p => ({ ...p, vendor: e.target.value.slice(0, 200) }))} className="bg-white/5 border-white/10 col-span-2" />
-                <Input placeholder="Amount ($)" type="number" min="0.01" max="999999.99" step="0.01" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))} className="bg-white/5 border-white/10" />
-                <Input type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} className="bg-white/5 border-white/10" />
+                <Input placeholder="Vendor" value={form.vendor} onChange={e => setForm(p => ({ ...p, vendor: e.target.value.slice(0, 200) }))} className="bg-muted/50 border-border col-span-2" />
+                <Input placeholder="Amount ($)" type="number" min="0.01" max="999999.99" step="0.01" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))} className="bg-muted/50 border-border" />
+                <Input type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} className="bg-muted/50 border-border" />
                 <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
-                  className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg p-3 text-white text-sm min-h-[44px] [&>option]:bg-[#0d0d1a] col-span-2">
+                  className="w-full bg-card border border-border rounded-lg p-3 text-foreground text-sm min-h-[44px] [&>option]:bg-card col-span-2">
                   <option value="">Select IRS Category</option>
                   {Object.entries(RECEIPT_CATEGORIES).map(([key, cat]) => (
                     <option key={key} value={key}>{cat.label} ({cat.pct}%)</option>
                   ))}
                 </select>
-                <Input placeholder="Business purpose" value={form.purpose} onChange={e => setForm(p => ({ ...p, purpose: e.target.value.slice(0, 500) }))} className="bg-white/5 border-white/10 col-span-2" />
+                <Input placeholder="Business purpose" value={form.purpose} onChange={e => setForm(p => ({ ...p, purpose: e.target.value.slice(0, 500) }))} className="bg-muted/50 border-border col-span-2" />
               </div>
               <Button className="w-full mt-3 bg-gradient-to-r from-secondary to-[#cc9900] text-black font-bold min-h-[44px]" onClick={addManualReceipt}>
                 Log Receipt
@@ -409,23 +409,23 @@ export default function Receipts() {
 
             <div className="flex items-center gap-2 mb-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
-                <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search documents..." className="pl-10 bg-white/5 border-white/10" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+                <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search documents..." className="pl-10 bg-muted/50 border-border" />
               </div>
               <div className="flex gap-1">
-                <button onClick={() => setViewMode("cards")} className={`p-2 rounded-lg ${viewMode === "cards" ? "bg-white/10 text-white" : "text-white/30"}`}>
+                <button onClick={() => setViewMode("cards")} className={`p-2 rounded-lg ${viewMode === "cards" ? "bg-muted text-foreground" : "text-muted-foreground/50"}`}>
                   <Receipt className="w-4 h-4" />
                 </button>
-                <button onClick={() => setViewMode("ledger")} className={`p-2 rounded-lg ${viewMode === "ledger" ? "bg-white/10 text-white" : "text-white/30"}`}>
+                <button onClick={() => setViewMode("ledger")} className={`p-2 rounded-lg ${viewMode === "ledger" ? "bg-muted text-foreground" : "text-muted-foreground/50"}`}>
                   <FileText className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
             <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-              <button onClick={() => setCategoryFilter("all")} className={`px-3 py-1 rounded-full text-[11px] whitespace-nowrap ${categoryFilter === "all" ? "bg-white/10 text-white" : "text-white/30"}`}>All</button>
+              <button onClick={() => setCategoryFilter("all")} className={`px-3 py-1 rounded-full text-[11px] whitespace-nowrap ${categoryFilter === "all" ? "bg-muted text-foreground" : "text-muted-foreground/50"}`}>All</button>
               {DOCUMENT_CATEGORIES.map(c => (
-                <button key={c.value} onClick={() => setCategoryFilter(c.value)} className={`px-3 py-1 rounded-full text-[11px] whitespace-nowrap ${categoryFilter === c.value ? "bg-white/10 text-white" : "text-white/30"}`}>
+                <button key={c.value} onClick={() => setCategoryFilter(c.value)} className={`px-3 py-1 rounded-full text-[11px] whitespace-nowrap ${categoryFilter === c.value ? "bg-muted text-foreground" : "text-muted-foreground/50"}`}>
                   {c.label}
                 </button>
               ))}
@@ -435,11 +435,11 @@ export default function Receipts() {
               <div className="space-y-3 mb-6">
                 {filteredDocs.length === 0 ? (
                   <div className="text-center py-12">
-                    <Receipt className="w-10 h-10 mx-auto mb-3 text-white/10" />
-                    <p className="font-semibold text-white/40 mb-1">
+                    <Receipt className="w-10 h-10 mx-auto mb-3 text-muted-foreground/20" />
+                    <p className="font-semibold text-muted-foreground/70 mb-1">
                       {documents.length === 0 ? "No receipts yet" : "No receipts match that filter"}
                     </p>
-                    <p className="text-sm text-white/50">
+                    <p className="text-sm text-muted-foreground">
                       {documents.length === 0 ? "Drop a file above or type in the form to add your first expense." : "Try a different category or clear the filter."}
                     </p>
                   </div>
@@ -477,19 +477,19 @@ export default function Receipts() {
                     {d.aiAnalysis && (
                       <div className="mt-2 p-3 rounded-lg border border-[rgba(156,39,176,0.2)] bg-[rgba(156,39,176,0.05)]">
                         <p className="text-[11px] text-[#9c27b0] font-semibold mb-1">AI Analysis</p>
-                        <p className="text-[12px] text-white/60">{d.aiAnalysis.suggestedPurpose || d.aiAnalysis.notes}</p>
+                        <p className="text-[12px] text-muted-foreground">{d.aiAnalysis.suggestedPurpose || d.aiAnalysis.notes}</p>
                         {d.aiAnalysis.items.length > 0 && (
-                          <p className="text-[11px] text-white/50 mt-1">Items: {d.aiAnalysis.items.join(", ")}</p>
+                          <p className="text-[11px] text-muted-foreground mt-1">Items: {d.aiAnalysis.items.join(", ")}</p>
                         )}
                         <p className="text-[11px] mt-1">
                           <span className={d.aiAnalysis.auditReady ? "text-[#00B4D8]" : "text-[#ffb800]"}>
                             {d.aiAnalysis.auditReady ? "✓ Audit Ready" : "⚠ Review Needed"}
                           </span>
-                          {d.aiAnalysis.ircSection && <span className="text-white/30 ml-2">· {d.aiAnalysis.ircSection}</span>}
+                          {d.aiAnalysis.ircSection && <span className="text-muted-foreground/50 ml-2">· {d.aiAnalysis.ircSection}</span>}
                         </p>
                       </div>
                     )}
-                    <p className="text-[11px] text-white/50 mt-2">{d.purpose}</p>
+                    <p className="text-[11px] text-muted-foreground mt-2">{d.purpose}</p>
                   </div>
                 ))}
               </div>
@@ -497,22 +497,22 @@ export default function Receipts() {
               <div className="glass-panel rounded-xl overflow-x-auto mb-6">
                 <table className="w-full text-[12px]">
                   <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="text-left p-3 text-white/50 font-semibold">Date</th>
-                      <th className="text-left p-3 text-white/50 font-semibold">Vendor</th>
-                      <th className="text-left p-3 text-white/50 font-semibold">Category</th>
-                      <th className="text-right p-3 text-white/50 font-semibold">Amount</th>
-                      <th className="text-right p-3 text-white/50 font-semibold">Deductible</th>
-                      <th className="text-center p-3 text-white/50 font-semibold">Status</th>
+                    <tr className="border-b border-border">
+                      <th className="text-left p-3 text-muted-foreground font-semibold">Date</th>
+                      <th className="text-left p-3 text-muted-foreground font-semibold">Vendor</th>
+                      <th className="text-left p-3 text-muted-foreground font-semibold">Category</th>
+                      <th className="text-right p-3 text-muted-foreground font-semibold">Amount</th>
+                      <th className="text-right p-3 text-muted-foreground font-semibold">Deductible</th>
+                      <th className="text-center p-3 text-muted-foreground font-semibold">Status</th>
                       <th className="p-3"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredDocs.map(d => (
-                      <tr key={d.id} className="border-b border-white/5 hover:bg-white/[0.02]">
-                        <td className="p-3 text-white/60">{d.date}</td>
-                        <td className="p-3 text-white/80 font-semibold">{d.vendor || d.fileName}</td>
-                        <td className="p-3 text-white/50">{d.category}</td>
+                      <tr key={d.id} className="border-b border-white/5 hover:bg-muted/30">
+                        <td className="p-3 text-muted-foreground">{d.date}</td>
+                        <td className="p-3 text-foreground/80 font-semibold">{d.vendor || d.fileName}</td>
+                        <td className="p-3 text-muted-foreground">{d.category}</td>
                         <td className="p-3 text-right font-mono font-bold text-[#00B4D8]">${d.amount.toFixed(2)}</td>
                         <td className="p-3 text-right font-mono text-[#00B4D8]">${d.deductibleAmount.toFixed(2)}</td>
                         <td className="p-3 text-center">
@@ -522,7 +522,7 @@ export default function Receipts() {
                           }}>{d.status}</span>
                         </td>
                         <td className="p-3">
-                          <button onClick={() => removeDocument(d.id)} className="text-white/50 hover:text-[#ff4757]">
+                          <button onClick={() => removeDocument(d.id)} className="text-muted-foreground hover:text-[#ff4757]">
                             <Trash2 className="w-3 h-3" />
                           </button>
                         </td>
@@ -536,7 +536,7 @@ export default function Receipts() {
             <div className="grid grid-cols-2 gap-3 mb-6">
               <div className="glass-panel rounded-xl p-4 text-center">
                 <p className="text-[10px] text-muted-foreground uppercase">Total Spent</p>
-                <p className="text-xl font-bold font-mono text-white">${total.toFixed(2)}</p>
+                <p className="text-xl font-bold font-mono text-foreground">${total.toFixed(2)}</p>
               </div>
               <div className="glass-panel rounded-xl p-4 text-center">
                 <p className="text-[10px] text-muted-foreground uppercase">Deductible</p>
@@ -557,11 +557,11 @@ export default function Receipts() {
                 <Car className="w-4 h-4" /> Log Mileage Trip
               </h3>
               <div className="grid grid-cols-2 gap-2.5">
-                <Input type="date" value={mileageForm.date} onChange={e => setMileageForm(p => ({ ...p, date: e.target.value }))} className="bg-white/5 border-white/10" />
-                <Input type="number" placeholder="Miles" min="0.1" step="0.1" value={mileageForm.miles} onChange={e => setMileageForm(p => ({ ...p, miles: e.target.value }))} className="bg-white/5 border-white/10" />
-                <Input placeholder="Start location" value={mileageForm.start} onChange={e => setMileageForm(p => ({ ...p, start: e.target.value.slice(0, 200) }))} className="bg-white/5 border-white/10" />
-                <Input placeholder="End location" value={mileageForm.end} onChange={e => setMileageForm(p => ({ ...p, end: e.target.value.slice(0, 200) }))} className="bg-white/5 border-white/10" />
-                <Input placeholder="Business purpose" value={mileageForm.purpose} onChange={e => setMileageForm(p => ({ ...p, purpose: e.target.value.slice(0, 500) }))} className="bg-white/5 border-white/10 col-span-2" />
+                <Input type="date" value={mileageForm.date} onChange={e => setMileageForm(p => ({ ...p, date: e.target.value }))} className="bg-muted/50 border-border" />
+                <Input type="number" placeholder="Miles" min="0.1" step="0.1" value={mileageForm.miles} onChange={e => setMileageForm(p => ({ ...p, miles: e.target.value }))} className="bg-muted/50 border-border" />
+                <Input placeholder="Start location" value={mileageForm.start} onChange={e => setMileageForm(p => ({ ...p, start: e.target.value.slice(0, 200) }))} className="bg-muted/50 border-border" />
+                <Input placeholder="End location" value={mileageForm.end} onChange={e => setMileageForm(p => ({ ...p, end: e.target.value.slice(0, 200) }))} className="bg-muted/50 border-border" />
+                <Input placeholder="Business purpose" value={mileageForm.purpose} onChange={e => setMileageForm(p => ({ ...p, purpose: e.target.value.slice(0, 500) }))} className="bg-muted/50 border-border col-span-2" />
               </div>
               <Button className="w-full mt-3 bg-gradient-to-r from-[#00B4D8] to-[#0099cc] text-black font-bold min-h-[44px]" onClick={addMileageEntry}>
                 <Plus className="w-4 h-4 mr-1" /> Add Trip
@@ -571,7 +571,7 @@ export default function Receipts() {
             <div className="grid grid-cols-3 gap-3 mb-6">
               <div className="glass-panel rounded-xl p-4 text-center">
                 <p className="text-[10px] text-muted-foreground uppercase">YTD Miles</p>
-                <p className="text-xl font-bold font-mono text-white">{ytdMiles.toLocaleString()}</p>
+                <p className="text-xl font-bold font-mono text-foreground">{ytdMiles.toLocaleString()}</p>
               </div>
               <div className="glass-panel rounded-xl p-4 text-center">
                 <p className="text-[10px] text-muted-foreground uppercase">YTD Deduction</p>
@@ -585,35 +585,35 @@ export default function Receipts() {
 
             {mileage.length === 0 ? (
               <div className="text-center py-12">
-                <Car className="w-10 h-10 mx-auto mb-3 text-white/10" />
-                <p className="font-semibold text-white/40 mb-1">No trips logged yet</p>
-                <p className="text-sm text-white/50">Fill in the form above to add your first business trip.</p>
+                <Car className="w-10 h-10 mx-auto mb-3 text-muted-foreground/20" />
+                <p className="font-semibold text-muted-foreground/70 mb-1">No trips logged yet</p>
+                <p className="text-sm text-muted-foreground">Fill in the form above to add your first business trip.</p>
               </div>
             ) : (
               <div className="glass-panel rounded-xl overflow-x-auto mb-6">
                 <table className="w-full text-[12px]">
                   <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="text-left p-3 text-white/50 font-semibold">Date</th>
-                      <th className="text-left p-3 text-white/50 font-semibold">From</th>
-                      <th className="text-left p-3 text-white/50 font-semibold">To</th>
-                      <th className="text-right p-3 text-white/50 font-semibold">Miles</th>
-                      <th className="text-left p-3 text-white/50 font-semibold">Purpose</th>
-                      <th className="text-right p-3 text-white/50 font-semibold">Deductible</th>
+                    <tr className="border-b border-border">
+                      <th className="text-left p-3 text-muted-foreground font-semibold">Date</th>
+                      <th className="text-left p-3 text-muted-foreground font-semibold">From</th>
+                      <th className="text-left p-3 text-muted-foreground font-semibold">To</th>
+                      <th className="text-right p-3 text-muted-foreground font-semibold">Miles</th>
+                      <th className="text-left p-3 text-muted-foreground font-semibold">Purpose</th>
+                      <th className="text-right p-3 text-muted-foreground font-semibold">Deductible</th>
                       <th className="p-3"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {mileage.map(m => (
-                      <tr key={m.id} className="border-b border-white/5 hover:bg-white/[0.02]">
-                        <td className="p-3 text-white/60">{m.date}</td>
-                        <td className="p-3 text-white/70">{m.startLocation}</td>
-                        <td className="p-3 text-white/70">{m.endLocation}</td>
-                        <td className="p-3 text-right font-mono text-white">{m.miles}</td>
-                        <td className="p-3 text-white/50">{m.purpose}</td>
+                      <tr key={m.id} className="border-b border-white/5 hover:bg-muted/30">
+                        <td className="p-3 text-muted-foreground">{m.date}</td>
+                        <td className="p-3 text-foreground/70">{m.startLocation}</td>
+                        <td className="p-3 text-foreground/70">{m.endLocation}</td>
+                        <td className="p-3 text-right font-mono text-foreground">{m.miles}</td>
+                        <td className="p-3 text-muted-foreground">{m.purpose}</td>
                         <td className="p-3 text-right font-mono font-bold text-[#00B4D8]">${m.deductible.toFixed(2)}</td>
                         <td className="p-3">
-                          <button onClick={() => setMileage(prev => prev.filter(e => e.id !== m.id))} className="text-white/50 hover:text-[#ff4757]">
+                          <button onClick={() => setMileage(prev => prev.filter(e => e.id !== m.id))} className="text-muted-foreground hover:text-[#ff4757]">
                             <Trash2 className="w-3 h-3" />
                           </button>
                         </td>

@@ -252,15 +252,15 @@ export default function TimeMachine() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
             <div>
               <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1 block">Stock Symbol</label>
-              <Input value={symbol} onChange={(e) => setSymbol(e.target.value.toUpperCase())} placeholder="NVDA" className="font-mono bg-black/50 border-white/10" />
+              <Input value={symbol} onChange={(e) => setSymbol(e.target.value.toUpperCase())} placeholder="NVDA" className="font-mono bg-black/50 border-border" />
             </div>
             <div>
               <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1 block">Start Date</label>
-              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="font-mono bg-black/50 border-white/10" />
+              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="font-mono bg-black/50 border-border" />
             </div>
             <div>
               <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1 block">Investment Amount</label>
-              <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="10000" className="font-mono bg-black/50 border-white/10" />
+              <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="10000" className="font-mono bg-black/50 border-border" />
             </div>
             <div className="flex items-end">
               <Button onClick={() => run()} disabled={loading} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-bold">
@@ -276,7 +276,7 @@ export default function TimeMachine() {
             <span className="text-[10px] text-muted-foreground py-1">Quick picks:</span>
             {PRESETS.map((p) => (
               <button key={p.label} onClick={() => { setSymbol(p.symbol); setStartDate(p.date); run(p.symbol, p.date, amount); }}
-                className="text-[10px] px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors">
+                className="text-[10px] px-2.5 py-1 rounded-full bg-muted/50 border border-border text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors">
                 {p.label}
               </button>
             ))}

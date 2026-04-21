@@ -4,6 +4,7 @@ import "./index.css";
 import { initSentry, Sentry } from "./lib/sentry";
 import { initInteractionSignals } from "./lib/interactionSignals";
 
+// production error tracking with privacy safeguards, completely disabled in dev.
 initSentry();
 initInteractionSignals();
 

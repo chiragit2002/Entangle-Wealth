@@ -120,7 +120,7 @@ function AgentPanel({
 
   return (
     <div
-      className={`rounded-xl border border-white/[0.06] overflow-hidden transition-all duration-300 hover:border-white/[0.12]`}
+      className={`rounded-xl border border-border overflow-hidden transition-all duration-300 hover:border-border`}
       style={{ background: "rgba(8,8,20,0.6)" }}
     >
       <button
@@ -135,7 +135,7 @@ function AgentPanel({
             <span style={{ color: agent.color }}>{agent.icon}</span>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-white">{agent.name}</h3>
+            <h3 className="text-sm font-semibold text-foreground">{agent.name}</h3>
             <p className="text-[10px] text-muted-foreground">{agent.maxChars.toLocaleString()} char limit</p>
           </div>
         </div>
@@ -150,14 +150,14 @@ function AgentPanel({
       </button>
 
       {expanded && (
-        <div className="px-4 pb-4 space-y-3 border-t border-white/[0.04] pt-3">
+        <div className="px-4 pb-4 space-y-3 border-t border-border pt-3">
           <div>
             <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Topic / Prompt</label>
             <textarea
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder={`What should ${agent.name} content be about?`}
-              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/40 resize-none focus:outline-none focus:border-primary/40 transition-colors"
+              className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 resize-none focus:outline-none focus:border-primary/40 transition-colors"
               rows={2}
             />
           </div>
@@ -175,7 +175,7 @@ function AgentPanel({
               value={context}
               onChange={(e) => setContext(e.target.value)}
               placeholder="Any specific angles, data points, or requirements..."
-              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/40 resize-none focus:outline-none focus:border-primary/40 transition-colors"
+              className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 resize-none focus:outline-none focus:border-primary/40 transition-colors"
               rows={2}
             />
           )}
@@ -190,7 +190,7 @@ function AgentPanel({
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     tone === t.value
                       ? "bg-primary/20 text-primary border border-primary/30"
-                      : "bg-white/[0.03] text-white/50 border border-white/[0.06] hover:bg-white/[0.06] hover:text-white/70"
+                      : "bg-muted/50 text-muted-foreground border border-border hover:bg-muted hover:text-foreground/70"
                   }`}
                 >
                   {t.emoji} {t.label}
@@ -202,7 +202,7 @@ function AgentPanel({
           <Button
             onClick={generate}
             disabled={loading || !topic.trim()}
-            className="w-full bg-gradient-to-r from-primary/80 to-blue-600/80 text-white hover:from-primary hover:to-blue-600 gap-2 h-10"
+            className="w-full bg-gradient-to-r from-primary/80 to-blue-600/80 text-foreground hover:from-primary hover:to-blue-600 gap-2 h-10"
           >
             {loading ? (
               <>
@@ -226,15 +226,15 @@ function AgentPanel({
                 </div>
               </div>
               <div
-                className="bg-white/[0.02] border border-white/[0.06] rounded-lg p-3 max-h-80 overflow-y-auto"
+                className="bg-muted/30 border border-border rounded-lg p-3 max-h-80 overflow-y-auto"
               >
-                <pre className="text-sm text-white/90 whitespace-pre-wrap font-sans leading-relaxed">{output}</pre>
+                <pre className="text-sm text-foreground/90 whitespace-pre-wrap font-sans leading-relaxed">{output}</pre>
               </div>
               <div className="flex gap-2">
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-white/10 gap-1.5 text-xs flex-1"
+                  className="border-border gap-1.5 text-xs flex-1"
                   onClick={copyToClipboard}
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -276,7 +276,7 @@ function QueuePanel({
     draft: "bg-yellow-500/20 text-yellow-400 border-yellow-500/20",
     approved: "bg-emerald-500/20 text-emerald-400 border-emerald-500/20",
     posted: "bg-blue-500/20 text-blue-400 border-blue-500/20",
-    archived: "bg-white/10 text-white/40 border-white/10",
+    archived: "bg-muted text-muted-foreground/70 border-border",
   };
 
   const statusCounts = {
@@ -297,7 +297,7 @@ function QueuePanel({
         <Button
           variant="outline"
           size="sm"
-          className="border-white/10 gap-1.5 text-xs"
+          className="border-border gap-1.5 text-xs"
           onClick={onExport}
           disabled={queue.length === 0}
         >
@@ -313,7 +313,7 @@ function QueuePanel({
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
               filter === s
                 ? "bg-primary/20 text-primary border border-primary/30"
-                : "bg-white/[0.03] text-white/50 border border-white/[0.06] hover:bg-white/[0.06]"
+                : "bg-muted/50 text-muted-foreground border border-border hover:bg-muted"
             }`}
           >
             <Filter className="w-3 h-3 inline mr-1" />
@@ -332,7 +332,7 @@ function QueuePanel({
           {filtered.map((item) => (
             <div
               key={item.id}
-              className="rounded-lg border border-white/[0.06] overflow-hidden"
+              className="rounded-lg border border-border overflow-hidden"
               style={{ background: "rgba(8,8,20,0.6)" }}
             >
               <button
@@ -344,7 +344,7 @@ function QueuePanel({
                     {item.status}
                   </span>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{item.platformName}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{item.platformName}</p>
                     <p className="text-[11px] text-muted-foreground truncate">{item.topic}</p>
                   </div>
                 </div>
@@ -358,14 +358,14 @@ function QueuePanel({
               </button>
 
               {expandedId === item.id && (
-                <div className="px-3 pb-3 space-y-2 border-t border-white/[0.04] pt-2">
+                <div className="px-3 pb-3 space-y-2 border-t border-border pt-2">
                   <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
                     <span>Tone: {item.tone}</span>
                     <span>|</span>
                     <span>{item.content.length.toLocaleString()} chars</span>
                   </div>
-                  <div className="bg-white/[0.02] border border-white/[0.06] rounded-lg p-3 max-h-48 overflow-y-auto">
-                    <pre className="text-xs text-white/80 whitespace-pre-wrap font-sans leading-relaxed">{item.content}</pre>
+                  <div className="bg-muted/30 border border-border rounded-lg p-3 max-h-48 overflow-y-auto">
+                    <pre className="text-xs text-foreground/80 whitespace-pre-wrap font-sans leading-relaxed">{item.content}</pre>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {item.status !== "approved" && (
@@ -379,7 +379,7 @@ function QueuePanel({
                       </Button>
                     )}
                     {item.status !== "archived" && (
-                      <Button size="sm" className="bg-white/5 text-white/40 hover:bg-white/10 border border-white/10 text-[10px] h-7 px-2" onClick={() => onUpdateStatus(item.id, "archived")}>
+                      <Button size="sm" className="bg-muted/50 text-muted-foreground/70 hover:bg-muted border border-border text-[10px] h-7 px-2" onClick={() => onUpdateStatus(item.id, "archived")}>
                         <Archive className="w-3 h-3 mr-1" /> Archive
                       </Button>
                     )}
@@ -509,7 +509,7 @@ export default function MarketingCenter() {
           <div className="w-16 h-16 rounded-sm bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
             <Shield className="w-8 h-8 text-red-400" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Access Denied</h1>
           <p className="text-muted-foreground max-w-md">
             The AI Marketing Command Center is restricted to admin-tier accounts. Contact the platform administrator for access.
           </p>
@@ -532,16 +532,16 @@ export default function MarketingCenter() {
         </div>
 
         {aiQueueStatus && (
-          <div className="mb-4 p-3 rounded-lg border border-white/[0.06] bg-white/[0.02] flex items-center gap-4 text-xs">
+          <div className="mb-4 p-3 rounded-lg border border-border bg-muted/30 flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">
               <div className={`w-2 h-2 rounded-full ${aiQueueStatus.active > 0 ? "bg-[#00B4D8] animate-pulse" : "bg-[#00B4D8]"}`} />
-              <span className="text-white/60">AI Queue:</span>
+              <span className="text-muted-foreground">AI Queue:</span>
             </div>
-            <span className="text-white/80 font-mono">{aiQueueStatus.active}/{aiQueueStatus.maxConcurrent} active</span>
+            <span className="text-foreground/80 font-mono">{aiQueueStatus.active}/{aiQueueStatus.maxConcurrent} active</span>
             {aiQueueStatus.queued > 0 && (
               <span className="text-[#FFB800] font-mono">{aiQueueStatus.queued} waiting</span>
             )}
-            <span className="text-white/50">|</span>
+            <span className="text-muted-foreground">|</span>
             <span className="text-[#00B4D8] font-mono">{aiQueueStatus.totalProcessed} processed</span>
             {aiQueueStatus.totalFailed > 0 && (
               <span className="text-[#ff3366] font-mono">{aiQueueStatus.totalFailed} failed</span>
@@ -555,7 +555,7 @@ export default function MarketingCenter() {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               activeTab === "agents"
                 ? "bg-primary/20 text-primary border border-primary/30"
-                : "bg-white/[0.03] text-white/50 border border-white/[0.06] hover:bg-white/[0.06]"
+                : "bg-muted/50 text-muted-foreground border border-border hover:bg-muted"
             }`}
           >
             <Sparkles className="w-4 h-4 inline mr-1.5" />
@@ -566,7 +566,7 @@ export default function MarketingCenter() {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               activeTab === "queue"
                 ? "bg-primary/20 text-primary border border-primary/30"
-                : "bg-white/[0.03] text-white/50 border border-white/[0.06] hover:bg-white/[0.06]"
+                : "bg-muted/50 text-muted-foreground border border-border hover:bg-muted"
             }`}
           >
             <Archive className="w-4 h-4 inline mr-1.5" />

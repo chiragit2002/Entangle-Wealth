@@ -69,9 +69,9 @@ export function JourneyMap() {
         role="complementary"
         aria-label="Financial journey progress map"
       >
-        <div className="bg-[#0a0a14] border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden">
+        <div className="bg-card border border-border rounded-xl shadow-2xl shadow-black/50 overflow-hidden">
           <div
-            className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-white/[0.02] transition-colors"
+            className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors"
             onClick={() => setCollapsed(c => !c)}
             role="button"
             aria-expanded={!collapsed}
@@ -80,7 +80,7 @@ export function JourneyMap() {
           >
             <div className="flex items-center gap-2">
               <Map className="w-4 h-4 text-[#FF8C00]" aria-hidden="true" />
-              <span className="text-xs font-bold text-white/80">Your Journey</span>
+              <span className="text-xs font-bold text-foreground/80">Your Journey</span>
               <span className="text-[10px] font-mono text-[#FF8C00]" aria-label={`${completedCount} of ${totalMilestones} milestones complete`}>
                 {completedCount}/{totalMilestones}
               </span>
@@ -88,19 +88,19 @@ export function JourneyMap() {
             <div className="flex items-center gap-1">
               <button
                 onClick={e => { e.stopPropagation(); dismiss(); }}
-                className="text-white/30 hover:text-white/50 transition-colors p-1 rounded min-w-[28px] min-h-[28px] flex items-center justify-center"
+                className="text-muted-foreground/50 hover:text-muted-foreground transition-colors p-1 rounded min-w-[28px] min-h-[28px] flex items-center justify-center"
                 aria-label="Dismiss journey map"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
               {collapsed
-                ? <ChevronUp className="w-4 h-4 text-white/30" aria-hidden="true" />
-                : <ChevronDown className="w-4 h-4 text-white/30" aria-hidden="true" />}
+                ? <ChevronUp className="w-4 h-4 text-muted-foreground/50" aria-hidden="true" />
+                : <ChevronDown className="w-4 h-4 text-muted-foreground/50" aria-hidden="true" />}
             </div>
           </div>
 
           <div className="px-4 pb-1">
-            <div className="h-1 bg-white/5 rounded-full overflow-hidden" role="progressbar" aria-valuenow={overallProgress} aria-valuemin={0} aria-valuemax={100}>
+            <div className="h-1 bg-muted/50 rounded-full overflow-hidden" role="progressbar" aria-valuenow={overallProgress} aria-valuemin={0} aria-valuemax={100}>
               <div
                 className="h-full transition-all duration-700 ease-out rounded-full"
                 style={{ width: `${overallProgress}%`, background: `linear-gradient(90deg, #FF8C00, #0099cc)` }}
@@ -118,7 +118,7 @@ export function JourneyMap() {
                 return (
                   <div key={phase.id} className={`rounded-lg overflow-hidden transition-all ${isLocked ? "opacity-40" : ""}`}>
                     <div
-                      className={`flex items-center gap-2.5 px-2 py-2 rounded-lg ${isCurrentPhase ? "bg-white/[0.04]" : ""}`}
+                      className={`flex items-center gap-2.5 px-2 py-2 rounded-lg ${isCurrentPhase ? "bg-muted/50" : ""}`}
                     >
                       <div
                         className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
@@ -131,9 +131,9 @@ export function JourneyMap() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
                           <span className="text-[9px] font-mono" style={{ color: phase.color }}>{phase.theme}</span>
-                          {isCurrentPhase && <span className="text-[8px] px-1 py-0.5 rounded bg-white/5 text-white/30 font-mono">ACTIVE</span>}
+                          {isCurrentPhase && <span className="text-[8px] px-1 py-0.5 rounded bg-muted/50 text-muted-foreground/50 font-mono">ACTIVE</span>}
                         </div>
-                        <span className="text-xs font-bold text-white/80">{phase.name}</span>
+                        <span className="text-xs font-bold text-foreground/80">{phase.name}</span>
                       </div>
                       {isPhaseCompleted && <Star className="w-3 h-3 shrink-0" style={{ color: phase.color }} />}
                     </div>
@@ -146,16 +146,16 @@ export function JourneyMap() {
                             <Link
                               key={milestone.id}
                               href={milestone.href}
-                              className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors group ${done ? "opacity-50" : "hover:bg-white/[0.03] cursor-pointer"}`}
+                              className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors group ${done ? "opacity-50" : "hover:bg-muted/50 cursor-pointer"}`}
                               aria-disabled={done}
                             >
                               {done
                                 ? <CheckCircle2 className="w-3 h-3 shrink-0" style={{ color: phase.color }} />
-                                : <Circle className="w-3 h-3 text-white/30 shrink-0 group-hover:text-white/50" />}
-                              <span className={`text-[11px] flex-1 ${done ? "text-white/30 line-through" : "text-white/60 group-hover:text-white/80"}`}>
+                                : <Circle className="w-3 h-3 text-muted-foreground/50 shrink-0 group-hover:text-muted-foreground" />}
+                              <span className={`text-[11px] flex-1 ${done ? "text-muted-foreground/50 line-through" : "text-muted-foreground group-hover:text-foreground/80"}`}>
                                 {milestone.label}
                               </span>
-                              {!done && <ArrowRight className="w-2.5 h-2.5 text-white/10 group-hover:text-white/30 shrink-0" />}
+                              {!done && <ArrowRight className="w-2.5 h-2.5 text-muted-foreground/20 group-hover:text-muted-foreground/50 shrink-0" />}
                             </Link>
                           );
                         })}
@@ -173,7 +173,7 @@ export function JourneyMap() {
                 </div>
               ) : (
                 <div className="pt-1 pb-2 text-center">
-                  <p className="text-[9px] text-white/30">
+                  <p className="text-[9px] text-muted-foreground/50">
                     <span style={{ color: currentPhase.color }}>{currentPhase.name}</span> phase · {completedCount}/{totalMilestones} milestones
                   </p>
                 </div>
@@ -183,8 +183,8 @@ export function JourneyMap() {
         </div>
 
         {collapsed && (
-          <div className="mt-2 px-4 py-2 bg-[#0a0a14] border border-white/[0.06] rounded-xl flex items-center gap-2">
-            <span className="text-[9px] font-mono text-white/30">Identity:</span>
+          <div className="mt-2 px-4 py-2 bg-card border border-border rounded-xl flex items-center gap-2">
+            <span className="text-[9px] font-mono text-muted-foreground/50">Identity:</span>
             <span className="text-[10px] font-bold" style={{ color: currentPhase.color }}>
               {state.completedPhases?.length ? JOURNEY_PHASES[Math.min(state.completedPhases.length, JOURNEY_PHASES.length - 1)].identityStage : "Explorer"}
             </span>

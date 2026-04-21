@@ -110,14 +110,14 @@ export function FirstVisitTooltips() {
     <>
       <div className="fixed inset-0 z-[90] bg-black/30" onClick={handleDismiss} />
       <div
-        className="fixed z-[91] w-[280px] bg-[#0a0a14] border border-[#00B4D8]/20 rounded-lg p-3 shadow-xl shadow-[#00B4D8]/10 animate-in fade-in slide-in-from-bottom-2 duration-300"
+        className="fixed z-[91] w-[280px] bg-card border border-[#00B4D8]/20 rounded-lg p-3 shadow-xl shadow-[#00B4D8]/10 animate-in fade-in slide-in-from-bottom-2 duration-300"
         style={style}
       >
         <div className="flex items-start justify-between gap-2">
-          <p className="text-xs text-white/70 leading-relaxed">{activeTooltip.message}</p>
+          <p className="text-xs text-foreground/70 leading-relaxed">{activeTooltip.message}</p>
           <button
             onClick={handleDismiss}
-            className="text-white/50 hover:text-white/50 transition-colors shrink-0 mt-0.5"
+            className="text-muted-foreground hover:text-muted-foreground transition-colors shrink-0 mt-0.5"
             aria-label="Dismiss tooltip"
           >
             <X className="w-3.5 h-3.5" />

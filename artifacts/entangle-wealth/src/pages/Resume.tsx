@@ -343,7 +343,7 @@ export default function Resume() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen bg-black text-foreground">
         <Navbar />
         <div className="flex items-center justify-center py-32">
           <div className="text-center space-y-4">
@@ -361,7 +361,7 @@ export default function Resume() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-foreground">
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-6 max-w-[1600px]">
         <div className="mb-8">
@@ -378,13 +378,13 @@ export default function Resume() {
             <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
-                className="border-white/20 gap-2"
+                className="border-border gap-2"
                 onClick={() => setShowPreview(!showPreview)}
               >
                 {showPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 {showPreview ? "Hide" : "Show"} Preview
               </Button>
-              <Button variant="outline" className="border-white/20 gap-2" onClick={exportPDF}>
+              <Button variant="outline" className="border-border gap-2" onClick={exportPDF}>
                 <Download className="w-4 h-4" /> Export PDF
               </Button>
               <Button className="bg-primary text-black font-semibold hover:bg-primary/90 gap-2" onClick={saveResume} disabled={saving}>
@@ -435,7 +435,7 @@ export default function Resume() {
             </div>
           </div>
 
-          <div className="flex gap-1 p-1 rounded-xl bg-white/5 border border-white/10 w-fit mb-6">
+          <div className="flex gap-1 p-1 rounded-xl bg-muted/50 border border-border w-fit mb-6">
             {[
               { id: "builder" as const, label: "Resume Builder", icon: FileText },
               { id: "linkedin" as const, label: "LinkedIn Import", icon: Linkedin },
@@ -447,7 +447,7 @@ export default function Resume() {
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   activeTab === tab.id
                     ? "bg-primary/20 text-primary border border-primary/30"
-                    : "text-muted-foreground hover:text-white hover:bg-white/5"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
@@ -491,7 +491,7 @@ export default function Resume() {
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {["Experience synced", "Skills imported", "Education pulled", "Headline matched"].map((item, i) => (
-                        <div key={i} className="p-3 rounded-lg bg-white/5 border border-white/10 text-center">
+                        <div key={i} className="p-3 rounded-lg bg-muted/50 border border-border text-center">
                           <CheckCircle2 className="w-4 h-4 text-green-400 mx-auto mb-1" />
                           <p className="text-xs text-muted-foreground">{item}</p>
                         </div>
@@ -506,7 +506,7 @@ export default function Resume() {
                         { icon: Brain, title: "AI Enhancement", desc: "Quantum AI rewrites bullets for maximum impact" },
                         { icon: Shield, title: "Privacy First", desc: "Your data stays entangled only with your résumé" },
                       ].map((feature, i) => (
-                        <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/10">
+                        <div key={i} className="p-4 rounded-xl bg-muted/50 border border-border">
                           <feature.icon className="w-5 h-5 text-[#0A66C2] mb-2" />
                           <p className="text-sm font-medium">{feature.title}</p>
                           <p className="text-xs text-muted-foreground mt-1">{feature.desc}</p>
@@ -514,19 +514,19 @@ export default function Resume() {
                       ))}
                     </div>
                     <div className="space-y-1.5">
-                      <label htmlFor="linkedin-url" className="text-xs text-white/50">LinkedIn Profile URL</label>
+                      <label htmlFor="linkedin-url" className="text-xs text-muted-foreground">LinkedIn Profile URL</label>
                       <div className="flex gap-2">
                         <Input
                           id="linkedin-url"
                           placeholder="https://linkedin.com/in/your-profile"
                           value={linkedInUrl}
                           onChange={(e) => setLinkedInUrl(e.target.value)}
-                          className="bg-white/5 border-white/10 flex-1"
+                          className="bg-muted/50 border-border flex-1"
                           type="url"
                           autoComplete="url"
                         />
                         <Button
-                          className="bg-[#0A66C2] hover:bg-[#094D92] text-white gap-2"
+                          className="bg-[#0A66C2] hover:bg-[#094D92] text-foreground gap-2"
                           onClick={handleLinkedInConnect}
                           disabled={linkedInImporting}
                         >
@@ -557,7 +557,7 @@ export default function Resume() {
                   { step: "3", title: "Auto-Populate Your Résumé", desc: "Experience, education, skills, and certifications flow into your résumé builder instantly." },
                   { step: "4", title: "Fine-Tune & Export", desc: "Review the entangled data, make adjustments, then export as PDF | ready for any opportunity." },
                 ].map((step, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors">
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
                     <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center text-primary font-bold text-xs shrink-0">
                       {step.step}
                     </div>
@@ -607,7 +607,7 @@ export default function Resume() {
 
             <div className="space-y-4">
               {accountingPlatforms.map((platform) => (
-                <div key={platform.id} className="glass-panel p-5 relative overflow-hidden group hover:border-white/20 transition-all">
+                <div key={platform.id} className="glass-panel p-5 relative overflow-hidden group hover:border-border transition-all">
                   <div
                     className="absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] opacity-20 transition-opacity group-hover:opacity-30"
                     style={{ backgroundColor: platform.color }}
@@ -615,7 +615,7 @@ export default function Resume() {
                   <div className="relative flex flex-col md:flex-row md:items-center gap-4">
                     <div className="flex items-center gap-4 flex-1">
                       <div
-                        className="w-14 h-14 rounded-xl flex items-center justify-center text-white font-bold text-lg shrink-0"
+                        className="w-14 h-14 rounded-xl flex items-center justify-center text-foreground font-bold text-lg shrink-0"
                         style={{ backgroundColor: platform.color + "30", border: `1px solid ${platform.color}50` }}
                       >
                         {platform.icon}
@@ -632,7 +632,7 @@ export default function Resume() {
                         <p className="text-sm text-muted-foreground mt-1">{platform.description}</p>
                         <div className="flex flex-wrap gap-2 mt-2">
                           {platform.features.map((feature, i) => (
-                            <span key={i} className="px-2 py-0.5 rounded-md bg-white/5 text-xs text-muted-foreground border border-white/10">
+                            <span key={i} className="px-2 py-0.5 rounded-md bg-muted/50 text-xs text-muted-foreground border border-border">
                               {feature}
                             </span>
                           ))}
@@ -647,7 +647,7 @@ export default function Resume() {
                     <div className="flex gap-2 shrink-0">
                       {platform.connected ? (
                         <>
-                          <Button variant="outline" size="sm" className="border-white/20 gap-1.5 text-xs">
+                          <Button variant="outline" size="sm" className="border-border gap-1.5 text-xs">
                             <Zap className="w-3.5 h-3.5" /> Sync Now
                           </Button>
                           <Button variant="outline" size="sm" className="border-red-500/30 text-red-400 hover:bg-red-500/10 gap-1.5 text-xs" onClick={() => handleAccountingDisconnect(platform.id)}>
@@ -701,7 +701,7 @@ export default function Resume() {
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                       resume.template === t.id
                         ? "bg-primary/20 text-primary border border-primary/50"
-                        : "bg-white/5 text-muted-foreground border border-white/10 hover:border-white/20"
+                        : "bg-muted/50 text-muted-foreground border border-border hover:border-border"
                     }`}
                   >
                     {t.name}
@@ -713,30 +713,30 @@ export default function Resume() {
               {expandedSections.contact && (
                 <div className="glass-panel p-4 space-y-3">
                   <div className="grid grid-cols-2 gap-3">
-                    <Input placeholder="Full Name" value={user?.fullName || ""} disabled className="bg-white/5 border-white/10" />
-                    <Input placeholder="Email" value={user?.primaryEmailAddress?.emailAddress || ""} disabled className="bg-white/5 border-white/10" />
+                    <Input placeholder="Full Name" value={user?.fullName || ""} disabled className="bg-muted/50 border-border" />
+                    <Input placeholder="Email" value={user?.primaryEmailAddress?.emailAddress || ""} disabled className="bg-muted/50 border-border" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input placeholder="Phone" value={resume.phone} onChange={(e) => setResume(prev => ({ ...prev, phone: e.target.value }))} className="bg-white/5 border-white/10 pl-10" />
+                      <Input placeholder="Phone" value={resume.phone} onChange={(e) => setResume(prev => ({ ...prev, phone: e.target.value }))} className="bg-muted/50 border-border pl-10" />
                     </div>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input placeholder="Location" value={resume.location} onChange={(e) => setResume(prev => ({ ...prev, location: e.target.value }))} className="bg-white/5 border-white/10 pl-10" />
+                      <Input placeholder="Location" value={resume.location} onChange={(e) => setResume(prev => ({ ...prev, location: e.target.value }))} className="bg-muted/50 border-border pl-10" />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="relative">
                       <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input placeholder="Website / Portfolio" value={resume.website} onChange={(e) => setResume(prev => ({ ...prev, website: e.target.value }))} className="bg-white/5 border-white/10 pl-10" />
+                      <Input placeholder="Website / Portfolio" value={resume.website} onChange={(e) => setResume(prev => ({ ...prev, website: e.target.value }))} className="bg-muted/50 border-border pl-10" />
                     </div>
                     <div className="relative">
                       <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input placeholder="LinkedIn URL" value={resume.linkedinUrl} onChange={(e) => setResume(prev => ({ ...prev, linkedinUrl: e.target.value }))} className="bg-white/5 border-white/10 pl-10" />
+                      <Input placeholder="LinkedIn URL" value={resume.linkedinUrl} onChange={(e) => setResume(prev => ({ ...prev, linkedinUrl: e.target.value }))} className="bg-muted/50 border-border pl-10" />
                     </div>
                   </div>
-                  <Input placeholder="Résumé Title / Headline" value={resume.title} onChange={(e) => setResume(prev => ({ ...prev, title: e.target.value }))} className="bg-white/5 border-white/10" />
+                  <Input placeholder="Résumé Title / Headline" value={resume.title} onChange={(e) => setResume(prev => ({ ...prev, title: e.target.value }))} className="bg-muted/50 border-border" />
                 </div>
               )}
 
@@ -747,7 +747,7 @@ export default function Resume() {
                     placeholder="Write a brief professional summary | 2-3 sentences describing who you are, what you do, and your biggest professional strengths..."
                     value={resume.summary}
                     onChange={(e) => setResume(prev => ({ ...prev, summary: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white placeholder:text-muted-foreground/50 min-h-[100px] resize-none focus:outline-none focus:border-primary/50"
+                    className="w-full bg-muted/50 border border-border rounded-lg p-3 text-foreground placeholder:text-muted-foreground/50 min-h-[100px] resize-none focus:outline-none focus:border-primary/50"
                   />
                   <p className="text-xs text-muted-foreground mt-2">{resume.summary.length}/300 characters recommended</p>
                 </div>
@@ -773,13 +773,13 @@ export default function Resume() {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
-                        <Input placeholder="Company (e.g., DoorDash, Google)" value={exp.company} onChange={(e) => updateExperience(i, "company", e.target.value)} className="bg-white/5 border-white/10" />
-                        <Input placeholder="Title (e.g., Software Engineer)" value={exp.title} onChange={(e) => updateExperience(i, "title", e.target.value)} className="bg-white/5 border-white/10" />
+                        <Input placeholder="Company (e.g., DoorDash, Google)" value={exp.company} onChange={(e) => updateExperience(i, "company", e.target.value)} className="bg-muted/50 border-border" />
+                        <Input placeholder="Title (e.g., Software Engineer)" value={exp.title} onChange={(e) => updateExperience(i, "title", e.target.value)} className="bg-muted/50 border-border" />
                       </div>
-                      <Input placeholder="Location (e.g., San Francisco, CA)" value={exp.location} onChange={(e) => updateExperience(i, "location", e.target.value)} className="bg-white/5 border-white/10" />
+                      <Input placeholder="Location (e.g., San Francisco, CA)" value={exp.location} onChange={(e) => updateExperience(i, "location", e.target.value)} className="bg-muted/50 border-border" />
                       <div className="grid grid-cols-2 gap-3">
-                        <Input type="month" value={exp.startDate} onChange={(e) => updateExperience(i, "startDate", e.target.value)} className="bg-white/5 border-white/10" />
-                        {!exp.isCurrent && <Input type="month" value={exp.endDate} onChange={(e) => updateExperience(i, "endDate", e.target.value)} className="bg-white/5 border-white/10" />}
+                        <Input type="month" value={exp.startDate} onChange={(e) => updateExperience(i, "startDate", e.target.value)} className="bg-muted/50 border-border" />
+                        {!exp.isCurrent && <Input type="month" value={exp.endDate} onChange={(e) => updateExperience(i, "endDate", e.target.value)} className="bg-muted/50 border-border" />}
                       </div>
                       <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
                         <input type="checkbox" checked={exp.isCurrent} onChange={(e) => updateExperience(i, "isCurrent", e.target.checked)} className="accent-primary" />
@@ -789,11 +789,11 @@ export default function Resume() {
                         placeholder="Describe accomplishments with specific numbers (e.g., 'Increased revenue by 35% through...')"
                         value={exp.description}
                         onChange={(e) => updateExperience(i, "description", e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white placeholder:text-muted-foreground/50 min-h-[80px] resize-none text-sm focus:outline-none focus:border-primary/50"
+                        className="w-full bg-muted/50 border border-border rounded-lg p-3 text-foreground placeholder:text-muted-foreground/50 min-h-[80px] resize-none text-sm focus:outline-none focus:border-primary/50"
                       />
                     </div>
                   ))}
-                  <Button variant="outline" className="w-full border-dashed border-white/20 text-muted-foreground" onClick={() => setResume(prev => ({ ...prev, experiences: [...prev.experiences, { ...emptyExperience }] }))}>
+                  <Button variant="outline" className="w-full border-dashed border-border text-muted-foreground" onClick={() => setResume(prev => ({ ...prev, experiences: [...prev.experiences, { ...emptyExperience }] }))}>
                     <Plus className="w-4 h-4 mr-2" /> Add Experience
                   </Button>
                 </div>
@@ -812,18 +812,18 @@ export default function Resume() {
                           </button>
                         )}
                       </div>
-                      <Input placeholder="School / University" value={edu.school} onChange={(e) => updateEducation(i, "school", e.target.value)} className="bg-white/5 border-white/10" />
+                      <Input placeholder="School / University" value={edu.school} onChange={(e) => updateEducation(i, "school", e.target.value)} className="bg-muted/50 border-border" />
                       <div className="grid grid-cols-2 gap-3">
-                        <Input placeholder="Degree" value={edu.degree} onChange={(e) => updateEducation(i, "degree", e.target.value)} className="bg-white/5 border-white/10" />
-                        <Input placeholder="Field of Study" value={edu.field} onChange={(e) => updateEducation(i, "field", e.target.value)} className="bg-white/5 border-white/10" />
+                        <Input placeholder="Degree" value={edu.degree} onChange={(e) => updateEducation(i, "degree", e.target.value)} className="bg-muted/50 border-border" />
+                        <Input placeholder="Field of Study" value={edu.field} onChange={(e) => updateEducation(i, "field", e.target.value)} className="bg-muted/50 border-border" />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
-                        <Input type="month" value={edu.startDate} onChange={(e) => updateEducation(i, "startDate", e.target.value)} className="bg-white/5 border-white/10" />
-                        <Input type="month" value={edu.endDate} onChange={(e) => updateEducation(i, "endDate", e.target.value)} className="bg-white/5 border-white/10" />
+                        <Input type="month" value={edu.startDate} onChange={(e) => updateEducation(i, "startDate", e.target.value)} className="bg-muted/50 border-border" />
+                        <Input type="month" value={edu.endDate} onChange={(e) => updateEducation(i, "endDate", e.target.value)} className="bg-muted/50 border-border" />
                       </div>
                     </div>
                   ))}
-                  <Button variant="outline" className="w-full border-dashed border-white/20 text-muted-foreground" onClick={() => setResume(prev => ({ ...prev, education: [...prev.education, { ...emptyEducation }] }))}>
+                  <Button variant="outline" className="w-full border-dashed border-border text-muted-foreground" onClick={() => setResume(prev => ({ ...prev, education: [...prev.education, { ...emptyEducation }] }))}>
                     <Plus className="w-4 h-4 mr-2" /> Add Education
                   </Button>
                 </div>
@@ -838,9 +838,9 @@ export default function Resume() {
                       value={skillInput}
                       onChange={(e) => setSkillInput(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill())}
-                      className="bg-white/5 border-white/10"
+                      className="bg-muted/50 border-border"
                     />
-                    <Button variant="outline" className="border-white/20 shrink-0" onClick={addSkill}><Plus className="w-4 h-4" /></Button>
+                    <Button variant="outline" className="border-border shrink-0" onClick={addSkill}><Plus className="w-4 h-4" /></Button>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {resume.skills.map((skill, i) => (
@@ -864,9 +864,9 @@ export default function Resume() {
                       value={certInput}
                       onChange={(e) => setCertInput(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCert())}
-                      className="bg-white/5 border-white/10"
+                      className="bg-muted/50 border-border"
                     />
-                    <Button variant="outline" className="border-white/20 shrink-0" onClick={addCert}><Plus className="w-4 h-4" /></Button>
+                    <Button variant="outline" className="border-border shrink-0" onClick={addCert}><Plus className="w-4 h-4" /></Button>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {resume.certifications.map((cert, i) => (
@@ -1009,7 +1009,7 @@ export default function Resume() {
 
 function SectionHeader({ title, icon, expanded, onToggle }: { title: string; icon: React.ReactNode; expanded: boolean; onToggle: () => void }) {
   return (
-    <button onClick={onToggle} className="w-full flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 transition-colors">
+    <button onClick={onToggle} className="w-full flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border hover:border-border transition-colors">
       <span className="flex items-center gap-2 text-sm font-medium">{icon} {title}</span>
       {expanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
     </button>

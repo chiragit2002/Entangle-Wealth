@@ -234,7 +234,7 @@ export default function Achievements() {
                   </div>
                   <div className="text-center">
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Tier</p>
-                    <p className={`text-xl font-bold ${TIER_COLORS[gamification.xp.tier] ? "bg-gradient-to-r bg-clip-text text-transparent " + TIER_COLORS[gamification.xp.tier] : "text-white"}`}>
+                    <p className={`text-xl font-bold ${TIER_COLORS[gamification.xp.tier] ? "bg-gradient-to-r bg-clip-text text-transparent " + TIER_COLORS[gamification.xp.tier] : "text-foreground"}`}>
                       {gamification.xp.tier}
                     </p>
                   </div>
@@ -267,14 +267,14 @@ export default function Achievements() {
         <div className="flex gap-2 mb-6">
           <Button
             variant={activeTab === "badges" ? "default" : "outline"}
-            className={activeTab === "badges" ? "bg-primary text-primary-foreground" : "border-white/10"}
+            className={activeTab === "badges" ? "bg-primary text-primary-foreground" : "border-border"}
             onClick={() => setActiveTab("badges")}
           >
             <Award className="w-4 h-4 mr-2" /> Badges ({earnedCount}/{badges.length})
           </Button>
           <Button
             variant={activeTab === "challenges" ? "default" : "outline"}
-            className={activeTab === "challenges" ? "bg-primary text-primary-foreground" : "border-white/10"}
+            className={activeTab === "challenges" ? "bg-primary text-primary-foreground" : "border-border"}
             onClick={() => setActiveTab("challenges")}
           >
             <Target className="w-4 h-4 mr-2" /> Challenges
@@ -289,7 +289,7 @@ export default function Achievements() {
                   key={cat}
                   size="sm"
                   variant={badgeFilter === cat ? "default" : "outline"}
-                  className={`text-xs ${badgeFilter === cat ? "bg-primary/20 text-primary border-primary/30" : "border-white/10"}`}
+                  className={`text-xs ${badgeFilter === cat ? "bg-primary/20 text-primary border-primary/30" : "border-border"}`}
                   onClick={() => setBadgeFilter(cat)}
                 >
                   {cat === "All" ? "All" : cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -316,8 +316,8 @@ export default function Achievements() {
                   )}
                   <div className={`w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center border ${
                     badge.earned
-                      ? CATEGORY_COLORS[badge.category] || "text-white bg-white/10 border-white/20"
-                      : "text-white/40 bg-white/5 border-white/10"
+                      ? CATEGORY_COLORS[badge.category] || "text-foreground bg-muted border-border"
+                      : "text-muted-foreground/70 bg-muted/50 border-border"
                   }`}>
                     {badge.isSecret && !badge.earned ? (
                       <Lock className="w-6 h-6" />
@@ -458,18 +458,18 @@ function ChallengeCard({ challenge }: { challenge: ChallengeData }) {
         </div>
       </div>
       <div className="flex items-center gap-3 mb-2">
-        <div className="flex-1 bg-white/5 rounded-full h-2">
+        <div className="flex-1 bg-muted/50 rounded-full h-2">
           <div
             className={`h-2 rounded-full transition-all ${challenge.completed ? "bg-[#00B4D8]" : urgent ? "bg-orange-400" : "bg-primary"}`}
             style={{ width: `${progressPercent}%` }}
           />
         </div>
-        <span className="text-xs font-mono text-white/40">{challenge.progress}/{challenge.target}</span>
+        <span className="text-xs font-mono text-muted-foreground/70">{challenge.progress}/{challenge.target}</span>
       </div>
       {!challenge.completed && (
         <div className="flex items-center gap-1.5">
-          <Clock className="w-3 h-3 text-white/30 flex-shrink-0" />
-          <span className={`text-[10px] font-mono ${urgent ? "text-orange-400 font-bold" : "text-white/30"}`}>
+          <Clock className="w-3 h-3 text-muted-foreground/50 flex-shrink-0" />
+          <span className={`text-[10px] font-mono ${urgent ? "text-orange-400 font-bold" : "text-muted-foreground/50"}`}>
             {formatTimeLeft(msLeft)} remaining
           </span>
           {urgent && multiplier > 1 && (

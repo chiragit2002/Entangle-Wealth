@@ -23,9 +23,9 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 function PanelHeader({ title, icon, color = "cyan", rightContent }: { title: string; icon?: React.ReactNode; color?: string; rightContent?: React.ReactNode }) {
   const borderColor = color === "cyan" ? "border-l-[#00B4D8]" : color === "gold" ? "border-l-[#FFB800]" : color === "green" ? "border-l-[#00B4D8]" : color === "red" ? "border-l-[#ff3366]" : color === "purple" ? "border-l-[#9c27b0]" : "border-l-white/20";
-  const textColor = color === "cyan" ? "text-[#00B4D8]" : color === "gold" ? "text-[#FFB800]" : color === "green" ? "text-[#00B4D8]" : color === "red" ? "text-[#ff3366]" : color === "purple" ? "text-[#9c27b0]" : "text-white/60";
+  const textColor = color === "cyan" ? "text-[#00B4D8]" : color === "gold" ? "text-[#FFB800]" : color === "green" ? "text-[#00B4D8]" : color === "red" ? "text-[#ff3366]" : color === "purple" ? "text-[#9c27b0]" : "text-muted-foreground";
   return (
-    <div className={`flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 ${borderColor}`}>
+    <div className={`flex items-center justify-between px-2 py-1.5 bg-muted/30 border-b border-border border-l-2 ${borderColor}`}>
       <div className="flex items-center gap-1.5">
         {icon && <span className={textColor}>{icon}</span>}
         <span className={`text-[10px] font-bold uppercase tracking-widest font-mono ${textColor}`}>{title}</span>
@@ -37,7 +37,7 @@ function PanelHeader({ title, icon, color = "cyan", rightContent }: { title: str
 
 function BloombergPanel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden ${className}`}>
+    <div className={`bg-card border border-border rounded-sm overflow-hidden ${className}`}>
       {children}
     </div>
   );
@@ -64,11 +64,11 @@ function MobilePanelTabs({ activeTab, onTabChange }: { activeTab: MobileTab; onT
   };
 
   return (
-    <div className="flex items-center bg-[#040408] border-b border-white/[0.06] px-1 gap-0.5 min-h-[44px]">
+    <div className="flex items-center bg-background border-b border-border px-1 gap-0.5 min-h-[44px]">
       <button
         onClick={goPrev}
         disabled={activeIndex === 0}
-        className="w-11 h-11 flex items-center justify-center text-white/30 disabled:opacity-20 hover:text-white/60 transition-colors flex-shrink-0"
+        className="w-11 h-11 flex items-center justify-center text-muted-foreground/50 disabled:opacity-20 hover:text-muted-foreground transition-colors flex-shrink-0"
         aria-label="Previous panel"
       >
         <ChevronLeft className="w-3.5 h-3.5" />
@@ -84,7 +84,7 @@ function MobilePanelTabs({ activeTab, onTabChange }: { activeTab: MobileTab; onT
               className={`flex-shrink-0 flex items-center gap-1 px-2.5 min-h-[44px] rounded-sm text-[9px] font-mono font-bold uppercase tracking-widest transition-all ${
                 isActive
                   ? "bg-[#00B4D8]/10 text-[#00B4D8] border border-[#00B4D8]/30"
-                  : "text-white/35 hover:text-white/60 border border-transparent"
+                  : "text-muted-foreground/60 hover:text-muted-foreground border border-transparent"
               }`}
               aria-current={isActive ? "true" : undefined}
             >
@@ -97,12 +97,12 @@ function MobilePanelTabs({ activeTab, onTabChange }: { activeTab: MobileTab; onT
       <button
         onClick={goNext}
         disabled={activeIndex === MOBILE_TABS.length - 1}
-        className="w-11 h-11 flex items-center justify-center text-white/30 disabled:opacity-20 hover:text-white/60 transition-colors flex-shrink-0"
+        className="w-11 h-11 flex items-center justify-center text-muted-foreground/50 disabled:opacity-20 hover:text-muted-foreground transition-colors flex-shrink-0"
         aria-label="Next panel"
       >
         <ChevronRight className="w-3.5 h-3.5" />
       </button>
-      <span className="text-[8px] font-mono text-white/20 pr-1 shrink-0">{activeIndex + 1}/{MOBILE_TABS.length}</span>
+      <span className="text-[8px] font-mono text-muted-foreground/40 pr-1 shrink-0">{activeIndex + 1}/{MOBILE_TABS.length}</span>
     </div>
   );
 }
@@ -118,7 +118,7 @@ function MobileTerminalView({ portfolioRefreshKey, handleSpinBalanceChange, onOp
         {activeTab === "terminal" && (
           <BloombergPanel>
             <PanelHeader title="MIROFISH TERMINAL" icon={<TerminalIcon className="w-3 h-3" />} color="cyan" rightContent={
-              <span className="text-[8px] font-mono text-white/40">Type <span className="text-[#00B4D8]/50">help</span> for commands</span>
+              <span className="text-[8px] font-mono text-muted-foreground/70">Type <span className="text-[#00B4D8]/50">help</span> for commands</span>
             } />
             <MirofishTerminal />
           </BloombergPanel>
@@ -163,7 +163,7 @@ function MobileTerminalView({ portfolioRefreshKey, handleSpinBalanceChange, onOp
             <BloombergPanel>
               <PanelHeader title="DAILY SPIN" icon={<Clock className="w-3 h-3" />} color="gold" />
               <div className="p-4 flex flex-col items-center gap-3">
-                <p className="text-[10px] font-mono text-white/40 text-center">Spin the wheel daily to earn XP, multipliers, and streak protection.</p>
+                <p className="text-[10px] font-mono text-muted-foreground/70 text-center">Spin the wheel daily to earn XP, multipliers, and streak protection.</p>
                 <button
                   onClick={onOpenSpinWheel}
                   className="px-6 py-2 bg-gradient-to-r from-[#FFB800] to-[#f59e0b] text-black text-[11px] font-bold font-mono rounded-lg tracking-wider shadow-lg shadow-[#FFB800]/20 hover:opacity-90 transition-opacity"
@@ -220,8 +220,8 @@ function ConnectionStatusBadge({ status }: { status: ConnectionStatus }) {
   }
   return (
     <div className="hidden sm:flex items-center gap-1.5" title="Connecting...">
-      <RefreshCw className="w-3 h-3 text-white/30 animate-spin" />
-      <span className="text-[9px] font-mono text-white/30 uppercase tracking-wider">CONNECTING</span>
+      <RefreshCw className="w-3 h-3 text-muted-foreground/50 animate-spin" />
+      <span className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">CONNECTING</span>
     </div>
   );
 }
@@ -310,14 +310,14 @@ export default function Terminal() {
       <FlashCouncil />
       <MarketTicker />
 
-      <div className="bg-[#040408] border-b border-white/[0.06] px-3 py-1.5 flex items-center justify-between">
+      <div className="bg-background border-b border-border px-3 py-1.5 flex items-center justify-between">
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <div className="flex items-center gap-1.5 shrink-0">
             <TerminalIcon className="w-3.5 h-3.5 text-[#00B4D8]" />
             <span className="text-[11px] font-mono font-bold text-[#00B4D8] tracking-wider hidden sm:inline">ANALYSIS TERMINAL v3.0</span>
             <span className="text-[11px] font-mono font-bold text-[#00B4D8] tracking-wider sm:hidden">TERMINAL v3.0</span>
           </div>
-          <div className="h-3 w-px bg-white/10 hidden sm:block" />
+          <div className="h-3 w-px bg-muted hidden sm:block" />
           <div className="flex items-center gap-1.5">
             <span className="relative flex h-2 w-2">
               <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isMarketOpen ? 'bg-[#00B4D8]' : 'bg-[#FFB800]'} opacity-75`} />
@@ -327,27 +327,27 @@ export default function Terminal() {
               {isMarketOpen ? "MARKET OPEN" : "MARKET CLOSED"}
             </span>
           </div>
-          <span className="text-[9px] font-mono text-white/30 hidden lg:inline">7 AI MODELS · MULTI-PANEL</span>
+          <span className="text-[9px] font-mono text-muted-foreground/50 hidden lg:inline">7 AI MODELS · MULTI-PANEL</span>
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <ConnectionStatusBadge status={priceStatus} />
-          <button onClick={() => setShowShortcuts(v => !v)} aria-label="Show keyboard shortcuts" className="hidden sm:flex items-center gap-1 text-[9px] font-mono text-white/40 hover:text-white/40 transition-colors">
+          <button onClick={() => setShowShortcuts(v => !v)} aria-label="Show keyboard shortcuts" className="hidden sm:flex items-center gap-1 text-[9px] font-mono text-muted-foreground/70 hover:text-muted-foreground/70 transition-colors">
             <Keyboard className="w-3 h-3" />
             <span>?</span>
           </button>
           <div className="flex items-center gap-1.5">
-            <Clock className="w-3 h-3 text-white/40" />
-            <span className="text-[11px] font-mono font-bold text-white/60 tabular-nums">{clock}</span>
+            <Clock className="w-3 h-3 text-muted-foreground/70" />
+            <span className="text-[11px] font-mono font-bold text-muted-foreground tabular-nums">{clock}</span>
           </div>
         </div>
       </div>
 
       {showShortcuts && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onClick={() => setShowShortcuts(false)} role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
-          <div className="bg-[#0a0a14] border border-white/10 rounded-sm p-6 max-w-md w-full mx-4" onClick={e => e.stopPropagation()}>
+          <div className="bg-card border border-border rounded-sm p-6 max-w-md w-full mx-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <span className="text-[12px] font-mono font-bold text-[#00B4D8] tracking-wider">KEYBOARD SHORTCUTS</span>
-              <button onClick={() => setShowShortcuts(false)} aria-label="Close shortcuts" className="text-white/50 hover:text-white/40"><X className="w-4 h-4" /></button>
+              <button onClick={() => setShowShortcuts(false)} aria-label="Close shortcuts" className="text-muted-foreground hover:text-muted-foreground/70"><X className="w-4 h-4" /></button>
             </div>
             <div className="space-y-1">
               {[
@@ -356,8 +356,8 @@ export default function Terminal() {
                 ["?", "Toggle shortcuts"], ["Esc", "Close"],
               ].map(([key, desc]) => (
                 <div key={key} className="flex items-center gap-3 py-1">
-                  <kbd className="min-w-[28px] text-center px-1.5 py-0.5 bg-white/[0.04] border border-white/10 rounded-sm text-[10px] font-mono font-bold text-white/60">{key}</kbd>
-                  <span className="text-[10px] text-white/50">{desc}</span>
+                  <kbd className="min-w-[28px] text-center px-1.5 py-0.5 bg-muted/50 border border-border rounded-sm text-[10px] font-mono font-bold text-muted-foreground">{key}</kbd>
+                  <span className="text-[10px] text-muted-foreground">{desc}</span>
                 </div>
               ))}
             </div>
@@ -376,7 +376,7 @@ export default function Terminal() {
           <div className="mb-1.5">
             <BloombergPanel>
               <PanelHeader title="MIROFISH TERMINAL" icon={<TerminalIcon className="w-3 h-3" />} color="cyan" rightContent={
-                <span className="text-[8px] font-mono text-white/40">Type <span className="text-[#00B4D8]/50">help</span> to see all commands</span>
+                <span className="text-[8px] font-mono text-muted-foreground/70">Type <span className="text-[#00B4D8]/50">help</span> to see all commands</span>
               } />
               <div className="p-0">
                 <MirofishTerminal />
@@ -420,7 +420,7 @@ export default function Terminal() {
             <BloombergPanel>
               <PanelHeader title="DAILY SPIN" icon={<Clock className="w-3 h-3" />} color="gold" />
               <div className="p-4 flex flex-col items-center justify-center gap-3 min-h-[120px]">
-                <p className="text-[10px] font-mono text-white/40 text-center">Spin the wheel daily to earn XP, multipliers, and streak shields.</p>
+                <p className="text-[10px] font-mono text-muted-foreground/70 text-center">Spin the wheel daily to earn XP, multipliers, and streak shields.</p>
                 <button
                   onClick={() => setShowSpinWheel(true)}
                   className="px-8 py-2.5 bg-gradient-to-r from-[#FFB800] to-[#f59e0b] text-black text-[11px] font-bold font-mono rounded-lg tracking-wider shadow-lg shadow-[#FFB800]/20 hover:opacity-90 transition-opacity"
@@ -441,15 +441,15 @@ export default function Terminal() {
             <TradeFlowPanel />
           </div>
 
-          <div className="flex items-center justify-between px-2 py-1 bg-[#0A0E1A] border border-white/[0.04] rounded-sm">
-            <div className="flex items-center gap-4 text-[8px] font-mono text-white/40">
+          <div className="flex items-center justify-between px-2 py-1 bg-card border border-border rounded-sm">
+            <div className="flex items-center gap-4 text-[8px] font-mono text-muted-foreground/70">
               <span>ENTANGLEWEALTH TERMINAL v3.0</span>
               <span>·</span>
               <span>7 AI MODELS</span>
               <span>·</span>
               <span>REAL-TIME ANALYSIS</span>
             </div>
-            <span className="text-[7px] font-mono text-white/10">Demo data · Not financial advice · Press ? for shortcuts</span>
+            <span className="text-[7px] font-mono text-muted-foreground/20">Demo data · Not financial advice · Press ? for shortcuts</span>
           </div>
           <div className="mt-2 flex justify-end">
             <MicroFeedback context="ai_terminal" label="Was the terminal helpful?" />

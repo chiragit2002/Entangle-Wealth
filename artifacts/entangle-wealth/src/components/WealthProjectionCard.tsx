@@ -35,7 +35,7 @@ export function WealthProjectionCard({ jobTitle, currentIncome = 60000, newIncom
   return (
     <div
       className={`relative rounded-xl overflow-hidden ${className}`}
-      style={{ border: `1px solid ${color}25`, background: "rgba(8,8,18,0.97)" }}
+      style={{ border: `1px solid ${color}25`, background: "var(--glass-bg)" }}
     >
       <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(135deg, ${color}06 0%, transparent 60%)` }} />
       <div className="absolute top-0 left-0 right-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${color}50, transparent)` }} />
@@ -46,11 +46,11 @@ export function WealthProjectionCard({ jobTitle, currentIncome = 60000, newIncom
             <GitBranch className="w-3.5 h-3.5" style={{ color }} />
           </div>
           <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color }}>What This Means For Your Wealth</span>
-          <span className="text-[9px] text-white/25 font-mono ml-1">Career → Timeline</span>
+          <span className="text-[9px] text-muted-foreground/40 font-mono ml-1">Career → Timeline</span>
         </div>
 
-        <p className="text-xs text-white/60 mb-3">
-          <span className="font-semibold text-white/80">{jobTitle}</span>
+        <p className="text-xs text-muted-foreground mb-3">
+          <span className="font-semibold text-foreground/80">{jobTitle}</span>
           {incomeIncrease > 0 ? (
             <> adds <span style={{ color }} className="font-semibold">+${incomeIncrease.toLocaleString()}/yr</span> to your income — here's the compounding effect at 15% savings rate:</>
           ) : (
@@ -60,15 +60,15 @@ export function WealthProjectionCard({ jobTitle, currentIncome = 60000, newIncom
 
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div className="rounded-lg p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-            <p className="text-[9px] text-white/40 uppercase tracking-wider mb-2">Current Path</p>
+            <p className="text-[9px] text-muted-foreground/70 uppercase tracking-wider mb-2">Current Path</p>
             <div className="space-y-1">
               <div className="flex justify-between">
-                <span className="text-[10px] text-white/40">10yr</span>
-                <span className="text-[10px] font-mono text-white/60">{fmt(current10)}</span>
+                <span className="text-[10px] text-muted-foreground/70">10yr</span>
+                <span className="text-[10px] font-mono text-muted-foreground">{fmt(current10)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[10px] text-white/40">20yr</span>
-                <span className="text-[10px] font-mono text-white/60">{fmt(current20)}</span>
+                <span className="text-[10px] text-muted-foreground/70">20yr</span>
+                <span className="text-[10px] font-mono text-muted-foreground">{fmt(current20)}</span>
               </div>
             </div>
           </div>
@@ -76,11 +76,11 @@ export function WealthProjectionCard({ jobTitle, currentIncome = 60000, newIncom
             <p className="text-[9px] uppercase tracking-wider mb-2" style={{ color }}>With This Income</p>
             <div className="space-y-1">
               <div className="flex justify-between">
-                <span className="text-[10px] text-white/40">10yr</span>
+                <span className="text-[10px] text-muted-foreground/70">10yr</span>
                 <span className="text-[10px] font-mono font-bold" style={{ color }}>{fmt(new10)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[10px] text-white/40">20yr</span>
+                <span className="text-[10px] text-muted-foreground/70">20yr</span>
                 <span className="text-[10px] font-mono font-bold" style={{ color }}>{fmt(new20)}</span>
               </div>
             </div>

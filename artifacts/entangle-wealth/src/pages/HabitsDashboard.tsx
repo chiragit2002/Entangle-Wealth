@@ -249,16 +249,16 @@ export default function HabitsDashboard() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#0a0a14] text-white">
+      <div className="min-h-screen bg-card text-foreground">
         <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-white">Daily Habit Dashboard</h1>
-              <p className="text-white/50 text-sm mt-1">Build financial habits. Earn XP. Change your life.</p>
+              <h1 className="text-3xl font-bold text-foreground">Daily Habit Dashboard</h1>
+              <p className="text-muted-foreground text-sm mt-1">Build financial habits. Earn XP. Change your life.</p>
             </div>
             <button
               onClick={fetchHabits}
-              className="flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
               Refresh
@@ -267,38 +267,38 @@ export default function HabitsDashboard() {
 
           {summary && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 flex flex-col items-center">
+              <div className="bg-muted/50 border border-border rounded-xl p-4 flex flex-col items-center">
                 <div className="relative mb-2">
                   <ProgressRing value={completedToday} max={totalToday} size={64} color="#00B4D8" />
-                  <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white">
+                  <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-foreground">
                     {completedToday}/{totalToday}
                   </span>
                 </div>
-                <p className="text-xs text-white/50">Today's Actions</p>
+                <p className="text-xs text-muted-foreground">Today's Actions</p>
               </div>
 
-              <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center gap-1">
+              <div className="bg-muted/50 border border-border rounded-xl p-4 flex flex-col items-center justify-center gap-1">
                 <div className="flex items-center gap-1.5">
                   <Flame className="w-5 h-5 text-orange-400" />
-                  <span className="text-2xl font-bold text-white">{summary.maxCurrentStreak}</span>
+                  <span className="text-2xl font-bold text-foreground">{summary.maxCurrentStreak}</span>
                 </div>
-                <p className="text-xs text-white/50">Best Streak</p>
+                <p className="text-xs text-muted-foreground">Best Streak</p>
               </div>
 
-              <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center gap-1">
+              <div className="bg-muted/50 border border-border rounded-xl p-4 flex flex-col items-center justify-center gap-1">
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-5 h-5 text-amber-500" />
-                  <span className="text-2xl font-bold text-white">{summary.completedThisWeek}</span>
+                  <span className="text-2xl font-bold text-foreground">{summary.completedThisWeek}</span>
                 </div>
-                <p className="text-xs text-white/50">This Week</p>
+                <p className="text-xs text-muted-foreground">This Week</p>
               </div>
 
-              <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center gap-1">
+              <div className="bg-muted/50 border border-border rounded-xl p-4 flex flex-col items-center justify-center gap-1">
                 <div className="flex items-center gap-1.5">
                   <Trophy className="w-5 h-5 text-amber-400" />
-                  <span className="text-2xl font-bold text-white">{summary.totalLifetimeCompletions}</span>
+                  <span className="text-2xl font-bold text-foreground">{summary.totalLifetimeCompletions}</span>
                 </div>
-                <p className="text-xs text-white/50">Total Actions</p>
+                <p className="text-xs text-muted-foreground">Total Actions</p>
               </div>
             </div>
           )}
@@ -311,7 +311,7 @@ export default function HabitsDashboard() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all ${
                   activeCategory === cat
                     ? "bg-[#00B4D8] text-black"
-                    : "bg-white/[0.04] text-white/50 hover:text-white hover:bg-white/[0.08] border border-white/10"
+                    : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted border border-border"
                 }`}
               >
                 {cat}
@@ -322,27 +322,27 @@ export default function HabitsDashboard() {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-44 bg-white/[0.04] rounded-xl animate-pulse border border-white/10" />
+                <div key={i} className="h-44 bg-muted/50 rounded-xl animate-pulse border border-border" />
               ))}
             </div>
           ) : fetchError ? (
-            <div className="text-center py-16 bg-white/[0.02] border border-red-500/20 rounded-xl">
+            <div className="text-center py-16 bg-muted/30 border border-red-500/20 rounded-xl">
               <AlertTriangle className="w-10 h-10 text-red-400/60 mx-auto mb-3" />
-              <p className="text-white/60 text-sm font-medium">Failed to load habits</p>
-              <p className="text-white/30 text-xs mt-1 mb-4">There was a problem connecting to the server.</p>
+              <p className="text-muted-foreground text-sm font-medium">Failed to load habits</p>
+              <p className="text-muted-foreground/50 text-xs mt-1 mb-4">There was a problem connecting to the server.</p>
               <button onClick={fetchHabits} className="text-xs text-[#00B4D8] hover:underline">Try again</button>
             </div>
           ) : filteredHabits.length === 0 ? (
-            <div className="text-center py-16 bg-white/[0.02] border border-white/[0.06] rounded-xl">
-              <Target className="w-10 h-10 text-white/10 mx-auto mb-3" />
+            <div className="text-center py-16 bg-muted/30 border border-border rounded-xl">
+              <Target className="w-10 h-10 text-muted-foreground/20 mx-auto mb-3" />
               {activeCategory === "all" ? (
                 <>
-                  <p className="text-[11px] font-mono text-white/25">&gt; NO HABITS TRACKED</p>
-                  <p className="text-[9px] font-mono text-white/15 mt-1">Habits refresh regularly — check back soon</p>
+                  <p className="text-[11px] font-mono text-muted-foreground/40">&gt; NO HABITS TRACKED</p>
+                  <p className="text-[9px] font-mono text-muted-foreground/30 mt-1">Habits refresh regularly — check back soon</p>
                 </>
               ) : (
                 <>
-                  <p className="text-[11px] font-mono text-white/25">&gt; NO HABITS IN "{activeCategory.toUpperCase()}"</p>
+                  <p className="text-[11px] font-mono text-muted-foreground/40">&gt; NO HABITS IN "{activeCategory.toUpperCase()}"</p>
                   <button onClick={() => setActiveCategory("all")} className="mt-3 text-xs text-[#00B4D8] hover:underline">View all habits</button>
                 </>
               )}
@@ -351,15 +351,15 @@ export default function HabitsDashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredHabits.map(habit => {
                 const IconComp = ICON_MAP[habit.icon] || Target;
-                const cardStyle = CATEGORY_COLORS[habit.category] || "border-white/10 bg-white/[0.04]";
-                const badgeStyle = CATEGORY_BADGE_COLORS[habit.category] || "bg-white/10 text-white/60";
+                const cardStyle = CATEGORY_COLORS[habit.category] || "border-border bg-muted/50";
+                const badgeStyle = CATEGORY_BADGE_COLORS[habit.category] || "bg-muted text-muted-foreground";
                 const isCompleting = completing === habit.id;
 
                 return (
                   <div
                     key={habit.id}
                     className={`border rounded-xl p-5 space-y-3 transition-all ${cardStyle} ${
-                      habit.completedToday ? "opacity-70" : "hover:border-white/20"
+                      habit.completedToday ? "opacity-70" : "hover:border-border"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -368,7 +368,7 @@ export default function HabitsDashboard() {
                           <IconComp className="w-5 h-5" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-white text-sm leading-tight">{habit.title}</h3>
+                          <h3 className="font-semibold text-foreground text-sm leading-tight">{habit.title}</h3>
                           <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${badgeStyle}`}>
                             {habit.category}
                           </span>
@@ -377,10 +377,10 @@ export default function HabitsDashboard() {
                       <StreakBadge streak={habit.currentStreak} />
                     </div>
 
-                    <p className="text-white/50 text-xs leading-relaxed">{habit.description}</p>
+                    <p className="text-muted-foreground text-xs leading-relaxed">{habit.description}</p>
 
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 text-xs text-white/40">
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground/70">
                         <span className="flex items-center gap-1">
                           <Zap className="w-3 h-3 text-[#00B4D8]" />
                           +{habit.xpReward} XP
@@ -429,38 +429,38 @@ export default function HabitsDashboard() {
           )}
 
           {!isSignedIn && (
-            <div className="text-center py-8 bg-white/[0.04] border border-white/10 rounded-xl">
+            <div className="text-center py-8 bg-muted/50 border border-border rounded-xl">
               <Zap className="w-8 h-8 text-[#00B4D8] mx-auto mb-3" />
-              <h3 className="text-white font-semibold mb-1">Sign in to track your habits</h3>
-              <p className="text-white/50 text-sm">Earn XP, build streaks, and connect your habits to your financial goals.</p>
+              <h3 className="text-foreground font-semibold mb-1">Sign in to track your habits</h3>
+              <p className="text-muted-foreground text-sm">Earn XP, build streaks, and connect your habits to your financial goals.</p>
             </div>
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
             <Link href="/life-outcomes">
-              <a className="group flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.04] hover:border-[#00B4D8]/40 hover:bg-[#00B4D8]/5 transition-all cursor-pointer">
+              <a className="group flex items-center gap-3 p-4 rounded-xl border border-border bg-muted/50 hover:border-[#00B4D8]/40 hover:bg-[#00B4D8]/5 transition-all cursor-pointer">
                 <TrendingUp className="w-8 h-8 text-[#00B4D8] flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <div>
-                  <p className="text-white font-medium text-sm">Life Outcomes</p>
-                  <p className="text-white/50 text-xs">See your habit impact projected forward</p>
+                  <p className="text-foreground font-medium text-sm">Life Outcomes</p>
+                  <p className="text-muted-foreground text-xs">See your habit impact projected forward</p>
                 </div>
               </a>
             </Link>
             <Link href="/ai-coach">
-              <a className="group flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.04] hover:border-purple-500/40 hover:bg-purple-500/5 transition-all cursor-pointer">
+              <a className="group flex items-center gap-3 p-4 rounded-xl border border-border bg-muted/50 hover:border-purple-500/40 hover:bg-purple-500/5 transition-all cursor-pointer">
                 <Activity className="w-8 h-8 text-purple-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <div>
-                  <p className="text-white font-medium text-sm">AI Coach</p>
-                  <p className="text-white/50 text-xs">Get personalized behavioral guidance</p>
+                  <p className="text-foreground font-medium text-sm">AI Coach</p>
+                  <p className="text-muted-foreground text-xs">Get personalized behavioral guidance</p>
                 </div>
               </a>
             </Link>
             <Link href="/alternate-timeline">
-              <a className="group flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.04] hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all cursor-pointer">
+              <a className="group flex items-center gap-3 p-4 rounded-xl border border-border bg-muted/50 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all cursor-pointer">
                 <GitBranch className="w-8 h-8 text-emerald-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <div>
-                  <p className="text-white font-medium text-sm">Alternate Timeline</p>
-                  <p className="text-white/50 text-xs">Model what-if financial decisions</p>
+                  <p className="text-foreground font-medium text-sm">Alternate Timeline</p>
+                  <p className="text-muted-foreground text-xs">Model what-if financial decisions</p>
                 </div>
               </a>
             </Link>

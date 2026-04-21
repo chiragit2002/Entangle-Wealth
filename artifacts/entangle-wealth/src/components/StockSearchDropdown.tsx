@@ -134,10 +134,10 @@ export function StockSearchDropdown({
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
-      <div className={`flex items-center gap-2 bg-white/[0.05] border rounded-lg px-3 py-2.5 ${disabled ? "opacity-50 cursor-not-allowed" : "border-white/10 focus-within:border-[#FF8C00]/40"}`}>
+      <div className={`flex items-center gap-2 bg-muted/50 border rounded-lg px-3 py-2.5 ${disabled ? "opacity-50 cursor-not-allowed" : "border-border focus-within:border-[#FF8C00]/40"}`}>
         {loading
-          ? <Loader2 className="w-4 h-4 text-white/30 animate-spin flex-shrink-0" />
-          : <Search className="w-4 h-4 text-white/30 flex-shrink-0" />
+          ? <Loader2 className="w-4 h-4 text-muted-foreground/50 animate-spin flex-shrink-0" />
+          : <Search className="w-4 h-4 text-muted-foreground/50 flex-shrink-0" />
         }
         <input
           ref={inputRef}
@@ -152,13 +152,13 @@ export function StockSearchDropdown({
           aria-label="Search stocks"
           aria-autocomplete="list"
           aria-expanded={isOpen}
-          className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 focus:outline-none font-mono min-w-0 disabled:cursor-not-allowed"
+          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none font-mono min-w-0 disabled:cursor-not-allowed"
         />
       </div>
 
       {isOpen && results.length > 0 && (
         <div
-          className="absolute top-full left-0 right-0 z-50 mt-1 bg-[#0d0d1a] border border-white/10 rounded-xl overflow-hidden shadow-2xl"
+          className="absolute top-full left-0 right-0 z-50 mt-1 bg-card border border-border rounded-xl overflow-hidden shadow-2xl"
           role="listbox"
           aria-label="Stock search results"
         >
@@ -176,7 +176,7 @@ export function StockSearchDropdown({
                 aria-selected={i === activeIndex}
                 onClick={() => handleSelect(r)}
                 onMouseEnter={() => setActiveIndex(i)}
-                className={`w-full flex items-center justify-between px-3 py-2.5 text-left transition-colors hover:bg-white/[0.05] ${i === activeIndex ? "bg-white/[0.07]" : ""} ${i > 0 ? "border-t border-white/[0.04]" : ""}`}
+                className={`w-full flex items-center justify-between px-3 py-2.5 text-left transition-colors hover:bg-muted/50 ${i === activeIndex ? "bg-white/[0.07]" : ""} ${i > 0 ? "border-t border-border" : ""}`}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-8 h-8 rounded-lg bg-[#FF8C00]/10 flex items-center justify-center flex-shrink-0">
@@ -186,14 +186,14 @@ export function StockSearchDropdown({
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold font-mono text-white">{r.symbol}</span>
-                      <span className="text-[10px] text-white/30 truncate max-w-[120px]">{r.name}</span>
+                      <span className="text-sm font-bold font-mono text-foreground">{r.symbol}</span>
+                      <span className="text-[10px] text-muted-foreground/50 truncate max-w-[120px]">{r.name}</span>
                     </div>
-                    <span className="text-[10px] text-white/20">{r.sector}</span>
+                    <span className="text-[10px] text-muted-foreground/40">{r.sector}</span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end flex-shrink-0 ml-2">
-                  <span className="text-sm font-mono font-bold text-white">{displayPrice(r)}</span>
+                  <span className="text-sm font-mono font-bold text-foreground">{displayPrice(r)}</span>
                   {r.livePrice !== null && (
                     <span className={`text-[10px] font-mono flex items-center gap-0.5 ${r.changePercent >= 0 ? "text-emerald-400" : "text-[#ff3366]"}`}>
                       {r.changePercent >= 0

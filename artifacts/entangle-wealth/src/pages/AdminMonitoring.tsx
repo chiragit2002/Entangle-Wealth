@@ -150,11 +150,11 @@ function StackTrace({
   entries: IssueDetail["latestEvent"];
 }) {
   if (!entries?.entries)
-    return <p className="text-white/30 text-xs">No stack trace available</p>;
+    return <p className="text-muted-foreground/50 text-xs">No stack trace available</p>;
 
   const exceptionEntry = entries.entries.find((e) => e.type === "exception");
   if (!exceptionEntry?.data?.values?.length)
-    return <p className="text-white/30 text-xs">No exception data</p>;
+    return <p className="text-muted-foreground/50 text-xs">No exception data</p>;
 
   const exception = exceptionEntry.data.values[0];
   const frames =
@@ -166,7 +166,7 @@ function StackTrace({
         <p className="text-[#ff3366] text-xs font-mono font-bold">
           {exception.type}
         </p>
-        <p className="text-white/70 text-xs mt-0.5 break-all">
+        <p className="text-foreground/70 text-xs mt-0.5 break-all">
           {exception.value}
         </p>
       </div>
@@ -175,11 +175,11 @@ function StackTrace({
           {frames.reverse().map((frame, i) => (
             <div
               key={i}
-              className="px-3 py-2 bg-white/[0.02] border border-white/[0.06] rounded font-mono text-[10px]"
+              className="px-3 py-2 bg-muted/30 border border-border rounded font-mono text-[10px]"
             >
               <span className="text-[#00B4D8]">{frame.filename}</span>
-              <span className="text-white/40">:{frame.lineNo}</span>
-              <span className="text-white/60"> in </span>
+              <span className="text-muted-foreground/70">:{frame.lineNo}</span>
+              <span className="text-muted-foreground"> in </span>
               <span className="text-[#FFB800]">{frame.function || "?"}</span>
             </div>
           ))}
@@ -227,20 +227,20 @@ function IssueDetailPanel({
   const { issue, latestEvent, tags } = data;
 
   return (
-    <div className="border-t border-white/[0.06] bg-white/[0.01] px-5 py-4 space-y-5">
+    <div className="border-t border-border bg-muted/30 px-5 py-4 space-y-5">
       {issue.metadata?.value && (
         <div>
-          <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">
+          <p className="text-[10px] text-muted-foreground/70 uppercase tracking-wider mb-1">
             Error Message
           </p>
-          <p className="text-white/80 text-xs break-all font-mono bg-white/[0.03] px-3 py-2 rounded-lg border border-white/[0.06]">
+          <p className="text-foreground/80 text-xs break-all font-mono bg-muted/50 px-3 py-2 rounded-lg border border-border">
             {issue.metadata.value}
           </p>
         </div>
       )}
 
       <div>
-        <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">
+        <p className="text-[10px] text-muted-foreground/70 uppercase tracking-wider mb-2">
           Stack Trace
         </p>
         <StackTrace entries={latestEvent} />
@@ -248,25 +248,25 @@ function IssueDetailPanel({
 
       {tags.length > 0 && (
         <div>
-          <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">
+          <p className="text-[10px] text-muted-foreground/70 uppercase tracking-wider mb-2">
             Tag Distribution
           </p>
           <div className="grid grid-cols-2 gap-3">
             {tags.map((tag) => (
               <div
                 key={tag.key}
-                className="bg-white/[0.02] border border-white/[0.06] rounded-lg p-3"
+                className="bg-muted/30 border border-border rounded-lg p-3"
               >
-                <p className="text-[10px] text-white/50 font-mono mb-2">
+                <p className="text-[10px] text-muted-foreground font-mono mb-2">
                   {tag.name || tag.key}
                 </p>
                 <div className="space-y-1">
                   {tag.topValues?.slice(0, 4).map((v) => (
                     <div key={v.value} className="flex items-center gap-2">
-                      <div className="flex-1 text-[10px] text-white/70 truncate font-mono">
+                      <div className="flex-1 text-[10px] text-foreground/70 truncate font-mono">
                         {v.value}
                       </div>
-                      <div className="text-[10px] text-white/40 font-mono">
+                      <div className="text-[10px] text-muted-foreground/70 font-mono">
                         {v.count}
                       </div>
                     </div>
@@ -305,10 +305,10 @@ function IssueRow({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
+    <div className="bg-muted/30 border border-border rounded-xl overflow-hidden">
       <button
         onClick={() => setExpanded((v) => !v)}
-        className="w-full text-left px-5 py-3.5 hover:bg-white/[0.03] transition-colors"
+        className="w-full text-left px-5 py-3.5 hover:bg-muted/50 transition-colors"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
@@ -321,53 +321,53 @@ function IssueRow({
                 </span>
               )}
             </div>
-            <p className="text-sm font-semibold text-white/80 truncate">
+            <p className="text-sm font-semibold text-foreground/80 truncate">
               {issue.title}
             </p>
-            <p className="text-[10px] text-white/30 font-mono mt-0.5 truncate">
+            <p className="text-[10px] text-muted-foreground/50 font-mono mt-0.5 truncate">
               {issue.culprit}
             </p>
           </div>
           <div className="flex items-center gap-4 flex-shrink-0">
             <div className="text-right hidden md:block">
-              <p className="text-sm font-mono font-bold text-white/70">
+              <p className="text-sm font-mono font-bold text-foreground/70">
                 {Number(issue.count).toLocaleString()}
               </p>
-              <p className="text-[10px] text-white/30">events</p>
+              <p className="text-[10px] text-muted-foreground/50">events</p>
             </div>
             <div className="text-right hidden lg:block">
-              <p className="text-xs font-mono text-white/50">
+              <p className="text-xs font-mono text-muted-foreground">
                 {new Date(issue.firstSeen).toLocaleDateString()}
               </p>
-              <p className="text-[10px] text-white/30">first seen</p>
+              <p className="text-[10px] text-muted-foreground/50">first seen</p>
             </div>
             <div className="text-right hidden sm:block">
-              <p className="text-xs font-mono text-white/50">
+              <p className="text-xs font-mono text-muted-foreground">
                 {new Date(issue.lastSeen).toLocaleDateString()}
               </p>
-              <p className="text-[10px] text-white/30">last seen</p>
+              <p className="text-[10px] text-muted-foreground/50">last seen</p>
             </div>
             <div className="text-right hidden md:block">
-              <p className="text-xs font-mono text-white/50">
+              <p className="text-xs font-mono text-muted-foreground">
                 {issue.userCount.toLocaleString()}
               </p>
-              <p className="text-[10px] text-white/30">users</p>
+              <p className="text-[10px] text-muted-foreground/50">users</p>
             </div>
             <span
               className={`hidden sm:inline-flex text-[10px] font-mono px-2 py-0.5 rounded-full border ${
                 issue.status === "resolved"
                   ? "bg-[#00B4D8]/10 text-[#00B4D8] border-[#00B4D8]/30"
                   : issue.status === "ignored"
-                  ? "bg-white/5 text-white/30 border-white/10"
+                  ? "bg-muted/50 text-muted-foreground/50 border-border"
                   : "bg-[#FFB800]/10 text-[#FFB800] border-[#FFB800]/30"
               }`}
             >
               {issue.status}
             </span>
             {expanded ? (
-              <ChevronUp className="w-4 h-4 text-white/30" />
+              <ChevronUp className="w-4 h-4 text-muted-foreground/50" />
             ) : (
-              <ChevronDown className="w-4 h-4 text-white/30" />
+              <ChevronDown className="w-4 h-4 text-muted-foreground/50" />
             )}
           </div>
         </div>
@@ -399,7 +399,7 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
 ];
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
-  if (!active) return <ArrowUpDown className="w-3.5 h-3.5 text-white/20" />;
+  if (!active) return <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground/40" />;
   return dir === "asc" ? (
     <ArrowUp className="w-3.5 h-3.5 text-[#00B4D8]" />
   ) : (
@@ -517,8 +517,8 @@ export default function AdminMonitoring() {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-20 text-center">
-          <RefreshCw className="w-6 h-6 text-white/20 animate-spin mx-auto mb-3" />
-          <p className="text-white/30 text-sm">Checking access...</p>
+          <RefreshCw className="w-6 h-6 text-muted-foreground/40 animate-spin mx-auto mb-3" />
+          <p className="text-muted-foreground/50 text-sm">Checking access...</p>
         </div>
       </Layout>
     );
@@ -548,19 +548,19 @@ export default function AdminMonitoring() {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
             <div>
-              <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                 <Activity className="w-6 h-6 text-[#00B4D8]" />
                 Sentry Monitoring
               </h1>
-              <p className="text-white/40 text-sm mt-1">
+              <p className="text-muted-foreground/70 text-sm mt-1">
                 Live error tracking —{" "}
-                <span className="font-mono text-white/60">{SENTRY_ORG}</span>
+                <span className="font-mono text-muted-foreground">{SENTRY_ORG}</span>
               </p>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
               <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-white/30" />
-                <span className="text-xs text-white/40">Auto-refresh:</span>
+                <Clock className="w-3.5 h-3.5 text-muted-foreground/50" />
+                <span className="text-xs text-muted-foreground/70">Auto-refresh:</span>
                 <div className="flex gap-1">
                   {REFRESH_INTERVALS.map((i) => (
                     <button
@@ -569,7 +569,7 @@ export default function AdminMonitoring() {
                       className={`px-2 py-1 text-xs rounded border transition-colors ${
                         refreshInterval === i.value
                           ? "bg-[#00B4D8]/20 border-[#00B4D8]/50 text-[#00B4D8]"
-                          : "bg-white/[0.03] border-white/10 text-white/40 hover:text-white/70"
+                          : "bg-muted/50 border-border text-muted-foreground/70 hover:text-foreground/70"
                       }`}
                     >
                       {i.label}
@@ -580,7 +580,7 @@ export default function AdminMonitoring() {
               <button
                 onClick={handleRefresh}
                 disabled={isLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white/[0.05] border border-white/10 rounded-lg hover:bg-white/10 transition-colors text-white/60 disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-muted/50 border border-border rounded-lg hover:bg-muted transition-colors text-muted-foreground disabled:opacity-50"
               >
                 <RefreshCw
                   className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`}
@@ -619,15 +619,15 @@ export default function AdminMonitoring() {
             ].map(({ label, value, icon: Icon, color }) => (
               <div
                 key={label}
-                className="bg-[#0A0E1A] border border-white/10 rounded-xl p-4"
+                className="bg-card border border-border rounded-xl p-4"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <Icon className="w-4 h-4" style={{ color }} />
-                  <span className="text-xs text-white/50">{label}</span>
+                  <span className="text-xs text-muted-foreground">{label}</span>
                 </div>
-                <div className="text-2xl font-bold font-mono text-white">
+                <div className="text-2xl font-bold font-mono text-foreground">
                   {summaryQuery.isLoading ? (
-                    <span className="text-white/20 animate-pulse">—</span>
+                    <span className="text-muted-foreground/40 animate-pulse">—</span>
                   ) : (
                     value
                   )}
@@ -637,8 +637,8 @@ export default function AdminMonitoring() {
           </div>
 
           {trendData.length > 0 && (
-            <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-5 mb-8">
-              <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4">
+            <div className="bg-card border border-border rounded-xl p-5 mb-8">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
                 Error Trend — Last 24h
               </h2>
               <ResponsiveContainer width="100%" height={180}>
@@ -673,10 +673,10 @@ export default function AdminMonitoring() {
                       backgroundColor: "#0A0E1A",
                       border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: 8,
-                      color: "#fff",
+                      color: "hsl(var(--foreground))",
                       fontSize: 11,
                     }}
-                    labelStyle={{ color: "rgba(255,255,255,0.5)" }}
+                    labelStyle={{ color: "hsl(var(--muted-foreground))" }}
                   />
                   <Area
                     type="monotone"
@@ -690,72 +690,72 @@ export default function AdminMonitoring() {
             </div>
           )}
 
-          <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-4 mb-4 space-y-3">
+          <div className="bg-card border border-border rounded-xl p-4 mb-4 space-y-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/50" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search issues by title or file..."
-                className="w-full h-9 pl-9 pr-3 text-xs bg-white/[0.04] border border-white/[0.1] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/40"
+                className="w-full h-9 pl-9 pr-3 text-xs bg-muted/50 border border-white/[0.1] rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[#00B4D8]/40"
               />
             </div>
             <div className="flex items-center gap-3 flex-wrap">
               <div>
-                <label className="text-[10px] text-white/30 uppercase tracking-wider block mb-1">
+                <label className="text-[10px] text-muted-foreground/50 uppercase tracking-wider block mb-1">
                   Project
                 </label>
                 <select
                   value={filterProject}
                   onChange={(e) => setFilterProject(e.target.value)}
-                  className="h-8 px-3 text-xs bg-white/[0.04] border border-white/[0.1] rounded-lg text-white focus:outline-none focus:border-[#00B4D8]/40 appearance-none"
+                  className="h-8 px-3 text-xs bg-muted/50 border border-white/[0.1] rounded-lg text-foreground focus:outline-none focus:border-[#00B4D8]/40 appearance-none"
                 >
-                  <option value="all" className="bg-[#0A0E1A]">All Projects</option>
-                  <option value="entangle-wealth-backend" className="bg-[#0A0E1A]">Backend</option>
-                  <option value="entangle-wealth-frontend" className="bg-[#0A0E1A]">Frontend</option>
+                  <option value="all" className="bg-card">All Projects</option>
+                  <option value="entangle-wealth-backend" className="bg-card">Backend</option>
+                  <option value="entangle-wealth-frontend" className="bg-card">Frontend</option>
                 </select>
               </div>
               <div>
-                <label className="text-[10px] text-white/30 uppercase tracking-wider block mb-1">
+                <label className="text-[10px] text-muted-foreground/50 uppercase tracking-wider block mb-1">
                   Level
                 </label>
                 <select
                   value={filterLevel}
                   onChange={(e) => setFilterLevel(e.target.value)}
-                  className="h-8 px-3 text-xs bg-white/[0.04] border border-white/[0.1] rounded-lg text-white focus:outline-none focus:border-[#00B4D8]/40 appearance-none"
+                  className="h-8 px-3 text-xs bg-muted/50 border border-white/[0.1] rounded-lg text-foreground focus:outline-none focus:border-[#00B4D8]/40 appearance-none"
                 >
-                  <option value="all" className="bg-[#0A0E1A]">All Levels</option>
-                  <option value="fatal" className="bg-[#0A0E1A]">Fatal</option>
-                  <option value="error" className="bg-[#0A0E1A]">Error</option>
-                  <option value="warning" className="bg-[#0A0E1A]">Warning</option>
-                  <option value="info" className="bg-[#0A0E1A]">Info</option>
+                  <option value="all" className="bg-card">All Levels</option>
+                  <option value="fatal" className="bg-card">Fatal</option>
+                  <option value="error" className="bg-card">Error</option>
+                  <option value="warning" className="bg-card">Warning</option>
+                  <option value="info" className="bg-card">Info</option>
                 </select>
               </div>
               <div>
-                <label className="text-[10px] text-white/30 uppercase tracking-wider block mb-1">
+                <label className="text-[10px] text-muted-foreground/50 uppercase tracking-wider block mb-1">
                   Status
                 </label>
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="h-8 px-3 text-xs bg-white/[0.04] border border-white/[0.1] rounded-lg text-white focus:outline-none focus:border-[#00B4D8]/40 appearance-none"
+                  className="h-8 px-3 text-xs bg-muted/50 border border-white/[0.1] rounded-lg text-foreground focus:outline-none focus:border-[#00B4D8]/40 appearance-none"
                 >
-                  <option value="unresolved" className="bg-[#0A0E1A]">Unresolved</option>
-                  <option value="resolved" className="bg-[#0A0E1A]">Resolved</option>
-                  <option value="all" className="bg-[#0A0E1A]">All</option>
+                  <option value="unresolved" className="bg-card">Unresolved</option>
+                  <option value="resolved" className="bg-card">Resolved</option>
+                  <option value="all" className="bg-card">All</option>
                 </select>
               </div>
               <div className="ml-auto text-right">
-                <p className="text-[10px] text-white/30">Showing</p>
-                <p className="text-xs font-mono text-white/60">
+                <p className="text-[10px] text-muted-foreground/50">Showing</p>
+                <p className="text-xs font-mono text-muted-foreground">
                   {issuesQuery.isLoading ? "..." : `${sortedAndFiltered.length} issues`}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-1 flex-wrap pt-1 border-t border-white/[0.05]">
-              <span className="text-[10px] text-white/30 mr-1">Sort:</span>
+            <div className="flex items-center gap-1 flex-wrap pt-1 border-t border-border">
+              <span className="text-[10px] text-muted-foreground/50 mr-1">Sort:</span>
               {SORT_OPTIONS.map(({ key, label }) => (
                 <button
                   key={key}
@@ -763,7 +763,7 @@ export default function AdminMonitoring() {
                   className={`flex items-center gap-1 px-2.5 py-1 text-[10px] rounded border transition-colors ${
                     sortKey === key
                       ? "bg-[#00B4D8]/10 border-[#00B4D8]/40 text-[#00B4D8]"
-                      : "bg-white/[0.02] border-white/[0.06] text-white/40 hover:text-white/70"
+                      : "bg-muted/30 border-border text-muted-foreground/70 hover:text-foreground/70"
                   }`}
                 >
                   {label}
@@ -781,12 +781,12 @@ export default function AdminMonitoring() {
                   <p className="text-[#ff3366] text-sm font-semibold">
                     Failed to load Sentry data
                   </p>
-                  <p className="text-white/50 text-xs mt-1 break-all">
+                  <p className="text-muted-foreground text-xs mt-1 break-all">
                     {errorMsg || "Unknown error"}
                   </p>
-                  <p className="text-white/40 text-xs mt-2">
+                  <p className="text-muted-foreground/70 text-xs mt-2">
                     Ensure{" "}
-                    <span className="font-mono text-white/60">SENTRY_AUTH_TOKEN</span>{" "}
+                    <span className="font-mono text-muted-foreground">SENTRY_AUTH_TOKEN</span>{" "}
                     is set to a valid token from{" "}
                     <a
                       href="https://sentry.io/settings/account/api/auth-tokens/"
@@ -808,14 +808,14 @@ export default function AdminMonitoring() {
               Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-16 bg-white/[0.02] border border-white/[0.06] rounded-xl animate-pulse"
+                  className="h-16 bg-muted/30 border border-border rounded-xl animate-pulse"
                 />
               ))
             ) : !hasError && sortedAndFiltered.length === 0 ? (
-              <div className="text-center py-16 bg-white/[0.01] border border-white/[0.06] rounded-xl">
+              <div className="text-center py-16 bg-muted/30 border border-border rounded-xl">
                 <CheckCircle2 className="w-8 h-8 text-[#00B4D8]/40 mx-auto mb-3" />
-                <p className="text-white/30 text-sm">No issues found</p>
-                <p className="text-white/20 text-xs mt-1">
+                <p className="text-muted-foreground/50 text-sm">No issues found</p>
+                <p className="text-muted-foreground/40 text-xs mt-1">
                   {filterStatus === "unresolved"
                     ? "All clear — no unresolved issues"
                     : "No issues matching current filters"}
@@ -829,7 +829,7 @@ export default function AdminMonitoring() {
           </div>
 
           {sortedAndFiltered.length > 0 && (
-            <div className="mt-6 text-center text-xs text-white/20 font-mono">
+            <div className="mt-6 text-center text-xs text-muted-foreground/40 font-mono">
               Showing {sortedAndFiltered.length} issues · Auto-refreshes every{" "}
               {refreshInterval}s
             </div>

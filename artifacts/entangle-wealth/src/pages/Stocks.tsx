@@ -99,7 +99,7 @@ export default function Stocks() {
   const SortHeader = ({ field, label, className = "" }: { field: string; label: string; className?: string }) => (
     <button
       onClick={() => handleSort(field)}
-      className={`flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-white transition-colors ${className}`}
+      className={`flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors ${className}`}
     >
       {label}
       {sortBy === field && <ArrowUpDown className="w-3 h-3 text-primary" />}
@@ -139,10 +139,10 @@ export default function Stocks() {
                       <button
                         key={s.symbol}
                         onClick={() => setSelectedStock(s)}
-                        className="w-full flex items-center justify-between text-xs hover:bg-white/5 p-1.5 rounded transition-colors"
+                        className="w-full flex items-center justify-between text-xs hover:bg-muted/50 p-1.5 rounded transition-colors"
                       >
                         <div>
-                          <span className="font-mono font-bold text-white">{s.symbol}</span>
+                          <span className="font-mono font-bold text-foreground">{s.symbol}</span>
                           <span className="text-muted-foreground ml-2 hidden sm:inline">{s.name.slice(0, 20)}</span>
                         </div>
                         <span className="text-green-400 font-mono">+{s.changePercent.toFixed(2)}%</span>
@@ -160,10 +160,10 @@ export default function Stocks() {
                       <button
                         key={s.symbol}
                         onClick={() => setSelectedStock(s)}
-                        className="w-full flex items-center justify-between text-xs hover:bg-white/5 p-1.5 rounded transition-colors"
+                        className="w-full flex items-center justify-between text-xs hover:bg-muted/50 p-1.5 rounded transition-colors"
                       >
                         <div>
-                          <span className="font-mono font-bold text-white">{s.symbol}</span>
+                          <span className="font-mono font-bold text-foreground">{s.symbol}</span>
                           <span className="text-muted-foreground ml-2 hidden sm:inline">{s.name.slice(0, 20)}</span>
                         </div>
                         <span className="text-red-400 font-mono">{Math.abs(s.changePercent).toFixed(2)}%</span>
@@ -181,7 +181,7 @@ export default function Stocks() {
                       <button
                         key={s.sector}
                         onClick={() => { setSectorFilter(s.sector); setSelectedStock(null); }}
-                        className="w-full flex items-center justify-between text-xs hover:bg-white/5 p-1 rounded transition-colors"
+                        className="w-full flex items-center justify-between text-xs hover:bg-muted/50 p-1 rounded transition-colors"
                       >
                         <span className="text-muted-foreground">{s.sector}</span>
                         <div className="flex items-center gap-2">
@@ -212,7 +212,7 @@ export default function Stocks() {
                       <div>
                         <h2 className="text-2xl font-bold font-mono">{selectedStock.symbol}</h2>
                         <p className="text-muted-foreground">{selectedStock.name}</p>
-                        <span className="text-xs px-2 py-0.5 rounded bg-white/5 border border-white/10 text-muted-foreground">
+                        <span className="text-xs px-2 py-0.5 rounded bg-muted/50 border border-border text-muted-foreground">
                           {selectedStock.sector}
                         </span>
                       </div>
@@ -228,35 +228,35 @@ export default function Stocks() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mt-6">
-                      <div className="p-3 rounded bg-white/5">
+                      <div className="p-3 rounded bg-muted/50">
                         <div className="text-xs text-muted-foreground">Market Cap</div>
                         <div className="font-mono font-bold">{formatMarketCap(selectedStock.marketCap)}</div>
                       </div>
-                      <div className="p-3 rounded bg-white/5">
+                      <div className="p-3 rounded bg-muted/50">
                         <div className="text-xs text-muted-foreground">Volume</div>
                         <div className="font-mono font-bold">{formatVolume(selectedStock.volume)}</div>
                       </div>
-                      <div className="p-3 rounded bg-white/5">
+                      <div className="p-3 rounded bg-muted/50">
                         <div className="text-xs text-muted-foreground">P/E Ratio</div>
                         <div className="font-mono font-bold">{selectedStock.pe !== null ? selectedStock.pe.toFixed(1) : "N/A"}</div>
                       </div>
-                      <div className="p-3 rounded bg-white/5">
+                      <div className="p-3 rounded bg-muted/50">
                         <div className="text-xs text-muted-foreground">Cap Tier</div>
                         <div className="font-mono font-bold capitalize">{selectedStock.capTier}</div>
                       </div>
-                      <div className="p-3 rounded bg-white/5">
+                      <div className="p-3 rounded bg-muted/50">
                         <div className="text-xs text-muted-foreground">52W High</div>
                         <div className="font-mono font-bold text-green-400">${selectedStock.week52High.toFixed(2)}</div>
                       </div>
-                      <div className="p-3 rounded bg-white/5">
+                      <div className="p-3 rounded bg-muted/50">
                         <div className="text-xs text-muted-foreground">52W Low</div>
                         <div className="font-mono font-bold text-red-400">${selectedStock.week52Low.toFixed(2)}</div>
                       </div>
                     </div>
 
-                    <div className="mt-4 p-3 rounded bg-white/5">
+                    <div className="mt-4 p-3 rounded bg-muted/50">
                       <div className="text-xs text-muted-foreground mb-2">52-Week Range</div>
-                      <div className="relative h-2 rounded-full bg-white/10">
+                      <div className="relative h-2 rounded-full bg-muted">
                         <div
                           className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500"
                           style={{
@@ -283,18 +283,18 @@ export default function Stocks() {
                       placeholder="Search by symbol or company name..."
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      className="pl-10 bg-white/5 border-white/10 font-mono"
+                      className="pl-10 bg-muted/50 border-border font-mono"
                     />
                     {query && (
                       <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Clear search">
-                        <X className="w-4 h-4 text-muted-foreground hover:text-white" />
+                        <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
                       </button>
                     )}
                   </div>
                   <Button
                     variant="outline"
                     onClick={() => setShowFilters(!showFilters)}
-                    className="border-white/10 gap-2"
+                    className="border-border gap-2"
                   >
                     <Filter className="w-4 h-4" />
                     Filters
@@ -305,11 +305,11 @@ export default function Stocks() {
                 </div>
 
                 {showFilters && (
-                  <div className="flex flex-wrap gap-2 mb-4 p-3 rounded bg-white/5 border border-white/10">
+                  <div className="flex flex-wrap gap-2 mb-4 p-3 rounded bg-muted/50 border border-border">
                     <div className="flex flex-wrap gap-1">
                       <button
                         onClick={() => setSectorFilter("")}
-                        className={`text-xs px-2 py-1 rounded transition-colors ${!sectorFilter ? "bg-primary text-white" : "bg-white/5 text-muted-foreground hover:bg-white/10"}`}
+                        className={`text-xs px-2 py-1 rounded transition-colors ${!sectorFilter ? "bg-primary text-foreground" : "bg-muted/50 text-muted-foreground hover:bg-muted"}`}
                       >
                         All Sectors
                       </button>
@@ -317,7 +317,7 @@ export default function Stocks() {
                         <button
                           key={s}
                           onClick={() => setSectorFilter(s)}
-                          className={`text-xs px-2 py-1 rounded transition-colors ${sectorFilter === s ? "bg-primary text-white" : "bg-white/5 text-muted-foreground hover:bg-white/10"}`}
+                          className={`text-xs px-2 py-1 rounded transition-colors ${sectorFilter === s ? "bg-primary text-foreground" : "bg-muted/50 text-muted-foreground hover:bg-muted"}`}
                         >
                           {s}
                         </button>
@@ -327,7 +327,7 @@ export default function Stocks() {
                     <div className="flex flex-wrap gap-1">
                       <button
                         onClick={() => setCapFilter("")}
-                        className={`text-xs px-2 py-1 rounded transition-colors ${!capFilter ? "bg-primary text-white" : "bg-white/5 text-muted-foreground hover:bg-white/10"}`}
+                        className={`text-xs px-2 py-1 rounded transition-colors ${!capFilter ? "bg-primary text-foreground" : "bg-muted/50 text-muted-foreground hover:bg-muted"}`}
                       >
                         All Caps
                       </button>
@@ -335,7 +335,7 @@ export default function Stocks() {
                         <button
                           key={t.value}
                           onClick={() => setCapFilter(t.value)}
-                          className={`text-xs px-2 py-1 rounded transition-colors ${capFilter === t.value ? "bg-primary text-white" : "bg-white/5 text-muted-foreground hover:bg-white/10"}`}
+                          className={`text-xs px-2 py-1 rounded transition-colors ${capFilter === t.value ? "bg-primary text-foreground" : "bg-muted/50 text-muted-foreground hover:bg-muted"}`}
                         >
                           {t.label}
                         </button>
@@ -356,7 +356,7 @@ export default function Stocks() {
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-white/10">
+                        <tr className="border-b border-border">
                           <th aria-sort={sortAttr("symbol")} className="text-left p-3"><SortHeader field="symbol" label="Symbol" /></th>
                           <th aria-sort={sortAttr("name")} className="text-left p-3 hidden md:table-cell"><SortHeader field="name" label="Company" /></th>
                           <th aria-sort={sortAttr("price")} className="text-right p-3"><SortHeader field="price" label="Price" className="justify-end" /></th>
@@ -383,7 +383,7 @@ export default function Stocks() {
                           Array.from({ length: 10 }).map((_, i) => (
                             <tr key={i} className="border-b border-white/5">
                               <td className="p-3" colSpan={8}>
-                                <div className="h-4 bg-white/5 rounded animate-pulse" />
+                                <div className="h-4 bg-muted/50 rounded animate-pulse" />
                               </td>
                             </tr>
                           ))
@@ -391,8 +391,8 @@ export default function Stocks() {
                           <tr>
                             <td className="p-10 text-center" colSpan={8}>
                               <div className="flex flex-col items-center gap-3">
-                                <Search className="w-8 h-8 text-white/10" />
-                                <p className="text-sm font-medium text-white/50">No stocks found</p>
+                                <Search className="w-8 h-8 text-muted-foreground/20" />
+                                <p className="text-sm font-medium text-muted-foreground">No stocks found</p>
                                 <p className="text-xs text-muted-foreground">
                                   {query || sectorFilter || capFilter
                                     ? "Try adjusting your search or filters."
@@ -413,11 +413,11 @@ export default function Stocks() {
                           stocks.map(stock => (
                             <tr
                               key={stock.symbol}
-                              className="border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors"
+                              className="border-b border-white/5 hover:bg-muted/50 cursor-pointer transition-colors"
                               onClick={() => setSelectedStock(stock)}
                             >
                               <td className="p-3">
-                                <span className="font-mono font-bold text-white">{stock.symbol}</span>
+                                <span className="font-mono font-bold text-foreground">{stock.symbol}</span>
                               </td>
                               <td className="p-3 hidden md:table-cell">
                                 <span className="text-muted-foreground text-xs">{stock.name.slice(0, 30)}</span>
@@ -433,7 +433,7 @@ export default function Stocks() {
                                 {formatMarketCap(stock.marketCap)}
                               </td>
                               <td className="p-3 text-center hidden md:table-cell">
-                                <span className="text-xs px-1.5 py-0.5 rounded bg-white/5 text-muted-foreground">
+                                <span className="text-xs px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
                                   {stock.sector.split(" ")[0]}
                                 </span>
                               </td>
@@ -453,7 +453,7 @@ export default function Stocks() {
                     </table>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 border-t border-white/10">
+                  <div className="flex items-center justify-between p-3 border-t border-border">
                     <span className="text-xs text-muted-foreground">
                       Showing {((page - 1) * 50) + 1}-{Math.min(page * 50, totalCount)} of {totalCount.toLocaleString()} stocks
                     </span>
@@ -463,7 +463,7 @@ export default function Stocks() {
                         size="sm"
                         onClick={() => setPage(p => Math.max(1, p - 1))}
                         disabled={page <= 1}
-                        className="border-white/10 h-8"
+                        className="border-border h-8"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </Button>
@@ -475,7 +475,7 @@ export default function Stocks() {
                         size="sm"
                         onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                         disabled={page >= totalPages}
-                        className="border-white/10 h-8"
+                        className="border-border h-8"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </Button>
@@ -490,7 +490,7 @@ export default function Stocks() {
       <Footer />
       <div className="fixed bottom-20 left-4 z-40">
         {selectedStock && (
-          <MicroFeedback context="stock_analysis" label="Was this analysis helpful?" className="bg-[#0a0a14] border border-white/10 rounded-xl p-3 shadow-xl" />
+          <MicroFeedback context="stock_analysis" label="Was this analysis helpful?" className="bg-card border border-border rounded-xl p-3 shadow-xl" />
         )}
       </div>
       <PaperTradingWidget variant="floating" initialSymbol={selectedStock?.symbol || ""} />

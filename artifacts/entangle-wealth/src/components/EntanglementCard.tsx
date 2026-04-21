@@ -47,12 +47,12 @@ export function EntanglementCard({ insight, compact = false, className = "" }: E
               <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color }}>
                 Entangled
               </span>
-              <span className="text-[9px] text-white/25">·</span>
-              <span className="text-[9px] text-white/35 font-mono">
+              <span className="text-[9px] text-muted-foreground/40">·</span>
+              <span className="text-[9px] text-muted-foreground/60 font-mono">
                 {DOMAIN_LABELS[insight.sourceDomain]} → {DOMAIN_LABELS[insight.targetDomain]}
               </span>
             </div>
-            <p className={`text-white/70 leading-snug ${compact ? "text-[11px]" : "text-xs"}`}>
+            <p className={`text-foreground/70 leading-snug ${compact ? "text-[11px]" : "text-xs"}`}>
               {insight.message}
             </p>
           </div>
@@ -102,8 +102,8 @@ export function EntangledInsightsFeed({ insights, title = "Entangled Insights", 
         >
           <Zap className="w-3.5 h-3.5 text-[#00B4D8]" />
         </div>
-        <span className="text-sm font-semibold text-white/70">{title}</span>
-        <span className="text-[10px] text-white/25 ml-auto font-mono">{visible.length} connections active</span>
+        <span className="text-sm font-semibold text-foreground/70">{title}</span>
+        <span className="text-[10px] text-muted-foreground/40 ml-auto font-mono">{visible.length} connections active</span>
       </div>
       <div className="space-y-2">
         {visible.map((insight) => (

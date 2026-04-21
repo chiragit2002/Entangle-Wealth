@@ -137,10 +137,10 @@ export function GoalGradientAccelerator() {
               You're {pct}% to {label}!
             </span>
           </div>
-          <ArrowRight className="w-3.5 h-3.5 text-white/20 group-hover:text-white/40 transition-colors" style={{ color }} />
+          <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-muted-foreground/70 transition-colors" style={{ color }} />
         </div>
 
-        <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden mb-1.5">
+        <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-1.5">
           <div
             className="h-full rounded-full transition-all duration-700"
             style={{

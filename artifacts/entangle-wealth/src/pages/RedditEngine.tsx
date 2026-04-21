@@ -52,7 +52,7 @@ const STATUS_CONFIG: Record<StatusTag, { color: string; bg: string; border: stri
 const ENGAGEMENT_CONFIG: Record<string, { color: string; bg: string }> = {
   "High": { color: "text-emerald-400", bg: "bg-emerald-500/10" },
   "Medium": { color: "text-yellow-400", bg: "bg-yellow-500/10" },
-  "Low": { color: "text-white/40", bg: "bg-white/5" },
+  "Low": { color: "text-muted-foreground/70", bg: "bg-muted/50" },
 };
 
 const CATEGORIES = ["All", ...Array.from(new Set(SUBREDDIT_DATA.map((s) => s.category))).sort()];
@@ -91,8 +91,8 @@ function StatusDropdown({ current, onChange }: { current: StatusTag; onChange: (
               <button
                 key={s}
                 onClick={() => { onChange(s); setOpen(false); }}
-                className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-medium transition-colors hover:bg-white/[0.05] ${
-                  s === current ? sc.color : "text-white/60"
+                className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-medium transition-colors hover:bg-muted/50 ${
+                  s === current ? sc.color : "text-muted-foreground"
                 }`}
               >
                 {sc.icon} {s}
@@ -196,7 +196,7 @@ export default function RedditEngine() {
           <div className="w-16 h-16 rounded-sm bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
             <Shield className="w-8 h-8 text-red-400" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Access Denied</h1>
           <p className="text-muted-foreground max-w-md">
             The Reddit Strategy Engine is restricted to admin-tier accounts.
           </p>
@@ -249,7 +249,7 @@ export default function RedditEngine() {
               placeholder="Search subreddits, categories, notes..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 bg-white/[0.03] border-white/[0.08] text-sm"
+              className="pl-9 bg-muted/50 border-border text-sm"
             />
           </div>
 
@@ -257,10 +257,10 @@ export default function RedditEngine() {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white/80 focus:outline-none focus:border-primary/40"
+              className="bg-muted/50 border border-border rounded-lg px-3 py-2 text-xs text-foreground/80 focus:outline-none focus:border-primary/40"
             >
               {CATEGORIES.map((c) => (
-                <option key={c} value={c} className="bg-[#0A0E1A]">{c === "All" ? "All Categories" : c}</option>
+                <option key={c} value={c} className="bg-card">{c === "All" ? "All Categories" : c}</option>
               ))}
             </select>
 
@@ -270,12 +270,12 @@ export default function RedditEngine() {
                 const v = e.target.value;
                 if (v === "All" || v === "High" || v === "Medium" || v === "Low") setEngagementFilter(v);
               }}
-              className="bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white/80 focus:outline-none focus:border-primary/40"
+              className="bg-muted/50 border border-border rounded-lg px-3 py-2 text-xs text-foreground/80 focus:outline-none focus:border-primary/40"
             >
-              <option value="All" className="bg-[#0A0E1A]">All Engagement</option>
-              <option value="High" className="bg-[#0A0E1A]">High</option>
-              <option value="Medium" className="bg-[#0A0E1A]">Medium</option>
-              <option value="Low" className="bg-[#0A0E1A]">Low</option>
+              <option value="All" className="bg-card">All Engagement</option>
+              <option value="High" className="bg-card">High</option>
+              <option value="Medium" className="bg-card">Medium</option>
+              <option value="Low" className="bg-card">Low</option>
             </select>
 
             <select
@@ -284,12 +284,12 @@ export default function RedditEngine() {
                 const v = e.target.value;
                 if (v === "All" || v === "Active Target" || v === "Research Only" || v === "Avoid") setStatusFilter(v);
               }}
-              className="bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white/80 focus:outline-none focus:border-primary/40"
+              className="bg-muted/50 border border-border rounded-lg px-3 py-2 text-xs text-foreground/80 focus:outline-none focus:border-primary/40"
             >
-              <option value="All" className="bg-[#0A0E1A]">All Statuses</option>
-              <option value="Active Target" className="bg-[#0A0E1A]">Active Target</option>
-              <option value="Research Only" className="bg-[#0A0E1A]">Research Only</option>
-              <option value="Avoid" className="bg-[#0A0E1A]">Avoid</option>
+              <option value="All" className="bg-card">All Statuses</option>
+              <option value="Active Target" className="bg-card">Active Target</option>
+              <option value="Research Only" className="bg-card">Research Only</option>
+              <option value="Avoid" className="bg-card">Avoid</option>
             </select>
           </div>
         </div>
@@ -298,27 +298,27 @@ export default function RedditEngine() {
           Showing {data.length} of {SUBREDDIT_DATA.length} subreddits
         </div>
 
-        <div className="rounded-xl border border-white/[0.06] overflow-hidden" style={{ background: "rgba(8,8,20,0.6)" }}>
+        <div className="rounded-xl border border-border overflow-hidden" style={{ background: "rgba(8,8,20,0.6)" }}>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/[0.06]">
+                <tr className="border-b border-border">
                   <th className="text-left px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider">
-                    <button onClick={() => toggleSort("name")} className="flex items-center gap-1 hover:text-white transition-colors">
+                    <button onClick={() => toggleSort("name")} className="flex items-center gap-1 hover:text-foreground transition-colors">
                       Subreddit
                       {sortField === "name" && (sortDir === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       {sortField !== "name" && <ArrowUpDown className="w-3 h-3 opacity-30" />}
                     </button>
                   </th>
                   <th className="text-right px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider">
-                    <button onClick={() => toggleSort("members")} className="flex items-center gap-1 justify-end hover:text-white transition-colors ml-auto">
+                    <button onClick={() => toggleSort("members")} className="flex items-center gap-1 justify-end hover:text-foreground transition-colors ml-auto">
                       Members
                       {sortField === "members" && (sortDir === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       {sortField !== "members" && <ArrowUpDown className="w-3 h-3 opacity-30" />}
                     </button>
                   </th>
                   <th className="text-center px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider">
-                    <button onClick={() => toggleSort("engagement")} className="flex items-center gap-1 justify-center hover:text-white transition-colors mx-auto">
+                    <button onClick={() => toggleSort("engagement")} className="flex items-center gap-1 justify-center hover:text-foreground transition-colors mx-auto">
                       Engagement
                       {sortField === "engagement" && (sortDir === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       {sortField !== "engagement" && <ArrowUpDown className="w-3 h-3 opacity-30" />}
@@ -335,7 +335,7 @@ export default function RedditEngine() {
                   return (
                     <tr
                       key={sub.name}
-                      className={`border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors ${
+                      className={`border-b border-border/50 hover:bg-muted/30 transition-colors ${
                         sub.status === "Avoid" ? "opacity-60" : ""
                       }`}
                     >
@@ -363,16 +363,16 @@ export default function RedditEngine() {
                           <span className="text-[10px] text-muted-foreground">{sub.category}</span>
                           <div className="group relative">
                             <Info className="w-3 h-3 text-muted-foreground/50 cursor-help" />
-                            <div className="absolute bottom-full left-0 mb-1 hidden group-hover:block z-50 w-64 px-3 py-2 rounded-lg text-[11px] text-white/80 bg-black/95 border border-white/10">
-                              <p className="font-semibold text-white mb-1">{sub.name}</p>
-                              <p className="text-white/60 mb-1">{sub.rulesSummary}</p>
+                            <div className="absolute bottom-full left-0 mb-1 hidden group-hover:block z-50 w-64 px-3 py-2 rounded-lg text-[11px] text-foreground/80 bg-black/95 border border-border">
+                              <p className="font-semibold text-foreground mb-1">{sub.name}</p>
+                              <p className="text-muted-foreground mb-1">{sub.rulesSummary}</p>
                               <p className="text-primary/80 italic">{sub.notes}</p>
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <span className="font-mono text-sm text-white/80 flex items-center gap-1 justify-end">
+                        <span className="font-mono text-sm text-foreground/80 flex items-center gap-1 justify-end">
                           <Users className="w-3 h-3 text-muted-foreground" />
                           {formatMembers(sub.members)}
                         </span>
@@ -382,10 +382,10 @@ export default function RedditEngine() {
                           {sub.engagement}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-white/60 hidden lg:table-cell max-w-48 truncate">
+                      <td className="px-4 py-3 text-xs text-muted-foreground hidden lg:table-cell max-w-48 truncate">
                         {sub.contentType}
                       </td>
-                      <td className="px-4 py-3 text-xs text-white/50 hidden xl:table-cell max-w-56 truncate">
+                      <td className="px-4 py-3 text-xs text-muted-foreground hidden xl:table-cell max-w-56 truncate">
                         {sub.rulesSummary}
                       </td>
                       <td className="px-4 py-3 text-center">

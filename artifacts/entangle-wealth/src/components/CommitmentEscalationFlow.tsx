@@ -137,9 +137,9 @@ export function CommitmentEscalationFlow() {
   if (completed) {
     return (
       <div className="fixed bottom-24 left-4 z-[200] w-72 animate-in fade-in duration-300">
-        <div className="bg-[#0a0a14] border border-[#00FF41]/25 rounded-xl p-4 flex items-center gap-3 shadow-2xl">
+        <div className="bg-card border border-[#00FF41]/25 rounded-xl p-4 flex items-center gap-3 shadow-2xl">
           <CheckCircle2 className="w-5 h-5 text-[#00FF41] flex-shrink-0" />
-          <p className="text-sm font-semibold text-white/80">Goals saved! Your experience is now personalized.</p>
+          <p className="text-sm font-semibold text-foreground/80">Goals saved! Your experience is now personalized.</p>
         </div>
       </div>
     );
@@ -150,15 +150,15 @@ export function CommitmentEscalationFlow() {
 
   return (
     <div className="fixed bottom-24 left-4 z-[200] w-72 animate-in slide-in-from-left-4 fade-in duration-500">
-      <div className="bg-[#0a0a14] border border-white/10 rounded-xl shadow-2xl shadow-black/60 overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+      <div className="bg-card border border-border rounded-xl shadow-2xl shadow-black/60 overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <div className="flex items-center gap-2">
             <Target className="w-4 h-4 text-[#00D4FF]" />
-            <span className="text-xs font-bold text-white/80">{stepTitles[step]}</span>
+            <span className="text-xs font-bold text-foreground/80">{stepTitles[step]}</span>
           </div>
           <button
             onClick={dismiss}
-            className="text-white/30 hover:text-white/50 transition-colors"
+            className="text-muted-foreground/50 hover:text-muted-foreground transition-colors"
             aria-label="Dismiss"
           >
             <X className="w-3.5 h-3.5" />
@@ -168,7 +168,7 @@ export function CommitmentEscalationFlow() {
         <div className="px-4 py-3">
           {step === 0 && (
             <>
-              <p className="text-[10px] text-white/40 mb-3">
+              <p className="text-[10px] text-muted-foreground/70 mb-3">
                 Pick one financial goal to focus on this month. Just one — start small.
               </p>
               <div className="space-y-1.5 mb-3">
@@ -181,13 +181,13 @@ export function CommitmentEscalationFlow() {
                       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border text-left transition-all ${
                         selected
                           ? "border-[#00D4FF]/40 bg-[#00D4FF]/8"
-                          : "border-white/[0.06] bg-white/[0.02] hover:border-white/15"
+                          : "border-border bg-muted/30 hover:border-white/15"
                       }`}
                     >
-                      <span className={`flex-shrink-0 ${selected ? "text-[#00D4FF]" : "text-white/30"}`}>{goal.icon}</span>
+                      <span className={`flex-shrink-0 ${selected ? "text-[#00D4FF]" : "text-muted-foreground/50"}`}>{goal.icon}</span>
                       <div>
-                        <p className={`text-xs font-semibold ${selected ? "text-white" : "text-white/60"}`}>{goal.label}</p>
-                        <p className="text-[9px] text-white/30">{goal.description}</p>
+                        <p className={`text-xs font-semibold ${selected ? "text-foreground" : "text-muted-foreground"}`}>{goal.label}</p>
+                        <p className="text-[9px] text-muted-foreground/50">{goal.description}</p>
                       </div>
                       {selected && <CheckCircle2 className="w-3.5 h-3.5 text-[#00D4FF] ml-auto" />}
                     </button>
@@ -206,12 +206,12 @@ export function CommitmentEscalationFlow() {
 
           {step === 1 && (
             <>
-              <p className="text-[10px] text-white/40 mb-3">
-                Great! Track today's progress toward your goal of <span className="text-white/70 font-semibold">{GOAL_OPTIONS.find(g => selectedGoals.includes(g.id))?.label}</span>.
+              <p className="text-[10px] text-muted-foreground/70 mb-3">
+                Great! Track today's progress toward your goal of <span className="text-foreground/70 font-semibold">{GOAL_OPTIONS.find(g => selectedGoals.includes(g.id))?.label}</span>.
               </p>
-              <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3 mb-3">
-                <p className="text-[9px] text-white/30 mb-1">Today's action</p>
-                <p className="text-xs text-white/70">Complete 1 habit related to your goal to earn 50 XP</p>
+              <div className="bg-muted/50 border border-border rounded-lg p-3 mb-3">
+                <p className="text-[9px] text-muted-foreground/50 mb-1">Today's action</p>
+                <p className="text-xs text-foreground/70">Complete 1 habit related to your goal to earn 50 XP</p>
               </div>
               <button
                 onClick={handleStep1Submit}
@@ -225,7 +225,7 @@ export function CommitmentEscalationFlow() {
 
           {step === 2 && (
             <>
-              <p className="text-[10px] text-white/40 mb-3">
+              <p className="text-[10px] text-muted-foreground/70 mb-3">
                 You're building momentum! Add up to 3 more goals to accelerate your financial growth.
               </p>
               <div className="space-y-1.5 mb-3 max-h-40 overflow-y-auto">
@@ -241,14 +241,14 @@ export function CommitmentEscalationFlow() {
                         selected
                           ? "border-[#FFB800]/40 bg-[#FFB800]/8"
                           : disabled
-                            ? "border-white/[0.04] bg-white/[0.01] opacity-40"
-                            : "border-white/[0.06] bg-white/[0.02] hover:border-white/15"
+                            ? "border-border bg-muted/30 opacity-40"
+                            : "border-border bg-muted/30 hover:border-white/15"
                       }`}
                     >
-                      <span className={`flex-shrink-0 ${selected ? "text-[#FFB800]" : "text-white/30"}`}>{goal.icon}</span>
+                      <span className={`flex-shrink-0 ${selected ? "text-[#FFB800]" : "text-muted-foreground/50"}`}>{goal.icon}</span>
                       <div>
-                        <p className={`text-xs font-semibold ${selected ? "text-white" : "text-white/60"}`}>{goal.label}</p>
-                        <p className="text-[9px] text-white/30">{goal.description}</p>
+                        <p className={`text-xs font-semibold ${selected ? "text-foreground" : "text-muted-foreground"}`}>{goal.label}</p>
+                        <p className="text-[9px] text-muted-foreground/50">{goal.description}</p>
                       </div>
                       {selected && <CheckCircle2 className="w-3.5 h-3.5 text-[#FFB800] ml-auto" />}
                     </button>
@@ -269,12 +269,12 @@ export function CommitmentEscalationFlow() {
 
           {step === 3 && (
             <>
-              <p className="text-[10px] text-white/40 mb-3">
+              <p className="text-[10px] text-muted-foreground/70 mb-3">
                 You're building momentum. Unlock advanced goal tracking with Pro — it connects your habits to real dollar outcomes.
               </p>
               <div className="space-y-1.5 mb-3">
                 {["Multi-goal tracking", "Dollar projections", "AI-powered coaching"].map(feat => (
-                  <div key={feat} className="flex items-center gap-2 text-[10px] text-white/50">
+                  <div key={feat} className="flex items-center gap-2 text-[10px] text-muted-foreground">
                     <CheckCircle2 className="w-3 h-3 text-[#FFB800] flex-shrink-0" />
                     {feat}
                   </div>
@@ -290,7 +290,7 @@ export function CommitmentEscalationFlow() {
                 </a>
                 <button
                   onClick={handleStep3Submit}
-                  className="px-3 h-9 text-xs text-white/30 hover:text-white/50 transition-colors"
+                  className="px-3 h-9 text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors"
                 >
                   Later
                 </button>

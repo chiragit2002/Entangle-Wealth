@@ -40,8 +40,8 @@ export function CapitalGainsPlannerModule() {
             <BarChart3 className="w-3.5 h-3.5 text-cyan-400" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-white/80">Capital Gains Planner</p>
-            <p className="text-[10px] text-white/35">Rates · harvesting · timing strategies</p>
+            <p className="text-xs font-semibold text-foreground/80">Capital Gains Planner</p>
+            <p className="text-[10px] text-muted-foreground/60">Rates · harvesting · timing strategies</p>
           </div>
         </div>
         <Link href="/taxgpt" className="flex items-center gap-1 text-[10px] text-cyan-400/70 hover:text-cyan-400 transition-colors">
@@ -50,20 +50,20 @@ export function CapitalGainsPlannerModule() {
       </div>
       <div className="grid grid-cols-2 gap-1.5 mb-2">
         {rates.map((r) => (
-          <div key={r.holding} className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.05]">
-            <p className="text-[9px] text-white/35 mb-0.5">{r.holding}</p>
+          <div key={r.holding} className="p-2 rounded-lg bg-muted/50 border border-border">
+            <p className="text-[9px] text-muted-foreground/60 mb-0.5">{r.holding}</p>
             <p className="text-xs font-semibold text-cyan-400">{r.rate}</p>
-            <p className="text-[9px] text-white/30">{r.example}</p>
+            <p className="text-[9px] text-muted-foreground/50">{r.example}</p>
           </div>
         ))}
       </div>
       <div className="space-y-1.5">
         {strategies.map((s) => (
-          <div key={s.label} className="flex items-start gap-3 py-1.5 border-b border-white/[0.04] last:border-0">
+          <div key={s.label} className="flex items-start gap-3 py-1.5 border-b border-border last:border-0">
             <TrendingDown className="w-3 h-3 text-cyan-400/60 shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-white/80">{s.label}</p>
-              <p className="text-[10px] text-white/40">{s.detail}</p>
+              <p className="text-xs font-medium text-foreground/80">{s.label}</p>
+              <p className="text-[10px] text-muted-foreground/70">{s.detail}</p>
             </div>
             <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400/70 shrink-0">{s.tag}</span>
           </div>

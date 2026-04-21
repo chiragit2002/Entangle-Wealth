@@ -80,8 +80,8 @@ function fmt(v: number) {
 function CustomTooltip({ active, payload, label }: Record<string, unknown>) {
   if (!active || !Array.isArray(payload) || payload.length === 0) return null;
   return (
-    <div className="bg-[#0f1117] border border-white/10 rounded-lg p-3 text-xs shadow-xl">
-      <p className="text-white/50 mb-2">Age {label as number}</p>
+    <div className="bg-[#0f1117] border border-border rounded-lg p-3 text-xs shadow-xl">
+      <p className="text-muted-foreground mb-2">Age {label as number}</p>
       {(payload as Array<{ dataKey: string; value: number; color: string }>).map(p => (
         <p key={p.dataKey} style={{ color: p.color }} className="font-bold">
           {p.dataKey === "currentPath" ? "Current Path" : "Optimized Path"}: {fmt(p.value)}
@@ -108,8 +108,8 @@ function SliderRow({ label, value, min, max, step = 1, format, field, onChange }
   return (
     <div className="space-y-2">
       <div className="flex justify-between text-sm">
-        <span className="text-white/60">{label}</span>
-        <span className="text-white font-medium">{format(value)}</span>
+        <span className="text-muted-foreground">{label}</span>
+        <span className="text-foreground font-medium">{format(value)}</span>
       </div>
       <Slider
         value={[value]}
@@ -186,27 +186,27 @@ export default function LifeOutcomes() {
   return (
     <Layout>
       <PageErrorBoundary fallbackTitle="Life Outcomes encountered an error">
-      <div className="min-h-screen bg-[#0a0a14] text-white">
+      <div className="min-h-screen bg-card text-foreground">
         <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-white">Life Outcome Visualizer</h1>
-              <p className="text-white/50 text-sm mt-1">See how your financial decisions map to real life milestones.</p>
+              <h1 className="text-3xl font-bold text-foreground">Life Outcome Visualizer</h1>
+              <p className="text-muted-foreground text-sm mt-1">See how your financial decisions map to real life milestones.</p>
             </div>
           </div>
 
           <FinancialDisclaimerBanner pageKey="life-outcomes" />
 
-          <div className="bg-white/[0.04] border border-white/10 rounded-xl overflow-hidden">
+          <div className="bg-muted/50 border border-border rounded-xl overflow-hidden">
             <button
               onClick={() => setShowParams(!showParams)}
-              className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/[0.02] transition-colors"
+              className="w-full flex items-center justify-between px-6 py-4 hover:bg-muted/30 transition-colors"
             >
-              <div className="flex items-center gap-2 font-semibold text-white">
+              <div className="flex items-center gap-2 font-semibold text-foreground">
                 <Target className="w-5 h-5 text-[#00B4D8]" />
                 Financial Parameters
               </div>
-              {showParams ? <ChevronUp className="w-4 h-4 text-white/50" /> : <ChevronDown className="w-4 h-4 text-white/50" />}
+              {showParams ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
             </button>
 
             {showParams && (
@@ -253,11 +253,11 @@ export default function LifeOutcomes() {
                     <div
                       key={pathKey}
                       className={`border rounded-xl p-6 space-y-4 ${
-                        isOptimized ? "border-[#00B4D8]/30 bg-[#00B4D8]/5" : "border-white/10 bg-white/[0.04]"
+                        isOptimized ? "border-[#00B4D8]/30 bg-[#00B4D8]/5" : "border-border bg-muted/50"
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <h3 className="font-bold text-white">
+                        <h3 className="font-bold text-foreground">
                           {isOptimized ? "Optimized Path" : "Current Path"}
                         </h3>
                         {isOptimized && <Zap className="w-5 h-5 text-[#00B4D8]" />}
@@ -265,34 +265,34 @@ export default function LifeOutcomes() {
 
                       <div className="space-y-3">
                         <div className="flex justify-between">
-                          <span className="text-white/50 text-sm">Projected Net Worth</span>
-                          <span className="text-white font-bold">{fmt(path.finalNetWorth)}</span>
+                          <span className="text-muted-foreground text-sm">Projected Net Worth</span>
+                          <span className="text-foreground font-bold">{fmt(path.finalNetWorth)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-white/50 text-sm">Annual Passive Income</span>
-                          <span className="text-white font-bold">{fmt(path.annualPassiveIncome)}/yr</span>
+                          <span className="text-muted-foreground text-sm">Annual Passive Income</span>
+                          <span className="text-foreground font-bold">{fmt(path.annualPassiveIncome)}/yr</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-white/50 text-sm">Lifestyle Tier</span>
+                          <span className="text-muted-foreground text-sm">Lifestyle Tier</span>
                           <span className="font-bold text-sm px-2 py-0.5 rounded-full" style={{ color: tier.color, background: `${tier.color}22` }}>
                             {path.lifestyleTier}
                           </span>
                         </div>
                         {path.retirementAge && (
                           <div className="flex justify-between">
-                            <span className="text-white/50 text-sm">Financial Independence</span>
-                            <span className="text-white font-bold">Age {path.retirementAge}</span>
+                            <span className="text-muted-foreground text-sm">Financial Independence</span>
+                            <span className="text-foreground font-bold">Age {path.retirementAge}</span>
                           </div>
                         )}
                         {path.homePurchaseAge && (
                           <div className="flex justify-between">
-                            <span className="text-white/50 text-sm">Home Purchase Ready</span>
-                            <span className="text-white font-bold">Age {path.homePurchaseAge}</span>
+                            <span className="text-muted-foreground text-sm">Home Purchase Ready</span>
+                            <span className="text-foreground font-bold">Age {path.homePurchaseAge}</span>
                           </div>
                         )}
                       </div>
 
-                      <p className="text-xs text-white/50 italic">{tier.desc}</p>
+                      <p className="text-xs text-muted-foreground italic">{tier.desc}</p>
                     </div>
                   );
                 })}
@@ -307,24 +307,24 @@ export default function LifeOutcomes() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="text-center">
                       <p className="text-2xl font-bold text-[#00B4D8]">{fmt(result.improvement.netWorthGain)}</p>
-                      <p className="text-xs text-white/50 mt-1">Additional Net Worth</p>
+                      <p className="text-xs text-muted-foreground mt-1">Additional Net Worth</p>
                     </div>
                     <div className="text-center">
                       <p className="text-2xl font-bold text-[#00B4D8]">{fmt(result.improvement.passiveIncomeGain)}/yr</p>
-                      <p className="text-xs text-white/50 mt-1">Additional Passive Income</p>
+                      <p className="text-xs text-muted-foreground mt-1">Additional Passive Income</p>
                     </div>
                     {result.improvement.retirementYearsEarlier !== null && (
                       <div className="text-center">
                         <p className="text-2xl font-bold text-[#00B4D8]">{result.improvement.retirementYearsEarlier} years</p>
-                        <p className="text-xs text-white/50 mt-1">Earlier Financial Independence</p>
+                        <p className="text-xs text-muted-foreground mt-1">Earlier Financial Independence</p>
                       </div>
                     )}
                   </div>
                 </div>
               )}
 
-              <div className="bg-white/[0.04] border border-white/10 rounded-xl p-6">
-                <h3 className="font-bold text-white mb-4">Net Worth Trajectory</h3>
+              <div className="bg-muted/50 border border-border rounded-xl p-6">
+                <h3 className="font-bold text-foreground mb-4">Net Worth Trajectory</h3>
                 <ResponsiveContainer width="100%" height={320}>
                   <AreaChart data={result.chartData} margin={{ top: 10, right: 10, bottom: 0, left: 0 }}>
                     <defs>
@@ -386,25 +386,25 @@ export default function LifeOutcomes() {
                 {result.milestones.map(milestone => {
                   const IconComp = ICON_MAP[milestone.icon] || Target;
                   return (
-                    <div key={milestone.id} className="bg-white/[0.04] border border-white/10 rounded-xl p-5 space-y-3">
+                    <div key={milestone.id} className="bg-muted/50 border border-border rounded-xl p-5 space-y-3">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-[#00B4D8]/10 flex items-center justify-center">
                           <IconComp className="w-5 h-5 text-[#00B4D8]" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-white text-sm">{milestone.label}</h4>
-                          <p className="text-xs text-white/50">{milestone.description}</p>
+                          <h4 className="font-semibold text-foreground text-sm">{milestone.label}</h4>
+                          <p className="text-xs text-muted-foreground">{milestone.description}</p>
                         </div>
                       </div>
                       <div className="space-y-1.5">
                         <div className="flex justify-between text-xs">
-                          <span className="text-white/50">Current Path</span>
-                          <span className={milestone.currentPathAge ? "text-white" : "text-red-400"}>
+                          <span className="text-muted-foreground">Current Path</span>
+                          <span className={milestone.currentPathAge ? "text-foreground" : "text-red-400"}>
                             {milestone.currentPathAge ? `Age ${milestone.currentPathAge}` : "Not achieved"}
                           </span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-white/50">Optimized Path</span>
+                          <span className="text-muted-foreground">Optimized Path</span>
                           <span className={milestone.optimizedPathAge ? "text-[#00B4D8]" : "text-red-400"}>
                             {milestone.optimizedPathAge ? `Age ${milestone.optimizedPathAge}` : "Not achieved"}
                           </span>
@@ -417,29 +417,29 @@ export default function LifeOutcomes() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                 <Link href="/habits">
-                  <a className="group flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.04] hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all cursor-pointer">
+                  <a className="group flex items-center gap-3 p-4 rounded-xl border border-border bg-muted/50 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all cursor-pointer">
                     <Zap className="w-8 h-8 text-emerald-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
                     <div>
-                      <p className="text-white font-medium text-sm">Build the Habits</p>
-                      <p className="text-white/50 text-xs">Take daily actions to reach this path</p>
+                      <p className="text-foreground font-medium text-sm">Build the Habits</p>
+                      <p className="text-muted-foreground text-xs">Take daily actions to reach this path</p>
                     </div>
                   </a>
                 </Link>
                 <Link href="/ai-coach">
-                  <a className="group flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.04] hover:border-[#00B4D8]/40 hover:bg-[#00B4D8]/5 transition-all cursor-pointer">
+                  <a className="group flex items-center gap-3 p-4 rounded-xl border border-border bg-muted/50 hover:border-[#00B4D8]/40 hover:bg-[#00B4D8]/5 transition-all cursor-pointer">
                     <Brain className="w-8 h-8 text-[#00B4D8] flex-shrink-0 group-hover:scale-110 transition-transform" />
                     <div>
-                      <p className="text-white font-medium text-sm">Ask Your Coach</p>
-                      <p className="text-white/50 text-xs">Get guidance on reaching this outcome</p>
+                      <p className="text-foreground font-medium text-sm">Ask Your Coach</p>
+                      <p className="text-muted-foreground text-xs">Get guidance on reaching this outcome</p>
                     </div>
                   </a>
                 </Link>
                 <Link href="/alternate-timeline">
-                  <a className="group flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.04] hover:border-purple-500/40 hover:bg-purple-500/5 transition-all cursor-pointer">
+                  <a className="group flex items-center gap-3 p-4 rounded-xl border border-border bg-muted/50 hover:border-purple-500/40 hover:bg-purple-500/5 transition-all cursor-pointer">
                     <GitBranch className="w-8 h-8 text-purple-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
                     <div>
-                      <p className="text-white font-medium text-sm">Alternate Timeline</p>
-                      <p className="text-white/50 text-xs">Compare decision paths side by side</p>
+                      <p className="text-foreground font-medium text-sm">Alternate Timeline</p>
+                      <p className="text-muted-foreground text-xs">Compare decision paths side by side</p>
                     </div>
                   </a>
                 </Link>

@@ -53,13 +53,13 @@ function CircuitStateIcon({ state }: { state: string }) {
 
 function MetricCard({ icon: Icon, label, value, sub }: { icon: typeof Activity; label: string; value: string; sub?: string }) {
   return (
-    <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-4">
+    <div className="bg-card border border-border rounded-xl p-4">
       <div className="flex items-center gap-2 mb-2">
         <Icon className="w-4 h-4 text-[#00B4D8]" />
-        <span className="text-sm text-white/60">{label}</span>
+        <span className="text-sm text-muted-foreground">{label}</span>
       </div>
-      <div className="text-2xl font-bold text-white font-mono">{value}</div>
-      {sub && <div className="text-xs text-white/50 mt-1">{sub}</div>}
+      <div className="text-2xl font-bold text-foreground font-mono">{value}</div>
+      {sub && <div className="text-xs text-muted-foreground mt-1">{sub}</div>}
     </div>
   );
 }
@@ -162,11 +162,11 @@ export default function AdminScalability() {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                 <Zap className="w-8 h-8 text-[#00B4D8]" />
                 Scalability Dashboard
               </h1>
-              <p className="text-white/50 mt-1">Real-time system performance & health</p>
+              <p className="text-muted-foreground mt-1">Real-time system performance & health</p>
             </div>
             <button
               onClick={fetchMetrics}
@@ -209,19 +209,19 @@ export default function AdminScalability() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6 mb-8">
-                <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6">
-                  <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+                <div className="bg-card border border-border rounded-xl p-6">
+                  <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-4">
                     <Shield className="w-5 h-5 text-[#00B4D8]" />
                     Circuit Breakers
                   </h2>
                   <div className="space-y-3">
                     {metrics.circuits.map((circuit) => (
-                      <div key={circuit.name} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                      <div key={circuit.name} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                         <div className="flex items-center gap-3">
                           <CircuitStateIcon state={circuit.state} />
                           <div>
-                            <div className="text-white font-medium capitalize">{circuit.name}</div>
-                            <div className="text-xs text-white/50">
+                            <div className="text-foreground font-medium capitalize">{circuit.name}</div>
+                            <div className="text-xs text-muted-foreground">
                               {circuit.failureCount} failures
                               {circuit.lastFailureTime > 0 && ` | Last: ${new Date(circuit.lastFailureTime).toLocaleTimeString()}`}
                             </div>
@@ -243,29 +243,29 @@ export default function AdminScalability() {
                   </div>
                 </div>
 
-                <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6">
-                  <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+                <div className="bg-card border border-border rounded-xl p-6">
+                  <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-4">
                     <Cpu className="w-5 h-5 text-[#00B4D8]" />
                     AI Request Queue
                   </h2>
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="p-3 bg-white/5 rounded-lg">
-                        <div className="text-xs text-white/50">Active</div>
+                      <div className="p-3 bg-muted/50 rounded-lg">
+                        <div className="text-xs text-muted-foreground">Active</div>
                         <div className="text-2xl font-mono text-[#00B4D8]">
                           {metrics.aiQueue.active}/{metrics.aiQueue.maxConcurrent}
                         </div>
                       </div>
-                      <div className="p-3 bg-white/5 rounded-lg">
-                        <div className="text-xs text-white/50">Queued</div>
+                      <div className="p-3 bg-muted/50 rounded-lg">
+                        <div className="text-xs text-muted-foreground">Queued</div>
                         <div className="text-2xl font-mono text-[#FFB800]">{metrics.aiQueue.queued}</div>
                       </div>
                     </div>
-                    <div className="flex justify-between text-sm text-white/60">
+                    <div className="flex justify-between text-sm text-muted-foreground">
                       <span>Processed: {metrics.aiQueue.totalProcessed}</span>
                       <span>Failed: {metrics.aiQueue.totalFailed}</span>
                     </div>
-                    <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-muted/50 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-[#00B4D8] rounded-full transition-all"
                         style={{
@@ -278,19 +278,19 @@ export default function AdminScalability() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6 mb-8">
-                <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6">
-                  <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+                <div className="bg-card border border-border rounded-xl p-6">
+                  <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-4">
                     <Server className="w-5 h-5 text-[#00B4D8]" />
                     Cache Status
                   </h2>
                   <div className="space-y-3">
                     {[metrics.caches.stockCache, metrics.caches.newsCache].map((c) => (
-                      <div key={c.label} className="p-3 bg-white/5 rounded-lg">
+                      <div key={c.label} className="p-3 bg-muted/50 rounded-lg">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-white/70 capitalize">{c.label} Cache</span>
+                          <span className="text-foreground/70 capitalize">{c.label} Cache</span>
                           <span className="font-mono text-[#00B4D8]">{c.size} entries</span>
                         </div>
-                        <div className="flex items-center gap-4 text-xs text-white/40">
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground/70">
                           <span>Hits: <span className="text-[#00B4D8] font-mono">{c.hits}</span></span>
                           <span>Misses: <span className="text-[#ff3366] font-mono">{c.misses}</span></span>
                           <span>Hit Rate: <span className="text-[#FFB800] font-mono">{c.hitRate}%</span></span>
@@ -300,8 +300,8 @@ export default function AdminScalability() {
                   </div>
                 </div>
 
-                <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6">
-                  <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+                <div className="bg-card border border-border rounded-xl p-6">
+                  <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-4">
                     <CheckCircle2 className="w-5 h-5 text-[#00B4D8]" />
                     Health Checklist ({passCount}/{checklist.length})
                   </h2>
@@ -314,8 +314,8 @@ export default function AdminScalability() {
                           <XCircle className="w-4 h-4 text-[#ff3366] mt-0.5 flex-shrink-0" />
                         )}
                         <div>
-                          <div className={`text-sm ${item.ok ? "text-white/70" : "text-[#ff3366]"}`}>{item.label}</div>
-                          <div className="text-xs text-white/50">{item.detail}</div>
+                          <div className={`text-sm ${item.ok ? "text-foreground/70" : "text-[#ff3366]"}`}>{item.label}</div>
+                          <div className="text-xs text-muted-foreground">{item.detail}</div>
                         </div>
                       </div>
                     ))}
@@ -323,7 +323,7 @@ export default function AdminScalability() {
                 </div>
               </div>
 
-              <div className="text-center text-xs text-white/30">
+              <div className="text-center text-xs text-muted-foreground/50">
                 Last updated: {new Date(metrics.timestamp).toLocaleString()} | Auto-refreshes every 15s
               </div>
             </>

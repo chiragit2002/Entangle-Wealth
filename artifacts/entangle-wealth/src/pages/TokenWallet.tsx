@@ -106,7 +106,7 @@ export default function TokenWallet() {
             </h1>
             <p className="text-muted-foreground mt-1">Your ENTGL token balance, transactions, and wallet</p>
           </div>
-          <Button variant="outline" className="border-white/10 gap-2" onClick={loadData}>
+          <Button variant="outline" className="border-border gap-2" onClick={loadData}>
             <RefreshCw className="w-4 h-4" /> Refresh
           </Button>
         </div>
@@ -135,14 +135,14 @@ export default function TokenWallet() {
             </div>
 
             {balance?.walletAddress ? (
-              <div className="mt-4 pt-4 border-t border-white/10">
+              <div className="mt-4 pt-4 border-t border-border">
                 <div className="flex items-center gap-2">
                   <Wallet className="w-4 h-4 text-primary" />
                   <span className="text-xs text-muted-foreground">Linked Wallet:</span>
                   <code className="text-xs text-primary font-mono">
                     {balance.walletAddress.slice(0, 6)}...{balance.walletAddress.slice(-4)}
                   </code>
-                  <button onClick={copyAddress} className="text-muted-foreground hover:text-white transition-colors">
+                  <button onClick={copyAddress} className="text-muted-foreground hover:text-foreground transition-colors">
                     {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                   <a
@@ -156,7 +156,7 @@ export default function TokenWallet() {
                 </div>
               </div>
             ) : (
-              <div className="mt-4 pt-4 border-t border-white/10">
+              <div className="mt-4 pt-4 border-t border-border">
                 {showLinkForm ? (
                   <div className="flex gap-2">
                     <Input
@@ -165,7 +165,7 @@ export default function TokenWallet() {
                       value={walletInput}
                       onChange={(e) => setWalletInput(e.target.value)}
                       onKeyDown={(e) => { if (e.key === "Enter") linkWallet(); }}
-                      className="bg-white/5 border-white/10 font-mono text-sm"
+                      className="bg-muted/50 border-border font-mono text-sm"
                       autoComplete="off"
                       spellCheck={false}
                     />
@@ -191,7 +191,7 @@ export default function TokenWallet() {
                 <Shield className="w-4 h-4 text-amber-500" />
                 <span className="text-xs text-muted-foreground uppercase tracking-wider">Network</span>
               </div>
-              <p className="text-sm font-bold text-white">Ethereum (Sepolia Testnet)</p>
+              <p className="text-sm font-bold text-foreground">Ethereum (Sepolia Testnet)</p>
               <p className="text-xs text-muted-foreground mt-1">Off-chain ledger (pre-mainnet)</p>
             </div>
             <div className="glass-panel p-4">
@@ -202,11 +202,11 @@ export default function TokenWallet() {
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Total Supply</span>
-                  <span className="font-mono text-white">100,000,000</span>
+                  <span className="font-mono text-foreground">100,000,000</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Founder (75%)</span>
-                  <span className="font-mono text-white">75,000,000</span>
+                  <span className="font-mono text-foreground">75,000,000</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Rewards (25%)</span>
@@ -230,7 +230,7 @@ export default function TokenWallet() {
           ) : (
             <div className="space-y-2">
               {transactions.map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors">
+                <div key={tx.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-white/5 hover:border-border transition-colors">
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${tx.amount > 0 ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
                       {tx.amount > 0 ? (
@@ -240,7 +240,7 @@ export default function TokenWallet() {
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-white">{tx.description}</p>
+                      <p className="text-sm font-medium text-foreground">{tx.description}</p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(tx.createdAt).toLocaleDateString()} · {tx.type}
                       </p>

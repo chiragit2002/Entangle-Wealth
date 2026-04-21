@@ -178,7 +178,7 @@ export function ScoreRing({ score, size = 72, label, color }: ScoreRingProps) {
           {Math.round(pct)}
         </text>
       </svg>
-      {label && <span className="text-[10px] text-white/40 font-mono text-center leading-tight">{label}</span>}
+      {label && <span className="text-[10px] text-muted-foreground/70 font-mono text-center leading-tight">{label}</span>}
     </div>
   );
 }

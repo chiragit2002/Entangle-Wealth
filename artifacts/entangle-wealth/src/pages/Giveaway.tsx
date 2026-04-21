@@ -45,11 +45,11 @@ interface LeaderboardEntry {
 
 function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col items-center bg-white/[0.04] border border-white/10 rounded-xl px-3 py-2.5 min-w-[64px]">
+    <div className="flex flex-col items-center bg-muted/50 border border-border rounded-xl px-3 py-2.5 min-w-[64px]">
       <span className="text-3xl md:text-4xl font-black font-mono text-[#FFB800] tabular-nums leading-none">
         {String(value).padStart(2, "0")}
       </span>
-      <span className="text-[9px] text-white/40 uppercase tracking-wider mt-1">{label}</span>
+      <span className="text-[9px] text-muted-foreground/70 uppercase tracking-wider mt-1">{label}</span>
     </div>
   );
 }
@@ -223,11 +223,11 @@ export default function Giveaway() {
             <span className="w-1.5 h-1.5 rounded-full bg-[#FFB800] animate-pulse" />
           </div>
 
-          <h1 className="text-3xl md:text-6xl font-black tracking-tight text-white mb-4">
+          <h1 className="text-3xl md:text-6xl font-black tracking-tight text-foreground mb-4">
             $50,000<br />
             <span className="bg-gradient-to-r from-[#FFB800] to-[#cc9900] bg-clip-text text-transparent">Anniversary Giveaway</span>
           </h1>
-          <p className="text-white/60 text-sm md:text-base max-w-xl mx-auto leading-relaxed">
+          <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto leading-relaxed">
             Every action — trading, streaks, referrals — earns you
             entries. One winner takes $50,000 on our 1-year anniversary.
           </p>
@@ -235,11 +235,11 @@ export default function Giveaway() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
           <div className="col-span-1 md:col-span-2 glass-panel rounded-sm p-6 flex flex-col gap-4">
-            <p className="text-[10px] text-white/50 uppercase tracking-widest font-mono">Drawing countdown</p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">Drawing countdown</p>
             {countdown.passed ? (
               <div className="text-center py-4">
                 <p className="text-2xl font-black text-[#FFB800]">Drawing has occurred!</p>
-                <p className="text-sm text-white/50 mt-1">Winner will be announced shortly.</p>
+                <p className="text-sm text-muted-foreground mt-1">Winner will be announced shortly.</p>
               </div>
             ) : (
               <div className="flex items-center gap-2 flex-wrap">
@@ -252,7 +252,7 @@ export default function Giveaway() {
                 <CountdownUnit value={countdown.seconds} label="Sec" />
               </div>
             )}
-            <p className="text-xs text-white/30">Drawing on April 11, 2026 at midnight UTC</p>
+            <p className="text-xs text-muted-foreground/50">Drawing on April 11, 2026 at midnight UTC</p>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -261,16 +261,16 @@ export default function Giveaway() {
                 <Trophy className="w-4 h-4 text-[#FFB800]" />
                 <span className="text-xs font-bold uppercase tracking-wider text-[#FFB800]">Grand Prize</span>
               </div>
-              <p className="text-3xl font-black text-white">${PRIZE_POOL.toLocaleString()}</p>
-              <p className="text-[10px] text-white/50">1 grand prize winner</p>
+              <p className="text-3xl font-black text-foreground">${PRIZE_POOL.toLocaleString()}</p>
+              <p className="text-[10px] text-muted-foreground">1 grand prize winner</p>
             </div>
             <div className="glass-panel rounded-sm p-5 flex flex-col gap-1 border border-[#00d4ff]/15">
               <div className="flex items-center gap-2 mb-1">
                 <Users className="w-4 h-4 text-[#00d4ff]" />
                 <span className="text-xs font-bold uppercase tracking-wider text-[#00d4ff]">Referral Pool</span>
               </div>
-              <p className="text-3xl font-black text-white">${REFERRAL_BONUS_POOL.toLocaleString()}</p>
-              <p className="text-[10px] text-white/50">Split among all referrers</p>
+              <p className="text-3xl font-black text-foreground">${REFERRAL_BONUS_POOL.toLocaleString()}</p>
+              <p className="text-[10px] text-muted-foreground">Split among all referrers</p>
             </div>
           </div>
         </div>
@@ -282,27 +282,27 @@ export default function Giveaway() {
                 <Gift className="w-4 h-4 text-[#00B4D8]" />
                 Your Entries
               </h2>
-              {loading && <span className="text-[10px] text-white/30 animate-pulse">Updating...</span>}
+              {loading && <span className="text-[10px] text-muted-foreground/50 animate-pulse">Updating...</span>}
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-              <div className="bg-white/[0.03] rounded-xl p-3 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-3 text-center border border-white/5">
                 <p className="text-2xl font-black font-mono text-[#FFB800]">{entries.totalEntries}</p>
-                <p className="text-[9px] uppercase tracking-wider text-white/40 mt-0.5">Total Entries</p>
+                <p className="text-[9px] uppercase tracking-wider text-muted-foreground/70 mt-0.5">Total Entries</p>
               </div>
-              <div className="bg-white/[0.03] rounded-xl p-3 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-3 text-center border border-white/5">
                 <p className="text-2xl font-black font-mono text-[#00B4D8]">{odds}</p>
-                <p className="text-[9px] uppercase tracking-wider text-white/40 mt-0.5">Win Odds</p>
+                <p className="text-[9px] uppercase tracking-wider text-muted-foreground/70 mt-0.5">Win Odds</p>
               </div>
-              <div className="bg-white/[0.03] rounded-xl p-3 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-3 text-center border border-white/5">
                 <p className="text-2xl font-black font-mono text-[#00d4ff]">{convertedReferrals}</p>
-                <p className="text-[9px] uppercase tracking-wider text-white/40 mt-0.5">Referrals</p>
+                <p className="text-[9px] uppercase tracking-wider text-muted-foreground/70 mt-0.5">Referrals</p>
               </div>
-              <div className="bg-white/[0.03] rounded-xl p-3 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-3 text-center border border-white/5">
                 <p className="text-xl font-black font-mono text-[#c084fc]">
                   ${referralBonusShare > 0 ? referralBonusShare.toFixed(0) : "—"}
                 </p>
-                <p className="text-[9px] uppercase tracking-wider text-white/40 mt-0.5">Bonus Share</p>
+                <p className="text-[9px] uppercase tracking-wider text-muted-foreground/70 mt-0.5">Bonus Share</p>
               </div>
             </div>
 
@@ -313,19 +313,19 @@ export default function Giveaway() {
                   <div key={item.title} className={`rounded-lg p-3 border ${item.border} ${item.bg} text-center`}>
                     <item.icon className={`w-4 h-4 ${item.color} mx-auto mb-1`} />
                     <p className={`text-lg font-black ${item.color}`}>{val}</p>
-                    <p className="text-[8px] text-white/40 leading-tight">{item.title.split(" ").slice(0, 2).join(" ")}</p>
+                    <p className="text-[8px] text-muted-foreground/70 leading-tight">{item.title.split(" ").slice(0, 2).join(" ")}</p>
                   </div>
                 );
               })}
             </div>
 
             {referralLink && (
-              <div className="bg-white/[0.03] rounded-xl p-4 border border-[#c084fc]/15">
+              <div className="bg-muted/50 rounded-xl p-4 border border-[#c084fc]/15">
                 <p className="text-xs font-bold text-[#c084fc] mb-2 flex items-center gap-1.5">
                   <Users className="w-3.5 h-3.5" /> Earn More Entries | Share Your Referral Link
                 </p>
                 <div className="flex gap-2">
-                  <div className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white/60 truncate">
+                  <div className="flex-1 bg-muted/50 border border-border rounded-lg px-3 py-2 text-xs font-mono text-muted-foreground truncate">
                     {referralLink}
                   </div>
                   <Button size="sm" variant="outline" className="border-[#c084fc]/30 text-[#c084fc] shrink-0" onClick={copyLink}>
@@ -335,7 +335,7 @@ export default function Giveaway() {
                     <Share2 className="w-4 h-4" />
                   </Button>
                 </div>
-                <p className="text-[10px] text-white/30 mt-2">Each converted referral = 5 giveaway entries + share of $36,000 referral bonus pool</p>
+                <p className="text-[10px] text-muted-foreground/50 mt-2">Each converted referral = 5 giveaway entries + share of $36,000 referral bonus pool</p>
               </div>
             )}
           </div>
@@ -345,7 +345,7 @@ export default function Giveaway() {
           <div className="glass-panel rounded-sm p-8 mb-8 text-center border border-[#FFB800]/20">
             <Trophy className="w-10 h-10 text-[#FFB800] mx-auto mb-3" />
             <h3 className="text-xl font-bold mb-2">Sign up to enter</h3>
-            <p className="text-sm text-white/50 mb-4 max-w-sm mx-auto">
+            <p className="text-sm text-muted-foreground mb-4 max-w-sm mx-auto">
               Create your free account and start earning entries through trading, streaks, and referrals.
             </p>
             <Link href="/sign-up">
@@ -368,7 +368,7 @@ export default function Giveaway() {
                   <item.icon className={`w-4.5 h-4.5 ${item.color}`} />
                 </div>
                 <h3 className="font-bold text-sm mb-1.5">{item.title}</h3>
-                <p className="text-xs text-white/50 leading-relaxed">{item.desc}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -379,44 +379,44 @@ export default function Giveaway() {
             <Crown className="w-5 h-5 text-[#FFB800]" />
             Entry Leaderboard
           </h2>
-          <p className="text-xs text-white/50 mb-5">Top participants ranked by total entries. More entries = better odds.</p>
+          <p className="text-xs text-muted-foreground mb-5">Top participants ranked by total entries. More entries = better odds.</p>
 
           {leaderboard.length === 0 ? (
-            <div className="glass-panel rounded-xl p-8 text-center text-white/30 text-sm">
+            <div className="glass-panel rounded-xl p-8 text-center text-muted-foreground/50 text-sm">
               No entries yet | be the first to participate!
             </div>
           ) : (
             <div className="glass-panel rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/[0.06]">
-                    <th className="text-left py-3 px-4 text-[10px] text-white/30 uppercase tracking-wider font-medium">Rank</th>
-                    <th className="text-left py-3 px-4 text-[10px] text-white/30 uppercase tracking-wider font-medium">Member</th>
-                    <th className="text-right py-3 px-4 text-[10px] text-white/30 uppercase tracking-wider font-medium">Entries</th>
-                    <th className="text-right py-3 px-4 text-[10px] text-white/30 uppercase tracking-wider font-medium hidden md:table-cell">Referrals</th>
-                    <th className="text-right py-3 px-4 text-[10px] text-white/30 uppercase tracking-wider font-medium hidden md:table-cell">Odds</th>
-                    <th className="text-right py-3 px-4 text-[10px] text-white/30 uppercase tracking-wider font-medium">Bonus Share</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 text-[10px] text-muted-foreground/50 uppercase tracking-wider font-medium">Rank</th>
+                    <th className="text-left py-3 px-4 text-[10px] text-muted-foreground/50 uppercase tracking-wider font-medium">Member</th>
+                    <th className="text-right py-3 px-4 text-[10px] text-muted-foreground/50 uppercase tracking-wider font-medium">Entries</th>
+                    <th className="text-right py-3 px-4 text-[10px] text-muted-foreground/50 uppercase tracking-wider font-medium hidden md:table-cell">Referrals</th>
+                    <th className="text-right py-3 px-4 text-[10px] text-muted-foreground/50 uppercase tracking-wider font-medium hidden md:table-cell">Odds</th>
+                    <th className="text-right py-3 px-4 text-[10px] text-muted-foreground/50 uppercase tracking-wider font-medium">Bonus Share</th>
                   </tr>
                 </thead>
                 <tbody>
                   {leaderboard.map((entry, idx) => (
-                    <tr key={entry.rank} className={`border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors ${idx === 0 ? "bg-[#FFB800]/[0.03]" : ""}`}>
+                    <tr key={entry.rank} className={`border-b border-border hover:bg-muted/30 transition-colors ${idx === 0 ? "bg-[#FFB800]/[0.03]" : ""}`}>
                       <td className="py-3 px-4">
-                        <span className={`font-mono font-bold text-sm ${idx === 0 ? "text-[#FFB800]" : idx === 1 ? "text-white/60" : idx === 2 ? "text-[#cd7f32]" : "text-white/30"}`}>
+                        <span className={`font-mono font-bold text-sm ${idx === 0 ? "text-[#FFB800]" : idx === 1 ? "text-muted-foreground" : idx === 2 ? "text-[#cd7f32]" : "text-muted-foreground/50"}`}>
                           #{entry.rank}
                         </span>
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${idx === 0 ? "bg-[#FFB800]/20 text-[#FFB800]" : "bg-white/5 text-white/40"}`}>
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${idx === 0 ? "bg-[#FFB800]/20 text-[#FFB800]" : "bg-muted/50 text-muted-foreground/70"}`}>
                             {entry.name.charAt(0).toUpperCase()}
                           </div>
                           <span className="text-sm font-medium">{entry.name}</span>
                         </div>
                       </td>
                       <td className="py-3 px-4 text-right font-mono font-bold text-[#00B4D8]">{entry.totalEntries.toLocaleString()}</td>
-                      <td className="py-3 px-4 text-right text-white/50 hidden md:table-cell">{entry.convertedReferrals}</td>
-                      <td className="py-3 px-4 text-right text-white/50 hidden md:table-cell text-xs">{entry.odds}</td>
+                      <td className="py-3 px-4 text-right text-muted-foreground hidden md:table-cell">{entry.convertedReferrals}</td>
+                      <td className="py-3 px-4 text-right text-muted-foreground hidden md:table-cell text-xs">{entry.odds}</td>
                       <td className="py-3 px-4 text-right font-mono font-bold text-[#c084fc] text-sm">
                         {entry.referralBonusShare > 0 ? `$${entry.referralBonusShare.toFixed(0)}` : "—"}
                       </td>
@@ -434,7 +434,7 @@ export default function Giveaway() {
             $36,000 Referral Bonus Pool
           </h2>
           <div className="glass-panel rounded-sm p-6 border border-[#00d4ff]/15">
-            <p className="text-sm text-white/60 leading-relaxed mb-4">
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               On top of the $50K grand prize drawing, there's a separate <strong className="text-[#00d4ff]">$36,000 referral bonus pool</strong> split
               among everyone who successfully brings friends onto the platform. The more friends you convert, the bigger your
               share. This is in addition to all existing milestone rewards (extra signals, Pro trial, TaxGPT, Ambassador).
@@ -445,15 +445,15 @@ export default function Giveaway() {
                 { icon: Star, color: "text-[#FFB800]", val: "10–25 refs", bonus: "~$3,600–$9,000", label: "Active referrer" },
                 { icon: Crown, color: "text-[#00B4D8]", val: "50+ refs", bonus: "$18,000+", label: "Super referrer" },
               ].map((t) => (
-                <div key={t.label} className="bg-white/[0.03] rounded-xl p-4 border border-white/5 text-center">
+                <div key={t.label} className="bg-muted/50 rounded-xl p-4 border border-white/5 text-center">
                   <t.icon className={`w-5 h-5 ${t.color} mx-auto mb-2`} />
-                  <p className="text-xs text-white/50">{t.val}</p>
+                  <p className="text-xs text-muted-foreground">{t.val}</p>
                   <p className={`text-lg font-black ${t.color}`}>{t.bonus}</p>
-                  <p className="text-[10px] text-white/30">{t.label}</p>
+                  <p className="text-[10px] text-muted-foreground/50">{t.label}</p>
                 </div>
               ))}
             </div>
-            <p className="text-[10px] text-white/30 mt-4">
+            <p className="text-[10px] text-muted-foreground/50 mt-4">
               * Bonus shares are approximate and proportional to your share of total converted referrals. Actual amounts depend on total pool participants.
             </p>
           </div>
@@ -464,7 +464,7 @@ export default function Giveaway() {
             <Target className="w-4 h-4 text-primary" />
             Rules Summary
           </h2>
-          <ul className="space-y-2 text-sm text-white/60">
+          <ul className="space-y-2 text-sm text-muted-foreground">
             {[
               "Open to all registered EntangleWealth members in good standing.",
               "Entries are calculated automatically based on platform activity | no manual submission needed.",
@@ -480,8 +480,8 @@ export default function Giveaway() {
               </li>
             ))}
           </ul>
-          <p className="text-[10px] text-white/50 mt-4">
-            <a href="/terms" className="underline hover:text-white/40 transition-colors">Full Terms & Conditions</a>
+          <p className="text-[10px] text-muted-foreground mt-4">
+            <a href="/terms" className="underline hover:text-muted-foreground/70 transition-colors">Full Terms & Conditions</a>
           </p>
         </div>
 
@@ -491,7 +491,7 @@ export default function Giveaway() {
               Enter Now | It's Free →
             </Button>
           </Link>
-          <p className="text-[10px] text-white/30 mt-2">No purchase necessary. Free tier users are fully eligible.</p>
+          <p className="text-[10px] text-muted-foreground/50 mt-2">No purchase necessary. Free tier users are fully eligible.</p>
         </div>
       </div>
     </Layout>

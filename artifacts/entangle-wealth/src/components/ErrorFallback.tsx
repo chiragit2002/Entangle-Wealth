@@ -7,7 +7,7 @@ interface ErrorFallbackProps {
 
 export default function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
   return (
-    <div className="min-h-screen bg-[#0A0E1A] text-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-card text-foreground flex items-center justify-center p-4">
       <div className="max-w-sm w-full space-y-4">
         <div className="flex items-center gap-3">
           <div
@@ -20,16 +20,16 @@ export default function ErrorFallback({ error, resetErrorBoundary }: ErrorFallba
             <AlertTriangle className="w-4 h-4 text-red-400" />
           </div>
           <div>
-            <div className="text-[9px] tracking-[0.3em] uppercase font-mono text-white/30 mb-0.5">
+            <div className="text-[9px] tracking-[0.3em] uppercase font-mono text-muted-foreground/50 mb-0.5">
               System Error
             </div>
-            <h2 className="text-sm font-semibold font-mono text-white/80">
+            <h2 className="text-sm font-semibold font-mono text-foreground/80">
               Something went wrong
             </h2>
           </div>
         </div>
 
-        <p className="text-xs text-white/40 font-mono leading-relaxed">
+        <p className="text-xs text-muted-foreground/70 font-mono leading-relaxed">
           An unexpected error occurred. Your data is safe. Try refreshing to resume.
         </p>
 

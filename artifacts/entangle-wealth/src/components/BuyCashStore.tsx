@@ -109,35 +109,35 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 " onClick={onClose}>
       <div
-        className="relative w-full max-w-2xl mx-4 bg-[#0A0E1A] border border-white/[0.08] rounded-xl shadow-2xl shadow-black/60 overflow-hidden"
+        className="relative w-full max-w-2xl mx-4 bg-card border border-border rounded-xl shadow-2xl shadow-black/60 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-5 py-4 bg-white/[0.02] border-b border-white/[0.06]">
+        <div className="flex items-center justify-between px-5 py-4 bg-muted/30 border-b border-border">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-md bg-[#00B4D8]/10 flex items-center justify-center">
               <TrendingUp className="w-4 h-4 text-[#00B4D8]" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-white font-mono tracking-wide">BUY PRACTICE CASH</h2>
-              <p className="text-[10px] font-mono text-white/30">Top up your paper trading account</p>
+              <h2 className="text-sm font-bold text-foreground font-mono tracking-wide">BUY PRACTICE CASH</h2>
+              <p className="text-[10px] font-mono text-muted-foreground/50">Top up your paper trading account</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-white/50 hover:text-white/50 transition-colors p-1">
+          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground transition-colors p-1">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="flex border-b border-white/[0.06]">
+        <div className="flex border-b border-border">
           <button
             onClick={() => setActiveTab("store")}
-            className={`flex-1 py-2.5 text-[10px] font-mono font-bold uppercase tracking-wider transition-colors ${activeTab === "store" ? "text-[#00B4D8] border-b-2 border-[#00B4D8] bg-[#00B4D8]/[0.05]" : "text-white/30 hover:text-white/50"}`}
+            className={`flex-1 py-2.5 text-[10px] font-mono font-bold uppercase tracking-wider transition-colors ${activeTab === "store" ? "text-[#00B4D8] border-b-2 border-[#00B4D8] bg-[#00B4D8]/[0.05]" : "text-muted-foreground/50 hover:text-muted-foreground"}`}
           >
             <ShoppingCart className="w-3 h-3 inline mr-1.5" />
             Store
           </button>
           <button
             onClick={() => setActiveTab("history")}
-            className={`flex-1 py-2.5 text-[10px] font-mono font-bold uppercase tracking-wider transition-colors ${activeTab === "history" ? "text-[#00B4D8] border-b-2 border-[#00B4D8] bg-[#00B4D8]/[0.05]" : "text-white/30 hover:text-white/50"}`}
+            className={`flex-1 py-2.5 text-[10px] font-mono font-bold uppercase tracking-wider transition-colors ${activeTab === "history" ? "text-[#00B4D8] border-b-2 border-[#00B4D8] bg-[#00B4D8]/[0.05]" : "text-muted-foreground/50 hover:text-muted-foreground"}`}
           >
             <Clock className="w-3 h-3 inline mr-1.5" />
             History
@@ -151,13 +151,13 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
                 <div className="flex items-center justify-center py-12">
                   <div className="flex flex-col items-center gap-3">
                     <div className="w-6 h-6 border-2 border-[#00B4D8]/30 border-t-[#00B4D8] rounded-full animate-spin" />
-                    <p className="text-[10px] font-mono text-white/30">LOADING PACKAGES...</p>
+                    <p className="text-[10px] font-mono text-muted-foreground/50">LOADING PACKAGES...</p>
                   </div>
                 </div>
               ) : products.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-3">
-                  <DollarSign className="w-8 h-8 text-white/10" />
-                  <p className="text-xs font-mono text-white/30">No packages available at this time</p>
+                  <DollarSign className="w-8 h-8 text-muted-foreground/20" />
+                  <p className="text-xs font-mono text-muted-foreground/50">No packages available at this time</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-3">
@@ -168,7 +168,7 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
                     return (
                       <div
                         key={product.priceId}
-                        className={`relative flex flex-col gap-2.5 p-4 rounded-lg border transition-all ${isPopular ? "border-[#00B4D8]/40 bg-[#00B4D8]/[0.04]" : "border-white/[0.07] bg-white/[0.02] hover:border-white/[0.12]"}`}
+                        className={`relative flex flex-col gap-2.5 p-4 rounded-lg border transition-all ${isPopular ? "border-[#00B4D8]/40 bg-[#00B4D8]/[0.04]" : "border-white/[0.07] bg-muted/30 hover:border-border"}`}
                       >
                         {isPopular && (
                           <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
@@ -180,14 +180,14 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
 
                         <div className="flex items-center gap-1.5">
                           <Zap className={`w-3 h-3 ${isPopular ? "text-[#00B4D8]" : "text-[#00B4D8]"}`} />
-                          <span className="text-[9px] font-mono text-white/30 uppercase">Virtual Cash</span>
+                          <span className="text-[9px] font-mono text-muted-foreground/50 uppercase">Virtual Cash</span>
                         </div>
 
                         <div>
-                          <p className={`text-2xl font-bold font-mono ${isPopular ? "text-[#00B4D8]" : "text-white"}`}>
+                          <p className={`text-2xl font-bold font-mono ${isPopular ? "text-[#00B4D8]" : "text-foreground"}`}>
                             {formatVirtualAmount(product.virtualAmount)}
                           </p>
-                          <p className="text-[9px] font-mono text-white/25 mt-0.5">
+                          <p className="text-[9px] font-mono text-muted-foreground/40 mt-0.5">
                             ${product.virtualAmount.toLocaleString()} practice dollars
                           </p>
                         </div>
@@ -195,7 +195,7 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
                         <button
                           onClick={() => handleBuy(product.priceId)}
                           disabled={isLoading || !isSignedIn}
-                          className={`w-full h-8 text-[10px] font-mono font-bold rounded-md transition-all disabled:opacity-40 ${isPopular ? "bg-[#00B4D8] text-black hover:bg-[#00B4D8]/80" : "bg-white/[0.06] text-white hover:bg-white/[0.10] border border-white/[0.08]"}`}
+                          className={`w-full h-8 text-[10px] font-mono font-bold rounded-md transition-all disabled:opacity-40 ${isPopular ? "bg-[#00B4D8] text-black hover:bg-[#00B4D8]/80" : "bg-muted text-foreground hover:bg-white/[0.10] border border-border"}`}
                         >
                           {isLoading ? (
                             <span className="flex items-center justify-center gap-1.5">
@@ -216,8 +216,8 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
                   Sign in to purchase virtual cash packages
                 </p>
               )}
-              <div className="mt-4 p-3 bg-white/[0.02] rounded-lg border border-white/[0.04]">
-                <p className="text-[9px] font-mono text-white/40 text-center leading-relaxed">
+              <div className="mt-4 p-3 bg-muted/30 rounded-lg border border-border">
+                <p className="text-[9px] font-mono text-muted-foreground/70 text-center leading-relaxed">
                   Virtual cash is for paper trading practice only and has no real-world monetary value.
                   Payments are processed securely by Stripe.
                 </p>
@@ -229,13 +229,13 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
             <>
               {!isSignedIn ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-3">
-                  <Clock className="w-8 h-8 text-white/10" />
-                  <p className="text-xs font-mono text-white/30">Sign in to view purchase history</p>
+                  <Clock className="w-8 h-8 text-muted-foreground/20" />
+                  <p className="text-xs font-mono text-muted-foreground/50">Sign in to view purchase history</p>
                 </div>
               ) : purchases.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-3">
-                  <ShoppingCart className="w-8 h-8 text-white/10" />
-                  <p className="text-xs font-mono text-white/30">No purchases yet</p>
+                  <ShoppingCart className="w-8 h-8 text-muted-foreground/20" />
+                  <p className="text-xs font-mono text-muted-foreground/50">No purchases yet</p>
                   <button
                     onClick={() => setActiveTab("store")}
                     className="text-[10px] font-mono text-[#00B4D8] hover:underline"
@@ -248,7 +248,7 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
                   {purchases.map((purchase) => (
                     <div
                       key={purchase.id}
-                      className="flex items-center justify-between p-3 bg-white/[0.02] rounded-lg border border-white/[0.05]"
+                      className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-7 h-7 rounded-md bg-[#00B4D8]/10 flex items-center justify-center">
@@ -258,14 +258,14 @@ export function BuyCashStore({ onClose, onPurchaseSuccess }: BuyCashStoreProps) 
                           <p className="text-[11px] font-mono font-bold text-[#00B4D8]">
                             +{formatVirtualAmount(purchase.virtualAmountCredited)} Virtual Cash
                           </p>
-                          <p className="text-[9px] font-mono text-white/25">{formatDate(purchase.createdAt)}</p>
+                          <p className="text-[9px] font-mono text-muted-foreground/40">{formatDate(purchase.createdAt)}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-[11px] font-mono font-bold text-white">
+                        <p className="text-[11px] font-mono font-bold text-foreground">
                           ${(purchase.amountPaidCents / 100).toFixed(0)}
                         </p>
-                        <p className="text-[9px] font-mono text-white/40 uppercase">paid</p>
+                        <p className="text-[9px] font-mono text-muted-foreground/70 uppercase">paid</p>
                       </div>
                     </div>
                   ))}

@@ -478,13 +478,13 @@ export default function TaxYearSummary() {
       <div className="container mx-auto px-4 py-10 max-w-3xl">
         <div className="flex items-center gap-3 mb-6">
           <Link href="/tax">
-            <Button variant="outline" size="sm" className="border-white/10 text-white/50 gap-1 text-xs">
+            <Button variant="outline" size="sm" className="border-border text-muted-foreground gap-1 text-xs">
               <ChevronLeft className="w-3 h-3" /> TaxFlow
             </Button>
           </Link>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold tracking-tight text-white">Tax Year Summary</h1>
-            <p className="text-white/40 text-xs">Paper trading gains, wash sales & quarterly estimates — {taxYear}</p>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Tax Year Summary</h1>
+            <p className="text-muted-foreground/70 text-xs">Paper trading gains, wash sales & quarterly estimates — {taxYear}</p>
           </div>
         </div>
 
@@ -497,40 +497,40 @@ export default function TaxYearSummary() {
           </div>
         )}
 
-        <div className="glass-panel rounded-xl p-3 mb-6 border border-white/[0.06]">
-          <p className="text-[11px] text-white/30 leading-relaxed">
+        <div className="glass-panel rounded-xl p-3 mb-6 border border-border">
+          <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
             For education only. Paper trading gains/losses are simulated. Consult a CPA for real tax situations.
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="glass-panel rounded-xl p-4 border border-[rgba(0,255,65,0.15)]">
-            <p className="text-[11px] text-white/40 mb-1">Net Realized P&L</p>
+            <p className="text-[11px] text-muted-foreground/70 mb-1">Net Realized P&L</p>
             <p className={`text-xl font-extrabold font-mono ${totalRealizedGain >= 0 ? "text-[#00FF41]" : "text-[#ff4757]"}`}>
               {formatDollarSigned(totalRealizedGain)}
             </p>
-            <p className="text-[10px] text-white/30 mt-1">{gainsWithWashSale.length} closed position{gainsWithWashSale.length !== 1 ? "s" : ""}</p>
+            <p className="text-[10px] text-muted-foreground/50 mt-1">{gainsWithWashSale.length} closed position{gainsWithWashSale.length !== 1 ? "s" : ""}</p>
           </div>
           <div className="glass-panel rounded-xl p-4 border border-[rgba(0,255,65,0.15)]">
-            <p className="text-[11px] text-white/40 mb-1">Unrealized Gain/Loss</p>
+            <p className="text-[11px] text-muted-foreground/70 mb-1">Unrealized Gain/Loss</p>
             <p className={`text-xl font-extrabold font-mono ${totalUnrealizedGain >= 0 ? "text-[#00FF41]" : "text-[#ff4757]"}`}>
               {formatDollarSigned(totalUnrealizedGain)}
             </p>
-            <p className="text-[10px] text-white/30 mt-1">{positions.length} open position{positions.length !== 1 ? "s" : ""}</p>
+            <p className="text-[10px] text-muted-foreground/50 mt-1">{positions.length} open position{positions.length !== 1 ? "s" : ""}</p>
           </div>
           <div className="glass-panel rounded-xl p-4 border border-[rgba(0,255,65,0.1)]">
-            <p className="text-[11px] text-white/40 mb-1">Short-Term Gains</p>
+            <p className="text-[11px] text-muted-foreground/70 mb-1">Short-Term Gains</p>
             <p className={`text-lg font-bold font-mono ${shortTermGains >= 0 ? "text-[#00FF41]" : "text-[#ff4757]"}`}>
               {formatDollarSigned(shortTermGains)}
             </p>
-            <p className="text-[10px] text-white/30 mt-1">Ordinary income rate ({Math.round(marginalRate * 100)}%)</p>
+            <p className="text-[10px] text-muted-foreground/50 mt-1">Ordinary income rate ({Math.round(marginalRate * 100)}%)</p>
           </div>
           <div className="glass-panel rounded-xl p-4 border border-[rgba(0,255,65,0.1)]">
-            <p className="text-[11px] text-white/40 mb-1">Long-Term Gains</p>
+            <p className="text-[11px] text-muted-foreground/70 mb-1">Long-Term Gains</p>
             <p className={`text-lg font-bold font-mono ${longTermGains >= 0 ? "text-[#00FF41]" : "text-[#ff4757]"}`}>
               {formatDollarSigned(longTermGains)}
             </p>
-            <p className="text-[10px] text-white/30 mt-1">LTCG rate ({Math.round(ltcgRate * 100)}%)</p>
+            <p className="text-[10px] text-muted-foreground/50 mt-1">LTCG rate ({Math.round(ltcgRate * 100)}%)</p>
           </div>
         </div>
 
@@ -539,7 +539,7 @@ export default function TaxYearSummary() {
             <AlertTriangle className="w-5 h-5 text-[#ff4757] shrink-0 mt-0.5" />
             <div>
               <p className="font-bold text-[14px] text-[#ff4757]">{washSaleFlags.length} Wash Sale Violation{washSaleFlags.length !== 1 ? "s" : ""} Detected</p>
-              <p className="text-[12px] text-white/50 mt-0.5">
+              <p className="text-[12px] text-muted-foreground mt-0.5">
                 {formatDollar(washSaleAdjustment)} in losses are disallowed under IRS §1091. See Wash Sales tab.
               </p>
             </div>
@@ -554,7 +554,7 @@ export default function TaxYearSummary() {
               className={`flex-1 py-2 rounded-xl text-[12px] font-semibold transition-all ${
                 activeTab === tab
                   ? "bg-[#00FF41]/10 text-[#00FF41] border border-[#00FF41]/30"
-                  : "text-white/40 border border-transparent hover:text-white/60"
+                  : "text-muted-foreground/70 border border-transparent hover:text-muted-foreground"
               }`}
             >
               {tab === "summary" ? "Year Summary" : tab === "washsales" ? `Wash Sales ${washSaleFlags.length > 0 ? `(${washSaleFlags.length})` : ""}` : "Quarterly Est."}
@@ -564,7 +564,7 @@ export default function TaxYearSummary() {
 
         {activeTab === "summary" && (
           <>
-            <div className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4">
+            <div className="flex items-center gap-2 pb-2 border-b border-border mb-4">
               <TrendingUp className="w-5 h-5 text-[#00FF41]" />
               <h2 className="text-base font-semibold">Realized Gains &amp; Losses</h2>
             </div>
@@ -588,8 +588,8 @@ export default function TaxYearSummary() {
                     </span>
                   </div>
                   <div className="flex justify-between mt-1">
-                    <span className="text-[11px] text-white/40">{g.quantity} shares · {g.date}</span>
-                    <span className="text-[11px] text-white/30">Proceeds {formatDollar(g.proceeds)} · Basis {formatDollar(g.costBasis)}</span>
+                    <span className="text-[11px] text-muted-foreground/70">{g.quantity} shares · {g.date}</span>
+                    <span className="text-[11px] text-muted-foreground/50">Proceeds {formatDollar(g.proceeds)} · Basis {formatDollar(g.costBasis)}</span>
                   </div>
                   {g.washSale && (
                     <p className="text-[10px] text-[#ffb800] mt-1">
@@ -599,11 +599,11 @@ export default function TaxYearSummary() {
                 </div>
               ))}
               {gainsWithWashSale.length === 0 && (
-                <p className="text-[13px] text-white/30 text-center py-8">No closed positions for this tax year.</p>
+                <p className="text-[13px] text-muted-foreground/50 text-center py-8">No closed positions for this tax year.</p>
               )}
             </div>
 
-            <div className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4">
+            <div className="flex items-center gap-2 pb-2 border-b border-border mb-4">
               <BarChart2 className="w-5 h-5 text-[#00FF41]" />
               <h2 className="text-base font-semibold">Unrealized Positions</h2>
             </div>
@@ -617,26 +617,26 @@ export default function TaxYearSummary() {
                     </span>
                   </div>
                   <div className="flex justify-between mt-1">
-                    <span className="text-[11px] text-white/40">{p.quantity} shares · Avg cost {formatDollar(p.avgCost)}</span>
-                    <span className="text-[11px] text-white/30">Market value {formatDollar(p.marketValue)}</span>
+                    <span className="text-[11px] text-muted-foreground/70">{p.quantity} shares · Avg cost {formatDollar(p.avgCost)}</span>
+                    <span className="text-[11px] text-muted-foreground/50">Market value {formatDollar(p.marketValue)}</span>
                   </div>
                 </div>
               ))}
             </div>
 
             <div className="glass-panel rounded-xl p-4 border border-[rgba(0,255,65,0.15)] mb-6">
-              <p className="text-[11px] text-white/40 mb-3 uppercase tracking-wider">Estimated Tax on Capital Gains</p>
+              <p className="text-[11px] text-muted-foreground/70 mb-3 uppercase tracking-wider">Estimated Tax on Capital Gains</p>
               <div className="space-y-2">
                 <div className="flex justify-between text-[13px]">
-                  <span className="text-white/60">Short-term tax ({Math.round(marginalRate * 100)}%)</span>
+                  <span className="text-muted-foreground">Short-term tax ({Math.round(marginalRate * 100)}%)</span>
                   <span className="font-mono text-[#ffb800]">{formatDollar(Math.max(0, shortTermGains) * marginalRate)}</span>
                 </div>
                 <div className="flex justify-between text-[13px]">
-                  <span className="text-white/60">Long-term tax ({Math.round(ltcgRate * 100)}%)</span>
+                  <span className="text-muted-foreground">Long-term tax ({Math.round(ltcgRate * 100)}%)</span>
                   <span className="font-mono text-[#ffb800]">{formatDollar(Math.max(0, longTermGains) * ltcgRate)}</span>
                 </div>
-                <div className="flex justify-between text-[13px] font-bold border-t border-white/10 pt-2">
-                  <span className="text-white">Estimated capital gains tax</span>
+                <div className="flex justify-between text-[13px] font-bold border-t border-border pt-2">
+                  <span className="text-foreground">Estimated capital gains tax</span>
                   <span className="font-mono text-[#00FF41]">{formatDollar(estimatedTaxOnGains)}</span>
                 </div>
               </div>
@@ -646,22 +646,22 @@ export default function TaxYearSummary() {
 
         {activeTab === "washsales" && (
           <>
-            <div className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4">
+            <div className="flex items-center gap-2 pb-2 border-b border-border mb-4">
               <Shield className="w-5 h-5 text-[#ff4757]" />
               <h2 className="text-base font-semibold">Wash Sale Detection — IRS §1091</h2>
             </div>
 
-            <div className="glass-panel rounded-xl p-4 mb-6 border border-white/[0.06]">
-              <p className="text-[12px] text-white/50 leading-relaxed">
-                <strong className="text-white">Wash sale rule:</strong> If you sell a security at a loss and repurchase the same or "substantially identical" security within 30 days before or after the sale, the loss is <strong className="text-[#ffb800]">disallowed</strong> for that tax year. The disallowed amount is added to the cost basis of the new shares.
+            <div className="glass-panel rounded-xl p-4 mb-6 border border-border">
+              <p className="text-[12px] text-muted-foreground leading-relaxed">
+                <strong className="text-foreground">Wash sale rule:</strong> If you sell a security at a loss and repurchase the same or "substantially identical" security within 30 days before or after the sale, the loss is <strong className="text-[#ffb800]">disallowed</strong> for that tax year. The disallowed amount is added to the cost basis of the new shares.
               </p>
             </div>
 
             {washSaleFlags.length === 0 ? (
               <div className="text-center py-12">
                 <Shield className="w-10 h-10 mx-auto mb-3 text-[#00FF41]/40" />
-                <p className="font-semibold text-white/50 mb-1">No Wash Sale Violations</p>
-                <p className="text-[13px] text-white/30">All your loss trades appear to be compliant with the 30-day repurchase rule.</p>
+                <p className="font-semibold text-muted-foreground mb-1">No Wash Sale Violations</p>
+                <p className="text-[13px] text-muted-foreground/50">All your loss trades appear to be compliant with the 30-day repurchase rule.</p>
               </div>
             ) : (
               <div className="space-y-3 mb-8">
@@ -674,21 +674,21 @@ export default function TaxYearSummary() {
                           <span className="font-bold text-[15px] font-mono">{f.sellTrade.symbol}</span>
                           <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#ff4757]/15 text-[#ff4757] font-bold">WASH SALE</span>
                         </div>
-                        <p className="text-[12px] text-white/50">
+                        <p className="text-[12px] text-muted-foreground">
                           Sold at loss on {new Date(f.sellTrade.createdAt).toLocaleDateString("en-US")}
                           {" · "}Repurchased {f.daysApart} days {new Date(f.triggeringBuyDate) < new Date(f.sellTrade.createdAt) ? "before" : "after"} ({f.triggeringBuyDate})
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-[11px] text-white/40">Disallowed Loss</p>
+                        <p className="text-[11px] text-muted-foreground/70">Disallowed Loss</p>
                         <p className="font-bold font-mono text-[#ff4757] text-[16px]">{formatDollar(f.disallowedLoss)}</p>
                       </div>
                     </div>
-                    <div className="bg-white/[0.03] rounded-lg p-3 mt-2 space-y-1">
-                      <p className="text-[11px] text-white/40">
-                        <span className="text-white/60">Sell price:</span> {formatDollar(f.sellTrade.totalCost / f.sellTrade.quantity)}/share
+                    <div className="bg-muted/50 rounded-lg p-3 mt-2 space-y-1">
+                      <p className="text-[11px] text-muted-foreground/70">
+                        <span className="text-muted-foreground">Sell price:</span> {formatDollar(f.sellTrade.totalCost / f.sellTrade.quantity)}/share
                         {" · "}
-                        <span className="text-white/60">Cost basis:</span> {formatDollar(f.sellTrade.costBasis)}/share
+                        <span className="text-muted-foreground">Cost basis:</span> {formatDollar(f.sellTrade.costBasis)}/share
                       </p>
                       <p className="text-[11px] text-[#ffb800]">
                         ⚠ The disallowed loss of {formatDollar(f.disallowedLoss)} is added to the cost basis of your replacement shares of {f.sellTrade.symbol}.
@@ -702,7 +702,7 @@ export default function TaxYearSummary() {
             {washSaleFlags.length > 0 && (
               <div className="glass-panel rounded-xl p-4 border border-[#ffb800]/20 bg-[#ffb800]/5">
                 <p className="font-bold text-[13px] mb-2">How to avoid wash sales:</p>
-                <ul className="space-y-1 text-[12px] text-white/60">
+                <ul className="space-y-1 text-[12px] text-muted-foreground">
                   <li>• Wait 31+ days before repurchasing the same security after a loss sale</li>
                   <li>• Buy a similar (but not "substantially identical") ETF instead</li>
                   <li>• Use tax-loss harvesting paired with a substitute holding during the 30-day window</li>
@@ -715,35 +715,35 @@ export default function TaxYearSummary() {
 
         {activeTab === "quarterly" && (
           <>
-            <div className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4">
+            <div className="flex items-center gap-2 pb-2 border-b border-border mb-4">
               <Calendar className="w-5 h-5 text-[#00FF41]" />
               <h2 className="text-base font-semibold">Quarterly Estimated Tax Payments</h2>
             </div>
 
-            <div className="glass-panel rounded-xl p-4 mb-6 border border-white/[0.06]">
-              <p className="text-[12px] text-white/50 leading-relaxed">
-                Self-employed individuals and investors with capital gains must make quarterly estimated payments to avoid an underpayment penalty. The <strong className="text-white">safe harbor</strong> rule protects you if you pay at least 100% of prior year tax (110% if AGI &gt; $150K).
+            <div className="glass-panel rounded-xl p-4 mb-6 border border-border">
+              <p className="text-[12px] text-muted-foreground leading-relaxed">
+                Self-employed individuals and investors with capital gains must make quarterly estimated payments to avoid an underpayment penalty. The <strong className="text-foreground">safe harbor</strong> rule protects you if you pay at least 100% of prior year tax (110% if AGI &gt; $150K).
               </p>
             </div>
 
             <div className="glass-panel rounded-xl p-4 mb-6 border border-[rgba(0,255,65,0.15)]">
-              <p className="text-[11px] text-white/40 mb-3 uppercase tracking-wider">Tax Estimate — {taxYear}</p>
+              <p className="text-[11px] text-muted-foreground/70 mb-3 uppercase tracking-wider">Tax Estimate — {taxYear}</p>
               <div className="space-y-2">
                 <div className="flex justify-between text-[13px]">
-                  <span className="text-white/60">SE Tax (15.3%)</span>
+                  <span className="text-muted-foreground">SE Tax (15.3%)</span>
                   <span className="font-mono">{formatDollar(seTax)}</span>
                 </div>
                 <div className="flex justify-between text-[13px]">
-                  <span className="text-white/60">Income Tax (federal)</span>
+                  <span className="text-muted-foreground">Income Tax (federal)</span>
                   <span className="font-mono">{formatDollar(incomeTax)}</span>
                 </div>
                 {estimatedTaxOnGains > 0 && (
                   <div className="flex justify-between text-[13px]">
-                    <span className="text-white/60">Capital Gains Tax</span>
+                    <span className="text-muted-foreground">Capital Gains Tax</span>
                     <span className="font-mono">{formatDollar(estimatedTaxOnGains)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-[13px] font-bold border-t border-white/10 pt-2">
+                <div className="flex justify-between text-[13px] font-bold border-t border-border pt-2">
                   <span>Estimated Annual Tax</span>
                   <span className="font-mono text-[#00FF41]">{formatDollar(totalTax)}</span>
                 </div>
@@ -758,10 +758,10 @@ export default function TaxYearSummary() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-[14px]">Due: {q.due}</p>
-                    <p className="text-[11px] text-white/40">{q.period}</p>
+                    <p className="text-[11px] text-muted-foreground/70">{q.period}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[11px] text-white/40">Payment</p>
+                    <p className="text-[11px] text-muted-foreground/70">Payment</p>
                     <p className="font-mono font-bold text-[18px] text-[#00FF41]">{formatDollar(quarterlyPayment)}</p>
                   </div>
                 </div>
@@ -772,16 +772,16 @@ export default function TaxYearSummary() {
               <p className="font-bold text-[13px] mb-3">Safe Harbor Thresholds</p>
               <div className="space-y-2">
                 <div className="flex justify-between text-[13px]">
-                  <span className="text-white/60">100% of prior year tax / quarter</span>
+                  <span className="text-muted-foreground">100% of prior year tax / quarter</span>
                   <span className="font-mono font-bold text-[#ffb800]">{formatDollar(safeHarbor100)}</span>
                 </div>
                 <div className="flex justify-between text-[13px]">
-                  <span className="text-white/60">110% of prior year tax / quarter (AGI &gt; $150K)</span>
+                  <span className="text-muted-foreground">110% of prior year tax / quarter (AGI &gt; $150K)</span>
                   <span className="font-mono font-bold text-[#ffb800]">{formatDollar(safeHarbor110)}</span>
                 </div>
-                <div className="mt-3 p-3 rounded-lg bg-white/[0.03] border border-white/10">
-                  <p className="text-[11px] text-white/40">
-                    Your required safe harbor payment: <strong className="text-white">{formatDollar(safeHarborRequired)} / quarter</strong>
+                <div className="mt-3 p-3 rounded-lg bg-muted/50 border border-border">
+                  <p className="text-[11px] text-muted-foreground/70">
+                    Your required safe harbor payment: <strong className="text-foreground">{formatDollar(safeHarborRequired)} / quarter</strong>
                     {grossRevenue > 150000
                       ? " (110% rule applies — AGI likely over $150K)"
                       : " (100% rule applies)"}
@@ -795,7 +795,7 @@ export default function TaxYearSummary() {
                 <AlertTriangle className="w-4 h-4 text-[#ff4757] shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold text-[13px] text-[#ff4757] mb-1">Underpayment Penalty Warning</p>
-                  <p className="text-[12px] text-white/50">
+                  <p className="text-[12px] text-muted-foreground">
                     If you pay less than the safe harbor amount in any quarter, the IRS charges an underpayment penalty (currently ~8% annualized on the shortfall). Pay the safe harbor amount by each due date to avoid this penalty even if your final tax is higher.
                   </p>
                 </div>

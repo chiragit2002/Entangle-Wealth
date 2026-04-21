@@ -246,19 +246,19 @@ export default function TaxGPT() {
       <div className="container mx-auto px-4 py-6 max-w-3xl">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9c27b0] to-[#6a1b9a] flex items-center justify-center">
-            <MessageCircle className="w-5 h-5 text-white" />
+            <MessageCircle className="w-5 h-5 text-foreground" />
           </div>
           <div className="flex-1">
             <h1 className="text-2xl md:text-3xl font-bold">TaxGPT</h1>
             <p className="text-[12px] text-muted-foreground">Ask anything about deductions, strategies, and IRS rules{profile ? ` · ${ENTITY_SHORT_LABELS[profile.entityType]}` : ""}</p>
           </div>
-          <Button variant="outline" size="sm" onClick={clearChat} className="border-white/10 text-white/40 gap-1 text-[11px]">
+          <Button variant="outline" size="sm" onClick={clearChat} className="border-border text-muted-foreground/70 gap-1 text-[11px]">
             <Trash2 className="w-3 h-3" /> Clear
           </Button>
         </div>
 
-        <div className="glass-panel rounded-xl p-3 mb-6 border border-white/[0.06]">
-          <p className="text-[11px] text-white/30 leading-relaxed">
+        <div className="glass-panel rounded-xl p-3 mb-6 border border-border">
+          <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
             Educational info only — not tax advice. Consult a CPA for your specific situation.
           </p>
         </div>
@@ -315,11 +315,11 @@ export default function TaxGPT() {
               onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               maxLength={1000}
               disabled={loading}
-              className="bg-white/5 border-white/10 flex-1"
+              className="bg-muted/50 border-border flex-1"
             />
             <Button
               aria-label="Send question"
-              className="bg-gradient-to-r from-[#9c27b0] to-[#6a1b9a] text-white font-bold px-4 min-h-[44px] min-w-[44px]"
+              className="bg-gradient-to-r from-[#9c27b0] to-[#6a1b9a] text-foreground font-bold px-4 min-h-[44px] min-w-[44px]"
               onClick={() => sendMessage()}
               disabled={loading || !input.trim()}
             >
@@ -328,7 +328,7 @@ export default function TaxGPT() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-border mb-4">
           <MessageCircle className="w-5 h-5 text-[#9c27b0]" />
           <h2 className="text-lg font-semibold">Quick Questions{profile ? ` for ${ENTITY_SHORT_LABELS[profile.entityType]}` : ""}</h2>
         </div>
@@ -337,7 +337,7 @@ export default function TaxGPT() {
             {chips.map((q, i) => (
               <button key={i}
                 onClick={() => sendMessage(q.text)}
-                className="text-left text-[13px] p-3 rounded-lg border border-white/10 bg-transparent hover:bg-white/5 text-muted-foreground transition-colors min-h-[44px]"
+                className="text-left text-[13px] p-3 rounded-lg border border-border bg-transparent hover:bg-muted/50 text-muted-foreground transition-colors min-h-[44px]"
                 disabled={loading}
               >
                 {q.emoji} {q.text}
@@ -346,7 +346,7 @@ export default function TaxGPT() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-border mb-4">
           <AlertTriangle className="w-5 h-5 text-[#ff4757]" />
           <h2 className="text-lg font-semibold">Audit Risk Factors</h2>
         </div>
@@ -363,7 +363,7 @@ export default function TaxGPT() {
                 </span>
               </div>
               <p className="text-[13px] text-muted-foreground mb-2">{risk.description}</p>
-              <div className="h-2 bg-white/[0.06] rounded-full overflow-hidden">
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div className="h-full rounded-full" style={{ width: `${risk.pct}%`, backgroundColor: getRiskColor(risk.level) }} />
               </div>
             </div>

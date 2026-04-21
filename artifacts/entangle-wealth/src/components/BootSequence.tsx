@@ -92,7 +92,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[200] bg-[#010108] flex flex-col items-center justify-center overflow-hidden select-none"
+      className="fixed inset-0 z-[200] bg-background flex flex-col items-center justify-center overflow-hidden select-none"
       style={{ fontFamily: "'JetBrains Mono', monospace" }}
     >
       <div
@@ -136,7 +136,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
             <div className="text-[10px] tracking-[0.3em] uppercase text-[#00B4D8]/60 mb-1">
               ENTANGLE WEALTH
             </div>
-            <div className="text-[8px] tracking-[0.2em] uppercase text-white/20">
+            <div className="text-[8px] tracking-[0.2em] uppercase text-muted-foreground/40">
               Quantum Financial Intelligence
             </div>
           </div>
@@ -218,7 +218,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 
       <button
         onClick={handleSkip}
-        className="absolute bottom-6 right-6 text-[10px] text-white/20 hover:text-white/50 transition-colors tracking-wider"
+        className="absolute bottom-6 right-6 text-[10px] text-muted-foreground/40 hover:text-muted-foreground transition-colors tracking-wider"
       >
         SKIP →
       </button>

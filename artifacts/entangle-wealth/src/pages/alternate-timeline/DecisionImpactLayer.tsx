@@ -44,13 +44,13 @@ export function DecisionImpactLayer({ compareResult, selectedHorizon }: {
       <div className="flex items-center gap-2">
         <Layers className="w-4 h-4 text-primary" aria-hidden="true" />
         <span className="font-bold text-sm">Decision Impact</span>
-        <span className="text-[10px] text-white/50 ml-auto font-mono">@ {selectedHorizon}</span>
+        <span className="text-[10px] text-muted-foreground ml-auto font-mono">@ {selectedHorizon}</span>
       </div>
 
       <div className="flex items-center gap-3" aria-hidden="true">
         <div className="flex items-center gap-1.5 flex-1">
           <div className="w-2 h-2 rounded-full bg-[#00B4D8]" />
-          <div className="text-[9px] text-white/40 font-mono">Current Path</div>
+          <div className="text-[9px] text-muted-foreground/70 font-mono">Current Path</div>
         </div>
         <div className="flex-1 relative h-2 flex items-center">
           <div className="absolute inset-0 flex items-center">
@@ -73,14 +73,14 @@ export function DecisionImpactLayer({ compareResult, selectedHorizon }: {
           </motion.div>
         </div>
         <div className="flex items-center gap-1.5 flex-1 justify-end">
-          <div className="text-[9px] text-white/40 font-mono">Better Path</div>
+          <div className="text-[9px] text-muted-foreground/70 font-mono">Better Path</div>
           <div className="w-2 h-2 rounded-full bg-[#00B4D8]" />
         </div>
       </div>
 
       <div className="flex items-center justify-between rounded-xl px-4 py-3"
         style={{ background: isPositive ? "rgba(0,180,216,0.06)" : "rgba(239,68,68,0.06)", border: `1px solid ${isPositive ? "rgba(0,180,216,0.15)" : "rgba(239,68,68,0.15)"}` }}>
-        <div className="text-xs text-white/50 font-mono">Path difference @ {selectedHorizon}</div>
+        <div className="text-xs text-muted-foreground font-mono">Path difference @ {selectedHorizon}</div>
         <motion.div
           key={selectedDelta}
           initial={{ scale: 0.8, opacity: 0 }}
@@ -101,7 +101,7 @@ export function DecisionImpactLayer({ compareResult, selectedHorizon }: {
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.08 }}
-              className="flex items-start gap-2 text-[11px] text-white/60"
+              className="flex items-start gap-2 text-[11px] text-muted-foreground"
             >
               <ArrowRight className="w-3 h-3 text-primary/60 mt-0.5 shrink-0" aria-hidden="true" />
               {msg}

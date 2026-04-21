@@ -103,7 +103,7 @@ function ChartSection({
       <div className="flex items-center gap-2">
         <TrendingUp className="w-4 h-4 text-primary" aria-hidden="true" />
         <span className="font-bold text-sm">Net Worth Projection</span>
-        <span className="text-[10px] text-white/50 ml-auto font-mono">Simulation — not financial advice</span>
+        <span className="text-[10px] text-muted-foreground ml-auto font-mono">Simulation — not financial advice</span>
       </div>
       <div className="h-52" role="img" aria-label="Net worth projection chart comparing two financial paths over time">
         <ResponsiveContainer width="100%" height="100%">
@@ -130,12 +130,12 @@ function ChartSection({
       </div>
 
       {deltaData && (
-        <div className="pt-3 border-t border-white/[0.06]">
-          <div className="text-[10px] text-white/50 uppercase tracking-wider font-mono mb-2">Decision Impact — Difference Between Paths</div>
+        <div className="pt-3 border-t border-border">
+          <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-mono mb-2">Decision Impact — Difference Between Paths</div>
           <div className="grid grid-cols-4 md:grid-cols-7 gap-2" role="list" aria-label="Net worth delta by time horizon">
             {deltaData.map(d => (
               <div key={d.horizon} className="text-center" role="listitem">
-                <div className="text-[9px] text-white/40 font-mono">{d.horizon}</div>
+                <div className="text-[9px] text-muted-foreground/70 font-mono">{d.horizon}</div>
                 <motion.div
                   key={d.deltaNetWorth}
                   initial={{ opacity: 0.4 }}
@@ -182,7 +182,7 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
 
   return (
     <div className="space-y-4">
-      <div className="text-[10px] text-white/30 font-mono uppercase tracking-wider flex items-center gap-1.5">
+      <div className="text-[10px] text-muted-foreground/50 font-mono uppercase tracking-wider flex items-center gap-1.5">
         <Flame className="w-3 h-3" aria-hidden="true" />
         Feedback Layers
       </div>
@@ -192,8 +192,8 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
         style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(255,255,255,0.06)" }}>
         <Zap className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
         <div className="flex-1">
-          <div className="text-xs font-bold text-white/70">Immediate — Sliders Update Instantly</div>
-          <div className="text-[11px] text-white/50 mt-0.5">
+          <div className="text-xs font-bold text-foreground/70">Immediate — Sliders Update Instantly</div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">
             Every slider change recalculates both timelines in real time. Numbers animate to their new values as you explore.
           </div>
         </div>
@@ -208,7 +208,7 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-blue-400" aria-hidden="true" />
             <span className="font-bold text-sm">Near-Term Outlook</span>
-            <span className="text-[10px] text-white/30 ml-auto font-mono">30 / 90 / 180 days</span>
+            <span className="text-[10px] text-muted-foreground/50 ml-auto font-mono">30 / 90 / 180 days</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
             {[
@@ -218,7 +218,7 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
             ].map(({ label, d }) => (
               <div key={label} className="rounded-xl p-2 text-center"
                 style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                <div className="text-[9px] text-white/40 font-mono mb-1">{label}</div>
+                <div className="text-[9px] text-muted-foreground/70 font-mono mb-1">{label}</div>
                 <div className={`text-xs font-bold font-mono ${(d?.deltaNetWorth || 0) >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                   {(d?.deltaNetWorth || 0) >= 0 ? "+" : ""}{fmt(d?.deltaNetWorth || 0)}
                 </div>
@@ -231,7 +231,7 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
               </div>
             ))}
           </div>
-          <div className="rounded-lg px-3 py-2 text-[11px] text-white/50"
+          <div className="rounded-lg px-3 py-2 text-[11px] text-muted-foreground"
             style={{ background: "rgba(255,255,255,0.02)" }}>
             {(d90?.deltaNetWorth || 0) > 0
               ? `In 90 days, the better path puts you ${fmt(d90?.deltaNetWorth || 0)} ahead — and clears ${fmt(d90?.deltaDebt || 0)} more debt.`
@@ -244,7 +244,7 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
           <div className="flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-amber-400" aria-hidden="true" />
             <span className="font-bold text-sm">Long-Term Divergence</span>
-            <span className="text-[10px] text-white/30 ml-auto font-mono">Small changes, big gap</span>
+            <span className="text-[10px] text-muted-foreground/50 ml-auto font-mono">Small changes, big gap</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
             {[
@@ -254,7 +254,7 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
             ].map(({ label, d }) => (
               <div key={label} className="rounded-xl p-2 text-center"
                 style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                <div className="text-[9px] text-white/40 font-mono mb-1">{label}</div>
+                <div className="text-[9px] text-muted-foreground/70 font-mono mb-1">{label}</div>
                 <div className={`text-xs font-bold font-mono ${(d?.deltaNetWorth || 0) >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                   {(d?.deltaNetWorth || 0) >= 0 ? "+" : ""}{fmt(d?.deltaNetWorth || 0)}
                 </div>
@@ -281,7 +281,7 @@ function FeedbackCards({ resultA, resultB, compareResult }: {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className="rounded-lg px-3 py-2 text-[11px] text-white/50"
+          <div className="rounded-lg px-3 py-2 text-[11px] text-muted-foreground"
             style={{ background: "rgba(255,255,255,0.02)" }}>
             {(d20?.deltaNetWorth || 0) > 10_000
               ? `By year 20, the gap is ${fmt(d20?.deltaNetWorth || 0)} — compounding does most of the work.`
@@ -312,7 +312,7 @@ function IdentityBadge({ stage }: { stage: Stage }) {
       </div>
       <div>
         <div className={`text-xs font-bold font-mono ${STAGE_COLORS[stage]}`}>{stage}</div>
-        <div className="text-[10px] text-white/50">{STAGE_DESCS[stage]}</div>
+        <div className="text-[10px] text-muted-foreground">{STAGE_DESCS[stage]}</div>
       </div>
     </div>
   );
@@ -389,7 +389,7 @@ function EnhancedSnapshotCompare({
 
   if (savedTimelines.length === 0) {
     return (
-      <div className="text-center py-8 text-white/30 text-sm">
+      <div className="text-center py-8 text-muted-foreground/50 text-sm">
         No saved scenarios yet. Run a simulation and save a snapshot above.
       </div>
     );
@@ -397,7 +397,7 @@ function EnhancedSnapshotCompare({
 
   return (
     <div className="space-y-4">
-      <div className="text-[10px] text-white/50 font-mono mb-2">
+      <div className="text-[10px] text-muted-foreground font-mono mb-2">
         Select up to 5 scenarios to compare side-by-side
       </div>
       <div className="space-y-2">
@@ -427,18 +427,18 @@ function EnhancedSnapshotCompare({
                 </button>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-sm text-white/90">{tl.name}</span>
+                    <span className="font-bold text-sm text-foreground/90">{tl.name}</span>
                     {tl.isBaseline && (
                       <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 font-bold">BASELINE</span>
                     )}
-                    <span className="text-[10px] text-white/30 font-mono ml-auto">
+                    <span className="text-[10px] text-muted-foreground/50 font-mono ml-auto">
                       {new Date(tl.createdAt).toLocaleDateString()}
                     </span>
                   </div>
                   {tl.annotation && (
-                    <div className="text-[11px] text-white/50 mt-1 italic">{tl.annotation}</div>
+                    <div className="text-[11px] text-muted-foreground mt-1 italic">{tl.annotation}</div>
                   )}
-                  <div className="text-[9px] text-white/30 font-mono mt-1">{generateAnnotation(tl)}</div>
+                  <div className="text-[9px] text-muted-foreground/50 font-mono mt-1">{generateAnnotation(tl)}</div>
                 </div>
                 <div className="flex gap-1 shrink-0">
                   <button
@@ -453,7 +453,7 @@ function EnhancedSnapshotCompare({
                   >B</button>
                   <button
                     onClick={() => onDelete(tl.id)}
-                    className="text-white/50 hover:text-red-400 transition-colors p-1"
+                    className="text-muted-foreground hover:text-red-400 transition-colors p-1"
                     aria-label={`Delete scenario: ${tl.name}`}
                   >
                     <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
@@ -475,7 +475,7 @@ function EnhancedSnapshotCompare({
           <div className="flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-primary" aria-hidden="true" />
             <span className="font-bold text-sm">Multi-Scenario Overlay</span>
-            <span className="text-[10px] text-white/50 ml-auto font-mono">{selectedTLs.length} scenarios</span>
+            <span className="text-[10px] text-muted-foreground ml-auto font-mono">{selectedTLs.length} scenarios</span>
           </div>
           <div className="h-52" role="img" aria-label={`Multi-scenario comparison chart for ${selectedTLs.map(t => t.name).join(", ")}`}>
             <ResponsiveContainer width="100%" height="100%">
@@ -510,11 +510,11 @@ function EnhancedSnapshotCompare({
           </div>
 
           <div className="space-y-2">
-            <div className="text-[10px] text-white/50 font-mono uppercase tracking-wider">Scenario Summary</div>
+            <div className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider">Scenario Summary</div>
             <div className="overflow-x-auto">
               <table className="w-full text-[10px] font-mono" aria-label="Scenario comparison summary table">
                 <thead>
-                  <tr className="text-white/30">
+                  <tr className="text-muted-foreground/50">
                     <th className="text-left pb-2 pr-4">Scenario</th>
                     <th className="text-right pb-2 px-2">Savings</th>
                     <th className="text-right pb-2 px-2">5yr NW</th>
@@ -530,17 +530,17 @@ function EnhancedSnapshotCompare({
                     const base = selectedTLs[0];
                     const insights = idx > 0 ? generateDeltaInsights(base, tl) : [];
                     return (
-                      <tr key={tl.id} className="border-t border-white/[0.04]">
+                      <tr key={tl.id} className="border-t border-border">
                         <td className="py-1.5 pr-4">
                           <div style={{ color: COLORS[idx % COLORS.length] }}>{tl.name}</div>
                           {insights.map((ins, ii) => (
-                            <div key={ii} className="text-[9px] text-white/30 mt-0.5">{ins}</div>
+                            <div key={ii} className="text-[9px] text-muted-foreground/50 mt-0.5">{ins}</div>
                           ))}
                         </td>
-                        <td className="text-right px-2 text-white/60">{(tl.savingsRate * 100).toFixed(0)}%</td>
-                        <td className="text-right px-2 text-white/70">{fmt(r5?.projectedNetWorth || 0)}</td>
-                        <td className="text-right px-2 text-white/70">{fmt(r10?.projectedNetWorth || 0)}</td>
-                        <td className="text-right px-2 text-white/70">{fmt(r20?.projectedNetWorth || 0)}</td>
+                        <td className="text-right px-2 text-muted-foreground">{(tl.savingsRate * 100).toFixed(0)}%</td>
+                        <td className="text-right px-2 text-foreground/70">{fmt(r5?.projectedNetWorth || 0)}</td>
+                        <td className="text-right px-2 text-foreground/70">{fmt(r10?.projectedNetWorth || 0)}</td>
+                        <td className="text-right px-2 text-foreground/70">{fmt(r20?.projectedNetWorth || 0)}</td>
                       </tr>
                     );
                   })}
@@ -854,7 +854,7 @@ export default function AlternateTimeline() {
                 <span className="electric-text">Alternate</span> Timeline
               </h1>
             </div>
-            <p className="text-xs text-white/50 font-mono">
+            <p className="text-xs text-muted-foreground font-mono">
               Compare two financial futures side-by-side. Projections are simulations — not financial advice.
             </p>
           </div>
@@ -865,7 +865,7 @@ export default function AlternateTimeline() {
               className={`text-xs px-3 py-2 rounded-lg border font-bold transition-all ${
                 isExplorationMode
                   ? "bg-amber-400/10 border-amber-400/30 text-amber-400"
-                  : "bg-white/[0.04] border-white/10 text-white/50 hover:text-white hover:border-white/20"
+                  : "bg-muted/50 border-border text-muted-foreground hover:text-foreground hover:border-border"
               }`}
               aria-pressed={isExplorationMode}
             >
@@ -875,7 +875,7 @@ export default function AlternateTimeline() {
             {isSignedIn && (
               <button
                 onClick={() => { setShowSaved(v => !v); fetchSaved(); }}
-                className="text-xs px-3 py-2 rounded-lg border bg-white/[0.04] border-white/10 text-white/50 hover:text-white hover:border-white/20 font-bold transition-all flex items-center gap-1.5"
+                className="text-xs px-3 py-2 rounded-lg border bg-muted/50 border-border text-muted-foreground hover:text-foreground hover:border-border font-bold transition-all flex items-center gap-1.5"
                 aria-expanded={showSaved}
               >
                 <BookmarkCheck className="w-3.5 h-3.5" aria-hidden="true" />
@@ -887,7 +887,7 @@ export default function AlternateTimeline() {
               variant="ghost"
               size="sm"
               onClick={handleReset}
-              className="text-white/50 hover:text-white text-xs border border-white/10 h-9"
+              className="text-muted-foreground hover:text-foreground text-xs border border-border h-9"
               aria-label="Reset all parameters to defaults"
             >
               <RefreshCw className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
@@ -927,7 +927,7 @@ export default function AlternateTimeline() {
         {isSignedIn && <div className="mb-4"><IdentityBadge stage={stage} /></div>}
 
         <div className="mb-4 flex flex-wrap gap-1.5" role="group" aria-label="Projection horizon selector">
-          <span className="text-[10px] text-white/30 font-mono py-1">Projection horizon:</span>
+          <span className="text-[10px] text-muted-foreground/50 font-mono py-1">Projection horizon:</span>
           {DISPLAY_HORIZONS.map(h => (
             <button
               key={h}
@@ -935,7 +935,7 @@ export default function AlternateTimeline() {
               className={`text-[10px] px-2.5 py-1 rounded-full border font-mono font-bold transition-all ${
                 selectedHorizon === h
                   ? "bg-primary/20 border-primary/40 text-primary"
-                  : "bg-white/[0.03] border-white/[0.08] text-white/40 hover:text-white hover:border-white/20"
+                  : "bg-muted/50 border-border text-muted-foreground/70 hover:text-foreground hover:border-border"
               }`}
               aria-pressed={selectedHorizon === h}
               aria-label={`View projection at ${h}`}
@@ -974,7 +974,7 @@ export default function AlternateTimeline() {
         </div>
 
         <div className="md:hidden mb-6">
-          <div className="flex rounded-xl overflow-hidden border border-white/10 mb-3" role="tablist" aria-label="Switch between timeline panes">
+          <div className="flex rounded-xl overflow-hidden border border-border mb-3" role="tablist" aria-label="Switch between timeline panes">
             {(["A", "B"] as const).map(t => (
               <button
                 key={t}
@@ -987,7 +987,7 @@ export default function AlternateTimeline() {
                     ? t === "A"
                       ? "bg-[#00B4D8]/20 text-[#00B4D8] border-b-2 border-[#00B4D8]"
                       : "bg-[#00B4D8]/20 text-[#00B4D8] border-b-2 border-[#00B4D8]"
-                    : "text-white/40 hover:text-white"
+                    : "text-muted-foreground/70 hover:text-foreground"
                 }`}
               >
                 {t === "A" ? "Current Path" : "Better Path"}
@@ -1027,19 +1027,19 @@ export default function AlternateTimeline() {
             style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(156,39,176,0.25)" }}>
             <button
               onClick={() => setShowWhatIf(v => !v)}
-              className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/[0.02] transition-colors"
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors"
             >
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-purple-400" />
                 <span className="font-bold text-sm text-purple-300">What-If Decision Modeler</span>
                 <span className="text-[9px] px-2 py-0.5 rounded-full bg-purple-400/10 border border-purple-400/20 text-purple-400 font-bold">NEW</span>
               </div>
-              {showWhatIf ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+              {showWhatIf ? <ChevronUp className="w-4 h-4 text-muted-foreground/70" /> : <ChevronDown className="w-4 h-4 text-muted-foreground/70" />}
             </button>
 
             {showWhatIf && (
               <div className="px-4 pb-4 space-y-4">
-                <p className="text-xs text-white/50">
+                <p className="text-xs text-muted-foreground">
                   Toggle key life decisions to see the ripple effect across your entire financial timeline. Selected decisions auto-populate the "Better Path" pane.
                 </p>
 
@@ -1055,12 +1055,12 @@ export default function AlternateTimeline() {
                         className={`text-left p-3 rounded-xl border transition-all ${
                           isSelected
                             ? "border-purple-400/40 bg-purple-400/10 text-purple-200"
-                            : "border-white/[0.08] bg-white/[0.02] text-white/60 hover:border-white/20 hover:text-white"
+                            : "border-border bg-muted/30 text-muted-foreground hover:border-border hover:text-foreground"
                         }`}
                       >
                         <div className="flex items-start gap-2">
                           <div className={`w-4 h-4 rounded border mt-0.5 flex-shrink-0 flex items-center justify-center ${
-                            isSelected ? "border-purple-400 bg-purple-400" : "border-white/20"
+                            isSelected ? "border-purple-400 bg-purple-400" : "border-border"
                           }`}>
                             {isSelected && <CheckCircle2 className="w-3 h-3 text-black" />}
                           </div>
@@ -1077,7 +1077,7 @@ export default function AlternateTimeline() {
                 <button
                   onClick={runWhatIfModel}
                   disabled={selectedDecisionIds.length === 0 || modelingWhatIf}
-                  className="w-full py-2.5 rounded-xl bg-purple-500 text-white font-bold text-sm hover:bg-purple-500/90 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full py-2.5 rounded-xl bg-purple-500 text-foreground font-bold text-sm hover:bg-purple-500/90 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {modelingWhatIf ? (
                     <><RefreshCw className="w-4 h-4 animate-spin" />Modeling...</>
@@ -1087,23 +1087,23 @@ export default function AlternateTimeline() {
                 </button>
 
                 {whatIfResult && (
-                  <div className="mt-2 pt-3 border-t border-white/[0.06] space-y-3">
+                  <div className="mt-2 pt-3 border-t border-border space-y-3">
                     <div className="text-[10px] text-purple-400 font-semibold uppercase tracking-wider">Decision Impact at 20 Years</div>
                     <div className="grid grid-cols-3 gap-3">
                       <div className="text-center rounded-xl p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div className="text-[10px] text-white/50 font-mono uppercase">Net Worth Gain</div>
+                        <div className="text-[10px] text-muted-foreground font-mono uppercase">Net Worth Gain</div>
                         <div className={`text-lg font-black font-mono mt-1 ${whatIfResult.summary.netWorthGain20yr >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                           {whatIfResult.summary.netWorthGain20yr >= 0 ? "+" : ""}{fmt(whatIfResult.summary.netWorthGain20yr)}
                         </div>
                       </div>
                       <div className="text-center rounded-xl p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div className="text-[10px] text-white/50 font-mono uppercase">Stress Reduction</div>
+                        <div className="text-[10px] text-muted-foreground font-mono uppercase">Stress Reduction</div>
                         <div className={`text-lg font-black font-mono mt-1 ${whatIfResult.summary.stressReduction >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                           {whatIfResult.summary.stressReduction >= 0 ? "+" : ""}{whatIfResult.summary.stressReduction.toFixed(1)}pts
                         </div>
                       </div>
                       <div className="text-center rounded-xl p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div className="text-[10px] text-white/50 font-mono uppercase">Opportunity Gain</div>
+                        <div className="text-[10px] text-muted-foreground font-mono uppercase">Opportunity Gain</div>
                         <div className={`text-lg font-black font-mono mt-1 ${whatIfResult.summary.opportunityGain >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                           {whatIfResult.summary.opportunityGain >= 0 ? "+" : ""}{whatIfResult.summary.opportunityGain.toFixed(1)}pts
                         </div>
@@ -1154,8 +1154,8 @@ export default function AlternateTimeline() {
                 style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(255,255,255,0.06)" }}
                 aria-label={`${label}: ${value >= 0 ? "+" : ""}${isMoney ? fmt(value) : `${value.toFixed(1)}${suffix || ""}`}`}
               >
-                <Icon className="w-4 h-4 mx-auto mb-1 text-white/40" aria-hidden="true" />
-                <div className="text-[9px] text-white/40 font-mono uppercase tracking-wider">{label}</div>
+                <Icon className="w-4 h-4 mx-auto mb-1 text-muted-foreground/70" aria-hidden="true" />
+                <div className="text-[9px] text-muted-foreground/70 font-mono uppercase tracking-wider">{label}</div>
                 <div className={`text-sm font-black font-mono mt-0.5 ${value >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                   {value >= 0 ? "+" : ""}
                   {isMoney ? (
@@ -1186,11 +1186,11 @@ export default function AlternateTimeline() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: borderColor }} aria-hidden="true" />
-                      <span className="text-xs font-bold text-white/70">Save {label} Snapshot</span>
+                      <span className="text-xs font-bold text-foreground/70">Save {label} Snapshot</span>
                     </div>
                     <button
                       onClick={() => setShowForm(v => !v)}
-                      className="text-white/50 hover:text-white transition-colors"
+                      className="text-muted-foreground hover:text-foreground transition-colors"
                       aria-expanded={showForm}
                       aria-controls={`save-form-${which}`}
                       aria-label={`${showForm ? "Collapse" : "Expand"} save form for ${label}`}
@@ -1208,7 +1208,7 @@ export default function AlternateTimeline() {
                         className="space-y-2 overflow-hidden"
                       >
                         <input
-                          className="w-full bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-primary/40"
+                          className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-xs text-foreground font-mono focus:outline-none focus:border-primary/40"
                           placeholder="Scenario name…"
                           value={name}
                           onChange={e => setName(e.target.value)}
@@ -1216,7 +1216,7 @@ export default function AlternateTimeline() {
                           aria-label="Scenario name"
                         />
                         <textarea
-                          className="w-full bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-primary/40 resize-none h-16"
+                          className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-xs text-foreground font-mono focus:outline-none focus:border-primary/40 resize-none h-16"
                           placeholder="Optional note about this scenario…"
                           value={annotation}
                           onChange={e => setAnnotation(e.target.value)}
@@ -1252,7 +1252,7 @@ export default function AlternateTimeline() {
               <div className="flex items-center gap-2 mb-4">
                 <BookmarkCheck className="w-4 h-4 text-primary" aria-hidden="true" />
                 <span className="font-bold text-sm">Saved Scenarios</span>
-                <span className="text-[10px] text-white/50 ml-auto">{savedTimelines.length} saved</span>
+                <span className="text-[10px] text-muted-foreground ml-auto">{savedTimelines.length} saved</span>
               </div>
               <EnhancedSnapshotCompare
                 savedTimelines={savedTimelines}
@@ -1267,7 +1267,7 @@ export default function AlternateTimeline() {
           <div className="mt-6 rounded-xl p-4 flex items-center gap-3"
             style={{ background: "rgba(0,180,216,0.05)", border: "1px solid rgba(0,180,216,0.12)" }}>
             <AlertTriangle className="w-4 h-4 text-primary/60 shrink-0" aria-hidden="true" />
-            <div className="text-xs text-white/50">
+            <div className="text-xs text-muted-foreground">
               <span className="text-primary font-bold">Sign in</span> to save scenarios, track your identity stage, and earn XP for exploring different financial paths.
             </div>
           </div>
@@ -1276,29 +1276,29 @@ export default function AlternateTimeline() {
         <div className="mt-6 rounded-2xl overflow-hidden" style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(0,180,216,0.2)" }}>
           <button
             onClick={() => setShowMonteCarlo(v => !v)}
-            className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/[0.02] transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors"
           >
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-primary" />
               <span className="font-bold text-sm text-primary">Monte Carlo Probability Cone</span>
               <span className="text-[9px] px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold">500 SIMS</span>
             </div>
-            {showMonteCarlo ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+            {showMonteCarlo ? <ChevronUp className="w-4 h-4 text-muted-foreground/70" /> : <ChevronDown className="w-4 h-4 text-muted-foreground/70" />}
           </button>
 
           {showMonteCarlo && (
             <div className="px-4 pb-5 space-y-4">
-              <p className="text-xs text-white/50">
+              <p className="text-xs text-muted-foreground">
                 Run 500 Monte Carlo simulations on your Current Path to model market uncertainty. Add life events as one-time wealth shocks to see how they affect outcomes.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                  <label className="text-[10px] text-white/40 font-mono uppercase tracking-wider block mb-1">Horizon (Years)</label>
+                  <label className="text-[10px] text-muted-foreground/70 font-mono uppercase tracking-wider block mb-1">Horizon (Years)</label>
                   <div className="flex gap-1">
                     {[10, 15, 20, 25, 30].map(y => (
                       <button key={y} onClick={() => setMcHorizon(y)}
-                        className={`flex-1 py-1.5 rounded text-[10px] font-bold transition-all ${mcHorizon === y ? "bg-primary/20 text-primary border border-primary/30" : "bg-white/[0.03] text-white/40 border border-white/[0.06] hover:text-white"}`}>
+                        className={`flex-1 py-1.5 rounded text-[10px] font-bold transition-all ${mcHorizon === y ? "bg-primary/20 text-primary border border-primary/30" : "bg-muted/50 text-muted-foreground/70 border border-border hover:text-foreground"}`}>
                         {y}
                       </button>
                     ))}
@@ -1307,22 +1307,22 @@ export default function AlternateTimeline() {
 
                 <div className="md:col-span-2">
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-[10px] text-white/40 font-mono uppercase tracking-wider">Life Events</label>
-                    <span className="text-[9px] text-white/30">{lifeEvents.length} added</span>
+                    <label className="text-[10px] text-muted-foreground/70 font-mono uppercase tracking-wider">Life Events</label>
+                    <span className="text-[9px] text-muted-foreground/50">{lifeEvents.length} added</span>
                   </div>
                   <div className="flex gap-2 flex-wrap">
                     <input
                       value={lifeEventLabel}
                       onChange={e => setLifeEventLabel(e.target.value)}
                       placeholder="Label (e.g. Buy a home)"
-                      className="flex-1 min-w-[120px] bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/40"
+                      className="flex-1 min-w-[120px] bg-muted/50 border border-border rounded px-2 py-1.5 text-[11px] text-foreground focus:outline-none focus:border-primary/40"
                     />
                     <input type="number" value={lifeEventYear} onChange={e => setLifeEventYear(parseInt(e.target.value) || 0)}
                       min={1} max={mcHorizon} placeholder="Year"
-                      className="w-16 bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/40" />
+                      className="w-16 bg-muted/50 border border-border rounded px-2 py-1.5 text-[11px] text-foreground focus:outline-none focus:border-primary/40" />
                     <input type="number" value={lifeEventCost} onChange={e => setLifeEventCost(parseInt(e.target.value) || 0)}
                       step={5000} placeholder="Cost $"
-                      className="w-24 bg-white/[0.04] border border-white/10 rounded px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/40" />
+                      className="w-24 bg-muted/50 border border-border rounded px-2 py-1.5 text-[11px] text-foreground focus:outline-none focus:border-primary/40" />
                     <button
                       onClick={() => {
                         if (!lifeEventLabel || lifeEventCost <= 0) return;
@@ -1415,7 +1415,7 @@ export default function AlternateTimeline() {
 
                     <div className="rounded-xl px-4 py-3" style={{ background: "rgba(0,180,216,0.04)", border: "1px solid rgba(0,180,216,0.12)" }}>
                       <div className="text-[10px] text-primary/60 font-mono uppercase tracking-wider mb-1.5">AI Narrative</div>
-                      <p className="text-[12px] text-white/70 leading-relaxed">{mcResult.narrative}</p>
+                      <p className="text-[12px] text-foreground/70 leading-relaxed">{mcResult.narrative}</p>
                     </div>
                   </div>
                 );
@@ -1439,8 +1439,8 @@ export default function AlternateTimeline() {
         <div className="mt-4 rounded-xl px-4 py-3"
           style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
           <div className="flex items-start gap-2">
-            <Info className="w-3.5 h-3.5 text-white/40 mt-0.5 shrink-0" aria-hidden="true" />
-            <p className="text-[10px] text-white/30 leading-relaxed">
+            <Info className="w-3.5 h-3.5 text-muted-foreground/70 mt-0.5 shrink-0" aria-hidden="true" />
+            <p className="text-[10px] text-muted-foreground/50 leading-relaxed">
               All projections are illustrative simulations using compound interest, simple debt amortization, and linear savings models. They do not account for taxes, inflation adjustments, market volatility, or individual circumstances. This tool is for educational exploration only — not financial advice. Assumptions: savings split 60% investments / 40% liquid. Debt is modeled as a fixed monthly payment over 36 months. Investment returns are annual rate applied monthly.
             </p>
           </div>

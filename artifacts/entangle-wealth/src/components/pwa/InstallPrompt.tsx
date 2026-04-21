@@ -71,8 +71,8 @@ export function InstallPrompt() {
           <Smartphone className="w-5 h-5 text-primary" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white mb-1">Install EntangleWealth</p>
-          <p className="text-xs text-white/60 leading-relaxed">
+          <p className="text-sm font-semibold text-foreground mb-1">Install EntangleWealth</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
             Add to your home screen for instant access to live market signals and analysis.
           </p>
           <button
@@ -86,7 +86,7 @@ export function InstallPrompt() {
         </div>
         <button
           onClick={handleDismiss}
-          className="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-lg text-white/40 hover:text-white/80 hover:bg-white/5 transition-colors"
+          className="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-lg text-muted-foreground/70 hover:text-foreground/80 hover:bg-muted/50 transition-colors"
           aria-label="Dismiss install prompt"
         >
           <X className="w-4 h-4" />

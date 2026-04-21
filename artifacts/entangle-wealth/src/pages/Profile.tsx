@@ -105,7 +105,7 @@ function MyFeedback() {
         )}
       </h3>
       {feedbackList.length === 0 && (
-        <div className="text-center py-6 text-white/30 text-sm">
+        <div className="text-center py-6 text-muted-foreground/50 text-sm">
           <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-30" />
           <p>You haven&apos;t submitted any feedback yet.</p>
           <p className="text-xs mt-1 opacity-70">Use the feedback button to share your thoughts!</p>
@@ -122,14 +122,14 @@ function MyFeedback() {
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
                   {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className={`w-3.5 h-3.5 ${s <= fb.rating ? "text-[#FFB800] fill-[#FFB800]" : "text-white/40"}`} />
+                    <Star key={s} className={`w-3.5 h-3.5 ${s <= fb.rating ? "text-[#FFB800] fill-[#FFB800]" : "text-muted-foreground/70"}`} />
                   ))}
                 </div>
-                <span className="text-xs px-2 py-0.5 rounded-full capitalize text-white/50" style={{ background: "rgba(255,255,255,0.05)" }}>
+                <span className="text-xs px-2 py-0.5 rounded-full capitalize text-muted-foreground" style={{ background: "rgba(255,255,255,0.05)" }}>
                   {fb.category}
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 text-[10px] text-white/30">
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/50">
                 {fb.admin_response ? (
                   <><CheckCircle className="w-3 h-3 text-[#00B4D8]" /><span className="text-[#00B4D8]">Responded</span></>
                 ) : (
@@ -138,7 +138,7 @@ function MyFeedback() {
               </div>
             </div>
             {fb.comment && (
-              <p className="text-sm text-white/60 mb-2">{fb.comment}</p>
+              <p className="text-sm text-muted-foreground mb-2">{fb.comment}</p>
             )}
             {fb.admin_response && (
               <div
@@ -149,7 +149,7 @@ function MyFeedback() {
                 {fb.admin_response}
               </div>
             )}
-            <p className="text-[10px] text-white/25 mt-2">
+            <p className="text-[10px] text-muted-foreground/40 mt-2">
               {new Date(fb.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </p>
           </div>
@@ -223,7 +223,7 @@ function DataManagementSection() {
             size="sm"
             onClick={handleExport}
             disabled={exporting}
-            className="border-white/10 hover:bg-white/5"
+            className="border-border hover:bg-muted/50"
           >
             {exporting ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <FileText className="w-4 h-4 mr-1" />}
             {exporting ? "Exporting..." : "Export"}
@@ -261,7 +261,7 @@ function DataManagementSection() {
                   variant="outline"
                   size="sm"
                   onClick={() => { setShowDeleteConfirm(false); setConfirmText(""); }}
-                  className="border-white/10"
+                  className="border-border"
                 >
                   Cancel
                 </Button>
@@ -324,7 +324,7 @@ function AlertDigestSettings() {
           <button
             key={opt.value}
             onClick={() => update(opt.value)}
-            className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${freq === opt.value ? "bg-primary/15 text-primary border border-primary/30" : "bg-white/[0.03] text-muted-foreground border border-white/[0.06] hover:text-white/50"}`}
+            className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${freq === opt.value ? "bg-primary/15 text-primary border border-primary/30" : "bg-muted/50 text-muted-foreground border border-border hover:text-muted-foreground"}`}
           >
             {opt.label}
           </button>
@@ -795,32 +795,32 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white pb-20 lg:pb-0">
+      <div className="min-h-screen bg-black text-foreground pb-20 lg:pb-0">
         <Navbar />
         <main className="container mx-auto px-4 md:px-6 py-8 max-w-4xl" aria-busy="true" aria-label="Loading profile">
           <div className="glass-panel p-8 mb-6 animate-pulse">
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-20 h-20 rounded-full bg-white/[0.06] shrink-0" />
+              <div className="w-20 h-20 rounded-full bg-muted shrink-0" />
               <div className="flex-1 space-y-2 pt-2">
-                <div className="h-7 bg-white/[0.06] rounded-lg w-48" />
-                <div className="h-4 bg-white/[0.04] rounded w-36" />
-                <div className="h-3 bg-white/[0.03] rounded w-56" />
+                <div className="h-7 bg-muted rounded-lg w-48" />
+                <div className="h-4 bg-muted/50 rounded w-36" />
+                <div className="h-3 bg-muted/50 rounded w-56" />
               </div>
-              <div className="w-20 h-9 bg-white/[0.04] rounded-lg" />
+              <div className="w-20 h-9 bg-muted/50 rounded-lg" />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             {[1, 2, 3].map(i => (
               <div key={i} className="glass-panel p-4 h-20 animate-pulse">
-                <div className="h-full bg-white/[0.03] rounded-lg" />
+                <div className="h-full bg-muted/50 rounded-lg" />
               </div>
             ))}
           </div>
           <div className="glass-panel p-6 mb-6 h-48 animate-pulse">
-            <div className="h-6 bg-white/[0.06] rounded w-40 mb-4" />
+            <div className="h-6 bg-muted rounded w-40 mb-4" />
             <div className="space-y-3">
-              <div className="h-10 bg-white/[0.04] rounded-lg" />
-              <div className="h-20 bg-white/[0.04] rounded-lg" />
+              <div className="h-10 bg-muted/50 rounded-lg" />
+              <div className="h-20 bg-muted/50 rounded-lg" />
             </div>
           </div>
         </main>
@@ -830,7 +830,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20 lg:pb-0">
+    <div className="min-h-screen bg-black text-foreground pb-20 lg:pb-0">
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-8 max-w-4xl">
         {profileLoadError && (
@@ -878,12 +878,12 @@ export default function Profile() {
             </div>
             <div className="flex gap-2">
               {editing && (
-                <Button variant="ghost" size="sm" className="text-white/50 hover:text-white/60" onClick={() => setEditing(false)}>
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-muted-foreground" onClick={() => setEditing(false)}>
                   Cancel
                 </Button>
               )}
               <Button
-                className={editing ? "bg-[#00B4D8] text-black font-bold hover:bg-[#00B4D8]/90 active:scale-[0.97] transition-all duration-150 gap-2" : "border-white/20 gap-2"}
+                className={editing ? "bg-[#00B4D8] text-black font-bold hover:bg-[#00B4D8]/90 active:scale-[0.97] transition-all duration-150 gap-2" : "border-border gap-2"}
                 variant={editing ? "default" : "outline"}
                 onClick={() => editing ? saveProfile() : setEditing(true)}
                 disabled={saving}
@@ -895,7 +895,7 @@ export default function Profile() {
           </div>
 
           {editing && (
-            <div className="space-y-4 border-t border-white/10 pt-4">
+            <div className="space-y-4 border-t border-border pt-4">
               <div className="form-field">
                 <label className="form-label flex items-center gap-1">
                   <Briefcase className="w-3 h-3" /> Occupation
@@ -914,7 +914,7 @@ export default function Profile() {
                   placeholder="Tell employers about yourself — your skills, experience, and what you're looking for."
                   value={profile.bio}
                   onChange={(e) => setProfile(prev => ({ ...prev, bio: e.target.value }))}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white placeholder:text-muted-foreground/50 min-h-[80px] resize-none focus:outline-none focus:border-primary/50 text-sm"
+                  className="w-full bg-muted/50 border border-border rounded-lg p-3 text-foreground placeholder:text-muted-foreground/50 min-h-[80px] resize-none focus:outline-none focus:border-primary/50 text-sm"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -925,7 +925,7 @@ export default function Profile() {
                     placeholder="+1 (555) 000-0000"
                     value={profile.phone}
                     onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
-                    className="bg-white/5 border-white/10 focus:border-primary/50"
+                    className="bg-muted/50 border-border focus:border-primary/50"
                     type="tel"
                     autoComplete="tel"
                   />
@@ -937,7 +937,7 @@ export default function Profile() {
                     placeholder="City, State"
                     value={profile.location}
                     onChange={(e) => setProfile(prev => ({ ...prev, location: e.target.value }))}
-                    className="bg-white/5 border-white/10 focus:border-primary/50"
+                    className="bg-muted/50 border-border focus:border-primary/50"
                     autoComplete="address-level2"
                   />
                 </div>
@@ -950,11 +950,11 @@ export default function Profile() {
           )}
 
           {!editing && profile.bio && (
-            <p className="text-muted-foreground text-sm border-t border-white/10 pt-4">{profile.bio}</p>
+            <p className="text-muted-foreground text-sm border-t border-border pt-4">{profile.bio}</p>
           )}
 
           {!editing && !profile.occupationId && profile.headline && (
-            <div className="border-t border-white/10 pt-4">
+            <div className="border-t border-border pt-4">
               <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                 <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
@@ -1008,33 +1008,33 @@ export default function Profile() {
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2"><Shield className="w-5 h-5 text-primary" /> Identity Verification (KYC)</h3>
             <p className="text-sm text-muted-foreground mb-4">Your information is handled securely and used only for identity verification.</p>
             <div className="space-y-3">
-              <Input placeholder="Full Legal Name *" value={kycForm.fullLegalName} onChange={(e) => setKycForm(prev => ({ ...prev, fullLegalName: e.target.value }))} className="bg-white/5 border-white/10" />
+              <Input placeholder="Full Legal Name *" value={kycForm.fullLegalName} onChange={(e) => setKycForm(prev => ({ ...prev, fullLegalName: e.target.value }))} className="bg-muted/50 border-border" />
               <div>
-                <label className="text-[11px] text-white/50 mb-1 block">Date of Birth *</label>
-                <Input type="date" value={kycForm.dateOfBirth} onChange={(e) => setKycForm(prev => ({ ...prev, dateOfBirth: e.target.value }))} className="bg-white/5 border-white/10" />
+                <label className="text-[11px] text-muted-foreground mb-1 block">Date of Birth *</label>
+                <Input type="date" value={kycForm.dateOfBirth} onChange={(e) => setKycForm(prev => ({ ...prev, dateOfBirth: e.target.value }))} className="bg-muted/50 border-border" />
               </div>
-              <Input placeholder="Full Address *" value={kycForm.address} onChange={(e) => setKycForm(prev => ({ ...prev, address: e.target.value }))} className="bg-white/5 border-white/10" />
+              <Input placeholder="Full Address *" value={kycForm.address} onChange={(e) => setKycForm(prev => ({ ...prev, address: e.target.value }))} className="bg-muted/50 border-border" />
               <select
                 value={kycForm.idType}
                 onChange={(e) => setKycForm(prev => ({ ...prev, idType: e.target.value }))}
-                className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary/50"
+                className="w-full bg-card border border-border rounded-lg p-3 text-foreground focus:outline-none focus:border-primary/50"
               >
                 <option value="drivers_license">Driver's License</option>
                 <option value="passport">Passport</option>
                 <option value="national_id">National ID</option>
               </select>
-              <Input placeholder="ID Number *" value={kycForm.idNumber} onChange={(e) => setKycForm(prev => ({ ...prev, idNumber: e.target.value }))} className="bg-white/5 border-white/10" />
+              <Input placeholder="ID Number *" value={kycForm.idNumber} onChange={(e) => setKycForm(prev => ({ ...prev, idNumber: e.target.value }))} className="bg-muted/50 border-border" />
 
-              <div className="border-t border-white/10 pt-3">
-                <p className="text-sm font-medium text-white/70 mb-3 flex items-center gap-2"><Image className="w-4 h-4 text-primary" /> Document Upload (Optional but recommended)</p>
+              <div className="border-t border-border pt-3">
+                <p className="text-sm font-medium text-foreground/70 mb-3 flex items-center gap-2"><Image className="w-4 h-4 text-primary" /> Document Upload (Optional but recommended)</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-xs text-white/50 mb-2">Government ID Photo</p>
+                    <p className="text-xs text-muted-foreground mb-2">Government ID Photo</p>
                     <input ref={idPhotoRef} type="file" accept="image/jpeg,image/png,image/jpg,image/webp" className="hidden" onChange={e => handleKycFileChange("id", e.target.files?.[0] || null)} />
                     {kycIdPhotoPreview ? (
                       <div className="relative">
-                        <img src={kycIdPhotoPreview} alt="ID preview" className="w-full h-24 object-cover rounded-lg border border-white/10" />
-                        <button onClick={() => { setKycIdPhoto(null); setKycIdPhotoPreview(null); setUploadProgress(p => ({ ...p, idPhoto: 0 })); }} className="absolute top-1 right-1 bg-black/60 rounded-full p-0.5 text-white/70 hover:text-white">
+                        <img src={kycIdPhotoPreview} alt="ID preview" className="w-full h-24 object-cover rounded-lg border border-border" />
+                        <button onClick={() => { setKycIdPhoto(null); setKycIdPhotoPreview(null); setUploadProgress(p => ({ ...p, idPhoto: 0 })); }} className="absolute top-1 right-1 bg-black/60 rounded-full p-0.5 text-foreground/70 hover:text-foreground">
                           <X className="w-3.5 h-3.5" />
                         </button>
                         {uploadProgress.idPhoto > 0 && uploadProgress.idPhoto < 100 && (
@@ -1049,20 +1049,20 @@ export default function Profile() {
                         onDragOver={e => { e.preventDefault(); setDragActive("id"); }}
                         onDragLeave={() => setDragActive(null)}
                         onDrop={e => { e.preventDefault(); setDragActive(null); handleKycFileChange("id", e.dataTransfer.files?.[0] || null); }}
-                        className={`w-full h-24 border border-dashed rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${dragActive === "id" ? "border-primary/60 bg-primary/10" : "border-white/20 hover:border-primary/40 hover:bg-primary/5"}`}
+                        className={`w-full h-24 border border-dashed rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${dragActive === "id" ? "border-primary/60 bg-primary/10" : "border-border hover:border-primary/40 hover:bg-primary/5"}`}
                       >
-                        <Upload className="w-5 h-5 text-white/30" />
-                        <span className="text-[11px] text-white/30">{dragActive === "id" ? "Drop to upload" : "Upload or drag photo"}</span>
+                        <Upload className="w-5 h-5 text-muted-foreground/50" />
+                        <span className="text-[11px] text-muted-foreground/50">{dragActive === "id" ? "Drop to upload" : "Upload or drag photo"}</span>
                       </div>
                     )}
                   </div>
                   <div>
-                    <p className="text-xs text-white/50 mb-2">Selfie with ID</p>
+                    <p className="text-xs text-muted-foreground mb-2">Selfie with ID</p>
                     <input ref={selfieRef} type="file" accept="image/jpeg,image/png,image/jpg,image/webp" className="hidden" onChange={e => handleKycFileChange("selfie", e.target.files?.[0] || null)} />
                     {kycSelfiePreview ? (
                       <div className="relative">
-                        <img src={kycSelfiePreview} alt="Selfie preview" className="w-full h-24 object-cover rounded-lg border border-white/10" />
-                        <button onClick={() => { setKycSelfie(null); setKycSelfiePreview(null); setUploadProgress(p => ({ ...p, selfie: 0 })); }} className="absolute top-1 right-1 bg-black/60 rounded-full p-0.5 text-white/70 hover:text-white">
+                        <img src={kycSelfiePreview} alt="Selfie preview" className="w-full h-24 object-cover rounded-lg border border-border" />
+                        <button onClick={() => { setKycSelfie(null); setKycSelfiePreview(null); setUploadProgress(p => ({ ...p, selfie: 0 })); }} className="absolute top-1 right-1 bg-black/60 rounded-full p-0.5 text-foreground/70 hover:text-foreground">
                           <X className="w-3.5 h-3.5" />
                         </button>
                         {uploadProgress.selfie > 0 && uploadProgress.selfie < 100 && (
@@ -1077,15 +1077,15 @@ export default function Profile() {
                         onDragOver={e => { e.preventDefault(); setDragActive("selfie"); }}
                         onDragLeave={() => setDragActive(null)}
                         onDrop={e => { e.preventDefault(); setDragActive(null); handleKycFileChange("selfie", e.dataTransfer.files?.[0] || null); }}
-                        className={`w-full h-24 border border-dashed rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${dragActive === "selfie" ? "border-primary/60 bg-primary/10" : "border-white/20 hover:border-primary/40 hover:bg-primary/5"}`}
+                        className={`w-full h-24 border border-dashed rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${dragActive === "selfie" ? "border-primary/60 bg-primary/10" : "border-border hover:border-primary/40 hover:bg-primary/5"}`}
                       >
-                        <Upload className="w-5 h-5 text-white/30" />
-                        <span className="text-[11px] text-white/30">{dragActive === "selfie" ? "Drop to upload" : "Upload or drag selfie"}</span>
+                        <Upload className="w-5 h-5 text-muted-foreground/50" />
+                        <span className="text-[11px] text-muted-foreground/50">{dragActive === "selfie" ? "Drop to upload" : "Upload or drag selfie"}</span>
                       </div>
                     )}
                   </div>
                 </div>
-                <p className="text-[10px] text-white/30 mt-2">JPG, PNG or WebP · Max 10MB each</p>
+                <p className="text-[10px] text-muted-foreground/50 mt-2">JPG, PNG or WebP · Max 10MB each</p>
               </div>
 
               <div className="flex gap-2">
@@ -1139,20 +1139,20 @@ export default function Profile() {
 
             {showBusinessDocUpload && (
               <div className="mt-4 space-y-3">
-                <p className="text-xs text-white/50">Upload at least one: business license, EIN letter, or articles of incorporation. (JPG, PNG, WebP, or PDF · Max 10MB)</p>
+                <p className="text-xs text-muted-foreground">Upload at least one: business license, EIN letter, or articles of incorporation. (JPG, PNG, WebP, or PDF · Max 10MB)</p>
                 {businessDocFiles.length > 0 && (
                   <div className="space-y-2">
                     {businessDocFiles.map((file, idx) => (
-                      <div key={idx} className="flex items-center gap-2 bg-white/5 rounded-lg p-2">
+                      <div key={idx} className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
                         {businessDocPreviews[idx] ? (
-                          <img src={businessDocPreviews[idx]} alt="" className="w-8 h-8 object-cover rounded border border-white/10" />
+                          <img src={businessDocPreviews[idx]} alt="" className="w-8 h-8 object-cover rounded border border-border" />
                         ) : (
-                          <div className="w-8 h-8 rounded border border-white/10 bg-white/5 flex items-center justify-center">
-                            <FileText className="w-4 h-4 text-white/40" />
+                          <div className="w-8 h-8 rounded border border-border bg-muted/50 flex items-center justify-center">
+                            <FileText className="w-4 h-4 text-muted-foreground/70" />
                           </div>
                         )}
-                        <span className="flex-1 text-xs text-white/60 truncate">{file.name}</span>
-                        <button onClick={() => removeBusinessDoc(idx)} className="text-white/30 hover:text-white/70">
+                        <span className="flex-1 text-xs text-muted-foreground truncate">{file.name}</span>
+                        <button onClick={() => removeBusinessDoc(idx)} className="text-muted-foreground/50 hover:text-foreground/70">
                           <X className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -1174,10 +1174,10 @@ export default function Profile() {
                       onDragOver={e => { e.preventDefault(); setBusinessDocDragActive(true); }}
                       onDragLeave={() => setBusinessDocDragActive(false)}
                       onDrop={e => { e.preventDefault(); setBusinessDocDragActive(false); handleBusinessDocFileAdd(e.dataTransfer.files); }}
-                      className={`w-full h-20 border border-dashed rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${businessDocDragActive ? "border-primary/60 bg-primary/10" : "border-white/20 hover:border-primary/40 hover:bg-primary/5"}`}
+                      className={`w-full h-20 border border-dashed rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${businessDocDragActive ? "border-primary/60 bg-primary/10" : "border-border hover:border-primary/40 hover:bg-primary/5"}`}
                     >
-                      <Upload className="w-5 h-5 text-white/30" />
-                      <span className="text-[11px] text-white/30">{businessDocDragActive ? "Drop to upload" : "Click or drag files here"}</span>
+                      <Upload className="w-5 h-5 text-muted-foreground/50" />
+                      <span className="text-[11px] text-muted-foreground/50">{businessDocDragActive ? "Drop to upload" : "Click or drag files here"}</span>
                     </div>
                   </>
                 )}
@@ -1228,22 +1228,22 @@ export default function Profile() {
         <div className="glass-panel p-6 mb-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-primary" /> Investment Progress</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+            <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
               <DollarSign className="w-5 h-5 text-[#00B4D8] mx-auto mb-1" />
               <p className="text-[10px] text-muted-foreground uppercase">This Month</p>
               <p className="text-xl font-bold font-mono text-[#00B4D8]">$1,247</p>
             </div>
-            <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+            <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
               <Zap className="w-5 h-5 text-primary mx-auto mb-1" />
               <p className="text-[10px] text-muted-foreground uppercase">Signals Used</p>
               <p className="text-xl font-bold font-mono text-primary">18</p>
             </div>
-            <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+            <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
               <Briefcase className="w-5 h-5 text-secondary mx-auto mb-1" />
               <p className="text-[10px] text-muted-foreground uppercase">Gig Earned</p>
               <p className="text-xl font-bold font-mono text-secondary">$320</p>
             </div>
-            <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+            <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
               <AlertTriangle className="w-5 h-5 text-[#ff3366] mx-auto mb-1" />
               <p className="text-[10px] text-muted-foreground uppercase">Max Risk</p>
               <p className="text-xl font-bold font-mono text-[#ff3366]">8.4%</p>
@@ -1258,24 +1258,24 @@ export default function Profile() {
           {gamification ? (
             <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+                <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
                   <Star className="w-5 h-5 text-primary mx-auto mb-1" />
                   <p className="text-[10px] text-muted-foreground uppercase">Level</p>
                   <p className="text-xl font-bold font-mono text-primary">{gamification.xp.level}</p>
                   <p className="text-[9px] text-muted-foreground">{gamification.xp.tier}</p>
                 </div>
-                <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+                <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
                   <Zap className="w-5 h-5 text-yellow-400 mx-auto mb-1" />
                   <p className="text-[10px] text-muted-foreground uppercase">Total XP</p>
                   <p className="text-xl font-bold font-mono text-yellow-400">{gamification.xp.totalXp.toLocaleString()}</p>
                 </div>
-                <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+                <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
                   <Flame className="w-5 h-5 text-orange-400 mx-auto mb-1" />
                   <p className="text-[10px] text-muted-foreground uppercase">Streak</p>
                   <p className="text-xl font-bold font-mono text-orange-400">{gamification.streak.currentStreak}</p>
                   <p className="text-[9px] text-muted-foreground">{gamification.streak.multiplier.toFixed(1)}x multi</p>
                 </div>
-                <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+                <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
                   <Trophy className="w-5 h-5 text-[#FFB800] mx-auto mb-1" />
                   <p className="text-[10px] text-muted-foreground uppercase">Rank</p>
                   <p className="text-xl font-bold font-mono text-[#FFB800]">{myRank ? `#${myRank}` : "--"}</p>
@@ -1286,7 +1286,7 @@ export default function Profile() {
                   <span className="text-muted-foreground">Level {gamification.xp.level} Progress</span>
                   <span className="text-muted-foreground">{gamification.xpToNextLevel} XP to next</span>
                 </div>
-                <div className="w-full bg-white/5 rounded-full h-2">
+                <div className="w-full bg-muted/50 rounded-full h-2">
                   <div
                     className="h-2 rounded-full bg-gradient-to-r from-primary to-amber-500 transition-all"
                     style={{ width: `${gamification.levelProgress}%` }}
@@ -1336,7 +1336,7 @@ export default function Profile() {
                 <div className="flex-shrink-0 text-2xl">🎉</div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-[#FFB800]">$50,000 Anniversary Giveaway</p>
-                  <p className="text-xs text-white/50 mt-0.5">Your XP, trades, streak & referrals earn entries. Plus share in the <span className="text-[#00d4ff] font-medium">$36K referral bonus pool</span>.</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Your XP, trades, streak & referrals earn entries. Plus share in the <span className="text-[#00d4ff] font-medium">$36K referral bonus pool</span>.</p>
                 </div>
                 <div className="text-[#FFB800] text-lg">→</div>
               </div>
@@ -1352,22 +1352,22 @@ export default function Profile() {
           </h3>
           {tokenData ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-              <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
                 <Coins className="w-5 h-5 text-yellow-400 mx-auto mb-1" />
                 <p className="text-[10px] text-muted-foreground uppercase">Rewards Balance</p>
                 <p className="text-xl font-bold font-mono text-yellow-400">{(tokenData.balance || 0).toLocaleString()}</p>
               </div>
-              <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
                 <DollarSign className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
                 <p className="text-[10px] text-muted-foreground uppercase">USD Value</p>
                 <p className="text-xl font-bold font-mono text-emerald-400">${(tokenData.totalValue || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
               </div>
-              <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
                 <TrendingUp className="w-5 h-5 text-primary mx-auto mb-1" />
                 <p className="text-[10px] text-muted-foreground uppercase">Token Value</p>
                 <p className="text-xl font-bold font-mono text-primary">${(tokenData.tokenValue || 0).toFixed(2)}</p>
               </div>
-              <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
                 <Wallet className="w-5 h-5 text-amber-500 mx-auto mb-1" />
                 <p className="text-[10px] text-muted-foreground uppercase">Wallet</p>
                 <p className="text-sm font-mono text-amber-500 truncate">
@@ -1421,13 +1421,13 @@ export default function Profile() {
             </Button>
           </div>
           {((user as ClerkUserWithPasskeys)?.passkeys?.length > 0) && (
-            <div className="mt-4 pt-3 border-t border-white/10">
-              <p className="text-xs text-white/50 mb-2">Registered passkeys ({(user as ClerkUserWithPasskeys).passkeys.length})</p>
+            <div className="mt-4 pt-3 border-t border-border">
+              <p className="text-xs text-muted-foreground mb-2">Registered passkeys ({(user as ClerkUserWithPasskeys).passkeys.length})</p>
               <div className="space-y-1">
                 {(user as ClerkUserWithPasskeys).passkeys.map((pk: PasskeyResource) => (
                   <div key={pk.id} className="flex items-center justify-between text-sm py-1.5">
-                    <span className="text-white/70">{pk.name || "Passkey"}</span>
-                    <span className="text-xs text-white/30">{new Date(pk.createdAt).toLocaleDateString()}</span>
+                    <span className="text-foreground/70">{pk.name || "Passkey"}</span>
+                    <span className="text-xs text-muted-foreground/50">{new Date(pk.createdAt).toLocaleDateString()}</span>
                   </div>
                 ))}
               </div>
@@ -1471,7 +1471,7 @@ export default function Profile() {
                       }
                     }}
                   />
-                  <div className="w-10 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary/60"></div>
+                  <div className="w-10 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary/60"></div>
                 </label>
               </div>
             ))}
@@ -1489,7 +1489,7 @@ export default function Profile() {
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2"><Briefcase className="w-5 h-5 text-gold" /> Saved Jobs</h3>
             <div className="space-y-3">
               {savedJobs.map((job) => (
-                <div key={job.id} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                <div key={job.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border">
                   <div>
                     <p className="font-medium text-sm">{job.jobTitle}</p>
                     <p className="text-xs text-muted-foreground">{job.company} • {job.location}</p>

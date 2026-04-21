@@ -120,12 +120,12 @@ export function SocialProofTicker({ compact = false }: SocialProofTickerProps) {
     return (
       <div
         key={current.id}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.06] bg-white/[0.02] text-[10px] font-medium animate-in fade-in slide-in-from-bottom-1 duration-300"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-muted/30 text-[10px] font-medium animate-in fade-in slide-in-from-bottom-1 duration-300"
         style={{ color: current.color }}
       >
         <span className="flex-shrink-0" style={{ color: current.color }}>{current.icon}</span>
         <span className="truncate max-w-[200px]">{current.text}</span>
-        <span className="text-white/25 ml-auto flex-shrink-0">now</span>
+        <span className="text-muted-foreground/40 ml-auto flex-shrink-0">now</span>
       </div>
     );
   }
@@ -134,7 +134,7 @@ export function SocialProofTicker({ compact = false }: SocialProofTickerProps) {
     <div className="relative overflow-hidden">
       <div
         key={current.id}
-        className="flex items-center gap-2.5 px-4 py-2.5 border border-white/[0.06] bg-white/[0.02] rounded-lg text-xs animate-in fade-in slide-in-from-top-1 duration-500"
+        className="flex items-center gap-2.5 px-4 py-2.5 border border-border bg-muted/30 rounded-lg text-xs animate-in fade-in slide-in-from-top-1 duration-500"
       >
         <div
           className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center"
@@ -142,11 +142,11 @@ export function SocialProofTicker({ compact = false }: SocialProofTickerProps) {
         >
           {current.icon}
         </div>
-        <span className="text-white/60 flex-1">{current.text}</span>
-        <span className="text-white/25 text-[10px] font-mono flex-shrink-0">just now</span>
+        <span className="text-muted-foreground flex-1">{current.text}</span>
+        <span className="text-muted-foreground/40 text-[10px] font-mono flex-shrink-0">just now</span>
         <button
           onClick={() => setVisible(false)}
-          className="text-white/20 hover:text-white/40 transition-colors flex-shrink-0 text-xs leading-none"
+          className="text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors flex-shrink-0 text-xs leading-none"
           aria-label="Dismiss"
         >
           ×

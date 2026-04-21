@@ -102,13 +102,13 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
     return (
       <div className={`bg-[#001a0f] border border-[#00B4D8]/20 rounded-xl p-4 flex items-center gap-3 animate-in fade-in duration-200 ${className}`}>
         <CheckCircle2 className="w-5 h-5 text-[#00B4D8] shrink-0" />
-        <p className="text-sm text-white/70">Profile updated — your experience is now more personalized.</p>
+        <p className="text-sm text-foreground/70">Profile updated — your experience is now more personalized.</p>
       </div>
     );
   }
 
   return (
-    <div className={`bg-[#0a0a14] border border-white/10 rounded-xl p-4 animate-in slide-in-from-top-2 duration-300 ${className}`}>
+    <div className={`bg-card border border-border rounded-xl p-4 animate-in slide-in-from-top-2 duration-300 ${className}`}>
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
           {step === "occupation" ? (
@@ -116,7 +116,7 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
           ) : (
             <Target className="w-4 h-4 text-[#00B4D8]" />
           )}
-          <p className="text-xs font-bold text-white/70">
+          <p className="text-xs font-bold text-foreground/70">
             {step === "occupation"
               ? "What do you do for work?"
               : "What's your main financial focus?"}
@@ -124,7 +124,7 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
         </div>
         <button
           onClick={dismiss}
-          className="text-white/50 hover:text-white/50 transition-colors p-0.5 shrink-0"
+          className="text-muted-foreground hover:text-muted-foreground transition-colors p-0.5 shrink-0"
           aria-label="Dismiss"
         >
           <X className="w-3.5 h-3.5" />
@@ -141,7 +141,7 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
           <div className="flex gap-2 justify-end">
             <button
               onClick={() => { setStep("focus"); trackEvent("progressive_profile_occupation_skipped"); }}
-              className="text-[11px] text-white/30 hover:text-white/50 transition-colors px-3 py-1.5"
+              className="text-[11px] text-muted-foreground/50 hover:text-muted-foreground transition-colors px-3 py-1.5"
             >
               Skip
             </button>
@@ -166,8 +166,8 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
                 aria-pressed={focus === opt.id}
                 className={`px-3 py-2 rounded-lg border text-[11px] font-semibold text-left transition-all ${
                   focus === opt.id
-                    ? "border-[#00B4D8]/50 bg-[#00B4D8]/8 text-white"
-                    : "border-white/8 bg-white/[0.02] text-white/60 hover:border-white/15"
+                    ? "border-[#00B4D8]/50 bg-[#00B4D8]/8 text-foreground"
+                    : "border-white/8 bg-muted/30 text-muted-foreground hover:border-white/15"
                 }`}
               >
                 {opt.label}
@@ -177,7 +177,7 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
           <div className="flex gap-2 justify-end mt-1">
             <button
               onClick={dismiss}
-              className="text-[11px] text-white/30 hover:text-white/50 transition-colors px-3 py-1.5"
+              className="text-[11px] text-muted-foreground/50 hover:text-muted-foreground transition-colors px-3 py-1.5"
             >
               Skip
             </button>

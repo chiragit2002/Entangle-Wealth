@@ -28,7 +28,7 @@ export function TaxImpactCard({
   return (
     <div
       className={`relative rounded-xl overflow-hidden ${className}`}
-      style={{ border: `1px solid ${color}25`, background: "rgba(8,8,18,0.97)" }}
+      style={{ border: `1px solid ${color}25`, background: "var(--glass-bg)" }}
     >
       <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(135deg, ${color}06 0%, transparent 60%)` }} />
       <div className="absolute top-0 left-0 right-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${color}50, transparent)` }} />
@@ -39,15 +39,15 @@ export function TaxImpactCard({
             <FileSearch className="w-3.5 h-3.5" style={{ color }} />
           </div>
           <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color }}>Tax Impact</span>
-          <span className="text-[9px] text-white/25 font-mono ml-1">
+          <span className="text-[9px] text-muted-foreground/40 font-mono ml-1">
             {DOMAIN_LABEL} → TaxGPT
           </span>
         </div>
 
         {!hasTaxProfile ? (
           <div className="flex items-start gap-2 mb-3">
-            <Info className="w-3.5 h-3.5 text-white/30 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-white/50">
+            <Info className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-muted-foreground">
               Set up your TaxFlow profile to see personalized capital gains impact, wash sale warnings, and bracket effects for your {symbol} trades.
             </p>
           </div>
@@ -55,14 +55,14 @@ export function TaxImpactCard({
           <>
             <div className="grid grid-cols-2 gap-2 mb-3">
               <div className="rounded-lg p-2.5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <p className="text-[9px] text-white/40 uppercase tracking-wider mb-1">Short-term gain tax</p>
+                <p className="text-[9px] text-muted-foreground/70 uppercase tracking-wider mb-1">Short-term gain tax</p>
                 <p className="text-sm font-bold font-mono text-red-400">~${impact.estimatedShortTermTax.toLocaleString()}</p>
-                <p className="text-[9px] text-white/30 mt-0.5">{(impact.shortTermRate * 100).toFixed(0)}% rate · held &lt;1yr</p>
+                <p className="text-[9px] text-muted-foreground/50 mt-0.5">{(impact.shortTermRate * 100).toFixed(0)}% rate · held &lt;1yr</p>
               </div>
               <div className="rounded-lg p-2.5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <p className="text-[9px] text-white/40 uppercase tracking-wider mb-1">Long-term gain tax</p>
+                <p className="text-[9px] text-muted-foreground/70 uppercase tracking-wider mb-1">Long-term gain tax</p>
                 <p className="text-sm font-bold font-mono text-emerald-400">~${impact.estimatedLongTermTax.toLocaleString()}</p>
-                <p className="text-[9px] text-white/30 mt-0.5">{(impact.longTermRate * 100).toFixed(0)}% rate · held &gt;1yr</p>
+                <p className="text-[9px] text-muted-foreground/50 mt-0.5">{(impact.longTermRate * 100).toFixed(0)}% rate · held &gt;1yr</p>
               </div>
             </div>
 
@@ -81,7 +81,7 @@ export function TaxImpactCard({
               ) : (
                 <TrendingDown className="w-3 h-3 text-red-400" />
               )}
-              <p className="text-[11px] text-white/50">{impact.bracketNote}</p>
+              <p className="text-[11px] text-muted-foreground">{impact.bracketNote}</p>
             </div>
           </>
         )}

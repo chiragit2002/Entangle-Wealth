@@ -118,7 +118,7 @@ function FlowBar({ sector }: { sector: SectorData }) {
         <span>Vol: {(sector.totalVolume / 1e6).toFixed(1)}M</span>
         <span className="text-[#ff4466]">{sector.losers} down</span>
       </div>
-      <div className="flex justify-between mt-2 pt-2 border-t border-white/[0.04]">
+      <div className="flex justify-between mt-2 pt-2 border-t border-border">
         <div className="text-[10px]">
           <span className="text-[#00B4D8] font-mono font-bold">{sector.topMover.symbol}</span>
           <span className="text-[#00B4D8] ml-1">{sector.topMover.change >= 0 ? "+" : ""}{Math.abs(sector.topMover.change).toFixed(1)}%</span>
@@ -227,7 +227,7 @@ export default function SectorFlow() {
           </div>
           <div className="flex items-center gap-3">
             {lastUpdate && lastUpdate !== "simulated" && <span className="live-dot text-[10px]">LIVE</span>}
-            {lastUpdate === "simulated" && <span className="text-[10px] text-white/40">SIMULATED DATA</span>}
+            {lastUpdate === "simulated" && <span className="text-[10px] text-muted-foreground/70">SIMULATED DATA</span>}
             <Button variant="outline" size="sm" onClick={loadData} disabled={loading} className="border-primary/30 text-primary hover:bg-primary/10">
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             </Button>

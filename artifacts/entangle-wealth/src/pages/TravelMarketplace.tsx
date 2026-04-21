@@ -102,7 +102,7 @@ export default function TravelMarketplace() {
           </span>
           <div className="mt-3 flex items-center gap-2">
             <span className="text-[#00B4D8] font-mono text-[10px]">&gt;</span>
-            <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">LIVE FEED NOT CONNECTED · SHOWING DEMO LISTINGS</span>
+            <span className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">LIVE FEED NOT CONNECTED · SHOWING DEMO LISTINGS</span>
           </div>
         </div>
 
@@ -129,7 +129,7 @@ export default function TravelMarketplace() {
             const isBooking = bookingId === listing.id && booking;
 
             return (
-              <div key={listing.id} className="glass-panel rounded-xl overflow-hidden hover:border-white/20 transition-all group">
+              <div key={listing.id} className="glass-panel rounded-xl overflow-hidden hover:border-border transition-all group">
                 <div className="h-32 flex items-center justify-center text-6xl" style={{
                   background: "linear-gradient(135deg, rgba(0,180,216,0.1), rgba(255,215,0,0.05))",
                 }}>
@@ -138,7 +138,7 @@ export default function TravelMarketplace() {
                 <div className="p-5">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <h3 className="font-bold text-white text-lg">{listing.name}</h3>
+                      <h3 className="font-bold text-foreground text-lg">{listing.name}</h3>
                       <p className="text-sm text-muted-foreground flex items-center gap-1">
                         <MapPin className="w-3 h-3" /> {listing.destination}
                       </p>

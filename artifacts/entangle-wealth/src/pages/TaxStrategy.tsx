@@ -88,19 +88,19 @@ export default function TaxStrategy() {
           </div>
         </div>
 
-        <div className="glass-panel rounded-xl p-3 mb-6 border border-white/[0.06]">
-          <p className="text-[11px] text-white/30 leading-relaxed">
+        <div className="glass-panel rounded-xl p-3 mb-6 border border-border">
+          <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
             Based on IRS publications and tax code. Educational only — not professional tax advice. Consult a CPA.
           </p>
         </div>
 
         <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
           <Input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search strategies..."
-            className="pl-10 bg-white/5 border-white/10"
+            className="pl-10 bg-muted/50 border-border"
           />
         </div>
 
@@ -110,7 +110,7 @@ export default function TaxStrategy() {
               className={`px-3 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all min-h-[32px] ${
                 entityFilter === f.value
                   ? "bg-[#00B4D8]/15 text-[#00B4D8] border border-[#00B4D8]/30"
-                  : "text-white/40 hover:text-white/60 border border-transparent"
+                  : "text-muted-foreground/70 hover:text-muted-foreground border border-transparent"
               }`}>
               {f.label}
             </button>
@@ -120,14 +120,14 @@ export default function TaxStrategy() {
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           <button onClick={() => setCategoryFilter("all")}
             className={`px-3 py-1 rounded-full text-[11px] whitespace-nowrap ${
-              categoryFilter === "all" ? "bg-white/10 text-white" : "text-white/30 hover:text-white/50"
+              categoryFilter === "all" ? "bg-muted text-foreground" : "text-muted-foreground/50 hover:text-muted-foreground"
             }`}>
             All Categories
           </button>
           {categories.map(c => (
             <button key={c} onClick={() => setCategoryFilter(c)}
               className={`px-3 py-1 rounded-full text-[11px] whitespace-nowrap ${
-                categoryFilter === c ? "bg-white/10 text-white" : "text-white/30 hover:text-white/50"
+                categoryFilter === c ? "bg-muted text-foreground" : "text-muted-foreground/50 hover:text-muted-foreground"
               }`}>
               {c}
             </button>
@@ -149,11 +149,11 @@ export default function TaxStrategy() {
                 >
                   <div className="flex justify-between items-start gap-3 mb-2">
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-[15px] text-white">{strategy.title}</h3>
+                      <h3 className="font-bold text-[15px] text-foreground">{strategy.title}</h3>
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
                         <span className="text-[11px] text-[#00B4D8] font-mono">{strategy.code}</span>
-                        <span className="text-[11px] text-white/30">·</span>
-                        <span className="text-[11px] text-white/50">{strategy.category}</span>
+                        <span className="text-[11px] text-muted-foreground/50">·</span>
+                        <span className="text-[11px] text-muted-foreground">{strategy.category}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
@@ -163,10 +163,10 @@ export default function TaxStrategy() {
                       }}>
                         {RISK_LABELS[strategy.risk]}
                       </span>
-                      {isExpanded ? <ChevronUp className="w-4 h-4 text-white/30" /> : <ChevronDown className="w-4 h-4 text-white/30" />}
+                      {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground/50" /> : <ChevronDown className="w-4 h-4 text-muted-foreground/50" />}
                     </div>
                   </div>
-                  <p className="text-[12px] text-white/50">{strategy.maxBenefit}</p>
+                  <p className="text-[12px] text-muted-foreground">{strategy.maxBenefit}</p>
                   {estimated !== null && estimated > 0 && (
                     <p className="text-[13px] font-mono font-bold text-[#00B4D8] mt-1">
                       Est. deduction: {formatDollar(Math.round(estimated))}
@@ -178,25 +178,25 @@ export default function TaxStrategy() {
                   <div className="px-4 pb-4 border-t border-white/5 pt-4">
                     <div className="mb-3">
                       <p className="text-[11px] text-[#00B4D8] font-semibold mb-1 uppercase">How It Works</p>
-                      <p className="text-[13px] text-white/70 whitespace-pre-line">{strategy.how}</p>
+                      <p className="text-[13px] text-foreground/70 whitespace-pre-line">{strategy.how}</p>
                     </div>
                     <div className="mb-3">
                       <p className="text-[11px] text-[#00B4D8] font-semibold mb-1 uppercase">Who's Eligible</p>
-                      <p className="text-[13px] text-white/70">{strategy.eligible}</p>
+                      <p className="text-[13px] text-foreground/70">{strategy.eligible}</p>
                     </div>
                     <div className="mb-3">
                       <p className="text-[11px] text-[#00B4D8] font-semibold mb-1 uppercase">Required Documentation</p>
                       <ul className="space-y-1">
                         {strategy.documentation.map((doc, i) => (
-                          <li key={i} className="text-[12px] text-white/60 flex items-start gap-2">
+                          <li key={i} className="text-[12px] text-muted-foreground flex items-start gap-2">
                             <span className="text-[#00B4D8] mt-0.5">•</span> {doc}
                           </li>
                         ))}
                       </ul>
                     </div>
                     <div className="mb-3 flex items-center gap-2">
-                      <BookOpen className="w-3.5 h-3.5 text-white/30" />
-                      <span className="text-[12px] text-white/50">IRS Reference: {strategy.irsPub}</span>
+                      <BookOpen className="w-3.5 h-3.5 text-muted-foreground/50" />
+                      <span className="text-[12px] text-muted-foreground">IRS Reference: {strategy.irsPub}</span>
                     </div>
                     {strategy.auditNote && (
                       <div className="mb-3 p-2 rounded-lg bg-[rgba(255,184,0,0.08)] border border-[rgba(255,184,0,0.15)]">
@@ -206,10 +206,10 @@ export default function TaxStrategy() {
                       </div>
                     )}
                     <div className="mb-3">
-                      <p className="text-[11px] text-white/30 mb-1">Applicable Entity Types:</p>
+                      <p className="text-[11px] text-muted-foreground/50 mb-1">Applicable Entity Types:</p>
                       <div className="flex gap-1 flex-wrap">
                         {strategy.entityTypes.map(e => (
-                          <span key={e} className="px-2 py-0.5 rounded text-[10px] bg-white/5 text-white/50">
+                          <span key={e} className="px-2 py-0.5 rounded text-[10px] bg-muted/50 text-muted-foreground">
                             {ENTITY_SHORT_LABELS[e]}
                           </span>
                         ))}
@@ -244,9 +244,9 @@ export default function TaxStrategy() {
 
         {filtered.length === 0 && (
           <div className="text-center py-16">
-            <Lightbulb className="w-10 h-10 mx-auto mb-3 text-white/10" />
-            <p className="text-sm font-medium text-white/40 mb-1">No strategies match those filters.</p>
-            <p className="text-xs text-white/25">Try removing a filter, or search by keyword instead.</p>
+            <Lightbulb className="w-10 h-10 mx-auto mb-3 text-muted-foreground/20" />
+            <p className="text-sm font-medium text-muted-foreground/70 mb-1">No strategies match those filters.</p>
+            <p className="text-xs text-muted-foreground/40">Try removing a filter, or search by keyword instead.</p>
           </div>
         )}
       </div>

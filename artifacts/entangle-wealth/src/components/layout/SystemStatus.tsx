@@ -84,8 +84,7 @@ export function SystemStatus() {
           }}
         />
         <span
-          className="text-[9px] font-mono uppercase tracking-wider hidden xl:block"
-          style={{ color: "rgba(255,255,255,0.35)" }}
+          className="text-[9px] font-mono uppercase tracking-wider hidden xl:block text-muted-foreground/70"
         >
           SYS
         </span>
@@ -95,7 +94,7 @@ export function SystemStatus() {
         <div
           className="absolute right-0 top-full mt-1 z-[200] min-w-[220px]"
           style={{
-            background: "#0a0e1a",
+            background: "hsl(var(--card))",
             border: "1px solid rgba(255,140,0,0.2)",
             borderRadius: 6,
             padding: "12px",
@@ -112,7 +111,7 @@ export function SystemStatus() {
             </span>
           </div>
 
-          <div className="flex gap-3 mb-3 text-[10px] font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>
+          <div className="flex gap-3 mb-3 text-[10px] font-mono text-muted-foreground/70">
             <span style={{ color: HEALTH_COLORS.green }}>{status.greenCount} ok</span>
             {status.yellowCount > 0 && (
               <span style={{ color: HEALTH_COLORS.yellow }}>{status.yellowCount} warn</span>

@@ -506,13 +506,13 @@ export default function Travel() {
           </div>
         </div>
 
-        <div className="flex gap-1 mt-4 mb-6 bg-white/[0.04] rounded-xl p-1">
+        <div className="flex gap-1 mt-4 mb-6 bg-muted/50 rounded-xl p-1">
           <button
             onClick={() => setTravelMode("personal")}
             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-[13px] font-semibold transition-all min-h-[44px] ${
               travelMode === "personal"
                 ? "bg-primary/15 text-primary border border-primary/30"
-                : "text-white/40 hover:text-white/60"
+                : "text-muted-foreground/70 hover:text-muted-foreground"
             }`}
           >
             <Compass className="w-4 h-4" /> Personal Trip
@@ -522,7 +522,7 @@ export default function Travel() {
             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-[13px] font-semibold transition-all min-h-[44px] ${
               travelMode === "business"
                 ? "bg-primary/15 text-primary border border-primary/30"
-                : "text-white/40 hover:text-white/60"
+                : "text-muted-foreground/70 hover:text-muted-foreground"
             }`}
           >
             <Briefcase className="w-4 h-4" /> Business Trip
@@ -549,7 +549,7 @@ export default function Travel() {
                         ? "bg-gradient-to-br from-primary to-[#FF6600] text-black shadow-lg shadow-primary/20"
                         : isDone
                         ? "bg-[#00B4D8]/20 text-[#00B4D8] border-2 border-[#00B4D8]/40 cursor-pointer"
-                        : "bg-white/5 text-white/30 border border-white/10"
+                        : "bg-muted/50 text-muted-foreground/50 border border-border"
                     }`}
                     aria-label={`Step ${s}: ${labels[i]}`}
                     disabled={!isDone && !isActive}
@@ -557,13 +557,13 @@ export default function Travel() {
                     {isDone ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-4 h-4 md:w-5 md:h-5" />}
                   </button>
                   <span className={`text-[10px] md:text-[11px] mt-2 font-semibold text-center ${
-                    isActive ? "text-primary" : isDone ? "text-[#00B4D8]" : "text-white/30"
+                    isActive ? "text-primary" : isDone ? "text-[#00B4D8]" : "text-muted-foreground/50"
                   }`}>
                     {labels[i]}
                   </span>
                 </div>
                 {i < 3 && (
-                  <div className={`h-[2px] flex-1 mx-1 -mt-5 ${step > s ? "bg-[#00B4D8]/40" : "bg-white/10"}`} />
+                  <div className={`h-[2px] flex-1 mx-1 -mt-5 ${step > s ? "bg-[#00B4D8]/40" : "bg-muted"}`} />
                 )}
               </div>
             );
@@ -579,7 +579,7 @@ export default function Travel() {
                     className={`px-4 py-2 rounded-full text-[12px] md:text-[13px] font-semibold transition-all min-h-[40px] ${
                       trip.tripType === t
                         ? "bg-primary/15 text-primary border border-primary/30"
-                        : "text-white/40 hover:text-white/60"
+                        : "text-muted-foreground/70 hover:text-muted-foreground"
                     }`}
                   >
                     {t === "roundtrip" ? "Round trip" : t === "oneway" ? "One way" : "Multi-city"}
@@ -600,14 +600,14 @@ export default function Travel() {
                     onFocus={() => setFromSugg(true)}
                     onBlur={() => setTimeout(() => setFromSugg(false), 200)}
                     maxLength={100}
-                    className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-10 pr-4 py-3.5 text-white text-[14px] md:text-[15px] focus:outline-none focus:border-primary/50 placeholder:text-white/25"
+                    className="w-full bg-muted/50 border border-border rounded-xl pl-10 pr-4 py-3.5 text-foreground text-[14px] md:text-[15px] focus:outline-none focus:border-primary/50 placeholder:text-muted-foreground/40"
                     aria-label="Departure city"
                   />
                   {fromSugg && trip.from.length > 0 && filteredFrom.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-[#0d0d1a] border border-white/10 rounded-xl overflow-hidden z-30 max-h-[260px] overflow-y-auto">
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl overflow-hidden z-30 max-h-[260px] overflow-y-auto">
                       {filteredFrom.slice(0, 8).map(a => (
                         <button key={a} onClick={() => { setTrip(p => ({ ...p, from: a })); setFromSugg(false); }}
-                          className="w-full text-left px-4 py-3 text-[13px] text-white/80 hover:bg-primary/10 transition-colors flex items-center gap-2 min-h-[44px]">
+                          className="w-full text-left px-4 py-3 text-[13px] text-foreground/80 hover:bg-primary/10 transition-colors flex items-center gap-2 min-h-[44px]">
                           <Plane className="w-3 h-3 text-primary/40" /> {a}
                         </button>
                       ))}
@@ -616,7 +616,7 @@ export default function Travel() {
                 </div>
 
                 <button onClick={swapLocations}
-                  className="self-center md:self-auto w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-primary hover:border-primary/30 transition-all flex-shrink-0"
+                  className="self-center md:self-auto w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground/70 hover:text-primary hover:border-primary/30 transition-all flex-shrink-0"
                   aria-label="Swap locations"
                 >
                   <ArrowLeftRight className="w-4 h-4" />
@@ -634,14 +634,14 @@ export default function Travel() {
                     onFocus={() => setToSugg(true)}
                     onBlur={() => setTimeout(() => setToSugg(false), 200)}
                     maxLength={100}
-                    className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-10 pr-4 py-3.5 text-white text-[14px] md:text-[15px] focus:outline-none focus:border-primary/50 placeholder:text-white/25"
+                    className="w-full bg-muted/50 border border-border rounded-xl pl-10 pr-4 py-3.5 text-foreground text-[14px] md:text-[15px] focus:outline-none focus:border-primary/50 placeholder:text-muted-foreground/40"
                     aria-label="Destination city"
                   />
                   {toSugg && trip.to.length > 0 && filteredTo.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-[#0d0d1a] border border-white/10 rounded-xl overflow-hidden z-30 max-h-[260px] overflow-y-auto">
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl overflow-hidden z-30 max-h-[260px] overflow-y-auto">
                       {filteredTo.slice(0, 8).map(a => (
                         <button key={a} onClick={() => { setTrip(p => ({ ...p, to: a })); setToSugg(false); }}
-                          className="w-full text-left px-4 py-3 text-[13px] text-white/80 hover:bg-primary/10 transition-colors flex items-center gap-2 min-h-[44px]">
+                          className="w-full text-left px-4 py-3 text-[13px] text-foreground/80 hover:bg-primary/10 transition-colors flex items-center gap-2 min-h-[44px]">
                           <Plane className="w-3 h-3 text-primary/40" /> {a}
                         </button>
                       ))}
@@ -654,27 +654,27 @@ export default function Travel() {
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/50"><Calendar className="w-4 h-4" /></div>
                   <input type="date" value={trip.departDate} onChange={e => setTrip(p => ({ ...p, departDate: e.target.value }))}
-                    className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-10 pr-3 py-3.5 text-white text-[13px] focus:outline-none focus:border-primary/50 min-h-[48px]"
+                    className="w-full bg-muted/50 border border-border rounded-xl pl-10 pr-3 py-3.5 text-foreground text-[13px] focus:outline-none focus:border-primary/50 min-h-[48px]"
                     aria-label="Departure date" />
                 </div>
                 {trip.tripType === "roundtrip" && (
                   <div className="relative">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/50"><Calendar className="w-4 h-4" /></div>
                     <input type="date" value={trip.returnDate} onChange={e => setTrip(p => ({ ...p, returnDate: e.target.value }))}
-                      className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-10 pr-3 py-3.5 text-white text-[13px] focus:outline-none focus:border-primary/50 min-h-[48px]"
+                      className="w-full bg-muted/50 border border-border rounded-xl pl-10 pr-3 py-3.5 text-foreground text-[13px] focus:outline-none focus:border-primary/50 min-h-[48px]"
                       aria-label="Return date" />
                   </div>
                 )}
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/50"><Users className="w-4 h-4" /></div>
                   <select value={trip.travelers} onChange={e => setTrip(p => ({ ...p, travelers: parseInt(e.target.value) }))}
-                    className="w-full bg-[#0d0d1a] border border-white/10 rounded-xl pl-10 pr-3 py-3.5 text-white text-[13px] focus:outline-none focus:border-primary/50 appearance-none min-h-[48px] [&>option]:bg-[#0d0d1a] [&>option]:text-white"
+                    className="w-full bg-card border border-border rounded-xl pl-10 pr-3 py-3.5 text-foreground text-[13px] focus:outline-none focus:border-primary/50 appearance-none min-h-[48px] [&>option]:bg-card [&>option]:text-foreground"
                     aria-label="Travelers">
                     {[1,2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n} traveler{n > 1 ? "s" : ""}</option>)}
                   </select>
                 </div>
                 <select value={trip.travelClass} onChange={e => setTrip(p => ({ ...p, travelClass: e.target.value }))}
-                  className="w-full bg-[#0d0d1a] border border-white/10 rounded-xl px-3 py-3.5 text-white text-[13px] focus:outline-none focus:border-primary/50 appearance-none min-h-[48px] [&>option]:bg-[#0d0d1a] [&>option]:text-white"
+                  className="w-full bg-card border border-border rounded-xl px-3 py-3.5 text-foreground text-[13px] focus:outline-none focus:border-primary/50 appearance-none min-h-[48px] [&>option]:bg-card [&>option]:text-foreground"
                   aria-label="Travel class">
                   <option value="economy">Economy</option>
                   <option value="premium">Premium Economy</option>
@@ -686,9 +686,9 @@ export default function Travel() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
                 <Input placeholder="Primary business purpose *" value={trip.purpose}
                   onChange={e => setTrip(p => ({ ...p, purpose: e.target.value.slice(0, 500) }))}
-                  maxLength={500} className="bg-white/[0.04] border-white/10 py-3.5 text-[14px]" />
+                  maxLength={500} className="bg-muted/50 border-border py-3.5 text-[14px]" />
                 <select value={trip.purposeType} onChange={e => setTrip(p => ({ ...p, purposeType: e.target.value }))}
-                  className="w-full bg-[#0d0d1a] border border-white/10 rounded-xl px-3 py-3.5 text-white text-[13px] focus:outline-none focus:border-primary/50 appearance-none min-h-[48px] [&>option]:bg-[#0d0d1a] [&>option]:text-white"
+                  className="w-full bg-card border border-border rounded-xl px-3 py-3.5 text-foreground text-[13px] focus:outline-none focus:border-primary/50 appearance-none min-h-[48px] [&>option]:bg-card [&>option]:text-foreground"
                   aria-label="Trip purpose type">
                   <option value="conference">Conference / Trade Show</option>
                   <option value="client">Client Meeting</option>
@@ -701,15 +701,15 @@ export default function Travel() {
               </div>
 
               {trip.from && trip.to && trip.departDate && (
-                <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-4 mt-2">
+                <div className="rounded-xl bg-muted/30 border border-border p-4 mt-2">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-[11px] uppercase tracking-wider text-white/30 font-semibold">Trip Summary</span>
+                    <span className="text-[11px] uppercase tracking-wider text-muted-foreground/50 font-semibold">Trip Summary</span>
                     <span className="text-[11px] px-2.5 py-1 rounded-full bg-primary/10 text-primary font-bold">{dayCount} day{dayCount > 1 ? "s" : ""}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-center">
-                      <p className="text-[18px] font-black text-white">{trip.from.match(/\((\w+)\)/)?.[1] || trip.from.slice(0, 3).toUpperCase()}</p>
-                      <p className="text-[10px] text-white/30">{formatDate(trip.departDate)}</p>
+                      <p className="text-[18px] font-black text-foreground">{trip.from.match(/\((\w+)\)/)?.[1] || trip.from.slice(0, 3).toUpperCase()}</p>
+                      <p className="text-[10px] text-muted-foreground/50">{formatDate(trip.departDate)}</p>
                     </div>
                     <div className="flex-1 flex items-center gap-1">
                       <div className="w-2 h-2 rounded-full bg-primary" />
@@ -719,8 +719,8 @@ export default function Travel() {
                       <div className="w-2 h-2 rounded-full bg-primary" />
                     </div>
                     <div className="text-center">
-                      <p className="text-[18px] font-black text-white">{trip.to.match(/\((\w+)\)/)?.[1] || trip.to.slice(0, 3).toUpperCase()}</p>
-                      <p className="text-[10px] text-white/30">{trip.returnDate ? formatDate(trip.returnDate) : "—"}</p>
+                      <p className="text-[18px] font-black text-foreground">{trip.to.match(/\((\w+)\)/)?.[1] || trip.to.slice(0, 3).toUpperCase()}</p>
+                      <p className="text-[10px] text-muted-foreground/50">{trip.returnDate ? formatDate(trip.returnDate) : "—"}</p>
                     </div>
                   </div>
                 </div>
@@ -750,14 +750,14 @@ export default function Travel() {
               </p>
 
               <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
                 <input
                   type="text"
                   placeholder="Search deductions (e.g., meals, vehicle, IRC §162...)"
                   value={dedSearch}
                   onChange={e => setDedSearch(e.target.value.slice(0, 100))}
                   maxLength={100}
-                  className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary/30 placeholder:text-white/40"
+                  className="w-full bg-muted/50 border border-border rounded-xl pl-10 pr-4 py-3 text-[13px] text-foreground focus:outline-none focus:border-primary/30 placeholder:text-muted-foreground/70"
                 />
               </div>
 
@@ -769,21 +769,21 @@ export default function Travel() {
                     <div key={d.id} className={`rounded-xl border transition-all ${
                       d.selected
                         ? "border-primary/30 bg-primary/[0.04]"
-                        : "border-white/[0.06] bg-white/[0.02] hover:border-white/15"
+                        : "border-border bg-muted/30 hover:border-white/15"
                     }`}>
                       <div className="flex items-center gap-3 p-3.5 md:p-4 cursor-pointer"
                         onClick={() => toggleDeduction(d.id)} role="button" tabIndex={0}
                         onKeyDown={e => { if (e.key === "Enter" || e.key === " ") toggleDeduction(d.id); }}>
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                          d.selected ? "bg-primary/15" : "bg-white/5"
+                          d.selected ? "bg-primary/15" : "bg-muted/50"
                         }`}>
-                          <Icon className={`w-5 h-5 ${d.selected ? "text-primary" : "text-white/30"}`} />
+                          <Icon className={`w-5 h-5 ${d.selected ? "text-primary" : "text-muted-foreground/50"}`} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="text-[13px] md:text-[14px] font-bold">{d.title}</p>
                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                              d.pct === 100 ? "bg-[#00B4D8]/15 text-[#00B4D8]" : d.pct >= 50 ? "bg-[#FFB800]/15 text-[#FFB800]" : "bg-white/10 text-white/50"
+                              d.pct === 100 ? "bg-[#00B4D8]/15 text-[#00B4D8]" : d.pct >= 50 ? "bg-[#FFB800]/15 text-[#FFB800]" : "bg-muted text-muted-foreground"
                             }`}>
                               {d.pct}%
                             </span>
@@ -792,12 +792,12 @@ export default function Travel() {
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <button onClick={e => { e.stopPropagation(); setExpandedDed(isExpanded ? null : d.id); }}
-                            className="p-1.5 rounded-lg hover:bg-white/5 text-white/30 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                            className="p-1.5 rounded-lg hover:bg-muted/50 text-muted-foreground/50 min-w-[36px] min-h-[36px] flex items-center justify-center"
                             aria-label={isExpanded ? "Collapse details" : "Expand details"}>
                             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                           </button>
                           <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${
-                            d.selected ? "bg-primary border-primary" : "border-white/20"
+                            d.selected ? "bg-primary border-primary" : "border-border"
                           }`}>
                             {d.selected && <CheckCircle2 className="w-4 h-4 text-black" />}
                           </div>
@@ -807,7 +807,7 @@ export default function Travel() {
                       {isExpanded && (
                         <div className="px-4 pb-4 pt-0 border-t border-white/5 mt-0">
                           <div className="pt-3">
-                            <p className="text-[12px] text-white/60 mb-3">{d.description}</p>
+                            <p className="text-[12px] text-muted-foreground mb-3">{d.description}</p>
                             <div className="flex items-center gap-2 mb-2">
                               <FileText className="w-3 h-3 text-secondary/60" />
                               <span className="text-[11px] text-secondary/80 font-semibold">{d.publication}</span>
@@ -816,7 +816,7 @@ export default function Travel() {
                               {d.conditions.map((c, i) => (
                                 <div key={i} className="flex items-start gap-2">
                                   <AlertTriangle className="w-3 h-3 text-[#FFB800]/50 mt-0.5 flex-shrink-0" />
-                                  <span className="text-[11px] text-white/50">{c}</span>
+                                  <span className="text-[11px] text-muted-foreground">{c}</span>
                                 </div>
                               ))}
                             </div>
@@ -836,7 +836,7 @@ export default function Travel() {
                   {selectedDeductions.map(d => (
                     <span key={d.id} className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-[11px] font-semibold flex items-center gap-1.5">
                       {d.title.split(" ")[0]} <span className="text-[#00B4D8]">{d.pct}%</span>
-                      <button onClick={() => toggleDeduction(d.id)} className="ml-1 text-white/30 hover:text-white/60">×</button>
+                      <button onClick={() => toggleDeduction(d.id)} className="ml-1 text-muted-foreground/50 hover:text-muted-foreground">×</button>
                     </span>
                   ))}
                 </div>
@@ -858,8 +858,8 @@ export default function Travel() {
 
               {activities.length === 0 && (
                 <div className="text-center py-8">
-                  <Calendar className="w-12 h-12 mx-auto mb-3 text-white/10" />
-                  <p className="text-[14px] text-white/30 mb-4">No activities yet. Start from a template or add manually.</p>
+                  <Calendar className="w-12 h-12 mx-auto mb-3 text-muted-foreground/20" />
+                  <p className="text-[14px] text-muted-foreground/50 mb-4">No activities yet. Start from a template or add manually.</p>
                   <Button className="bg-gradient-to-r from-primary to-[#FF6600] text-black font-bold min-h-[44px]" onClick={seedDefaultItinerary}>
                     Generate Template Itinerary
                   </Button>
@@ -874,14 +874,14 @@ export default function Travel() {
                 const bizCount = dayActivities.filter(a => a.type !== "personal").length;
 
                 return (
-                  <div key={day} className="rounded-xl border border-white/[0.06] bg-white/[0.015] mb-3 overflow-hidden">
-                    <div className="flex items-center justify-between px-4 py-3 bg-white/[0.02] border-b border-white/[0.06]">
+                  <div key={day} className="rounded-xl border border-border bg-white/[0.015] mb-3 overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 bg-muted/30 border-b border-border">
                       <div className="flex items-center gap-2">
                         <span className="text-[16px] font-black text-primary">Day {day}</span>
-                        <span className="text-[11px] text-white/30">{dateStr}</span>
+                        <span className="text-[11px] text-muted-foreground/50">{dateStr}</span>
                       </div>
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                        bizCount > 0 ? "bg-[#00B4D8]/15 text-[#00B4D8]" : "bg-white/5 text-white/30"
+                        bizCount > 0 ? "bg-[#00B4D8]/15 text-[#00B4D8]" : "bg-muted/50 text-muted-foreground/50"
                       }`}>
                         {bizCount > 0 ? `${bizCount} business` : "No activities"}
                       </span>
@@ -889,25 +889,25 @@ export default function Travel() {
 
                     <div className="p-3 space-y-2">
                       {dayActivities.map(a => (
-                        <div key={a.id} className="rounded-lg bg-white/[0.03] border border-white/[0.05] p-3">
+                        <div key={a.id} className="rounded-lg bg-muted/50 border border-border p-3">
                           <div className="flex gap-2 mb-2">
                             <input type="time" value={a.time}
                               onChange={e => updateActivity(a.id, { time: e.target.value })}
-                              className="bg-white/[0.05] border border-white/10 rounded-lg px-2.5 py-2 text-[12px] text-white w-[100px] focus:outline-none focus:border-primary/30"
+                              className="bg-muted/50 border border-border rounded-lg px-2.5 py-2 text-[12px] text-foreground w-[100px] focus:outline-none focus:border-primary/30"
                               aria-label="Activity time" />
                             <input type="text" placeholder="Activity description" value={a.title}
                               onChange={e => updateActivity(a.id, { title: e.target.value.slice(0, 200) })}
                               maxLength={200}
-                              className="flex-1 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-[13px] text-white focus:outline-none focus:border-primary/30 placeholder:text-white/40 min-w-0" />
+                              className="flex-1 bg-muted/50 border border-border rounded-lg px-3 py-2 text-[13px] text-foreground focus:outline-none focus:border-primary/30 placeholder:text-muted-foreground/70 min-w-0" />
                             <button onClick={() => removeActivity(a.id)}
-                              className="p-2 text-white/40 hover:text-[#ff3366] transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
+                              className="p-2 text-muted-foreground/70 hover:text-[#ff3366] transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
                               aria-label="Remove activity">
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
                           <div className="flex gap-2 items-center">
                             <select value={a.type} onChange={e => updateActivity(a.id, { type: e.target.value as ItineraryActivity["type"] })}
-                              className="bg-[#0d0d1a] border border-white/10 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/30 min-h-[34px] [&>option]:bg-[#0d0d1a] [&>option]:text-white">
+                              className="bg-card border border-border rounded-lg px-2.5 py-1.5 text-[11px] text-foreground focus:outline-none focus:border-primary/30 min-h-[34px] [&>option]:bg-card [&>option]:text-foreground">
                               {ACTIVITY_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                             </select>
                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold flex-shrink-0 ${
@@ -920,12 +920,12 @@ export default function Travel() {
                             <input type="text" placeholder="Notes for CPA..." value={a.notes}
                               onChange={e => updateActivity(a.id, { notes: e.target.value.slice(0, 300) })}
                               maxLength={300}
-                              className="flex-1 bg-transparent border-none text-[11px] text-white/40 focus:outline-none placeholder:text-white/40 min-w-0" />
+                              className="flex-1 bg-transparent border-none text-[11px] text-muted-foreground/70 focus:outline-none placeholder:text-muted-foreground/70 min-w-0" />
                           </div>
                         </div>
                       ))}
                       <button onClick={() => addActivity(day)}
-                        className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-dashed border-white/10 text-white/25 hover:text-primary hover:border-primary/30 text-[12px] transition-colors min-h-[40px]">
+                        className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-dashed border-border text-muted-foreground/40 hover:text-primary hover:border-primary/30 text-[12px] transition-colors min-h-[40px]">
                         <Plus className="w-3.5 h-3.5" /> Add Activity
                       </button>
                     </div>
@@ -949,7 +949,7 @@ export default function Travel() {
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <span className="text-[28px] font-black" style={{ color: getScoreColor(complianceScore) }}>{complianceScore}</span>
-                    <span className="text-[9px] text-white/30 uppercase tracking-wider">Compliance</span>
+                    <span className="text-[9px] text-muted-foreground/50 uppercase tracking-wider">Compliance</span>
                   </div>
                 </div>
                 <h2 className="text-xl font-bold mb-1">Trip Tax Report</h2>
@@ -961,27 +961,27 @@ export default function Travel() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                 <div className="rounded-xl p-3 bg-[#00B4D8]/[0.06] border border-[#00B4D8]/15 text-center">
                   <p className="text-[20px] font-black text-[#00B4D8]">${estimatedSavings.toLocaleString()}</p>
-                  <p className="text-[10px] text-white/30 mt-1">Est. Deductible</p>
+                  <p className="text-[10px] text-muted-foreground/50 mt-1">Est. Deductible</p>
                 </div>
                 <div className="rounded-xl p-3 bg-primary/[0.06] border border-primary/15 text-center">
                   <p className="text-[20px] font-black text-primary">{selectedDeductions.length}</p>
-                  <p className="text-[10px] text-white/30 mt-1">IRS Categories</p>
+                  <p className="text-[10px] text-muted-foreground/50 mt-1">IRS Categories</p>
                 </div>
                 <div className="rounded-xl p-3 bg-secondary/[0.06] border border-secondary/15 text-center">
                   <p className="text-[20px] font-black text-secondary">{businessDays}</p>
-                  <p className="text-[10px] text-white/30 mt-1">Business Days</p>
+                  <p className="text-[10px] text-muted-foreground/50 mt-1">Business Days</p>
                 </div>
-                <div className="rounded-xl p-3 bg-white/[0.03] border border-white/10 text-center">
-                  <p className="text-[20px] font-black text-white">{activities.length}</p>
-                  <p className="text-[10px] text-white/30 mt-1">Activities</p>
+                <div className="rounded-xl p-3 bg-muted/50 border border-border text-center">
+                  <p className="text-[20px] font-black text-foreground">{activities.length}</p>
+                  <p className="text-[10px] text-muted-foreground/50 mt-1">Activities</p>
                 </div>
               </div>
 
-              <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-4 mb-4">
+              <div className="rounded-xl bg-muted/30 border border-border p-4 mb-4">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="text-center">
                     <p className="text-[16px] font-black">{trip.from.match(/\((\w+)\)/)?.[1] || trip.from.slice(0, 3).toUpperCase()}</p>
-                    <p className="text-[10px] text-white/30">{formatDate(trip.departDate)}</p>
+                    <p className="text-[10px] text-muted-foreground/50">{formatDate(trip.departDate)}</p>
                   </div>
                   <div className="flex-1 flex items-center gap-1">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary" />
@@ -992,30 +992,30 @@ export default function Travel() {
                   </div>
                   <div className="text-center">
                     <p className="text-[16px] font-black">{trip.to.match(/\((\w+)\)/)?.[1] || trip.to.slice(0, 3).toUpperCase()}</p>
-                    <p className="text-[10px] text-white/30">{trip.returnDate ? formatDate(trip.returnDate) : "—"}</p>
+                    <p className="text-[10px] text-muted-foreground/50">{trip.returnDate ? formatDate(trip.returnDate) : "—"}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
-                  <div className="flex justify-between"><span className="text-white/30">Purpose</span><span className="text-white/60">{trip.purpose.slice(0, 40)}</span></div>
-                  <div className="flex justify-between"><span className="text-white/30">Type</span><span className="text-white/60">{trip.purposeType}</span></div>
-                  <div className="flex justify-between"><span className="text-white/30">Travelers</span><span className="text-white/60">{trip.travelers}</span></div>
-                  <div className="flex justify-between"><span className="text-white/30">Class</span><span className="text-white/60 capitalize">{trip.travelClass}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground/50">Purpose</span><span className="text-muted-foreground">{trip.purpose.slice(0, 40)}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground/50">Type</span><span className="text-muted-foreground">{trip.purposeType}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground/50">Travelers</span><span className="text-muted-foreground">{trip.travelers}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground/50">Class</span><span className="text-muted-foreground capitalize">{trip.travelClass}</span></div>
                 </div>
               </div>
 
-              <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] overflow-hidden mb-4">
-                <div className="px-4 py-2.5 bg-white/[0.02] border-b border-white/[0.06]">
+              <div className="rounded-xl bg-muted/30 border border-border overflow-hidden mb-4">
+                <div className="px-4 py-2.5 bg-muted/30 border-b border-border">
                   <p className="text-[12px] font-bold text-primary">Deduction Breakdown</p>
                 </div>
                 <div className="divide-y divide-white/[0.04]">
                   {selectedDeductions.map(d => (
                     <div key={d.id} className="flex items-center justify-between px-4 py-2.5">
                       <div className="flex items-center gap-2 min-w-0">
-                        <d.icon className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
-                        <span className="text-[12px] text-white/70 truncate">{d.title}</span>
+                        <d.icon className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0" />
+                        <span className="text-[12px] text-foreground/70 truncate">{d.title}</span>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="text-[10px] text-white/30 font-mono">{d.irsRef}</span>
+                        <span className="text-[10px] text-muted-foreground/50 font-mono">{d.irsRef}</span>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                           d.pct === 100 ? "bg-[#00B4D8]/15 text-[#00B4D8]" : "bg-[#FFB800]/15 text-[#FFB800]"
                         }`}>{d.pct}%</span>
@@ -1026,8 +1026,8 @@ export default function Travel() {
               </div>
 
               {activities.length > 0 && (
-                <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] overflow-hidden mb-4">
-                  <div className="px-4 py-2.5 bg-white/[0.02] border-b border-white/[0.06]">
+                <div className="rounded-xl bg-muted/30 border border-border overflow-hidden mb-4">
+                  <div className="px-4 py-2.5 bg-muted/30 border-b border-border">
                     <p className="text-[12px] font-bold text-primary">Itinerary Overview</p>
                   </div>
                   <div className="divide-y divide-white/[0.04]">
@@ -1036,13 +1036,13 @@ export default function Travel() {
                       if (dayActs.length === 0) return null;
                       return (
                         <div key={day} className="px-4 py-2.5">
-                          <p className="text-[11px] font-bold text-white/50 mb-1.5">Day {day}</p>
+                          <p className="text-[11px] font-bold text-muted-foreground mb-1.5">Day {day}</p>
                           {dayActs.map(a => (
                             <div key={a.id} className="flex items-center justify-between py-1">
                               <div className="flex items-center gap-2 min-w-0">
-                                <Clock className="w-3 h-3 text-white/40 flex-shrink-0" />
-                                <span className="text-[11px] text-white/50">{a.time}</span>
-                                <span className="text-[12px] text-white/70 truncate">{a.title || "Untitled"}</span>
+                                <Clock className="w-3 h-3 text-muted-foreground/70 flex-shrink-0" />
+                                <span className="text-[11px] text-muted-foreground">{a.time}</span>
+                                <span className="text-[12px] text-foreground/70 truncate">{a.title || "Untitled"}</span>
                               </div>
                               <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold flex-shrink-0 ${
                                 a.deductible === "full" ? "bg-[#00B4D8]/15 text-[#00B4D8]" :
@@ -1066,10 +1066,10 @@ export default function Travel() {
                     <Camera className="w-6 h-6 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-[15px] font-bold text-white mb-0.5">Capture Trip Receipts</h3>
-                    <p className="text-[12px] text-white/40">Upload photos of receipts for AI-powered categorization and IRS-compliant tracking. Scan meals, hotels, transport, and more.</p>
+                    <h3 className="text-[15px] font-bold text-foreground mb-0.5">Capture Trip Receipts</h3>
+                    <p className="text-[12px] text-muted-foreground/70">Upload photos of receipts for AI-powered categorization and IRS-compliant tracking. Scan meals, hotels, transport, and more.</p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-primary transition-colors flex-shrink-0" />
+                  <ChevronRight className="w-5 h-5 text-muted-foreground/40 group-hover:text-primary transition-colors flex-shrink-0" />
                 </div>
               </div>
             </Link>
@@ -1084,41 +1084,41 @@ export default function Travel() {
             </div>
 
             <Dialog open={cpaDialogOpen} onOpenChange={setCpaDialogOpen}>
-              <DialogContent className="bg-[#0d0d1a] border-white/10 max-w-md">
+              <DialogContent className="bg-card border-border max-w-md">
                 <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2 text-white">
+                  <DialogTitle className="flex items-center gap-2 text-foreground">
                     <Mail className="w-5 h-5 text-[#00B4D8]" /> Send Travel Plan to CPA
                   </DialogTitle>
-                  <DialogDescription className="text-white/50 text-[13px]">
+                  <DialogDescription className="text-muted-foreground text-[13px]">
                     Your full trip report including deductions, itinerary, and tax summary will be prepared for your CPA to review.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-2">
                   <div>
-                    <label className="text-[12px] font-semibold text-white/60 mb-1.5 block">CPA Email Address *</label>
+                    <label className="text-[12px] font-semibold text-muted-foreground mb-1.5 block">CPA Email Address *</label>
                     <Input
                       type="email"
                       placeholder="cpa@example.com"
                       value={cpaEmail}
                       onChange={e => setCpaEmail(e.target.value)}
-                      className="bg-white/[0.04] border-white/10 text-white"
+                      className="bg-muted/50 border-border text-foreground"
                     />
-                    <p className="text-[10px] text-white/30 mt-1">Email is saved for future use</p>
+                    <p className="text-[10px] text-muted-foreground/50 mt-1">Email is saved for future use</p>
                   </div>
                   <div>
-                    <label className="text-[12px] font-semibold text-white/60 mb-1.5 block">Personal Message (optional)</label>
+                    <label className="text-[12px] font-semibold text-muted-foreground mb-1.5 block">Personal Message (optional)</label>
                     <Textarea
                       placeholder="Hi, please review my upcoming business trip deductions..."
                       value={cpaMessage}
                       onChange={e => setCpaMessage(e.target.value)}
                       rows={3}
                       maxLength={1000}
-                      className="bg-white/[0.04] border-white/10 text-white resize-none text-[13px]"
+                      className="bg-muted/50 border-border text-foreground resize-none text-[13px]"
                     />
                   </div>
-                  <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-3">
-                    <p className="text-[11px] font-bold text-white/50 mb-2">Report Preview</p>
-                    <div className="space-y-1 text-[11px] text-white/40">
+                  <div className="rounded-xl bg-muted/30 border border-border p-3">
+                    <p className="text-[11px] font-bold text-muted-foreground mb-2">Report Preview</p>
+                    <div className="space-y-1 text-[11px] text-muted-foreground/70">
                       <p>{trip.from} → {trip.to}</p>
                       <p>{formatDate(trip.departDate)}{trip.returnDate ? ` — ${formatDate(trip.returnDate)}` : ""} · {dayCount} day{dayCount > 1 ? "s" : ""}</p>
                       <p>{selectedDeductions.length} deduction{selectedDeductions.length !== 1 ? "s" : ""} · {activities.length} activit{activities.length !== 1 ? "ies" : "y"}</p>
@@ -1127,7 +1127,7 @@ export default function Travel() {
                   </div>
                 </div>
                 <DialogFooter className="gap-2 sm:gap-0">
-                  <Button variant="outline" onClick={() => setCpaDialogOpen(false)} className="border-white/10 text-white/60 min-h-[44px]">
+                  <Button variant="outline" onClick={() => setCpaDialogOpen(false)} className="border-border text-muted-foreground min-h-[44px]">
                     Cancel
                   </Button>
                   <Button onClick={sendToCpa} className="bg-gradient-to-r from-[#00B4D8] to-[#FFA500] text-black font-bold min-h-[44px] gap-2">
@@ -1147,13 +1147,13 @@ export default function Travel() {
           </div>
         )}
 
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/[0.06]">
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
           <Button variant="outline" className="gap-1.5 min-h-[44px]" onClick={goBack} disabled={step === 1}>
             <ChevronLeft className="w-4 h-4" /> Back
           </Button>
           <div className="flex items-center gap-1">
             {[1,2,3,4].map(s => (
-              <div key={s} className={`w-2 h-2 rounded-full transition-all ${step === s ? "bg-primary w-6" : step > s ? "bg-[#00B4D8]/40" : "bg-white/10"}`} />
+              <div key={s} className={`w-2 h-2 rounded-full transition-all ${step === s ? "bg-primary w-6" : step > s ? "bg-[#00B4D8]/40" : "bg-muted"}`} />
             ))}
           </div>
           {step < 4 ? (

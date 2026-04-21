@@ -251,10 +251,10 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
     <>
     <BigWinOverlay show={showBigWin} label="BIG WIN" onDone={() => setShowBigWin(false)} />
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 ">
-      <div className="relative w-[min(360px,calc(100vw-24px))] bg-[#0A0E1A] border border-white/[0.1] rounded-xl shadow-2xl overflow-hidden">
+      <div className="relative w-[min(360px,calc(100vw-24px))] bg-card border border-white/[0.1] rounded-xl shadow-2xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#00B4D8]/5 via-transparent to-[#FFB800]/5 pointer-events-none" />
 
-        <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+        <div className="relative flex items-center justify-between px-4 py-3 border-b border-border">
           <div className="flex items-center gap-2">
             <Gift className="w-4 h-4 text-[#FFB800]" />
             <span className="text-sm font-bold font-mono text-[#FFB800] tracking-wider">DAILY SPIN</span>
@@ -263,7 +263,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
             onClick={onClose}
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.9 }}
-            className="text-white/30 hover:text-white/60 transition-colors"
+            className="text-muted-foreground/50 hover:text-muted-foreground transition-colors"
           >
             <X className="w-4 h-4" />
           </motion.button>
@@ -305,15 +305,15 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
                 <p className="text-[10px] font-mono text-[#FFB800]/60 uppercase tracking-widest">YOU WON</p>
                 <p className="text-lg font-bold font-mono text-[#FFB800] mt-1">{result.reward}</p>
                 {result.rewardType === "xp" && (
-                  <p className="text-[10px] font-mono text-white/30 mt-1">
+                  <p className="text-[10px] font-mono text-muted-foreground/50 mt-1">
                     {result.baseXp ? `+${result.baseXp} XP` : `+${result.rewardValue} XP`} added to your account
                   </p>
                 )}
                 {result.rewardType === "multiplier" && (
-                  <p className="text-[10px] font-mono text-white/30 mt-1">Your next session earns 2x XP</p>
+                  <p className="text-[10px] font-mono text-muted-foreground/50 mt-1">Your next session earns 2x XP</p>
                 )}
                 {result.rewardType === "streak_protection" && (
-                  <p className="text-[10px] font-mono text-white/30 mt-1">Your streak is protected for 1 missed day</p>
+                  <p className="text-[10px] font-mono text-muted-foreground/50 mt-1">Your streak is protected for 1 missed day</p>
                 )}
               </motion.div>
             )}
@@ -324,12 +324,12 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
               {canSpin ? (
                 <div>
                   <p className="text-sm font-mono text-[#00B4D8] font-bold">Ready to spin!</p>
-                  <p className="text-[10px] font-mono text-white/30 mt-1">Tap the wheel to claim your daily reward</p>
+                  <p className="text-[10px] font-mono text-muted-foreground/50 mt-1">Tap the wheel to claim your daily reward</p>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 justify-center">
-                  <Clock className="w-3.5 h-3.5 text-white/30" />
-                  <p className="text-xs font-mono text-white/40">Next spin in <span className="text-[#00B4D8] font-bold">{countdown}</span></p>
+                  <Clock className="w-3.5 h-3.5 text-muted-foreground/50" />
+                  <p className="text-xs font-mono text-muted-foreground/70">Next spin in <span className="text-[#00B4D8] font-bold">{countdown}</span></p>
                 </div>
               )}
             </div>
@@ -345,24 +345,24 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
             className={`w-full py-2.5 mb-3 rounded-lg text-[11px] font-bold font-mono tracking-wider transition-colors disabled:opacity-40 ${
               canSpin && !spinning
                 ? "bg-gradient-to-r from-[#FFB800] to-[#f59e0b] text-black shadow-lg shadow-[#FFB800]/20"
-                : "bg-white/[0.05] text-white/30 border border-white/[0.08]"
+                : "bg-muted/50 text-muted-foreground/50 border border-border"
             }`}
           >
             {spinning ? "SPINNING..." : canSpin ? "SPIN NOW" : `NEXT SPIN: ${countdown}`}
           </motion.button>
 
           <div className="grid grid-cols-3 gap-1.5">
-            <div className="flex items-center gap-1.5 bg-white/[0.02] rounded px-2 py-1.5">
+            <div className="flex items-center gap-1.5 bg-muted/30 rounded px-2 py-1.5">
               <Zap className="w-3 h-3 text-[#00B4D8]" />
-              <span className="text-[8px] font-mono text-white/40">XP Boosts</span>
+              <span className="text-[8px] font-mono text-muted-foreground/70">XP Boosts</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-white/[0.02] rounded px-2 py-1.5">
+            <div className="flex items-center gap-1.5 bg-muted/30 rounded px-2 py-1.5">
               <Shield className="w-3 h-3 text-[#ff3366]" />
-              <span className="text-[8px] font-mono text-white/40">Streak Shield</span>
+              <span className="text-[8px] font-mono text-muted-foreground/70">Streak Shield</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-white/[0.02] rounded px-2 py-1.5">
+            <div className="flex items-center gap-1.5 bg-muted/30 rounded px-2 py-1.5">
               <Star className="w-3 h-3 text-[#FFB800]" />
-              <span className="text-[8px] font-mono text-white/40">Multipliers</span>
+              <span className="text-[8px] font-mono text-muted-foreground/70">Multipliers</span>
             </div>
           </div>
         </div>

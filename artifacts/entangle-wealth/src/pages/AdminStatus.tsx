@@ -126,8 +126,8 @@ export default function AdminStatus() {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-20 text-center">
-          <RefreshCw className="w-6 h-6 text-white/40 animate-spin mx-auto mb-3" />
-          <p className="text-white/30 text-sm">Checking access...</p>
+          <RefreshCw className="w-6 h-6 text-muted-foreground/70 animate-spin mx-auto mb-3" />
+          <p className="text-muted-foreground/50 text-sm">Checking access...</p>
         </div>
       </Layout>
     );
@@ -141,25 +141,25 @@ export default function AdminStatus() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold">Service Status Management</h1>
-            <p className="text-xs text-white/30 mt-1">Toggle service states and manage incidents</p>
+            <p className="text-xs text-muted-foreground/50 mt-1">Toggle service states and manage incidents</p>
           </div>
-          <button onClick={fetchData} disabled={loading} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white/[0.05] border border-white/10 rounded-lg hover:bg-white/10 transition-colors text-white/60">
+          <button onClick={fetchData} disabled={loading} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-muted/50 border border-border rounded-lg hover:bg-muted transition-colors text-muted-foreground">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
           </button>
         </div>
 
         <div className="space-y-3 mb-10">
-          <h2 className="text-sm font-semibold text-white/50 uppercase tracking-wider">Services</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Services</h2>
           {services.map((svc) => {
             const Icon = SERVICE_ICONS[svc.service_name] || Server;
             const currentOpt = STATUS_OPTIONS.find((o) => o.value === svc.status) || STATUS_OPTIONS[0];
             const CurrentIcon = currentOpt.icon;
             return (
-              <div key={svc.service_name} className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-5">
+              <div key={svc.service_name} className="bg-muted/30 border border-border rounded-xl p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <Icon className="w-5 h-5 text-white/30" />
-                    <span className="text-sm font-semibold text-white/80">{svc.service_name}</span>
+                    <Icon className="w-5 h-5 text-muted-foreground/50" />
+                    <span className="text-sm font-semibold text-foreground/80">{svc.service_name}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <CurrentIcon className="w-4 h-4" style={{ color: currentOpt.color }} />
@@ -187,7 +187,7 @@ export default function AdminStatus() {
                     </button>
                   ))}
                 </div>
-                <p className="text-[10px] text-white/50 mt-2 font-mono">Updated: {new Date(svc.updated_at).toLocaleString()}</p>
+                <p className="text-[10px] text-muted-foreground mt-2 font-mono">Updated: {new Date(svc.updated_at).toLocaleString()}</p>
               </div>
             );
           })}
@@ -195,7 +195,7 @@ export default function AdminStatus() {
 
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-white/50 uppercase tracking-wider">Recent Incidents</h2>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Recent Incidents</h2>
             <button
               onClick={() => setShowNewIncident(!showNewIncident)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-[#ff3366]/10 text-[#ff3366] border border-[#ff3366]/20 rounded-lg hover:bg-[#ff3366]/20 transition-colors"
@@ -205,15 +205,15 @@ export default function AdminStatus() {
           </div>
 
           {showNewIncident && (
-            <div className="bg-white/[0.02] border border-[#ff3366]/20 rounded-xl p-5 mb-4 space-y-4">
-              <h3 className="text-sm font-bold text-white/70">New Incident</h3>
+            <div className="bg-muted/30 border border-[#ff3366]/20 rounded-xl p-5 mb-4 space-y-4">
+              <h3 className="text-sm font-bold text-foreground/70">New Incident</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] text-white/30 uppercase tracking-wider">Service</label>
+                  <label className="text-[10px] text-muted-foreground/50 uppercase tracking-wider">Service</label>
                   <select
                     value={incidentForm.serviceName}
                     onChange={(e) => setIncidentForm((f) => ({ ...f, serviceName: e.target.value }))}
-                    className="w-full h-9 mt-1 px-3 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#00B4D8]/40 appearance-none"
+                    className="w-full h-9 mt-1 px-3 text-xs bg-muted/50 border border-border rounded-lg text-foreground focus:outline-none focus:border-[#00B4D8]/40 appearance-none"
                   >
                     <option value="" className="bg-black">Select service...</option>
                     {services.map((s) => (
@@ -222,11 +222,11 @@ export default function AdminStatus() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] text-white/30 uppercase tracking-wider">Severity</label>
+                  <label className="text-[10px] text-muted-foreground/50 uppercase tracking-wider">Severity</label>
                   <select
                     value={incidentForm.severity}
                     onChange={(e) => setIncidentForm((f) => ({ ...f, severity: e.target.value }))}
-                    className="w-full h-9 mt-1 px-3 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#00B4D8]/40 appearance-none"
+                    className="w-full h-9 mt-1 px-3 text-xs bg-muted/50 border border-border rounded-lg text-foreground focus:outline-none focus:border-[#00B4D8]/40 appearance-none"
                   >
                     <option value="minor" className="bg-black">Minor</option>
                     <option value="major" className="bg-black">Major</option>
@@ -235,31 +235,31 @@ export default function AdminStatus() {
                 </div>
               </div>
               <div>
-                <label className="text-[10px] text-white/30 uppercase tracking-wider">Title</label>
+                <label className="text-[10px] text-muted-foreground/50 uppercase tracking-wider">Title</label>
                 <input
                   value={incidentForm.title}
                   onChange={(e) => setIncidentForm((f) => ({ ...f, title: e.target.value }))}
                   placeholder="Brief incident title"
                   maxLength={200}
-                  className="w-full h-9 mt-1 px-3 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/40"
+                  className="w-full h-9 mt-1 px-3 text-xs bg-muted/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-[#00B4D8]/40"
                 />
               </div>
               <div>
-                <label className="text-[10px] text-white/30 uppercase tracking-wider">Description (optional)</label>
+                <label className="text-[10px] text-muted-foreground/50 uppercase tracking-wider">Description (optional)</label>
                 <textarea
                   value={incidentForm.description}
                   onChange={(e) => setIncidentForm((f) => ({ ...f, description: e.target.value }))}
                   placeholder="Details about the incident..."
                   rows={3}
                   maxLength={2000}
-                  className="w-full mt-1 px-3 py-2 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/40 resize-none"
+                  className="w-full mt-1 px-3 py-2 text-xs bg-muted/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-[#00B4D8]/40 resize-none"
                 />
               </div>
               <div className="flex gap-2">
-                <button onClick={createIncident} className="px-4 py-2 text-xs font-semibold bg-[#ff3366] text-white rounded-lg hover:bg-[#ff3366]/90 transition-colors">
+                <button onClick={createIncident} className="px-4 py-2 text-xs font-semibold bg-[#ff3366] text-foreground rounded-lg hover:bg-[#ff3366]/90 transition-colors">
                   Create Incident
                 </button>
-                <button onClick={() => setShowNewIncident(false)} className="px-4 py-2 text-xs font-semibold bg-white/[0.05] text-white/50 rounded-lg hover:bg-white/10 transition-colors">
+                <button onClick={() => setShowNewIncident(false)} className="px-4 py-2 text-xs font-semibold bg-muted/50 text-muted-foreground rounded-lg hover:bg-muted transition-colors">
                   Cancel
                 </button>
               </div>
@@ -267,19 +267,19 @@ export default function AdminStatus() {
           )}
 
           {incidents.length === 0 ? (
-            <div className="text-center py-12 bg-white/[0.01] border border-white/[0.06] rounded-xl">
+            <div className="text-center py-12 bg-muted/30 border border-border rounded-xl">
               <CheckCircle2 className="w-8 h-8 text-[#00B4D8]/40 mx-auto mb-3" />
-              <p className="text-white/30 text-sm">No recent incidents</p>
+              <p className="text-muted-foreground/50 text-sm">No recent incidents</p>
             </div>
           ) : (
             <div className="space-y-2">
               {incidents.map((inc) => {
                 const sevColor = inc.severity === "critical" ? "#ff3366" : inc.severity === "major" ? "#FFB800" : "#00B4D8";
                 return (
-                  <div key={inc.id} className="px-4 py-3 bg-white/[0.02] border border-white/[0.06] rounded-xl flex items-center justify-between">
+                  <div key={inc.id} className="px-4 py-3 bg-muted/30 border border-border rounded-xl flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-semibold text-white/70">{inc.title}</p>
-                      <p className="text-[10px] text-white/50 font-mono">{inc.service_name} · {new Date(inc.created_at).toLocaleDateString()}</p>
+                      <p className="text-sm font-semibold text-foreground/70">{inc.title}</p>
+                      <p className="text-[10px] text-muted-foreground font-mono">{inc.service_name} · {new Date(inc.created_at).toLocaleDateString()}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border" style={{ color: sevColor, borderColor: `${sevColor}33`, backgroundColor: `${sevColor}10` }}>

@@ -100,7 +100,7 @@ export default function Gigs() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20 lg:pb-0">
+    <div className="min-h-screen bg-black text-foreground pb-20 lg:pb-0">
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-8 max-w-4xl">
         <div className="flex items-center justify-between mb-2">
@@ -133,18 +133,18 @@ export default function Gigs() {
                 placeholder="Service title (e.g. Pressure Wash Driveway)"
                 value={form.title}
                 onChange={(e) => setForm(p => ({ ...p, title: e.target.value }))}
-                className="bg-white/5 border-white/10"
+                className="bg-muted/50 border-border"
               />
               <Input
                 placeholder="Your price (e.g. $75)"
                 value={form.price}
                 onChange={(e) => setForm(p => ({ ...p, price: e.target.value }))}
-                className="bg-white/5 border-white/10"
+                className="bg-muted/50 border-border"
               />
               <select
                 value={form.category}
                 onChange={(e) => setForm(p => ({ ...p, category: e.target.value }))}
-                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-primary/50"
+                className="w-full bg-muted/50 border border-border rounded-lg p-3 text-foreground focus:outline-none focus:border-primary/50"
               >
                 <option value="cleaning">🧹 Cleaning</option>
                 <option value="outdoor">🌿 Outdoor</option>
@@ -157,7 +157,7 @@ export default function Gigs() {
                 value={form.description}
                 onChange={(e) => setForm(p => ({ ...p, description: e.target.value }))}
                 rows={3}
-                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white placeholder:text-muted-foreground/50 resize-none focus:outline-none focus:border-primary/50"
+                className="w-full bg-muted/50 border border-border rounded-lg p-3 text-foreground placeholder:text-muted-foreground/50 resize-none focus:outline-none focus:border-primary/50"
               />
               <Button className="w-full bg-gradient-to-r from-primary to-[#0099cc] text-black font-bold" onClick={postGig} disabled={posting}>
                 {posting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
@@ -175,7 +175,7 @@ export default function Gigs() {
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-colors ${
                 category === cat.id
                   ? "bg-primary/10 border-primary text-primary"
-                  : "bg-white/5 border-white/10 text-muted-foreground hover:border-white/20"
+                  : "bg-muted/50 border-border text-muted-foreground hover:border-border"
               }`}
             >
               {cat.emoji} {cat.label}
@@ -189,17 +189,17 @@ export default function Gigs() {
             placeholder="Search gigs..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white/5 border-white/10"
+            className="pl-10 bg-muted/50 border-border"
           />
         </div>
 
         {loading ? (
           <div className="flex justify-center py-16"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
         ) : gigs.length === 0 ? (
-          <div className="text-center py-16 border border-white/[0.06] rounded-lg bg-white/[0.02]">
-            <Wrench className="w-12 h-12 mx-auto mb-4 text-white/10" />
-            <p className="text-[11px] font-mono text-white/30">&gt; NO GIGS IN MARKETPLACE</p>
-            <p className="text-[9px] font-mono text-white/15 mt-2 max-w-md mx-auto">
+          <div className="text-center py-16 border border-border rounded-lg bg-muted/30">
+            <Wrench className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />
+            <p className="text-[11px] font-mono text-muted-foreground/50">&gt; NO GIGS IN MARKETPLACE</p>
+            <p className="text-[9px] font-mono text-muted-foreground/30 mt-2 max-w-md mx-auto">
               Post a gig to offer your services to the community
             </p>
           </div>

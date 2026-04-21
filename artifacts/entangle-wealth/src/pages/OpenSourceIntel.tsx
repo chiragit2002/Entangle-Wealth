@@ -258,7 +258,7 @@ export default function OpenSourceIntel() {
   const totalStars = "150k+";
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-foreground">
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-8 max-w-6xl">
         <div className="mb-8">
@@ -324,7 +324,7 @@ export default function OpenSourceIntel() {
         </div>
 
         <div className="flex flex-wrap gap-2 mb-6">
-          <div className="flex gap-1 p-1 rounded-lg bg-white/5 border border-white/10">
+          <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border">
             {["all", "critical", "high", "medium", "nice-to-have"].map(p => (
               <button
                 key={p}
@@ -332,18 +332,18 @@ export default function OpenSourceIntel() {
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                   filterPriority === p
                     ? "bg-primary/20 text-primary"
-                    : "text-muted-foreground hover:text-white"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {p === "all" ? "All Priorities" : p === "nice-to-have" ? "Explore" : p.charAt(0).toUpperCase() + p.slice(1)}
               </button>
             ))}
           </div>
-          <div className="flex gap-1 p-1 rounded-lg bg-white/5 border border-white/10 flex-wrap">
+          <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border flex-wrap">
             <button
               onClick={() => setFilterCategory("all")}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                filterCategory === "all" ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-white"
+                filterCategory === "all" ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               All Categories
@@ -353,7 +353,7 @@ export default function OpenSourceIntel() {
                 key={c}
                 onClick={() => setFilterCategory(c)}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                  filterCategory === c ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-white"
+                  filterCategory === c ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {c}
@@ -369,7 +369,7 @@ export default function OpenSourceIntel() {
             return (
               <div
                 key={lib.name}
-                className={`glass-panel overflow-hidden transition-all hover:border-white/20 ${isExpanded ? "border-white/20" : ""}`}
+                className={`glass-panel overflow-hidden transition-all hover:border-border ${isExpanded ? "border-border" : ""}`}
               >
                 <button
                   onClick={() => setExpandedLib(isExpanded ? null : lib.name)}
@@ -377,8 +377,8 @@ export default function OpenSourceIntel() {
                 >
                   <div className="flex flex-col md:flex-row md:items-center gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                        <Github className="w-5 h-5 text-white/60" />
+                      <div className="w-10 h-10 rounded-xl bg-muted/50 border border-border flex items-center justify-center shrink-0">
+                        <Github className="w-5 h-5 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -388,7 +388,7 @@ export default function OpenSourceIntel() {
                           >
                             {config.label}
                           </span>
-                          <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-md bg-white/5">{lib.category}</span>
+                          <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-md bg-muted/50">{lib.category}</span>
                         </div>
                         <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1">{lib.description}</p>
                       </div>
@@ -398,7 +398,7 @@ export default function OpenSourceIntel() {
                         <Star className="w-3.5 h-3.5" />
                         <span className="text-xs font-mono">{lib.stars}</span>
                       </div>
-                      <span className="text-xs text-muted-foreground px-2 py-0.5 rounded bg-white/5">{lib.license}</span>
+                      <span className="text-xs text-muted-foreground px-2 py-0.5 rounded bg-muted/50">{lib.license}</span>
                       <span className="text-xs text-muted-foreground">{lib.language}</span>
                       {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                     </div>
@@ -426,16 +426,16 @@ export default function OpenSourceIntel() {
                     </div>
 
                     <div className="flex flex-wrap gap-3 pt-2">
-                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 text-xs">
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 text-xs">
                         <Terminal className="w-3.5 h-3.5 text-primary" />
                         <code className="font-mono text-primary">{lib.install}</code>
                       </div>
                       {lib.bundleSize && (
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 text-xs text-muted-foreground">
                           <Package className="w-3.5 h-3.5" /> {lib.bundleSize}
                         </div>
                       )}
-                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 text-xs text-muted-foreground">
                         <Clock className="w-3.5 h-3.5" /> Active: {lib.lastActive}
                       </div>
                       {lib.currentlyUsing && (
@@ -449,7 +449,7 @@ export default function OpenSourceIntel() {
                       href={`https://github.com/${lib.repo}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:border-primary/30 hover:bg-primary/5 transition-all text-sm"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 border border-border hover:border-primary/30 hover:bg-primary/5 transition-all text-sm"
                     >
                       <Github className="w-4 h-4" />
                       View on GitHub
@@ -477,7 +477,7 @@ export default function OpenSourceIntel() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/10">
+                <tr className="border-b border-border">
                   <th className="text-left py-2 px-3 text-xs text-muted-foreground font-medium">License</th>
                   <th className="text-center py-2 px-3 text-xs text-muted-foreground font-medium">Commercial OK</th>
                   <th className="text-center py-2 px-3 text-xs text-muted-foreground font-medium">Must Open Source?</th>

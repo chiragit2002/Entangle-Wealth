@@ -100,11 +100,11 @@ export function FeedbackWidget() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
                 <MessageSquarePlus className="w-5 h-5 text-[#00B4D8]" />
                 Quick Feedback
               </h3>
-              <button onClick={handleClose} className="text-white/50 hover:text-white transition-colors">
+              <button onClick={handleClose} className="text-muted-foreground hover:text-foreground transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -114,13 +114,13 @@ export function FeedbackWidget() {
                 <div className="w-12 h-12 rounded-full bg-[#00B4D8]/20 flex items-center justify-center mx-auto mb-3">
                   <Check className="w-6 h-6 text-[#00B4D8]" />
                 </div>
-                <p className="text-white font-semibold">Thank you!</p>
-                <p className="text-white/50 text-sm mt-1">Your feedback helps us improve.</p>
+                <p className="text-foreground font-semibold">Thank you!</p>
+                <p className="text-muted-foreground text-sm mt-1">Your feedback helps us improve.</p>
               </div>
             ) : (
               <div className="space-y-4">
                 <div>
-                  <p className="text-xs text-white/60 mb-2 uppercase tracking-wider">How would you rate your experience?</p>
+                  <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">How would you rate your experience?</p>
                   <div className="flex gap-1 justify-center">
                     {[1, 2, 3, 4, 5].map((s) => (
                       <button
@@ -132,19 +132,19 @@ export function FeedbackWidget() {
                       >
                         <Star
                           className={`w-8 h-8 transition-colors ${
-                            s <= effectiveRating ? "text-[#FFB800] fill-[#FFB800]" : "text-white/40"
+                            s <= effectiveRating ? "text-[#FFB800] fill-[#FFB800]" : "text-muted-foreground/70"
                           }`}
                         />
                       </button>
                     ))}
                   </div>
-                  <p className="text-center text-xs text-white/40 mt-1">
+                  <p className="text-center text-xs text-muted-foreground/70 mt-1">
                     {effectiveRating === 1 ? "Poor" : effectiveRating === 2 ? "Fair" : effectiveRating === 3 ? "Good" : effectiveRating === 4 ? "Very Good" : "Excellent"}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-xs text-white/60 mb-2 uppercase tracking-wider">Category</p>
+                  <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">Category</p>
                   <div className="flex flex-wrap gap-1.5">
                     {CATEGORIES.map((cat) => (
                       <button
@@ -164,19 +164,19 @@ export function FeedbackWidget() {
                 </div>
 
                 <div>
-                  <p className="text-xs text-white/60 mb-2 uppercase tracking-wider">Comment (optional)</p>
+                  <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">Comment (optional)</p>
                   <textarea
                     value={comment}
                     onChange={(e) => setComment(e.target.value.slice(0, 500))}
                     placeholder="Tell us more..."
                     rows={3}
-                    className="w-full rounded-lg p-3 text-sm text-white resize-none focus:outline-none"
+                    className="w-full rounded-lg p-3 text-sm text-foreground resize-none focus:outline-none"
                     style={{
                       background: "rgba(255,255,255,0.05)",
                       border: "1px solid rgba(255,255,255,0.1)",
                     }}
                   />
-                  <p className="text-right text-[10px] text-white/30">{comment.length}/500</p>
+                  <p className="text-right text-[10px] text-muted-foreground/50">{comment.length}/500</p>
                 </div>
 
                 <button

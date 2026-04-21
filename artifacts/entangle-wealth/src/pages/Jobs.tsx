@@ -114,7 +114,7 @@ export default function Jobs() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-foreground">
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-8 max-w-6xl">
         <div className="mb-8">
@@ -133,7 +133,7 @@ export default function Jobs() {
                 placeholder="Job title, keywords, or company..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="pl-10 bg-white/5 border-white/10"
+                className="pl-10 bg-muted/50 border-border"
               />
             </div>
             <div className="relative flex-1 max-w-xs">
@@ -142,7 +142,7 @@ export default function Jobs() {
                 placeholder="Location..."
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="pl-10 bg-white/5 border-white/10"
+                className="pl-10 bg-muted/50 border-border"
               />
             </div>
             <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={loading}>
@@ -158,7 +158,7 @@ export default function Jobs() {
               <div className="flex justify-between items-start gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-lg font-semibold text-white truncate">{job.title}</h3>
+                    <h3 className="text-lg font-semibold text-foreground truncate">{job.title}</h3>
                     {job.isRemote && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/30 whitespace-nowrap">
                         Remote
@@ -182,7 +182,7 @@ export default function Jobs() {
                       </Button>
                     </a>
                   ) : (
-                    <Button size="sm" variant="outline" className="border-white/20 text-muted-foreground" disabled>
+                    <Button size="sm" variant="outline" className="border-border text-muted-foreground" disabled>
                       Demo listing
                     </Button>
                   )}
@@ -208,10 +208,10 @@ export default function Jobs() {
           )}
 
           {!loading && hasSearched && jobs.length === 0 && (
-            <div className="text-center py-16 border border-white/[0.06] rounded-lg bg-white/[0.02]">
-              <Briefcase className="w-12 h-12 text-white/10 mx-auto mb-4" />
-              <p className="text-[11px] font-mono text-white/30">&gt; NO JOB LISTINGS IN FEED</p>
-              <p className="text-[9px] font-mono text-white/15 mt-2 max-w-md mx-auto">
+            <div className="text-center py-16 border border-border rounded-lg bg-muted/30">
+              <Briefcase className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
+              <p className="text-[11px] font-mono text-muted-foreground/50">&gt; NO JOB LISTINGS IN FEED</p>
+              <p className="text-[9px] font-mono text-muted-foreground/30 mt-2 max-w-md mx-auto">
                 Search above to find positions matching your profile
               </p>
             </div>

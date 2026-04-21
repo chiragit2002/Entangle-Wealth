@@ -193,7 +193,7 @@ export function CinematicAchievement({ achievement, onComplete }: CinematicAchie
         </div>
 
         {achievement.subtitle && (
-          <div className="text-base text-white/60 max-w-sm">{achievement.subtitle}</div>
+          <div className="text-base text-muted-foreground max-w-sm">{achievement.subtitle}</div>
         )}
 
         <div

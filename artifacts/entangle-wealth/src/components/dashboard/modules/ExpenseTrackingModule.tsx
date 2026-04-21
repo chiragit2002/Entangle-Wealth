@@ -43,8 +43,8 @@ export function ExpenseTrackingModule() {
             <Receipt className="w-3.5 h-3.5 text-orange-400" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-white/80">Expense Tracking</p>
-            <p className="text-[10px] text-white/35">Home office · mileage · business spend</p>
+            <p className="text-xs font-semibold text-foreground/80">Expense Tracking</p>
+            <p className="text-[10px] text-muted-foreground/60">Home office · mileage · business spend</p>
           </div>
         </div>
         <Link href="/taxgpt" className="flex items-center gap-1 text-[10px] text-orange-400/70 hover:text-orange-400 transition-colors">
@@ -59,19 +59,19 @@ export function ExpenseTrackingModule() {
               <Icon className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${c.color}`} />
               <div>
                 <p className={`text-xs font-semibold ${c.color}`}>{c.label}</p>
-                <p className="text-[10px] text-white/40 mt-0.5">{c.detail}</p>
+                <p className="text-[10px] text-muted-foreground/70 mt-0.5">{c.detail}</p>
               </div>
             </div>
           );
         })}
       </div>
-      <div className="border-t border-white/[0.05] pt-2">
-        <p className="text-[10px] text-white/35 mb-1.5 font-semibold uppercase tracking-wider">Also deductible</p>
+      <div className="border-t border-border pt-2">
+        <p className="text-[10px] text-muted-foreground/60 mb-1.5 font-semibold uppercase tracking-wider">Also deductible</p>
         <div className="grid grid-cols-2 gap-1">
           {quickItems.map((item) => (
             <div key={item} className="flex items-center gap-1.5">
               <div className="w-1 h-1 rounded-full bg-orange-400/40 shrink-0" />
-              <span className="text-[10px] text-white/45">{item}</span>
+              <span className="text-[10px] text-muted-foreground/70">{item}</span>
             </div>
           ))}
         </div>

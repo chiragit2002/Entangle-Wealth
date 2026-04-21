@@ -30,7 +30,7 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
       <span className="text-xl md:text-2xl font-black font-mono text-[#FFB800] tabular-nums leading-none">
         {String(value).padStart(2, "0")}
       </span>
-      <span className="text-[9px] text-white/40 uppercase tracking-wider mt-0.5">{label}</span>
+      <span className="text-[9px] text-muted-foreground/70 uppercase tracking-wider mt-0.5">{label}</span>
     </div>
   );
 }
@@ -96,13 +96,13 @@ export function AnniversaryGiveawayBanner() {
   if (dismissed) return null;
 
   return (
-    <div className="relative overflow-hidden rounded-sm border border-[#FFB800]/30 bg-gradient-to-r from-[#0d0b00] via-[#0f0d02] to-[#0A0E1A] p-5 md:p-6 mb-6">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(245,200,66,0.08),transparent_60%)] pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(0,180,216,0.05),transparent_60%)] pointer-events-none" />
+    <div className="relative overflow-hidden rounded-sm border border-[#FFB800]/30 bg-card p-5 md:p-6 mb-6">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(245,200,66,0.06),transparent_60%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(0,180,216,0.04),transparent_60%)] pointer-events-none" />
 
       <button
         onClick={() => setDismissed(true)}
-        className="absolute top-3 right-3 text-white/30 hover:text-white/60 transition-colors z-10"
+        className="absolute top-3 right-3 text-muted-foreground/50 hover:text-muted-foreground transition-colors z-10"
         aria-label="Dismiss"
       >
         <X className="w-4 h-4" />
@@ -123,10 +123,10 @@ export function AnniversaryGiveawayBanner() {
 
         <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
           <div className="flex-1">
-            <h2 className="text-xl md:text-3xl font-black tracking-tight text-white mb-1">
+            <h2 className="text-xl md:text-3xl font-black tracking-tight text-foreground mb-1">
               $50,000. <span className="text-[#FFB800]">One year. Real money.</span>
             </h2>
-            <p className="text-xs md:text-sm text-white/60 max-w-md leading-relaxed">
+            <p className="text-xs md:text-sm text-muted-foreground max-w-md leading-relaxed">
               We're giving back $50,000 to the members who showed up. Every trade, streak, login, and referral earns entries. The active members win — because they should.
             </p>
 
@@ -138,7 +138,7 @@ export function AnniversaryGiveawayBanner() {
                 </div>
               ) : null}
               {info && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-[11px] text-white/50">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/50 border border-border text-[11px] text-muted-foreground">
                   <Users className="w-3 h-3" />
                   <span>{info.totalParticipants.toLocaleString()} participants</span>
                 </div>
@@ -153,7 +153,7 @@ export function AnniversaryGiveawayBanner() {
           <div className="flex flex-col items-center md:items-end gap-3">
             {countdown && !countdown.passed ? (
               <div className="text-center md:text-right">
-                <p className="text-[9px] text-white/40 uppercase tracking-wider mb-1.5">Drawing in</p>
+                <p className="text-[9px] text-muted-foreground/70 uppercase tracking-wider mb-1.5">Drawing in</p>
                 <div className="flex items-center gap-1.5">
                   <CountdownUnit value={countdown.days} label="days" />
                   <Divider />
@@ -167,7 +167,7 @@ export function AnniversaryGiveawayBanner() {
             ) : (
               <div className="text-center px-4 py-2 rounded-xl bg-[#FFB800]/10 border border-[#FFB800]/30">
                 <p className="text-sm font-bold text-[#FFB800]">Drawing has occurred!</p>
-                <p className="text-[10px] text-white/50">Winner announced on our 1 year anniversary</p>
+                <p className="text-[10px] text-muted-foreground">Winner announced on our 1 year anniversary</p>
               </div>
             )}
 

@@ -4,7 +4,7 @@ import logoImg from "@assets/Gemini_Generated_Image_nso2qnso2qnso2qn_17759009505
 
 function FooterComponent() {
   return (
-    <footer className="w-full mt-auto" style={{ background: "#080C18", borderTop: "1px solid rgba(0,180,216,0.12)" }}>
+    <footer className="w-full mt-auto pb-20 lg:pb-0 bg-background border-t border-border">
       <div className="bloomberg-header" style={{ borderBottom: "1px solid rgba(0,180,216,0.08)" }}>
         ENTANGLEWEALTH TERMINAL · INSTITUTIONAL INTELLIGENCE · BUILT FOR REAL PEOPLE
       </div>

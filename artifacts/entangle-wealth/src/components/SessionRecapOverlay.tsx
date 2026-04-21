@@ -125,10 +125,10 @@ export function SessionRecapOverlay() {
       aria-modal="true"
       aria-label="Session summary"
     >
-      <div className="relative bg-[#0a0a14] border border-[#00D4FF]/20 rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl shadow-black/70 animate-in zoom-in-95 duration-300">
+      <div className="relative bg-card border border-[#00D4FF]/20 rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl shadow-black/70 animate-in zoom-in-95 duration-300">
         <button
           onClick={() => setShow(false)}
-          className="absolute top-3 right-3 text-white/30 hover:text-white/50 transition-colors"
+          className="absolute top-3 right-3 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
@@ -139,30 +139,30 @@ export function SessionRecapOverlay() {
             <TrendingUp className="w-3.5 h-3.5 text-[#00D4FF]" />
             <span className="text-[10px] font-bold uppercase tracking-widest text-[#00D4FF]">Session Summary</span>
           </div>
-          <h2 className="text-lg font-black text-white mb-1">Nice work today</h2>
-          <p className="text-xs text-white/40">Here's what you accomplished this session</p>
+          <h2 className="text-lg font-black text-foreground mb-1">Nice work today</h2>
+          <p className="text-xs text-muted-foreground/70">Here's what you accomplished this session</p>
         </div>
 
         <div className="grid grid-cols-3 gap-3 mb-5">
           {analyses > 0 && (
-            <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3 text-center">
+            <div className="bg-muted/50 border border-border rounded-lg p-3 text-center">
               <TrendingUp className="w-4 h-4 text-[#00D4FF] mx-auto mb-1" />
               <p className="text-lg font-bold font-mono text-[#00D4FF]">{analyses}</p>
-              <p className="text-[9px] text-white/30">analyses</p>
+              <p className="text-[9px] text-muted-foreground/50">analyses</p>
             </div>
           )}
           {xp > 0 && (
-            <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3 text-center">
+            <div className="bg-muted/50 border border-border rounded-lg p-3 text-center">
               <Zap className="w-4 h-4 text-[#FFB800] mx-auto mb-1" />
               <p className="text-lg font-bold font-mono text-[#FFB800]">+{xp}</p>
-              <p className="text-[9px] text-white/30">XP earned</p>
+              <p className="text-[9px] text-muted-foreground/50">XP earned</p>
             </div>
           )}
           {streak > 0 && (
-            <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3 text-center">
+            <div className="bg-muted/50 border border-border rounded-lg p-3 text-center">
               <Flame className="w-4 h-4 text-orange-400 mx-auto mb-1" />
               <p className="text-lg font-bold font-mono text-orange-400">{streak}d</p>
-              <p className="text-[9px] text-white/30">streak</p>
+              <p className="text-[9px] text-muted-foreground/50">streak</p>
             </div>
           )}
         </div>
@@ -170,12 +170,12 @@ export function SessionRecapOverlay() {
         {savings > 0 && (
           <div className="bg-[#00FF41]/[0.06] border border-[#00FF41]/20 rounded-lg px-3 py-2.5 mb-4 text-center">
             <p className="text-sm font-bold text-[#00FF41]">+${savings.toLocaleString()} in potential savings found</p>
-            <p className="text-[10px] text-white/40">from deduction analysis</p>
+            <p className="text-[10px] text-muted-foreground/70">from deduction analysis</p>
           </div>
         )}
 
         {streak > 1 && (
-          <p className="text-xs text-white/50 text-center mb-4">
+          <p className="text-xs text-muted-foreground text-center mb-4">
             Come back tomorrow to keep your <span className="text-orange-400 font-semibold">{streak}-day streak</span> alive
           </p>
         )}
@@ -190,7 +190,7 @@ export function SessionRecapOverlay() {
           </Link>
           <button
             onClick={() => setShow(false)}
-            className="px-4 h-10 text-xs text-white/30 hover:text-white/50 transition-colors"
+            className="px-4 h-10 text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors"
           >
             Close
           </button>

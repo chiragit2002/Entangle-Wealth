@@ -247,30 +247,37 @@ export default function Charts() {
     }
     overlaySeriesRef.current = [];
 
+    const cs = getComputedStyle(document.documentElement);
+    const hsl = (v: string) => `hsl(${cs.getPropertyValue(v).trim()})`;
+    const bgColor = hsl("--background");
+    const textColor = hsl("--muted-foreground");
+    const borderColor = hsl("--border");
+    const cardColor = hsl("--card");
+
     const chart = createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
       height: chartContainerRef.current.clientHeight,
       layout: {
-        background: { type: ColorType.Solid, color: "#131722" },
-        textColor: "#787B86",
+        background: { type: ColorType.Solid, color: bgColor },
+        textColor,
         fontSize: 11,
         fontFamily: "'JetBrains Mono', 'Inter', monospace",
       },
       grid: {
-        vertLines: { color: showGrid ? "rgba(255,255,255,0.03)" : "transparent" },
-        horzLines: { color: showGrid ? "rgba(255,255,255,0.03)" : "transparent" },
+        vertLines: { color: showGrid ? borderColor : "transparent" },
+        horzLines: { color: showGrid ? borderColor : "transparent" },
       },
       crosshair: {
         mode: showCrosshair ? CrosshairMode.Normal : CrosshairMode.Hidden,
-        vertLine: { color: "rgba(255,255,255,0.3)", width: 1, style: LineStyle.Dashed, labelBackgroundColor: "#2A2E39" },
-        horzLine: { color: "rgba(255,255,255,0.3)", width: 1, style: LineStyle.Dashed, labelBackgroundColor: "#2A2E39" },
+        vertLine: { color: textColor, width: 1, style: LineStyle.Dashed, labelBackgroundColor: cardColor },
+        horzLine: { color: textColor, width: 1, style: LineStyle.Dashed, labelBackgroundColor: cardColor },
       },
       rightPriceScale: {
-        borderColor: "#363A45",
+        borderColor,
         scaleMargins: { top: 0.05, bottom: 0.2 },
       },
       timeScale: {
-        borderColor: "#363A45",
+        borderColor,
         timeVisible: true,
         secondsVisible: false,
       },
@@ -530,9 +537,9 @@ export default function Charts() {
   return (
     <Layout>
       <PageErrorBoundary fallbackTitle="Charts encountered an error">
-      <div className="flex flex-col h-[calc(100vh-64px)] bg-[#131722] text-[#D1D4DC] overflow-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <div className="flex flex-col h-[calc(100vh-64px)] bg-background text-foreground overflow-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
         {/* Header */}
-        <div className="flex items-center h-10 bg-[#1E222D] border-b border-[#363A45] px-2 gap-1 shrink-0">
+        <div className="flex items-center h-10 bg-card border-b border-border px-2 gap-1 shrink-0">
           <div className="flex items-center gap-2 min-w-[200px]">
             <BarChart3 className="w-4 h-4 text-[#2962FF]" />
             <span className="text-xs font-bold tracking-wider" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{symbol}</span>
@@ -542,24 +549,24 @@ export default function Charts() {
           </div>
 
           <div className="relative flex-1 max-w-[300px]">
-            <div className="flex items-center bg-[#2A2E39] rounded h-7 px-2">
-              <Search className="w-3 h-3 text-[#787B86] mr-1" />
+            <div className="flex items-center bg-muted rounded h-7 px-2">
+              <Search className="w-3 h-3 text-muted-foreground mr-1" />
               <input
                 value={searchText}
                 onChange={e => { setSearchText(e.target.value.toUpperCase()); setShowSearch(true); }}
                 onFocus={() => setShowSearch(true)}
                 onBlur={() => setTimeout(() => setShowSearch(false), 200)}
                 placeholder="Search ticker..."
-                className="bg-transparent text-xs text-[#D1D4DC] outline-none w-full font-mono placeholder:text-[#787B86]"
+                className="bg-transparent text-xs text-foreground outline-none w-full font-mono placeholder:text-muted-foreground"
               />
             </div>
             {showSearch && searchResults.length > 0 && (
-              <div className="absolute top-8 left-0 w-full bg-[#2A2E39] border border-[#363A45] rounded shadow-xl z-50 max-h-48 overflow-y-auto">
+              <div className="absolute top-8 left-0 w-full bg-muted border border-border rounded shadow-xl z-50 max-h-48 overflow-y-auto">
                 {searchResults.map(s => (
                   <button key={s.symbol} onMouseDown={() => selectSymbol(s.symbol)}
-                    className="w-full flex items-center justify-between px-3 py-1.5 text-xs hover:bg-[#363A45] text-left">
+                    className="w-full flex items-center justify-between px-3 py-1.5 text-xs hover:bg-muted/70 text-left">
                     <span className="font-mono font-bold">{s.symbol}</span>
-                    <span className="text-[#787B86] truncate ml-2">{s.name}</span>
+                    <span className="text-muted-foreground truncate ml-2">{s.name}</span>
                   </button>
                 ))}
               </div>
@@ -569,7 +576,7 @@ export default function Charts() {
           <div className="flex items-center gap-0.5 mx-2">
             {TIMEFRAMES.map(tf => (
               <button key={tf.label} onClick={() => setTimeframe(tf.label)}
-                className={`px-2 py-1 text-[10px] font-mono rounded ${timeframe === tf.label ? "bg-[#2962FF] text-white" : "text-[#787B86] hover:text-[#D1D4DC] hover:bg-[#2A2E39]"}`}>
+                className={`px-2 py-1 text-[10px] font-mono rounded ${timeframe === tf.label ? "bg-[#2962FF] text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
                 {tf.label}
               </button>
             ))}
@@ -577,20 +584,20 @@ export default function Charts() {
 
           <div className="flex items-center gap-1 ml-auto">
             <button onClick={() => setShowIndicatorPanel(!showIndicatorPanel)}
-              className="flex items-center gap-1 px-2 py-1 text-[10px] text-[#787B86] hover:text-[#D1D4DC] hover:bg-[#2A2E39] rounded">
+              className="flex items-center gap-1 px-2 py-1 text-[10px] text-muted-foreground hover:text-foreground hover:bg-muted rounded">
               <Activity className="w-3 h-3" /> Indicators
             </button>
             <button onClick={() => setShowDrawTools(!showDrawTools)}
-              className="flex items-center gap-1 px-2 py-1 text-[10px] text-[#787B86] hover:text-[#D1D4DC] hover:bg-[#2A2E39] rounded">
+              className="flex items-center gap-1 px-2 py-1 text-[10px] text-muted-foreground hover:text-foreground hover:bg-muted rounded">
               <Pencil className="w-3 h-3" /> Draw
             </button>
             <button onClick={startScan} disabled={scanning}
-              className="flex items-center gap-1 px-2 py-1 text-[10px] bg-[#2962FF] text-white rounded hover:bg-[#1E53E4] disabled:opacity-50">
+              className="flex items-center gap-1 px-2 py-1 text-[10px] bg-[#2962FF] text-foreground rounded hover:bg-[#1E53E4] disabled:opacity-50">
               {scanning ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
               {scanning ? `${scanProgress.done}/${scanProgress.total}` : "Scan"}
             </button>
             <button onClick={() => setShowSettings(!showSettings)}
-              className="p-1 text-[#787B86] hover:text-[#D1D4DC] hover:bg-[#2A2E39] rounded">
+              className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded">
               <Settings className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -598,12 +605,12 @@ export default function Charts() {
 
         {/* Indicator Panel Dropdown */}
         {showIndicatorPanel && (
-          <div className="absolute top-[104px] left-1/2 -translate-x-1/2 w-[min(400px,calc(100vw-32px))] bg-[#1E222D] border border-[#363A45] rounded-lg shadow-2xl z-50 max-h-[60vh] overflow-hidden">
-            <div className="p-3 border-b border-[#363A45]">
-              <div className="flex items-center bg-[#2A2E39] rounded px-2 h-8">
-                <Search className="w-3 h-3 text-[#787B86] mr-2" />
+          <div className="absolute top-[104px] left-1/2 -translate-x-1/2 w-[min(400px,calc(100vw-32px))] bg-card border border-border rounded-lg shadow-2xl z-50 max-h-[60vh] overflow-hidden">
+            <div className="p-3 border-b border-border">
+              <div className="flex items-center bg-muted rounded px-2 h-8">
+                <Search className="w-3 h-3 text-muted-foreground mr-2" />
                 <input value={indicatorSearch} onChange={e => setIndicatorSearch(e.target.value)}
-                  placeholder="Search indicators..." className="bg-transparent text-xs text-[#D1D4DC] outline-none w-full" />
+                  placeholder="Search indicators..." className="bg-transparent text-xs text-foreground outline-none w-full" />
               </div>
             </div>
             <div className="overflow-y-auto max-h-[50vh] p-2">
@@ -612,13 +619,13 @@ export default function Charts() {
                 return acc;
               }, {} as Record<string, typeof AVAILABLE_INDICATORS>)).map(([group, inds]) => (
                 <div key={group} className="mb-2">
-                  <div className="text-[9px] uppercase tracking-wider text-[#787B86] px-2 py-1">{group}</div>
+                  <div className="text-[9px] uppercase tracking-wider text-muted-foreground px-2 py-1">{group}</div>
                   {inds.map(ind => {
                     const active = activeIndicators.includes(ind.id);
                     return (
                       <button key={ind.id}
                         onClick={() => setActiveIndicators(prev => active ? prev.filter(id => id !== ind.id) : [...prev, ind.id])}
-                        className={`w-full flex items-center justify-between px-2 py-1.5 text-xs rounded ${active ? "bg-[#2962FF]/20 text-[#2962FF]" : "text-[#D1D4DC] hover:bg-[#2A2E39]"}`}>
+                        className={`w-full flex items-center justify-between px-2 py-1.5 text-xs rounded ${active ? "bg-[#2962FF]/20 text-[#2962FF]" : "text-foreground hover:bg-muted"}`}>
                         <span>{ind.name}</span>
                         <span className={`text-[9px] px-1.5 py-0.5 rounded ${ind.type === "overlay" ? "bg-[#26A69A]/20 text-[#26A69A]" : "bg-[#9C27B0]/20 text-[#9C27B0]"}`}>
                           {ind.type}
@@ -629,8 +636,8 @@ export default function Charts() {
                 </div>
               ))}
             </div>
-            <div className="p-2 border-t border-[#363A45] flex items-center justify-between">
-              <span className="text-[10px] text-[#787B86]">{activeIndicators.length} active</span>
+            <div className="p-2 border-t border-border flex items-center justify-between">
+              <span className="text-[10px] text-muted-foreground">{activeIndicators.length} active</span>
               <button onClick={() => setShowIndicatorPanel(false)} className="text-[10px] text-[#2962FF] hover:underline">Close</button>
             </div>
           </div>
@@ -638,39 +645,39 @@ export default function Charts() {
 
         {/* Settings Panel */}
         {showSettings && (
-          <div className="absolute top-[104px] right-4 w-[300px] bg-[#1E222D] border border-[#363A45] rounded-lg shadow-2xl z-50">
-            <div className="p-3 border-b border-[#363A45] flex items-center justify-between">
+          <div className="absolute top-[104px] right-4 w-[300px] bg-card border border-border rounded-lg shadow-2xl z-50">
+            <div className="p-3 border-b border-border flex items-center justify-between">
               <span className="text-xs font-bold">Chart Settings</span>
-              <button onClick={() => setShowSettings(false)}><X className="w-3.5 h-3.5 text-[#787B86]" /></button>
+              <button onClick={() => setShowSettings(false)}><X className="w-3.5 h-3.5 text-muted-foreground" /></button>
             </div>
             <div className="p-3 space-y-3">
               <div>
-                <label className="text-[9px] uppercase tracking-wider text-[#787B86] block mb-1">Candle Style</label>
+                <label className="text-[9px] uppercase tracking-wider text-muted-foreground block mb-1">Candle Style</label>
                 <div className="flex gap-1">
                   {CANDLE_STYLES.map(s => (
                     <button key={s} onClick={() => setCandleStyle(s)}
-                      className={`px-2 py-1 text-[10px] rounded ${candleStyle === s ? "bg-[#2962FF] text-white" : "bg-[#2A2E39] text-[#787B86]"}`}>{s}</button>
+                      className={`px-2 py-1 text-[10px] rounded ${candleStyle === s ? "bg-[#2962FF] text-foreground" : "bg-muted text-muted-foreground"}`}>{s}</button>
                   ))}
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-xs">Show Grid</span>
-                <button onClick={() => setShowGrid(!showGrid)} className={`w-8 h-4 rounded-full ${showGrid ? "bg-[#2962FF]" : "bg-[#363A45]"} relative`}>
+                <button onClick={() => setShowGrid(!showGrid)} className={`w-8 h-4 rounded-full ${showGrid ? "bg-[#2962FF]" : "bg-muted-foreground/30"} relative`}>
                   <div className={`w-3 h-3 rounded-full bg-white absolute top-0.5 transition-all ${showGrid ? "left-4" : "left-0.5"}`} />
                 </button>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-xs">Show Crosshair</span>
-                <button onClick={() => setShowCrosshair(!showCrosshair)} className={`w-8 h-4 rounded-full ${showCrosshair ? "bg-[#2962FF]" : "bg-[#363A45]"} relative`}>
+                <button onClick={() => setShowCrosshair(!showCrosshair)} className={`w-8 h-4 rounded-full ${showCrosshair ? "bg-[#2962FF]" : "bg-muted-foreground/30"} relative`}>
                   <div className={`w-3 h-3 rounded-full bg-white absolute top-0.5 transition-all ${showCrosshair ? "left-4" : "left-0.5"}`} />
                 </button>
               </div>
-              <div className="border-t border-[#363A45] pt-3">
-                <label className="text-[9px] uppercase tracking-wider text-[#787B86] block mb-1">Claude API Key (optional)</label>
+              <div className="border-t border-border pt-3">
+                <label className="text-[9px] uppercase tracking-wider text-muted-foreground block mb-1">Claude API Key (optional)</label>
                 <input value={claudeKey} onChange={e => setClaudeKey(e.target.value)}
                   type="password" placeholder="Enter API key..."
-                  className="w-full bg-[#2A2E39] text-xs text-[#D1D4DC] rounded px-2 py-1.5 outline-none border border-[#363A45] focus:border-[#2962FF]" />
-                <p className="text-[9px] text-[#787B86] mt-1">Stored in session memory only (cleared on tab close). Enables AI deep analysis on scanner results.</p>
+                  className="w-full bg-muted text-xs text-foreground rounded px-2 py-1.5 outline-none border border-border focus:border-[#2962FF]" />
+                <p className="text-[9px] text-muted-foreground mt-1">Stored in session memory only (cleared on tab close). Enables AI deep analysis on scanner results.</p>
               </div>
             </div>
           </div>
@@ -678,34 +685,34 @@ export default function Charts() {
 
         {/* Drawing Tools Bar */}
         {showDrawTools && (
-          <div className="flex items-center h-8 bg-[#1E222D] border-b border-[#363A45] px-3 gap-2 shrink-0">
-            <button onClick={addHLine} className="flex items-center gap-1 px-2 py-0.5 text-[10px] text-[#787B86] hover:text-[#D1D4DC] hover:bg-[#2A2E39] rounded">
+          <div className="flex items-center h-8 bg-card border-b border-border px-3 gap-2 shrink-0">
+            <button onClick={addHLine} className="flex items-center gap-1 px-2 py-0.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-muted rounded">
               <Minus className="w-3 h-3" /> H-Line
             </button>
-            <button onClick={addFibRetracement} className="flex items-center gap-1 px-2 py-0.5 text-[10px] text-[#787B86] hover:text-[#D1D4DC] hover:bg-[#2A2E39] rounded">
+            <button onClick={addFibRetracement} className="flex items-center gap-1 px-2 py-0.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-muted rounded">
               <Triangle className="w-3 h-3" /> Fibonacci
             </button>
             <button onClick={() => {
               if (bars.length) addAlert(bars[bars.length - 1].close, "above");
-            }} className="flex items-center gap-1 px-2 py-0.5 text-[10px] text-[#787B86] hover:text-[#D1D4DC] hover:bg-[#2A2E39] rounded">
+            }} className="flex items-center gap-1 px-2 py-0.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-muted rounded">
               <Bell className="w-3 h-3" /> Alert
             </button>
             <div className="flex-1" />
-            <button onClick={clearDrawings} className="flex items-center gap-1 px-2 py-0.5 text-[10px] text-[#EF5350] hover:bg-[#2A2E39] rounded">
+            <button onClick={clearDrawings} className="flex items-center gap-1 px-2 py-0.5 text-[10px] text-[#EF5350] hover:bg-muted rounded">
               <Trash2 className="w-3 h-3" /> Clear All
             </button>
-            <span className="text-[9px] text-[#787B86]">{drawings.length} drawings</span>
+            <span className="text-[9px] text-muted-foreground">{drawings.length} drawings</span>
           </div>
         )}
 
         {/* Main Content */}
         <div className="flex flex-1 overflow-hidden">
           {/* Left Sidebar */}
-          <div className="w-56 bg-[#1E222D] border-r border-[#363A45] flex flex-col shrink-0 overflow-hidden">
-            <div className="flex border-b border-[#363A45]">
+          <div className="w-56 bg-card border-r border-border flex flex-col shrink-0 overflow-hidden">
+            <div className="flex border-b border-border">
               {(["watchlist", "scanner", "alerts", "patterns"] as const).map(tab => (
                 <button key={tab} onClick={() => setSidebarTab(tab)}
-                  className={`flex-1 py-2 text-[9px] uppercase tracking-wider ${sidebarTab === tab ? "text-[#2962FF] border-b-2 border-[#2962FF]" : "text-[#787B86] hover:text-[#D1D4DC]"}`}>
+                  className={`flex-1 py-2 text-[9px] uppercase tracking-wider ${sidebarTab === tab ? "text-[#2962FF] border-b-2 border-[#2962FF]" : "text-muted-foreground hover:text-foreground"}`}>
                   {tab === "watchlist" ? "Watch" : tab === "scanner" ? "Scan" : tab === "alerts" ? "Alerts" : "Pat."}
                 </button>
               ))}
@@ -713,9 +720,9 @@ export default function Charts() {
             <div className="flex-1 overflow-y-auto">
               {sidebarTab === "watchlist" && (
                 <div>
-                  <div className="p-2 border-b border-[#2A2E39]">
+                  <div className="p-2 border-b border-border">
                     <div className="flex items-center gap-1">
-                      <input placeholder="Add ticker..." className="flex-1 bg-[#2A2E39] text-[10px] text-[#D1D4DC] rounded px-2 py-1 outline-none font-mono"
+                      <input placeholder="Add ticker..." className="flex-1 bg-muted text-[10px] text-foreground rounded px-2 py-1 outline-none font-mono"
                         onKeyDown={e => {
                           if (e.key === "Enter") {
                             const v = (e.target as HTMLInputElement).value.toUpperCase().trim();
@@ -723,20 +730,20 @@ export default function Charts() {
                           }
                         }}
                       />
-                      <button onClick={() => loadChart(symbol, timeframe)} className="p-1 text-[#787B86] hover:text-[#D1D4DC]">
+                      <button onClick={() => loadChart(symbol, timeframe)} className="p-1 text-muted-foreground hover:text-foreground">
                         <RefreshCw className="w-3 h-3" />
                       </button>
                     </div>
                   </div>
                   {watchlist.map(w => (
                     <div key={w.symbol} onClick={() => selectSymbol(w.symbol)}
-                      className={`w-full flex items-center justify-between px-3 py-2 text-xs hover:bg-[#2A2E39] border-b border-[#2A2E39]/50 cursor-pointer group ${w.symbol === symbol ? "bg-[#2A2E39]" : ""}`}>
+                      className={`w-full flex items-center justify-between px-3 py-2 text-xs hover:bg-muted border-b border-border cursor-pointer group ${w.symbol === symbol ? "bg-muted" : ""}`}>
                       <div className="text-left">
                         <div className="font-mono font-bold text-[11px]">{w.symbol}</div>
-                        <div className="text-[9px] text-[#787B86] truncate max-w-[80px]">{w.name}</div>
+                        <div className="text-[9px] text-muted-foreground truncate max-w-[80px]">{w.name}</div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <span onClick={e => { e.stopPropagation(); removeFromWatchlist(w.symbol); }} className="opacity-0 group-hover:opacity-100 p-0.5 text-[#787B86] hover:text-[#EF5350] cursor-pointer">
+                        <span onClick={e => { e.stopPropagation(); removeFromWatchlist(w.symbol); }} className="opacity-0 group-hover:opacity-100 p-0.5 text-muted-foreground hover:text-[#EF5350] cursor-pointer">
                           <X className="w-2.5 h-2.5" />
                         </span>
                       </div>
@@ -749,10 +756,10 @@ export default function Charts() {
                 <div>
                   {scanResults.length === 0 ? (
                     <div className="p-4 text-center">
-                      <Zap className="w-6 h-6 text-[#787B86] mx-auto mb-2" />
-                      <p className="text-[10px] text-[#787B86]">Run the AI Scanner to analyze 100+ tickers</p>
+                      <Zap className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-[10px] text-muted-foreground">Run the AI Scanner to analyze 100+ tickers</p>
                       <button onClick={startScan} disabled={scanning}
-                        className="mt-2 px-3 py-1.5 text-[10px] bg-[#2962FF] text-white rounded hover:bg-[#1E53E4] disabled:opacity-50">
+                        className="mt-2 px-3 py-1.5 text-[10px] bg-[#2962FF] text-foreground rounded hover:bg-[#1E53E4] disabled:opacity-50">
                         {scanning ? "Scanning..." : "Start Scan"}
                       </button>
                     </div>
@@ -760,7 +767,7 @@ export default function Charts() {
                     <div>
                       {scanResults.slice(0, 20).map(r => (
                         <button key={r.symbol} onClick={() => selectSymbol(r.symbol)}
-                          className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] hover:bg-[#2A2E39] border-b border-[#2A2E39]/50">
+                          className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] hover:bg-muted border-b border-border">
                           <div className="flex items-center gap-2">
                             <div className="w-5 text-right font-mono font-bold" style={{ color: sigColor(r.signal) }}>{r.score}</div>
                             <span className="font-mono">{r.symbol}</span>
@@ -779,23 +786,23 @@ export default function Charts() {
                 <div>
                   <div className="p-2">
                     <button onClick={() => { if (bars.length) addAlert(bars[bars.length - 1].close * 1.02, "above"); }}
-                      className="w-full px-2 py-1.5 text-[10px] bg-[#2A2E39] text-[#787B86] rounded hover:text-[#D1D4DC] mb-1">
+                      className="w-full px-2 py-1.5 text-[10px] bg-muted text-muted-foreground rounded hover:text-foreground mb-1">
                       + Add Alert Above
                     </button>
                     <button onClick={() => { if (bars.length) addAlert(bars[bars.length - 1].close * 0.98, "below"); }}
-                      className="w-full px-2 py-1.5 text-[10px] bg-[#2A2E39] text-[#787B86] rounded hover:text-[#D1D4DC]">
+                      className="w-full px-2 py-1.5 text-[10px] bg-muted text-muted-foreground rounded hover:text-foreground">
                       + Add Alert Below
                     </button>
                   </div>
                   {alerts.filter(a => a.symbol === symbol).map(a => (
-                    <div key={a.id} className={`flex items-center justify-between px-3 py-2 text-[10px] border-b border-[#2A2E39]/50 ${a.triggered ? "opacity-50" : ""}`}>
+                    <div key={a.id} className={`flex items-center justify-between px-3 py-2 text-[10px] border-b border-border ${a.triggered ? "opacity-50" : ""}`}>
                       <div>
                         <span className={a.condition === "above" ? "text-[#26A69A]" : "text-[#EF5350]"}>
                           {a.condition === "above" ? "▲" : "▼"} ${a.price.toFixed(2)}
                         </span>
-                        {a.triggered && <span className="ml-1 text-[#787B86]">(triggered)</span>}
+                        {a.triggered && <span className="ml-1 text-muted-foreground">(triggered)</span>}
                       </div>
-                      <button onClick={() => removeAlert(a.id)} className="text-[#787B86] hover:text-[#EF5350]">
+                      <button onClick={() => removeAlert(a.id)} className="text-muted-foreground hover:text-[#EF5350]">
                         <X className="w-3 h-3" />
                       </button>
                     </div>
@@ -806,26 +813,26 @@ export default function Charts() {
               {sidebarTab === "patterns" && (
                 <div>
                   {candlestickPatterns.length === 0 && chartPatterns.length === 0 ? (
-                    <div className="p-4 text-center text-[10px] text-[#787B86]">Load a chart to detect patterns</div>
+                    <div className="p-4 text-center text-[10px] text-muted-foreground">Load a chart to detect patterns</div>
                   ) : (
                     <>
                       {chartPatterns.map((p, i) => (
-                        <div key={i} className="px-3 py-2 text-[10px] border-b border-[#2A2E39]/50">
+                        <div key={i} className="px-3 py-2 text-[10px] border-b border-border">
                           <div className="flex items-center gap-1.5">
-                            <span className={`w-1.5 h-1.5 rounded-full ${p.type === "bullish" ? "bg-[#26A69A]" : p.type === "bearish" ? "bg-[#EF5350]" : "bg-[#787B86]"}`} />
+                            <span className={`w-1.5 h-1.5 rounded-full ${p.type === "bullish" ? "bg-[#26A69A]" : p.type === "bearish" ? "bg-[#EF5350]" : "bg-muted-foreground"}`} />
                             <span className="font-bold">{p.name}</span>
                           </div>
-                          <p className="text-[9px] text-[#787B86] mt-0.5">{p.description}</p>
+                          <p className="text-[9px] text-muted-foreground mt-0.5">{p.description}</p>
                         </div>
                       ))}
                       {candlestickPatterns.slice(-10).map((p, i) => (
-                        <div key={`cp-${i}`} className="px-3 py-1.5 text-[10px] border-b border-[#2A2E39]/50">
+                        <div key={`cp-${i}`} className="px-3 py-1.5 text-[10px] border-b border-border">
                           <div className="flex items-center gap-1.5">
-                            <span className={p.type === "bullish" ? "text-[#26A69A]" : p.type === "bearish" ? "text-[#EF5350]" : "text-[#787B86]"}>
+                            <span className={p.type === "bullish" ? "text-[#26A69A]" : p.type === "bearish" ? "text-[#EF5350]" : "text-muted-foreground"}>
                               {p.type === "bullish" ? "▲" : p.type === "bearish" ? "▼" : "●"}
                             </span>
                             <span>{p.name}</span>
-                            <span className="text-[8px] text-[#787B86]">({p.reliability})</span>
+                            <span className="text-[8px] text-muted-foreground">({p.reliability})</span>
                           </div>
                         </div>
                       ))}
@@ -840,13 +847,13 @@ export default function Charts() {
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Active indicators bar */}
             {activeIndicators.length > 0 && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-[#1E222D] border-b border-[#363A45] flex-wrap shrink-0">
+              <div className="flex items-center gap-1 px-2 py-1 bg-card border-b border-border flex-wrap shrink-0">
                 {activeIndicators.map(id => {
                   const ind = AVAILABLE_INDICATORS.find(i => i.id === id);
                   return ind ? (
-                    <span key={id} className="flex items-center gap-1 px-1.5 py-0.5 text-[9px] bg-[#2A2E39] rounded text-[#D1D4DC]">
+                    <span key={id} className="flex items-center gap-1 px-1.5 py-0.5 text-[9px] bg-muted rounded text-foreground">
                       {ind.name}
-                      <button onClick={() => setActiveIndicators(prev => prev.filter(i => i !== id))} className="text-[#787B86] hover:text-[#EF5350]">
+                      <button onClick={() => setActiveIndicators(prev => prev.filter(i => i !== id))} className="text-muted-foreground hover:text-[#EF5350]">
                         <X className="w-2.5 h-2.5" />
                       </button>
                     </span>
@@ -857,15 +864,15 @@ export default function Charts() {
 
             {/* Overall signal bar */}
             {overall && (
-              <div className="flex items-center justify-between px-3 py-1 bg-[#1E222D] border-b border-[#363A45] shrink-0">
+              <div className="flex items-center justify-between px-3 py-1 bg-card border-b border-border shrink-0">
                 <div className="flex items-center gap-3">
                   <span className="text-[10px] font-mono font-bold" style={{ color: sigColor(overall.signal) }}>
                     {overall.signal.replace("_", " ")}
                   </span>
-                  <span className="text-[9px] text-[#787B86]">{overall.confidence}% confidence</span>
+                  <span className="text-[9px] text-muted-foreground">{overall.confidence}% confidence</span>
                   <span className="text-[9px] text-[#26A69A]">↑{overall.buyCount}</span>
                   <span className="text-[9px] text-[#EF5350]">↓{overall.sellCount}</span>
-                  <span className="text-[9px] text-[#787B86]">●{overall.neutralCount}</span>
+                  <span className="text-[9px] text-muted-foreground">●{overall.neutralCount}</span>
                 </div>
                 {claudeKey && (
                   <button onClick={() => {
@@ -892,13 +899,13 @@ export default function Charts() {
             {/* Main Chart Canvas */}
             <div className="flex-1 relative min-h-0">
               {loading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#131722]/80 z-10">
+                <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-10">
                   <Loader2 className="w-8 h-8 text-[#2962FF] animate-spin" />
                 </div>
               )}
               {/* Watermark */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                <span className="text-6xl font-bold text-white/[0.04] font-mono select-none">{symbol}</span>
+                <span className="text-6xl font-bold text-muted-foreground/10 font-mono select-none">{symbol}</span>
               </div>
               <div ref={chartContainerRef} className="w-full h-full" />
             </div>
@@ -912,8 +919,8 @@ export default function Charts() {
 
         {/* Bottom Panel - Scanner Results */}
         {bottomOpen && scanResults.length > 0 && (
-          <div className="h-56 bg-[#1E222D] border-t border-[#363A45] flex flex-col shrink-0">
-            <div className="flex items-center justify-between px-3 h-8 border-b border-[#363A45]">
+          <div className="h-56 bg-card border-t border-border flex flex-col shrink-0">
+            <div className="flex items-center justify-between px-3 h-8 border-b border-border">
               <div className="flex items-center gap-2">
                 <Zap className="w-3.5 h-3.5 text-[#2962FF]" />
                 <span className="text-[10px] font-bold uppercase tracking-wider">AI Signal Engine</span>
@@ -922,20 +929,20 @@ export default function Charts() {
                     <button key={tab} onClick={() => setScanTab(tab)}
                       className={`px-2.5 py-0.5 text-[9px] uppercase rounded ${scanTab === tab
                         ? tab === "buy" ? "bg-[#26A69A]/20 text-[#26A69A]" : tab === "call" ? "bg-[#2962FF]/20 text-[#2962FF]" : "bg-[#EF5350]/20 text-[#EF5350]"
-                        : "text-[#787B86] hover:text-[#D1D4DC]"}`}>
+                        : "text-muted-foreground hover:text-foreground"}`}>
                       {tab === "buy" ? `Buy (${buySignals.length})` : tab === "call" ? `Call (${callSignals.length})` : `Put (${putSignals.length})`}
                     </button>
                   ))}
                 </div>
               </div>
-              <button onClick={() => setBottomOpen(false)} className="text-[#787B86] hover:text-[#D1D4DC]">
+              <button onClick={() => setBottomOpen(false)} className="text-muted-foreground hover:text-foreground">
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
             <div className="flex-1 overflow-auto">
               <table className="w-full text-[10px]">
-                <thead className="sticky top-0 bg-[#1E222D]">
-                  <tr className="text-[#787B86] text-left">
+                <thead className="sticky top-0 bg-card">
+                  <tr className="text-muted-foreground text-left">
                     <th className="px-3 py-1.5 font-normal">Ticker</th>
                     <th className="px-2 py-1.5 font-normal">Price</th>
                     <th className="px-2 py-1.5 font-normal">Score</th>
@@ -954,10 +961,10 @@ export default function Charts() {
                 </thead>
                 <tbody>
                   {(scanTab === "buy" ? buySignals : scanTab === "call" ? callSignals : putSignals).map(r => (
-                    <tr key={r.symbol} className="border-b border-[#2A2E39]/50 hover:bg-[#2A2E39]/50 cursor-pointer" onClick={() => selectSymbol(r.symbol)}>
+                    <tr key={r.symbol} className="border-b border-border hover:bg-muted/50 cursor-pointer" onClick={() => selectSymbol(r.symbol)}>
                       <td className="px-3 py-1.5">
                         <span className="font-mono font-bold">{r.symbol}</span>
-                        <span className="ml-1.5 text-[#787B86]">{r.name.slice(0, 15)}</span>
+                        <span className="ml-1.5 text-muted-foreground">{r.name.slice(0, 15)}</span>
                       </td>
                       <td className="px-2 py-1.5 font-mono">${r.price.toFixed(2)}</td>
                       <td className="px-2 py-1.5">
@@ -992,7 +999,7 @@ export default function Charts() {
                 </tbody>
               </table>
             </div>
-            <div className="px-3 py-1 border-t border-[#363A45] text-[8px] text-[#787B86]">
+            <div className="px-3 py-1 border-t border-border text-[8px] text-muted-foreground">
               This scanner provides technical analysis signals only and does not constitute financial advice. Options trading involves substantial risk. Past performance does not guarantee future results. Always do your own research.
             </div>
           </div>
@@ -1001,38 +1008,38 @@ export default function Charts() {
         {/* Claude Analysis Modal */}
         {showClaudeModal && claudeAnalysis && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setShowClaudeModal(false)}>
-            <div className="bg-[#1E222D] border border-[#363A45] rounded-lg w-full max-w-[500px] mx-4 max-h-[80vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-              <div className="p-4 border-b border-[#363A45] flex items-center justify-between">
+            <div className="bg-card border border-border rounded-lg w-full max-w-[500px] mx-4 max-h-[80vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+              <div className="p-4 border-b border-border flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Brain className="w-4 h-4 text-[#CE93D8]" />
                   <span className="text-sm font-bold">AI Deep Analysis</span>
                 </div>
-                <button onClick={() => setShowClaudeModal(false)}><X className="w-4 h-4 text-[#787B86]" /></button>
+                <button onClick={() => setShowClaudeModal(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
               </div>
               <div className="p-4 space-y-3 text-xs">
                 <div>
                   <span className="text-2xl font-bold mr-2" style={{ color: sigColor(claudeAnalysis.direction === "BULLISH" ? "BUY" : claudeAnalysis.direction === "BEARISH" ? "SELL" : "NEUTRAL") }}>
                     {claudeAnalysis.direction}
                   </span>
-                  <span className="text-[#787B86]">{claudeAnalysis.confidence}% confidence</span>
+                  <span className="text-muted-foreground">{claudeAnalysis.confidence}% confidence</span>
                 </div>
-                <p className="text-[#D1D4DC]">{claudeAnalysis.summary}</p>
+                <p className="text-foreground">{claudeAnalysis.summary}</p>
                 <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-[#2A2E39] rounded p-2">
-                    <div className="text-[9px] text-[#787B86] uppercase">Entry</div>
+                  <div className="bg-muted rounded p-2">
+                    <div className="text-[9px] text-muted-foreground uppercase">Entry</div>
                     <div className="font-mono font-bold text-[#26A69A]">{claudeAnalysis.entry}</div>
                   </div>
-                  <div className="bg-[#2A2E39] rounded p-2">
-                    <div className="text-[9px] text-[#787B86] uppercase">Target</div>
+                  <div className="bg-muted rounded p-2">
+                    <div className="text-[9px] text-muted-foreground uppercase">Target</div>
                     <div className="font-mono font-bold text-[#2962FF]">{claudeAnalysis.target}</div>
                   </div>
-                  <div className="bg-[#2A2E39] rounded p-2">
-                    <div className="text-[9px] text-[#787B86] uppercase">Stop</div>
+                  <div className="bg-muted rounded p-2">
+                    <div className="text-[9px] text-muted-foreground uppercase">Stop</div>
                     <div className="font-mono font-bold text-[#EF5350]">{claudeAnalysis.stop}</div>
                   </div>
                 </div>
-                <div className="bg-[#2A2E39] rounded p-2">
-                  <div className="text-[9px] text-[#787B86] uppercase mb-1">Risk/Reward</div>
+                <div className="bg-muted rounded p-2">
+                  <div className="text-[9px] text-muted-foreground uppercase mb-1">Risk/Reward</div>
                   <div className="font-mono">{claudeAnalysis.riskReward}</div>
                 </div>
                 {claudeAnalysis.callSetup && (
@@ -1049,9 +1056,9 @@ export default function Charts() {
                 )}
                 {claudeAnalysis.keyLevels.length > 0 && (
                   <div>
-                    <div className="text-[9px] text-[#787B86] uppercase mb-1">Key Levels</div>
+                    <div className="text-[9px] text-muted-foreground uppercase mb-1">Key Levels</div>
                     <div className="flex flex-wrap gap-1">{claudeAnalysis.keyLevels.map((l, i) => (
-                      <span key={i} className="px-2 py-0.5 bg-[#2A2E39] rounded text-[10px]">{l}</span>
+                      <span key={i} className="px-2 py-0.5 bg-muted rounded text-[10px]">{l}</span>
                     ))}</div>
                   </div>
                 )}
@@ -1059,7 +1066,7 @@ export default function Charts() {
                   <div>
                     <div className="text-[9px] text-[#EF5350] uppercase mb-1">Risks</div>
                     {claudeAnalysis.risks.map((r, i) => (
-                      <div key={i} className="text-[10px] text-[#787B86]">• {r}</div>
+                      <div key={i} className="text-[10px] text-muted-foreground">• {r}</div>
                     ))}
                   </div>
                 )}
@@ -1067,7 +1074,7 @@ export default function Charts() {
                   <div>
                     <div className="text-[9px] text-[#26A69A] uppercase mb-1">Catalysts</div>
                     {claudeAnalysis.catalysts.map((c, i) => (
-                      <div key={i} className="text-[10px] text-[#787B86]">• {c}</div>
+                      <div key={i} className="text-[10px] text-muted-foreground">• {c}</div>
                     ))}
                   </div>
                 )}
@@ -1101,25 +1108,32 @@ function SubPane({ indicator, bars, height }: { indicator: IndicatorSeries; bars
     if (!ref.current || dedupedBars.length === 0) return;
     if (chartRef.current) { chartRef.current.remove(); chartRef.current = null; }
 
+    const cs = getComputedStyle(document.documentElement);
+    const hsl = (v: string) => `hsl(${cs.getPropertyValue(v).trim()})`;
+    const bgColor = hsl("--background");
+    const txtColor = hsl("--muted-foreground");
+    const bdrColor = hsl("--border");
+    const crdColor = hsl("--card");
+
     const chart = createChart(ref.current, {
       width: ref.current.clientWidth,
       height,
       layout: {
-        background: { type: ColorType.Solid, color: "#131722" },
-        textColor: "#787B86",
+        background: { type: ColorType.Solid, color: bgColor },
+        textColor: txtColor,
         fontSize: 10,
         fontFamily: "'JetBrains Mono', monospace",
       },
       grid: {
-        vertLines: { color: "rgba(255,255,255,0.02)" },
-        horzLines: { color: "rgba(255,255,255,0.02)" },
+        vertLines: { color: bdrColor },
+        horzLines: { color: bdrColor },
       },
       crosshair: {
         mode: CrosshairMode.Normal,
-        vertLine: { color: "rgba(255,255,255,0.2)", width: 1, style: LineStyle.Dashed, labelVisible: false },
-        horzLine: { color: "rgba(255,255,255,0.2)", width: 1, style: LineStyle.Dashed, labelBackgroundColor: "#2A2E39" },
+        vertLine: { color: txtColor, width: 1, style: LineStyle.Dashed, labelVisible: false },
+        horzLine: { color: txtColor, width: 1, style: LineStyle.Dashed, labelBackgroundColor: crdColor },
       },
-      rightPriceScale: { borderColor: "#363A45", scaleMargins: { top: 0.1, bottom: 0.1 } },
+      rightPriceScale: { borderColor: bdrColor, scaleMargins: { top: 0.1, bottom: 0.1 } },
       timeScale: { visible: false },
     });
     chartRef.current = chart;
@@ -1188,9 +1202,9 @@ function SubPane({ indicator, bars, height }: { indicator: IndicatorSeries; bars
   }, [indicator, dedupedBars, height]);
 
   return (
-    <div className="border-t border-[#363A45] shrink-0" style={{ height }}>
-      <div className="flex items-center justify-between px-2 py-0.5 bg-[#1E222D]">
-        <span className="text-[9px] text-[#787B86] uppercase tracking-wider">{indicator.name}</span>
+    <div className="border-t border-border shrink-0" style={{ height }}>
+      <div className="flex items-center justify-between px-2 py-0.5 bg-card">
+        <span className="text-[9px] text-muted-foreground uppercase tracking-wider">{indicator.name}</span>
       </div>
       <div ref={ref} className="w-full" style={{ height: height - 20 }} />
     </div>

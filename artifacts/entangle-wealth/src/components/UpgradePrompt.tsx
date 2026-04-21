@@ -122,10 +122,10 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
       aria-modal="true"
       aria-label="Upgrade to Pro"
     >
-      <div className="relative bg-[#0a0a14] border border-[#FFB800]/20 rounded-sm p-6 max-w-sm w-full shadow-2xl shadow-black/60 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-card border border-[#FFB800]/20 rounded-sm p-6 max-w-sm w-full shadow-2xl shadow-black/60 animate-in fade-in zoom-in-95 duration-200">
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-white/40 hover:text-white/50 transition-colors"
+          className="absolute top-3 right-3 text-muted-foreground/70 hover:text-muted-foreground transition-colors"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
@@ -136,18 +136,18 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
             <Lock className="w-5 h-5 text-[#FFB800]" />
           </div>
           <div>
-            <p className="text-sm font-black text-white leading-tight">{copy.headline}</p>
+            <p className="text-sm font-black text-foreground leading-tight">{copy.headline}</p>
             {config.currentUsage !== undefined && config.maxUsage !== undefined && (
-              <p className="text-[10px] font-mono text-white/30 mt-0.5">
+              <p className="text-[10px] font-mono text-muted-foreground/50 mt-0.5">
                 {config.currentUsage} / {config.maxUsage} used
               </p>
             )}
           </div>
         </div>
 
-        <p className="text-xs text-white/50 mb-5 leading-relaxed">{copy.sub}</p>
+        <p className="text-xs text-muted-foreground mb-5 leading-relaxed">{copy.sub}</p>
 
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 mb-5">
+        <div className="bg-muted/50 border border-border rounded-xl p-3 mb-5">
           <p className="text-[10px] font-bold text-[#FFB800] uppercase tracking-widest mb-2">
             Pro unlocks
           </p>
@@ -155,7 +155,7 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
             {config.unlocks.map((unlock) => (
               <li key={unlock} className="flex items-center gap-2">
                 <Zap className="w-3 h-3 text-[#FFB800] flex-shrink-0" />
-                <span className="text-[11px] text-white/60">{unlock}</span>
+                <span className="text-[11px] text-muted-foreground">{unlock}</span>
               </li>
             ))}
           </ul>
@@ -179,7 +179,7 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
           </div>
         )}
 
-        <div className="text-[10px] text-white/50 mb-3 text-center">
+        <div className="text-[10px] text-muted-foreground mb-3 text-center">
           30-day free trial · No credit card required
         </div>
 
@@ -197,7 +197,7 @@ export function UpgradePrompt({ config, onClose }: UpgradePromptProps) {
 
         <button
           onClick={() => { setSuppressed(true); onClose(); }}
-          className="w-full mt-2 text-[10px] text-white/40 hover:text-white/30 transition-colors py-1"
+          className="w-full mt-2 text-[10px] text-muted-foreground/70 hover:text-muted-foreground/50 transition-colors py-1"
         >
           Maybe later
         </button>

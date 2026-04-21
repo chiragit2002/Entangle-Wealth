@@ -160,43 +160,43 @@ export function OptionsChain() {
   }, [tradeSelection, contracts, isSignedIn, getToken, toast]);
 
   return (
-    <div data-tour="options-chain" className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden mb-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 py-3 border-b border-white/[0.04] gap-2">
+    <div data-tour="options-chain" className="bg-card border border-border rounded-xl overflow-hidden mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 py-3 border-b border-border gap-2">
         <div className="flex items-center gap-3">
           <span className="text-[13px] font-bold">Options Chain</span>
           <select value={selectedSymbol.symbol} onChange={e => {
             const s = CHAIN_SYMBOLS.find(c => c.symbol === e.target.value);
             if (s) setSelectedSymbol(s);
-          }} className="bg-[#0c0c1a] border border-white/[0.08] rounded-lg px-2.5 py-1 text-[12px] font-mono text-white focus:outline-none focus:border-primary/30 [&>option]:bg-[#0c0c1a] cursor-pointer">
+          }} className="bg-[#0c0c1a] border border-border rounded-lg px-2.5 py-1 text-[12px] font-mono text-foreground focus:outline-none focus:border-primary/30 [&>option]:bg-[#0c0c1a] cursor-pointer">
             {CHAIN_SYMBOLS.map(s => <option key={s.symbol} value={s.symbol}>{s.symbol} ${s.price.toFixed(2)}</option>)}
           </select>
           <select value={selectedExp} onChange={e => setSelectedExp(e.target.value)}
-            className="bg-[#0c0c1a] border border-white/[0.08] rounded-lg px-2.5 py-1 text-[12px] font-mono text-white focus:outline-none focus:border-primary/30 [&>option]:bg-[#0c0c1a] cursor-pointer">
+            className="bg-[#0c0c1a] border border-border rounded-lg px-2.5 py-1 text-[12px] font-mono text-foreground focus:outline-none focus:border-primary/30 [&>option]:bg-[#0c0c1a] cursor-pointer">
             {EXPIRATIONS.map(exp => <option key={exp} value={exp}>{exp}</option>)}
           </select>
         </div>
         <div className="flex items-center gap-4">
-          <div className="hidden sm:flex items-center gap-2 text-[10px] text-white/40">
-            <span>P/C: <span className="font-mono font-bold text-white/40">{pcRatio}</span></span>
+          <div className="hidden sm:flex items-center gap-2 text-[10px] text-muted-foreground/70">
+            <span>P/C: <span className="font-mono font-bold text-muted-foreground/70">{pcRatio}</span></span>
           </div>
-          <button onClick={() => setShowGreeks(!showGreeks)} className="text-[10px] text-white/50 hover:text-white/40 transition-colors">
+          <button onClick={() => setShowGreeks(!showGreeks)} className="text-[10px] text-muted-foreground hover:text-muted-foreground/70 transition-colors">
             {showGreeks ? "Hide Greeks" : "Show Greeks"}
           </button>
         </div>
       </div>
 
       {tradeSelection && (
-        <div className="px-4 py-3 border-b border-white/[0.04] bg-white/[0.02]">
+        <div className="px-4 py-3 border-b border-border bg-muted/30">
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
               <span className={`text-xs font-bold ${tradeSelection.side === "buy" ? "text-[#00B4D8]" : "text-[#ff3366]"}`}>
                 {tradeSelection.side.toUpperCase()}
               </span>
-              <span className="text-xs font-mono text-white">
+              <span className="text-xs font-mono text-foreground">
                 {tradeSelection.symbol} ${tradeSelection.strike} {tradeSelection.optionType}
               </span>
-              <span className="text-[10px] text-white/40">@ ${tradeSelection.premium.toFixed(2)}</span>
-              <span className="text-[10px] text-white/30">exp {tradeSelection.expiration}</span>
+              <span className="text-[10px] text-muted-foreground/70">@ ${tradeSelection.premium.toFixed(2)}</span>
+              <span className="text-[10px] text-muted-foreground/50">exp {tradeSelection.expiration}</span>
             </div>
             <div className="flex items-center gap-2">
               <input
@@ -204,10 +204,10 @@ export function OptionsChain() {
                 onChange={e => setContracts(e.target.value)}
                 type="number"
                 min="1"
-                className="w-16 h-7 px-2 text-[11px] font-mono bg-white/[0.04] border border-white/[0.1] rounded text-white focus:outline-none focus:border-[#00B4D8]/30 text-center"
+                className="w-16 h-7 px-2 text-[11px] font-mono bg-muted/50 border border-white/[0.1] rounded text-foreground focus:outline-none focus:border-[#00B4D8]/30 text-center"
               />
-              <span className="text-[10px] text-white/30">contracts</span>
-              <span className="text-[10px] font-mono text-white/50">
+              <span className="text-[10px] text-muted-foreground/50">contracts</span>
+              <span className="text-[10px] font-mono text-muted-foreground">
                 = ${(Number(contracts) * tradeSelection.premium * 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </span>
             </div>
@@ -218,14 +218,14 @@ export function OptionsChain() {
                 className={`px-3 py-1 text-[10px] font-bold rounded transition-all disabled:opacity-40 ${
                   tradeSelection.side === "buy"
                     ? "bg-[#00B4D8] text-black hover:bg-[#00B4D8]/80"
-                    : "bg-[#ff3366] text-white hover:bg-[#ff3366]/80"
+                    : "bg-[#ff3366] text-foreground hover:bg-[#ff3366]/80"
                 }`}
               >
                 {tradeLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirm"}
               </button>
               <button
                 onClick={() => setTradeSelection(null)}
-                className="px-2 py-1 text-[10px] text-white/40 hover:text-white/60 transition-colors"
+                className="px-2 py-1 text-[10px] text-muted-foreground/70 hover:text-muted-foreground transition-colors"
               >
                 Cancel
               </button>
@@ -237,14 +237,14 @@ export function OptionsChain() {
       <div className="overflow-x-auto">
         <table className="w-full text-[10px] font-mono">
           <thead>
-            <tr className="border-b border-white/[0.04]">
+            <tr className="border-b border-border">
               <th className="w-8 py-1.5 bg-primary/[0.02]"></th>
               <th colSpan={showGreeks ? 9 : 5} className="text-center py-1.5 text-primary/40 font-bold text-[9px] uppercase tracking-wider bg-primary/[0.02]">CALLS</th>
-              <th className="text-center py-1.5 text-white/40 font-bold text-[9px] uppercase tracking-wider bg-white/[0.02]">STRIKE</th>
+              <th className="text-center py-1.5 text-muted-foreground/70 font-bold text-[9px] uppercase tracking-wider bg-muted/30">STRIKE</th>
               <th colSpan={showGreeks ? 9 : 5} className="text-center py-1.5 text-[#ff3366]/40 font-bold text-[9px] uppercase tracking-wider bg-[#ff3366]/[0.02]">PUTS</th>
               <th className="w-8 py-1.5 bg-[#ff3366]/[0.02]"></th>
             </tr>
-            <tr className="border-b border-white/[0.04] text-white/40">
+            <tr className="border-b border-border text-muted-foreground/70">
               <th className="px-1 py-1.5 text-center text-[8px] font-normal">Trade</th>
               <th className="px-2 py-1.5 text-right font-normal">Bid</th>
               <th className="px-2 py-1.5 text-right font-normal">Ask</th>
@@ -257,7 +257,7 @@ export function OptionsChain() {
                 <th className="px-2 py-1.5 text-right font-normal">Theta</th>
                 <th className="px-2 py-1.5 text-right font-normal">IV%</th>
               </>}
-              <th className="px-3 py-1.5 text-center font-bold text-white/30">Strike</th>
+              <th className="px-3 py-1.5 text-center font-bold text-muted-foreground/50">Strike</th>
               <th className="px-2 py-1.5 text-right font-normal">Bid</th>
               <th className="px-2 py-1.5 text-right font-normal">Ask</th>
               <th className="px-2 py-1.5 text-right font-normal">Last</th>
@@ -280,7 +280,7 @@ export function OptionsChain() {
               const isCallSelected = tradeSelection?.optionType === "CALL" && tradeSelection?.strike === row.strike;
               const isPutSelected = tradeSelection?.optionType === "PUT" && tradeSelection?.strike === row.strike;
               return (
-                <tr key={row.strike} className={`border-b border-white/[0.015] hover:bg-white/[0.02] transition-colors ${isATM ? "bg-[#FFB800]/[0.03] border-[#FFB800]/10" : ""} ${isCallSelected || isPutSelected ? "bg-[#00B4D8]/[0.04]" : ""}`}>
+                <tr key={row.strike} className={`border-b border-white/[0.015] hover:bg-muted/30 transition-colors ${isATM ? "bg-[#FFB800]/[0.03] border-[#FFB800]/10" : ""} ${isCallSelected || isPutSelected ? "bg-[#00B4D8]/[0.04]" : ""}`}>
                   <td className="px-1 py-1">
                     <div className="flex gap-0.5">
                       <button onClick={() => selectContract("CALL", row.strike, row.callAsk, "buy")} className="w-4 h-4 flex items-center justify-center rounded bg-[#00B4D8]/10 hover:bg-[#00B4D8]/25 transition-colors" title="Buy Call">
@@ -291,31 +291,31 @@ export function OptionsChain() {
                       </button>
                     </div>
                   </td>
-                  <td className={`px-2 py-1.5 text-right ${callITM ? "text-primary/60 bg-primary/[0.02]" : "text-white/25"}`}>{row.callBid}</td>
-                  <td className={`px-2 py-1.5 text-right ${callITM ? "text-primary/60 bg-primary/[0.02]" : "text-white/25"}`}>{row.callAsk}</td>
-                  <td className={`px-2 py-1.5 text-right font-bold ${callITM ? "text-primary/70 bg-primary/[0.02]" : "text-white/35"}`}>{row.callLast}</td>
-                  <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} ${row.callVol > 2000 ? "text-primary/50 font-bold" : "text-white/40"}`}>{row.callVol.toLocaleString()}</td>
-                  <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/12`}>{row.callOI.toLocaleString()}</td>
+                  <td className={`px-2 py-1.5 text-right ${callITM ? "text-primary/60 bg-primary/[0.02]" : "text-muted-foreground/40"}`}>{row.callBid}</td>
+                  <td className={`px-2 py-1.5 text-right ${callITM ? "text-primary/60 bg-primary/[0.02]" : "text-muted-foreground/40"}`}>{row.callAsk}</td>
+                  <td className={`px-2 py-1.5 text-right font-bold ${callITM ? "text-primary/70 bg-primary/[0.02]" : "text-muted-foreground/60"}`}>{row.callLast}</td>
+                  <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} ${row.callVol > 2000 ? "text-primary/50 font-bold" : "text-muted-foreground/70"}`}>{row.callVol.toLocaleString()}</td>
+                  <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-muted-foreground/20`}>{row.callOI.toLocaleString()}</td>
                   {showGreeks && <>
-                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/40`}>{Math.abs(row.callDelta)}</td>
-                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/12`}>{Math.abs(row.callGamma)}</td>
+                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-muted-foreground/70`}>{Math.abs(row.callDelta)}</td>
+                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-muted-foreground/20`}>{Math.abs(row.callGamma)}</td>
                     <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-[#ff3366]/30`}>{Math.abs(row.callTheta).toFixed(3)}</td>
-                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-white/40`}>{row.callIV}</td>
+                    <td className={`px-2 py-1.5 text-right ${callITM ? "bg-primary/[0.02]" : ""} text-muted-foreground/70`}>{row.callIV}</td>
                   </>}
-                  <td className={`px-3 py-1.5 text-center font-bold text-[11px] ${isATM ? "text-[#FFB800] bg-[#FFB800]/[0.05]" : "text-white/40 bg-white/[0.015]"}`}>
+                  <td className={`px-3 py-1.5 text-center font-bold text-[11px] ${isATM ? "text-[#FFB800] bg-[#FFB800]/[0.05]" : "text-muted-foreground/70 bg-white/[0.015]"}`}>
                     {row.strike.toFixed(2)}
                     {isATM && <span className="text-[7px] ml-1 text-[#FFB800]/50">ATM</span>}
                   </td>
-                  <td className={`px-2 py-1.5 text-right ${putITM ? "text-[#ff3366]/60 bg-[#ff3366]/[0.02]" : "text-white/25"}`}>{row.putBid}</td>
-                  <td className={`px-2 py-1.5 text-right ${putITM ? "text-[#ff3366]/60 bg-[#ff3366]/[0.02]" : "text-white/25"}`}>{row.putAsk}</td>
-                  <td className={`px-2 py-1.5 text-right font-bold ${putITM ? "text-[#ff3366]/70 bg-[#ff3366]/[0.02]" : "text-white/35"}`}>{row.putLast}</td>
-                  <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} ${row.putVol > 2000 ? "text-[#ff3366]/50 font-bold" : "text-white/40"}`}>{row.putVol.toLocaleString()}</td>
-                  <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/12`}>{row.putOI.toLocaleString()}</td>
+                  <td className={`px-2 py-1.5 text-right ${putITM ? "text-[#ff3366]/60 bg-[#ff3366]/[0.02]" : "text-muted-foreground/40"}`}>{row.putBid}</td>
+                  <td className={`px-2 py-1.5 text-right ${putITM ? "text-[#ff3366]/60 bg-[#ff3366]/[0.02]" : "text-muted-foreground/40"}`}>{row.putAsk}</td>
+                  <td className={`px-2 py-1.5 text-right font-bold ${putITM ? "text-[#ff3366]/70 bg-[#ff3366]/[0.02]" : "text-muted-foreground/60"}`}>{row.putLast}</td>
+                  <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} ${row.putVol > 2000 ? "text-[#ff3366]/50 font-bold" : "text-muted-foreground/70"}`}>{row.putVol.toLocaleString()}</td>
+                  <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-muted-foreground/20`}>{row.putOI.toLocaleString()}</td>
                   {showGreeks && <>
-                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/40`}>{Math.abs(row.putDelta)}</td>
-                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/12`}>{Math.abs(row.putGamma)}</td>
+                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-muted-foreground/70`}>{Math.abs(row.putDelta)}</td>
+                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-muted-foreground/20`}>{Math.abs(row.putGamma)}</td>
                     <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-[#ff3366]/30`}>{Math.abs(row.putTheta).toFixed(3)}</td>
-                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-white/40`}>{row.putIV}</td>
+                    <td className={`px-2 py-1.5 text-right ${putITM ? "bg-[#ff3366]/[0.02]" : ""} text-muted-foreground/70`}>{row.putIV}</td>
                   </>}
                   <td className="px-1 py-1">
                     <div className="flex gap-0.5">

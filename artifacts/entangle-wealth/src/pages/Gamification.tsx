@@ -145,7 +145,7 @@ function SpinWheel({ canSpin, spinning, rotation }: { canSpin: boolean; spinning
       </div>
       {!canSpin && (
         <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
-          <Lock className="w-8 h-8 text-white/40" />
+          <Lock className="w-8 h-8 text-muted-foreground/70" />
         </div>
       )}
     </div>
@@ -293,10 +293,10 @@ export default function Gamification() {
   if (!isLoaded || !isSignedIn) {
     return (
       <Layout>
-        <div className="min-h-screen bg-[#040408] flex items-center justify-center">
+        <div className="min-h-screen bg-background flex items-center justify-center">
           <div className="text-center">
             <Trophy className="w-12 h-12 text-[#FFB800] mx-auto mb-4" />
-            <p className="text-white/60 mb-4">Sign in to access your rewards dashboard</p>
+            <p className="text-muted-foreground mb-4">Sign in to access your rewards dashboard</p>
             <Link href="/sign-in" className="px-4 py-2 bg-[#00B4D8] text-black font-bold rounded-sm text-sm">Sign In</Link>
           </div>
         </div>
@@ -310,19 +310,19 @@ export default function Gamification() {
   return (
     <Layout>
       <BigWinOverlay show={showBigWin} label={bigWinLabel} onDone={() => setShowBigWin(false)} />
-      <div className="min-h-screen bg-[#040408]">
-        <div className="bg-[#040408] border-b border-white/[0.06] px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+      <div className="min-h-screen bg-background">
+        <div className="bg-background border-b border-border px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="flex items-center gap-3 flex-1">
             {user?.imageUrl ? (
-              <img src={user.imageUrl} alt="avatar" className="w-9 h-9 rounded-sm object-cover border border-white/10 shrink-0" />
+              <img src={user.imageUrl} alt="avatar" className="w-9 h-9 rounded-sm object-cover border border-border shrink-0" />
             ) : (
-              <div className="w-9 h-9 rounded-sm bg-white/[0.06] border border-white/10 flex items-center justify-center shrink-0">
-                <User className="w-4 h-4 text-white/30" />
+              <div className="w-9 h-9 rounded-sm bg-muted border border-border flex items-center justify-center shrink-0">
+                <User className="w-4 h-4 text-muted-foreground/50" />
               </div>
             )}
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-[13px] font-bold text-white/90 truncate">
+                <span className="text-[13px] font-bold text-foreground/90 truncate">
                   {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.firstName || user?.username || "Trader"}
                 </span>
                 {status && (
@@ -335,24 +335,24 @@ export default function Gamification() {
                 )}
               </div>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[9px] font-mono text-white/30">Level {status?.xp.level ?? "..."}</span>
+                <span className="text-[9px] font-mono text-muted-foreground/50">Level {status?.xp.level ?? "..."}</span>
                 {status && (
-                  <div className="w-24 relative h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                  <div className="w-24 relative h-1.5 bg-muted rounded-full overflow-hidden">
                     <div
                       className="absolute inset-y-0 left-0 rounded-full"
                       style={{ width: `${status.levelProgress}%`, background: tierColor }}
                     />
                   </div>
                 )}
-                <span className="text-[9px] font-mono text-white/40">{status ? `${status.xp.totalXp.toLocaleString()} XP` : "..."}</span>
+                <span className="text-[9px] font-mono text-muted-foreground/70">{status ? `${status.xp.totalXp.toLocaleString()} XP` : "..."}</span>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/leaderboard" className="text-[10px] font-mono text-white/30 hover:text-white/60 flex items-center gap-1 transition-colors">
+            <Link href="/leaderboard" className="text-[10px] font-mono text-muted-foreground/50 hover:text-muted-foreground flex items-center gap-1 transition-colors">
               <Trophy className="w-3 h-3" /> Leaderboard <ChevronRight className="w-3 h-3" />
             </Link>
-            <Link href="/achievements" className="text-[10px] font-mono text-white/30 hover:text-white/60 flex items-center gap-1 transition-colors">
+            <Link href="/achievements" className="text-[10px] font-mono text-muted-foreground/50 hover:text-muted-foreground flex items-center gap-1 transition-colors">
               <Star className="w-3 h-3" /> Achievements <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
@@ -360,13 +360,13 @@ export default function Gamification() {
 
         {loading ? (
           <div className="flex items-center justify-center py-24">
-            <RefreshCw className="w-6 h-6 text-white/40 animate-spin" />
+            <RefreshCw className="w-6 h-6 text-muted-foreground/70 animate-spin" />
           </div>
         ) : (
           <div className="p-4 max-w-6xl mx-auto space-y-4">
 
             {status && (
-              <div className="bg-gradient-to-r from-[#0a0a14] via-[#0d0d1f] to-[#0a0a14] border border-white/[0.08] rounded-sm p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="bg-gradient-to-r from-[#0a0a14] via-[#0d0d1f] to-[#0a0a14] border border-border rounded-sm p-4 flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex items-center gap-4 flex-1">
                   <div
                     className="w-14 h-14 rounded-sm flex items-center justify-center text-2xl font-black font-mono border-2"
@@ -376,7 +376,7 @@ export default function Gamification() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[11px] font-mono font-bold text-white/80">
+                      <span className="text-[11px] font-mono font-bold text-foreground/80">
                         Level {status.xp.level}
                       </span>
                       <span
@@ -391,25 +391,25 @@ export default function Gamification() {
                         </span>
                       )}
                     </div>
-                    <div className="relative h-2 bg-white/[0.06] rounded-full overflow-hidden mb-1">
+                    <div className="relative h-2 bg-muted rounded-full overflow-hidden mb-1">
                       <div
                         className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
                         style={{ width: `${status.levelProgress}%`, background: `linear-gradient(90deg, ${tierColor}80, ${tierColor})` }}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-mono text-white/30">{status.xp.totalXp.toLocaleString()} XP total</span>
-                      <span className="text-[9px] font-mono text-white/30">{status.xpToNextLevel.toLocaleString()} XP to next level</span>
+                      <span className="text-[9px] font-mono text-muted-foreground/50">{status.xp.totalXp.toLocaleString()} XP total</span>
+                      <span className="text-[9px] font-mono text-muted-foreground/50">{status.xpToNextLevel.toLocaleString()} XP to next level</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-center">
-                    <p className="text-[9px] font-mono text-white/25 uppercase tracking-widest">Weekly</p>
+                    <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-widest">Weekly</p>
                     <p className="text-[15px] font-black font-mono text-[#00B4D8]">+{status.xp.weeklyXp.toLocaleString()}</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-[9px] font-mono text-white/25 uppercase tracking-widest">Monthly</p>
+                    <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-widest">Monthly</p>
                     <p className="text-[15px] font-black font-mono text-[#00B4D8]">+{status.xp.monthlyXp.toLocaleString()}</p>
                   </div>
                 </div>
@@ -418,8 +418,8 @@ export default function Gamification() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-              <div className="lg:col-span-1 bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
-                <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FFB800]">
+              <div className="lg:col-span-1 bg-card border border-border rounded-sm overflow-hidden">
+                <div className="flex items-center gap-2 px-3 py-2 bg-muted/30 border-b border-border border-l-2 border-l-[#FFB800]">
                   <Gift className="w-3.5 h-3.5 text-[#FFB800]" />
                   <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FFB800]">Daily Spin</span>
                   {status?.canSpin && (
@@ -436,7 +436,7 @@ export default function Gamification() {
                   {showResult && spinResult && (
                     <div className="w-full text-center animate-in fade-in zoom-in-95 duration-300">
                       <div className="bg-gradient-to-r from-[#FFB800]/10 to-[#00B4D8]/10 border border-[#FFB800]/20 rounded-sm px-4 py-3">
-                        <p className="text-[9px] font-mono text-white/40 uppercase tracking-widest mb-1">You Won!</p>
+                        <p className="text-[9px] font-mono text-muted-foreground/70 uppercase tracking-widest mb-1">You Won!</p>
                         <p className="text-xl font-black font-mono text-[#FFB800]">{spinResult.reward}</p>
                       </div>
                     </div>
@@ -462,18 +462,18 @@ export default function Gamification() {
                     </button>
                   ) : (
                     <div className="w-full text-center">
-                      <p className="text-[9px] font-mono text-white/30 mb-1">Next spin available in</p>
+                      <p className="text-[9px] font-mono text-muted-foreground/50 mb-1">Next spin available in</p>
                       <div className="text-lg font-black font-mono">
                         {status?.nextSpinAt ? <CountdownTimer nextSpinAt={status.nextSpinAt} /> : "—"}
                       </div>
                       {status?.lastSpin && (
-                        <p className="text-[9px] font-mono text-white/40 mt-1">Last: {status.lastSpin.reward}</p>
+                        <p className="text-[9px] font-mono text-muted-foreground/70 mt-1">Last: {status.lastSpin.reward}</p>
                       )}
                     </div>
                   )}
 
-                  <div className="w-full border-t border-white/[0.04] pt-3">
-                    <p className="text-[9px] font-mono text-white/25 uppercase tracking-widest mb-2">Possible Rewards</p>
+                  <div className="w-full border-t border-border pt-3">
+                    <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-widest mb-2">Possible Rewards</p>
                     <div className="grid grid-cols-2 gap-1">
                       {[
                         { label: "+50 XP", chance: "50%", color: "#00B4D8" },
@@ -482,9 +482,9 @@ export default function Gamification() {
                         { label: "2x XP Boost", chance: "4%", color: "#9c27b0" },
                         { label: "Streak Boost", chance: "1%", color: "#ff6b35" },
                       ].map(r => (
-                        <div key={r.label} className="flex items-center justify-between px-2 py-1 bg-white/[0.02] rounded-sm">
+                        <div key={r.label} className="flex items-center justify-between px-2 py-1 bg-muted/30 rounded-sm">
                           <span className="text-[9px] font-mono font-bold" style={{ color: r.color }}>{r.label}</span>
-                          <span className="text-[8px] font-mono text-white/25">{r.chance}</span>
+                          <span className="text-[8px] font-mono text-muted-foreground/40">{r.chance}</span>
                         </div>
                       ))}
                     </div>
@@ -494,8 +494,8 @@ export default function Gamification() {
 
               <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#00B4D8]">
+                <div className="bg-card border border-border rounded-sm overflow-hidden">
+                  <div className="flex items-center gap-2 px-3 py-2 bg-muted/30 border-b border-border border-l-2 border-l-[#00B4D8]">
                     <Zap className="w-3.5 h-3.5 text-[#00B4D8]" />
                     <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00B4D8]">XP Progress</span>
                   </div>
@@ -505,17 +505,17 @@ export default function Gamification() {
                         <span className="text-3xl font-black font-mono" style={{ color: tierColor }}>
                           {status?.xp.totalXp.toLocaleString() ?? "—"}
                         </span>
-                        <span className="text-[10px] font-mono text-white/30">total XP</span>
+                        <span className="text-[10px] font-mono text-muted-foreground/50">total XP</span>
                       </div>
-                      <div className="relative h-3 bg-white/[0.06] rounded-full overflow-hidden">
+                      <div className="relative h-3 bg-muted rounded-full overflow-hidden">
                         <div
                           className="absolute inset-y-0 left-0 rounded-full transition-all duration-1000"
                           style={{ width: `${status?.levelProgress ?? 0}%`, background: `linear-gradient(90deg, ${tierColor}60, ${tierColor})` }}
                         />
                       </div>
                       <div className="flex justify-between mt-1">
-                        <span className="text-[8px] font-mono text-white/25">Level {status?.xp.level ?? 1}</span>
-                        <span className="text-[8px] font-mono text-white/25">Level {(status?.xp.level ?? 1) + 1}</span>
+                        <span className="text-[8px] font-mono text-muted-foreground/40">Level {status?.xp.level ?? 1}</span>
+                        <span className="text-[8px] font-mono text-muted-foreground/40">Level {(status?.xp.level ?? 1) + 1}</span>
                       </div>
                     </div>
 
@@ -526,8 +526,8 @@ export default function Gamification() {
                         { label: "To Next Lvl", value: `${status?.xpToNextLevel.toLocaleString() ?? 0} XP`, color: "#00B4D8" },
                         { label: "Multiplier", value: `${status?.streak.multiplier.toFixed(1) ?? "1.0"}x`, color: "#00B4D8" },
                       ].map(stat => (
-                        <div key={stat.label} className="bg-white/[0.02] border border-white/[0.04] rounded-sm px-2.5 py-2">
-                          <p className="text-[8px] font-mono text-white/25 uppercase tracking-widest">{stat.label}</p>
+                        <div key={stat.label} className="bg-muted/30 border border-border rounded-sm px-2.5 py-2">
+                          <p className="text-[8px] font-mono text-muted-foreground/40 uppercase tracking-widest">{stat.label}</p>
                           <p className="text-[14px] font-black font-mono mt-0.5" style={{ color: stat.color }}>{stat.value}</p>
                         </div>
                       ))}
@@ -535,8 +535,8 @@ export default function Gamification() {
                   </div>
                 </div>
 
-                <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-orange-400">
+                <div className="bg-card border border-border rounded-sm overflow-hidden">
+                  <div className="flex items-center gap-2 px-3 py-2 bg-muted/30 border-b border-border border-l-2 border-l-orange-400">
                     <Flame className="w-3.5 h-3.5 text-orange-400" />
                     <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-orange-400">Streak</span>
                   </div>
@@ -544,16 +544,16 @@ export default function Gamification() {
                     <div className="flex items-center gap-4">
                       <div className="relative">
                         <Flame className="w-10 h-10 text-orange-400" />
-                        <span className="absolute -top-1 -right-1 text-[9px] font-black font-mono text-[#FFB800] bg-[#0A0E1A] rounded-full w-5 h-5 flex items-center justify-center border border-[#FFB800]/30">
+                        <span className="absolute -top-1 -right-1 text-[9px] font-black font-mono text-[#FFB800] bg-card rounded-full w-5 h-5 flex items-center justify-center border border-[#FFB800]/30">
                           {(status?.streak.currentStreak ?? 0) > 9 ? "9+" : status?.streak.currentStreak ?? 0}
                         </span>
                       </div>
                       <div>
                         <div className="flex items-baseline gap-1.5">
                           <span className="text-3xl font-black font-mono text-orange-400">{status?.streak.currentStreak ?? 0}</span>
-                          <span className="text-[10px] font-mono text-white/30">day streak</span>
+                          <span className="text-[10px] font-mono text-muted-foreground/50">day streak</span>
                         </div>
-                        <p className="text-[9px] font-mono text-white/30">Best: {status?.streak.longestStreak ?? 0} days</p>
+                        <p className="text-[9px] font-mono text-muted-foreground/50">Best: {status?.streak.longestStreak ?? 0} days</p>
                       </div>
                     </div>
 
@@ -574,9 +574,9 @@ export default function Gamification() {
                             {milestone.active ? (
                               <CheckCircle className="w-3.5 h-3.5 text-[#00B4D8]" />
                             ) : (
-                              <Clock className="w-3.5 h-3.5 text-white/40" />
+                              <Clock className="w-3.5 h-3.5 text-muted-foreground/70" />
                             )}
-                            <span className="text-[10px] font-mono text-white/60">{milestone.days}-day streak</span>
+                            <span className="text-[10px] font-mono text-muted-foreground">{milestone.days}-day streak</span>
                           </div>
                           <span className="text-[10px] font-mono font-bold" style={{ color: milestone.active ? "#ff6b35" : "#ffffff30" }}>
                             {milestone.bonus}
@@ -613,18 +613,18 @@ export default function Gamification() {
                   </div>
                 </div>
 
-                <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden sm:col-span-2">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#00B4D8]">
+                <div className="bg-card border border-border rounded-sm overflow-hidden sm:col-span-2">
+                  <div className="flex items-center gap-2 px-3 py-2 bg-muted/30 border-b border-border border-l-2 border-l-[#00B4D8]">
                     <TrendingUp className="w-3.5 h-3.5 text-[#00B4D8]" />
                     <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00B4D8]">Recent Rewards</span>
-                    <Link href="/achievements" className="ml-auto text-[9px] font-mono text-white/40 hover:text-white/40 flex items-center gap-0.5 transition-colors">
+                    <Link href="/achievements" className="ml-auto text-[9px] font-mono text-muted-foreground/70 hover:text-muted-foreground/70 flex items-center gap-0.5 transition-colors">
                       View all <ChevronRight className="w-2.5 h-2.5" />
                     </Link>
                   </div>
                   <div className="divide-y divide-white/[0.04]">
                     {status?.recentRewards && status.recentRewards.length > 0 ? (
                       status.recentRewards.slice(0, 6).map((r) => (
-                        <div key={r.id} className="flex items-center justify-between px-3 py-2 hover:bg-white/[0.02] transition-colors">
+                        <div key={r.id} className="flex items-center justify-between px-3 py-2 hover:bg-muted/30 transition-colors">
                           <div className="flex items-center gap-2">
                             {r.type === "spin_reward" ? (
                               r.rewardType === "multiplier" ? (
@@ -636,10 +636,10 @@ export default function Gamification() {
                               <Zap className="w-3 h-3 text-[#FFB800]" />
                             )}
                             <div>
-                              <span className="text-[10px] font-mono text-white/70">
+                              <span className="text-[10px] font-mono text-foreground/70">
                                 {r.label || ReasonLabel(r.reason)}
                               </span>
-                              <span className="text-[8px] font-mono text-white/25 ml-2">{r.category}</span>
+                              <span className="text-[8px] font-mono text-muted-foreground/40 ml-2">{r.category}</span>
                             </div>
                           </div>
                           <div className="text-right">
@@ -650,7 +650,7 @@ export default function Gamification() {
                             ) : (
                               <span className="text-[11px] font-mono font-bold text-orange-400">Streak+</span>
                             )}
-                            <p className="text-[8px] font-mono text-white/40">
+                            <p className="text-[8px] font-mono text-muted-foreground/70">
                               {new Date(r.createdAt).toLocaleDateString([], { month: "short", day: "numeric" })}
                             </p>
                           </div>
@@ -658,7 +658,7 @@ export default function Gamification() {
                       ))
                     ) : (
                       <div className="px-3 py-6 text-center">
-                        <p className="text-[10px] font-mono text-white/40">No rewards yet | start earning XP!</p>
+                        <p className="text-[10px] font-mono text-muted-foreground/70">No rewards yet | start earning XP!</p>
                       </div>
                     )}
                   </div>
@@ -679,13 +679,13 @@ export default function Gamification() {
                   </div>
                   <div className="flex-1 text-center sm:text-left">
                     <h3 className="text-[13px] font-bold font-mono text-[#FFB800] mb-1">Early Adopter | Founders Badge</h3>
-                    <p className="text-[10px] font-mono text-white/40">
+                    <p className="text-[10px] font-mono text-muted-foreground/70">
                       You joined EntangleWealth as one of our earliest members. This badge grants you a permanent XP multiplier
                       and exclusive recognition across the platform.
                     </p>
                   </div>
                   <div className="text-center shrink-0">
-                    <p className="text-[9px] font-mono text-white/25 uppercase tracking-widest mb-1">XP Multiplier</p>
+                    <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-widest mb-1">XP Multiplier</p>
                     <p className="text-3xl font-black font-mono text-[#FFB800]">{status.founderMultiplier.toFixed(1)}x</p>
                     <p className="text-[9px] font-mono text-[#FFB800]/40">All XP earnings boosted</p>
                   </div>
@@ -694,19 +694,19 @@ export default function Gamification() {
             )}
 
             {!status?.isFounder && (
-              <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden opacity-60">
-                <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.02] border-b border-white/[0.06]">
-                  <Lock className="w-3.5 h-3.5 text-white/30" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-white/30">Founders Badge</span>
-                  <span className="ml-auto text-[8px] font-mono text-white/40">Early adopter exclusive</span>
+              <div className="bg-card border border-border rounded-sm overflow-hidden opacity-60">
+                <div className="flex items-center gap-2 px-3 py-2 bg-muted/30 border-b border-border">
+                  <Lock className="w-3.5 h-3.5 text-muted-foreground/50" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-muted-foreground/50">Founders Badge</span>
+                  <span className="ml-auto text-[8px] font-mono text-muted-foreground/70">Early adopter exclusive</span>
                 </div>
                 <div className="p-4 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-sm bg-white/[0.03] border border-white/[0.06] flex items-center justify-center shrink-0">
-                    <Crown className="w-6 h-6 text-white/40" />
+                  <div className="w-12 h-12 rounded-sm bg-muted/50 border border-border flex items-center justify-center shrink-0">
+                    <Crown className="w-6 h-6 text-muted-foreground/70" />
                   </div>
                   <div>
-                    <p className="text-[11px] font-mono font-bold text-white/30">Founders Badge | Locked</p>
-                    <p className="text-[9px] font-mono text-white/40">Reserved for early EntangleWealth members. Stay active to unlock exclusive perks.</p>
+                    <p className="text-[11px] font-mono font-bold text-muted-foreground/50">Founders Badge | Locked</p>
+                    <p className="text-[9px] font-mono text-muted-foreground/70">Reserved for early EntangleWealth members. Stay active to unlock exclusive perks.</p>
                   </div>
                 </div>
               </div>

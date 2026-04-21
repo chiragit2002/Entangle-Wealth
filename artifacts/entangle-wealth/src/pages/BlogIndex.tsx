@@ -36,7 +36,7 @@ export default function BlogIndex() {
             placeholder="Search articles..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-white/[0.03] border-white/[0.08] text-sm"
+            className="pl-9 bg-muted/50 border-border text-sm"
           />
         </div>
 
@@ -58,31 +58,31 @@ export default function BlogIndex() {
               <BookOpen className="w-8 h-8" style={{ color: "#00D4FF" }} />
             </div>
             <h2 className="text-lg font-mono font-bold mb-2" style={{ color: "#00D4FF" }}>&gt; NO ARTICLES IN FEED</h2>
-            <p className="text-sm font-mono mb-1" style={{ color: "rgba(255,255,255,0.5)" }}>
+            <p className="text-sm font-mono mb-1 text-muted-foreground">
               STATUS: Content pipeline initializing
             </p>
-            <p className="text-sm font-mono mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>
+            <p className="text-sm font-mono mb-8 text-muted-foreground/70">
               Explore available tools while the editorial feed connects.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
               <Link href="/research">
-                <div className="group rounded-xl border border-white/[0.06] p-5 hover:border-primary/20 transition-all cursor-pointer text-left" style={{ background: "rgba(8,8,20,0.6)" }}>
+                <div className="group rounded-xl border border-border p-5 hover:border-primary/20 transition-all cursor-pointer text-left" style={{ background: "rgba(8,8,20,0.6)" }}>
                   <TrendingUp className="w-6 h-6 text-primary mb-3" />
-                  <p className="font-semibold text-white text-sm mb-1">News Intelligence</p>
+                  <p className="font-semibold text-foreground text-sm mb-1">News Intelligence</p>
                   <p className="text-xs text-muted-foreground">Live financial news scored by relevance</p>
                 </div>
               </Link>
               <Link href="/technical">
-                <div className="group rounded-xl border border-white/[0.06] p-5 hover:border-primary/20 transition-all cursor-pointer text-left" style={{ background: "rgba(8,8,20,0.6)" }}>
+                <div className="group rounded-xl border border-border p-5 hover:border-primary/20 transition-all cursor-pointer text-left" style={{ background: "rgba(8,8,20,0.6)" }}>
                   <BarChart3 className="w-6 h-6 text-primary mb-3" />
-                  <p className="font-semibold text-white text-sm mb-1">Technical Analysis</p>
+                  <p className="font-semibold text-foreground text-sm mb-1">Technical Analysis</p>
                   <p className="text-xs text-muted-foreground">55+ indicators with AI consensus signals</p>
                 </div>
               </Link>
               <Link href="/screener">
-                <div className="group rounded-xl border border-white/[0.06] p-5 hover:border-primary/20 transition-all cursor-pointer text-left" style={{ background: "rgba(8,8,20,0.6)" }}>
+                <div className="group rounded-xl border border-border p-5 hover:border-primary/20 transition-all cursor-pointer text-left" style={{ background: "rgba(8,8,20,0.6)" }}>
                   <GraduationCap className="w-6 h-6 text-primary mb-3" />
-                  <p className="font-semibold text-white text-sm mb-1">Stock Screener</p>
+                  <p className="font-semibold text-foreground text-sm mb-1">Stock Screener</p>
                   <p className="text-xs text-muted-foreground">Filter and find your next trade</p>
                 </div>
               </Link>
@@ -107,17 +107,17 @@ function BlogCard({ post }: { post: BlogPost }) {
   return (
     <Link href={`/blog/${post.slug}`}>
       <article
-        className="group rounded-xl border border-white/[0.06] p-6 hover:border-primary/20 transition-all cursor-pointer"
+        className="group rounded-xl border border-border p-6 hover:border-primary/20 transition-all cursor-pointer"
         style={{ background: "rgba(8,8,20,0.6)" }}
       >
         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
           <Calendar className="w-3.5 h-3.5" />
           {new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
         </div>
-        <h2 className="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">
+        <h2 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
           {post.title}
         </h2>
-        <p className="text-sm text-white/50 line-clamp-2 mb-3">{preview}</p>
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{preview}</p>
         <span className="text-xs text-primary font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
           Read more <ArrowRight className="w-3.5 h-3.5" />
         </span>

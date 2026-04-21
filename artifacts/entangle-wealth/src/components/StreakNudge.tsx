@@ -65,13 +65,13 @@ export function StreakNudge() {
         <div className="flex items-center gap-2.5">
           <div className="relative">
             <Flame className="w-5 h-5 text-orange-400" />
-            <span className="absolute -top-1 -right-1 text-[8px] font-black font-mono text-[#FFB800] bg-[#0A0E1A] rounded-full w-3.5 h-3.5 flex items-center justify-center leading-none">
+            <span className="absolute -top-1 -right-1 text-[8px] font-black font-mono text-[#FFB800] bg-card rounded-full w-3.5 h-3.5 flex items-center justify-center leading-none">
               {streak > 9 ? "!" : streak}
             </span>
           </div>
           <div>
             <p className="text-[11px] font-bold text-orange-300">Keep your {streak}-day streak alive!</p>
-            <p className="text-[9px] font-mono text-white/30">You haven't checked in today | your streak is at risk</p>
+            <p className="text-[9px] font-mono text-muted-foreground/50">You haven't checked in today | your streak is at risk</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -84,7 +84,7 @@ export function StreakNudge() {
           </button>
           <button
             onClick={dismiss}
-            className="text-white/50 hover:text-white/40 transition-colors p-0.5"
+            className="text-muted-foreground hover:text-muted-foreground/70 transition-colors p-0.5"
             aria-label="Dismiss streak nudge"
           >
             <X className="w-3.5 h-3.5" />

@@ -53,8 +53,8 @@ export function RetirementPlanningModule() {
             <PiggyBank className="w-3.5 h-3.5 text-purple-400" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-white/80">Retirement Planning</p>
-            <p className="text-[10px] text-white/35">2026 contribution limits</p>
+            <p className="text-xs font-semibold text-foreground/80">Retirement Planning</p>
+            <p className="text-[10px] text-muted-foreground/60">2026 contribution limits</p>
           </div>
         </div>
         <Link href="/taxgpt" className="flex items-center gap-1 text-[10px] text-purple-400/70 hover:text-purple-400 transition-colors">
@@ -63,13 +63,13 @@ export function RetirementPlanningModule() {
       </div>
       <div className="space-y-2">
         {accounts.map((a) => (
-          <div key={a.name} className="flex items-center gap-3 py-1.5 border-b border-white/[0.04] last:border-0">
+          <div key={a.name} className="flex items-center gap-3 py-1.5 border-b border-border last:border-0">
             <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0 ${a.badgeColor}`}>{a.badge}</span>
             <div className="flex-1 min-w-0">
               <p className={`text-xs font-semibold ${a.color}`}>{a.name}</p>
-              <p className="text-[10px] text-white/40">{a.note}</p>
+              <p className="text-[10px] text-muted-foreground/70">{a.note}</p>
             </div>
-            <p className="text-[10px] font-mono text-white/50 shrink-0 text-right">{a.limit}</p>
+            <p className="text-[10px] font-mono text-muted-foreground shrink-0 text-right">{a.limit}</p>
           </div>
         ))}
       </div>

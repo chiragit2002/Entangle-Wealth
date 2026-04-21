@@ -184,7 +184,7 @@ export default function TripMap({ activities, destinations, highlightDay }: Prop
           <div key={type} className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-semibold"
             style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}>
             <div className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
-            <span className="text-white/70 capitalize">{type}</span>
+            <span className="text-foreground/70 capitalize">{type}</span>
           </div>
         ))}
       </div>

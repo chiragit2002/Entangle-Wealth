@@ -91,7 +91,7 @@ export default function PersonalTrip() {
           </button>
         </div>
 
-        <div className="flex gap-1 bg-white/[0.04] rounded-xl p-1">
+        <div className="flex gap-1 bg-muted/50 rounded-xl p-1">
           {views.map(v => {
             const Icon = v.icon;
             return (
@@ -99,7 +99,7 @@ export default function PersonalTrip() {
                 className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-[12px] font-semibold transition-all min-h-[40px] ${
                   viewMode === v.key
                     ? "bg-primary/15 text-primary border border-primary/30"
-                    : "text-white/40 hover:text-white/60"
+                    : "text-muted-foreground/70 hover:text-muted-foreground"
                 }`}>
                 <Icon className="w-4 h-4" /> {v.label}
               </button>

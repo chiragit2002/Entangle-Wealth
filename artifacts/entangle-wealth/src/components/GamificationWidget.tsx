@@ -88,16 +88,16 @@ export function GamificationWidget() {
 
   if (!isSignedIn || !data) {
     return (
-      <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
-        <div className="flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FFB800]">
+      <div className="bg-card border border-border rounded-sm overflow-hidden">
+        <div className="flex items-center justify-between px-2 py-1.5 bg-muted/30 border-b border-border border-l-2 border-l-[#FFB800]">
           <div className="flex items-center gap-1.5">
             <Trophy className="w-3 h-3 text-[#FFB800]" />
             <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FFB800]">PROGRESSION</span>
           </div>
         </div>
         <div className="p-3 flex flex-col items-center justify-center h-[140px]">
-          <Trophy className="w-6 h-6 text-white/10 mb-2" />
-          <p className="text-[10px] font-mono text-white/25">Sign in to track your progress</p>
+          <Trophy className="w-6 h-6 text-muted-foreground/20 mb-2" />
+          <p className="text-[10px] font-mono text-muted-foreground/40">Sign in to track your progress</p>
         </div>
       </div>
     );
@@ -108,8 +108,8 @@ export function GamificationWidget() {
 
   return (
     <>
-      <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
-        <div className="flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#FFB800]">
+      <div className="bg-card border border-border rounded-sm overflow-hidden">
+        <div className="flex items-center justify-between px-2 py-1.5 bg-muted/30 border-b border-border border-l-2 border-l-[#FFB800]">
           <div className="flex items-center gap-1.5">
             <Trophy className="w-3 h-3 text-[#FFB800]" />
             <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FFB800]">PROGRESSION</span>
@@ -121,15 +121,15 @@ export function GamificationWidget() {
 
         <div className="p-2 space-y-2">
           <div className="grid grid-cols-2 gap-1.5">
-            <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
-              <p className="text-[7px] font-mono text-white/30">STREAK</p>
+            <div className="bg-muted/50 rounded-sm p-1.5 text-center">
+              <p className="text-[7px] font-mono text-muted-foreground/50">STREAK</p>
               <div className="flex items-center justify-center gap-0.5">
                 <Flame className="w-3 h-3 text-[#ff3366]" />
                 <p className="text-[11px] font-mono font-bold text-[#ff3366]">{data.streak.currentStreak}</p>
               </div>
             </div>
-            <div className="bg-white/[0.03] rounded-sm p-1.5 text-center">
-              <p className="text-[7px] font-mono text-white/30">MULTIPLIER</p>
+            <div className="bg-muted/50 rounded-sm p-1.5 text-center">
+              <p className="text-[7px] font-mono text-muted-foreground/50">MULTIPLIER</p>
               <p className="text-[11px] font-mono font-bold text-[#00B4D8]">{data.streak.multiplier.toFixed(1)}x</p>
             </div>
           </div>
@@ -155,7 +155,7 @@ export function GamificationWidget() {
               className={`flex-1 flex items-center justify-center gap-1 h-7 text-[9px] font-mono font-bold rounded-sm transition-colors ${
                 canSpin
                   ? "bg-[#FFB800]/15 text-[#FFB800] border border-[#FFB800]/30 hover:bg-[#FFB800]/25 animate-pulse"
-                  : "bg-white/[0.03] text-white/30 border border-white/[0.06]"
+                  : "bg-muted/50 text-muted-foreground/50 border border-border"
               }`}
             >
               <Gift className="w-3 h-3" />
@@ -164,17 +164,17 @@ export function GamificationWidget() {
           </div>
 
           {data.badges.length > 0 && (
-            <div className="border-t border-white/[0.06] pt-1.5">
-              <p className="text-[8px] font-mono text-white/25 mb-1">BADGES ({data.badges.length})</p>
+            <div className="border-t border-border pt-1.5">
+              <p className="text-[8px] font-mono text-muted-foreground/40 mb-1">BADGES ({data.badges.length})</p>
               <div className="flex flex-wrap gap-1">
                 {data.badges.slice(0, 6).map((b, i) => (
-                  <div key={i} className="flex items-center gap-1 bg-white/[0.03] rounded px-1.5 py-0.5" title={b.badge.name}>
+                  <div key={i} className="flex items-center gap-1 bg-muted/50 rounded px-1.5 py-0.5" title={b.badge.name}>
                     <span className="text-[10px]">{b.badge.icon}</span>
-                    <span className="text-[8px] font-mono text-white/40">{b.badge.name}</span>
+                    <span className="text-[8px] font-mono text-muted-foreground/70">{b.badge.name}</span>
                   </div>
                 ))}
                 {data.badges.length > 6 && (
-                  <span className="text-[8px] font-mono text-white/40 self-center">+{data.badges.length - 6}</span>
+                  <span className="text-[8px] font-mono text-muted-foreground/70 self-center">+{data.badges.length - 6}</span>
                 )}
               </div>
             </div>

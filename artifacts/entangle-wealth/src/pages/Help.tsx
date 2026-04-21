@@ -49,19 +49,19 @@ export default function Help() {
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-3">
             Help <span className="electric-text">Center</span>
           </h1>
-          <p className="text-white/50 max-w-lg mx-auto">
+          <p className="text-muted-foreground max-w-lg mx-auto">
             Find answers to common questions or submit a support ticket for
             personalized assistance.
           </p>
         </div>
 
         <div className="relative mb-8 max-w-xl mx-auto">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/70" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search for help..."
-            className="w-full h-12 pl-12 pr-4 text-sm bg-white/[0.03] border border-white/[0.08] rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-[#00B4D8]/40 transition-colors"
+            className="w-full h-12 pl-12 pr-4 text-sm bg-muted/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-[#00B4D8]/40 transition-colors"
           />
         </div>
 
@@ -71,7 +71,7 @@ export default function Help() {
             className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-colors ${
               activeCategory === "all"
                 ? "bg-[#00B4D8]/10 text-[#00B4D8] border-[#00B4D8]/30"
-                : "bg-white/[0.03] text-white/40 border-white/[0.06] hover:bg-white/[0.06]"
+                : "bg-muted/50 text-muted-foreground/70 border-border hover:bg-muted"
             }`}
           >
             All ({FAQ_DATA.length})
@@ -85,7 +85,7 @@ export default function Help() {
                 className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-colors flex items-center gap-1.5 ${
                   activeCategory === cat.key
                     ? "bg-[#00B4D8]/10 text-[#00B4D8] border-[#00B4D8]/30"
-                    : "bg-white/[0.03] text-white/40 border-white/[0.06] hover:bg-white/[0.06]"
+                    : "bg-muted/50 text-muted-foreground/70 border-border hover:bg-muted"
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -97,9 +97,9 @@ export default function Help() {
 
         {filtered.length === 0 ? (
           <div className="text-center py-16">
-            <HelpCircle className="w-12 h-12 text-white/10 mx-auto mb-4" />
-            <p className="text-white/50 font-semibold mb-1">No results found</p>
-            <p className="text-white/25 text-sm max-w-xs mx-auto leading-relaxed">
+            <HelpCircle className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
+            <p className="text-muted-foreground font-semibold mb-1">No results found</p>
+            <p className="text-muted-foreground/40 text-sm max-w-xs mx-auto leading-relaxed">
               Try a different search term or category, or scroll down to{" "}
               <Link
                 href="/help#submit-ticket"
@@ -120,7 +120,7 @@ export default function Help() {
                   className={`border rounded-xl overflow-hidden transition-colors ${
                     isOpen
                       ? "border-[#00B4D8]/20 bg-[#00B4D8]/[0.02]"
-                      : "border-white/[0.06] bg-white/[0.01] hover:border-white/10"
+                      : "border-border bg-muted/30 hover:border-border"
                   }`}
                 >
                   <button
@@ -128,26 +128,26 @@ export default function Help() {
                     className="w-full flex items-center justify-between px-5 py-4 text-left"
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider shrink-0 w-20">
+                      <span className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider shrink-0 w-20">
                         {
                           FAQ_CATEGORIES.find((c) => c.key === faq.category)
                             ?.label
                         }
                       </span>
-                      <span className="text-sm font-medium text-white/80 truncate">
+                      <span className="text-sm font-medium text-foreground/80 truncate">
                         {faq.question}
                       </span>
                     </div>
                     {isOpen ? (
                       <ChevronUp className="w-4 h-4 text-[#00B4D8] shrink-0 ml-2" />
                     ) : (
-                      <ChevronDown className="w-4 h-4 text-white/40 shrink-0 ml-2" />
+                      <ChevronDown className="w-4 h-4 text-muted-foreground/70 shrink-0 ml-2" />
                     )}
                   </button>
                   {isOpen && (
                     <div className="px-5 pb-4 pt-0">
                       <div className="pl-[92px]">
-                        <p className="text-sm text-white/50 leading-relaxed">
+                        <p className="text-sm text-muted-foreground leading-relaxed">
                           {faq.answer}
                         </p>
                       </div>
@@ -161,13 +161,13 @@ export default function Help() {
 
         <div
           id="submit-ticket"
-          className="mt-16 text-center bg-white/[0.02] border border-white/[0.06] rounded-sm p-8"
+          className="mt-16 text-center bg-muted/30 border border-border rounded-sm p-8"
         >
           <MessageSquarePlus className="w-10 h-10 text-[#00B4D8] mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-white mb-2">
+          <h2 className="text-xl font-bold text-foreground mb-2">
             Still need help?
           </h2>
-          <p className="text-white/50 text-sm mb-6 max-w-md mx-auto">
+          <p className="text-muted-foreground text-sm mb-6 max-w-md mx-auto">
             Can't find what you're looking for? Submit a support ticket and our
             team will get back to you within 1–2 business days.
           </p>
@@ -181,7 +181,7 @@ export default function Help() {
         <div className="mt-8 text-center">
           <Link
             href="/status"
-            className="text-xs text-white/50 hover:text-[#00B4D8] transition-colors"
+            className="text-xs text-muted-foreground hover:text-[#00B4D8] transition-colors"
           >
             Check system status
           </Link>

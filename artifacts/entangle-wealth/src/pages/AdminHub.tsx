@@ -47,7 +47,7 @@ export default function AdminHub() {
   }
 
   return (
-    <div className="min-h-screen bg-[#020204] text-white flex flex-col">
+    <div className="min-h-screen bg-[#020204] text-foreground flex flex-col">
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-6 max-w-6xl">
         <h1 className="text-lg font-mono font-bold text-[#00B4D8] uppercase tracking-wider mb-4">Admin Hub</h1>
@@ -58,10 +58,10 @@ export default function AdminHub() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className="flex items-center gap-3 p-3 border border-[#00B4D8]/10 bg-[#0A0E1A] hover:bg-[#00B4D8]/5 hover:border-[#00B4D8]/20 transition-colors text-left"
+                className="flex items-center gap-3 p-3 border border-[#00B4D8]/10 bg-card hover:bg-[#00B4D8]/5 hover:border-[#00B4D8]/20 transition-colors text-left"
               >
                 <Icon className="w-4 h-4 text-[#00B4D8]/60 shrink-0" />
-                <span className="text-xs font-mono font-medium text-white/80">{tab.label}</span>
+                <span className="text-xs font-mono font-medium text-foreground/80">{tab.label}</span>
               </button>
             );
           })}

@@ -194,7 +194,7 @@ function MonteCarloPanel({ collapsed }: { collapsed: boolean }) {
                 className="rounded px-2 py-1.5"
                 style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
               >
-                <div className="text-[8px] font-mono uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.35)" }}>
+                <div className="text-[8px] font-mono uppercase tracking-widest text-muted-foreground/70">
                   {label}
                 </div>
                 <div className="text-sm font-mono font-bold" style={{ color }}>{val}</div>
@@ -236,7 +236,7 @@ function MonteCarloPanel({ collapsed }: { collapsed: boolean }) {
           ].map(({ label, key, min, max, step, color }) => (
             <div key={key}>
               <div className="flex justify-between mb-1">
-                <span className="text-[8px] font-mono uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.4)" }}>
+                <span className="text-[8px] font-mono uppercase tracking-widest text-muted-foreground/70">
                   {label}
                 </span>
                 <span className="text-[9px] font-mono font-bold" style={{ color }}>
@@ -327,7 +327,7 @@ function FlashCouncilPanel({ collapsed }: { collapsed: boolean }) {
             >
               <div className="flex items-center gap-2">
                 <div className="w-1 h-1 rounded-full animate-pulse" style={{ background: agent.color }} />
-                <span className="text-[9px] font-mono" style={{ color: "rgba(255,255,255,0.5)" }}>
+                <span className="text-[9px] font-mono text-muted-foreground">
                   {agent.name}
                 </span>
               </div>
@@ -341,7 +341,7 @@ function FlashCouncilPanel({ collapsed }: { collapsed: boolean }) {
                     style={{ width: `${agent.conf}%`, background: agent.color }}
                   />
                 </div>
-                <span className="text-[8px] font-mono" style={{ color: "rgba(255,255,255,0.35)" }}>
+                <span className="text-[8px] font-mono text-muted-foreground/70">
                   {agent.conf}%
                 </span>
               </div>
@@ -417,7 +417,7 @@ function MirofishPanel({ collapsed }: { collapsed: boolean }) {
         </div>
         <div className="flex items-center gap-3 text-[9px] font-mono">
           <span className="text-green-400">7 MODELS ONLINE</span>
-          <span style={{ color: "rgba(255,255,255,0.35)" }}>{clock}</span>
+          <span className="text-muted-foreground/70">{clock}</span>
         </div>
       </div>
       <div className="flex-1 overflow-hidden grid grid-cols-2 gap-0">
@@ -571,7 +571,7 @@ function BacktesterPanel({ collapsed }: { collapsed: boolean }) {
       <div className="p-3 space-y-2 flex-shrink-0">
         <div className="grid grid-cols-4 gap-1.5">
           <div className="col-span-1">
-            <div className="text-[7px] font-mono uppercase tracking-widest mb-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>Symbol</div>
+            <div className="text-[7px] font-mono uppercase tracking-widest mb-0.5 text-muted-foreground/70">Symbol</div>
             <input
               value={symbol}
               onChange={(e) => setSymbol(e.target.value.toUpperCase())}
@@ -581,7 +581,7 @@ function BacktesterPanel({ collapsed }: { collapsed: boolean }) {
             />
           </div>
           <div className="col-span-1">
-            <div className="text-[7px] font-mono uppercase tracking-widest mb-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>From</div>
+            <div className="text-[7px] font-mono uppercase tracking-widest mb-0.5 text-muted-foreground/70">From</div>
             <input
               type="date"
               value={startDate}
@@ -591,7 +591,7 @@ function BacktesterPanel({ collapsed }: { collapsed: boolean }) {
             />
           </div>
           <div className="col-span-1">
-            <div className="text-[7px] font-mono uppercase tracking-widest mb-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>Amount</div>
+            <div className="text-[7px] font-mono uppercase tracking-widest mb-0.5 text-muted-foreground/70">Amount</div>
             <input
               type="number"
               value={amount}
@@ -775,7 +775,7 @@ export default function CommandCenter() {
         </div>
         <div className="flex items-center gap-1.5">
           <Activity className="w-2.5 h-2.5" style={{ color: "rgba(255,255,255,0.3)" }} />
-          <span className="text-[8px] font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>4 PANELS ACTIVE</span>
+          <span className="text-[8px] font-mono text-muted-foreground/70">4 PANELS ACTIVE</span>
         </div>
       </div>
       <div className="flex items-center gap-4">
@@ -784,8 +784,7 @@ export default function CommandCenter() {
         </span>
         <Link
           href="/dashboard"
-          className="text-[8px] font-mono uppercase tracking-widest transition-opacity hover:opacity-70"
-          style={{ color: "rgba(255,255,255,0.35)" }}
+          className="text-[8px] font-mono uppercase tracking-widest transition-opacity hover:opacity-70 text-muted-foreground/70"
         >
           ← Dashboard
         </Link>
@@ -866,7 +865,7 @@ export default function CommandCenter() {
                     </div>
                   </div>
                 </ResizablePanel>
-                <ResizableHandle className="w-1 bg-white/[0.04] hover:bg-[#00B4D8]/30 transition-colors" />
+                <ResizableHandle className="w-1 bg-muted/50 hover:bg-[#00B4D8]/30 transition-colors" />
                 <ResizablePanel defaultSize={topSizes[1]} minSize={20}>
                   <div className="flex flex-col h-full">
                     <BloombergPanelHeader
@@ -881,7 +880,7 @@ export default function CommandCenter() {
                 </ResizablePanel>
               </ResizablePanelGroup>
             </ResizablePanel>
-            <ResizableHandle className="h-1 bg-white/[0.04] hover:bg-[#00B4D8]/30 transition-colors" />
+            <ResizableHandle className="h-1 bg-muted/50 hover:bg-[#00B4D8]/30 transition-colors" />
             <ResizablePanel defaultSize={verticalSizes[1]} minSize={20}>
               <ResizablePanelGroup
                 direction="horizontal"
@@ -903,7 +902,7 @@ export default function CommandCenter() {
                     </div>
                   </div>
                 </ResizablePanel>
-                <ResizableHandle className="w-1 bg-white/[0.04] hover:bg-[#00B4D8]/30 transition-colors" />
+                <ResizableHandle className="w-1 bg-muted/50 hover:bg-[#00B4D8]/30 transition-colors" />
                 <ResizablePanel defaultSize={bottomSizes[1]} minSize={20}>
                   <div
                     className="flex flex-col h-full border-t"

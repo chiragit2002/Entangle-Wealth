@@ -42,14 +42,14 @@ export function PLSimulator() {
       <div className="grid grid-cols-4 gap-2 mb-4">
         <div>
           <label className="text-[9px] font-mono text-muted-foreground uppercase block mb-1">Type</label>
-          <div className="flex h-8 rounded overflow-hidden border border-white/10">
+          <div className="flex h-8 rounded overflow-hidden border border-border">
             <button
               onClick={() => setOptionType("CALL")}
-              className={`flex-1 text-[10px] font-mono font-bold transition-colors ${optionType === "CALL" ? "bg-primary text-black" : "text-muted-foreground hover:text-white"}`}
+              className={`flex-1 text-[10px] font-mono font-bold transition-colors ${optionType === "CALL" ? "bg-primary text-black" : "text-muted-foreground hover:text-foreground"}`}
             >CALL</button>
             <button
               onClick={() => setOptionType("PUT")}
-              className={`flex-1 text-[10px] font-mono font-bold transition-colors ${optionType === "PUT" ? "bg-red-500 text-white" : "text-muted-foreground hover:text-white"}`}
+              className={`flex-1 text-[10px] font-mono font-bold transition-colors ${optionType === "PUT" ? "bg-red-500 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >PUT</button>
           </div>
         </div>
@@ -58,7 +58,7 @@ export function PLSimulator() {
           <input
             value={strikePrice}
             onChange={(e) => setStrikePrice(Number(e.target.value))}
-            className="w-full h-8 bg-black/50 border border-white/10 rounded px-2 font-mono text-sm text-white"
+            className="w-full h-8 bg-black/50 border border-border rounded px-2 font-mono text-sm text-foreground"
             type="number"
           />
         </div>
@@ -67,7 +67,7 @@ export function PLSimulator() {
           <input
             value={premium}
             onChange={(e) => setPremium(Number(e.target.value))}
-            className="w-full h-8 bg-black/50 border border-white/10 rounded px-2 font-mono text-sm text-white"
+            className="w-full h-8 bg-black/50 border border-border rounded px-2 font-mono text-sm text-foreground"
             type="number"
             step="0.50"
           />
@@ -77,7 +77,7 @@ export function PLSimulator() {
           <input
             value={contracts}
             onChange={(e) => setContracts(Number(e.target.value))}
-            className="w-full h-8 bg-black/50 border border-white/10 rounded px-2 font-mono text-sm text-white"
+            className="w-full h-8 bg-black/50 border border-border rounded px-2 font-mono text-sm text-foreground"
             type="number"
             min="1"
           />

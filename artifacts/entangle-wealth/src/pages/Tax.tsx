@@ -382,8 +382,8 @@ export default function Tax() {
       )}
       <div className="container mx-auto px-4 py-10 max-w-3xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">TaxFlow</h1>
-          <p className="text-white/50 text-sm">Find deductions you're missing and see exactly how much you could save this year.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground mb-1">TaxFlow</h1>
+          <p className="text-muted-foreground text-sm">Find deductions you're missing and see exactly how much you could save this year.</p>
         </div>
         {isSignedIn && kycStatus && (
           <div className={`rounded-xl p-4 mb-4 border flex items-start gap-3 ${
@@ -405,7 +405,7 @@ export default function Tax() {
               <Shield className="w-5 h-5 text-primary shrink-0 mt-0.5" />
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white">
+              <p className="text-sm font-semibold text-foreground">
                 {kycStatus === "verified"
                   ? "Identity Verified"
                   : kycStatus === "rejected"
@@ -414,7 +414,7 @@ export default function Tax() {
                   ? "KYC Under Review"
                   : "Verify Your Identity for Enhanced Features"}
               </p>
-              <p className="text-xs text-white/50 mt-0.5">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 {kycStatus === "verified"
                   ? "Your identity has been verified. All advanced tax tools are unlocked."
                   : kycStatus === "rejected"
@@ -435,7 +435,7 @@ export default function Tax() {
         )}
 
         <div className="glass-panel rounded-xl p-4 mb-6 border border-[rgba(255,215,0,0.15)] bg-[rgba(255,215,0,0.02)]">
-          <p className="text-[12px] text-white/50 leading-relaxed">
+          <p className="text-[12px] text-muted-foreground leading-relaxed">
             For education only. Not tax advice — consult a licensed CPA for your specific situation.
           </p>
         </div>
@@ -443,8 +443,8 @@ export default function Tax() {
         {!profile && !showOnboarding && (
           <div className="glass-panel rounded-xl p-6 mb-6 border border-[#00B4D8]/20 bg-[#00B4D8]/[0.03] flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-white mb-1">No tax profile set up yet</p>
-              <p className="text-sm text-white/50">Add your income and entity type to see personalized deductions, savings estimates, and quarterly tax payments.</p>
+              <p className="font-bold text-foreground mb-1">No tax profile set up yet</p>
+              <p className="text-sm text-muted-foreground">Add your income and entity type to see personalized deductions, savings estimates, and quarterly tax payments.</p>
             </div>
             <Button
               onClick={() => setShowOnboarding(true)}
@@ -506,31 +506,31 @@ export default function Tax() {
         </div>
 
         <div className="flex gap-2 mb-6">
-          <div className="flex-1 h-3 bg-white/[0.06] rounded-full overflow-hidden">
+          <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
             <div className="h-full rounded-full bg-[#00B4D8]" style={{ width: `${totalFound > 0 ? (totalDocumented / totalFound) * 100 : 0}%` }} />
           </div>
           <span className="text-[11px] text-muted-foreground font-mono">{totalFound > 0 ? Math.round((totalDocumented / totalFound) * 100) : 0}%</span>
         </div>
 
-        <div className="flex gap-3 mb-8 overflow-x-auto pb-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
           <Link href="/taxgpt">
-            <Button className="bg-[#00B4D8] text-black font-bold gap-2 whitespace-nowrap min-h-[44px] hover:bg-[#00B4D8]/90 active:scale-[0.97] transition-all">
+            <Button className="w-full bg-[#00B4D8] text-black font-bold gap-2 min-h-[44px] hover:bg-[#00B4D8]/90 active:scale-[0.97] transition-all">
               <MessageCircle className="w-4 h-4" /> Get my tax answers
             </Button>
           </Link>
           <Link href="/receipts">
-            <Button variant="outline" className="border-primary/30 text-primary gap-2 whitespace-nowrap min-h-[44px] active:scale-[0.97] transition-all">
+            <Button variant="outline" className="w-full border-primary/30 text-primary gap-2 min-h-[44px] active:scale-[0.97] transition-all">
               <Receipt className="w-4 h-4" /> Log receipts
             </Button>
           </Link>
           <Link href="/tax-strategy">
-            <Button variant="outline" className="border-secondary/30 text-secondary gap-2 whitespace-nowrap min-h-[44px] active:scale-[0.97] transition-all">
+            <Button variant="outline" className="w-full border-amber-400/40 text-amber-400 gap-2 min-h-[44px] active:scale-[0.97] transition-all hover:bg-amber-400/10">
               <Lightbulb className="w-4 h-4" /> See strategies
             </Button>
           </Link>
         </div>
 
-        <div className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-border mb-4">
           <TrendingUp className="w-5 h-5 text-[#00B4D8]" />
           <h2 className="text-lg font-semibold">Deduction Category Breakdown</h2>
         </div>
@@ -542,16 +542,16 @@ export default function Tax() {
             return (
               <div key={c.id} className="glass-panel rounded-xl p-3">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[13px] font-semibold text-white/80">{c.label}</span>
+                  <span className="text-[13px] font-semibold text-foreground/80">{c.label}</span>
                   <div className="flex items-center gap-3 text-[11px] font-mono">
                     <span className="text-[#00B4D8] font-bold">{formatDollar(c.found)}</span>
-                    <span className="text-white/30">/</span>
+                    <span className="text-muted-foreground/50">/</span>
                     <span className="text-[#00B4D8]">{formatDollar(c.documented)}</span>
                     {gap > 0 && <span className="text-[#ffb800]">⚠ {formatDollar(gap)}</span>}
                     {gap === 0 && c.found > 0 && <span className="text-[#00B4D8]">✓</span>}
                   </div>
                 </div>
-                <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                   <div className="h-full rounded-full" style={{
                     width: `${Math.min(100, pct)}%`,
                     backgroundColor: pct >= 100 ? "#00B4D8" : pct >= 50 ? "#00B4D8" : "#ffb800",
@@ -564,7 +564,7 @@ export default function Tax() {
 
         {missedOpportunities.length > 0 && (
           <>
-            <div className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4">
+            <div className="flex items-center gap-2 pb-2 border-b border-border mb-4">
               <AlertTriangle className="w-5 h-5 text-[#ffb800]" />
               <h2 className="text-lg font-semibold">Top Missed Opportunities</h2>
             </div>
@@ -605,17 +605,17 @@ export default function Tax() {
         <div className="mb-8">
           <button
             onClick={() => setExpandEstimator(!expandEstimator)}
-            className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4 w-full text-left"
+            className="flex items-center gap-2 pb-2 border-b border-border mb-4 w-full text-left"
           >
             <Calculator className="w-5 h-5 text-[#00B4D8]" />
             <h2 className="text-lg font-semibold flex-1">Tax Estimator</h2>
-            {expandEstimator ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+            {expandEstimator ? <ChevronUp className="w-4 h-4 text-muted-foreground/70" /> : <ChevronDown className="w-4 h-4 text-muted-foreground/70" />}
           </button>
 
           {expandEstimator && estimator && (
             <div className="glass-panel rounded-xl p-5">
               <div className="grid grid-cols-3 gap-2 text-[12px] mb-4">
-                <div className="font-semibold text-white/50"></div>
+                <div className="font-semibold text-muted-foreground"></div>
                 <div className="font-semibold text-center text-[#ff4757]">No Planning</div>
                 <div className="font-semibold text-center text-[#00B4D8]">With Strategies</div>
               </div>
@@ -625,8 +625,8 @@ export default function Tax() {
                 ["Income Tax", formatDollar(Math.round(estimator.incomeTaxNoPlan)), formatDollar(Math.round(estimator.incomeTaxWithPlan))],
                 ["Total Tax", formatDollar(Math.round(estimator.totalNoPlan)), formatDollar(Math.round(estimator.totalWithPlan))],
               ].map(([label, noPlan, withPlan], i) => (
-                <div key={i} className={`grid grid-cols-3 gap-2 text-[13px] py-2 ${i === 3 ? "border-t border-white/10 font-bold" : ""}`}>
-                  <div className="text-white/60">{label}</div>
+                <div key={i} className={`grid grid-cols-3 gap-2 text-[13px] py-2 ${i === 3 ? "border-t border-border font-bold" : ""}`}>
+                  <div className="text-muted-foreground">{label}</div>
                   <div className="text-center font-mono text-[#ff4757]">{noPlan}</div>
                   <div className="text-center font-mono text-[#00B4D8]">{withPlan}</div>
                 </div>
@@ -636,7 +636,7 @@ export default function Tax() {
                 <p className="text-2xl font-black font-mono text-[#00B4D8]">{formatDollar(Math.round(Math.max(0, estimator.savings)))}</p>
               </div>
               {estimator.savings > 0 && (
-                <div className="mt-4 pt-4 border-t border-white/10">
+                <div className="mt-4 pt-4 border-t border-border">
                   <p className="text-xs text-muted-foreground mb-2">Share your tax savings</p>
                   <ShareTaxCard
                     referralLink={referralLink || undefined}
@@ -661,11 +661,11 @@ export default function Tax() {
         <div className="mb-8">
           <button
             onClick={() => setExpandQuarterly(!expandQuarterly)}
-            className="flex items-center gap-2 pb-2 border-b border-white/10 mb-4 w-full text-left"
+            className="flex items-center gap-2 pb-2 border-b border-border mb-4 w-full text-left"
           >
             <Calendar className="w-5 h-5 text-[#00FF41]" />
             <h2 className="text-lg font-semibold flex-1">Quarterly Estimated Taxes</h2>
-            {expandQuarterly ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+            {expandQuarterly ? <ChevronUp className="w-4 h-4 text-muted-foreground/70" /> : <ChevronDown className="w-4 h-4 text-muted-foreground/70" />}
           </button>
 
           {expandQuarterly && quarterlyCalc && (
@@ -682,7 +682,7 @@ export default function Tax() {
               </div>
               <div className="space-y-2 mb-4">
                 {QUARTERLY_DATES.map((q, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-muted/30">
                     <span className="font-black text-[#00FF41] text-sm w-7">{q.quarter}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-semibold">Due: {q.due}</p>
@@ -696,22 +696,22 @@ export default function Tax() {
                 <p className="text-[11px] font-bold text-[#ffb800] mb-2">Safe Harbor Thresholds</p>
                 <div className="space-y-1">
                   <div className="flex justify-between text-[12px]">
-                    <span className="text-white/60">100% of prior year / quarter</span>
+                    <span className="text-muted-foreground">100% of prior year / quarter</span>
                     <span className="font-mono text-[#ffb800]">{formatDollar(quarterlyCalc.safeHarbor100)}</span>
                   </div>
                   <div className="flex justify-between text-[12px]">
-                    <span className="text-white/60">110% of prior year / quarter (AGI &gt; $150K)</span>
+                    <span className="text-muted-foreground">110% of prior year / quarter (AGI &gt; $150K)</span>
                     <span className="font-mono text-[#ffb800]">{formatDollar(quarterlyCalc.safeHarbor110)}</span>
                   </div>
-                  <div className="flex justify-between text-[12px] font-bold border-t border-white/10 pt-1 mt-1">
-                    <span className="text-white">Your required safe harbor</span>
+                  <div className="flex justify-between text-[12px] font-bold border-t border-border pt-1 mt-1">
+                    <span className="text-foreground">Your required safe harbor</span>
                     <span className="font-mono text-[#ffb800]">{formatDollar(quarterlyCalc.safeHarborRequired)}</span>
                   </div>
                 </div>
               </div>
               <div className="flex items-start gap-2 p-3 rounded-xl border border-[#ff4757]/20 bg-[#ff4757]/5">
                 <AlertTriangle className="w-3.5 h-3.5 text-[#ff4757] shrink-0 mt-0.5" />
-                <p className="text-[11px] text-white/50">
+                <p className="text-[11px] text-muted-foreground">
                   Underpayment penalty (~8% annualized) applies if you pay less than the safe harbor amount. Pay by each due date to stay penalty-free.
                 </p>
               </div>
@@ -733,9 +733,9 @@ export default function Tax() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-[14px]">Tax Year Summary</p>
-                <p className="text-[11px] text-white/40">Realized gains, wash sale detection, and quarterly estimates for your paper trading</p>
+                <p className="text-[11px] text-muted-foreground/70">Realized gains, wash sale detection, and quarterly estimates for your paper trading</p>
               </div>
-              <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-[#00FF41] flex-shrink-0" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-[#00FF41] flex-shrink-0" />
             </div>
           </div>
         </Link>
@@ -759,7 +759,7 @@ export default function Tax() {
           />
         )}
 
-        <div className="p-4 rounded-lg border border-white/5 bg-white/[0.01]">
+        <div className="p-4 rounded-lg border border-white/5 bg-muted/30">
           <p className="text-[11px] text-muted-foreground/50 text-center">
             TaxFlow uses IRS publications for reference. Always verify deductions with a qualified tax professional. Tax laws change frequently.
           </p>

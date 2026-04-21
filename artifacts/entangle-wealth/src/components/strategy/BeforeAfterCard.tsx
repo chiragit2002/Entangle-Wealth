@@ -14,9 +14,9 @@ export function BeforeAfterCard({ param, oldValue, newValue, impact }: BeforeAft
   const impactPositive = impact.toLowerCase().includes("+") || impact.toLowerCase().includes("improv") || impact.toLowerCase().includes("better");
 
   return (
-    <div className="bg-white/[0.02] border border-white/8 rounded-xl p-4 hover:border-white/15 transition-all group">
+    <div className="bg-muted/30 border border-white/8 rounded-xl p-4 hover:border-white/15 transition-all group">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-mono font-semibold text-white/70 capitalize">
+        <span className="text-xs font-mono font-semibold text-foreground/70 capitalize">
           {param.replace(/_/g, " ")}
         </span>
         <span
@@ -31,13 +31,13 @@ export function BeforeAfterCard({ param, oldValue, newValue, impact }: BeforeAft
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="flex-1 text-center bg-white/[0.03] border border-white/8 rounded-lg py-3 px-2">
-          <div className="text-[10px] text-white/30 font-mono uppercase tracking-wider mb-1">Before</div>
-          <div className="text-xl font-bold font-mono text-white/50">{oldValue}</div>
+        <div className="flex-1 text-center bg-muted/50 border border-white/8 rounded-lg py-3 px-2">
+          <div className="text-[10px] text-muted-foreground/50 font-mono uppercase tracking-wider mb-1">Before</div>
+          <div className="text-xl font-bold font-mono text-muted-foreground">{oldValue}</div>
         </div>
 
         <div className="flex-shrink-0 flex flex-col items-center gap-1">
-          <ArrowRight className="w-4 h-4 text-white/20" />
+          <ArrowRight className="w-4 h-4 text-muted-foreground/40" />
           <span className={`text-[10px] font-mono font-semibold ${improved ? "text-green-400" : "text-orange-400"}`}>
             {improved ? "+" : ""}{pctChange}%
           </span>
@@ -49,7 +49,7 @@ export function BeforeAfterCard({ param, oldValue, newValue, impact }: BeforeAft
         </div>
       </div>
 
-      <div className="mt-3 h-1.5 bg-white/5 rounded-full overflow-hidden">
+      <div className="mt-3 h-1.5 bg-muted/50 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-1000"
           style={{

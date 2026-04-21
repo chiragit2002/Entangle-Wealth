@@ -147,13 +147,13 @@ export function VariableSurpriseReward() {
       aria-live="polite"
     >
       <div
-        className="relative bg-[#0a0a14] border rounded-xl p-4 shadow-2xl shadow-black/60"
+        className="relative bg-card border rounded-xl p-4 shadow-2xl shadow-black/60"
         style={{ borderColor: `${color}40` }}
       >
         <div className="absolute inset-0 rounded-xl pointer-events-none" style={{ background: `radial-gradient(ellipse at top right, ${color}10 0%, transparent 70%)` }} />
         <button
           onClick={() => setDismissed(true)}
-          className="absolute top-2 right-2 text-white/30 hover:text-white/50 transition-colors"
+          className="absolute top-2 right-2 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
           aria-label="Dismiss reward"
         >
           <X className="w-3.5 h-3.5" />
@@ -170,8 +170,8 @@ export function VariableSurpriseReward() {
               <Gift className="w-3 h-3" style={{ color }} />
               <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color }}>Surprise Drop</span>
             </div>
-            <p className="text-sm font-bold text-white mb-0.5">{reward.title}</p>
-            <p className="text-[11px] text-white/50 leading-relaxed">{reward.description}</p>
+            <p className="text-sm font-bold text-foreground mb-0.5">{reward.title}</p>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">{reward.description}</p>
           </div>
         </div>
       </div>

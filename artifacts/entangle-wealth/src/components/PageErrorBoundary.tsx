@@ -33,16 +33,16 @@ export class PageErrorBoundary extends Component<Props, State> {
         >
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-red-400/50" />
-            <span className="text-xs font-mono text-white/50">
+            <span className="text-xs font-mono text-muted-foreground">
               {this.props.fallbackTitle ?? "Module unavailable"}
             </span>
           </div>
-          <p className="text-[11px] text-white/30 max-w-xs">
+          <p className="text-[11px] text-muted-foreground/50 max-w-xs">
             This section encountered an error. Other modules continue working normally.
           </p>
           <button
             onClick={() => this.setState({ hasError: false })}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono text-white/40 hover:text-white/70 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono text-muted-foreground/70 hover:text-foreground/70 transition-colors"
             style={{
               border: "1px solid rgba(255,255,255,0.08)",
             }}

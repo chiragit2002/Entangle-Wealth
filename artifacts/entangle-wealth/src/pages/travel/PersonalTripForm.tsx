@@ -68,18 +68,18 @@ export default function PersonalTripForm({ form, onChange, onPlan }: Props) {
               value={form.origin}
               onChange={e => onChange({ ...form, origin: e.target.value.slice(0, 100) })}
               maxLength={100}
-              className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-10 pr-4 py-3.5 text-white text-[14px] focus:outline-none focus:border-primary/50 placeholder:text-white/25"
+              className="w-full bg-muted/50 border border-border rounded-xl pl-10 pr-4 py-3.5 text-foreground text-[14px] focus:outline-none focus:border-primary/50 placeholder:text-muted-foreground/40"
               aria-label="Origin city"
             />
           </div>
 
           <div>
-            <label className="text-[11px] uppercase tracking-wider text-white/30 font-semibold mb-2 block">Destinations</label>
+            <label className="text-[11px] uppercase tracking-wider text-muted-foreground/50 font-semibold mb-2 block">Destinations</label>
             <div className="flex flex-wrap gap-2 mb-2">
               {form.destinations.map(dest => (
                 <span key={dest} className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-[12px] font-semibold flex items-center gap-1.5">
                   {dest}
-                  <button onClick={() => removeDestination(dest)} className="text-white/30 hover:text-white/60">
+                  <button onClick={() => removeDestination(dest)} className="text-muted-foreground/50 hover:text-muted-foreground">
                     <X className="w-3 h-3" />
                   </button>
                 </span>
@@ -98,23 +98,23 @@ export default function PersonalTripForm({ form, onChange, onPlan }: Props) {
                 onBlur={() => setTimeout(() => setShowSugg(false), 200)}
                 onKeyDown={e => { if (e.key === "Enter" && destInput.trim()) { addDestination(destInput); } }}
                 maxLength={100}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-10 pr-4 py-3.5 text-white text-[14px] focus:outline-none focus:border-primary/50 placeholder:text-white/25"
+                className="w-full bg-muted/50 border border-border rounded-xl pl-10 pr-4 py-3.5 text-foreground text-[14px] focus:outline-none focus:border-primary/50 placeholder:text-muted-foreground/40"
                 aria-label="Add destination"
               />
               {showSugg && filteredDest.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-[#0d0d1a] border border-white/10 rounded-xl overflow-hidden z-30 max-h-[200px] overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl overflow-hidden z-30 max-h-[200px] overflow-y-auto">
                   {filteredDest.slice(0, 6).map(d => (
                     <button key={d} onClick={() => addDestination(d)}
-                      className="w-full text-left px-4 py-3 text-[13px] text-white/80 hover:bg-primary/10 transition-colors flex items-center gap-2 min-h-[44px]">
+                      className="w-full text-left px-4 py-3 text-[13px] text-foreground/80 hover:bg-primary/10 transition-colors flex items-center gap-2 min-h-[44px]">
                       <MapPin className="w-3 h-3 text-primary/40" /> {d}
                     </button>
                   ))}
                 </div>
               )}
               {destInput.trim() && filteredDest.length === 0 && showSugg && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-[#0d0d1a] border border-white/10 rounded-xl overflow-hidden z-30">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl overflow-hidden z-30">
                   <button onClick={() => addDestination(destInput)}
-                    className="w-full text-left px-4 py-3 text-[13px] text-white/80 hover:bg-primary/10 transition-colors flex items-center gap-2 min-h-[44px]">
+                    className="w-full text-left px-4 py-3 text-[13px] text-foreground/80 hover:bg-primary/10 transition-colors flex items-center gap-2 min-h-[44px]">
                     <Plus className="w-3 h-3 text-primary/40" /> Add "{destInput}"
                   </button>
                 </div>
@@ -126,19 +126,19 @@ export default function PersonalTripForm({ form, onChange, onPlan }: Props) {
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/50"><Calendar className="w-4 h-4" /></div>
               <input type="date" value={form.startDate} onChange={e => onChange({ ...form, startDate: e.target.value })}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-10 pr-3 py-3.5 text-white text-[13px] focus:outline-none focus:border-primary/50 min-h-[48px]"
+                className="w-full bg-muted/50 border border-border rounded-xl pl-10 pr-3 py-3.5 text-foreground text-[13px] focus:outline-none focus:border-primary/50 min-h-[48px]"
                 aria-label="Start date" />
             </div>
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/50"><Calendar className="w-4 h-4" /></div>
               <input type="date" value={form.endDate} onChange={e => onChange({ ...form, endDate: e.target.value })}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-10 pr-3 py-3.5 text-white text-[13px] focus:outline-none focus:border-primary/50 min-h-[48px]"
+                className="w-full bg-muted/50 border border-border rounded-xl pl-10 pr-3 py-3.5 text-foreground text-[13px] focus:outline-none focus:border-primary/50 min-h-[48px]"
                 aria-label="End date" />
             </div>
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/50"><Users className="w-4 h-4" /></div>
               <select value={form.travelers} onChange={e => onChange({ ...form, travelers: parseInt(e.target.value) })}
-                className="w-full bg-[#0d0d1a] border border-white/10 rounded-xl pl-10 pr-3 py-3.5 text-white text-[13px] focus:outline-none focus:border-primary/50 appearance-none min-h-[48px] [&>option]:bg-[#0d0d1a] [&>option]:text-white"
+                className="w-full bg-card border border-border rounded-xl pl-10 pr-3 py-3.5 text-foreground text-[13px] focus:outline-none focus:border-primary/50 appearance-none min-h-[48px] [&>option]:bg-card [&>option]:text-foreground"
                 aria-label="Travelers">
                 {[1,2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n} traveler{n > 1 ? "s" : ""}</option>)}
               </select>
@@ -146,7 +146,7 @@ export default function PersonalTripForm({ form, onChange, onPlan }: Props) {
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/50"><DollarSign className="w-4 h-4" /></div>
               <select value={form.budgetLevel} onChange={e => onChange({ ...form, budgetLevel: e.target.value as FormType["budgetLevel"] })}
-                className="w-full bg-[#0d0d1a] border border-white/10 rounded-xl pl-10 pr-3 py-3.5 text-white text-[13px] focus:outline-none focus:border-primary/50 appearance-none min-h-[48px] [&>option]:bg-[#0d0d1a] [&>option]:text-white"
+                className="w-full bg-card border border-border rounded-xl pl-10 pr-3 py-3.5 text-foreground text-[13px] focus:outline-none focus:border-primary/50 appearance-none min-h-[48px] [&>option]:bg-card [&>option]:text-foreground"
                 aria-label="Budget level">
                 <option value="budget">Budget</option>
                 <option value="mid-range">Mid-Range</option>
@@ -156,14 +156,14 @@ export default function PersonalTripForm({ form, onChange, onPlan }: Props) {
           </div>
 
           <div>
-            <label className="text-[11px] uppercase tracking-wider text-white/30 font-semibold mb-2 block">Trip Style</label>
+            <label className="text-[11px] uppercase tracking-wider text-muted-foreground/50 font-semibold mb-2 block">Trip Style</label>
             <div className="flex flex-wrap gap-2">
               {TRIP_STYLES.map(style => (
                 <button key={style.value} onClick={() => toggleStyle(style.value)}
                   className={`px-4 py-2 rounded-full text-[12px] font-semibold transition-all min-h-[40px] ${
                     form.tripStyle.includes(style.value)
                       ? "bg-primary/15 text-primary border border-primary/30"
-                      : "bg-white/[0.04] text-white/40 border border-white/10 hover:text-white/60"
+                      : "bg-muted/50 text-muted-foreground/70 border border-border hover:text-muted-foreground"
                   }`}>
                   {style.emoji} {style.label}
                 </button>

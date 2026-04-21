@@ -127,7 +127,7 @@ function OrbitalRing({
         >
           {count}
         </motion.span>
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-white/40">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">
           {count === 1 ? "person" : "people"}
         </span>
       </div>
@@ -317,13 +317,13 @@ export function ReferralSection() {
 
       <div className="relative z-10">
         <div className="mb-5">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30 mb-1">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50 mb-1">
             Referral Program
           </p>
-          <h3 className="text-xl font-bold text-white leading-tight">
+          <h3 className="text-xl font-bold text-foreground leading-tight">
             Share the edge.
           </h3>
-          <p className="text-sm text-white/45 mt-1.5 leading-relaxed">
+          <p className="text-sm text-muted-foreground/70 mt-1.5 leading-relaxed">
             Every referral unlocks real upgrades — not points or badges.
           </p>
         </div>
@@ -401,7 +401,7 @@ export function ReferralSection() {
                         >
                           {tier.name}
                         </span>
-                        <span className="text-[10px] text-white/25 font-mono">
+                        <span className="text-[10px] text-muted-foreground/40 font-mono">
                           {tier.threshold} people
                         </span>
                       </div>
@@ -504,12 +504,12 @@ export function ReferralSection() {
 
         {code && (
           <div className="flex items-center gap-2">
-            <div className="flex-1 bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs font-mono text-white/40 truncate select-all">
+            <div className="flex-1 bg-muted/50 border border-border rounded-lg px-3 py-2 text-xs font-mono text-muted-foreground/70 truncate select-all">
               {referralLink}
             </div>
             <button
               onClick={copyLink}
-              className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-white/40 hover:text-white/80 hover:border-white/20 transition-colors"
+              className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border border-border bg-muted/50 text-muted-foreground/70 hover:text-foreground/80 hover:border-border transition-colors"
               title="Copy link"
             >
               {copied ? (

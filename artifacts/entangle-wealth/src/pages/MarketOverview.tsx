@@ -127,13 +127,13 @@ const TOP_LOSERS = [
 function heatColor(change: number): string {
   if (change >= 3) return "bg-[#00B4D8] text-black";
   if (change >= 1.5) return "bg-[#00B4D8]/70 text-black";
-  if (change >= 0.5) return "bg-[#00B4D8]/40 text-white";
+  if (change >= 0.5) return "bg-[#00B4D8]/40 text-foreground";
   if (change > 0) return "bg-[#00B4D8]/20 text-[#00B4D8]";
-  if (change === 0) return "bg-white/5 text-white/40";
+  if (change === 0) return "bg-muted/50 text-muted-foreground/70";
   if (change > -0.5) return "bg-[#ff3366]/20 text-[#ff3366]";
-  if (change > -1.5) return "bg-[#ff3366]/40 text-white";
-  if (change > -3) return "bg-[#ff3366]/70 text-white";
-  return "bg-[#ff3366] text-white";
+  if (change > -1.5) return "bg-[#ff3366]/40 text-foreground";
+  if (change > -3) return "bg-[#ff3366]/70 text-foreground";
+  return "bg-[#ff3366] text-foreground";
 }
 
 function sectorHeatBg(change: number): string {
@@ -222,7 +222,7 @@ export default function MarketOverview() {
   return (
     <Layout>
       <FinancialDisclaimerBanner pageKey="market-overview" />
-      <div className="w-full border-b border-white/[0.04] bg-[#060610]">
+      <div className="w-full border-b border-border bg-[#060610]">
         <div className="container mx-auto px-4 max-w-[1600px]">
           <div className="flex items-center justify-between h-11">
             <div className="flex items-center gap-3">
@@ -235,10 +235,10 @@ export default function MarketOverview() {
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-[11px] font-mono text-white/40">
+              <span className="text-[11px] font-mono text-muted-foreground/70">
                 {clock.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} ET
               </span>
-              <span className="text-[10px] text-white/50">A/D: <span className="text-[#00B4D8]">{advDecl.adv}</span>/<span className="text-[#ff3366]">{advDecl.decl}</span> ({advDecl.ratio}%)</span>
+              <span className="text-[10px] text-muted-foreground">A/D: <span className="text-[#00B4D8]">{advDecl.adv}</span>/<span className="text-[#ff3366]">{advDecl.decl}</span> ({advDecl.ratio}%)</span>
             </div>
           </div>
         </div>
@@ -247,9 +247,9 @@ export default function MarketOverview() {
       <div className="container mx-auto px-4 max-w-[1600px] py-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-4">
           {INDICES.map(idx => (
-            <div key={idx.ticker} className="bg-[#0a0a16] border border-white/[0.06] rounded-lg p-3">
+            <div key={idx.ticker} className="bg-card border border-border rounded-lg p-3">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] text-white/30 font-bold">{idx.ticker}</span>
+                <span className="text-[10px] text-muted-foreground/50 font-bold">{idx.ticker}</span>
                 {idx.changePercent >= 0 ? <ArrowUpRight className="w-3 h-3 text-[#00B4D8]" /> : <ArrowDownRight className="w-3 h-3 text-[#ff3366]" />}
               </div>
               <p className="text-[16px] font-black font-mono">{idx.value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
@@ -261,20 +261,20 @@ export default function MarketOverview() {
                   ({idx.changePercent >= 0 ? "+" : ""}{Math.abs(idx.changePercent).toFixed(2)}%)
                 </span>
               </div>
-              <p className="text-[9px] text-white/40 mt-1">{idx.name}</p>
+              <p className="text-[9px] text-muted-foreground/70 mt-1">{idx.name}</p>
             </div>
           ))}
         </div>
 
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-5">
           {ECON_INDICATORS.map(e => (
-            <div key={e.name} className="bg-[#0a0a16] border border-white/[0.04] rounded-lg px-3 py-2">
-              <p className="text-[9px] text-white/40 font-bold uppercase tracking-wider">{e.name}</p>
+            <div key={e.name} className="bg-card border border-border rounded-lg px-3 py-2">
+              <p className="text-[9px] text-muted-foreground/70 font-bold uppercase tracking-wider">{e.name}</p>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="text-[14px] font-black font-mono">{e.value}</span>
-                {e.status === "up" ? <ArrowUpRight className="w-3 h-3 text-[#ff3366]" /> : e.status === "down" ? <ArrowDownRight className="w-3 h-3 text-[#00B4D8]" /> : <Activity className="w-3 h-3 text-white/40" />}
+                {e.status === "up" ? <ArrowUpRight className="w-3 h-3 text-[#ff3366]" /> : e.status === "down" ? <ArrowDownRight className="w-3 h-3 text-[#00B4D8]" /> : <Activity className="w-3 h-3 text-muted-foreground/70" />}
               </div>
-              <p className="text-[8px] text-white/10 mt-0.5">Prev: {e.prev} · {e.date}</p>
+              <p className="text-[8px] text-muted-foreground/20 mt-0.5">Prev: {e.prev} · {e.date}</p>
             </div>
           ))}
         </div>
@@ -282,18 +282,18 @@ export default function MarketOverview() {
         <div className="mb-5">
           <div className="flex items-center gap-2 mb-3">
             <Activity className="w-4 h-4 text-primary/60" />
-            <span className="text-[12px] font-bold text-white/50">SECTOR HEAT MAP</span>
+            <span className="text-[12px] font-bold text-muted-foreground">SECTOR HEAT MAP</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
             {liveSectors.slice(0, 9).map(sector => (
-              <div key={sector.ticker} className={`bg-gradient-to-br ${sectorHeatBg(sector.change)} bg-[#0a0a16] border border-white/[0.04] rounded-xl p-3 hover:border-white/10 transition-all`}>
+              <div key={sector.ticker} className={`bg-gradient-to-br ${sectorHeatBg(sector.change)} bg-card border border-border rounded-xl p-3 hover:border-border transition-all`}>
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <span className="text-[12px] font-bold">{sector.name}</span>
-                    <span className="text-[9px] text-white/40 ml-2 font-mono">{sector.ticker}</span>
+                    <span className="text-[9px] text-muted-foreground/70 ml-2 font-mono">{sector.ticker}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[9px] text-white/40">{sector.volume} vol</span>
+                    <span className="text-[9px] text-muted-foreground/70">{sector.volume} vol</span>
                     <span className={`text-[13px] font-black font-mono ${sector.change >= 0 ? "text-[#00B4D8]" : "text-[#ff3366]"}`}>
                       {sector.change >= 0 ? "+" : ""}{Math.abs(sector.change).toFixed(2)}%
                     </span>
@@ -307,7 +307,7 @@ export default function MarketOverview() {
                     </div>
                   ))}
                 </div>
-                <div className="flex items-center gap-2 mt-1.5 text-[8px] text-white/10">
+                <div className="flex items-center gap-2 mt-1.5 text-[8px] text-muted-foreground/20">
                   <span>MCap: {sector.marketCap}</span>
                 </div>
               </div>
@@ -316,40 +316,40 @@ export default function MarketOverview() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
-          <div className="bg-[#0a0a16] border border-white/[0.04] rounded-xl overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.04]">
+          <div className="bg-card border border-border rounded-xl overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border">
               <TrendingUp className="w-3.5 h-3.5 text-[#00B4D8]/60" />
-              <span className="text-[11px] font-bold text-white/50">TOP GAINERS</span>
+              <span className="text-[11px] font-bold text-muted-foreground">TOP GAINERS</span>
             </div>
             <div>
               {liveGainers.map((s, i) => (
-                <div key={s.symbol} className="flex items-center px-4 py-2 border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors">
-                  <span className="text-[10px] text-white/10 font-mono w-5">{i + 1}</span>
+                <div key={s.symbol} className="flex items-center px-4 py-2 border-b border-white/[0.02] hover:bg-muted/30 transition-colors">
+                  <span className="text-[10px] text-muted-foreground/20 font-mono w-5">{i + 1}</span>
                   <div className="flex-1 min-w-0">
                     <span className="text-[12px] font-bold font-mono">{s.symbol}</span>
-                    <span className="text-[10px] text-white/50 ml-2">{s.name}</span>
+                    <span className="text-[10px] text-muted-foreground ml-2">{s.name}</span>
                   </div>
-                  <span className="text-[11px] font-mono text-white/40 mr-3">${s.price.toFixed(2)}</span>
+                  <span className="text-[11px] font-mono text-muted-foreground/70 mr-3">${s.price.toFixed(2)}</span>
                   <span className="text-[12px] font-mono font-bold text-[#00B4D8]">+{s.change.toFixed(2)}%</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-[#0a0a16] border border-white/[0.04] rounded-xl overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.04]">
+          <div className="bg-card border border-border rounded-xl overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border">
               <TrendingDown className="w-3.5 h-3.5 text-[#ff3366]/60" />
-              <span className="text-[11px] font-bold text-white/50">TOP LOSERS</span>
+              <span className="text-[11px] font-bold text-muted-foreground">TOP LOSERS</span>
             </div>
             <div>
               {liveLosers.map((s, i) => (
-                <div key={s.symbol} className="flex items-center px-4 py-2 border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors">
-                  <span className="text-[10px] text-white/10 font-mono w-5">{i + 1}</span>
+                <div key={s.symbol} className="flex items-center px-4 py-2 border-b border-white/[0.02] hover:bg-muted/30 transition-colors">
+                  <span className="text-[10px] text-muted-foreground/20 font-mono w-5">{i + 1}</span>
                   <div className="flex-1 min-w-0">
                     <span className="text-[12px] font-bold font-mono">{s.symbol}</span>
-                    <span className="text-[10px] text-white/50 ml-2">{s.name}</span>
+                    <span className="text-[10px] text-muted-foreground ml-2">{s.name}</span>
                   </div>
-                  <span className="text-[11px] font-mono text-white/40 mr-3">${s.price.toFixed(2)}</span>
+                  <span className="text-[11px] font-mono text-muted-foreground/70 mr-3">${s.price.toFixed(2)}</span>
                   <span className="text-[12px] font-mono font-bold text-[#ff3366]">{s.change.toFixed(2)}%</span>
                 </div>
               ))}
@@ -360,13 +360,13 @@ export default function MarketOverview() {
         <div className="mb-5">
           <div className="flex items-center gap-2 mb-3">
             <Globe className="w-4 h-4 text-primary/60" />
-            <span className="text-[12px] font-bold text-white/50">GLOBAL MARKETS & ASSETS</span>
+            <span className="text-[12px] font-bold text-muted-foreground">GLOBAL MARKETS & ASSETS</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
             {GLOBAL_MARKETS.map(m => (
-              <div key={m.name} className="bg-[#0a0a16] border border-white/[0.04] rounded-lg px-3 py-2.5 hover:border-white/10 transition-colors">
+              <div key={m.name} className="bg-card border border-border rounded-lg px-3 py-2.5 hover:border-border transition-colors">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[9px] text-white/40 font-bold uppercase">{m.region}</span>
+                  <span className="text-[9px] text-muted-foreground/70 font-bold uppercase">{m.region}</span>
                   {m.change >= 0 ? <ArrowUpRight className="w-2.5 h-2.5 text-[#00B4D8]/50" /> : <ArrowDownRight className="w-2.5 h-2.5 text-[#ff3366]/50" />}
                 </div>
                 <p className="text-[11px] font-bold truncate">{m.name}</p>
@@ -381,8 +381,8 @@ export default function MarketOverview() {
           </div>
         </div>
 
-        <div className="rounded-lg bg-white/[0.01] border border-white/[0.04] p-3">
-          <p className="text-[10px] text-white/50 text-center">
+        <div className="rounded-lg bg-muted/30 border border-border p-3">
+          <p className="text-[10px] text-muted-foreground text-center">
             {isLive ? "Live market data powered by Alpaca Markets. Stock prices and heat map reflect real-time trading data via IEX feed." : "Loading live data... Falling back to illustrative values."} Economic indicators and global markets are for reference only.
           </p>
         </div>

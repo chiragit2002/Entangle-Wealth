@@ -90,11 +90,11 @@ function GaugeBar({
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-[10px]">
-        <span className="text-white/50 uppercase tracking-wider font-mono">{label}</span>
+        <span className="text-muted-foreground uppercase tracking-wider font-mono">{label}</span>
         <span className={`font-mono font-bold ${color}`}>{value.toFixed(0)}</span>
       </div>
       <div
-        className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden"
+        className="h-1.5 bg-muted rounded-full overflow-hidden"
         role="progressbar"
         aria-valuenow={Math.round(value)}
         aria-valuemin={0}
@@ -180,9 +180,9 @@ export function TimelinePane({
       <div className="space-y-4">
         {sliders.map(s => (
           <div key={s.key}>
-            <div className="flex justify-between text-[10px] text-white/50 mb-1.5 font-mono">
+            <div className="flex justify-between text-[10px] text-muted-foreground mb-1.5 font-mono">
               <label htmlFor={`${paneSlug}-${s.key}`}>{s.label}</label>
-              <span className="text-white/80 font-bold">{s.display}</span>
+              <span className="text-foreground/80 font-bold">{s.display}</span>
             </div>
             <Slider
               id={`${paneSlug}-${s.key}`}
@@ -208,10 +208,10 @@ export function TimelinePane({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.35 }}
-            className="space-y-3 pt-3 border-t border-white/[0.06]"
+            className="space-y-3 pt-3 border-t border-border"
           >
             <div className="text-center">
-              <div className="text-[10px] text-white/50 uppercase tracking-wider font-mono mb-1">Net Worth @ {selectedHorizon}</div>
+              <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-mono mb-1">Net Worth @ {selectedHorizon}</div>
               <div className="text-2xl font-black font-mono" style={{ color: borderColor }} aria-live="polite" aria-label={`Net worth at ${selectedHorizon}: ${fmt(horizonResult.projectedNetWorth)}`}>
                 <AnimatedNumber value={horizonResult.projectedNetWorth} prefix="$" />
               </div>
@@ -235,7 +235,7 @@ export function TimelinePane({
                 { label: "Debt Left", value: horizonResult.debtRemaining, color: "text-red-400" },
               ].map(({ label: l, value, color }) => (
                 <div key={l}>
-                  <div className="text-[9px] text-white/40 font-mono uppercase">{l}</div>
+                  <div className="text-[9px] text-muted-foreground/70 font-mono uppercase">{l}</div>
                   <div className={`text-xs font-bold font-mono ${color}`}>
                     <AnimatedNumber value={value} prefix="$" />
                   </div>

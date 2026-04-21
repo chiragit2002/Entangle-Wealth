@@ -9,8 +9,8 @@ export function FearGreedGauge() {
       </div>
       <div className="flex flex-col items-center justify-center py-8 text-center gap-2">
         <Activity className="w-8 h-8 text-[#00B4D8]/20 mb-1" />
-        <p className="text-xs font-medium text-white/30 font-mono tracking-tight">SENTIMENT DATA UNAVAILABLE</p>
-        <p className="text-[10px] text-white/25 max-w-[160px] leading-relaxed">Market sentiment index requires a third-party data provider</p>
+        <p className="text-xs font-medium text-muted-foreground/50 font-mono tracking-tight">SENTIMENT DATA UNAVAILABLE</p>
+        <p className="text-[10px] text-muted-foreground/40 max-w-[160px] leading-relaxed">Market sentiment index requires a third-party data provider</p>
       </div>
     </div>
   );

@@ -276,14 +276,14 @@ function CompetitorCard({ c, isExpanded, onToggle }: { c: Competitor; isExpanded
       </button>
 
       {isExpanded && (
-        <div className="px-4 md:px-5 pb-4 md:pb-5 border-t border-white/[0.06] pt-4 space-y-4">
+        <div className="px-4 md:px-5 pb-4 md:pb-5 border-t border-border pt-4 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2">Strengths</div>
               {c.strengths.map((s, i) => (
                 <div key={i} className="flex items-start gap-2 mb-1.5">
                   <Check className="w-3 h-3 text-[#00B4D8] mt-0.5 flex-shrink-0" />
-                  <span className="text-xs text-white/80">{s}</span>
+                  <span className="text-xs text-foreground/80">{s}</span>
                 </div>
               ))}
             </div>
@@ -292,7 +292,7 @@ function CompetitorCard({ c, isExpanded, onToggle }: { c: Competitor; isExpanded
               {c.weaknesses.map((w, i) => (
                 <div key={i} className="flex items-start gap-2 mb-1.5">
                   <AlertTriangle className="w-3 h-3 text-[#ff4466] mt-0.5 flex-shrink-0" />
-                  <span className="text-xs text-white/80">{w}</span>
+                  <span className="text-xs text-foreground/80">{w}</span>
                 </div>
               ))}
             </div>
@@ -304,7 +304,7 @@ function CompetitorCard({ c, isExpanded, onToggle }: { c: Competitor; isExpanded
               { label: "Indicators", value: c.technicalIndicators.toString() },
               { label: "Mobile-First", value: c.mobileFirst ? "Yes" : "No" },
             ].map((s) => (
-              <div key={s.label} className="bg-white/[0.03] rounded-lg p-2 text-center">
+              <div key={s.label} className="bg-muted/50 rounded-lg p-2 text-center">
                 <div className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">{s.label}</div>
                 <div className="text-sm font-bold mt-0.5">{s.value}</div>
               </div>
@@ -548,13 +548,13 @@ export default function CompetitiveAnalysis() {
         <div className="glass-panel rounded-sm p-5 md:p-8 mb-10 relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-primary" />
           <h2 className="text-lg md:text-xl font-bold mb-3">April Dunford Positioning Statement</h2>
-          <p className="text-sm md:text-base text-white/80 leading-relaxed italic">
+          <p className="text-sm md:text-base text-foreground/80 leading-relaxed italic">
             "For <span className="text-primary font-semibold">everyday families</span> who need institutional-grade financial intelligence,{" "}
             <span className="text-primary font-semibold">{PRODUCT}</span> is a{" "}
             <span className="gold-text font-semibold">quantum entanglement analysis platform</span> that delivers AI-consensus stock signals, tax tools, and income opportunities in one place. Unlike{" "}
-            <span className="text-white font-semibold">Bloomberg</span> ($32K/yr),{" "}
-            <span className="text-white font-semibold">TradingView</span> (no AI), or{" "}
-            <span className="text-white font-semibold">Robinhood</span> (gamified trading),{" "}
+            <span className="text-foreground font-semibold">Bloomberg</span> ($32K/yr),{" "}
+            <span className="text-foreground font-semibold">TradingView</span> (no AI), or{" "}
+            <span className="text-foreground font-semibold">Robinhood</span> (gamified trading),{" "}
             {PRODUCT} is the only platform where <span className="text-primary font-semibold">6 independent AI models must agree</span> before a signal fires."
           </p>
         </div>
@@ -592,7 +592,7 @@ export default function CompetitiveAnalysis() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/[0.06]">
+                  <tr className="border-b border-border">
                     <th className="text-left p-3 text-xs font-bold uppercase tracking-wider text-muted-foreground min-w-[160px]">Feature</th>
                     <th className="text-center p-3 text-xs font-bold uppercase tracking-wider text-primary min-w-[50px]">Wt</th>
                     <th className="text-center p-3 min-w-[60px]">
@@ -607,7 +607,7 @@ export default function CompetitiveAnalysis() {
                 </thead>
                 <tbody>
                   {featureMatrix.map((f, fi) => (
-                    <tr key={f.feature} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                    <tr key={f.feature} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                       <td className="p-3 text-xs font-medium">{f.feature}</td>
                       <td className="p-3 text-center">
                         <div className="flex items-center justify-center gap-0.5">
@@ -643,14 +643,14 @@ export default function CompetitiveAnalysis() {
         <Section title="Positioning Map | Quantum Quadrant" icon={TrendingUp} color="bg-secondary/10 text-secondary">
           <div className="glass-panel rounded-sm p-6 md:p-8">
             <div className="relative w-full aspect-square max-w-lg mx-auto">
-              <div className="absolute inset-0 border border-white/[0.06] rounded-lg">
+              <div className="absolute inset-0 border border-border rounded-lg">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-6 text-[10px] uppercase tracking-wider text-muted-foreground font-bold">High AI Sophistication</div>
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-6 text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Low AI Sophistication</div>
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 -rotate-90 text-[10px] uppercase tracking-wider text-muted-foreground font-bold whitespace-nowrap">Narrow Scope</div>
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 rotate-90 text-[10px] uppercase tracking-wider text-muted-foreground font-bold whitespace-nowrap">Broad Scope</div>
 
-                <div className="absolute top-1/2 left-0 right-0 h-px bg-white/[0.06]" />
-                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/[0.06]" />
+                <div className="absolute top-1/2 left-0 right-0 h-px bg-muted" />
+                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-muted" />
 
                 <div className="absolute text-[10px] top-[5%] left-[5%] text-muted-foreground/40 font-bold uppercase">Specialized AI</div>
                 <div className="absolute text-[10px] top-[5%] right-[5%] text-muted-foreground/40 font-bold uppercase">Platform AI</div>
@@ -694,7 +694,7 @@ export default function CompetitiveAnalysis() {
           <div className="space-y-3">
             {kanoAnalysis.map((k) => {
               const colors = {
-                Basic: { bg: "bg-white/[0.03]", border: "border-white/[0.06]", badge: "bg-white/10 text-white/50" },
+                Basic: { bg: "bg-muted/50", border: "border-border", badge: "bg-muted text-muted-foreground" },
                 Performance: { bg: "bg-[#00B4D8]/[0.03]", border: "border-[#00B4D8]/10", badge: "bg-[#00B4D8]/10 text-[#00B4D8]" },
                 Delighter: { bg: "bg-primary/[0.03]", border: "border-primary/10", badge: "bg-primary/10 text-primary" },
               }[k.category]!;
@@ -741,7 +741,7 @@ export default function CompetitiveAnalysis() {
           <div className="text-[10px] uppercase tracking-[0.2em] text-secondary/60 font-bold mb-3">The Quantum Advantage</div>
           <h2 className="text-xl md:text-2xl font-bold mb-4">
             EntangleWealth has <span className="gold-text">5 features</span> that{" "}
-            <span className="text-white">zero competitors</span> offer.
+            <span className="text-foreground">zero competitors</span> offer.
           </h2>
           <div className="flex flex-wrap justify-center gap-2 mb-4">
             {["Multi-Model AI Consensus", "TaxFlow Suite", "What-If Time Machine", "Sector Flow Radar", "Volatility Lab"].map((f) => (

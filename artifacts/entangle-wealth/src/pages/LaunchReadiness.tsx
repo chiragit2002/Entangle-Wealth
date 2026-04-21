@@ -137,7 +137,7 @@ function ScoreRing({ score, ready }: { score: number; ready: boolean }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className="text-3xl font-bold font-mono" style={{ color }}>{score}%</span>
-        <span className="text-[10px] text-white/50 uppercase tracking-wider">
+        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
           {ready ? "Ready" : "Not Ready"}
         </span>
       </div>
@@ -234,43 +234,43 @@ export default function LaunchReadiness() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00B4D8]/20 to-[#9c27b0]/20 border border-[#00B4D8]/30 flex items-center justify-center">
                 <Rocket className="w-5 h-5 text-[#00B4D8]" />
               </div>
-              <h1 className="text-2xl font-bold text-white">Launch Readiness</h1>
+              <h1 className="text-2xl font-bold text-foreground">Launch Readiness</h1>
             </div>
-            <p className="text-sm text-white/50">Go/No-Go checklist for production deployment</p>
+            <p className="text-sm text-muted-foreground">Go/No-Go checklist for production deployment</p>
           </div>
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white/70 hover:bg-white/10 transition disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 border border-border text-sm text-foreground/70 hover:bg-muted transition disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
             Refresh Checks
           </button>
         </div>
 
-        <div className="flex flex-col md:flex-row items-center gap-8 bg-[#0A0E1A] border border-white/10 rounded-sm p-8">
+        <div className="flex flex-col md:flex-row items-center gap-8 bg-card border border-border rounded-sm p-8">
           <ScoreRing score={overallScore} ready={isReady} />
           <div className="flex-1 space-y-3">
-            <h2 className="text-xl font-bold text-white">
+            <h2 className="text-xl font-bold text-foreground">
               {isReady ? "All Systems Go!" : "Action Required"}
             </h2>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <div className="text-2xl font-bold font-mono text-[#00B4D8]">{autoPassCount + manualPassCount}</div>
-                <div className="text-xs text-white/50">Passing</div>
+                <div className="text-xs text-muted-foreground">Passing</div>
               </div>
               <div>
                 <div className="text-2xl font-bold font-mono text-[#FFB800]">{data?.summary.warnings || 0}</div>
-                <div className="text-xs text-white/50">Warnings</div>
+                <div className="text-xs text-muted-foreground">Warnings</div>
               </div>
               <div>
                 <div className="text-2xl font-bold font-mono text-[#ff3366]">
                   {(data?.summary.failing || 0) + manualChecks.filter((c) => !c.checked).length}
                 </div>
-                <div className="text-xs text-white/50">Failing</div>
+                <div className="text-xs text-muted-foreground">Failing</div>
               </div>
             </div>
-            <div className="text-xs text-white/30">
+            <div className="text-xs text-muted-foreground/50">
               Last checked: {data?.timestamp ? new Date(data.timestamp).toLocaleString() : "—"}
             </div>
           </div>
@@ -279,19 +279,19 @@ export default function LaunchReadiness() {
         <div className="space-y-4">
           <button
             onClick={() => toggleSection("checks")}
-            className="w-full flex items-center justify-between bg-[#0A0E1A] border border-white/10 rounded-xl px-6 py-4 hover:bg-white/[0.02] transition"
+            className="w-full flex items-center justify-between bg-card border border-border rounded-xl px-6 py-4 hover:bg-muted/30 transition"
           >
             <div className="flex items-center gap-3">
               <Server className="w-5 h-5 text-[#00B4D8]" />
-              <span className="text-lg font-semibold text-white">Automated Checks</span>
-              <span className="text-xs text-white/50 bg-white/5 px-2 py-0.5 rounded-full">
+              <span className="text-lg font-semibold text-foreground">Automated Checks</span>
+              <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
                 {autoPassCount}/{autoChecks.length} passing
               </span>
             </div>
             {expandedSection === "checks" ? (
-              <ChevronUp className="w-5 h-5 text-white/40" />
+              <ChevronUp className="w-5 h-5 text-muted-foreground/70" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-white/40" />
+              <ChevronDown className="w-5 h-5 text-muted-foreground/70" />
             )}
           </button>
 
@@ -302,16 +302,16 @@ export default function LaunchReadiness() {
                 return (
                   <div
                     key={check.id}
-                    className="flex items-start gap-3 bg-[#0A0E1A] border border-white/10 rounded-xl p-4"
+                    className="flex items-start gap-3 bg-card border border-border rounded-xl p-4"
                   >
                     <StatusIcon status={check.status} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <Icon className="w-3.5 h-3.5 text-white/30" />
-                        <span className="text-sm font-medium text-white">{check.label}</span>
+                        <Icon className="w-3.5 h-3.5 text-muted-foreground/50" />
+                        <span className="text-sm font-medium text-foreground">{check.label}</span>
                       </div>
-                      <p className="text-xs text-white/50 mt-1">{check.detail}</p>
-                      <span className="text-[10px] text-white/50 uppercase tracking-wider">{check.category}</span>
+                      <p className="text-xs text-muted-foreground mt-1">{check.detail}</p>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{check.category}</span>
                     </div>
                   </div>
                 );
@@ -323,19 +323,19 @@ export default function LaunchReadiness() {
         <div className="space-y-4">
           <button
             onClick={() => toggleSection("manual")}
-            className="w-full flex items-center justify-between bg-[#0A0E1A] border border-white/10 rounded-xl px-6 py-4 hover:bg-white/[0.02] transition"
+            className="w-full flex items-center justify-between bg-card border border-border rounded-xl px-6 py-4 hover:bg-muted/30 transition"
           >
             <div className="flex items-center gap-3">
               <CheckCircle2 className="w-5 h-5 text-[#FFB800]" />
-              <span className="text-lg font-semibold text-white">Manual Checks</span>
-              <span className="text-xs text-white/50 bg-white/5 px-2 py-0.5 rounded-full">
+              <span className="text-lg font-semibold text-foreground">Manual Checks</span>
+              <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
                 {manualPassCount}/{manualChecks.length} confirmed
               </span>
             </div>
             {expandedSection === "manual" ? (
-              <ChevronUp className="w-5 h-5 text-white/40" />
+              <ChevronUp className="w-5 h-5 text-muted-foreground/70" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-white/40" />
+              <ChevronDown className="w-5 h-5 text-muted-foreground/70" />
             )}
           </button>
 
@@ -347,16 +347,16 @@ export default function LaunchReadiness() {
                   <button
                     key={check.id}
                     onClick={() => toggleManualCheck(check.id)}
-                    className="flex items-start gap-3 bg-[#0A0E1A] border border-white/10 rounded-xl p-4 text-left hover:bg-white/[0.02] transition w-full"
+                    className="flex items-start gap-3 bg-card border border-border rounded-xl p-4 text-left hover:bg-muted/30 transition w-full"
                   >
                     <StatusIcon status={check.checked} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <Icon className="w-3.5 h-3.5 text-white/30" />
-                        <span className="text-sm font-medium text-white">{check.label}</span>
+                        <Icon className="w-3.5 h-3.5 text-muted-foreground/50" />
+                        <span className="text-sm font-medium text-foreground">{check.label}</span>
                       </div>
-                      <p className="text-xs text-white/50 mt-1">{check.detail}</p>
-                      <span className="text-[10px] text-white/50 uppercase tracking-wider">{check.category}</span>
+                      <p className="text-xs text-muted-foreground mt-1">{check.detail}</p>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{check.category}</span>
                     </div>
                   </button>
                 );
@@ -368,29 +368,29 @@ export default function LaunchReadiness() {
         <div className="space-y-4">
           <button
             onClick={() => toggleSection("domain")}
-            className="w-full flex items-center justify-between bg-[#0A0E1A] border border-white/10 rounded-xl px-6 py-4 hover:bg-white/[0.02] transition"
+            className="w-full flex items-center justify-between bg-card border border-border rounded-xl px-6 py-4 hover:bg-muted/30 transition"
           >
             <div className="flex items-center gap-3">
               <Globe className="w-5 h-5 text-[#9c27b0]" />
-              <span className="text-lg font-semibold text-white">Custom Domain Setup Guide</span>
+              <span className="text-lg font-semibold text-foreground">Custom Domain Setup Guide</span>
             </div>
             {expandedSection === "domain" ? (
-              <ChevronUp className="w-5 h-5 text-white/40" />
+              <ChevronUp className="w-5 h-5 text-muted-foreground/70" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-white/40" />
+              <ChevronDown className="w-5 h-5 text-muted-foreground/70" />
             )}
           </button>
 
           {expandedSection === "domain" && (
-            <div className="bg-[#0A0E1A] border border-white/10 rounded-xl p-6 space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6 space-y-6">
               {DNS_STEPS.map((step) => (
                 <div key={step.step} className="flex gap-4">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#9c27b0]/20 border border-[#9c27b0]/30 flex items-center justify-center">
                     <span className="text-sm font-bold text-[#9c27b0]">{step.step}</span>
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-sm font-semibold text-white mb-1">{step.title}</h4>
-                    <pre className="text-xs text-white/50 whitespace-pre-wrap font-mono bg-white/[0.02] rounded-lg p-3 border border-white/5">
+                    <h4 className="text-sm font-semibold text-foreground mb-1">{step.title}</h4>
+                    <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono bg-muted/30 rounded-lg p-3 border border-white/5">
                       {step.desc}
                     </pre>
                   </div>
@@ -414,36 +414,36 @@ export default function LaunchReadiness() {
         <div className="space-y-4">
           <button
             onClick={() => toggleSection("env")}
-            className="w-full flex items-center justify-between bg-[#0A0E1A] border border-white/10 rounded-xl px-6 py-4 hover:bg-white/[0.02] transition"
+            className="w-full flex items-center justify-between bg-card border border-border rounded-xl px-6 py-4 hover:bg-muted/30 transition"
           >
             <div className="flex items-center gap-3">
               <Key className="w-5 h-5 text-[#FFB800]" />
-              <span className="text-lg font-semibold text-white">Production Environment Config</span>
+              <span className="text-lg font-semibold text-foreground">Production Environment Config</span>
             </div>
             {expandedSection === "env" ? (
-              <ChevronUp className="w-5 h-5 text-white/40" />
+              <ChevronUp className="w-5 h-5 text-muted-foreground/70" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-white/40" />
+              <ChevronDown className="w-5 h-5 text-muted-foreground/70" />
             )}
           </button>
 
           {expandedSection === "env" && (
-            <div className="bg-[#0A0E1A] border border-white/10 rounded-xl overflow-hidden">
+            <div className="bg-card border border-border rounded-xl overflow-hidden">
               <div className="p-4 border-b border-white/5">
-                <p className="text-xs text-white/50">
+                <p className="text-xs text-muted-foreground">
                   These environment variables must be updated when switching from development to production.
                   Click the copy icon to copy the variable name.
                 </p>
               </div>
               <div className="divide-y divide-white/5">
                 {ENV_VARS.map((v) => (
-                  <div key={v.name} className="flex items-center gap-4 px-4 py-3 hover:bg-white/[0.02] transition">
+                  <div key={v.name} className="flex items-center gap-4 px-4 py-3 hover:bg-muted/30 transition">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <code className="text-sm font-mono text-[#00B4D8]">{v.name}</code>
                         <button
                           onClick={() => copyToClipboard(v.name, v.name)}
-                          className="text-white/50 hover:text-white/60 transition"
+                          className="text-muted-foreground hover:text-muted-foreground transition"
                         >
                           <Copy className="w-3.5 h-3.5" />
                         </button>
@@ -451,9 +451,9 @@ export default function LaunchReadiness() {
                           <span className="text-[10px] text-[#00B4D8]">Copied!</span>
                         )}
                       </div>
-                      <p className="text-xs text-white/50 mt-0.5">{v.desc}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{v.desc}</p>
                     </div>
-                    <code className="text-xs text-white/50 font-mono hidden md:block">{v.production}</code>
+                    <code className="text-xs text-muted-foreground font-mono hidden md:block">{v.production}</code>
                   </div>
                 ))}
               </div>

@@ -42,7 +42,7 @@ function YesNoButtons({ value, onChange }: YesNoButtonsProps) {
         className={`px-5 py-1.5 rounded-full text-[12px] font-bold transition-all ${
           value
             ? "bg-[#00B4D8]/15 text-[#00B4D8] border border-[#00B4D8]/40"
-            : "bg-white/5 text-white/40 border border-white/10 hover:border-white/20"
+            : "bg-muted/50 text-muted-foreground/70 border border-border hover:border-border"
         }`}
       >
         Yes
@@ -53,7 +53,7 @@ function YesNoButtons({ value, onChange }: YesNoButtonsProps) {
         className={`px-5 py-1.5 rounded-full text-[12px] font-bold transition-all ${
           !value
             ? "bg-red-500/15 text-red-400 border border-red-500/40"
-            : "bg-white/5 text-white/40 border border-white/10 hover:border-white/20"
+            : "bg-muted/50 text-muted-foreground/70 border border-border hover:border-border"
         }`}
       >
         No
@@ -129,10 +129,10 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
   const totalSteps = 4;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)" }}>
-      <div className="w-full max-w-lg rounded-sm border border-white/10 bg-[#0d0f18] p-6 relative max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 pb-24 lg:pb-6 px-4 overflow-y-auto bg-black/40 dark:bg-black/85 backdrop-blur-md">
+      <div className="w-full max-w-lg rounded-sm border border-border bg-card p-4 sm:p-6 relative my-auto">
         {onClose && (
-          <button onClick={onClose} className="absolute top-4 right-4 text-white/40 hover:text-white p-1">
+          <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground/70 hover:text-foreground p-1">
             <X className="w-5 h-5" />
           </button>
         )}
@@ -142,14 +142,14 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
             <span className="text-black font-bold text-sm">⚛</span>
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">TaxFlow Setup</h2>
-            <p className="text-[11px] text-white/50">Step {step} of {totalSteps}</p>
+            <h2 className="text-lg font-bold text-foreground">TaxFlow Setup</h2>
+            <p className="text-[11px] text-muted-foreground">Step {step} of {totalSteps}</p>
           </div>
         </div>
 
         <div className="flex gap-1 mb-6">
           {Array.from({ length: totalSteps }, (_, i) => i + 1).map(s => (
-            <div key={s} className={`h-1 flex-1 rounded-full ${s <= step ? "bg-[#00B4D8]" : "bg-white/10"}`} />
+            <div key={s} className={`h-1 flex-1 rounded-full ${s <= step ? "bg-[#00B4D8]" : "bg-muted"}`} />
           ))}
         </div>
 
@@ -157,9 +157,9 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Building2 className="w-5 h-5 text-[#00B4D8]" />
-              <h3 className="font-semibold text-white">What describes you best?</h3>
+              <h3 className="font-semibold text-foreground">What describes you best?</h3>
             </div>
-            <p className="text-[11px] text-white/50 mb-4">Select your primary business structure — this determines which tax strategies and deductions apply to you.</p>
+            <p className="text-[11px] text-muted-foreground mb-4">Select your primary business structure — this determines which tax strategies and deductions apply to you.</p>
             <div className="space-y-2">
               {(Object.entries(ENTITY_LABELS) as [EntityType, string][]).map(([key, label]) => (
                 <button
@@ -169,7 +169,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                   className={`w-full text-left p-3 rounded-xl border text-[13px] transition-all min-h-[44px] ${
                     hasSelectedEntity && profile.entityType === key
                       ? "border-[#00B4D8]/50 bg-[#00B4D8]/10 text-[#00B4D8]"
-                      : "border-white/10 text-white/60 hover:border-white/20"
+                      : "border-border text-muted-foreground hover:border-border"
                   }`}
                 >
                   {label}
@@ -183,12 +183,12 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Building2 className="w-5 h-5 text-[#00B4D8]" />
-              <h3 className="font-semibold text-white">Business Information</h3>
+              <h3 className="font-semibold text-foreground">Business Information</h3>
             </div>
             <div className="space-y-3">
               <div>
                 <label className="form-label">Business Name *</label>
-                <Input value={profile.businessName} onChange={e => update({ businessName: e.target.value.slice(0, 100) })} placeholder="Your Business LLC" className="bg-white/5 border-white/10" />
+                <Input value={profile.businessName} onChange={e => update({ businessName: e.target.value.slice(0, 100) })} placeholder="Your Business LLC" className="bg-muted/50 border-border" />
               </div>
               <div>
                 <label className="form-label">EIN (Employer Identification Number)</label>
@@ -197,7 +197,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                   onChange={e => update({ ein: formatEin(e.target.value) })}
                   placeholder="XX-XXXXXXX"
                   maxLength={10}
-                  className={`bg-white/5 border-white/10 ${profile.ein && !isValidEin(profile.ein) ? "border-red-500/50" : ""}`}
+                  className={`bg-muted/50 border-border ${profile.ein && !isValidEin(profile.ein) ? "border-red-500/50" : ""}`}
                 />
                 {profile.ein && !isValidEin(profile.ein) && (
                   <p className="text-[10px] text-red-400 mt-1">EIN must be in XX-XXXXXXX format</p>
@@ -205,14 +205,14 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
               </div>
               <div>
                 <label className="form-label">Industry</label>
-                <Input value={profile.industry} onChange={e => update({ industry: e.target.value.slice(0, 100) })} placeholder="e.g., Graphic Design, Consulting" className="bg-white/5 border-white/10" />
+                <Input value={profile.industry} onChange={e => update({ industry: e.target.value.slice(0, 100) })} placeholder="e.g., Graphic Design, Consulting" className="bg-muted/50 border-border" />
               </div>
               <div>
                 <label className="form-label">State of Residence *</label>
                 <select
                   value={profile.homeState}
                   onChange={e => update({ homeState: e.target.value, state: e.target.value })}
-                  className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg p-3 text-white text-sm min-h-[44px] [&>option]:bg-[#0d0d1a]"
+                  className="w-full bg-card border border-border rounded-lg p-3 text-foreground text-sm min-h-[44px] [&>option]:bg-card"
                 >
                   <option value="">Select State</option>
                   {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -220,11 +220,11 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
               </div>
               <div>
                 <label className="form-label">Year Business Started</label>
-                <Input type="number" value={profile.yearStarted} onChange={e => update({ yearStarted: e.target.value })} placeholder="2020" min="1950" max="2026" className="bg-white/5 border-white/10" />
+                <Input type="number" value={profile.yearStarted} onChange={e => update({ yearStarted: e.target.value })} placeholder="2020" min="1950" max="2026" className="bg-muted/50 border-border" />
               </div>
               <div>
                 <label className="form-label">Primary Business Activity</label>
-                <Input value={profile.primaryActivity} onChange={e => update({ primaryActivity: e.target.value.slice(0, 200) })} placeholder="What does your business do?" className="bg-white/5 border-white/10" />
+                <Input value={profile.primaryActivity} onChange={e => update({ primaryActivity: e.target.value.slice(0, 200) })} placeholder="What does your business do?" className="bg-muted/50 border-border" />
               </div>
             </div>
           </div>
@@ -234,45 +234,45 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <DollarSign className="w-5 h-5 text-[#00B4D8]" />
-              <h3 className="font-semibold text-white">Income Profile</h3>
+              <h3 className="font-semibold text-foreground">Income Profile</h3>
             </div>
             <div className="space-y-3">
               <div>
                 <label className="form-label">Estimated Annual Gross Revenue *</label>
-                <Input type="number" value={profile.grossRevenue || ""} onChange={e => update({ grossRevenue: Math.max(0, Number(e.target.value)) })} placeholder="100000" className="bg-white/5 border-white/10" />
+                <Input type="number" value={profile.grossRevenue || ""} onChange={e => update({ grossRevenue: Math.max(0, Number(e.target.value)) })} placeholder="100000" className="bg-muted/50 border-border" />
               </div>
               <div>
                 <label className="form-label">W-2 Income (if any)</label>
-                <Input type="number" value={profile.w2Income || ""} onChange={e => update({ w2Income: Math.max(0, Number(e.target.value)) })} placeholder="0" className="bg-white/5 border-white/10" />
+                <Input type="number" value={profile.w2Income || ""} onChange={e => update({ w2Income: Math.max(0, Number(e.target.value)) })} placeholder="0" className="bg-muted/50 border-border" />
               </div>
               <div>
                 <label className="form-label">Number of Employees/Contractors You Pay</label>
-                <Input type="number" value={profile.employeeCount || ""} onChange={e => update({ employeeCount: Math.max(0, Number(e.target.value)) })} placeholder="0" className="bg-white/5 border-white/10" />
+                <Input type="number" value={profile.employeeCount || ""} onChange={e => update({ employeeCount: Math.max(0, Number(e.target.value)) })} placeholder="0" className="bg-muted/50 border-border" />
               </div>
-              <div className="flex items-center justify-between p-3 rounded-xl border border-white/10">
-                <span className="text-[13px] text-white/70">Do you have a home office?</span>
+              <div className="flex items-center justify-between p-3 rounded-xl border border-border">
+                <span className="text-[13px] text-foreground/70">Do you have a home office?</span>
                 <YesNoButtons value={profile.hasHomeOffice} onChange={val => update({ hasHomeOffice: val })} />
               </div>
               {profile.hasHomeOffice && (
                 <div>
                   <label className="form-label">Home Office Square Footage</label>
-                  <Input type="number" value={profile.homeOfficeSqft || ""} onChange={e => update({ homeOfficeSqft: Math.min(300, Math.max(0, Number(e.target.value))) })} placeholder="150" max="300" className="bg-white/5 border-white/10" />
+                  <Input type="number" value={profile.homeOfficeSqft || ""} onChange={e => update({ homeOfficeSqft: Math.min(300, Math.max(0, Number(e.target.value))) })} placeholder="150" max="300" className="bg-muted/50 border-border" />
                 </div>
               )}
-              <div className="flex items-center justify-between p-3 rounded-xl border border-white/10">
-                <span className="text-[13px] text-white/70">Do you use a vehicle for business?</span>
+              <div className="flex items-center justify-between p-3 rounded-xl border border-border">
+                <span className="text-[13px] text-foreground/70">Do you use a vehicle for business?</span>
                 <YesNoButtons value={profile.usesVehicle} onChange={val => update({ usesVehicle: val })} />
               </div>
               {profile.usesVehicle && (
                 <div>
                   <label className="form-label">Business Use Percentage</label>
-                  <Input type="number" value={profile.vehicleBusinessPct || ""} onChange={e => update({ vehicleBusinessPct: Math.min(100, Math.max(0, Number(e.target.value))) })} placeholder="70" max="100" className="bg-white/5 border-white/10" />
+                  <Input type="number" value={profile.vehicleBusinessPct || ""} onChange={e => update({ vehicleBusinessPct: Math.min(100, Math.max(0, Number(e.target.value))) })} placeholder="70" max="100" className="bg-muted/50 border-border" />
                 </div>
               )}
 
-              <div className="border-t border-white/10 pt-4 mt-4">
+              <div className="border-t border-border pt-4 mt-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-semibold text-white text-sm">Business Trip Deductions</h4>
+                  <h4 className="font-semibold text-foreground text-sm">Business Trip Deductions</h4>
                   <button
                     type="button"
                     onClick={addTrip}
@@ -282,13 +282,13 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                   </button>
                 </div>
                 {profile.businessTripDeductions.length === 0 && (
-                  <p className="text-[12px] text-white/30 italic">No trips added yet. Click "Add Trip" to add business travel deductions.</p>
+                  <p className="text-[12px] text-muted-foreground/50 italic">No trips added yet. Click "Add Trip" to add business travel deductions.</p>
                 )}
                 <div className="space-y-3">
                   {profile.businessTripDeductions.map((trip, idx) => (
-                    <div key={trip.id} className="p-3 rounded-xl border border-white/10 space-y-2">
+                    <div key={trip.id} className="p-3 rounded-xl border border-border space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] text-white/50 font-semibold">Trip {idx + 1}</span>
+                        <span className="text-[11px] text-muted-foreground font-semibold">Trip {idx + 1}</span>
                         <button
                           type="button"
                           onClick={() => removeTrip(trip.id)}
@@ -301,20 +301,20 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                         value={trip.destination}
                         onChange={e => updateTrip(trip.id, { destination: e.target.value.slice(0, 100) })}
                         placeholder="Destination (e.g., New York, NY)"
-                        className="bg-white/5 border-white/10 text-[13px]"
+                        className="bg-muted/50 border-border text-[13px]"
                       />
                       <Input
                         value={trip.purpose}
                         onChange={e => updateTrip(trip.id, { purpose: e.target.value.slice(0, 200) })}
                         placeholder="Business purpose"
-                        className="bg-white/5 border-white/10 text-[13px]"
+                        className="bg-muted/50 border-border text-[13px]"
                       />
                       <Input
                         type="number"
                         value={trip.estimatedCost || ""}
                         onChange={e => updateTrip(trip.id, { estimatedCost: Math.max(0, Number(e.target.value)) })}
                         placeholder="Estimated cost ($)"
-                        className="bg-white/5 border-white/10 text-[13px]"
+                        className="bg-muted/50 border-border text-[13px]"
                       />
                     </div>
                   ))}
@@ -328,11 +328,11 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Target className="w-5 h-5 text-[#00B4D8]" />
-              <h3 className="font-semibold text-white">Your Goals</h3>
+              <h3 className="font-semibold text-foreground">Your Goals</h3>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="text-[11px] text-white/50 mb-2 block">Primary Goal *</label>
+                <label className="text-[11px] text-muted-foreground mb-2 block">Primary Goal *</label>
                 <div className="space-y-2">
                   {([
                     ["se_tax", "Reduce self-employment tax"],
@@ -343,26 +343,26 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
                       className={`w-full text-left p-3 rounded-xl border text-[13px] transition-all min-h-[44px] ${
                         profile.primaryGoal === val
                           ? "border-[#00B4D8]/50 bg-[#00B4D8]/10 text-[#00B4D8]"
-                          : "border-white/10 text-white/60 hover:border-white/20"
+                          : "border-border text-muted-foreground hover:border-border"
                       }`}>
                       {label}
                     </button>
                   ))}
                 </div>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-xl border border-white/10">
-                <span className="text-[13px] text-white/70">Do you currently work with a CPA?</span>
+              <div className="flex items-center justify-between p-3 rounded-xl border border-border">
+                <span className="text-[13px] text-foreground/70">Do you currently work with a CPA?</span>
                 <YesNoButtons value={profile.hasCPA} onChange={val => update({ hasCPA: val })} />
               </div>
               <div>
-                <label className="text-[11px] text-white/50 mb-2 block">When do you typically file? *</label>
+                <label className="text-[11px] text-muted-foreground mb-2 block">When do you typically file? *</label>
                 <div className="flex gap-2">
                   {([["ontime", "On Time"], ["extension", "Extension"]] as const).map(([val, label]) => (
                     <button key={val} onClick={() => update({ filingTime: val })}
                       className={`flex-1 p-3 rounded-xl border text-[13px] font-semibold transition-all min-h-[44px] ${
                         profile.filingTime === val
                           ? "border-[#00B4D8]/50 bg-[#00B4D8]/10 text-[#00B4D8]"
-                          : "border-white/10 text-white/60 hover:border-white/20"
+                          : "border-border text-muted-foreground hover:border-border"
                       }`}>
                       {label}
                     </button>
@@ -375,7 +375,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
 
         <div className="flex gap-3 mt-6">
           {step > 1 && (
-            <Button variant="outline" onClick={() => setStep(s => s - 1)} className="border-white/10 text-white/60 gap-1 min-h-[44px]">
+            <Button variant="outline" onClick={() => setStep(s => s - 1)} className="border-border text-muted-foreground gap-1 min-h-[44px]">
               <ChevronLeft className="w-4 h-4" /> Back
             </Button>
           )}
@@ -391,7 +391,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
           )}
         </div>
         {onClose && step === 1 && (
-          <button onClick={onClose} className="mt-3 w-full text-[11px] text-white/25 hover:text-white/50 transition-colors py-1 text-center">
+          <button onClick={onClose} className="mt-3 w-full text-[11px] text-muted-foreground/40 hover:text-muted-foreground transition-colors py-1 text-center">
             Skip setup for now
           </button>
         )}

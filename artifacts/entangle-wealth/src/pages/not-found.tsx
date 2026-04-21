@@ -147,11 +147,11 @@ export default function NotFound() {
           </div>
         </div>
 
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
           This timeline doesn't exist.
         </h1>
-        <p className="text-base text-white/45 mb-2 max-w-md leading-relaxed">{wittyLine}</p>
-        <p className="text-sm text-white/25 mb-10 max-w-sm">
+        <p className="text-base text-muted-foreground/70 mb-2 max-w-md leading-relaxed">{wittyLine}</p>
+        <p className="text-sm text-muted-foreground/40 mb-10 max-w-sm">
           Navigate back to a known dimension using the links below.
         </p>
 
@@ -165,7 +165,7 @@ export default function NotFound() {
           </Link>
           <Button
             variant="outline"
-            className="border-white/10 text-white/60 hover:bg-white/5 gap-2"
+            className="border-border text-muted-foreground hover:bg-muted/50 gap-2"
             onClick={() => window.history.back()}
           >
             <ArrowLeft className="w-4 h-4" /> Previous Dimension
@@ -173,7 +173,7 @@ export default function NotFound() {
         </div>
 
         <div className="w-full max-w-lg">
-          <div className="text-[10px] uppercase tracking-[0.18em] text-white/25 mb-4 font-semibold">
+          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground/40 mb-4 font-semibold">
             Known Coordinates
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -199,13 +199,13 @@ export default function NotFound() {
                     className="w-9 h-9 flex items-center justify-center flex-shrink-0 transition-colors"
                     style={{ background: "rgba(255,255,255,0.04)", borderRadius: 0 }}
                   >
-                    <link.icon className="w-4 h-4 text-white/40 group-hover:text-[#00B4D8] transition-colors" />
+                    <link.icon className="w-4 h-4 text-muted-foreground/70 group-hover:text-[#00B4D8] transition-colors" />
                   </div>
                   <div className="text-left">
-                    <div className="text-sm font-medium text-white group-hover:text-[#00B4D8] transition-colors uppercase font-mono">
+                    <div className="text-sm font-medium text-foreground group-hover:text-[#00B4D8] transition-colors uppercase font-mono">
                       {link.label}
                     </div>
-                    <div className="text-[11px] text-white/28 font-mono">{link.desc}</div>
+                    <div className="text-[11px] text-muted-foreground/50 font-mono">{link.desc}</div>
                   </div>
                 </div>
               </Link>
@@ -213,7 +213,7 @@ export default function NotFound() {
           </div>
         </div>
 
-        <div className="mt-12 flex items-center gap-2 text-[11px] text-white/20 font-mono">
+        <div className="mt-12 flex items-center gap-2 text-[11px] text-muted-foreground/40 font-mono">
           <span>SIGNAL://LOST</span>
           <span className="opacity-50">·</span>
           <span>EntangleWealth Quantum OS</span>

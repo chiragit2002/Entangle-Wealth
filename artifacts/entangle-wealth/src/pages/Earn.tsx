@@ -27,7 +27,7 @@ export default function Earn() {
       case "Gig": return "text-green-400 border-green-400/30 bg-green-400/10";
       case "Freelance": return "text-blue-400 border-blue-400/30 bg-blue-400/10";
       case "Options": return "text-secondary border-secondary/30 bg-secondary/10";
-      default: return "text-muted-foreground border-white/10";
+      default: return "text-muted-foreground border-border";
     }
   };
 
@@ -69,7 +69,7 @@ export default function Earn() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-          <Card className="bg-black/40 border-white/10 hover:border-white/20 transition-colors">
+          <Card className="bg-black/40 border-border hover:border-border transition-colors">
             <CardContent className="p-5 flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center shrink-0">
                 <TrendingUp className="w-6 h-6 text-secondary" />
@@ -81,7 +81,7 @@ export default function Earn() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-black/40 border-white/10 hover:border-white/20 transition-colors">
+          <Card className="bg-black/40 border-border hover:border-border transition-colors">
             <CardContent className="p-5 flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-green-400/10 flex items-center justify-center shrink-0">
                 <Briefcase className="w-6 h-6 text-green-400" />
@@ -101,7 +101,7 @@ export default function Earn() {
               key={cat}
               variant={activeCategory === cat ? "default" : "outline"}
               size="sm"
-              className={activeCategory === cat ? "bg-primary text-primary-foreground" : "border-white/10 hover:bg-white/5"}
+              className={activeCategory === cat ? "bg-primary text-primary-foreground" : "border-border hover:bg-muted/50"}
               onClick={() => { setActiveCategory(cat); setExpandedId(null); }}
             >
               {cat === "All" ? "All" : `${getTypeIcon(cat)} ${cat}`}
@@ -114,9 +114,9 @@ export default function Earn() {
 
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Target className="w-10 h-10 text-white/10 mb-3" />
-            <p className="text-base font-semibold text-white/40">Nothing here yet</p>
-            <p className="text-sm text-white/25 mt-1">Try a different category to see what's available.</p>
+            <Target className="w-10 h-10 text-muted-foreground/20 mb-3" />
+            <p className="text-base font-semibold text-muted-foreground/70">Nothing here yet</p>
+            <p className="text-sm text-muted-foreground/40 mt-1">Try a different category to see what's available.</p>
           </div>
         ) : (
           <div className="space-y-4 mb-8">
@@ -127,7 +127,7 @@ export default function Earn() {
               return (
                 <div key={opp.id}>
                   <Card
-                    className={`border-white/10 hover:border-white/20 transition-all cursor-pointer ${isExpanded ? 'bg-white/[0.04] border-primary/30' : 'bg-black/40'}`}
+                    className={`border-border hover:border-border transition-all cursor-pointer ${isExpanded ? 'bg-muted/50 border-primary/30' : 'bg-black/40'}`}
                     onClick={() => setExpandedId(isExpanded ? null : opp.id)}
                   >
                     <CardContent className="p-5">
@@ -157,7 +157,7 @@ export default function Earn() {
                   </Card>
 
                   {isExpanded && (
-                    <div className="bg-white/[0.02] border border-white/5 border-t-0 rounded-b-lg px-5 py-5 animate-in slide-in-from-top-2 duration-200">
+                    <div className="bg-muted/30 border border-white/5 border-t-0 rounded-b-lg px-5 py-5 animate-in slide-in-from-top-2 duration-200">
                       <div className="flex flex-col gap-4">
                         <div className="flex items-start gap-3">
                           <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
@@ -198,7 +198,7 @@ export default function Earn() {
                           )}
                           <Button
                             variant="outline"
-                            className={`border-white/10 gap-2 ${isSaved ? 'text-secondary border-secondary/30' : ''}`}
+                            className={`border-border gap-2 ${isSaved ? 'text-secondary border-secondary/30' : ''}`}
                             onClick={(e) => { e.stopPropagation(); toggleSave(opp.id, opp.title); }}
                           >
                             {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
@@ -227,7 +227,7 @@ export default function Earn() {
           </CardContent>
         </Card>
 
-        <p className="text-xs text-white/50 text-center pb-4">Demo data — opportunities and earnings shown are examples, not guarantees.</p>
+        <p className="text-xs text-muted-foreground text-center pb-4">Demo data — opportunities and earnings shown are examples, not guarantees.</p>
 
         <AnniversaryGiveawayBanner />
         <ReferralSection />

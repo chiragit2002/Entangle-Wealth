@@ -101,23 +101,23 @@ export function IdentityLabel({ variant = "badge" }: IdentityLabelProps) {
           <p className="text-[10px] font-bold uppercase tracking-wider mb-0.5" style={{ color: archetype.color }}>
             {archetype.label} <span className="opacity-50 normal-case font-normal">— {phase.theme}</span>
           </p>
-          <p className="text-[11px] text-white/50">{archetype.nudge}</p>
+          <p className="text-[11px] text-muted-foreground">{archetype.nudge}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
+    <div className="bg-card border border-border rounded-sm overflow-hidden">
       <div
-        className="flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06]"
+        className="flex items-center justify-between px-2 py-1.5 bg-muted/30 border-b border-border"
         style={{ borderLeftWidth: 2, borderLeftColor: archetype.color }}
       >
         <div className="flex items-center gap-1.5">
           <span style={{ color: archetype.color }}>{archetype.icon}</span>
           <span className="text-[10px] font-bold uppercase tracking-widest font-mono" style={{ color: archetype.color }}>YOUR IDENTITY</span>
         </div>
-        <span className="text-[9px] text-white/30 font-mono">{phase.theme}</span>
+        <span className="text-[9px] text-muted-foreground/50 font-mono">{phase.theme}</span>
       </div>
       <div className="p-2.5">
         <div className="flex items-center gap-2 mb-2">
@@ -128,19 +128,19 @@ export function IdentityLabel({ variant = "badge" }: IdentityLabelProps) {
             {archetype.icon}
           </div>
           <div>
-            <p className="text-[13px] font-bold text-white">{archetype.label}</p>
-            <p className="text-[8px] font-mono text-white/30">{phase.name} Phase · {completedMilestonesInPhase}/{phase.milestones.length} milestones</p>
+            <p className="text-[13px] font-bold text-foreground">{archetype.label}</p>
+            <p className="text-[8px] font-mono text-muted-foreground/50">{phase.name} Phase · {completedMilestonesInPhase}/{phase.milestones.length} milestones</p>
           </div>
         </div>
         <div className="mb-2">
-          <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-1 bg-muted/50 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{ width: `${phaseProgress * 100}%`, background: archetype.color }}
             />
           </div>
         </div>
-        <p className="text-[10px] text-white/40 leading-relaxed">{archetype.description}</p>
+        <p className="text-[10px] text-muted-foreground/70 leading-relaxed">{archetype.description}</p>
         <p className="text-[10px] font-semibold mt-1.5" style={{ color: archetype.color }}>{archetype.nudge}</p>
       </div>
     </div>

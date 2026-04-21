@@ -149,7 +149,7 @@ function KeywordsTab() {
   };
 
   const SortBtn = ({ field, label }: { field: typeof sortField; label: string }) => (
-    <button onClick={() => toggleSort(field)} className="flex items-center gap-1 hover:text-white transition-colors">
+    <button onClick={() => toggleSort(field)} className="flex items-center gap-1 hover:text-foreground transition-colors">
       {label}
       {sortField === field ? (sortDir === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-30" />}
     </button>
@@ -158,7 +158,7 @@ function KeywordsTab() {
   const TrendIcon = ({ trend }: { trend: string }) => {
     if (trend === "up") return <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />;
     if (trend === "down") return <TrendingDown className="w-3.5 h-3.5 text-red-400" />;
-    return <Minus className="w-3.5 h-3.5 text-white/30" />;
+    return <Minus className="w-3.5 h-3.5 text-muted-foreground/50" />;
   };
 
   return (
@@ -166,7 +166,7 @@ function KeywordsTab() {
       <div className="flex flex-col md:flex-row gap-3 mb-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search keywords..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 bg-white/[0.03] border-white/[0.08] text-sm" />
+          <Input placeholder="Search keywords..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 bg-muted/50 border-border text-sm" />
         </div>
         <Button onClick={() => setShowAdd(!showAdd)} className="bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 gap-1.5 text-xs">
           <Plus className="w-3.5 h-3.5" /> Add Keyword
@@ -175,21 +175,21 @@ function KeywordsTab() {
 
       {showAdd && (
         <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 mb-4 grid grid-cols-2 md:grid-cols-5 gap-3">
-          <Input placeholder="Keyword" value={newKw} onChange={(e) => setNewKw(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm col-span-2 md:col-span-1" />
-          <Input placeholder="Volume" type="number" value={newVol} onChange={(e) => setNewVol(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm" />
-          <Input placeholder="Difficulty (0-100)" type="number" value={newDiff} onChange={(e) => setNewDiff(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm" />
-          <Input placeholder="Current Rank" type="number" value={newRank} onChange={(e) => setNewRank(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm" />
+          <Input placeholder="Keyword" value={newKw} onChange={(e) => setNewKw(e.target.value)} className="bg-muted/50 border-border text-sm col-span-2 md:col-span-1" />
+          <Input placeholder="Volume" type="number" value={newVol} onChange={(e) => setNewVol(e.target.value)} className="bg-muted/50 border-border text-sm" />
+          <Input placeholder="Difficulty (0-100)" type="number" value={newDiff} onChange={(e) => setNewDiff(e.target.value)} className="bg-muted/50 border-border text-sm" />
+          <Input placeholder="Current Rank" type="number" value={newRank} onChange={(e) => setNewRank(e.target.value)} className="bg-muted/50 border-border text-sm" />
           <Button onClick={handleAdd} className="bg-primary text-black hover:bg-primary/90 text-xs font-bold">Save</Button>
         </div>
       )}
 
       <div className="text-xs text-muted-foreground mb-2">{filtered.length} keywords tracked</div>
 
-      <div className="rounded-xl border border-white/[0.06] overflow-hidden" style={{ background: "rgba(8,8,20,0.6)" }}>
+      <div className="rounded-xl border border-border overflow-hidden" style={{ background: "rgba(8,8,20,0.6)" }}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/[0.06]">
+              <tr className="border-b border-border">
                 <th className="text-left px-4 py-3 text-muted-foreground text-xs uppercase tracking-wider font-semibold"><SortBtn field="keyword" label="Keyword" /></th>
                 <th className="text-right px-4 py-3 text-muted-foreground text-xs uppercase tracking-wider font-semibold"><SortBtn field="volume" label="Volume" /></th>
                 <th className="text-right px-4 py-3 text-muted-foreground text-xs uppercase tracking-wider font-semibold"><SortBtn field="difficulty" label="Difficulty" /></th>
@@ -202,12 +202,12 @@ function KeywordsTab() {
               {filtered.map((kw) =>
                 editingId === kw.id ? (
                   <tr key={kw.id} className="border-b border-primary/20 bg-primary/5">
-                    <td className="px-4 py-2"><Input value={editKw} onChange={(e) => setEditKw(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm h-8" /></td>
-                    <td className="px-4 py-2"><Input type="number" value={editVol} onChange={(e) => setEditVol(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm h-8 text-right w-24 ml-auto" /></td>
-                    <td className="px-4 py-2"><Input type="number" value={editDiff} onChange={(e) => setEditDiff(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm h-8 text-right w-20 ml-auto" /></td>
-                    <td className="px-4 py-2"><Input type="number" value={editRank} onChange={(e) => setEditRank(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm h-8 text-right w-20 ml-auto" /></td>
+                    <td className="px-4 py-2"><Input value={editKw} onChange={(e) => setEditKw(e.target.value)} className="bg-muted/50 border-border text-sm h-8" /></td>
+                    <td className="px-4 py-2"><Input type="number" value={editVol} onChange={(e) => setEditVol(e.target.value)} className="bg-muted/50 border-border text-sm h-8 text-right w-24 ml-auto" /></td>
+                    <td className="px-4 py-2"><Input type="number" value={editDiff} onChange={(e) => setEditDiff(e.target.value)} className="bg-muted/50 border-border text-sm h-8 text-right w-20 ml-auto" /></td>
+                    <td className="px-4 py-2"><Input type="number" value={editRank} onChange={(e) => setEditRank(e.target.value)} className="bg-muted/50 border-border text-sm h-8 text-right w-20 ml-auto" /></td>
                     <td className="px-4 py-2 text-center">
-                      <select value={editTrend} onChange={(e) => setEditTrend(e.target.value as "up" | "down" | "stable")} className="bg-white/[0.03] border border-white/[0.08] rounded px-2 py-1 text-xs text-white">
+                      <select value={editTrend} onChange={(e) => setEditTrend(e.target.value as "up" | "down" | "stable")} className="bg-muted/50 border border-border rounded px-2 py-1 text-xs text-foreground">
                         <option value="up">↑ Up</option>
                         <option value="down">↓ Down</option>
                         <option value="stable">— Stable</option>
@@ -216,18 +216,18 @@ function KeywordsTab() {
                     <td className="px-4 py-2">
                       <div className="flex items-center gap-1">
                         <button onClick={handleEdit} className="text-emerald-400 hover:text-emerald-300 transition-colors" aria-label="Save edit"><Save className="w-3.5 h-3.5" aria-hidden="true" /></button>
-                        <button onClick={() => setEditingId(null)} className="text-white/50 hover:text-white transition-colors" aria-label="Cancel edit"><X className="w-3.5 h-3.5" aria-hidden="true" /></button>
+                        <button onClick={() => setEditingId(null)} className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Cancel edit"><X className="w-3.5 h-3.5" aria-hidden="true" /></button>
                       </div>
                     </td>
                   </tr>
                 ) : (
-                  <tr key={kw.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
-                    <td className="px-4 py-3 font-mono text-sm text-white/90">{kw.keyword}</td>
-                    <td className="px-4 py-3 text-right font-mono text-sm text-white/70">{kw.volume.toLocaleString()}</td>
+                  <tr key={kw.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                    <td className="px-4 py-3 font-mono text-sm text-foreground/90">{kw.keyword}</td>
+                    <td className="px-4 py-3 text-right font-mono text-sm text-foreground/70">{kw.volume.toLocaleString()}</td>
                     <td className="px-4 py-3 text-right">
                       <span className={`font-mono text-sm ${kw.difficulty <= 30 ? "text-emerald-400" : kw.difficulty <= 60 ? "text-yellow-400" : "text-red-400"}`}>{kw.difficulty}</span>
                     </td>
-                    <td className="px-4 py-3 text-right font-mono text-sm text-white/70">{kw.rank || "—"}</td>
+                    <td className="px-4 py-3 text-right font-mono text-sm text-foreground/70">{kw.rank || "—"}</td>
                     <td className="px-4 py-3 text-center"><TrendIcon trend={kw.trend} /></td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
@@ -242,7 +242,7 @@ function KeywordsTab() {
           </table>
         </div>
         {filtered.length === 0 && (
-          <div className="text-center py-12 text-[10px] font-mono text-white/25">&gt; NO KEYWORDS FOUND — adjust search parameters</div>
+          <div className="text-center py-12 text-[10px] font-mono text-muted-foreground/40">&gt; NO KEYWORDS FOUND — adjust search parameters</div>
         )}
       </div>
     </div>
@@ -361,28 +361,28 @@ function BlogTab() {
     return (
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-white">{editing ? "Edit Post" : "New Blog Post"}</h3>
-          <Button variant="ghost" size="sm" onClick={resetForm} className="text-muted-foreground hover:text-white"><X className="w-4 h-4" /></Button>
+          <h3 className="text-lg font-bold text-foreground">{editing ? "Edit Post" : "New Blog Post"}</h3>
+          <Button variant="ghost" size="sm" onClick={resetForm} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></Button>
         </div>
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">Title</label>
-              <Input value={title} onChange={(e) => { setTitle(e.target.value); if (!editing) setSlug(slugify(e.target.value)); }} className="bg-white/[0.03] border-white/[0.08]" />
+              <Input value={title} onChange={(e) => { setTitle(e.target.value); if (!editing) setSlug(slugify(e.target.value)); }} className="bg-muted/50 border-border" />
             </div>
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">Slug</label>
-              <Input value={slug} onChange={(e) => setSlug(e.target.value)} className="bg-white/[0.03] border-white/[0.08] font-mono text-sm" />
+              <Input value={slug} onChange={(e) => setSlug(e.target.value)} className="bg-muted/50 border-border font-mono text-sm" />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Meta Title <span className={metaTitle.length > 60 ? "text-red-400" : "text-white/30"}>({metaTitle.length}/60)</span></label>
-              <Input value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} className="bg-white/[0.03] border-white/[0.08]" />
+              <label className="text-xs text-muted-foreground mb-1 block">Meta Title <span className={metaTitle.length > 60 ? "text-red-400" : "text-muted-foreground/50"}>({metaTitle.length}/60)</span></label>
+              <Input value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} className="bg-muted/50 border-border" />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Meta Description <span className={metaDesc.length > 160 ? "text-red-400" : "text-white/30"}>({metaDesc.length}/160)</span></label>
-              <Input value={metaDesc} onChange={(e) => setMetaDesc(e.target.value)} className="bg-white/[0.03] border-white/[0.08]" />
+              <label className="text-xs text-muted-foreground mb-1 block">Meta Description <span className={metaDesc.length > 160 ? "text-red-400" : "text-muted-foreground/50"}>({metaDesc.length}/160)</span></label>
+              <Input value={metaDesc} onChange={(e) => setMetaDesc(e.target.value)} className="bg-muted/50 border-border" />
             </div>
           </div>
           <div>
@@ -397,12 +397,12 @@ function BlogTab() {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={18}
-              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-4 py-3 text-sm text-white/90 font-mono resize-y focus:outline-none focus:border-primary/40"
+              className="w-full bg-muted/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground/90 font-mono resize-y focus:outline-none focus:border-primary/40"
               placeholder="Write your blog post content in Markdown..."
             />
           </div>
           <div className="flex items-center gap-3 pt-2">
-            <Button onClick={() => handleSave("draft")} className="bg-white/[0.05] text-white/80 hover:bg-white/[0.1] border border-white/[0.08] gap-1.5 text-xs">
+            <Button onClick={() => handleSave("draft")} className="bg-muted/50 text-foreground/80 hover:bg-white/[0.1] border border-border gap-1.5 text-xs">
               <Save className="w-3.5 h-3.5" /> Save Draft
             </Button>
             <Button onClick={() => handleSave("published")} className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 gap-1.5 text-xs">
@@ -431,34 +431,34 @@ function BlogTab() {
       </div>
       <div className="space-y-3">
         {posts.map((post) => (
-          <div key={post.id} className="rounded-xl border border-white/[0.06] p-4 hover:border-white/[0.1] transition-colors" style={{ background: "rgba(8,8,20,0.6)" }}>
+          <div key={post.id} className="rounded-xl border border-border p-4 hover:border-white/[0.1] transition-colors" style={{ background: "rgba(8,8,20,0.6)" }}>
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-semibold text-white truncate">{post.title}</h4>
+                  <h4 className="font-semibold text-foreground truncate">{post.title}</h4>
                   <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${post.status === "published" ? "bg-emerald-500/15 text-emerald-400" : "bg-yellow-500/15 text-yellow-400"}`}>
                     {post.status}
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground font-mono">/blog/{post.slug}</p>
-                {post.metaDescription && <p className="text-xs text-white/50 mt-1 line-clamp-2">{post.metaDescription}</p>}
+                {post.metaDescription && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{post.metaDescription}</p>}
               </div>
               <div className="flex items-center gap-1 shrink-0">
                 {post.status === "published" && (
-                  <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-primary hover:bg-white/[0.05] transition-colors">
+                  <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground/70 hover:text-primary hover:bg-muted/50 transition-colors">
                     <Eye className="w-4 h-4" />
                   </a>
                 )}
-                <button onClick={() => exportPost(post, "html")} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-primary hover:bg-white/[0.05] transition-colors" title="Export HTML">
+                <button onClick={() => exportPost(post, "html")} className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground/70 hover:text-primary hover:bg-muted/50 transition-colors" title="Export HTML">
                   <Download className="w-4 h-4" />
                 </button>
-                <button onClick={() => exportPost(post, "md")} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-primary hover:bg-white/[0.05] transition-colors" title="Export Markdown">
+                <button onClick={() => exportPost(post, "md")} className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground/70 hover:text-primary hover:bg-muted/50 transition-colors" title="Export Markdown">
                   <Copy className="w-4 h-4" />
                 </button>
-                <button onClick={() => openEdit(post)} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-blue-400 hover:bg-white/[0.05] transition-colors" aria-label="Edit post">
+                <button onClick={() => openEdit(post)} className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground/70 hover:text-blue-400 hover:bg-muted/50 transition-colors" aria-label="Edit post">
                   <Edit3 className="w-4 h-4" aria-hidden="true" />
                 </button>
-                <button onClick={() => handleDelete(post.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-red-400 hover:bg-white/[0.05] transition-colors" aria-label="Delete post">
+                <button onClick={() => handleDelete(post.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground/70 hover:text-red-400 hover:bg-muted/50 transition-colors" aria-label="Delete post">
                   <Trash2 className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
@@ -478,7 +478,7 @@ function BlogTab() {
 
 function SerpPreview({ title, description, url }: { title: string; description: string; url: string }) {
   return (
-    <div className="rounded-lg border border-white/[0.06] p-4" style={{ background: "rgba(255,255,255,0.02)" }}>
+    <div className="rounded-lg border border-border p-4" style={{ background: "rgba(255,255,255,0.02)" }}>
       <p className="text-xs text-emerald-400/80 font-normal mb-0.5 truncate">{url || "entanglewealth.com"}</p>
       <p className="text-[#8ab4f8] text-base font-medium mb-1 truncate hover:underline cursor-default">{title || "Page Title"}</p>
       <p className="text-[#bdc1c6] text-[13px] leading-relaxed line-clamp-2">{description || "Add a meta description to see a preview here."}</p>
@@ -500,14 +500,14 @@ function MetaTagsTab() {
       {tags.map((tag) => {
         const isEditing = editingId === tag.id;
         return (
-          <div key={tag.id} className="rounded-xl border border-white/[0.06] p-4" style={{ background: "rgba(8,8,20,0.6)" }}>
+          <div key={tag.id} className="rounded-xl border border-border p-4" style={{ background: "rgba(8,8,20,0.6)" }}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-white">{tag.pageLabel}</span>
+                <span className="text-sm font-semibold text-foreground">{tag.pageLabel}</span>
                 <span className="text-xs text-muted-foreground font-mono">{tag.pagePath}</span>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setEditingId(isEditing ? null : tag.id)} className="text-xs text-muted-foreground hover:text-white h-7 px-2" aria-label={isEditing ? "Cancel editing" : `Edit ${tag.pageLabel}`}>
+              <Button variant="ghost" size="sm" onClick={() => setEditingId(isEditing ? null : tag.id)} className="text-xs text-muted-foreground hover:text-foreground h-7 px-2" aria-label={isEditing ? "Cancel editing" : `Edit ${tag.pageLabel}`}>
                 {isEditing ? <X className="w-3.5 h-3.5" aria-hidden="true" /> : <Edit3 className="w-3.5 h-3.5" aria-hidden="true" />}
               </Button>
             </div>
@@ -516,19 +516,19 @@ function MetaTagsTab() {
               <div className="space-y-3">
                 <div>
                   <label className="text-xs text-muted-foreground mb-1 block">
-                    Title <span className={tag.title.length > 60 ? "text-red-400" : "text-white/30"}>({tag.title.length}/60)</span>
+                    Title <span className={tag.title.length > 60 ? "text-red-400" : "text-muted-foreground/50"}>({tag.title.length}/60)</span>
                   </label>
-                  <Input value={tag.title} onChange={(e) => handleUpdate(tag.id, "title", e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm" />
+                  <Input value={tag.title} onChange={(e) => handleUpdate(tag.id, "title", e.target.value)} className="bg-muted/50 border-border text-sm" />
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground mb-1 block">
-                    Description <span className={tag.description.length > 160 ? "text-red-400" : "text-white/30"}>({tag.description.length}/160)</span>
+                    Description <span className={tag.description.length > 160 ? "text-red-400" : "text-muted-foreground/50"}>({tag.description.length}/160)</span>
                   </label>
-                  <Input value={tag.description} onChange={(e) => handleUpdate(tag.id, "description", e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm" />
+                  <Input value={tag.description} onChange={(e) => handleUpdate(tag.id, "description", e.target.value)} className="bg-muted/50 border-border text-sm" />
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground mb-1 block">og:image URL</label>
-                  <Input value={tag.ogImage} onChange={(e) => handleUpdate(tag.id, "ogImage", e.target.value)} placeholder="https://..." className="bg-white/[0.03] border-white/[0.08] text-sm" />
+                  <Input value={tag.ogImage} onChange={(e) => handleUpdate(tag.id, "ogImage", e.target.value)} placeholder="https://..." className="bg-muted/50 border-border text-sm" />
                 </div>
                 <SerpPreview title={tag.title} description={tag.description} url={`entanglewealth.com${tag.pagePath}`} />
               </div>
@@ -599,18 +599,18 @@ function BacklinksTab() {
 
       {showAdd && (
         <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
-          <Input placeholder="URL" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm" />
-          <Input placeholder="Source Domain" value={newSource} onChange={(e) => setNewSource(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm" />
-          <Input placeholder="Anchor Text" value={newAnchor} onChange={(e) => setNewAnchor(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-sm" />
+          <Input placeholder="URL" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} className="bg-muted/50 border-border text-sm" />
+          <Input placeholder="Source Domain" value={newSource} onChange={(e) => setNewSource(e.target.value)} className="bg-muted/50 border-border text-sm" />
+          <Input placeholder="Anchor Text" value={newAnchor} onChange={(e) => setNewAnchor(e.target.value)} className="bg-muted/50 border-border text-sm" />
           <Button onClick={handleAdd} className="bg-primary text-black hover:bg-primary/90 text-xs font-bold">Save</Button>
         </div>
       )}
 
-      <div className="rounded-xl border border-white/[0.06] overflow-hidden" style={{ background: "rgba(8,8,20,0.6)" }}>
+      <div className="rounded-xl border border-border overflow-hidden" style={{ background: "rgba(8,8,20,0.6)" }}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/[0.06]">
+              <tr className="border-b border-border">
                 <th className="text-left px-4 py-3 text-muted-foreground text-xs uppercase tracking-wider font-semibold">URL</th>
                 <th className="text-left px-4 py-3 text-muted-foreground text-xs uppercase tracking-wider font-semibold">Source</th>
                 <th className="text-left px-4 py-3 text-muted-foreground text-xs uppercase tracking-wider font-semibold hidden md:table-cell">Anchor Text</th>
@@ -623,38 +623,38 @@ function BacklinksTab() {
               {links.map((link) =>
                 editingId === link.id ? (
                   <tr key={link.id} className="border-b border-primary/20 bg-primary/5">
-                    <td className="px-4 py-2"><Input value={editUrl} onChange={(e) => setEditUrl(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-xs h-8" /></td>
-                    <td className="px-4 py-2"><Input value={editSource} onChange={(e) => setEditSource(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-xs h-8" /></td>
-                    <td className="px-4 py-2 hidden md:table-cell"><Input value={editAnchor} onChange={(e) => setEditAnchor(e.target.value)} className="bg-white/[0.03] border-white/[0.08] text-xs h-8" /></td>
+                    <td className="px-4 py-2"><Input value={editUrl} onChange={(e) => setEditUrl(e.target.value)} className="bg-muted/50 border-border text-xs h-8" /></td>
+                    <td className="px-4 py-2"><Input value={editSource} onChange={(e) => setEditSource(e.target.value)} className="bg-muted/50 border-border text-xs h-8" /></td>
+                    <td className="px-4 py-2 hidden md:table-cell"><Input value={editAnchor} onChange={(e) => setEditAnchor(e.target.value)} className="bg-muted/50 border-border text-xs h-8" /></td>
                     <td className="px-4 py-2 text-center">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${link.status === "active" ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}`}>
                         {link.status}
                       </span>
                     </td>
-                    <td className="px-4 py-2 hidden lg:table-cell text-xs text-white/40">{new Date(link.addedAt).toLocaleDateString()}</td>
+                    <td className="px-4 py-2 hidden lg:table-cell text-xs text-muted-foreground/70">{new Date(link.addedAt).toLocaleDateString()}</td>
                     <td className="px-4 py-2">
                       <div className="flex items-center gap-1">
                         <button onClick={handleEdit} className="text-emerald-400 hover:text-emerald-300 transition-colors" aria-label="Save edit"><Save className="w-3.5 h-3.5" aria-hidden="true" /></button>
-                        <button onClick={() => setEditingId(null)} className="text-white/50 hover:text-white transition-colors" aria-label="Cancel edit"><X className="w-3.5 h-3.5" aria-hidden="true" /></button>
+                        <button onClick={() => setEditingId(null)} className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Cancel edit"><X className="w-3.5 h-3.5" aria-hidden="true" /></button>
                       </div>
                     </td>
                   </tr>
                 ) : (
-                  <tr key={link.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                  <tr key={link.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                     <td className="px-4 py-3">
                       <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1 text-xs font-mono truncate max-w-56">
                         {link.url} <ExternalLink className="w-3 h-3 shrink-0 opacity-50" />
                       </a>
                     </td>
-                    <td className="px-4 py-3 text-xs text-white/70">{link.sourceDomain}</td>
-                    <td className="px-4 py-3 text-xs text-white/50 hidden md:table-cell">{link.anchorText || "—"}</td>
+                    <td className="px-4 py-3 text-xs text-foreground/70">{link.sourceDomain}</td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground hidden md:table-cell">{link.anchorText || "—"}</td>
                     <td className="px-4 py-3 text-center">
                       <button onClick={() => toggleStatus(link)} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${link.status === "active" ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}`}>
                         {link.status === "active" ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                         {link.status}
                       </button>
                     </td>
-                    <td className="px-4 py-3 text-xs text-white/40 hidden lg:table-cell">{new Date(link.addedAt).toLocaleDateString()}</td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground/70 hidden lg:table-cell">{new Date(link.addedAt).toLocaleDateString()}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
                         <button onClick={() => startEdit(link)} className="text-blue-400/60 hover:text-blue-400 transition-colors" aria-label={`Edit backlink ${link.url}`}><Edit3 className="w-3.5 h-3.5" aria-hidden="true" /></button>
@@ -712,7 +712,7 @@ export default function SeoEngine() {
           <div className="w-16 h-16 rounded-sm bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
             <Shield className="w-8 h-8 text-red-400" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Access Denied</h1>
           <p className="text-muted-foreground max-w-md">The SEO Engine is restricted to admin-tier accounts.</p>
         </div>
       </Layout>
@@ -740,7 +740,7 @@ export default function SeoEngine() {
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === tab.id
                   ? "bg-primary/10 text-primary border border-primary/20"
-                  : "text-muted-foreground hover:text-white hover:bg-white/[0.03]"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               }`}
             >
               {tab.icon} {tab.label}

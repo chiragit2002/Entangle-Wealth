@@ -61,7 +61,7 @@ const TICKER_SYMBOLS = [
 function TickerTape() {
   const items = [...TICKER_SYMBOLS, ...TICKER_SYMBOLS];
   return (
-    <div className="ticker-tape border-b border-[rgba(0,180,216,0.10)] bg-[#080C18]" style={{ height: "22px", display: "flex", alignItems: "center" }}>
+    <div className="ticker-tape border-b border-[rgba(0,180,216,0.10)] bg-background" style={{ height: "22px", display: "flex", alignItems: "center" }}>
       <div className="inline-flex items-center gap-6 animate-ticker" style={{ willChange: "transform" }}>
         {items.map((item, i) => {
           const isUp = !item.change.startsWith("-");
@@ -162,7 +162,7 @@ function NavbarComponent() {
           </Show>
         </div>
 
-        <div className="lg:hidden flex items-center gap-1">
+        <div className="lg:hidden flex items-center gap-1 ml-auto">
           <ThemeToggle />
           <NotificationCenter />
           <button className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-[var(--nav-hover-bg)] transition-colors duration-150" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}>

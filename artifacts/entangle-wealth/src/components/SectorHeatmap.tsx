@@ -81,7 +81,7 @@ function SectorHeatmapBase() {
         </div>
         <div className="grid grid-cols-5 gap-1.5">
           {SECTOR_ETFS.map(s => (
-            <div key={s.ticker} className="bg-white/[0.03] rounded-lg animate-pulse" style={{ minHeight: 60 }} />
+            <div key={s.ticker} className="bg-muted/50 rounded-lg animate-pulse" style={{ minHeight: 60 }} />
           ))}
         </div>
       </div>
@@ -126,17 +126,17 @@ function SectorHeatmapBase() {
               aria-label={`${sector.sector}: ${sector.change >= 0 ? "+" : ""}${Math.abs(sector.change).toFixed(1)}% change, ${sector.weight}% weight`}
             >
               <div className="flex flex-col h-full justify-between">
-                <span className="text-[9px] text-white/60 leading-tight">{sector.sector}</span>
+                <span className="text-[9px] text-muted-foreground leading-tight">{sector.sector}</span>
                 <div>
-                  <span className="text-[10px] font-mono text-white/40">{sector.ticker}</span>
+                  <span className="text-[10px] font-mono text-muted-foreground/70">{sector.ticker}</span>
                   <div className={`text-sm font-mono font-bold ${sector.change >= 0 ? "text-primary" : "text-red-400"}`}>
                     {sector.change >= 0 ? "+" : ""}{Math.abs(sector.change).toFixed(1)}%
                   </div>
                 </div>
               </div>
               {isHovered && (
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full z-50 bg-black/95 border border-white/10 rounded-lg p-2.5 text-[10px] whitespace-nowrap shadow-xl">
-                  <div className="font-bold text-white mb-1">{sector.sector}</div>
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full z-50 bg-black/95 border border-border rounded-lg p-2.5 text-[10px] whitespace-nowrap shadow-xl">
+                  <div className="font-bold text-foreground mb-1">{sector.sector}</div>
                   <div className="text-muted-foreground">Weight: {sector.weight}%</div>
                   <div className="text-muted-foreground">Volume: {sector.volume}</div>
                 </div>

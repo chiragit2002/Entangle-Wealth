@@ -49,8 +49,8 @@ export function RealEstateDeductionsModule() {
             <HomeIcon className="w-3.5 h-3.5 text-emerald-400" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-white/80">Real Estate Deductions</p>
-            <p className="text-[10px] text-white/35">Mortgage · depreciation · 1031 exchange</p>
+            <p className="text-xs font-semibold text-foreground/80">Real Estate Deductions</p>
+            <p className="text-[10px] text-muted-foreground/60">Mortgage · depreciation · 1031 exchange</p>
           </div>
         </div>
         <Link href="/taxgpt" className="flex items-center gap-1 text-[10px] text-emerald-400/70 hover:text-emerald-400 transition-colors">
@@ -59,11 +59,11 @@ export function RealEstateDeductionsModule() {
       </div>
       <div className="space-y-2">
         {deductions.map((d) => (
-          <div key={d.label} className="flex items-start gap-3 py-2 border-b border-white/[0.04] last:border-0">
+          <div key={d.label} className="flex items-start gap-3 py-2 border-b border-border last:border-0">
             <div className={`mt-0.5 w-1.5 h-1.5 rounded-full shrink-0 ${d.priority === "high" ? "bg-emerald-400" : d.priority === "medium" ? "bg-[#FFB800]" : "bg-white/20"}`} />
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-white/80">{d.label}</p>
-              <p className="text-[10px] text-white/40 mt-0.5">{d.detail}</p>
+              <p className="text-xs font-medium text-foreground/80">{d.label}</p>
+              <p className="text-[10px] text-muted-foreground/70 mt-0.5">{d.detail}</p>
             </div>
             <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400/70 shrink-0">{d.tag}</span>
           </div>

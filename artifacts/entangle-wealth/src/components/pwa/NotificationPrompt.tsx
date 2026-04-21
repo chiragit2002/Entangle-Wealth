@@ -120,8 +120,8 @@ export function NotificationPrompt() {
           <Bell className="w-5 h-5 text-[#FFB800]" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white mb-1">Stay Updated + Earn Giveaway Entries</p>
-          <p className="text-xs text-white/60 leading-relaxed">
+          <p className="text-sm font-semibold text-foreground mb-1">Stay Updated + Earn Giveaway Entries</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
             Enable alerts for market signals and portfolio updates. Every login earns entries into the <span className="text-[#FFB800] font-medium">$50K anniversary giveaway</span>.
           </p>
           <button
@@ -135,7 +135,7 @@ export function NotificationPrompt() {
         </div>
         <button
           onClick={handleDismiss}
-          className="flex-shrink-0 p-1 rounded-lg text-white/40 hover:text-white/80 hover:bg-white/5 transition-colors"
+          className="flex-shrink-0 p-1 rounded-lg text-muted-foreground/70 hover:text-foreground/80 hover:bg-muted/50 transition-colors"
           aria-label="Dismiss"
         >
           <X className="w-4 h-4" />

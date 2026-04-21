@@ -426,9 +426,9 @@ function LogicRuleSelector({
             key={cond}
             type="button"
             onClick={() => toggle(cond)}
-            className={`w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-xs border transition-all ${selected.includes(cond) ? colorClass : "border-white/8 bg-white/[0.02] text-white/40 hover:border-white/15 hover:text-white/70"}`}
+            className={`w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-xs border transition-all ${selected.includes(cond) ? colorClass : "border-border bg-muted/30 text-muted-foreground/70 hover:border-border hover:text-foreground/70"}`}
           >
-            <div className={`w-3 h-3 rounded border flex-shrink-0 flex items-center justify-center ${selected.includes(cond) ? (color === "green" ? "border-green-500 bg-green-500/30" : "border-red-500 bg-red-500/30") : "border-white/20"}`}>
+            <div className={`w-3 h-3 rounded border flex-shrink-0 flex items-center justify-center ${selected.includes(cond) ? (color === "green" ? "border-green-500 bg-green-500/30" : "border-red-500 bg-red-500/30") : "border-border"}`}>
               {selected.includes(cond) && <Check className="w-2 h-2" />}
             </div>
             {conditionLabel(cond)}
@@ -436,7 +436,7 @@ function LogicRuleSelector({
         ))}
       </div>
       {selected.length === 0 && (
-        <p className="text-xs text-white/25 mt-1 px-1">Select at least one condition</p>
+        <p className="text-xs text-muted-foreground/40 mt-1 px-1">Select at least one condition</p>
       )}
     </div>
   );
@@ -658,7 +658,7 @@ export default function StrategyBuilder() {
   return (
     <PageErrorBoundary>
       <Layout>
-        <div className="min-h-screen bg-black text-white">
+        <div className="min-h-screen bg-background text-foreground">
           <div className="max-w-[1200px] mx-auto px-4 py-6 space-y-6">
 
             {/* Header */}
@@ -668,7 +668,7 @@ export default function StrategyBuilder() {
                   {view !== "list" && (
                     <button
                       onClick={() => setView("list")}
-                      className="p-1.5 rounded-lg hover:bg-white/5 text-white/50 hover:text-white transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -677,8 +677,8 @@ export default function StrategyBuilder() {
                     <Zap className="w-5 h-5 text-purple-400" />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold text-white">Strategy Builder</h1>
-                    <p className="text-sm text-white/50">
+                    <h1 className="text-2xl font-bold text-foreground">Strategy Builder</h1>
+                    <p className="text-sm text-muted-foreground">
                       {view === "list" ? "Create, backtest, and activate custom trading strategies" :
                        view === "form" ? (editingId ? "Edit Strategy" : "New Strategy") :
                        `Backtesting: ${backtestTarget?.name}`}
@@ -687,13 +687,13 @@ export default function StrategyBuilder() {
                 </div>
               </div>
               {view === "list" && (
-                <Button onClick={startCreate} className="bg-purple-600 hover:bg-purple-700 text-white">
+                <Button onClick={startCreate} className="bg-purple-600 hover:bg-purple-700 text-foreground">
                   <Plus className="w-4 h-4 mr-1.5" /> New Strategy
                 </Button>
               )}
               {view === "form" && (
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setView("list")} className="border-white/10 text-white/70">
+                  <Button variant="outline" size="sm" onClick={() => setView("list")} className="border-border text-foreground/70">
                     Cancel
                   </Button>
                   <Button size="sm" onClick={saveStrategy} disabled={saving} className="bg-purple-600 hover:bg-purple-700">
@@ -709,25 +709,25 @@ export default function StrategyBuilder() {
               <>
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 flex items-center gap-3">
+                  <div className="bg-muted/50 border border-border rounded-xl p-4 flex items-center gap-3">
                     <Activity className="w-6 h-6 text-purple-400" />
                     <div>
-                      <div className="text-xl font-bold text-white">{strategies.length}</div>
-                      <div className="text-xs text-white/40">Total Strategies</div>
+                      <div className="text-xl font-bold text-foreground">{strategies.length}</div>
+                      <div className="text-xs text-muted-foreground/70">Total Strategies</div>
                     </div>
                   </div>
-                  <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 flex items-center gap-3">
+                  <div className="bg-muted/50 border border-border rounded-xl p-4 flex items-center gap-3">
                     <Power className="w-6 h-6 text-green-400" />
                     <div>
-                      <div className="text-xl font-bold text-white">{activeCount}</div>
-                      <div className="text-xs text-white/40">Active in Engine</div>
+                      <div className="text-xl font-bold text-foreground">{activeCount}</div>
+                      <div className="text-xs text-muted-foreground/70">Active in Engine</div>
                     </div>
                   </div>
-                  <div className="bg-white/[0.03] border border-white/8 rounded-xl p-4 flex items-center gap-3">
+                  <div className="bg-muted/50 border border-border rounded-xl p-4 flex items-center gap-3">
                     <BarChart3 className="w-6 h-6 text-blue-400" />
                     <div>
-                      <div className="text-xl font-bold text-white">{strategies.filter(s => s.backtestResults).length}</div>
-                      <div className="text-xs text-white/40">Backtested</div>
+                      <div className="text-xl font-bold text-foreground">{strategies.filter(s => s.backtestResults).length}</div>
+                      <div className="text-xs text-muted-foreground/70">Backtested</div>
                     </div>
                   </div>
                 </div>
@@ -735,18 +735,18 @@ export default function StrategyBuilder() {
                 {/* Templates */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Tag className="w-4 h-4 text-white/40" />
-                    <span className="text-xs font-medium text-white/60 uppercase tracking-wider">Pre-built Templates</span>
+                    <Tag className="w-4 h-4 text-muted-foreground/70" />
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Pre-built Templates</span>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
                     {TEMPLATES.map(t => (
                       <button
                         key={t.name}
                         onClick={() => loadTemplate(t)}
-                        className="text-left p-3 bg-white/[0.02] border border-white/8 rounded-xl hover:border-purple-500/40 hover:bg-purple-500/5 transition-all group"
+                        className="text-left p-3 bg-muted/30 border border-border rounded-xl hover:border-purple-500/40 hover:bg-purple-500/5 transition-all group"
                       >
-                        <div className="text-xs font-semibold text-white/80 group-hover:text-purple-300 mb-1">{t.name}</div>
-                        <div className="text-xs text-white/30">{INDICATOR_TYPES.find(i => i.value === t.type)?.label}</div>
+                        <div className="text-xs font-semibold text-foreground/80 group-hover:text-purple-300 mb-1">{t.name}</div>
+                        <div className="text-xs text-muted-foreground/50">{INDICATOR_TYPES.find(i => i.value === t.type)?.label}</div>
                       </button>
                     ))}
                   </div>
@@ -759,22 +759,22 @@ export default function StrategyBuilder() {
                   </div>
                 ) : strategies.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center">
-                      <Zap className="w-8 h-8 text-white/20" />
+                    <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center">
+                      <Zap className="w-8 h-8 text-muted-foreground/40" />
                     </div>
-                    <p className="text-white/40 text-sm">No strategies yet. Create one or load a template above.</p>
-                    <Button onClick={startCreate} variant="outline" size="sm" className="border-white/10 text-white/60">
+                    <p className="text-muted-foreground/70 text-sm">No strategies yet. Create one or load a template above.</p>
+                    <Button onClick={startCreate} variant="outline" size="sm" className="border-border text-muted-foreground">
                       <Plus className="w-4 h-4 mr-1.5" /> Create First Strategy
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {strategies.map(s => (
-                      <div key={s.id} className="bg-white/[0.02] border border-white/8 rounded-xl p-4 hover:border-white/15 transition-all">
+                      <div key={s.id} className="bg-muted/30 border border-border rounded-xl p-4 hover:border-border transition-all">
                         <div className="flex items-start justify-between gap-4 flex-wrap">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className="font-bold text-white">{s.name}</span>
+                              <span className="font-bold text-foreground">{s.name}</span>
                               {s.isActive && <BadgePill color="green">Active</BadgePill>}
                               <BadgePill color="purple">
                                 {INDICATOR_TYPES.find(i => i.value === s.type)?.label ?? s.type}
@@ -783,7 +783,7 @@ export default function StrategyBuilder() {
                                 <BadgePill key={tag} color="blue">{tag}</BadgePill>
                               ))}
                             </div>
-                            <div className="flex flex-wrap gap-3 text-xs text-white/40 mb-2">
+                            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground/70 mb-2">
                               <span>Assets: {s.assets.join(", ")}</span>
                               <span>Timeframe: {s.timeframes.join(", ")}</span>
                             </div>
@@ -810,24 +810,24 @@ export default function StrategyBuilder() {
                             {s.backtestResults && (
                               <div className="flex flex-wrap gap-4 text-xs mt-1">
                                 <div>
-                                  <span className="text-white/40">Win Rate </span>
+                                  <span className="text-muted-foreground/70">Win Rate </span>
                                   <span className={`font-semibold ${s.backtestResults.winRate >= 50 ? "text-green-400" : "text-red-400"}`}>
                                     {s.backtestResults.winRate.toFixed(1)}%
                                   </span>
                                 </div>
                                 <div>
-                                  <span className="text-white/40">Avg Return </span>
+                                  <span className="text-muted-foreground/70">Avg Return </span>
                                   <span className={`font-semibold ${s.backtestResults.avgReturn >= 0 ? "text-green-400" : "text-red-400"}`}>
                                     {s.backtestResults.avgReturn >= 0 ? "+" : ""}{s.backtestResults.avgReturn.toFixed(2)}%
                                   </span>
                                 </div>
                                 <div>
-                                  <span className="text-white/40">Max DD </span>
+                                  <span className="text-muted-foreground/70">Max DD </span>
                                   <span className="font-semibold text-yellow-400">{s.backtestResults.maxDrawdown.toFixed(1)}%</span>
                                 </div>
                                 <div>
-                                  <span className="text-white/40">Trades </span>
-                                  <span className="font-semibold text-white/70">{s.backtestResults.totalTrades}</span>
+                                  <span className="text-muted-foreground/70">Trades </span>
+                                  <span className="font-semibold text-foreground/70">{s.backtestResults.totalTrades}</span>
                                 </div>
                               </div>
                             )}
@@ -837,35 +837,35 @@ export default function StrategyBuilder() {
                               onClick={() => toggleActive(s)}
                               disabled={togglingId === s.id}
                               title={s.isActive ? "Deactivate" : "Activate"}
-                              className={`p-1.5 rounded-lg transition-colors ${s.isActive ? "text-green-400 hover:bg-green-500/10" : "text-white/30 hover:text-white/60 hover:bg-white/5"}`}
+                              className={`p-1.5 rounded-lg transition-colors ${s.isActive ? "text-green-400 hover:bg-green-500/10" : "text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/50"}`}
                             >
                               {togglingId === s.id ? <Loader2 className="w-4 h-4 animate-spin" /> : s.isActive ? <Power className="w-4 h-4" /> : <PowerOff className="w-4 h-4" />}
                             </button>
                             <button
                               onClick={() => runBacktest(s)}
                               title="Run Backtest"
-                              className="p-1.5 rounded-lg text-white/30 hover:text-[#00d4ff] hover:bg-[#00d4ff]/10 transition-colors"
+                              className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-[#00d4ff] hover:bg-[#00d4ff]/10 transition-colors"
                             >
                               <Play className="w-4 h-4" />
                             </button>
                             <a
                               href={`${BASE_URL}/eval-pipeline`}
                               title="Multi-Model Evaluation"
-                              className="p-1.5 rounded-lg text-white/30 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
+                              className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
                             >
                               <TargetIcon className="w-4 h-4" />
                             </a>
                             <button
                               onClick={() => startEdit(s)}
                               title="Edit"
-                              className="p-1.5 rounded-lg text-white/30 hover:text-white hover:bg-white/5 transition-colors"
+                              className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-foreground hover:bg-muted/50 transition-colors"
                             >
                               <Edit2 className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => duplicateStrategy(s.id)}
                               title="Duplicate"
-                              className="p-1.5 rounded-lg text-white/30 hover:text-white hover:bg-white/5 transition-colors"
+                              className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-foreground hover:bg-muted/50 transition-colors"
                             >
                               <Copy className="w-4 h-4" />
                             </button>
@@ -873,7 +873,7 @@ export default function StrategyBuilder() {
                               onClick={() => deleteStrategy(s.id)}
                               disabled={deletingId === s.id}
                               title="Delete"
-                              className="p-1.5 rounded-lg text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                              className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                             >
                               {deletingId === s.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                             </button>
@@ -892,39 +892,39 @@ export default function StrategyBuilder() {
                 {/* Left: Main form */}
                 <div className="lg:col-span-2 space-y-5">
                   {/* Name */}
-                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-4 space-y-3">
-                    <label className="text-xs font-semibold text-white/50 uppercase tracking-wider">Strategy Name</label>
+                  <div className="bg-muted/30 border border-border rounded-xl p-4 space-y-3">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Strategy Name</label>
                     <input
                       type="text"
                       value={form.name}
                       onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                       placeholder="e.g. My EMA Strategy"
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-purple-500/50"
+                      className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-purple-500/50"
                     />
                   </div>
 
                   {/* Indicator type */}
-                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-4 space-y-3">
-                    <label className="text-xs font-semibold text-white/50 uppercase tracking-wider">Indicator Type</label>
+                  <div className="bg-muted/30 border border-border rounded-xl p-4 space-y-3">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Indicator Type</label>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {INDICATOR_TYPES.map(ind => (
                         <button
                           key={ind.value}
                           onClick={() => handleTypeChange(ind.value)}
-                          className={`text-left p-2.5 rounded-lg border text-xs transition-all ${form.type === ind.value ? "border-purple-500/50 bg-purple-500/10 text-purple-300" : "border-white/8 bg-white/[0.02] text-white/50 hover:border-white/15 hover:text-white/80"}`}
+                          className={`text-left p-2.5 rounded-lg border text-xs transition-all ${form.type === ind.value ? "border-purple-500/50 bg-purple-500/10 text-purple-300" : "border-border bg-muted/30 text-muted-foreground hover:border-border hover:text-foreground/80"}`}
                         >
                           <div className="font-medium">{ind.label}</div>
-                          <div className="text-white/30 text-[10px] mt-0.5">{ind.description}</div>
+                          <div className="text-muted-foreground/50 text-[10px] mt-0.5">{ind.description}</div>
                         </button>
                       ))}
                     </div>
                   </div>
 
                   {/* Entry / Exit Logic Builder */}
-                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-4 space-y-4">
+                  <div className="bg-muted/30 border border-border rounded-xl p-4 space-y-4">
                     <div className="flex items-center gap-2">
-                      <ArrowDownUp className="w-4 h-4 text-white/40" />
-                      <label className="text-xs font-semibold text-white/50 uppercase tracking-wider">Entry / Exit Logic</label>
+                      <ArrowDownUp className="w-4 h-4 text-muted-foreground/70" />
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Entry / Exit Logic</label>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <LogicRuleSelector
@@ -942,19 +942,19 @@ export default function StrategyBuilder() {
                         onChange={exit => setForm(f => ({ ...f, logic: { ...f.logic, exit } }))}
                       />
                     </div>
-                    <p className="text-xs text-white/25">
+                    <p className="text-xs text-muted-foreground/40">
                       These conditions determine when the strategy triggers entry and exit signals. A signal fires when ANY selected condition is met (OR logic).
                     </p>
                   </div>
 
                   {/* Parameters */}
                   {paramDefs.length > 0 && (
-                    <div className="bg-white/[0.02] border border-white/8 rounded-xl p-4 space-y-3">
-                      <label className="text-xs font-semibold text-white/50 uppercase tracking-wider">Parameters</label>
+                    <div className="bg-muted/30 border border-border rounded-xl p-4 space-y-3">
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Parameters</label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {paramDefs.map(def => (
                           <div key={def.key}>
-                            <label className="text-xs text-white/40 mb-1 block">{def.label}</label>
+                            <label className="text-xs text-muted-foreground/70 mb-1 block">{def.label}</label>
                             <div className="flex items-center gap-2">
                               <input
                                 type="range"
@@ -976,14 +976,14 @@ export default function StrategyBuilder() {
                   )}
 
                   {/* Assets */}
-                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-4 space-y-3">
-                    <label className="text-xs font-semibold text-white/50 uppercase tracking-wider">Target Assets</label>
+                  <div className="bg-muted/30 border border-border rounded-xl p-4 space-y-3">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Target Assets</label>
                     <div className="flex flex-wrap gap-2">
                       {POPULAR_ASSETS.map(asset => (
                         <button
                           key={asset}
                           onClick={() => toggleAsset(asset)}
-                          className={`px-2.5 py-1 rounded-lg text-xs font-mono font-medium border transition-all ${form.assets.includes(asset) ? "border-[#00d4ff]/40 bg-[#00d4ff]/10 text-[#00d4ff]" : "border-white/10 bg-white/[0.02] text-white/40 hover:border-white/20 hover:text-white/70"}`}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-mono font-medium border transition-all ${form.assets.includes(asset) ? "border-[#00d4ff]/40 bg-[#00d4ff]/10 text-[#00d4ff]" : "border-border bg-muted/30 text-muted-foreground/70 hover:border-border hover:text-foreground/70"}`}
                         >
                           {asset}
                         </button>
@@ -993,7 +993,7 @@ export default function StrategyBuilder() {
                       <input
                         type="text"
                         placeholder="Add custom symbol (e.g. CRWD) — press Enter"
-                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/25 focus:outline-none focus:border-primary/50"
+                        className="flex-1 bg-muted/50 border border-border rounded-lg px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50"
                         onKeyDown={e => {
                           if (e.key === "Enter") {
                             const val = (e.target as HTMLInputElement).value.trim().toUpperCase();
@@ -1010,7 +1010,7 @@ export default function StrategyBuilder() {
                         {form.assets.map(a => (
                           <span key={a} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#00d4ff]/10 border border-[#00d4ff]/20 text-[#00d4ff] text-xs">
                             {a}
-                            <button onClick={() => setForm(f => ({ ...f, assets: f.assets.filter(x => x !== a) }))} className="hover:text-white">
+                            <button onClick={() => setForm(f => ({ ...f, assets: f.assets.filter(x => x !== a) }))} className="hover:text-foreground">
                               <X className="w-2.5 h-2.5" />
                             </button>
                           </span>
@@ -1020,14 +1020,14 @@ export default function StrategyBuilder() {
                   </div>
 
                   {/* Timeframe */}
-                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-4 space-y-3">
-                    <label className="text-xs font-semibold text-white/50 uppercase tracking-wider">Timeframe</label>
+                  <div className="bg-muted/30 border border-border rounded-xl p-4 space-y-3">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Timeframe</label>
                     <div className="flex flex-wrap gap-2">
                       {TIMEFRAMES.map(tf => (
                         <button
                           key={tf.value}
                           onClick={() => toggleTimeframe(tf.value)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${form.timeframes.includes(tf.value) ? "border-purple-500/40 bg-purple-500/10 text-purple-300" : "border-white/10 text-white/40 hover:border-white/20 hover:text-white/70"}`}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${form.timeframes.includes(tf.value) ? "border-purple-500/40 bg-purple-500/10 text-purple-300" : "border-border text-muted-foreground/70 hover:border-border hover:text-foreground/70"}`}
                         >
                           {tf.label}
                         </button>
@@ -1036,33 +1036,33 @@ export default function StrategyBuilder() {
                   </div>
 
                   {/* Tags */}
-                  <div className="bg-white/[0.02] border border-white/8 rounded-xl p-4 space-y-3">
-                    <label className="text-xs font-semibold text-white/50 uppercase tracking-wider">Tags (comma separated)</label>
+                  <div className="bg-muted/30 border border-border rounded-xl p-4 space-y-3">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tags (comma separated)</label>
                     <input
                       type="text"
                       value={form.tags}
                       onChange={e => setForm(f => ({ ...f, tags: e.target.value }))}
                       placeholder="e.g. trend, momentum, swing"
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-purple-500/50"
+                      className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-purple-500/50"
                     />
                   </div>
                 </div>
 
                 {/* Right: Summary */}
                 <div className="space-y-4">
-                  <div className="bg-white/[0.02] border border-white/8 rounded-2xl p-5 sticky top-24 space-y-4">
+                  <div className="bg-muted/30 border border-border rounded-2xl p-5 sticky top-24 space-y-4">
                     <div>
-                      <div className="text-xs font-mono font-semibold text-white/40 uppercase tracking-widest mb-3">Strategy Preview</div>
+                      <div className="text-xs font-mono font-semibold text-muted-foreground/70 uppercase tracking-widest mb-3">Strategy Preview</div>
                       {form.name ? (
                         <div
                           className="bg-gradient-to-br from-purple-500/10 to-blue-500/5 border border-purple-500/20 rounded-xl px-3 py-2 mb-3"
                           style={{ boxShadow: "0 0 20px rgba(167,139,250,0.05)" }}
                         >
-                          <div className="text-white font-bold">{form.name}</div>
+                          <div className="text-foreground font-bold">{form.name}</div>
                           <div className="text-purple-300/60 text-xs mt-0.5">{INDICATOR_TYPES.find(i => i.value === form.type)?.label}</div>
                         </div>
                       ) : (
-                        <div className="bg-white/3 border border-white/8 rounded-xl px-3 py-2 mb-3 text-white/20 text-sm italic">
+                        <div className="bg-muted/30 border border-border rounded-xl px-3 py-2 mb-3 text-muted-foreground/40 text-sm italic">
                           Enter a strategy name…
                         </div>
                       )}
@@ -1097,19 +1097,19 @@ export default function StrategyBuilder() {
                       )}
                       {form.timeframes.length > 0 && (
                         <div className="flex items-center justify-between">
-                          <div className="text-[10px] font-mono text-white/30 uppercase tracking-wider">Timeframe</div>
-                          <div className="text-xs font-mono text-white/60">{form.timeframes.join(", ")}</div>
+                          <div className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">Timeframe</div>
+                          <div className="text-xs font-mono text-muted-foreground">{form.timeframes.join(", ")}</div>
                         </div>
                       )}
                       {Object.entries(form.parameters).length > 0 && (
                         <div>
-                          <div className="text-[10px] font-mono font-semibold text-white/30 uppercase tracking-wider mb-1.5">Parameters</div>
+                          <div className="text-[10px] font-mono font-semibold text-muted-foreground/50 uppercase tracking-wider mb-1.5">Parameters</div>
                           <div className="space-y-1">
                             {Object.entries(form.parameters).map(([k, v]) => (
                               <div key={k} className="flex items-center justify-between gap-2">
-                                <span className="text-xs text-white/30 font-mono">{k}</span>
+                                <span className="text-xs text-muted-foreground/50 font-mono">{k}</span>
                                 <div className="flex items-center gap-2 flex-1 max-w-[120px]">
-                                  <div className="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
+                                  <div className="flex-1 h-1 bg-muted/50 rounded-full overflow-hidden">
                                     <div className="h-full bg-purple-400/50 rounded-full" style={{ width: `${Math.min(100, (v / 200) * 100)}%` }} />
                                   </div>
                                   <span className="text-xs font-mono text-purple-300/80 w-8 text-right">{v}</span>
@@ -1121,7 +1121,7 @@ export default function StrategyBuilder() {
                       )}
                     </div>
 
-                    <div className="pt-3 border-t border-white/5 space-y-2">
+                    <div className="pt-3 border-t border-border space-y-2">
                       <Button
                         onClick={saveStrategy}
                         disabled={saving}
@@ -1144,21 +1144,21 @@ export default function StrategyBuilder() {
                 {backtestLoading ? (
                   <div className="flex flex-col items-center justify-center py-24 gap-4">
                     <Loader2 className="w-10 h-10 text-purple-400 animate-spin" />
-                    <p className="text-white/50 text-sm">Running backtest against historical data…</p>
-                    <p className="text-white/25 text-xs">This may take 20–40 seconds</p>
+                    <p className="text-muted-foreground text-sm">Running backtest against historical data…</p>
+                    <p className="text-muted-foreground/40 text-xs">This may take 20–40 seconds</p>
                   </div>
                 ) : backtestResults ? (
                   <>
                     {/* Result cards */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      <div className={`bg-white/[0.02] border rounded-xl p-4 ${backtestResults.winRate >= 50 ? "border-green-500/20" : "border-red-500/20"}`}>
-                        <div className="text-xs text-white/40 mb-1 flex items-center gap-1"><TargetIcon className="w-3 h-3" /> Win Rate</div>
+                      <div className={`bg-muted/30 border rounded-xl p-4 ${backtestResults.winRate >= 50 ? "border-green-500/20" : "border-red-500/20"}`}>
+                        <div className="text-xs text-muted-foreground/70 mb-1 flex items-center gap-1"><TargetIcon className="w-3 h-3" /> Win Rate</div>
                         <div className={`text-2xl font-bold ${backtestResults.winRate >= 50 ? "text-green-400" : "text-red-400"}`}>
                           {backtestResults.winRate.toFixed(1)}%
                         </div>
                       </div>
-                      <div className={`bg-white/[0.02] border rounded-xl p-4 ${backtestResults.avgReturn >= 0 ? "border-green-500/20" : "border-red-500/20"}`}>
-                        <div className="text-xs text-white/40 mb-1 flex items-center gap-1">
+                      <div className={`bg-muted/30 border rounded-xl p-4 ${backtestResults.avgReturn >= 0 ? "border-green-500/20" : "border-red-500/20"}`}>
+                        <div className="text-xs text-muted-foreground/70 mb-1 flex items-center gap-1">
                           {backtestResults.avgReturn >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                           Avg Return
                         </div>
@@ -1166,29 +1166,29 @@ export default function StrategyBuilder() {
                           {backtestResults.avgReturn >= 0 ? "+" : ""}{backtestResults.avgReturn.toFixed(2)}%
                         </div>
                       </div>
-                      <div className="bg-white/[0.02] border border-yellow-500/20 rounded-xl p-4">
-                        <div className="text-xs text-white/40 mb-1 flex items-center gap-1"><Shield className="w-3 h-3" /> Max Drawdown</div>
+                      <div className="bg-muted/30 border border-yellow-500/20 rounded-xl p-4">
+                        <div className="text-xs text-muted-foreground/70 mb-1 flex items-center gap-1"><Shield className="w-3 h-3" /> Max Drawdown</div>
                         <div className="text-2xl font-bold text-yellow-400">{backtestResults.maxDrawdown.toFixed(1)}%</div>
                       </div>
-                      <div className="bg-white/[0.02] border border-white/8 rounded-xl p-4">
-                        <div className="text-xs text-white/40 mb-1 flex items-center gap-1"><BarChart3 className="w-3 h-3" /> Total Trades</div>
-                        <div className="text-2xl font-bold text-white">{backtestResults.totalTrades}</div>
+                      <div className="bg-muted/30 border border-border rounded-xl p-4">
+                        <div className="text-xs text-muted-foreground/70 mb-1 flex items-center gap-1"><BarChart3 className="w-3 h-3" /> Total Trades</div>
+                        <div className="text-2xl font-bold text-foreground">{backtestResults.totalTrades}</div>
                       </div>
                     </div>
 
                     {/* Equity curve */}
                     {backtestResults.equityCurve.length > 2 && (
-                      <div className="bg-white/[0.02] border border-white/8 rounded-xl p-5">
+                      <div className="bg-muted/30 border border-border rounded-xl p-5">
                         <div className="flex items-center justify-between mb-4">
-                          <div className="text-xs font-semibold text-white/50 uppercase tracking-wider">Equity Curve</div>
+                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Equity Curve</div>
                           <div className="flex items-center gap-3 text-xs font-mono">
                             <span className="flex items-center gap-1.5">
                               <span className="w-2 h-2 rounded-full" style={{ background: backtestResults.avgReturn >= 0 ? "#22c55e" : "#ef4444" }} />
-                              <span className="text-white/40">Equity</span>
+                              <span className="text-muted-foreground/70">Equity</span>
                             </span>
                             <span className="flex items-center gap-1.5">
                               <span className="w-2 h-2 rounded-full bg-red-500/60" />
-                              <span className="text-white/40">Drawdown</span>
+                              <span className="text-muted-foreground/70">Drawdown</span>
                             </span>
                           </div>
                         </div>
@@ -1200,15 +1200,15 @@ export default function StrategyBuilder() {
                                 <stop offset="95%" stopColor={backtestResults.avgReturn >= 0 ? "#22c55e" : "#ef4444"} stopOpacity={0.02} />
                               </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                             <XAxis
                               dataKey="bar"
-                              tick={{ fill: "rgba(255,255,255,0.2)", fontSize: 10, fontFamily: "monospace" }}
+                              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "monospace" }}
                               axisLine={false}
                               tickLine={false}
                             />
                             <YAxis
-                              tick={{ fill: "rgba(255,255,255,0.2)", fontSize: 10, fontFamily: "monospace" }}
+                              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "monospace" }}
                               tickFormatter={(v: number) => `$${v.toFixed(0)}`}
                               axisLine={false}
                               tickLine={false}
@@ -1216,19 +1216,19 @@ export default function StrategyBuilder() {
                             />
                             <ReferenceLine
                               y={backtestResults.equityCurve[0]?.equity ?? 100000}
-                              stroke="rgba(255,255,255,0.1)"
+                              stroke="hsl(var(--border))"
                               strokeDasharray="4 4"
                             />
                             <Tooltip
                               contentStyle={{
-                                background: "#0D1321",
-                                border: "1px solid rgba(255,255,255,0.1)",
+                                background: "hsl(var(--card))",
+                                border: "1px solid hsl(var(--border))",
                                 borderRadius: 10,
                                 fontSize: 12,
                                 fontFamily: "monospace",
                               }}
                               formatter={(v: number) => [`$${v.toFixed(2)}`, "Equity"]}
-                              labelStyle={{ color: "rgba(255,255,255,0.4)", marginBottom: 4 }}
+                              labelStyle={{ color: "hsl(var(--muted-foreground))", marginBottom: 4 }}
                             />
                             <Area
                               type="monotone"
@@ -1249,21 +1249,21 @@ export default function StrategyBuilder() {
                       <Button
                         onClick={() => { setView("list"); }}
                         variant="outline"
-                        className="border-white/10 text-white/70"
+                        className="border-border text-foreground/70"
                       >
                         <ChevronLeft className="w-4 h-4 mr-1.5" /> Back to Strategies
                       </Button>
                       <Button
                         onClick={() => startEdit(backtestTarget)}
                         variant="outline"
-                        className="border-white/10 text-white/70"
+                        className="border-border text-foreground/70"
                       >
                         <Edit2 className="w-4 h-4 mr-1.5" /> Edit Strategy
                       </Button>
                       {!backtestTarget.isActive && (
                         <Button
                           onClick={() => { toggleActive(backtestTarget); setView("list"); }}
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          className="bg-green-600 hover:bg-green-700 text-foreground"
                         >
                           <Power className="w-4 h-4 mr-1.5" /> Activate Strategy
                         </Button>

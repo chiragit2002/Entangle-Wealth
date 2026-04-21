@@ -101,7 +101,7 @@ export function PersonalizedResultScreen({
   const [, navigate] = useLocation();
   const rec = getRecommendation(focus, outcome);
   const focusLabel = FOCUS_LABELS[focus];
-  const focusColor = FOCUS_COLORS[focus] || "text-white/60";
+  const focusColor = FOCUS_COLORS[focus] || "text-muted-foreground";
 
   const handleCTA = () => {
     onContinue();
@@ -115,10 +115,10 @@ export function PersonalizedResultScreen({
       aria-modal="true"
       aria-labelledby="result-screen-title"
     >
-      <div className="bg-[#0a0a14] border border-white/[0.08] rounded-sm w-full max-w-md my-4 shadow-2xl shadow-[#00B4D8]/5 animate-in fade-in zoom-in-95 duration-300">
+      <div className="bg-card border border-border rounded-sm w-full max-w-md my-4 shadow-2xl shadow-[#00B4D8]/5 animate-in fade-in zoom-in-95 duration-300">
 
         {/* Header */}
-        <div className="px-6 pt-7 pb-5 border-b border-white/[0.06]">
+        <div className="px-6 pt-7 pb-5 border-b border-border">
           <div className="flex items-center gap-2 mb-3">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#00B4D8]/30 to-transparent" />
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00B4D8]/[0.08] border border-[#00B4D8]/20">
@@ -129,7 +129,7 @@ export function PersonalizedResultScreen({
             </div>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#00B4D8]/30 to-transparent" />
           </div>
-          <h2 id="result-screen-title" className="text-xl font-bold text-white leading-snug">
+          <h2 id="result-screen-title" className="text-xl font-bold text-foreground leading-snug">
             {firstName ? (
               <>{firstName}, here's the <span className="text-[#00B4D8]">one move that matters most</span></>
             ) : (
@@ -139,13 +139,13 @@ export function PersonalizedResultScreen({
           {(focusLabel || occupationName) && (
             <div className="flex flex-wrap gap-1.5 mt-3">
               {occupationName && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/[0.04] border border-white/[0.08] text-white/50">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-muted/50 border border-border text-muted-foreground">
                   <Briefcase className="w-2.5 h-2.5 text-[#00B4D8]" aria-hidden="true" />
                   {occupationName}
                 </span>
               )}
               {focusLabel && (
-                <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/[0.04] border border-white/[0.08] ${focusColor}`}>
+                <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-muted/50 border border-border ${focusColor}`}>
                   <Target className="w-2.5 h-2.5" aria-hidden="true" />
                   {focusLabel}
                 </span>
@@ -155,24 +155,24 @@ export function PersonalizedResultScreen({
         </div>
 
         {/* Primary recommendation */}
-        <div className="px-6 py-5 border-b border-white/[0.06]">
+        <div className="px-6 py-5 border-b border-border">
           <div className="flex items-start gap-3.5">
             <div className="w-10 h-10 rounded-xl bg-[#00B4D8]/10 border border-[#00B4D8]/20 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-[0_0_12px_rgba(0,180,216,0.1)]">
               <CheckCircle2 className="w-5 h-5 text-[#00B4D8]" aria-hidden="true" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30 mb-1.5">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50 mb-1.5">
                 Top recommendation
               </p>
-              <h3 className="text-[15px] font-bold text-white leading-snug mb-2.5">{rec.title}</h3>
-              <p className="text-[13px] text-white/50 leading-relaxed">{rec.why}</p>
+              <h3 className="text-[15px] font-bold text-foreground leading-snug mb-2.5">{rec.title}</h3>
+              <p className="text-[13px] text-muted-foreground leading-relaxed">{rec.why}</p>
             </div>
           </div>
         </div>
 
         {/* Supporting insights */}
-        <div className="px-6 py-4 border-b border-white/[0.06]">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-white/25 mb-3">
+        <div className="px-6 py-4 border-b border-border">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/40 mb-3">
             Why this matters
           </p>
           <div className="space-y-3">
@@ -180,10 +180,10 @@ export function PersonalizedResultScreen({
               const Icon = INSIGHT_ICONS[i];
               return (
                 <div key={i} className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <div className="w-6 h-6 rounded-lg bg-muted/50 border border-border flex items-center justify-center flex-shrink-0 mt-0.5">
                     <Icon className="w-3 h-3 text-[#00B4D8]/50" aria-hidden="true" />
                   </div>
-                  <p className="text-[12px] text-white/45 leading-relaxed">{insight}</p>
+                  <p className="text-[12px] text-muted-foreground/70 leading-relaxed">{insight}</p>
                 </div>
               );
             })}
@@ -199,7 +199,7 @@ export function PersonalizedResultScreen({
             Open my dashboard
             <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </button>
-          <p className="text-center text-[11px] text-white/20 mt-3 leading-relaxed">
+          <p className="text-center text-[11px] text-muted-foreground/40 mt-3 leading-relaxed">
             Your dashboard is configured and ready — tools matched to your goal, not a generic template
           </p>
         </div>

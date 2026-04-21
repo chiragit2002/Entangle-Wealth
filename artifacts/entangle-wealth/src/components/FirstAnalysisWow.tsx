@@ -237,7 +237,7 @@ export function FirstAnalysisWow({ onComplete, symbol }: FirstAnalysisWowProps) 
             >
               Your First Quantum Analysis
             </div>
-            <div className="text-sm text-white/50">
+            <div className="text-sm text-muted-foreground">
               is complete. You're now operating on a new level.
             </div>
           </div>

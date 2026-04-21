@@ -17,7 +17,7 @@ interface ProgressItem {
 function ProgressBar({ pct, color }: { pct: number; color: string }) {
   const isNearComplete = pct >= 75;
   return (
-    <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
       <div
         className="h-full rounded-full transition-all duration-700 ease-out"
         style={{
@@ -151,13 +151,13 @@ export function ZeigarnikProgressBar({ compact = false }: ZeigarnikProgressBarPr
                     {item.label}
                   </span>
                 </div>
-                <span className="text-[9px] font-mono text-white/30">
+                <span className="text-[9px] font-mono text-muted-foreground/50">
                   {item.current}/{item.total}
                 </span>
               </div>
               <ProgressBar pct={pct} color={item.color} />
               {remaining > 0 && pct >= 60 && (
-                <p className="text-[8px] font-mono text-white/25 mt-0.5">
+                <p className="text-[8px] font-mono text-muted-foreground/40 mt-0.5">
                   {remaining} more to complete
                 </p>
               )}
@@ -169,13 +169,13 @@ export function ZeigarnikProgressBar({ compact = false }: ZeigarnikProgressBarPr
   }
 
   return (
-    <div className="bg-[#0A0E1A] border border-white/[0.06] rounded-sm overflow-hidden">
-      <div className="flex items-center justify-between px-2 py-1.5 bg-white/[0.02] border-b border-white/[0.06] border-l-2 border-l-[#00D4FF]">
+    <div className="bg-card border border-border rounded-sm overflow-hidden">
+      <div className="flex items-center justify-between px-2 py-1.5 bg-muted/30 border-b border-border border-l-2 border-l-[#00D4FF]">
         <div className="flex items-center gap-1.5">
           <BookOpen className="w-3 h-3 text-[#00D4FF]" />
           <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#00D4FF]">YOUR PROGRESS</span>
         </div>
-        <span className="text-[8px] font-mono text-white/25">finish what you started</span>
+        <span className="text-[8px] font-mono text-muted-foreground/40">finish what you started</span>
       </div>
       <div className="p-2 space-y-2.5">
         {items.map(item => {
@@ -192,11 +192,11 @@ export function ZeigarnikProgressBar({ compact = false }: ZeigarnikProgressBarPr
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[9px] font-mono text-white/30">
+                  <span className="text-[9px] font-mono text-muted-foreground/50">
                     {pct}%
                   </span>
                   {remaining > 0 && (
-                    <ArrowRight className="w-2.5 h-2.5 text-white/20 group-hover:text-white/40 transition-colors" />
+                    <ArrowRight className="w-2.5 h-2.5 text-muted-foreground/40 group-hover:text-muted-foreground/70 transition-colors" />
                   )}
                 </div>
               </div>

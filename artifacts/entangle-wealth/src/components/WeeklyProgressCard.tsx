@@ -54,27 +54,27 @@ export function WeeklyProgressCard() {
     <div className="col-span-12 mb-1.5">
       <div className="bg-gradient-to-r from-[#0d0d1f] via-[#0a0a18] to-[#0d0d1f] border border-[#FFB800]/15 rounded-sm overflow-hidden">
         <div
-          className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-white/[0.01] transition-colors"
+          className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-muted/30 transition-colors"
           onClick={() => setCollapsed(c => !c)}
         >
           <div className="flex items-center gap-2">
             <Trophy className="w-3.5 h-3.5 text-[#FFB800]" />
             <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#FFB800]">YOUR WEEK IN REVIEW</span>
-            <span className="text-[9px] font-mono text-white/40">·</span>
-            <span className="text-[9px] font-mono text-white/30">
+            <span className="text-[9px] font-mono text-muted-foreground/70">·</span>
+            <span className="text-[9px] font-mono text-muted-foreground/50">
               You're in the top {Math.max(1, 100 - summary.percentile)}% of all users
             </span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={(e) => { e.stopPropagation(); dismiss(); }}
-              className="text-white/50 hover:text-white/40 transition-colors p-0.5"
+              className="text-muted-foreground hover:text-muted-foreground/70 transition-colors p-0.5"
               aria-label="Dismiss weekly summary"
             >
               <X className="w-3 h-3" />
             </button>
             <ChevronUp
-              className={`w-3.5 h-3.5 text-white/40 transition-transform ${collapsed ? "rotate-180" : ""}`}
+              className={`w-3.5 h-3.5 text-muted-foreground/70 transition-transform ${collapsed ? "rotate-180" : ""}`}
             />
           </div>
         </div>
@@ -125,13 +125,13 @@ export function WeeklyProgressCard() {
 
 function StatTile({ icon, label, value, sub, color }: { icon: React.ReactNode; label: string; value: string; sub: string; color: string }) {
   return (
-    <div className="bg-white/[0.02] border border-white/[0.04] rounded-sm px-2.5 py-2">
+    <div className="bg-muted/30 border border-border rounded-sm px-2.5 py-2">
       <div className="flex items-center gap-1.5 mb-1">
         {icon}
-        <span className="text-[8px] font-mono text-white/25 uppercase tracking-widest">{label}</span>
+        <span className="text-[8px] font-mono text-muted-foreground/40 uppercase tracking-widest">{label}</span>
       </div>
       <p className="text-[15px] font-black font-mono" style={{ color }}>{value}</p>
-      <p className="text-[9px] font-mono text-white/25 mt-0.5">{sub}</p>
+      <p className="text-[9px] font-mono text-muted-foreground/40 mt-0.5">{sub}</p>
     </div>
   );
 }

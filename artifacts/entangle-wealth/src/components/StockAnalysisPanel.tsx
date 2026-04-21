@@ -154,7 +154,7 @@ export function StockAnalysisPanel({ symbol, name }: StockAnalysisPanelProps) {
             </div>
           </div>
 
-          <div className="p-3 rounded bg-white/5 border border-white/10 mb-4">
+          <div className="p-3 rounded bg-muted/50 border border-border mb-4">
             <p className="text-sm">{analysis.flashCouncilSummary}</p>
           </div>
 
@@ -183,7 +183,7 @@ export function StockAnalysisPanel({ symbol, name }: StockAnalysisPanelProps) {
           </h4>
           <div className="space-y-2">
             {analysis.agents?.map((agent) => (
-              <div key={agent.id} className="p-3 rounded bg-white/5 border border-white/5 hover:border-primary/20 transition-colors">
+              <div key={agent.id} className="p-3 rounded bg-muted/50 border border-white/5 hover:border-primary/20 transition-colors">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-xs text-muted-foreground">#{String(agent.id).padStart(3, "0")}</span>

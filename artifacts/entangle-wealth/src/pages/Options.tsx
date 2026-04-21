@@ -78,7 +78,7 @@ export default function Options() {
   const SortHeader = ({ field, children, className = "" }: { field: SortField; children: React.ReactNode; className?: string }) => (
     <button onClick={() => handleSort(field)} className={`flex items-center gap-1 hover:text-primary transition-colors group ${className}`}>
       {children}
-      <ArrowUpDown className={`w-3 h-3 transition-colors ${sortField === field ? 'text-primary' : 'text-white/40 group-hover:text-white/40'}`} />
+      <ArrowUpDown className={`w-3 h-3 transition-colors ${sortField === field ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-muted-foreground/70'}`} />
       {sortField === field && <span className="text-primary text-[9px]">{sortDir === "asc" ? "↑" : "↓"}</span>}
     </button>
   );
@@ -105,7 +105,7 @@ export default function Options() {
           <div className="flex items-center gap-2">
             <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" className="border-white/10 hover:bg-white/5 relative">
+                <Button variant="outline" className="border-border hover:bg-muted/50 relative">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
                   Filters
                   {activeFilterCount > 0 && (
@@ -113,12 +113,12 @@ export default function Options() {
                   )}
                 </Button>
               </SheetTrigger>
-              <SheetContent className="bg-black/95 border-white/10 w-80">
+              <SheetContent className="bg-black/95 border-border w-80">
                 <SheetHeader>
-                  <SheetTitle className="text-white flex items-center justify-between">
+                  <SheetTitle className="text-foreground flex items-center justify-between">
                     Filter Signals
                     {activeFilterCount > 0 && (
-                      <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-muted-foreground hover:text-white">
+                      <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-muted-foreground hover:text-foreground">
                         Clear all
                       </Button>
                     )}
@@ -133,7 +133,7 @@ export default function Options() {
                           key={t}
                           variant={filterType === t ? "default" : "outline"}
                           size="sm"
-                          className={filterType === t ? "bg-primary text-primary-foreground" : "border-white/10 hover:bg-white/5"}
+                          className={filterType === t ? "bg-primary text-primary-foreground" : "border-border hover:bg-muted/50"}
                           onClick={() => setFilterType(t)}
                         >
                           {t}
@@ -150,7 +150,7 @@ export default function Options() {
                           key={t}
                           variant={filterTickers.includes(t) ? "default" : "outline"}
                           size="sm"
-                          className={filterTickers.includes(t) ? "bg-primary text-primary-foreground" : "border-white/10 hover:bg-white/5"}
+                          className={filterTickers.includes(t) ? "bg-primary text-primary-foreground" : "border-border hover:bg-muted/50"}
                           onClick={() => toggleTicker(t)}
                         >
                           {t}
@@ -178,12 +178,12 @@ export default function Options() {
 
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="border-white/10 hover:bg-white/5">
+                <Button variant="outline" className="border-border hover:bg-muted/50">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
                   Columns ({colCount})
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="bg-black/95 border-white/10 w-48 p-3" align="end">
+              <PopoverContent className="bg-black/95 border-border w-48 p-3" align="end">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Toggle Columns</p>
                 <div className="flex flex-col gap-2">
                   {(Object.keys(visibleCols) as (keyof typeof visibleCols)[]).map(col => (
@@ -207,7 +207,7 @@ export default function Options() {
               </Badge>
             )}
             {filterTickers.map(t => (
-              <Badge key={t} variant="outline" className="bg-white/5 text-white border-white/10 gap-1 text-xs">
+              <Badge key={t} variant="outline" className="bg-muted/50 text-foreground border-border gap-1 text-xs">
                 {t} <button onClick={() => toggleTicker(t)}><X className="w-3 h-3" /></button>
               </Badge>
             ))}
@@ -227,17 +227,17 @@ export default function Options() {
 
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 rounded-sm bg-white/5 flex items-center justify-center mb-4">
+            <div className="w-16 h-16 rounded-sm bg-muted/50 flex items-center justify-center mb-4">
               <Target className="w-8 h-8 text-muted-foreground" />
             </div>
             <p className="text-lg font-semibold mb-1">No signals match your filters</p>
             <p className="text-sm text-muted-foreground mb-4">Try adjusting your filter criteria.</p>
-            <Button variant="outline" className="border-white/10" onClick={clearFilters}>Clear All Filters</Button>
+            <Button variant="outline" className="border-border" onClick={clearFilters}>Clear All Filters</Button>
           </div>
         ) : (
           <div className="w-full overflow-x-auto">
             <div className="min-w-[900px] flex flex-col gap-2">
-              <div className="flex items-center gap-4 px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-white/10">
+              <div className="flex items-center gap-4 px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border">
                 <div className="w-8" />
                 {visibleCols.time && <div className="w-20"><SortHeader field="time">Time</SortHeader></div>}
                 {visibleCols.symbol && <div className="w-20"><SortHeader field="symbol">Ticker</SortHeader></div>}
@@ -256,7 +256,7 @@ export default function Options() {
                 const isSaved = savedSignals.includes(item.id);
                 return (
                   <div key={`uoa-${item.id}`}>
-                    <Card className={`border-white/5 hover:border-white/20 transition-all overflow-hidden rounded-lg cursor-pointer ${isExpanded ? 'bg-white/[0.04] border-primary/30' : 'bg-black/40'}`}
+                    <Card className={`border-white/5 hover:border-border transition-all overflow-hidden rounded-lg cursor-pointer ${isExpanded ? 'bg-muted/50 border-primary/30' : 'bg-black/40'}`}
                       onClick={() => setExpandedRow(isExpanded ? null : item.id)}>
                       <CardContent className="p-0">
                         <div className="flex items-center gap-4 px-4 py-4">
@@ -280,7 +280,7 @@ export default function Options() {
                           {visibleCols.ivRank && (
                             <div className="w-28 flex items-center justify-center gap-2">
                               <span className="font-mono text-sm w-8 text-right">{item.ivRank}%</span>
-                              <div className="w-12 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                              <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
                                 <div className="h-full bg-secondary" style={{ width: `${item.ivRank}%` }} />
                               </div>
                             </div>
@@ -289,7 +289,7 @@ export default function Options() {
                             <div className="flex-1 min-w-[160px] flex items-center justify-center gap-3">
                               <Progress
                                 value={item.strength}
-                                className={`h-2 flex-1 max-w-[120px] ${item.strength > 80 ? 'bg-primary/20 [&>div]:bg-primary shadow-[0_0_10px_rgba(0,180,216,0.5)]' : 'bg-white/10 [&>div]:bg-white/50'}`}
+                                className={`h-2 flex-1 max-w-[120px] ${item.strength > 80 ? 'bg-primary/20 [&>div]:bg-primary shadow-[0_0_10px_rgba(0,180,216,0.5)]' : 'bg-muted [&>div]:bg-muted/500'}`}
                               />
                               <span className="font-mono text-sm font-bold w-10 text-right">{item.strength}</span>
                               {item.strength > 90 && <Zap className="w-4 h-4 text-primary animate-pulse" />}
@@ -297,13 +297,13 @@ export default function Options() {
                           )}
                           {visibleCols.strategy && (
                             <div className="w-36 text-center">
-                              <span className="text-[10px] font-mono text-muted-foreground bg-white/5 px-2 py-1 rounded">{item.strategy}</span>
+                              <span className="text-[10px] font-mono text-muted-foreground bg-muted/50 px-2 py-1 rounded">{item.strategy}</span>
                             </div>
                           )}
                           <div className="w-10 flex items-center justify-center">
                             <button
                               onClick={(e) => { e.stopPropagation(); toggleSave(item.id, item.symbol); }}
-                              className={`p-1.5 rounded-md transition-colors ${isSaved ? 'text-secondary hover:text-secondary/80' : 'text-white/40 hover:text-white/50'}`}
+                              className={`p-1.5 rounded-md transition-colors ${isSaved ? 'text-secondary hover:text-secondary/80' : 'text-muted-foreground/70 hover:text-muted-foreground'}`}
                             >
                               {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                             </button>
@@ -313,7 +313,7 @@ export default function Options() {
                     </Card>
 
                     {isExpanded && (
-                      <div className="bg-white/[0.02] border border-white/5 border-t-0 rounded-b-lg px-6 py-5 animate-in slide-in-from-top-2 duration-200">
+                      <div className="bg-muted/30 border border-white/5 border-t-0 rounded-b-lg px-6 py-5 animate-in slide-in-from-top-2 duration-200">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div className="space-y-3">
                             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Contract Details</h4>
@@ -356,7 +356,7 @@ export default function Options() {
                                 <span className="text-sm text-muted-foreground">Signal Strength</span>
                                 <span className="font-mono font-bold text-lg">{item.strength}/100</span>
                               </div>
-                              <Progress value={item.strength} className={`h-3 ${item.strength > 80 ? 'bg-primary/20 [&>div]:bg-primary' : 'bg-white/10 [&>div]:bg-white/50'}`} />
+                              <Progress value={item.strength} className={`h-3 ${item.strength > 80 ? 'bg-primary/20 [&>div]:bg-primary' : 'bg-muted [&>div]:bg-muted/500'}`} />
                               <div className="flex items-center gap-2 mt-2">
                                 {item.strength >= 90 && <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">High Conviction</Badge>}
                                 {item.ivRank >= 70 && <Badge className="bg-secondary/20 text-secondary border-secondary/30 text-xs">Elevated IV</Badge>}
@@ -398,7 +398,7 @@ export default function Options() {
           </div>
         )}
 
-        <div className="mt-8 p-4 rounded-lg border border-white/5 bg-white/[0.01]">
+        <div className="mt-8 p-4 rounded-lg border border-white/5 bg-muted/30">
           <p className="text-xs text-muted-foreground/60 text-center">Options trading carries substantial risk. The data shown above is for demonstration purposes. Signal strength is a composite score based on volume, premium size, and IV rank | it is not a recommendation to trade.</p>
         </div>
       </div>

@@ -56,7 +56,7 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
 
   if (state === "done") {
     return (
-      <div className={`flex items-center gap-2 text-xs text-white/30 ${className}`}>
+      <div className={`flex items-center gap-2 text-xs text-muted-foreground/50 ${className}`}>
         <span>Thanks for your feedback!</span>
       </div>
     );
@@ -69,7 +69,7 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
         style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.08)" }}
       >
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2 text-sm text-white/70">
+          <div className="flex items-center gap-2 text-sm text-foreground/70">
             {helpful ? (
               <ThumbsUp className="w-4 h-4 text-[#00B4D8]" />
             ) : (
@@ -77,7 +77,7 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
             )}
             <span>{helpful ? "Glad it helped!" : "Sorry to hear that."} Any details?</span>
           </div>
-          <button onClick={handleDismiss} className="text-white/30 hover:text-white/60 transition-colors">
+          <button onClick={handleDismiss} className="text-muted-foreground/50 hover:text-muted-foreground transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -86,7 +86,7 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
           onChange={(e) => setComment(e.target.value.slice(0, 500))}
           placeholder="Optional: tell us more..."
           rows={2}
-          className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 resize-none focus:outline-none focus:border-white/20 mb-3"
+          className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder-white/30 resize-none focus:outline-none focus:border-border mb-3"
         />
         <div className="flex gap-2">
           <button
@@ -101,7 +101,7 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
           <button
             onClick={() => handleSubmit(false)}
             disabled={submitting}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/40 hover:text-white/60 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground/70 hover:text-muted-foreground transition-colors"
           >
             Skip
           </button>
@@ -112,10 +112,10 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <span className="text-xs text-white/50">{label}</span>
+      <span className="text-xs text-muted-foreground">{label}</span>
       <button
         onClick={() => handleVote(true)}
-        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-[#00B4D8] hover:bg-[#00B4D8]/10 border border-white/10 hover:border-[#00B4D8]/30 transition-all"
+        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-[#00B4D8] hover:bg-[#00B4D8]/10 border border-border hover:border-[#00B4D8]/30 transition-all"
         aria-label="Helpful"
       >
         <ThumbsUp className="w-3.5 h-3.5" />
@@ -123,7 +123,7 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
       </button>
       <button
         onClick={() => handleVote(false)}
-        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-[#ff3366] hover:bg-[#ff3366]/10 border border-white/10 hover:border-[#ff3366]/30 transition-all"
+        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-[#ff3366] hover:bg-[#ff3366]/10 border border-border hover:border-[#ff3366]/30 transition-all"
         aria-label="Not helpful"
       >
         <ThumbsDown className="w-3.5 h-3.5" />

@@ -117,10 +117,10 @@ export function MilestoneCelebrationModal() {
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 px-4"
       onClick={(e) => { if (e.target === e.currentTarget) dismiss(); }}
     >
-      <div className="relative bg-[#0d0d1a] border border-[rgba(0,180,216,0.3)] rounded-sm p-6 w-full max-w-sm text-center shadow-[0_0_60px_rgba(0,180,216,0.15)] animate-in zoom-in-95 duration-300">
+      <div className="relative bg-card border border-[rgba(0,180,216,0.3)] rounded-sm p-6 w-full max-w-sm text-center shadow-[0_0_60px_rgba(0,180,216,0.15)] animate-in zoom-in-95 duration-300">
         <button
           onClick={dismiss}
-          className="absolute top-3 right-3 text-[#555] hover:text-white p-2"
+          className="absolute top-3 right-3 text-[#555] hover:text-foreground p-2"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
@@ -152,7 +152,7 @@ export function MilestoneCelebrationModal() {
           </Button>
           <Button
             variant="outline"
-            className="border-white/10 min-h-[44px] px-3"
+            className="border-border min-h-[44px] px-3"
             onClick={handleCopyLink}
             title="Copy referral link"
           >
@@ -162,7 +162,7 @@ export function MilestoneCelebrationModal() {
 
         <Button
           variant="ghost"
-          className="w-full text-[#555] hover:text-white text-sm min-h-[40px]"
+          className="w-full text-[#555] hover:text-foreground text-sm min-h-[40px]"
           onClick={dismiss}
         >
           {queue.length > 1 ? "Next →" : "Awesome, got it!"}

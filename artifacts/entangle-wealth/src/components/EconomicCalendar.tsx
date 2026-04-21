@@ -35,7 +35,7 @@ const EVENTS: EconEvent[] = [
   { date: "May 3", time: "8:30 AM", name: "Unemployment Rate", impact: "high", previous: "3.8%", forecast: "3.9%", category: "employment" },
 ];
 
-const impactColor = (i: string) => i === "high" ? "text-[#ff3366] bg-[#ff3366]/10" : i === "medium" ? "text-[#FFB800] bg-[#FFB800]/10" : "text-white/40 bg-white/[0.03]";
+const impactColor = (i: string) => i === "high" ? "text-[#ff3366] bg-[#ff3366]/10" : i === "medium" ? "text-[#FFB800] bg-[#FFB800]/10" : "text-muted-foreground/70 bg-muted/50";
 const catIcon = (c: string) => c === "fed" ? "FED" : c === "employment" ? "EMP" : c === "inflation" ? "CPI" : c === "gdp" ? "GDP" : c === "earnings" ? "ERN" : "HSG";
 
 export function EconomicCalendar() {
@@ -44,16 +44,16 @@ export function EconomicCalendar() {
   const filtered = filter === "all" ? EVENTS : EVENTS.filter(e => e.category === filter);
 
   return (
-    <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.04]">
+    <div className="bg-card border border-border rounded-xl overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
         <div className="flex items-center gap-2">
           <Calendar className="w-3.5 h-3.5 text-primary/50" />
-          <span className="text-[11px] font-bold text-white/50">ECONOMIC CALENDAR</span>
+          <span className="text-[11px] font-bold text-muted-foreground">ECONOMIC CALENDAR</span>
         </div>
         <div className="flex items-center gap-1">
           {["all", "fed", "earnings", "inflation", "employment"].map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-2 py-0.5 rounded text-[9px] font-bold transition-colors ${filter === f ? "bg-primary/10 text-primary" : "text-white/40 hover:text-white/30"}`}>
+              className={`px-2 py-0.5 rounded text-[9px] font-bold transition-colors ${filter === f ? "bg-primary/10 text-primary" : "text-muted-foreground/70 hover:text-muted-foreground/50"}`}>
               {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
             </button>
           ))}
@@ -61,28 +61,28 @@ export function EconomicCalendar() {
       </div>
       <div className="max-h-[400px] overflow-y-auto">
         {filtered.map((event, i) => (
-          <div key={i} className="flex items-center px-4 py-2 border-b border-white/[0.015] hover:bg-white/[0.01] transition-colors gap-3">
+          <div key={i} className="flex items-center px-4 py-2 border-b border-white/[0.015] hover:bg-muted/30 transition-colors gap-3">
             <div className="w-[52px] flex-shrink-0">
-              <p className="text-[10px] font-bold text-white/30">{event.date}</p>
-              <p className="text-[8px] text-white/12 font-mono">{event.time}</p>
+              <p className="text-[10px] font-bold text-muted-foreground/50">{event.date}</p>
+              <p className="text-[8px] text-muted-foreground/20 font-mono">{event.time}</p>
             </div>
             <span className={`text-[7px] font-black px-1.5 py-0.5 rounded ${impactColor(event.impact)} flex-shrink-0 w-7 text-center`}>
               {event.impact === "high" ? "!!!" : event.impact === "medium" ? "!!" : "!"}
             </span>
-            <span className="text-[8px] font-mono text-white/40 w-6 flex-shrink-0">{catIcon(event.category)}</span>
+            <span className="text-[8px] font-mono text-muted-foreground/70 w-6 flex-shrink-0">{catIcon(event.category)}</span>
             <span className="text-[11px] font-medium flex-1 min-w-0 truncate">{event.name}</span>
             <div className="flex items-center gap-3 flex-shrink-0">
               <div className="text-right">
-                <p className="text-[8px] text-white/10">Prev</p>
-                <p className="text-[10px] font-mono text-white/25">{event.previous}</p>
+                <p className="text-[8px] text-muted-foreground/20">Prev</p>
+                <p className="text-[10px] font-mono text-muted-foreground/40">{event.previous}</p>
               </div>
               <div className="text-right">
-                <p className="text-[8px] text-white/10">Fcst</p>
-                <p className="text-[10px] font-mono text-white/35">{event.forecast}</p>
+                <p className="text-[8px] text-muted-foreground/20">Fcst</p>
+                <p className="text-[10px] font-mono text-muted-foreground/60">{event.forecast}</p>
               </div>
               {event.actual && (
                 <div className="text-right">
-                  <p className="text-[8px] text-white/10">Act</p>
+                  <p className="text-[8px] text-muted-foreground/20">Act</p>
                   <p className="text-[10px] font-mono font-bold text-primary">{event.actual}</p>
                 </div>
               )}

@@ -71,7 +71,7 @@ export default function BlogPostPage() {
       <Layout>
         <div className="flex flex-col items-center justify-center py-32 text-center px-4">
           <FileText className="w-12 h-12 text-muted-foreground/30 mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-2">Article Not Found</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Article Not Found</h1>
           <p className="text-muted-foreground mb-6">This blog post doesn't exist or hasn't been published yet.</p>
           <Link href="/blog" className="text-primary hover:underline text-sm font-semibold flex items-center gap-1">
             <ArrowLeft className="w-4 h-4" /> Back to Blog
@@ -92,7 +92,7 @@ export default function BlogPostPage() {
         </Link>
 
         <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white mb-4 leading-tight">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4 leading-tight">
             {post.title}
           </h1>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -112,9 +112,9 @@ export default function BlogPostPage() {
           dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }}
         />
 
-        <div className="border-t border-white/[0.06] mt-12 pt-8">
+        <div className="border-t border-border mt-12 pt-8">
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 text-center">
-            <h3 className="text-lg font-bold text-white mb-2">Ready to level up your financial game?</h3>
+            <h3 className="text-lg font-bold text-foreground mb-2">Ready to level up your financial game?</h3>
             <p className="text-sm text-muted-foreground mb-4">
               EntangleWealth gives you Bloomberg Terminal-parity tools | free.
             </p>

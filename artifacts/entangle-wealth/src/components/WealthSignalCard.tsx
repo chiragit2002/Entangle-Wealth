@@ -184,13 +184,13 @@ export function WealthSignalCard({
           boxShadow: "0 0 60px rgba(0,180,216,0.1)",
         }}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div>
-            <div className="text-sm font-bold text-white">Wealth Signal Card</div>
-            <div className="text-[11px] text-white/40 mt-0.5">Your shareable performance snapshot</div>
+            <div className="text-sm font-bold text-foreground">Wealth Signal Card</div>
+            <div className="text-[11px] text-muted-foreground/70 mt-0.5">Your shareable performance snapshot</div>
           </div>
           {onClose && (
-            <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/5 text-white/40 hover:text-white/70 transition-colors">
+            <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/50 text-muted-foreground/70 hover:text-foreground/70 transition-colors">
               <X className="w-4 h-4" />
             </button>
           )}
@@ -215,9 +215,9 @@ export function WealthSignalCard({
               EntangleWealth
             </div>
 
-            <div className="text-[13px] text-white/50 mb-1">{userName}</div>
+            <div className="text-[13px] text-muted-foreground mb-1">{userName}</div>
 
-            <div className="text-4xl font-extrabold text-white mb-1">
+            <div className="text-4xl font-extrabold text-foreground mb-1">
               ${portfolioValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </div>
             <div
@@ -234,7 +234,7 @@ export function WealthSignalCard({
               >
                 <div className="flex items-center gap-1 mb-1">
                   <Flame className="w-3 h-3 text-[#FFD700]" />
-                  <span className="text-[9px] text-white/40 uppercase tracking-widest">Streak</span>
+                  <span className="text-[9px] text-muted-foreground/70 uppercase tracking-widest">Streak</span>
                 </div>
                 <div className="text-lg font-bold text-[#FFD700]">{streak}d</div>
               </div>
@@ -244,7 +244,7 @@ export function WealthSignalCard({
               >
                 <div className="flex items-center gap-1 mb-1">
                   <Zap className="w-3 h-3 text-[#00B4D8]" />
-                  <span className="text-[9px] text-white/40 uppercase tracking-widest">Level</span>
+                  <span className="text-[9px] text-muted-foreground/70 uppercase tracking-widest">Level</span>
                 </div>
                 <div className="text-lg font-bold text-[#00B4D8]">{level}</div>
               </div>
@@ -254,7 +254,7 @@ export function WealthSignalCard({
               >
                 <div className="flex items-center gap-1 mb-1">
                   <TrendingUp className="w-3 h-3 text-[#7B61FF]" />
-                  <span className="text-[9px] text-white/40 uppercase tracking-widest">XP</span>
+                  <span className="text-[9px] text-muted-foreground/70 uppercase tracking-widest">XP</span>
                 </div>
                 <div className="text-lg font-bold text-[#7B61FF]">{xp.toLocaleString()}</div>
               </div>
@@ -271,7 +271,7 @@ export function WealthSignalCard({
             <Button
               onClick={handleDownload}
               variant="outline"
-              className="flex-1 border-white/10 text-white/70 hover:bg-white/5 hover:text-white gap-2"
+              className="flex-1 border-border text-foreground/70 hover:bg-muted/50 hover:text-foreground gap-2"
             >
               <Download className="w-4 h-4" />
               Download

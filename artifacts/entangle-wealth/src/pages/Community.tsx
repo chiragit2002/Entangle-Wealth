@@ -9,7 +9,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { authFetch } from "@/lib/authFetch";
-import { Calendar, Briefcase, CreditCard, Plus, ThumbsUp, MessageCircle, Share2, MapPin, Video, Clock, DollarSign, ExternalLink } from "lucide-react";
+import { Calendar, Briefcase, CreditCard, Plus, ThumbsUp, MessageCircle, Share2, MapPin, Video, Clock, DollarSign, ExternalLink, Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 type Tab = "communities" | "feed" | "events" | "jobs" | "pricing";
 
@@ -277,16 +278,16 @@ export default function Community() {
             <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-6">
               <Users className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Community</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">Community</h1>
             <p className="text-muted-foreground text-lg max-w-md mx-auto">
               Connect, share strategies, and grow together.
             </p>
           </div>
-          <div className="border border-white/[0.06] rounded-lg bg-white/[0.02] p-8 text-center mb-8">
+          <div className="border border-border rounded-lg bg-muted/30 p-8 text-center mb-8">
             <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4">
               <MessageSquare className="w-6 h-6 text-primary" />
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Join the Community</h2>
+            <h2 className="text-xl font-bold text-foreground mb-2">Join the Community</h2>
             <p className="text-muted-foreground text-sm max-w-md mx-auto mb-6">
               Sign up to access community groups, discussion feeds, events, and networking features.
             </p>
@@ -313,10 +314,10 @@ export default function Community() {
     <Layout>
       <div className="container mx-auto px-4 py-10 max-w-3xl">
         <div className="mb-7">
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Community</h1>
-          <p className="text-white/50 text-sm">Connect, learn, and grow with fellow traders & investors</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground mb-1">Community</h1>
+          <p className="text-muted-foreground text-sm">Connect, learn, and grow with fellow traders & investors</p>
         </div>
-        <div className="flex overflow-x-auto gap-1 mb-6 bg-[#0d0d1a] border border-[rgba(0,180,216,0.15)] rounded-xl p-1">
+        <div className="flex overflow-x-auto gap-1 mb-6 bg-card border border-[rgba(0,180,216,0.15)] rounded-xl p-1">
           {tabs.map(t => {
             const Icon = t.icon;
             return (
@@ -324,7 +325,7 @@ export default function Community() {
                 key={t.key}
                 onClick={() => setTab(t.key)}
                 className={`flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
-                  tab === t.key ? "bg-[rgba(0,180,216,0.1)] text-primary" : "text-[#555] hover:text-white/70"
+                  tab === t.key ? "bg-[rgba(0,180,216,0.1)] text-primary" : "text-[#555] hover:text-foreground/70"
                 }`}
               >
                 <Icon className="w-4 h-4 flex-shrink-0" />
@@ -336,7 +337,7 @@ export default function Community() {
 
         {tab === "communities" && (
           <div>
-            <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-4">
+            <div className="flex items-center justify-between pb-2 border-b border-border mb-4">
               <h2 className="text-lg font-bold">Communities</h2>
               <button onClick={() => setShowCreateCommunity(true)} className="text-xs text-primary font-semibold flex items-center gap-1 min-h-[44px] px-3">
                 <Plus className="w-3.5 h-3.5" /> Create
@@ -349,7 +350,7 @@ export default function Community() {
                   className={`px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap border transition-colors min-h-[36px] ${
                     commFilter === c.key
                       ? "bg-[rgba(0,180,216,0.1)] border-primary/50 text-primary"
-                      : "bg-[#0d0d1a] border-[rgba(0,180,216,0.15)] text-[#777] hover:text-white/70"
+                      : "bg-card border-[rgba(0,180,216,0.15)] text-[#777] hover:text-foreground/70"
                   }`}
                 >
                   {c.label}
@@ -401,7 +402,7 @@ export default function Community() {
             <div className="mb-4">
               <ReferralSection />
             </div>
-            <div className="flex items-center pb-2 border-b border-white/10 mb-4">
+            <div className="flex items-center pb-2 border-b border-border mb-4">
               <h2 className="text-lg font-bold">Community Feed</h2>
             </div>
             <div className="glass-panel rounded-xl p-4 mb-4">
@@ -411,14 +412,14 @@ export default function Community() {
                 placeholder="Share something with your community..."
                 rows={3}
                 maxLength={1000}
-                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm resize-none focus:outline-none focus:border-primary/50 placeholder:text-[#444]"
+                className="w-full bg-muted/50 border border-border rounded-lg p-3 text-foreground text-sm resize-none focus:outline-none focus:border-primary/50 placeholder:text-[#444]"
               />
               <p className="text-[10px] text-[#444] text-right mb-2">{postText.length}/1000</p>
               <div className="flex gap-2">
                 <Button className="bg-gradient-to-r from-primary to-[#FF6600] text-black font-bold min-h-[44px]" onClick={createPost}>
                   Post
                 </Button>
-                <Button variant="outline" className="border-white/10 text-muted-foreground/50 min-h-[44px] cursor-not-allowed opacity-60" disabled title="Photo uploads not available">
+                <Button variant="outline" className="border-border text-muted-foreground/50 min-h-[44px] cursor-not-allowed opacity-60" disabled title="Photo uploads not available">
                   Photo
                 </Button>
               </div>
@@ -490,18 +491,18 @@ export default function Community() {
 
         {tab === "events" && (
           <div>
-            <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-4">
+            <div className="flex items-center justify-between pb-2 border-b border-border mb-4">
               <h2 className="text-lg font-bold">Events & Trade Shows</h2>
               <button onClick={() => setShowCreateEvent(true)} className="text-xs text-primary font-semibold flex items-center gap-1 min-h-[44px] px-3">
                 <Plus className="w-3.5 h-3.5" /> Create
               </button>
             </div>
-            <div className="flex bg-[#0d0d1a] border border-[rgba(0,180,216,0.15)] rounded-xl overflow-hidden mb-4">
+            <div className="flex bg-card border border-[rgba(0,180,216,0.15)] rounded-xl overflow-hidden mb-4">
               {EVENT_TABS.map(t => (
                 <button key={t.key}
                   onClick={() => setEventTab(t.key)}
                   className={`flex-1 py-2.5 text-xs font-semibold transition-colors min-h-[44px] ${
-                    eventTab === t.key ? "bg-[rgba(0,180,216,0.1)] text-primary" : "text-[#555] hover:text-white/70"
+                    eventTab === t.key ? "bg-[rgba(0,180,216,0.1)] text-primary" : "text-[#555] hover:text-foreground/70"
                   }`}
                 >
                   {t.label}
@@ -533,7 +534,7 @@ export default function Community() {
 
         {tab === "jobs" && (
           <div>
-            <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-4">
+            <div className="flex items-center justify-between pb-2 border-b border-border mb-4">
               <h2 className="text-lg font-bold">Job Board</h2>
               <button onClick={() => setShowPostJob(true)} className="text-xs text-primary font-semibold flex items-center gap-1 min-h-[44px] px-3">
                 <Plus className="w-3.5 h-3.5" /> Post Job
@@ -546,7 +547,7 @@ export default function Community() {
                 value={jobSearch}
                 onChange={e => setJobSearch(e.target.value.slice(0, 200))}
                 maxLength={200}
-                className="bg-white/5 border-white/10 pl-10"
+                className="bg-muted/50 border-border pl-10"
               />
             </div>
             <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
@@ -556,7 +557,7 @@ export default function Community() {
                   className={`px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap border transition-colors min-h-[36px] ${
                     jobFilter === c.key
                       ? "bg-[rgba(0,180,216,0.1)] border-primary/50 text-primary"
-                      : "bg-[#0d0d1a] border-[rgba(0,180,216,0.15)] text-[#777] hover:text-white/70"
+                      : "bg-card border-[rgba(0,180,216,0.15)] text-[#777] hover:text-foreground/70"
                   }`}
                 >
                   {c.label}
@@ -567,8 +568,8 @@ export default function Community() {
               {filteredJobs.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                  <p className="font-semibold text-white/40 mb-1">No jobs match your filters</p>
-                  <p className="text-sm text-white/50">Try a broader category or check back later for new listings.</p>
+                  <p className="font-semibold text-muted-foreground/70 mb-1">No jobs match your filters</p>
+                  <p className="text-sm text-muted-foreground">Try a broader category or check back later for new listings.</p>
                 </div>
               ) : (
                 filteredJobs.map(j => (
@@ -611,7 +612,7 @@ export default function Community() {
                   <p key={i} className="text-[13px] text-[#555] py-2 border-b border-white/5 last:border-0">❌ {f}</p>
                 ))}
               </div>
-              <Button variant="outline" className="w-full mt-4 border-white/10 text-muted-foreground min-h-[44px]" onClick={() => toast({ title: "Current plan", description: "You are on the free plan." })}>
+              <Button variant="outline" className="w-full mt-4 border-border text-muted-foreground min-h-[44px]" onClick={() => toast({ title: "Current plan", description: "You are on the free plan." })}>
                 Current Plan
               </Button>
             </div>
@@ -685,13 +686,13 @@ export default function Community() {
 
         {showCreateCommunity && (
           <div className="fixed inset-0 z-[9998] bg-black/80 flex items-start justify-center pt-20 px-4 overflow-y-auto" onClick={e => { if (e.target === e.currentTarget) setShowCreateCommunity(false); }}>
-            <div className="bg-[#0d0d1a] border border-[rgba(0,180,216,0.15)] rounded-sm p-5 w-full max-w-md">
+            <div className="bg-card border border-[rgba(0,180,216,0.15)] rounded-sm p-5 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-extrabold text-primary">Create Community</h3>
-                <button onClick={() => setShowCreateCommunity(false)} className="text-[#555] hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
+                <button onClick={() => setShowCreateCommunity(false)} className="text-[#555] hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
               </div>
-              <Input placeholder="Community name" value={newComm.name} onChange={e => setNewComm(p => ({ ...p, name: e.target.value.slice(0, 100) }))} maxLength={100} className="bg-white/5 border-white/10 mb-2" />
-              <select value={newComm.category} onChange={e => setNewComm(p => ({ ...p, category: e.target.value }))} className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-primary/50 mb-2 [&>option]:bg-[#0d0d1a] [&>option]:text-white">
+              <Input placeholder="Community name" value={newComm.name} onChange={e => setNewComm(p => ({ ...p, name: e.target.value.slice(0, 100) }))} maxLength={100} className="bg-muted/50 border-border mb-2" />
+              <select value={newComm.category} onChange={e => setNewComm(p => ({ ...p, category: e.target.value }))} className="w-full bg-card border border-border rounded-lg p-3 text-foreground text-sm focus:outline-none focus:border-primary/50 mb-2 [&>option]:bg-card [&>option]:text-foreground">
                 <option value="trading">Trading & Investing</option>
                 <option value="realestate">Real Estate</option>
                 <option value="tax">Tax & Accounting</option>
@@ -705,9 +706,9 @@ export default function Community() {
                 onChange={e => setNewComm(p => ({ ...p, description: e.target.value.slice(0, 500) }))}
                 maxLength={500}
                 rows={3}
-                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm resize-none focus:outline-none focus:border-primary/50 placeholder:text-[#444] mb-2"
+                className="w-full bg-muted/50 border border-border rounded-lg p-3 text-foreground text-sm resize-none focus:outline-none focus:border-primary/50 placeholder:text-[#444] mb-2"
               />
-              <select value={newComm.privacy} onChange={e => setNewComm(p => ({ ...p, privacy: e.target.value }))} className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-primary/50 mb-3 [&>option]:bg-[#0d0d1a] [&>option]:text-white">
+              <select value={newComm.privacy} onChange={e => setNewComm(p => ({ ...p, privacy: e.target.value }))} className="w-full bg-card border border-border rounded-lg p-3 text-foreground text-sm focus:outline-none focus:border-primary/50 mb-3 [&>option]:bg-card [&>option]:text-foreground">
                 <option value="public">Public | Anyone can join</option>
                 <option value="private">Private | Request to join</option>
               </select>
@@ -720,14 +721,14 @@ export default function Community() {
 
         {showCreateEvent && (
           <div className="fixed inset-0 z-[9998] bg-black/80 flex items-start justify-center pt-20 px-4 overflow-y-auto" onClick={e => { if (e.target === e.currentTarget) setShowCreateEvent(false); }}>
-            <div className="bg-[#0d0d1a] border border-[rgba(0,180,216,0.15)] rounded-sm p-5 w-full max-w-md">
+            <div className="bg-card border border-[rgba(0,180,216,0.15)] rounded-sm p-5 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-extrabold text-primary">Create Event</h3>
-                <button onClick={() => setShowCreateEvent(false)} className="text-[#555] hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
+                <button onClick={() => setShowCreateEvent(false)} className="text-[#555] hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
               </div>
-              <Input placeholder="Event title" value={newEvent.title} onChange={e => setNewEvent(p => ({ ...p, title: e.target.value.slice(0, 200) }))} maxLength={200} className="bg-white/5 border-white/10 mb-2" />
-              <Input type="date" value={newEvent.date} onChange={e => setNewEvent(p => ({ ...p, date: e.target.value }))} className="bg-white/5 border-white/10 mb-2" />
-              <select value={newEvent.type} onChange={e => setNewEvent(p => ({ ...p, type: e.target.value as "virtual" | "inperson" }))} className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-primary/50 mb-2 [&>option]:bg-[#0d0d1a] [&>option]:text-white">
+              <Input placeholder="Event title" value={newEvent.title} onChange={e => setNewEvent(p => ({ ...p, title: e.target.value.slice(0, 200) }))} maxLength={200} className="bg-muted/50 border-border mb-2" />
+              <Input type="date" value={newEvent.date} onChange={e => setNewEvent(p => ({ ...p, date: e.target.value }))} className="bg-muted/50 border-border mb-2" />
+              <select value={newEvent.type} onChange={e => setNewEvent(p => ({ ...p, type: e.target.value as "virtual" | "inperson" }))} className="w-full bg-card border border-border rounded-lg p-3 text-foreground text-sm focus:outline-none focus:border-primary/50 mb-2 [&>option]:bg-card [&>option]:text-foreground">
                 <option value="virtual">Virtual</option>
                 <option value="inperson">In Person</option>
               </select>
@@ -737,7 +738,7 @@ export default function Community() {
                 onChange={e => setNewEvent(p => ({ ...p, description: e.target.value.slice(0, 500) }))}
                 maxLength={500}
                 rows={3}
-                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm resize-none focus:outline-none focus:border-primary/50 placeholder:text-[#444] mb-3"
+                className="w-full bg-muted/50 border border-border rounded-lg p-3 text-foreground text-sm resize-none focus:outline-none focus:border-primary/50 placeholder:text-[#444] mb-3"
               />
               <Button className="w-full bg-gradient-to-r from-primary to-[#FF6600] text-black font-bold min-h-[44px]" onClick={createEvent}>
                 Create Event
@@ -748,15 +749,15 @@ export default function Community() {
 
         {showPostJob && (
           <div className="fixed inset-0 z-[9998] bg-black/80 flex items-start justify-center pt-20 px-4 overflow-y-auto" onClick={e => { if (e.target === e.currentTarget) setShowPostJob(false); }}>
-            <div className="bg-[#0d0d1a] border border-[rgba(0,180,216,0.15)] rounded-sm p-5 w-full max-w-md">
+            <div className="bg-card border border-[rgba(0,180,216,0.15)] rounded-sm p-5 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-extrabold text-primary">Post a Job</h3>
-                <button onClick={() => setShowPostJob(false)} className="text-[#555] hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
+                <button onClick={() => setShowPostJob(false)} className="text-[#555] hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
               </div>
-              <Input placeholder="Job title" value={newJob.title} onChange={e => setNewJob(p => ({ ...p, title: e.target.value.slice(0, 200) }))} maxLength={200} className="bg-white/5 border-white/10 mb-2" />
-              <Input placeholder="Company name" value={newJob.company} onChange={e => setNewJob(p => ({ ...p, company: e.target.value.slice(0, 100) }))} maxLength={100} className="bg-white/5 border-white/10 mb-2" />
-              <Input placeholder="Salary range (e.g. $50K-$80K)" value={newJob.salary} onChange={e => setNewJob(p => ({ ...p, salary: e.target.value.slice(0, 50) }))} maxLength={50} className="bg-white/5 border-white/10 mb-2" />
-              <select value={newJob.category} onChange={e => setNewJob(p => ({ ...p, category: e.target.value }))} className="w-full bg-[#0d0d1a] border border-white/10 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-primary/50 mb-3 [&>option]:bg-[#0d0d1a] [&>option]:text-white">
+              <Input placeholder="Job title" value={newJob.title} onChange={e => setNewJob(p => ({ ...p, title: e.target.value.slice(0, 200) }))} maxLength={200} className="bg-muted/50 border-border mb-2" />
+              <Input placeholder="Company name" value={newJob.company} onChange={e => setNewJob(p => ({ ...p, company: e.target.value.slice(0, 100) }))} maxLength={100} className="bg-muted/50 border-border mb-2" />
+              <Input placeholder="Salary range (e.g. $50K-$80K)" value={newJob.salary} onChange={e => setNewJob(p => ({ ...p, salary: e.target.value.slice(0, 50) }))} maxLength={50} className="bg-muted/50 border-border mb-2" />
+              <select value={newJob.category} onChange={e => setNewJob(p => ({ ...p, category: e.target.value }))} className="w-full bg-card border border-border rounded-lg p-3 text-foreground text-sm focus:outline-none focus:border-primary/50 mb-3 [&>option]:bg-card [&>option]:text-foreground">
                 <option value="remote">Remote</option>
                 <option value="fulltime">Full-time</option>
                 <option value="parttime">Part-time</option>

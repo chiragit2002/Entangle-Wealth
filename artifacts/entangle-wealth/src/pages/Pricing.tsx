@@ -238,28 +238,28 @@ export default function Pricing() {
         {/* Value anchoring section — shown before pricing */}
         {!promo?.active && (
           <div className="mb-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="relative overflow-hidden bg-[#0a0a14] border border-[#FFB800]/25 rounded-xl p-5 text-center">
+            <div className="relative overflow-hidden bg-card border border-[#FFB800]/25 rounded-xl p-5 text-center">
               <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at top, rgba(255,184,0,0.08) 0%, transparent 70%)" }} />
               <DollarSign className="w-6 h-6 text-[#FFB800] mx-auto mb-2" />
               <p className="text-2xl font-black text-[#FFB800] mb-0.5">$4,800</p>
-              <p className="text-sm font-bold text-white/70">avg saved per year</p>
-              <p className="text-xs text-white/35 mt-1">What Pro users recover in overlooked tax deductions alone</p>
+              <p className="text-sm font-bold text-foreground/70">avg saved per year</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">What Pro users recover in overlooked tax deductions alone</p>
             </div>
-            <div className="relative overflow-hidden bg-[#0a0a14] border border-[#00B4D8]/25 rounded-xl p-5 text-center">
+            <div className="relative overflow-hidden bg-card border border-[#00B4D8]/25 rounded-xl p-5 text-center">
               <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at top, rgba(0,180,216,0.08) 0%, transparent 70%)" }} />
               <TrendingUp className="w-6 h-6 text-[#00B4D8] mx-auto mb-2" />
               <p className="text-2xl font-black text-[#00B4D8] mb-0.5">
-                <span className="line-through text-white/20 text-lg mr-1">$99</span>$29
+                <span className="line-through text-muted-foreground/40 text-lg mr-1">$99</span>$29
               </p>
-              <p className="text-sm font-bold text-white/70">less than $1/day</p>
-              <p className="text-xs text-white/35 mt-1">Bloomberg Terminal costs $2,000+/month. We charge $29.</p>
+              <p className="text-sm font-bold text-foreground/70">less than $1/day</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">Bloomberg Terminal costs $2,000+/month. We charge $29.</p>
             </div>
-            <div className="relative overflow-hidden bg-[#0a0a14] border border-[#00B4D8]/25 rounded-xl p-5 text-center">
+            <div className="relative overflow-hidden bg-card border border-[#00B4D8]/25 rounded-xl p-5 text-center">
               <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at top, rgba(0,180,216,0.08) 0%, transparent 70%)" }} />
               <Clock className="w-6 h-6 text-[#00B4D8] mx-auto mb-2" />
               <p className="text-2xl font-black text-[#00B4D8] mb-0.5">30 days</p>
-              <p className="text-sm font-bold text-white/70">completely free</p>
-              <p className="text-xs text-white/35 mt-1">Full Pro access. If it's not worth it, cancel. No questions.</p>
+              <p className="text-sm font-bold text-foreground/70">completely free</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">Full Pro access. If it's not worth it, cancel. No questions.</p>
             </div>
           </div>
         )}
@@ -316,7 +316,7 @@ export default function Pricing() {
                       ? "bg-gradient-to-r from-[#FFB800] to-[#cc9900] text-black hover:opacity-90"
                       : plan.ctaStyle === "blue"
                       ? "bg-gradient-to-r from-[#00B4D8] to-[#0099cc] text-black hover:opacity-90"
-                      : "bg-white/5 border border-white/10 text-muted-foreground hover:bg-white/10"
+                      : "bg-muted/50 border border-border text-muted-foreground hover:bg-muted"
                   }`}
                 >
                   {isLoading ? (
@@ -339,7 +339,7 @@ export default function Pricing() {
           <p className="text-sm text-muted-foreground leading-relaxed mb-1">
             Earn <strong className="text-[#FFB800]">20% recurring</strong> for every person you refer — every month, for as long as they're a member. Not a one-time bonus. Recurring income.
           </p>
-          <p className="text-xs text-white/50 mb-4">
+          <p className="text-xs text-muted-foreground mb-4">
             Each referral earns you 5 entries into the $50K anniversary drawing and a cut of the $36K bonus pool. Actual money, not badges or points.
           </p>
           <Button

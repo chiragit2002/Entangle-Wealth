@@ -81,7 +81,7 @@ const STATUS_COLORS: Record<string, string> = {
   draft: "bg-yellow-500/20 text-yellow-400 border-yellow-500/20",
   approved: "bg-emerald-500/20 text-emerald-400 border-emerald-500/20",
   posted: "bg-blue-500/20 text-blue-400 border-blue-500/20",
-  archived: "bg-white/10 text-white/40 border-white/10",
+  archived: "bg-muted text-muted-foreground/70 border-border",
 };
 
 const MONTHS = [
@@ -135,10 +135,10 @@ function CalendarGrid({
   };
 
   return (
-    <div className="rounded-xl border border-white/[0.06] overflow-hidden" style={{ background: "rgba(8,8,20,0.6)" }}>
-      <div className="grid grid-cols-7 border-b border-white/[0.06]">
+    <div className="rounded-xl border border-border overflow-hidden" style={{ background: "rgba(8,8,20,0.6)" }}>
+      <div className="grid grid-cols-7 border-b border-border">
         {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-          <div key={d} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground text-center py-2 border-r border-white/[0.03] last:border-r-0">
+          <div key={d} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground text-center py-2 border-r border-border/50 last:border-r-0">
             {d}
           </div>
         ))}
@@ -156,12 +156,12 @@ function CalendarGrid({
               onClick={() => onSelectDate(day.key)}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, day.key)}
-              className={`min-h-[80px] md:min-h-[100px] p-1 border-r border-b border-white/[0.03] last:border-r-0 cursor-pointer transition-colors ${
+              className={`min-h-[80px] md:min-h-[100px] p-1 border-r border-b border-border/50 last:border-r-0 cursor-pointer transition-colors ${
                 !day.inMonth ? "opacity-30" : ""
-              } ${isSelected ? "bg-primary/[0.06]" : "hover:bg-white/[0.02]"}`}
+              } ${isSelected ? "bg-primary/[0.06]" : "hover:bg-muted/30"}`}
             >
               <div className={`text-[11px] font-mono mb-1 px-1 ${
-                isToday ? "text-primary font-bold" : "text-white/60"
+                isToday ? "text-primary font-bold" : "text-muted-foreground"
               }`}>
                 {day.date.getDate()}
                 {isToday && <span className="ml-1 text-[8px] text-primary">TODAY</span>}
@@ -214,16 +214,16 @@ function DailyChecklist({
   const formatted = date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
   return (
-    <div className="rounded-xl border border-white/[0.06] overflow-hidden" style={{ background: "rgba(8,8,20,0.6)" }}>
-      <div className="flex items-center justify-between p-3 border-b border-white/[0.04]">
+    <div className="rounded-xl border border-border overflow-hidden" style={{ background: "rgba(8,8,20,0.6)" }}>
+      <div className="flex items-center justify-between p-3 border-b border-border">
         <div>
-          <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <CalendarDays className="w-4 h-4 text-primary" />
             {dayName}
           </h3>
           <p className="text-[10px] text-muted-foreground">{formatted}</p>
         </div>
-        <button onClick={onClose} className="text-muted-foreground hover:text-white transition-colors">
+        <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -239,11 +239,11 @@ function DailyChecklist({
           {items.map((item) => {
             const bestTime = BEST_TIMES[item.platform];
             return (
-              <div key={item.id} className="rounded-lg border border-white/[0.06] p-3 space-y-2" style={{ background: "rgba(0,0,0,0.3)" }}>
+              <div key={item.id} className="rounded-lg border border-border p-3 space-y-2" style={{ background: "rgba(0,0,0,0.3)" }}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span style={{ color: PLATFORM_COLORS[item.platform] }}>{PLATFORM_ICONS[item.platform]}</span>
-                    <span className="text-xs font-medium text-white">{item.platformName}</span>
+                    <span className="text-xs font-medium text-foreground">{item.platformName}</span>
                     <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${STATUS_COLORS[item.status]}`}>
                       {item.status}
                     </span>
@@ -255,9 +255,9 @@ function DailyChecklist({
                     </span>
                   )}
                 </div>
-                <p className="text-[11px] text-white/60 truncate">{item.topic}</p>
-                <div className="bg-white/[0.02] border border-white/[0.04] rounded p-2 max-h-24 overflow-y-auto">
-                  <pre className="text-[10px] text-white/70 whitespace-pre-wrap font-sans leading-relaxed">{item.content}</pre>
+                <p className="text-[11px] text-muted-foreground truncate">{item.topic}</p>
+                <div className="bg-muted/30 border border-border rounded p-2 max-h-24 overflow-y-auto">
+                  <pre className="text-[10px] text-foreground/70 whitespace-pre-wrap font-sans leading-relaxed">{item.content}</pre>
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {item.status !== "approved" && (
@@ -271,7 +271,7 @@ function DailyChecklist({
                     </Button>
                   )}
                   {item.status !== "archived" && (
-                    <Button size="sm" className="bg-white/5 text-white/40 hover:bg-white/10 border border-white/10 text-[9px] h-6 px-2" onClick={() => onUpdateStatus(item.id, "archived")}>
+                    <Button size="sm" className="bg-muted/50 text-muted-foreground/70 hover:bg-muted border border-border text-[9px] h-6 px-2" onClick={() => onUpdateStatus(item.id, "archived")}>
                       <Archive className="w-2.5 h-2.5 mr-1" /> Archive
                     </Button>
                   )}
@@ -287,10 +287,10 @@ function DailyChecklist({
         </div>
       )}
 
-      <div className="p-3 border-t border-white/[0.04]">
+      <div className="p-3 border-t border-border">
         <div className="flex items-center gap-1.5 mb-2">
           <Info className="w-3 h-3 text-primary" />
-          <span className="text-[10px] font-semibold text-white/70 uppercase tracking-wider">Best Times to Post</span>
+          <span className="text-[10px] font-semibold text-foreground/70 uppercase tracking-wider">Best Times to Post</span>
         </div>
         <div className="grid grid-cols-3 gap-1">
           {Object.entries(BEST_TIMES).map(([platform, info]) => (
@@ -307,8 +307,8 @@ function DailyChecklist({
 
 function BestTimesPanel() {
   return (
-    <div className="rounded-xl border border-white/[0.06] p-4" style={{ background: "rgba(8,8,20,0.6)" }}>
-      <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-3">
+    <div className="rounded-xl border border-border p-4" style={{ background: "rgba(8,8,20,0.6)" }}>
+      <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
         <Clock className="w-4 h-4 text-primary" />
         Best Times to Post
       </h3>
@@ -316,10 +316,10 @@ function BestTimesPanel() {
         {Object.entries(BEST_TIMES).map(([platform, info]) => {
           const platformName = platform === "twitter" ? "Twitter/X" : platform === "blog" ? "Blog/SEO" : platform === "email" ? "Newsletter" : platform.charAt(0).toUpperCase() + platform.slice(1);
           return (
-            <div key={platform} className="flex items-center justify-between py-1.5 border-b border-white/[0.03] last:border-0">
+            <div key={platform} className="flex items-center justify-between py-1.5 border-b border-border/50 last:border-0">
               <div className="flex items-center gap-2">
                 <span style={{ color: PLATFORM_COLORS[platform] }}>{PLATFORM_ICONS[platform]}</span>
-                <span className="text-xs text-white/80">{platformName}</span>
+                <span className="text-xs text-foreground/80">{platformName}</span>
               </div>
               <div className="text-[10px] text-muted-foreground font-mono">
                 {info.days} {info.time} {info.timezone}
@@ -403,15 +403,15 @@ function ExportModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 " onClick={onClose}>
       <div
-        className="w-full max-w-md rounded-xl border border-white/[0.08] p-5 space-y-4"
+        className="w-full max-w-md rounded-xl border border-border p-5 space-y-4"
         style={{ background: "rgba(8,8,20,0.98)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Download className="w-4 h-4 text-primary" /> Export to CSV
           </h3>
-          <button onClick={onClose} className="text-muted-foreground hover:text-white"><X className="w-4 h-4" /></button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
         </div>
 
         <div>
@@ -424,7 +424,7 @@ function ExportModal({
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   exportStatus === s
                     ? "bg-primary/20 text-primary border border-primary/30"
-                    : "bg-white/[0.03] text-white/50 border border-white/[0.06] hover:bg-white/[0.06]"
+                    : "bg-muted/50 text-muted-foreground border border-border hover:bg-muted"
                 }`}
               >
                 {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -440,7 +440,7 @@ function ExportModal({
               type="date"
               value={exportFrom}
               onChange={(e) => setExportFrom(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/40"
+              className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/40"
             />
           </div>
           <div>
@@ -449,7 +449,7 @@ function ExportModal({
               type="date"
               value={exportTo}
               onChange={(e) => setExportTo(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/40"
+              className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/40"
             />
           </div>
         </div>
@@ -459,7 +459,7 @@ function ExportModal({
         </div>
 
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="border-white/10 text-xs flex-1" onClick={onClose}>
+          <Button variant="outline" size="sm" className="border-border text-xs flex-1" onClick={onClose}>
             Cancel
           </Button>
           <Button
@@ -567,7 +567,7 @@ export default function ContentCalendar() {
           <div className="w-16 h-16 rounded-sm bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
             <Shield className="w-8 h-8 text-red-400" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Access Denied</h1>
           <p className="text-muted-foreground max-w-md">
             The Content Calendar is restricted to admin-tier accounts. Contact the platform administrator for access.
           </p>
@@ -590,7 +590,7 @@ export default function ContentCalendar() {
             <p className="text-muted-foreground mt-1 text-sm">Schedule, review, and track content across all platforms</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="border-white/10 gap-1.5 text-xs" onClick={() => setShowExport(true)}>
+            <Button variant="outline" size="sm" className="border-border gap-1.5 text-xs" onClick={() => setShowExport(true)}>
               <Download className="w-3.5 h-3.5" /> Export CSV
             </Button>
           </div>
@@ -598,16 +598,16 @@ export default function ContentCalendar() {
 
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-white" onClick={prevMonth}>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground" onClick={prevMonth}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <h2 className="text-lg font-semibold text-white min-w-[180px] text-center">
+            <h2 className="text-lg font-semibold text-foreground min-w-[180px] text-center">
               {MONTHS[viewMonth]} {viewYear}
             </h2>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-white" onClick={nextMonth}>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground" onClick={nextMonth}>
               <ChevronRight className="w-4 h-4" />
             </Button>
-            <Button variant="outline" size="sm" className="border-white/10 text-xs h-7 ml-2" onClick={goToday}>
+            <Button variant="outline" size="sm" className="border-border text-xs h-7 ml-2" onClick={goToday}>
               Today
             </Button>
           </div>
@@ -649,9 +649,9 @@ export default function ContentCalendar() {
             )}
 
             {unscheduledItems.length > 0 && (
-              <div className="rounded-xl border border-white/[0.06] overflow-hidden" style={{ background: "rgba(8,8,20,0.6)" }}>
-                <div className="p-3 border-b border-white/[0.04]">
-                  <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+              <div className="rounded-xl border border-border overflow-hidden" style={{ background: "rgba(8,8,20,0.6)" }}>
+                <div className="p-3 border-b border-border">
+                  <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-yellow-400" />
                     Unscheduled ({unscheduledItems.length})
                   </h3>
@@ -662,11 +662,11 @@ export default function ContentCalendar() {
                     <button
                       key={item.id}
                       onClick={() => scheduleUnscheduled(item.id)}
-                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left hover:bg-white/[0.04] transition-colors"
+                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left hover:bg-muted/50 transition-colors"
                     >
                       <span style={{ color: PLATFORM_COLORS[item.platform] }}>{PLATFORM_ICONS[item.platform]}</span>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[11px] text-white/80 truncate">{item.topic || item.platformName}</p>
+                        <p className="text-[11px] text-foreground/80 truncate">{item.topic || item.platformName}</p>
                         <p className="text-[9px] text-muted-foreground">{item.platformName} - {item.tone}</p>
                       </div>
                       <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${STATUS_COLORS[item.status]}`}>

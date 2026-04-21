@@ -115,7 +115,7 @@ export default function RewardHistory() {
             {REWARD_TIERS.map((tier) => {
               const Icon = tier.icon;
               return (
-                <div key={tier.label} className="bg-white/[0.02] rounded-lg p-3 text-center border border-white/5">
+                <div key={tier.label} className="bg-muted/30 rounded-lg p-3 text-center border border-white/5">
                   <Icon className="w-5 h-5 mx-auto mb-1" style={{ color: tier.color }} />
                   <p className="text-sm font-bold" style={{ color: tier.color }}>{tier.label}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{tier.tokens}</p>
@@ -132,13 +132,13 @@ export default function RewardHistory() {
             </h2>
             <div className="space-y-2">
               {myRewards.map((r) => (
-                <div key={r.id} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/5">
+                <div key={r.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-white/5">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center">
                       <span className="text-xs font-bold text-yellow-400">#{r.rank}</span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-white">{r.month}</p>
+                      <p className="text-sm font-medium text-foreground">{r.month}</p>
                       <p className="text-xs text-muted-foreground">
                         Monthly XP: <span className="text-primary">
                           {Math.round(r.portfolioGain).toLocaleString()} XP
@@ -175,13 +175,13 @@ export default function RewardHistory() {
                 return (
                   <div key={month} className="border border-white/5 rounded-lg overflow-hidden">
                     <button
-                      className="w-full flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors text-left"
+                      className="w-full flex items-center justify-between p-4 hover:bg-muted/30 transition-colors text-left"
                       onClick={() => setExpandedMonth(isExpanded ? null : month)}
                     >
                       <div className="flex items-center gap-3">
                         <Calendar className="w-5 h-5 text-primary" />
                         <div>
-                          <p className="font-bold text-white">{month}</p>
+                          <p className="font-bold text-foreground">{month}</p>
                           <p className="text-xs text-muted-foreground">{entries.length} recipients</p>
                         </div>
                       </div>
@@ -192,15 +192,15 @@ export default function RewardHistory() {
                     </button>
 
                     {isExpanded && (
-                      <div className="border-t border-white/5 p-4 bg-white/[0.01]">
+                      <div className="border-t border-white/5 p-4 bg-muted/30">
                         <div className="space-y-1.5">
                           {entries.map((entry, i) => (
-                            <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-white/[0.02]">
+                            <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted/30">
                               <div className="flex items-center gap-2">
                                 <span className={`text-xs font-mono w-6 text-right ${entry.rank <= 3 ? "text-yellow-400 font-bold" : "text-muted-foreground"}`}>
                                   #{entry.rank}
                                 </span>
-                                <span className="text-sm text-white">{entry.name}</span>
+                                <span className="text-sm text-foreground">{entry.name}</span>
                               </div>
                               <div className="flex items-center gap-4">
                                 <span className="text-xs text-primary">

@@ -51,9 +51,9 @@ export function WatchlistPanel({ externalItems, onRemove }: WatchlistPanelProps 
 
       {items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center gap-1.5">
-          <Eye className="w-8 h-8 text-white/10 mb-1" />
-          <p className="text-xs font-medium text-white/30">Your watchlist is empty</p>
-          <p className="text-[10px] text-white/50 max-w-[140px] leading-relaxed">Bookmark a signal from the Signals page to track it here</p>
+          <Eye className="w-8 h-8 text-muted-foreground/20 mb-1" />
+          <p className="text-xs font-medium text-muted-foreground/50">Your watchlist is empty</p>
+          <p className="text-[10px] text-muted-foreground max-w-[140px] leading-relaxed">Bookmark a signal from the Signals page to track it here</p>
         </div>
       ) : (
         <div className="space-y-1">
@@ -61,7 +61,7 @@ export function WatchlistPanel({ externalItems, onRemove }: WatchlistPanelProps 
             const livePrice = prices[item.symbol];
             const hasAlert = alerts.includes(item.symbol);
             return (
-              <div key={item.symbol} className="flex items-center gap-3 py-2 px-2 rounded-lg hover:bg-white/[0.02] transition-colors group">
+              <div key={item.symbol} className="flex items-center gap-3 py-2 px-2 rounded-lg hover:bg-muted/30 transition-colors group">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm">{item.symbol}</span>
@@ -71,13 +71,13 @@ export function WatchlistPanel({ externalItems, onRemove }: WatchlistPanelProps 
                   </div>
                   {livePrice && livePrice.price > 0 ? (
                     <div className="flex items-center gap-2 text-[10px] font-mono">
-                      <span className="text-white/60">${livePrice.price.toFixed(2)}</span>
+                      <span className="text-muted-foreground">${livePrice.price.toFixed(2)}</span>
                       <span className={livePrice.changePercent >= 0 ? "text-primary" : "text-red-400"}>
                         {livePrice.changePercent >= 0 ? "+" : ""}{livePrice.changePercent.toFixed(2)}%
                       </span>
                     </div>
                   ) : (
-                    <div className="text-[10px] font-mono text-white/25">Price unavailable</div>
+                    <div className="text-[10px] font-mono text-muted-foreground/40">Price unavailable</div>
                   )}
                 </div>
                 <div className="flex items-center gap-1 text-[10px] font-mono">
@@ -85,14 +85,14 @@ export function WatchlistPanel({ externalItems, onRemove }: WatchlistPanelProps 
                 </div>
                 <button
                   onClick={() => toggleAlert(item.symbol)}
-                  className={`p-1 rounded transition-colors ${hasAlert ? "text-secondary" : "text-white/40 hover:text-white/40"}`}
+                  className={`p-1 rounded transition-colors ${hasAlert ? "text-secondary" : "text-muted-foreground/70 hover:text-muted-foreground/70"}`}
                   aria-label={hasAlert ? `Disable alert for ${item.symbol}` : `Enable alert for ${item.symbol}`}
                 >
                   {hasAlert ? <Bell className="w-3 h-3" /> : <BellOff className="w-3 h-3" />}
                 </button>
                 <button
                   onClick={() => removeItem(item.symbol)}
-                  className="p-1 rounded text-white/10 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                  className="p-1 rounded text-muted-foreground/20 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
                   aria-label={`Remove ${item.symbol} from watchlist`}
                 >
                   <X className="w-3 h-3" />

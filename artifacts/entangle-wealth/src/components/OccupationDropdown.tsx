@@ -104,8 +104,8 @@ export function OccupationDropdown({
         aria-haspopup="listbox"
         className={cn(
           "w-full flex items-center justify-between gap-2 px-3 py-2 text-sm rounded-md border transition-colors text-left",
-          "bg-white/5 border-white/10 text-white min-h-[40px]",
-          error ? "border-red-500/50" : open ? "border-primary/50" : "hover:border-white/20",
+          "bg-muted/50 border-border text-foreground min-h-[40px]",
+          error ? "border-red-500/50" : open ? "border-primary/50" : "hover:border-border",
           disabled && "opacity-50 cursor-not-allowed"
         )}
       >
@@ -113,7 +113,7 @@ export function OccupationDropdown({
           <Briefcase className="w-3.5 h-3.5 text-primary/60 shrink-0" />
           {selectedOccupation ? (
             <span className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="truncate text-white">{selectedOccupation.name}</span>
+              <span className="truncate text-foreground">{selectedOccupation.name}</span>
               <span className={cn("text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0", taxBadgeColor[selectedOccupation.taxCategory])}>
                 {selectedOccupation.taxCategory}
               </span>
@@ -135,39 +135,39 @@ export function OccupationDropdown({
                   setQuery("");
                 }
               }}
-              className="text-white/50 hover:text-white/50 rounded p-0.5 transition-colors"
+              className="text-muted-foreground hover:text-muted-foreground rounded p-0.5 transition-colors"
               aria-label="Clear selection"
             >
               <X className="w-3 h-3" />
             </span>
           )}
-          <ChevronDown className={cn("w-3.5 h-3.5 text-white/30 transition-transform", open && "rotate-180")} />
+          <ChevronDown className={cn("w-3.5 h-3.5 text-muted-foreground/50 transition-transform", open && "rotate-180")} />
         </span>
       </button>
 
       {open && (
         <div
-          className="absolute z-50 w-full mt-1 rounded-md border border-white/10 bg-[#0d0f18] shadow-2xl shadow-black/50 overflow-hidden"
+          className="absolute z-50 w-full mt-1 rounded-md border border-border bg-card shadow-2xl shadow-black/50 overflow-hidden"
           role="listbox"
           aria-label="Select occupation"
         >
-          <div className="p-2 border-b border-white/10">
-            <div className="flex items-center gap-2 px-2 py-1.5 bg-white/5 rounded-md">
-              <Search className="w-3.5 h-3.5 text-white/30 shrink-0" />
+          <div className="p-2 border-b border-border">
+            <div className="flex items-center gap-2 px-2 py-1.5 bg-muted/50 rounded-md">
+              <Search className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
               <input
                 ref={inputRef}
                 type="text"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Type to search..."
-                className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none"
+                className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 outline-none"
                 aria-label="Search occupations"
               />
               {query && (
                 <button
                   type="button"
                   onClick={() => setQuery("")}
-                  className="text-white/30 hover:text-white/50 transition-colors"
+                  className="text-muted-foreground/50 hover:text-muted-foreground transition-colors"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -183,7 +183,7 @@ export function OccupationDropdown({
             ) : (
               groupedResults.map(({ category, occupations }) => (
                 <div key={category}>
-                  <div className="px-3 py-1.5 text-[10px] font-semibold text-white/30 uppercase tracking-wider sticky top-0 bg-[#0d0f18]">
+                  <div className="px-3 py-1.5 text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider sticky top-0 bg-card">
                     {category}
                   </div>
                   {occupations.map(occ => (
@@ -194,7 +194,7 @@ export function OccupationDropdown({
                       aria-selected={occ.id === value}
                       onClick={() => handleSelect(occ)}
                       className={cn(
-                        "w-full flex items-center justify-between gap-2 px-3 py-2 text-sm text-left transition-colors hover:bg-white/[0.05]",
+                        "w-full flex items-center justify-between gap-2 px-3 py-2 text-sm text-left transition-colors hover:bg-muted/50",
                         occ.id === value && "bg-primary/10 text-primary"
                       )}
                     >

@@ -217,7 +217,7 @@ export default function Integrations() {
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Connected Accounts</h1>
-            <p className="text-[12px] text-white/50">
+            <p className="text-[12px] text-muted-foreground">
               Link your accounting & tax software to auto-import expenses and deductions.
             </p>
           </div>
@@ -226,24 +226,24 @@ export default function Integrations() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 mb-6">
           <div className="glass-panel rounded-xl p-3 text-center">
             <p className="text-[22px] font-extrabold font-mono text-primary">{connectedCount}</p>
-            <p className="text-[11px] text-white/40">Connected</p>
+            <p className="text-[11px] text-muted-foreground/70">Connected</p>
           </div>
           <div className="glass-panel rounded-xl p-3 text-center">
             <p className="text-[22px] font-extrabold font-mono text-secondary">{PROVIDERS.length}</p>
-            <p className="text-[11px] text-white/40">Available</p>
+            <p className="text-[11px] text-muted-foreground/70">Available</p>
           </div>
           <div className="glass-panel rounded-xl p-3 text-center">
             <p className="text-[22px] font-extrabold font-mono text-[#00B4D8]">
               {connections.filter((c) => c.lastSyncAt).length}
             </p>
-            <p className="text-[11px] text-white/40">Synced</p>
+            <p className="text-[11px] text-muted-foreground/70">Synced</p>
           </div>
           <div className="glass-panel rounded-xl p-3 text-center">
             <div className="flex items-center justify-center gap-1">
               <Shield className="w-4 h-4 text-[#9c27b0]" />
               <p className="text-[12px] font-bold text-[#9c27b0]">256-bit</p>
             </div>
-            <p className="text-[11px] text-white/40">Encrypted</p>
+            <p className="text-[11px] text-muted-foreground/70">Encrypted</p>
           </div>
         </div>
 
@@ -251,11 +251,11 @@ export default function Integrations() {
           <div className="glass-panel rounded-xl p-4 mb-6 border border-primary/10 hover:border-primary/30 cursor-pointer transition-all group flex items-center gap-3">
             <Receipt className="w-5 h-5 text-primary flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-semibold text-white/70 group-hover:text-white transition-colors">
+              <p className="text-[13px] font-semibold text-foreground/70 group-hover:text-foreground transition-colors">
                 Connected accounts auto-import into your Receipt Tracker
               </p>
             </div>
-            <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-primary flex-shrink-0" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary flex-shrink-0" />
           </div>
         </Link>
 
@@ -265,7 +265,7 @@ export default function Integrations() {
           </div>
         ) : (
           <>
-            <h2 className="text-[15px] font-bold text-white/70 mb-3 flex items-center gap-2">
+            <h2 className="text-[15px] font-bold text-foreground/70 mb-3 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-primary" />
               Accounting Software
             </h2>
@@ -286,7 +286,7 @@ export default function Integrations() {
               ))}
             </div>
 
-            <h2 className="text-[15px] font-bold text-white/70 mb-3 flex items-center gap-2">
+            <h2 className="text-[15px] font-bold text-foreground/70 mb-3 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-secondary" />
               Tax Preparation
             </h2>
@@ -370,12 +370,12 @@ function ProviderCard({
       className={`glass-panel rounded-xl p-4 border transition-all ${
         connected
           ? "border-[#00B4D8]/20 bg-[#00B4D8]/[0.02]"
-          : "border-white/[0.06] hover:border-white/[0.12]"
+          : "border-border hover:border-border"
       }`}
     >
       <div className="flex items-start gap-3 mb-3">
         <div
-          className="w-11 h-11 rounded-xl flex items-center justify-center font-extrabold text-[14px] text-white flex-shrink-0"
+          className="w-11 h-11 rounded-xl flex items-center justify-center font-extrabold text-[14px] text-foreground flex-shrink-0"
           style={{ backgroundColor: `${provider.color}20`, color: provider.color }}
         >
           {provider.logo}
@@ -389,13 +389,13 @@ function ProviderCard({
               </span>
             )}
           </div>
-          <p className="text-[12px] text-white/40">{provider.tagline}</p>
+          <p className="text-[12px] text-muted-foreground/70">{provider.tagline}</p>
         </div>
       </div>
 
       <div className="flex flex-wrap gap-1.5 mb-3">
         {provider.features.map((f) => (
-          <span key={f} className="text-[10px] text-white/30 bg-white/5 px-2 py-0.5 rounded-full">
+          <span key={f} className="text-[10px] text-muted-foreground/50 bg-muted/50 px-2 py-0.5 rounded-full">
             {f}
           </span>
         ))}
@@ -404,13 +404,13 @@ function ProviderCard({
       {connected ? (
         <div className="space-y-2">
           {lastSync && (
-            <div className="flex items-center gap-1.5 text-[11px] text-white/40">
+            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70">
               <Clock className="w-3 h-3" />
               Last synced: {lastSync}
             </div>
           )}
           {connectedAt && !lastSync && (
-            <div className="flex items-center gap-1.5 text-[11px] text-white/40">
+            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70">
               <Clock className="w-3 h-3" />
               Connected: {connectedAt}
             </div>
@@ -448,7 +448,7 @@ function ProviderCard({
       ) : (
         <Button
           className="w-full text-[13px] font-bold min-h-[40px] gap-2"
-          style={{ backgroundColor: provider.color, color: "#fff" }}
+          style={{ backgroundColor: provider.color, color: "hsl(var(--foreground))" }}
           onClick={onConnect}
           disabled={connecting}
         >

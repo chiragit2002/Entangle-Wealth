@@ -10,9 +10,9 @@ function DocImageOrPlaceholder({ url, alt }: { url: string; alt: string }) {
   const [failed, setFailed] = useState(false);
   if (failed) {
     return (
-      <div className="w-full h-28 rounded-lg border border-white/10 bg-white/[0.02] flex flex-col items-center justify-center gap-1">
-        <FileText className="w-6 h-6 text-white/30" />
-        <span className="text-[10px] text-white/30">PDF Document</span>
+      <div className="w-full h-28 rounded-lg border border-border bg-muted/30 flex flex-col items-center justify-center gap-1">
+        <FileText className="w-6 h-6 text-muted-foreground/50" />
+        <span className="text-[10px] text-muted-foreground/50">PDF Document</span>
       </div>
     );
   }
@@ -20,7 +20,7 @@ function DocImageOrPlaceholder({ url, alt }: { url: string; alt: string }) {
     <img
       src={url}
       alt={alt}
-      className="w-full h-28 object-cover rounded-lg border border-white/10 group-hover:border-primary/40 transition-colors"
+      className="w-full h-28 object-cover rounded-lg border border-border group-hover:border-primary/40 transition-colors"
       onError={() => setFailed(true)}
     />
   );
@@ -205,15 +205,15 @@ export default function AdminKyc() {
               <p className="text-sm text-muted-foreground">Admin · Verification Queue</p>
             </div>
           </div>
-          <Button variant="outline" size="sm" className="border-white/20 gap-2" onClick={() => { fetchKycSubmissions(); fetchBusinessSubmissions(); }} disabled={loading}>
+          <Button variant="outline" size="sm" className="border-border gap-2" onClick={() => { fetchKycSubmissions(); fetchBusinessSubmissions(); }} disabled={loading}>
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Refresh
           </Button>
         </div>
 
-        <div className="flex gap-1 p-1 bg-white/[0.03] rounded-xl border border-white/[0.06] mb-6">
+        <div className="flex gap-1 p-1 bg-muted/50 rounded-xl border border-border mb-6">
           <button
             onClick={() => setActiveTab("kyc")}
-            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${activeTab === "kyc" ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"}`}
+            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${activeTab === "kyc" ? "bg-muted text-foreground" : "text-muted-foreground/70 hover:text-foreground/70"}`}
           >
             <span className="flex items-center justify-center gap-2">
               <Shield className="w-4 h-4" /> Identity KYC
@@ -224,7 +224,7 @@ export default function AdminKyc() {
           </button>
           <button
             onClick={() => setActiveTab("business")}
-            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${activeTab === "business" ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"}`}
+            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${activeTab === "business" ? "bg-muted text-foreground" : "text-muted-foreground/70 hover:text-foreground/70"}`}
           >
             <span className="flex items-center justify-center gap-2">
               <Building2 className="w-4 h-4" /> Business Documents
@@ -254,8 +254,8 @@ export default function AdminKyc() {
                   <div key={s.id} className="glass-panel p-6 rounded-xl">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                          <User className="w-5 h-5 text-white/60" />
+                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                          <User className="w-5 h-5 text-muted-foreground" />
                         </div>
                         <div>
                           <p className="font-semibold">{s.firstName && s.lastName ? `${s.firstName} ${s.lastName}` : s.email}</p>
@@ -271,44 +271,44 @@ export default function AdminKyc() {
                     </div>
 
                     {(s.kycFullLegalName || s.kycDateOfBirth || s.kycAddress || s.kycIdType) && (
-                      <div className="mb-4 p-4 rounded-lg border border-white/5 bg-white/[0.02]">
-                        <p className="text-xs text-white/50 mb-3 font-medium uppercase tracking-wide flex items-center gap-1.5">
+                      <div className="mb-4 p-4 rounded-lg border border-white/5 bg-muted/30">
+                        <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wide flex items-center gap-1.5">
                           <FileText className="w-3 h-3" /> Submitted Information
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {s.kycFullLegalName && (
                             <div className="flex items-start gap-2">
-                              <User className="w-3.5 h-3.5 text-white/30 mt-0.5 shrink-0" />
+                              <User className="w-3.5 h-3.5 text-muted-foreground/50 mt-0.5 shrink-0" />
                               <div>
-                                <p className="text-[10px] text-white/30 uppercase tracking-wide">Full Legal Name</p>
-                                <p className="text-sm text-white font-medium">{s.kycFullLegalName}</p>
+                                <p className="text-[10px] text-muted-foreground/50 uppercase tracking-wide">Full Legal Name</p>
+                                <p className="text-sm text-foreground font-medium">{s.kycFullLegalName}</p>
                               </div>
                             </div>
                           )}
                           {s.kycDateOfBirth && (
                             <div className="flex items-start gap-2">
-                              <Calendar className="w-3.5 h-3.5 text-white/30 mt-0.5 shrink-0" />
+                              <Calendar className="w-3.5 h-3.5 text-muted-foreground/50 mt-0.5 shrink-0" />
                               <div>
-                                <p className="text-[10px] text-white/30 uppercase tracking-wide">Date of Birth</p>
-                                <p className="text-sm text-white font-medium">{s.kycDateOfBirth}</p>
+                                <p className="text-[10px] text-muted-foreground/50 uppercase tracking-wide">Date of Birth</p>
+                                <p className="text-sm text-foreground font-medium">{s.kycDateOfBirth}</p>
                               </div>
                             </div>
                           )}
                           {s.kycAddress && (
                             <div className="flex items-start gap-2">
-                              <MapPin className="w-3.5 h-3.5 text-white/30 mt-0.5 shrink-0" />
+                              <MapPin className="w-3.5 h-3.5 text-muted-foreground/50 mt-0.5 shrink-0" />
                               <div>
-                                <p className="text-[10px] text-white/30 uppercase tracking-wide">Address</p>
-                                <p className="text-sm text-white font-medium">{s.kycAddress}</p>
+                                <p className="text-[10px] text-muted-foreground/50 uppercase tracking-wide">Address</p>
+                                <p className="text-sm text-foreground font-medium">{s.kycAddress}</p>
                               </div>
                             </div>
                           )}
                           {s.kycIdType && (
                             <div className="flex items-start gap-2">
-                              <CreditCard className="w-3.5 h-3.5 text-white/30 mt-0.5 shrink-0" />
+                              <CreditCard className="w-3.5 h-3.5 text-muted-foreground/50 mt-0.5 shrink-0" />
                               <div>
-                                <p className="text-[10px] text-white/30 uppercase tracking-wide">ID Type / Number</p>
-                                <p className="text-sm text-white font-medium">{s.kycIdType}{s.kycIdNumber ? ` | ${s.kycIdNumber}` : ""}</p>
+                                <p className="text-[10px] text-muted-foreground/50 uppercase tracking-wide">ID Type / Number</p>
+                                <p className="text-sm text-foreground font-medium">{s.kycIdType}{s.kycIdNumber ? ` | ${s.kycIdNumber}` : ""}</p>
                               </div>
                             </div>
                           )}
@@ -318,11 +318,11 @@ export default function AdminKyc() {
 
                     {(s.idPhotoUrl || s.selfieUrl) && (
                       <div className="mb-4">
-                        <p className="text-xs text-white/50 mb-2 font-medium uppercase tracking-wide">Uploaded Documents</p>
+                        <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Uploaded Documents</p>
                         <div className="grid grid-cols-2 gap-3">
                           {s.idPhotoUrl && (
                             <div>
-                              <p className="text-xs text-white/50 mb-1">Government ID</p>
+                              <p className="text-xs text-muted-foreground mb-1">Government ID</p>
                               <div
                                 className="relative cursor-pointer group"
                                 onClick={() => setPreviewUrl(getDocUrl(s.kycIdPhotoPath!))}
@@ -330,11 +330,11 @@ export default function AdminKyc() {
                                 <img
                                   src={getDocUrl(s.kycIdPhotoPath!)}
                                   alt="Government ID"
-                                  className="w-full h-36 object-cover rounded-lg border border-white/10 group-hover:border-primary/40 transition-colors"
+                                  className="w-full h-36 object-cover rounded-lg border border-border group-hover:border-primary/40 transition-colors"
                                   onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-colors flex items-center justify-center">
-                                  <ExternalLink className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                  <ExternalLink className="w-5 h-5 text-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
                               </div>
                               <a href={getDocUrl(s.kycIdPhotoPath!)} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary/60 hover:text-primary mt-1 inline-flex items-center gap-0.5">
@@ -344,7 +344,7 @@ export default function AdminKyc() {
                           )}
                           {s.selfieUrl && (
                             <div>
-                              <p className="text-xs text-white/50 mb-1">Selfie with ID</p>
+                              <p className="text-xs text-muted-foreground mb-1">Selfie with ID</p>
                               <div
                                 className="relative cursor-pointer group"
                                 onClick={() => setPreviewUrl(getDocUrl(s.kycSelfiePath!))}
@@ -352,11 +352,11 @@ export default function AdminKyc() {
                                 <img
                                   src={getDocUrl(s.kycSelfiePath!)}
                                   alt="Selfie with ID"
-                                  className="w-full h-36 object-cover rounded-lg border border-white/10 group-hover:border-primary/40 transition-colors"
+                                  className="w-full h-36 object-cover rounded-lg border border-border group-hover:border-primary/40 transition-colors"
                                   onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-colors flex items-center justify-center">
-                                  <ExternalLink className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                  <ExternalLink className="w-5 h-5 text-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
                               </div>
                               <a href={getDocUrl(s.kycSelfiePath!)} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary/60 hover:text-primary mt-1 inline-flex items-center gap-0.5">
@@ -369,12 +369,12 @@ export default function AdminKyc() {
                     )}
 
                     {!s.kycFullLegalName && !s.kycDateOfBirth && !s.idPhotoUrl && !s.selfieUrl && (
-                      <div className="mb-4 p-3 rounded-lg border border-white/5 bg-white/[0.02]">
-                        <p className="text-xs text-white/50">No details or documents in this submission</p>
+                      <div className="mb-4 p-3 rounded-lg border border-white/5 bg-muted/30">
+                        <p className="text-xs text-muted-foreground">No details or documents in this submission</p>
                       </div>
                     )}
 
-                    <div className="flex gap-3 pt-3 border-t border-white/10">
+                    <div className="flex gap-3 pt-3 border-t border-border">
                       <Button
                         className="flex-1 bg-green-500/10 text-green-400 hover:bg-green-500/20 border border-green-500/20 gap-2"
                         variant="outline"
@@ -420,8 +420,8 @@ export default function AdminKyc() {
                   <div key={s.id} className="glass-panel p-6 rounded-xl">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                          <Building2 className="w-5 h-5 text-white/60" />
+                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                          <Building2 className="w-5 h-5 text-muted-foreground" />
                         </div>
                         <div>
                           <p className="font-semibold">{s.firstName && s.lastName ? `${s.firstName} ${s.lastName}` : s.email}</p>
@@ -438,15 +438,15 @@ export default function AdminKyc() {
 
                     {s.docUrls && s.docUrls.length > 0 && (
                       <div className="mb-4">
-                        <p className="text-xs text-white/50 mb-2 font-medium uppercase tracking-wide">Business Documents ({s.docUrls.length})</p>
+                        <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Business Documents ({s.docUrls.length})</p>
                         <div className="grid grid-cols-3 gap-3">
                           {s.docUrls.map((url, idx) => (
                             <div key={idx}>
-                              <p className="text-[10px] text-white/50 mb-1">Document {idx + 1}</p>
+                              <p className="text-[10px] text-muted-foreground mb-1">Document {idx + 1}</p>
                               <div className="relative cursor-pointer group" onClick={() => setPreviewUrl(url)}>
                                 <DocImageOrPlaceholder url={url} alt={`Business doc ${idx + 1}`} />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-colors flex items-center justify-center">
-                                  <ExternalLink className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                  <ExternalLink className="w-4 h-4 text-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
                               </div>
                               <a href={url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary/60 hover:text-primary mt-1 inline-flex items-center gap-0.5">
@@ -459,17 +459,17 @@ export default function AdminKyc() {
                     )}
 
                     <div className="mb-3">
-                      <label className="text-[11px] text-white/50 mb-1 block">Rejection reason (optional)</label>
+                      <label className="text-[11px] text-muted-foreground mb-1 block">Rejection reason (optional)</label>
                       <input
                         type="text"
                         placeholder="e.g., Document illegible, expired license..."
                         value={rejectReason[s.id] || ""}
                         onChange={e => setRejectReason(prev => ({ ...prev, [s.id]: e.target.value }))}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-primary/50"
+                        className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50"
                       />
                     </div>
 
-                    <div className="flex gap-3 pt-3 border-t border-white/10">
+                    <div className="flex gap-3 pt-3 border-t border-border">
                       <Button
                         className="flex-1 bg-green-500/10 text-green-400 hover:bg-green-500/20 border border-green-500/20 gap-2"
                         variant="outline"
@@ -503,12 +503,12 @@ export default function AdminKyc() {
           >
             <div className="relative max-w-2xl w-full" onClick={e => e.stopPropagation()}>
               <button
-                className="absolute -top-10 right-0 text-white/60 hover:text-white"
+                className="absolute -top-10 right-0 text-muted-foreground hover:text-foreground"
                 onClick={() => setPreviewUrl(null)}
               >
                 <X className="w-6 h-6" />
               </button>
-              <img src={previewUrl} alt="Document preview" className="w-full rounded-xl border border-white/20" />
+              <img src={previewUrl} alt="Document preview" className="w-full rounded-xl border border-border" />
             </div>
           </div>
         )}

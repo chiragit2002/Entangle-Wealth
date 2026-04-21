@@ -322,15 +322,15 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
   const activeSideConfig = sideButtons.find(b => b.id === side) ?? sideButtons[0];
 
   return (
-    <div className="bg-[#0a0a16] border border-white/[0.06] rounded-xl overflow-hidden" role="region" aria-label={`Paper trade panel${symbol ? ` for ${symbol}` : ""}`}>
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+    <div className="bg-card border border-border rounded-xl overflow-hidden" role="region" aria-label={`Paper trade panel${symbol ? ` for ${symbol}` : ""}`}>
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <div className="flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-[#00B4D8]" aria-hidden="true" />
-          <span className="text-sm font-bold text-white">{symbol ? `Trade ${symbol}` : "Paper Trading"}</span>
+          <span className="text-sm font-bold text-foreground">{symbol ? `Trade ${symbol}` : "Paper Trading"}</span>
         </div>
         {portfolio && (
           <div className="flex items-center gap-3 text-[10px] font-mono">
-            <span className="text-white/40">Cash: <span className="text-[#00B4D8] font-bold">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span></span>
+            <span className="text-muted-foreground/70">Cash: <span className="text-[#00B4D8] font-bold">${portfolio.cashBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span></span>
             <span className={`font-bold ${pnl >= 0 ? "text-[#00B4D8]" : "text-[#ff3366]"}`}>
               P&L: {pnl >= 0 ? "+" : ""}{pnlPct}%
             </span>
@@ -347,7 +347,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
 
       {allowSymbolSearch && (
         <div className="px-4 pt-3">
-          <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Stock</label>
+          <label className="text-[9px] font-mono text-muted-foreground/50 uppercase mb-1 block">Stock</label>
           <StockSearchDropdown
             onSelect={(sym, _name, price) => {
               setSelectedSymbol(sym);
@@ -360,14 +360,14 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
         </div>
       )}
 
-      <div className="flex border-b border-white/[0.06]" role="tablist">
+      <div className="flex border-b border-border" role="tablist">
         {(["stocks", "options", "orders"] as TabType[]).map(t => (
           <button
             key={t}
             role="tab"
             aria-selected={tab === t}
             onClick={() => setTab(t)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors ${tab === t ? "text-[#00B4D8] border-b-2 border-[#00B4D8] bg-[#00B4D8]/[0.04]" : "text-white/40 hover:text-white/60"}`}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors ${tab === t ? "text-[#00B4D8] border-b-2 border-[#00B4D8] bg-[#00B4D8]/[0.04]" : "text-muted-foreground/70 hover:text-muted-foreground"}`}
           >
             {t === "stocks" && <><BarChart3 className="w-3.5 h-3.5" /> Stocks</>}
             {t === "options" && <><Layers className="w-3.5 h-3.5" /> Options</>}
@@ -389,22 +389,22 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
         <div className="p-4">
           {symbolPendingOrders.length === 0 ? (
             <div className="text-center py-8">
-              <Clock className="w-8 h-8 mx-auto mb-2 text-white/10" />
-              <p className="text-xs text-white/30">No open orders{symbol ? ` for ${symbol}` : ""}</p>
+              <Clock className="w-8 h-8 mx-auto mb-2 text-muted-foreground/20" />
+              <p className="text-xs text-muted-foreground/50">No open orders{symbol ? ` for ${symbol}` : ""}</p>
             </div>
           ) : (
             <div className="space-y-2">
               {symbolPendingOrders.map(order => (
-                <div key={order.id} className="flex items-center justify-between bg-white/[0.03] rounded-lg px-3 py-2.5 border border-white/[0.06]">
+                <div key={order.id} className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2.5 border border-border">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-xs font-bold font-mono text-white">{order.symbol}</span>
+                      <span className="text-xs font-bold font-mono text-foreground">{order.symbol}</span>
                       <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase ${order.side === "buy" ? "bg-[#00B4D8]/20 text-[#00B4D8]" : order.side === "sell" ? "bg-[#ff3366]/20 text-[#ff3366]" : order.side === "short_sell" ? "bg-[#9c27b0]/20 text-[#9c27b0]" : "bg-[#0099cc]/20 text-[#0099cc]"}`}>
                         {order.side.replace("_", " ")}
                       </span>
-                      <span className="text-[9px] text-white/30 uppercase">{order.orderType}</span>
+                      <span className="text-[9px] text-muted-foreground/50 uppercase">{order.orderType}</span>
                     </div>
-                    <p className="text-[10px] font-mono text-white/50">
+                    <p className="text-[10px] font-mono text-muted-foreground">
                       {order.quantity} shares
                       {order.limitPrice ? ` @ limit $${order.limitPrice.toFixed(2)}` : ""}
                       {order.stopPrice ? ` @ stop $${order.stopPrice.toFixed(2)}` : ""}
@@ -413,7 +413,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
                   </div>
                   <button
                     onClick={() => cancelOrder(order.id)}
-                    className="ml-2 p-1.5 rounded-lg text-white/30 hover:text-[#ff3366] hover:bg-[#ff3366]/10 transition-colors flex-shrink-0"
+                    className="ml-2 p-1.5 rounded-lg text-muted-foreground/50 hover:text-[#ff3366] hover:bg-[#ff3366]/10 transition-colors flex-shrink-0"
                     aria-label="Cancel order"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -434,7 +434,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
                 className={`py-1.5 text-[10px] font-bold rounded-lg transition-all ${
                   side === btn.id
                     ? `border`
-                    : "bg-white/[0.03] text-white/40 border border-white/[0.06] hover:border-white/10"
+                    : "bg-muted/50 text-muted-foreground/70 border border-border hover:border-border"
                 }`}
                 style={side === btn.id ? {
                   backgroundColor: `${btn.color}20`,
@@ -451,7 +451,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
             <div className="space-y-2">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Shares</label>
+                  <label className="text-[9px] font-mono text-muted-foreground/50 uppercase mb-1 block">Shares</label>
                   <input
                     value={qty}
                     onChange={e => setQty(e.target.value)}
@@ -459,16 +459,16 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
                     type="number"
                     aria-label="Number of shares"
                     disabled={marketDataUnavailable}
-                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/30 disabled:opacity-50"
+                    className="w-full h-9 px-3 text-sm font-mono bg-muted/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[#00B4D8]/30 disabled:opacity-50"
                   />
                 </div>
                 <div>
-                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Order Type</label>
+                  <label className="text-[9px] font-mono text-muted-foreground/50 uppercase mb-1 block">Order Type</label>
                   <select
                     value={orderType}
                     onChange={e => setOrderType(e.target.value as OrderType)}
                     disabled={marketDataUnavailable}
-                    className="w-full h-9 px-2 text-xs font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#00B4D8]/30 disabled:opacity-50 [&>option]:bg-[#0a0a16]"
+                    className="w-full h-9 px-2 text-xs font-mono bg-muted/50 border border-border rounded-lg text-foreground focus:outline-none focus:border-[#00B4D8]/30 disabled:opacity-50 [&>option]:bg-card"
                   >
                     <option value="market">Market</option>
                     <option value="limit">Limit</option>
@@ -480,41 +480,41 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
 
               {orderType === "limit" && (
                 <div>
-                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Limit Price ($)</label>
+                  <label className="text-[9px] font-mono text-muted-foreground/50 uppercase mb-1 block">Limit Price ($)</label>
                   <input
                     value={limitPrice}
                     onChange={e => setLimitPrice(e.target.value)}
                     placeholder={livePrice ? livePrice.toFixed(2) : "0.00"}
                     type="number"
                     step="0.01"
-                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/30"
+                    className="w-full h-9 px-3 text-sm font-mono bg-muted/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[#00B4D8]/30"
                   />
                 </div>
               )}
 
               {orderType === "stop" && (
                 <div>
-                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Stop Price ($)</label>
+                  <label className="text-[9px] font-mono text-muted-foreground/50 uppercase mb-1 block">Stop Price ($)</label>
                   <input
                     value={stopPrice}
                     onChange={e => setStopPrice(e.target.value)}
                     placeholder={livePrice ? livePrice.toFixed(2) : "0.00"}
                     type="number"
                     step="0.01"
-                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/30"
+                    className="w-full h-9 px-3 text-sm font-mono bg-muted/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[#00B4D8]/30"
                   />
                 </div>
               )}
 
               {orderType === "time_based" && (
                 <div>
-                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Expires At</label>
+                  <label className="text-[9px] font-mono text-muted-foreground/50 uppercase mb-1 block">Expires At</label>
                   <input
                     value={expiresAt}
                     onChange={e => setExpiresAt(e.target.value)}
                     type="datetime-local"
                     min={new Date().toISOString().slice(0, 16)}
-                    className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#00B4D8]/30"
+                    className="w-full h-9 px-3 text-sm font-mono bg-muted/50 border border-border rounded-lg text-foreground focus:outline-none focus:border-[#00B4D8]/30"
                   />
                 </div>
               )}
@@ -530,7 +530,7 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
                     className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
                       optionType === t
                         ? t === "CALL" ? "bg-[#00B4D8]/15 text-[#00B4D8] border border-[#00B4D8]/30" : "bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30"
-                        : "bg-white/[0.03] text-white/40 border border-white/[0.06]"
+                        : "bg-muted/50 text-muted-foreground/70 border border-border"
                     }`}
                   >
                     {t}
@@ -540,12 +540,12 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Strike</label>
-                  <input value={strike} onChange={e => setStrike(e.target.value)} placeholder="Strike" type="number" step="0.01" className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/30" />
+                  <label className="text-[9px] font-mono text-muted-foreground/50 uppercase mb-1 block">Strike</label>
+                  <input value={strike} onChange={e => setStrike(e.target.value)} placeholder="Strike" type="number" step="0.01" className="w-full h-9 px-3 text-sm font-mono bg-muted/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[#00B4D8]/30" />
                 </div>
                 <div>
-                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Expiration</label>
-                  <select value={expiration} onChange={e => setExpiration(e.target.value)} className="w-full h-9 px-2 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-[#00B4D8]/30 [&>option]:bg-[#0a0a16]">
+                  <label className="text-[9px] font-mono text-muted-foreground/50 uppercase mb-1 block">Expiration</label>
+                  <select value={expiration} onChange={e => setExpiration(e.target.value)} className="w-full h-9 px-2 text-sm font-mono bg-muted/50 border border-border rounded-lg text-foreground focus:outline-none focus:border-[#00B4D8]/30 [&>option]:bg-card">
                     {EXPIRATIONS.map(exp => <option key={exp} value={exp}>{exp}</option>)}
                   </select>
                 </div>
@@ -553,21 +553,21 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Contracts</label>
-                  <input value={contracts} onChange={e => setContracts(e.target.value)} placeholder="1" type="number" className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/30" />
+                  <label className="text-[9px] font-mono text-muted-foreground/50 uppercase mb-1 block">Contracts</label>
+                  <input value={contracts} onChange={e => setContracts(e.target.value)} placeholder="1" type="number" className="w-full h-9 px-3 text-sm font-mono bg-muted/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[#00B4D8]/30" />
                 </div>
                 <div>
-                  <label className="text-[9px] font-mono text-white/30 uppercase mb-1 block">Premium</label>
-                  <input value={premium} onChange={e => setPremium(e.target.value)} placeholder="0.00" type="number" step="0.01" className="w-full h-9 px-3 text-sm font-mono bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-[#00B4D8]/30" />
+                  <label className="text-[9px] font-mono text-muted-foreground/50 uppercase mb-1 block">Premium</label>
+                  <input value={premium} onChange={e => setPremium(e.target.value)} placeholder="0.00" type="number" step="0.01" className="w-full h-9 px-3 text-sm font-mono bg-muted/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[#00B4D8]/30" />
                 </div>
               </div>
             </div>
           )}
 
           {totalEstimate > 0 && (
-            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
-              <span className="text-[10px] font-mono text-white/40">Estimated Total</span>
-              <span className="text-sm font-mono font-bold text-white">${totalEstimate.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30 border border-border">
+              <span className="text-[10px] font-mono text-muted-foreground/70">Estimated Total</span>
+              <span className="text-sm font-mono font-bold text-foreground">${totalEstimate.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
             </div>
           )}
 
@@ -598,17 +598,17 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
       )}
 
       {(symbolPositions.length > 0 || symbolOptionsPositions.length > 0) && tab !== "orders" && (
-        <div className="border-t border-white/[0.06] px-4 py-3 space-y-2">
-          <p className="text-[9px] font-mono text-white/30 uppercase font-bold">Your {symbol} Positions</p>
+        <div className="border-t border-border px-4 py-3 space-y-2">
+          <p className="text-[9px] font-mono text-muted-foreground/50 uppercase font-bold">Your {symbol} Positions</p>
           {symbolPositions.map(p => (
             <div key={p.id} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <BarChart3 className="w-3 h-3 text-[#00B4D8]" />
-                <span className={`text-xs font-mono font-bold ${p.quantity < 0 ? "text-[#9c27b0]" : "text-white"}`}>
+                <span className={`text-xs font-mono font-bold ${p.quantity < 0 ? "text-[#9c27b0]" : "text-foreground"}`}>
                   {p.quantity < 0 ? `${Math.abs(p.quantity)} short` : `${p.quantity} shares`}
                 </span>
               </div>
-              <span className="text-[10px] font-mono text-white/50">avg ${Math.abs(p.avgCost).toFixed(2)}</span>
+              <span className="text-[10px] font-mono text-muted-foreground">avg ${Math.abs(p.avgCost).toFixed(2)}</span>
               {p.unrealizedPnl !== undefined && (
                 <span className={`text-xs font-mono ${p.unrealizedPnl >= 0 ? "text-emerald-400" : "text-[#ff3366]"}`}>
                   {p.unrealizedPnl >= 0 ? "+" : ""}${p.unrealizedPnl.toFixed(2)}
@@ -620,12 +620,12 @@ export function StockTradePanel({ symbol: propSymbol = "", currentPrice, allowSy
             <div key={p.id} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Layers className="w-3 h-3 text-[#9c27b0]" />
-                <span className="text-xs font-mono font-bold text-white">
+                <span className="text-xs font-mono font-bold text-foreground">
                   {p.contracts}x ${p.strike} {p.optionType}
                 </span>
               </div>
-              <span className="text-[10px] font-mono text-white/50">{p.expiration}</span>
-              <span className="text-xs font-mono text-white/70">${(p.contracts * p.avgPremium * 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+              <span className="text-[10px] font-mono text-muted-foreground">{p.expiration}</span>
+              <span className="text-xs font-mono text-foreground/70">${(p.contracts * p.avgPremium * 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
             </div>
           ))}
         </div>

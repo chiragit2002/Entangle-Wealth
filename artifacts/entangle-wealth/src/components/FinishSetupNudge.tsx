@@ -31,10 +31,10 @@ export function FinishSetupNudgeUI({ incompleteItems, onDismiss }: FinishSetupNu
           <div className="flex items-start gap-2.5">
             <Rocket className="w-4 h-4 text-[#00B4D8] mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-[11px] font-bold text-white/70">
+              <p className="text-[11px] font-bold text-foreground/70">
                 You left {incompleteItems.length} setup {incompleteItems.length === 1 ? "step" : "steps"} unfinished
               </p>
-              <p className="text-[9px] font-mono text-white/25 mb-2">Complete your setup to get the most out of EntangleWealth</p>
+              <p className="text-[9px] font-mono text-muted-foreground/40 mb-2">Complete your setup to get the most out of EntangleWealth</p>
               <div className="flex flex-wrap gap-1.5">
                 {incompleteItems.map(item => (
                   <Link
@@ -51,7 +51,7 @@ export function FinishSetupNudgeUI({ incompleteItems, onDismiss }: FinishSetupNu
           </div>
           <button
             onClick={onDismiss}
-            className="text-white/15 hover:text-white/40 transition-colors p-0.5 flex-shrink-0"
+            className="text-muted-foreground/30 hover:text-muted-foreground/70 transition-colors p-0.5 flex-shrink-0"
             aria-label="Dismiss setup nudge"
           >
             <X className="w-3.5 h-3.5" />

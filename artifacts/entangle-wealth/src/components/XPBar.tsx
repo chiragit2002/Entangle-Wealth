@@ -36,14 +36,14 @@ export function XPBar({ level, levelProgress, xpToNextLevel, tier, variant = "co
       {isCompact ? (
         <div>
           <div className="flex items-center justify-between mb-0.5">
-            <span className="text-[8px] font-mono text-white/25">
+            <span className="text-[8px] font-mono text-muted-foreground/40">
               Level {level} → {level + 1}
             </span>
             <span className="text-[8px] font-mono" style={{ color: colors.start }}>
               {xpToNextLevel.toLocaleString()} XP to go
             </span>
           </div>
-          <div className="w-full h-1.5 bg-white/[0.04] rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-muted/50 rounded-full overflow-hidden">
             <motion.div
               className="h-full rounded-full relative overflow-hidden"
               initial={{ width: "0%" }}
@@ -70,14 +70,14 @@ export function XPBar({ level, levelProgress, xpToNextLevel, tier, variant = "co
       ) : (
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono text-white/50">
+            <span className="text-xs font-mono text-muted-foreground">
               Level {level} → {level + 1}
             </span>
             <span className="text-xs font-mono font-bold" style={{ color: colors.start }}>
               {xpToNextLevel.toLocaleString()} XP remaining
             </span>
           </div>
-          <div className="w-full h-3 bg-white/[0.04] rounded-full overflow-hidden">
+          <div className="w-full h-3 bg-muted/50 rounded-full overflow-hidden">
             <motion.div
               className="h-full rounded-full relative overflow-hidden"
               initial={{ width: "0%" }}
@@ -101,7 +101,7 @@ export function XPBar({ level, levelProgress, xpToNextLevel, tier, variant = "co
             </motion.div>
           </div>
           <div className="flex items-center justify-between mt-1.5">
-            <span className="text-[10px] font-mono text-white/30">
+            <span className="text-[10px] font-mono text-muted-foreground/50">
               {clampedProgress.toFixed(0)}% complete
             </span>
           </div>

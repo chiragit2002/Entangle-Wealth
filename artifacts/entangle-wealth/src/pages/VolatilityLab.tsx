@@ -181,7 +181,7 @@ function VolGauge({ vol, label }: { vol: number; label: string }) {
     <div className="mobile-card text-center">
       <div className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold mb-1">{label}</div>
       <div className="font-mono text-xl font-bold" style={{ color }}>{vol.toFixed(1)}%</div>
-      <div className="h-1.5 bg-white/5 rounded-full mt-2 overflow-hidden">
+      <div className="h-1.5 bg-muted/50 rounded-full mt-2 overflow-hidden">
         <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(vol / 60 * 100, 100)}%`, background: color }} />
       </div>
     </div>
@@ -241,7 +241,7 @@ export default function VolatilityLab() {
             <div className="flex-1">
               <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1 block">Symbol</label>
               <Input value={symbol} onChange={(e) => setSymbol(e.target.value.toUpperCase())} placeholder="NVDA"
-                className="font-mono bg-black/50 border-white/10" onKeyDown={(e) => e.key === "Enter" && analyze()} />
+                className="font-mono bg-black/50 border-border" onKeyDown={(e) => e.key === "Enter" && analyze()} />
             </div>
             <Button onClick={() => analyze()} disabled={loading} className="h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-6">
               {loading ? <Activity className="w-4 h-4 animate-spin" /> : <><Zap className="w-4 h-4 mr-1" /> Analyze</>}
@@ -250,7 +250,7 @@ export default function VolatilityLab() {
           <div className="flex flex-wrap gap-2">
             {POPULAR.map((s) => (
               <button key={s} onClick={() => { setSymbol(s); analyze(s); }}
-                className="text-[10px] px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors font-mono">
+                className="text-[10px] px-2.5 py-1 rounded-full bg-muted/50 border border-border text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors font-mono">
                 {s}
               </button>
             ))}

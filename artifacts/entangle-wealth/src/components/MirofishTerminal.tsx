@@ -1128,12 +1128,12 @@ export function MirofishTerminal() {
           </div>
           <div className="space-y-0.5 max-h-64 overflow-y-auto">
             {liveOrderFlow.slice(0, 8).map((order, i) => (
-              <div key={i} className="flex items-center gap-2 text-[10px] font-mono py-1 border-b border-white/[0.03] animate-in fade-in duration-500">
-                <span className="text-white/30 w-16">{order.time}</span>
+              <div key={i} className="flex items-center gap-2 text-[10px] font-mono py-1 border-b border-border/50 animate-in fade-in duration-500">
+                <span className="text-muted-foreground/50 w-16">{order.time}</span>
                 <span className={`w-8 font-bold ${order.action === "BUY" ? "text-green-400" : "text-red-400"}`}>{order.action}</span>
-                <span className="text-white font-bold w-10">{order.symbol}</span>
-                <span className="text-white/50 w-12 text-right">{order.size}</span>
-                <span className="text-white/70 w-14 text-right">{order.price}</span>
+                <span className="text-foreground font-bold w-10">{order.symbol}</span>
+                <span className="text-muted-foreground w-12 text-right">{order.size}</span>
+                <span className="text-foreground/70 w-14 text-right">{order.price}</span>
                 <span className="text-primary/40 text-[8px] w-10">{order.type}</span>
               </div>
             ))}
@@ -1147,15 +1147,15 @@ export function MirofishTerminal() {
           </div>
           <div className="space-y-1 max-h-64 overflow-y-auto">
             {newsItems.map((item, i) => (
-              <div key={i} className="py-1.5 border-b border-white/[0.03]">
+              <div key={i} className="py-1.5 border-b border-border/50">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-[9px] font-mono text-white/30">{item.time}</span>
+                  <span className="text-[9px] font-mono text-muted-foreground/50">{item.time}</span>
                   <span className="text-[9px] font-mono text-primary/50">{item.source}</span>
                   <span className={`text-[8px] font-mono ml-auto ${getSentimentColor(item.sentiment)}`}>
                     {item.sentiment === "positive" ? "+" : item.sentiment === "negative" ? "▼" : "~"}
                   </span>
                 </div>
-                <p className="text-[10px] font-mono text-white/70 leading-tight">{item.headline}</p>
+                <p className="text-[10px] font-mono text-foreground/70 leading-tight">{item.headline}</p>
               </div>
             ))}
           </div>
@@ -1167,7 +1167,7 @@ export function MirofishTerminal() {
             <span className="text-[9px] font-mono text-purple-400/70 uppercase tracking-wider">System Log</span>
           </div>
           <div className="space-y-0.5 max-h-64 overflow-y-auto">
-            <div className="text-[10px] font-mono py-4 text-center text-white/15">No system events</div>
+            <div className="text-[10px] font-mono py-4 text-center text-muted-foreground/30">No system events</div>
           </div>
         </div>
       </div>
@@ -1186,7 +1186,7 @@ export function MirofishTerminal() {
                   <span className="text-primary/40">entangle@core:~$ </span>{cmd.input}
                 </div>
               )}
-              <div className="text-white/60 pl-4 whitespace-pre-wrap">{cmd.output}</div>
+              <div className="text-muted-foreground pl-4 whitespace-pre-wrap">{cmd.output}</div>
             </div>
           ))}
         </div>

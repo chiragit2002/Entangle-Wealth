@@ -258,7 +258,7 @@ export default function OpenSourceIntel() {
   const totalStars = "150k+";
 
   return (
-    <div className="min-h-screen bg-black text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-8 max-w-6xl">
         <div className="mb-8">
@@ -406,7 +406,7 @@ export default function OpenSourceIntel() {
                 </button>
 
                 {isExpanded && (
-                  <div className="px-4 md:px-5 pb-5 space-y-4 border-t border-white/5 pt-4 animate-in fade-in duration-200">
+                  <div className="px-4 md:px-5 pb-5 space-y-4 border-t border-border pt-4 animate-in fade-in duration-200">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">How It Helps EntangleWealth</p>
@@ -489,7 +489,7 @@ export default function OpenSourceIntel() {
                   { license: "MIT", commercial: true, openSource: false, libs: LIBRARY_DATA.filter(l => l.license === "MIT").map(l => l.name) },
                   { license: "Apache-2.0", commercial: true, openSource: false, libs: LIBRARY_DATA.filter(l => l.license === "Apache-2.0").map(l => l.name) },
                 ].map((row, i) => (
-                  <tr key={i} className="border-b border-white/5">
+                  <tr key={i} className="border-b border-border">
                     <td className="py-2.5 px-3 font-mono text-xs">{row.license}</td>
                     <td className="py-2.5 px-3 text-center">
                       <CheckCircle2 className="w-4 h-4 text-green-400 mx-auto" />

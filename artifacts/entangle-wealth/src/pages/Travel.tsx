@@ -805,7 +805,7 @@ export default function Travel() {
                       </div>
 
                       {isExpanded && (
-                        <div className="px-4 pb-4 pt-0 border-t border-white/5 mt-0">
+                        <div className="px-4 pb-4 pt-0 border-t border-border mt-0">
                           <div className="pt-3">
                             <p className="text-[12px] text-muted-foreground mb-3">{d.description}</p>
                             <div className="flex items-center gap-2 mb-2">

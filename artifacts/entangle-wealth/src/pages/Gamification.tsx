@@ -117,7 +117,7 @@ function SpinWheel({ canSpin, spinning, rotation }: { canSpin: boolean; spinning
               <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
             </filter>
           </defs>
-          <circle cx={cx} cy={cy} r={r + 8} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="2" />
+          <circle cx={cx} cy={cy} r={r + 8} fill="none" stroke="hsl(var(--border))" strokeWidth="2" />
           {segments.map((seg, i) => (
             <g key={i}>
               <path d={seg.d} fill={seg.color} stroke="rgba(0,0,0,0.3)" strokeWidth="1.5" />
@@ -136,7 +136,7 @@ function SpinWheel({ canSpin, spinning, rotation }: { canSpin: boolean; spinning
               </text>
             </g>
           ))}
-          <circle cx={cx} cy={cy} r="14" fill="#0a0a14" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+          <circle cx={cx} cy={cy} r="14" fill="hsl(var(--card))" stroke="hsl(var(--border))" strokeWidth="2" />
           <circle cx={cx} cy={cy} r="8" fill="#00B4D8" />
         </svg>
       </div>
@@ -144,7 +144,7 @@ function SpinWheel({ canSpin, spinning, rotation }: { canSpin: boolean; spinning
         <div className="w-0 h-0" style={{ borderLeft: "8px solid transparent", borderRight: "8px solid transparent", borderTop: "20px solid #FFB800" }} />
       </div>
       {!canSpin && (
-        <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
+        <div className="absolute inset-0 rounded-full bg-muted/50 flex items-center justify-center">
           <Lock className="w-8 h-8 text-muted-foreground/70" />
         </div>
       )}
@@ -366,7 +366,7 @@ export default function Gamification() {
           <div className="p-4 max-w-6xl mx-auto space-y-4">
 
             {status && (
-              <div className="bg-gradient-to-r from-[#0a0a14] via-[#0d0d1f] to-[#0a0a14] border border-border rounded-sm p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="bg-card border border-border rounded-sm p-4 flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex items-center gap-4 flex-1">
                   <div
                     className="w-14 h-14 rounded-sm flex items-center justify-center text-2xl font-black font-mono border-2"
@@ -564,11 +564,9 @@ export default function Gamification() {
                       ].map(milestone => (
                         <div
                           key={milestone.days}
-                          className="flex items-center justify-between px-3 py-2 rounded-sm border transition-colors"
-                          style={{
-                            background: milestone.active ? "rgba(255,107,53,0.08)" : "rgba(255,255,255,0.02)",
-                            borderColor: milestone.active ? "rgba(255,107,53,0.25)" : "rgba(255,255,255,0.06)",
-                          }}
+                          className={`flex items-center justify-between px-3 py-2 rounded-sm border transition-colors ${
+                            milestone.active ? "bg-orange-500/[0.08] border-orange-500/25" : "bg-muted/30 border-border"
+                          }`}
                         >
                           <div className="flex items-center gap-2">
                             {milestone.active ? (
@@ -578,7 +576,7 @@ export default function Gamification() {
                             )}
                             <span className="text-[10px] font-mono text-muted-foreground">{milestone.days}-day streak</span>
                           </div>
-                          <span className="text-[10px] font-mono font-bold" style={{ color: milestone.active ? "#ff6b35" : "#ffffff30" }}>
+                          <span className={`text-[10px] font-mono font-bold ${milestone.active ? "text-[#ff6b35]" : "text-muted-foreground/30"}`}>
                             {milestone.bonus}
                           </span>
                         </div>
@@ -588,13 +586,11 @@ export default function Gamification() {
                     <button
                       onClick={handleClaimDaily}
                       disabled={status?.alreadyClaimedDaily || claimingDaily}
-                      className="w-full py-2 rounded-sm text-[10px] font-bold font-mono uppercase tracking-widest flex items-center justify-center gap-2 transition-colors"
-                      style={{
-                        background: status?.alreadyClaimedDaily ? "rgba(255,255,255,0.04)" : "rgba(255,107,53,0.2)",
-                        border: `1px solid ${status?.alreadyClaimedDaily ? "rgba(255,255,255,0.06)" : "rgba(255,107,53,0.3)"}`,
-                        color: status?.alreadyClaimedDaily ? "rgba(255,255,255,0.25)" : "#ff6b35",
-                        cursor: status?.alreadyClaimedDaily ? "not-allowed" : "pointer",
-                      }}
+                      className={`w-full py-2 rounded-sm text-[10px] font-bold font-mono uppercase tracking-widest flex items-center justify-center gap-2 transition-colors border ${
+                        status?.alreadyClaimedDaily
+                          ? "bg-muted/30 border-border text-muted-foreground/30 cursor-not-allowed"
+                          : "bg-orange-500/20 border-orange-500/30 text-[#ff6b35] cursor-pointer"
+                      }`}
                     >
                       {status?.alreadyClaimedDaily ? (
                         <>
@@ -621,7 +617,7 @@ export default function Gamification() {
                       View all <ChevronRight className="w-2.5 h-2.5" />
                     </Link>
                   </div>
-                  <div className="divide-y divide-white/[0.04]">
+                  <div className="divide-y divide-border">
                     {status?.recentRewards && status.recentRewards.length > 0 ? (
                       status.recentRewards.slice(0, 6).map((r) => (
                         <div key={r.id} className="flex items-center justify-between px-3 py-2 hover:bg-muted/30 transition-colors">

@@ -1,5 +1,6 @@
 import { useEffect, useState, memo } from "react";
 import { Link } from "wouter";
+import { useTheme } from "next-themes";
 
 const MARKET_STATS = [
   { label: "S&P 500", value: "5,127.45", change: "+1.2%", positive: true },
@@ -22,7 +23,58 @@ interface TickerItem {
   isPositive: boolean;
 }
 
-function TickerTape() {
+interface ThemeColors {
+  bg: string;
+  bgPanel: string;
+  bgTicker: string;
+  tickerBorder: string;
+  accent: string;
+  accentMuted: string;
+  textPrimary: string;
+  textSecondary: string;
+  textMuted: string;
+  textFaint: string;
+  borderSubtle: string;
+  negativeColor: string;
+  protectedBg: string;
+  protectedBorder: string;
+}
+
+const darkColors: ThemeColors = {
+  bg: "hsl(var(--card))",
+  bgPanel: "#0D1321",
+  bgTicker: "#060910",
+  tickerBorder: "rgba(0,180,216,0.15)",
+  accent: "#00B4D8",
+  accentMuted: "rgba(0,180,216,0.5)",
+  textPrimary: "#ffffff",
+  textSecondary: "rgba(255,255,255,0.6)",
+  textMuted: "rgba(255,255,255,0.5)",
+  textFaint: "rgba(255,255,255,0.25)",
+  borderSubtle: "rgba(0,180,216,0.12)",
+  negativeColor: "#FF3B3B",
+  protectedBg: "rgba(0,180,216,0.05)",
+  protectedBorder: "rgba(0,180,216,0.2)",
+};
+
+const lightColors: ThemeColors = {
+  bg: "hsl(210, 20%, 96%)",
+  bgPanel: "hsl(0, 0%, 100%)",
+  bgTicker: "hsl(210, 20%, 98%)",
+  tickerBorder: "rgba(0,180,216,0.15)",
+  accent: "#00B4D8",
+  accentMuted: "rgba(0,180,216,0.5)",
+  textPrimary: "#1a1a2e",
+  textSecondary: "rgba(0,0,0,0.6)",
+  textMuted: "rgba(0,0,0,0.5)",
+  textFaint: "rgba(0,0,0,0.3)",
+  borderSubtle: "rgba(0,0,0,0.08)",
+  negativeColor: "#DC2626",
+  protectedBg: "rgba(0,180,216,0.05)",
+  protectedBorder: "rgba(0,180,216,0.2)",
+};
+
+function TickerTape({ colors }: { colors: ThemeColors }) {
   const [items, setItems] = useState<TickerItem[]>([]);
 
   useEffect(() => {
@@ -46,13 +98,13 @@ function TickerTape() {
 
   return (
     <div className="w-full overflow-hidden py-1.5 flex items-center"
-      style={{ background: "#060910", borderBottom: "1px solid rgba(0,180,216,0.15)" }}>
+      style={{ background: colors.bgTicker, borderBottom: `1px solid ${colors.tickerBorder}` }}>
       <div className="flex animate-[ticker_30s_linear_infinite] whitespace-nowrap">
         {doubled.map((item, i) => (
           <div key={`${item.symbol}-${i}`} className="flex items-center gap-1.5 mx-4 text-xs tracking-wider" style={{ fontFamily: "'JetBrains Mono', 'Fira Code', 'Courier New', monospace" }}>
-            <span style={{ color: "#ffffff", fontWeight: 700 }}>{item.symbol}</span>
-            <span style={{ color: "rgba(255,255,255,0.6)" }}>${item.price.toFixed(2)}</span>
-            <span style={{ color: item.isPositive ? "#00B4D8" : "#FF3B3B" }}>
+            <span style={{ color: colors.textPrimary, fontWeight: 700 }}>{item.symbol}</span>
+            <span style={{ color: colors.textSecondary }}>${item.price.toFixed(2)}</span>
+            <span style={{ color: item.isPositive ? colors.accent : colors.negativeColor }}>
               {item.isPositive ? "\u25B2" : "\u25BC"} {item.isPositive ? "+" : ""}{item.changePercent.toFixed(2)}%
             </span>
           </div>
@@ -62,7 +114,7 @@ function TickerTape() {
   );
 }
 
-function BlinkingCursor() {
+function BlinkingCursor({ color }: { color: string }) {
   const [visible, setVisible] = useState(true);
   useEffect(() => {
     const interval = setInterval(() => setVisible(v => !v), 530);
@@ -73,7 +125,7 @@ function BlinkingCursor() {
       display: "inline-block",
       width: "10px",
       height: "20px",
-      background: visible ? "#00B4D8" : "transparent",
+      background: visible ? color : "transparent",
       marginLeft: "4px",
       verticalAlign: "middle",
       transition: "background 0.1s",
@@ -81,11 +133,11 @@ function BlinkingCursor() {
   );
 }
 
-function MarketStatTile({ label, value, change, positive }: { label: string; value: string; change: string; positive: boolean }) {
+function MarketStatTile({ label, value, change, positive, colors }: { label: string; value: string; change: string; positive: boolean; colors: ThemeColors }) {
   return (
     <div style={{
-      background: "#0D1321",
-      border: "1px solid rgba(0,180,216,0.12)",
+      background: colors.bgPanel,
+      border: `1px solid ${colors.borderSubtle}`,
       padding: "12px 14px",
       flex: "1 1 0",
       minWidth: 0,
@@ -93,7 +145,7 @@ function MarketStatTile({ label, value, change, positive }: { label: string; val
       <div style={{
         fontFamily: "'JetBrains Mono', monospace",
         fontSize: "10px",
-        color: "rgba(255,255,255,0.4)",
+        color: colors.textMuted,
         letterSpacing: "0.08em",
         marginBottom: "4px",
         textTransform: "uppercase",
@@ -102,13 +154,13 @@ function MarketStatTile({ label, value, change, positive }: { label: string; val
         <span style={{
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: "16px",
-          color: "#ffffff",
+          color: colors.textPrimary,
           fontWeight: 600,
         }}>{value}</span>
         <span style={{
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: "12px",
-          color: positive ? "#00B4D8" : "#FF3B3B",
+          color: positive ? colors.accent : colors.negativeColor,
           fontWeight: 500,
         }}>{change}</span>
       </div>
@@ -116,7 +168,7 @@ function MarketStatTile({ label, value, change, positive }: { label: string; val
   );
 }
 
-function TerminalLine({ label, status, delay }: { label: string; status: string; delay: number }) {
+function TerminalLine({ label, status, delay, colors }: { label: string; status: string; delay: number; colors: ThemeColors }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), delay);
@@ -130,13 +182,13 @@ function TerminalLine({ label, status, delay }: { label: string; status: string;
     <div style={{
       fontFamily: "'JetBrains Mono', monospace",
       fontSize: "12px",
-      color: "rgba(255,255,255,0.5)",
+      color: colors.textMuted,
       lineHeight: "1.8",
     }}>
-      <span style={{ color: "#00B4D8" }}>{"> "}</span>
+      <span style={{ color: colors.accent }}>{"> "}</span>
       {label}
-      <span style={{ color: "rgba(255,255,255,0.15)" }}>{dots}</span>
-      <span style={{ color: "#00B4D8", fontWeight: 600 }}>{status}</span>
+      <span style={{ color: colors.textFaint }}>{dots}</span>
+      <span style={{ color: colors.accent, fontWeight: 600 }}>{status}</span>
     </div>
   );
 }
@@ -150,15 +202,18 @@ const TerminalAuthShellBase = memo(function TerminalAuthShell({
   reason?: string | null;
   mode?: "sign-in" | "sign-up";
 }) {
+  const { resolvedTheme } = useTheme();
+  const colors = resolvedTheme === "dark" ? darkColors : lightColors;
+
   return (
     <div style={{
       minHeight: "100vh",
-      background: "hsl(var(--card))",
+      background: colors.bg,
       display: "flex",
       flexDirection: "column",
       overflow: "hidden",
     }}>
-      <TickerTape />
+      <TickerTape colors={colors} />
 
       <div style={{
         flex: 1,
@@ -177,19 +232,19 @@ const TerminalAuthShellBase = memo(function TerminalAuthShell({
               fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
               fontSize: "32px",
               fontWeight: 700,
-              color: "#ffffff",
+              color: colors.textPrimary,
               letterSpacing: "0.06em",
               lineHeight: 1.2,
               display: "flex",
               alignItems: "center",
             }}>
               ENTANGLE WEALTH
-              <BlinkingCursor />
+              <BlinkingCursor color={colors.accent} />
             </h1>
             <p style={{
               fontFamily: "'JetBrains Mono', monospace",
               fontSize: "13px",
-              color: "rgba(255,255,255,0.35)",
+              color: colors.textFaint,
               letterSpacing: "0.12em",
               marginTop: "8px",
               textTransform: "uppercase",
@@ -205,17 +260,17 @@ const TerminalAuthShellBase = memo(function TerminalAuthShell({
             marginBottom: "36px",
           }}>
             {MARKET_STATS.map(s => (
-              <MarketStatTile key={s.label} {...s} />
+              <MarketStatTile key={s.label} {...s} colors={colors} />
             ))}
           </div>
 
           <div style={{
-            background: "#0D1321",
-            border: "1px solid rgba(0,180,216,0.12)",
+            background: colors.bgPanel,
+            border: `1px solid ${colors.borderSubtle}`,
             padding: "16px 18px",
           }}>
             {TERMINAL_LINES.map((line, i) => (
-              <TerminalLine key={line.label} label={line.label} status={line.status} delay={i * 400} />
+              <TerminalLine key={line.label} label={line.label} status={line.status} delay={i * 400} colors={colors} />
             ))}
           </div>
         </div>
@@ -232,11 +287,11 @@ const TerminalAuthShellBase = memo(function TerminalAuthShell({
             <div style={{
               marginBottom: "16px",
               padding: "8px 16px",
-              border: "1px solid rgba(0,180,216,0.2)",
-              background: "rgba(0,180,216,0.05)",
+              border: `1px solid ${colors.protectedBorder}`,
+              background: colors.protectedBg,
               fontFamily: "'JetBrains Mono', monospace",
               fontSize: "12px",
-              color: "#00B4D8",
+              color: colors.accent,
               maxWidth: "420px",
               width: "100%",
             }}>
@@ -251,15 +306,15 @@ const TerminalAuthShellBase = memo(function TerminalAuthShell({
           <p style={{
             marginTop: "20px",
             fontSize: "10px",
-            color: "rgba(255,255,255,0.25)",
+            color: colors.textFaint,
             textAlign: "center",
             fontFamily: "'JetBrains Mono', monospace",
             letterSpacing: "0.04em",
           }}>
             By continuing, you agree to our{" "}
-            <Link href="/terms" style={{ color: "rgba(0,180,216,0.5)", textDecoration: "none" }}>Terms</Link>
+            <Link href="/terms" style={{ color: colors.accentMuted, textDecoration: "none" }}>Terms</Link>
             {" "}&{" "}
-            <Link href="/privacy" style={{ color: "rgba(0,180,216,0.5)", textDecoration: "none" }}>Privacy Policy</Link>
+            <Link href="/privacy" style={{ color: colors.accentMuted, textDecoration: "none" }}>Privacy Policy</Link>
           </p>
         </div>
       </div>

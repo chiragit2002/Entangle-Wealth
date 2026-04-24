@@ -378,12 +378,12 @@ export function ReferralSection() {
                           }
                         : isNext
                         ? {
-                            background: "rgba(255,255,255,0.03)",
+                            background: "hsl(var(--muted) / 0.3)",
                             border: `1px solid ${tier.color}20`,
                           }
                         : {
-                            background: "rgba(255,255,255,0.02)",
-                            border: "1px solid rgba(255,255,255,0.05)",
+                            background: "hsl(var(--muted) / 0.2)",
+                            border: "1px solid hsl(var(--border))",
                           }
                     }
                   >
@@ -396,7 +396,7 @@ export function ReferralSection() {
                             color:
                               done || isNext
                                 ? tier.color
-                                : "rgba(255,255,255,0.3)",
+                                : "hsl(var(--muted-foreground))",
                           }}
                         >
                           {tier.name}
@@ -409,10 +409,10 @@ export function ReferralSection() {
                         className="text-xs leading-snug mt-0.5"
                         style={{
                           color: done
-                            ? "rgba(255,255,255,0.7)"
+                            ? "hsl(var(--foreground) / 0.7)"
                             : isNext
-                            ? "rgba(255,255,255,0.5)"
-                            : "rgba(255,255,255,0.2)",
+                            ? "hsl(var(--muted-foreground))"
+                            : "hsl(var(--muted-foreground) / 0.5)",
                         }}
                       >
                         {done ? tier.detail : tier.benefit}
@@ -491,7 +491,7 @@ export function ReferralSection() {
           style={{
             background: code
               ? "linear-gradient(135deg, #00d4ff 0%, #0099cc 50%, #00B4D8 100%)"
-              : "rgba(255,255,255,0.1)",
+              : "hsl(var(--muted) / 0.5)",
             backgroundSize: "200% 100%",
           }}
         >

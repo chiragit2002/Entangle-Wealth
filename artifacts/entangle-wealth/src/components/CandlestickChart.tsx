@@ -71,30 +71,37 @@ function CandlestickChartBase({ data, symbol, height = 380 }: CandlestickChartPr
   useEffect(() => {
     if (!containerRef.current || !bars.length) return;
 
+    const cs = getComputedStyle(document.documentElement);
+    const hsl = (v: string) => `hsl(${cs.getPropertyValue(v).trim()})`;
+    const bgColor = hsl("--background");
+    const textColor = hsl("--muted-foreground");
+    const borderColor = hsl("--border");
+    const cardColor = hsl("--card");
+
     const chart = createChart(containerRef.current, {
       width: containerRef.current.clientWidth,
       height,
       layout: {
-        background: { type: ColorType.Solid, color: "#0a0a16" },
-        textColor: "rgba(255, 255, 255, 0.35)",
+        background: { type: ColorType.Solid, color: bgColor },
+        textColor,
         fontSize: 10,
         fontFamily: "'JetBrains Mono', monospace",
       },
       grid: {
-        vertLines: { color: "rgba(255, 255, 255, 0.03)" },
-        horzLines: { color: "rgba(255, 255, 255, 0.03)" },
+        vertLines: { color: borderColor },
+        horzLines: { color: borderColor },
       },
       crosshair: {
         mode: CrosshairMode.Normal,
-        vertLine: { color: "rgba(0,180,216, 0.25)", width: 1, style: 2, labelBackgroundColor: "#0a0a16" },
-        horzLine: { color: "rgba(0,180,216, 0.25)", width: 1, style: 2, labelBackgroundColor: "#0a0a16" },
+        vertLine: { color: "rgba(0,180,216, 0.25)", width: 1, style: 2, labelBackgroundColor: cardColor },
+        horzLine: { color: "rgba(0,180,216, 0.25)", width: 1, style: 2, labelBackgroundColor: cardColor },
       },
       rightPriceScale: {
-        borderColor: "rgba(255, 255, 255, 0.06)",
+        borderColor,
         scaleMargins: { top: 0.1, bottom: 0.25 },
       },
       timeScale: {
-        borderColor: "rgba(255, 255, 255, 0.06)",
+        borderColor,
         timeVisible: true,
         secondsVisible: false,
       },

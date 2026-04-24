@@ -54,12 +54,12 @@ export function TaxImpactCard({
         ) : (
           <>
             <div className="grid grid-cols-2 gap-2 mb-3">
-              <div className="rounded-lg p-2.5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <div className="rounded-lg p-2.5" style={{ background: "hsl(var(--muted) / 0.3)", border: "1px solid hsl(var(--border))" }}>
                 <p className="text-[9px] text-muted-foreground/70 uppercase tracking-wider mb-1">Short-term gain tax</p>
                 <p className="text-sm font-bold font-mono text-red-400">~${impact.estimatedShortTermTax.toLocaleString()}</p>
                 <p className="text-[9px] text-muted-foreground/50 mt-0.5">{(impact.shortTermRate * 100).toFixed(0)}% rate · held &lt;1yr</p>
               </div>
-              <div className="rounded-lg p-2.5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <div className="rounded-lg p-2.5" style={{ background: "hsl(var(--muted) / 0.3)", border: "1px solid hsl(var(--border))" }}>
                 <p className="text-[9px] text-muted-foreground/70 uppercase tracking-wider mb-1">Long-term gain tax</p>
                 <p className="text-sm font-bold font-mono text-emerald-400">~${impact.estimatedLongTermTax.toLocaleString()}</p>
                 <p className="text-[9px] text-muted-foreground/50 mt-0.5">{(impact.longTermRate * 100).toFixed(0)}% rate · held &gt;1yr</p>

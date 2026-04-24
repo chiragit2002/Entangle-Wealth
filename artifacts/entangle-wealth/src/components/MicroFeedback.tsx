@@ -66,7 +66,7 @@ export function MicroFeedback({ context, label = "Was this helpful?", className 
     return (
       <div
         className={`rounded-xl border p-4 ${className}`}
-        style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.08)" }}
+        style={{ background: "hsl(var(--muted) / 0.3)", borderColor: "hsl(var(--border))" }}
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2 text-sm text-foreground/70">

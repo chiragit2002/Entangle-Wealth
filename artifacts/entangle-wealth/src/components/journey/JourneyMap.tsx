@@ -122,11 +122,11 @@ export function JourneyMap() {
                     >
                       <div
                         className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
-                        style={{ background: isPhaseCompleted ? phase.color + "20" : "rgba(255,255,255,0.05)", border: `1px solid ${isPhaseCompleted ? phase.color + "60" : "rgba(255,255,255,0.1)"}` }}
+                        style={{ background: isPhaseCompleted ? phase.color + "20" : "hsl(var(--muted) / 0.3)", border: `1px solid ${isPhaseCompleted ? phase.color + "60" : "hsl(var(--border))"}` }}
                       >
                         {isPhaseCompleted
                           ? <CheckCircle2 className="w-3 h-3" style={{ color: phase.color }} />
-                          : <span className="text-[8px] font-bold font-mono" style={{ color: isCurrentPhase ? phase.color : "rgba(255,255,255,0.3)" }}>{phaseIdx + 1}</span>}
+                          : <span className="text-[8px] font-bold font-mono" style={{ color: isCurrentPhase ? phase.color : "hsl(var(--muted-foreground))" }}>{phaseIdx + 1}</span>}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">

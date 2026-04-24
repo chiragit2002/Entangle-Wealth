@@ -401,7 +401,7 @@ function ExportModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 " onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-muted/40 " onClick={onClose}>
       <div
         className="w-full max-w-md rounded-xl border border-border p-5 space-y-4"
         style={{ background: "rgba(8,8,20,0.98)" }}

@@ -544,7 +544,7 @@ export default function AdminMonitoring() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#020204] py-8 px-4">
+      <div className="min-h-screen bg-background py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
             <div>

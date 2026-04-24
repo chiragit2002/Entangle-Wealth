@@ -114,7 +114,7 @@ function MobileTerminalView({ portfolioRefreshKey, handleSpinBalanceChange, onOp
     <div className="flex flex-col">
       <MobilePanelTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <div className="p-2 bg-[#020204]">
+      <div className="p-2 bg-background">
         {activeTab === "terminal" && (
           <BloombergPanel>
             <PanelHeader title="MIROFISH TERMINAL" icon={<TerminalIcon className="w-3 h-3" />} color="cyan" rightContent={
@@ -372,7 +372,7 @@ export default function Terminal() {
           onOpenSpinWheel={() => setShowSpinWheel(true)}
         />
       ) : (
-        <div className="px-2 py-2 bg-[#020204]">
+        <div className="px-2 py-2 bg-background">
           <div className="mb-1.5">
             <BloombergPanel>
               <PanelHeader title="MIROFISH TERMINAL" icon={<TerminalIcon className="w-3 h-3" />} color="cyan" rightContent={

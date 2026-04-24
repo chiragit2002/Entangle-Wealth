@@ -230,7 +230,7 @@ export default function TokenWallet() {
           ) : (
             <div className="space-y-2">
               {transactions.map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-white/5 hover:border-border transition-colors">
+                <div key={tx.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border hover:border-border transition-colors">
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${tx.amount > 0 ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
                       {tx.amount > 0 ? (

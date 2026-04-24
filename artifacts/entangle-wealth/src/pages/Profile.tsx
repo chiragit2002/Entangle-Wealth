@@ -230,7 +230,7 @@ function DataManagementSection() {
           </Button>
         </div>
 
-        <div className="border-t border-white/5 pt-4">
+        <div className="border-t border-border pt-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-red-400">Delete Account</p>
@@ -254,7 +254,7 @@ function DataManagementSection() {
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder="Type DELETE MY ACCOUNT"
-                className="mb-3 bg-black/30 border-red-500/30 text-sm"
+                className="mb-3 bg-muted/30 border-red-500/30 text-sm"
               />
               <div className="flex gap-2">
                 <Button
@@ -795,7 +795,7 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-foreground pb-20 lg:pb-0">
+      <div className="min-h-screen bg-background text-foreground pb-20 lg:pb-0">
         <Navbar />
         <main className="container mx-auto px-4 md:px-6 py-8 max-w-4xl" aria-busy="true" aria-label="Loading profile">
           <div className="glass-panel p-8 mb-6 animate-pulse">
@@ -830,7 +830,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-foreground pb-20 lg:pb-0">
+    <div className="min-h-screen bg-background text-foreground pb-20 lg:pb-0">
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-8 max-w-4xl">
         {profileLoadError && (
@@ -1034,11 +1034,11 @@ export default function Profile() {
                     {kycIdPhotoPreview ? (
                       <div className="relative">
                         <img src={kycIdPhotoPreview} alt="ID preview" className="w-full h-24 object-cover rounded-lg border border-border" />
-                        <button onClick={() => { setKycIdPhoto(null); setKycIdPhotoPreview(null); setUploadProgress(p => ({ ...p, idPhoto: 0 })); }} className="absolute top-1 right-1 bg-black/60 rounded-full p-0.5 text-foreground/70 hover:text-foreground">
+                        <button onClick={() => { setKycIdPhoto(null); setKycIdPhotoPreview(null); setUploadProgress(p => ({ ...p, idPhoto: 0 })); }} className="absolute top-1 right-1 bg-muted/40 rounded-full p-0.5 text-foreground/70 hover:text-foreground">
                           <X className="w-3.5 h-3.5" />
                         </button>
                         {uploadProgress.idPhoto > 0 && uploadProgress.idPhoto < 100 && (
-                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40 rounded-b-lg overflow-hidden">
+                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted/40 rounded-b-lg overflow-hidden">
                             <div className="h-full bg-primary transition-all" style={{ width: `${uploadProgress.idPhoto}%` }} />
                           </div>
                         )}
@@ -1062,11 +1062,11 @@ export default function Profile() {
                     {kycSelfiePreview ? (
                       <div className="relative">
                         <img src={kycSelfiePreview} alt="Selfie preview" className="w-full h-24 object-cover rounded-lg border border-border" />
-                        <button onClick={() => { setKycSelfie(null); setKycSelfiePreview(null); setUploadProgress(p => ({ ...p, selfie: 0 })); }} className="absolute top-1 right-1 bg-black/60 rounded-full p-0.5 text-foreground/70 hover:text-foreground">
+                        <button onClick={() => { setKycSelfie(null); setKycSelfiePreview(null); setUploadProgress(p => ({ ...p, selfie: 0 })); }} className="absolute top-1 right-1 bg-muted/40 rounded-full p-0.5 text-foreground/70 hover:text-foreground">
                           <X className="w-3.5 h-3.5" />
                         </button>
                         {uploadProgress.selfie > 0 && uploadProgress.selfie < 100 && (
-                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40 rounded-b-lg overflow-hidden">
+                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted/40 rounded-b-lg overflow-hidden">
                             <div className="h-full bg-primary transition-all" style={{ width: `${uploadProgress.selfie}%` }} />
                           </div>
                         )}
@@ -1228,22 +1228,22 @@ export default function Profile() {
         <div className="glass-panel p-6 mb-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-primary" /> Investment Progress</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
+            <div className="bg-muted/50 rounded-xl p-4 text-center border border-border">
               <DollarSign className="w-5 h-5 text-[#00B4D8] mx-auto mb-1" />
               <p className="text-[10px] text-muted-foreground uppercase">This Month</p>
               <p className="text-xl font-bold font-mono text-[#00B4D8]">$1,247</p>
             </div>
-            <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
+            <div className="bg-muted/50 rounded-xl p-4 text-center border border-border">
               <Zap className="w-5 h-5 text-primary mx-auto mb-1" />
               <p className="text-[10px] text-muted-foreground uppercase">Signals Used</p>
               <p className="text-xl font-bold font-mono text-primary">18</p>
             </div>
-            <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
+            <div className="bg-muted/50 rounded-xl p-4 text-center border border-border">
               <Briefcase className="w-5 h-5 text-secondary mx-auto mb-1" />
               <p className="text-[10px] text-muted-foreground uppercase">Gig Earned</p>
               <p className="text-xl font-bold font-mono text-secondary">$320</p>
             </div>
-            <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
+            <div className="bg-muted/50 rounded-xl p-4 text-center border border-border">
               <AlertTriangle className="w-5 h-5 text-[#ff3366] mx-auto mb-1" />
               <p className="text-[10px] text-muted-foreground uppercase">Max Risk</p>
               <p className="text-xl font-bold font-mono text-[#ff3366]">8.4%</p>
@@ -1258,24 +1258,24 @@ export default function Profile() {
           {gamification ? (
             <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
+                <div className="bg-muted/50 rounded-xl p-4 text-center border border-border">
                   <Star className="w-5 h-5 text-primary mx-auto mb-1" />
                   <p className="text-[10px] text-muted-foreground uppercase">Level</p>
                   <p className="text-xl font-bold font-mono text-primary">{gamification.xp.level}</p>
                   <p className="text-[9px] text-muted-foreground">{gamification.xp.tier}</p>
                 </div>
-                <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
+                <div className="bg-muted/50 rounded-xl p-4 text-center border border-border">
                   <Zap className="w-5 h-5 text-yellow-400 mx-auto mb-1" />
                   <p className="text-[10px] text-muted-foreground uppercase">Total XP</p>
                   <p className="text-xl font-bold font-mono text-yellow-400">{gamification.xp.totalXp.toLocaleString()}</p>
                 </div>
-                <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
+                <div className="bg-muted/50 rounded-xl p-4 text-center border border-border">
                   <Flame className="w-5 h-5 text-orange-400 mx-auto mb-1" />
                   <p className="text-[10px] text-muted-foreground uppercase">Streak</p>
                   <p className="text-xl font-bold font-mono text-orange-400">{gamification.streak.currentStreak}</p>
                   <p className="text-[9px] text-muted-foreground">{gamification.streak.multiplier.toFixed(1)}x multi</p>
                 </div>
-                <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
+                <div className="bg-muted/50 rounded-xl p-4 text-center border border-border">
                   <Trophy className="w-5 h-5 text-[#FFB800] mx-auto mb-1" />
                   <p className="text-[10px] text-muted-foreground uppercase">Rank</p>
                   <p className="text-xl font-bold font-mono text-[#FFB800]">{myRank ? `#${myRank}` : "--"}</p>
@@ -1352,22 +1352,22 @@ export default function Profile() {
           </h3>
           {tokenData ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-              <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-4 text-center border border-border">
                 <Coins className="w-5 h-5 text-yellow-400 mx-auto mb-1" />
                 <p className="text-[10px] text-muted-foreground uppercase">Rewards Balance</p>
                 <p className="text-xl font-bold font-mono text-yellow-400">{(tokenData.balance || 0).toLocaleString()}</p>
               </div>
-              <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-4 text-center border border-border">
                 <DollarSign className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
                 <p className="text-[10px] text-muted-foreground uppercase">USD Value</p>
                 <p className="text-xl font-bold font-mono text-emerald-400">${(tokenData.totalValue || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
               </div>
-              <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-4 text-center border border-border">
                 <TrendingUp className="w-5 h-5 text-primary mx-auto mb-1" />
                 <p className="text-[10px] text-muted-foreground uppercase">Token Value</p>
                 <p className="text-xl font-bold font-mono text-primary">${(tokenData.tokenValue || 0).toFixed(2)}</p>
               </div>
-              <div className="bg-muted/50 rounded-xl p-4 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-4 text-center border border-border">
                 <Wallet className="w-5 h-5 text-amber-500 mx-auto mb-1" />
                 <p className="text-[10px] text-muted-foreground uppercase">Wallet</p>
                 <p className="text-sm font-mono text-amber-500 truncate">
@@ -1441,7 +1441,7 @@ export default function Profile() {
             {[
               { key: "isPublicProfile" as const, label: "Public Profile", desc: "Make your profile visible to other users", icon: User },
             ].map((toggle) => (
-              <div key={toggle.key} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+              <div key={toggle.key} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                 <div className="flex items-center gap-3">
                   <toggle.icon className="w-4 h-4 text-muted-foreground" />
                   <div>

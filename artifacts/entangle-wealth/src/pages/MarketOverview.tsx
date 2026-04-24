@@ -222,7 +222,7 @@ export default function MarketOverview() {
   return (
     <Layout>
       <FinancialDisclaimerBanner pageKey="market-overview" />
-      <div className="w-full border-b border-border bg-[#060610]">
+      <div className="w-full border-b border-border bg-card">
         <div className="container mx-auto px-4 max-w-[1600px]">
           <div className="flex items-center justify-between h-11">
             <div className="flex items-center gap-3">

@@ -69,7 +69,7 @@ export default function Earn() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-          <Card className="bg-black/40 border-border hover:border-border transition-colors">
+          <Card className="bg-muted/40 border-border hover:border-border transition-colors">
             <CardContent className="p-5 flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center shrink-0">
                 <TrendingUp className="w-6 h-6 text-secondary" />
@@ -81,7 +81,7 @@ export default function Earn() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-black/40 border-border hover:border-border transition-colors">
+          <Card className="bg-muted/40 border-border hover:border-border transition-colors">
             <CardContent className="p-5 flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-green-400/10 flex items-center justify-center shrink-0">
                 <Briefcase className="w-6 h-6 text-green-400" />
@@ -127,7 +127,7 @@ export default function Earn() {
               return (
                 <div key={opp.id}>
                   <Card
-                    className={`border-border hover:border-border transition-all cursor-pointer ${isExpanded ? 'bg-muted/50 border-primary/30' : 'bg-black/40'}`}
+                    className={`border-border hover:border-border transition-all cursor-pointer ${isExpanded ? 'bg-muted/50 border-primary/30' : 'bg-muted/40'}`}
                     onClick={() => setExpandedId(isExpanded ? null : opp.id)}
                   >
                     <CardContent className="p-5">
@@ -157,7 +157,7 @@ export default function Earn() {
                   </Card>
 
                   {isExpanded && (
-                    <div className="bg-muted/30 border border-white/5 border-t-0 rounded-b-lg px-5 py-5 animate-in slide-in-from-top-2 duration-200">
+                    <div className="bg-muted/30 border border-border border-t-0 rounded-b-lg px-5 py-5 animate-in slide-in-from-top-2 duration-200">
                       <div className="flex flex-col gap-4">
                         <div className="flex items-start gap-3">
                           <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />

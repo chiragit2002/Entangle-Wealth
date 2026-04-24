@@ -184,7 +184,7 @@ export default function TravelMarketplace() {
                   </div>
 
                   {isConfirmed && (
-                    <div className="mt-3 pt-3 border-t border-white/5">
+                    <div className="mt-3 pt-3 border-t border-border">
                       <p className="text-xs text-emerald-400 flex items-center gap-1">
                         <Check className="w-3 h-3" /> Booking confirmed | off-chain record logged
                       </p>

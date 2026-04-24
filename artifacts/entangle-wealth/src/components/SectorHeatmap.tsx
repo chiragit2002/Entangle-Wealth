@@ -42,7 +42,7 @@ function SectorHeatmapBase() {
 
   const getBorderColor = (change: number) => {
     if (change >= 1) return "rgba(0,180,216, 0.3)";
-    if (change >= 0) return "rgba(255, 255, 255, 0.08)";
+    if (change >= 0) return "hsl(var(--border))";
     return "rgba(255, 68, 68, 0.2)";
   };
 

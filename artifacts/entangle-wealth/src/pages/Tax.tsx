@@ -759,7 +759,7 @@ export default function Tax() {
           />
         )}
 
-        <div className="p-4 rounded-lg border border-white/5 bg-muted/30">
+        <div className="p-4 rounded-lg border border-border bg-muted/30">
           <p className="text-[11px] text-muted-foreground/50 text-center">
             TaxFlow uses IRS publications for reference. Always verify deductions with a qualified tax professional. Tax laws change frequently.
           </p>

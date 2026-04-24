@@ -54,7 +54,7 @@ function MarketTickerBase() {
 
   if (items.length === 0) {
     return (
-      <div className="w-full bg-black/90 border-b border-border py-2 flex items-center justify-center relative z-20">
+      <div className="w-full bg-card border-b border-border py-2 flex items-center justify-center relative z-20">
         <span className="text-xs font-mono text-muted-foreground/50">Market data unavailable</span>
       </div>
     );
@@ -63,7 +63,7 @@ function MarketTickerBase() {
   const doubled = [...items, ...items, ...items];
 
   return (
-    <div data-tour="market-ticker" className="w-full bg-black/90 border-b border-border overflow-hidden py-2 flex items-center relative z-20">
+    <div data-tour="market-ticker" className="w-full bg-card border-b border-border overflow-hidden py-2 flex items-center relative z-20">
       <div className="w-full flex space-x-8 overflow-hidden">
         <div className="flex space-x-8 animate-[ticker_30s_linear_infinite] whitespace-nowrap px-4 hover:[animation-play-state:paused]">
           {doubled.map((item, i) => (

@@ -370,7 +370,7 @@ export default function Community() {
                     </div>
                   </div>
                   <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed">{c.description}</p>
-                  <div className="flex gap-4 pt-3 border-t border-white/5 items-center">
+                  <div className="flex gap-4 pt-3 border-t border-border items-center">
                     <div className="flex-1">
                       <p className="text-xs text-[#555]">Members</p>
                       <p className="text-[15px] font-bold mt-0.5">{c.members.toLocaleString()}</p>
@@ -444,7 +444,7 @@ export default function Community() {
                     </div>
                   </div>
                   <p className="text-sm text-[#ccc] leading-relaxed mb-3">{p.body}</p>
-                  <div className="flex gap-4 pt-3 border-t border-white/5">
+                  <div className="flex gap-4 pt-3 border-t border-border">
                     <button
                       onClick={() => likePost(p.id)}
                       aria-label={p.liked ? "Unlike post" : "Like post"}
@@ -606,10 +606,10 @@ export default function Community() {
               <p className="text-[13px] text-[#555] mb-5">Forever free tier</p>
               <div className="text-left space-y-0">
                 {["3 stock signals per day", "Basic options flow", "Community access", "5 receipt scans per month"].map((f, i) => (
-                  <p key={i} className="text-[13px] text-[#aaa] py-2 border-b border-white/5 last:border-0">✅ {f}</p>
+                  <p key={i} className="text-[13px] text-[#aaa] py-2 border-b border-border last:border-0">✅ {f}</p>
                 ))}
                 {["TaxGPT", "Travel itinerary builder", "Resume builder"].map((f, i) => (
-                  <p key={i} className="text-[13px] text-[#555] py-2 border-b border-white/5 last:border-0">❌ {f}</p>
+                  <p key={i} className="text-[13px] text-[#555] py-2 border-b border-border last:border-0">❌ {f}</p>
                 ))}
               </div>
               <Button variant="outline" className="w-full mt-4 border-border text-muted-foreground min-h-[44px]" onClick={() => toast({ title: "Current plan", description: "You are on the free plan." })}>
@@ -626,7 +626,7 @@ export default function Community() {
               <p className="text-[13px] text-[#555] mb-5">After 30-day free trial</p>
               <div className="text-left space-y-0">
                 {["Unlimited stock signals", "Full options flow with Greeks", "TaxGPT unlimited", "Unlimited receipt scanning", "Travel itinerary builder", "Resume builder & job finder", "Community + events access", "Compliance score dashboard", "CPA-ready expense exports"].map((f, i) => (
-                  <p key={i} className="text-[13px] text-[#aaa] py-2 border-b border-white/5 last:border-0">✅ {f}</p>
+                  <p key={i} className="text-[13px] text-[#aaa] py-2 border-b border-border last:border-0">✅ {f}</p>
                 ))}
               </div>
               <Button className="w-full mt-4 bg-gradient-to-r from-secondary to-[#cc9900] text-black font-bold min-h-[44px]" onClick={() => setLocation("/pricing")}>
@@ -640,7 +640,7 @@ export default function Community() {
               <p className="text-[13px] text-[#555] mb-5">For teams and power users</p>
               <div className="text-left space-y-0">
                 {["Everything in Pro", "Up to 5 team members", "Priority signal alerts", "White-label reports for CPA", "Trade show event creation", "Job board posting (5/mo)", "Dedicated support"].map((f, i) => (
-                  <p key={i} className="text-[13px] text-[#aaa] py-2 border-b border-white/5 last:border-0">✅ {f}</p>
+                  <p key={i} className="text-[13px] text-[#aaa] py-2 border-b border-border last:border-0">✅ {f}</p>
                 ))}
               </div>
               <Button className="w-full mt-4 bg-gradient-to-r from-primary to-[#FF6600] text-black font-bold min-h-[44px]" onClick={() => setLocation("/pricing")}>

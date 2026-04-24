@@ -61,7 +61,7 @@ export function EconomicCalendar() {
       </div>
       <div className="max-h-[400px] overflow-y-auto">
         {filtered.map((event, i) => (
-          <div key={i} className="flex items-center px-4 py-2 border-b border-white/[0.015] hover:bg-muted/30 transition-colors gap-3">
+          <div key={i} className="flex items-center px-4 py-2 border-b border-border/30 hover:bg-muted/30 transition-colors gap-3">
             <div className="w-[52px] flex-shrink-0">
               <p className="text-[10px] font-bold text-muted-foreground/50">{event.date}</p>
               <p className="text-[8px] text-muted-foreground/20 font-mono">{event.time}</p>

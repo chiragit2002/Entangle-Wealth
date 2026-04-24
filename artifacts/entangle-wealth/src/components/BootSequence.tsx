@@ -142,7 +142,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
           </div>
 
           <div
-            className="w-80 max-w-full space-y-1 text-left bg-black/40 rounded-lg p-4"
+            className="w-80 max-w-full space-y-1 text-left bg-muted/40 rounded-lg p-4"
             style={{ border: "1px solid rgba(0,180,216,0.1)" }}
           >
             {BOOT_LINES.slice(0, lineIndex + 1).map((line, i) => (

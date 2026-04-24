@@ -134,7 +134,7 @@ export class AuditErrorBoundary extends Component<Props, State> {
                 Unhandled Error
               </span>
             </div>
-            <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+            <p style={{ fontSize: "12px", color: "hsl(var(--muted-foreground))", lineHeight: 1.6, marginBottom: "1.5rem" }}>
               A critical error occurred. The error has been logged automatically.
               {this.state.errorMessage && import.meta.env.DEV && (
                 <span style={{ display: "block", marginTop: "0.5rem", color: "rgba(239,68,68,0.5)", fontSize: "11px", wordBreak: "break-all" }}>
@@ -172,8 +172,8 @@ export class AuditErrorBoundary extends Component<Props, State> {
                   gap: "0.375rem",
                   padding: "0.375rem 0.875rem",
                   background: "transparent",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  color: "rgba(255,255,255,0.4)",
+                  border: "1px solid hsl(var(--border))",
+                  color: "hsl(var(--muted-foreground))",
                   cursor: "pointer",
                   fontFamily: "inherit",
                   fontSize: "11px",
@@ -186,7 +186,7 @@ export class AuditErrorBoundary extends Component<Props, State> {
               </button>
             </div>
           </div>
-          <div style={{ marginTop: "0.5rem", fontSize: "9px", fontFamily: "inherit", color: "rgba(255,255,255,0.12)", letterSpacing: "0.1em" }}>
+          <div style={{ marginTop: "0.5rem", fontSize: "9px", fontFamily: "inherit", color: "hsl(var(--muted-foreground) / 0.3)", letterSpacing: "0.1em" }}>
             ENTANGLEWEALTH · ERROR CAPTURED · AUDIT LOGGED
           </div>
         </div>

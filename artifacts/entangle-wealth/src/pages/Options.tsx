@@ -113,7 +113,7 @@ export default function Options() {
                   )}
                 </Button>
               </SheetTrigger>
-              <SheetContent className="bg-black/95 border-border w-80">
+              <SheetContent className="bg-card border-border w-80">
                 <SheetHeader>
                   <SheetTitle className="text-foreground flex items-center justify-between">
                     Filter Signals
@@ -183,7 +183,7 @@ export default function Options() {
                   Columns ({colCount})
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="bg-black/95 border-border w-48 p-3" align="end">
+              <PopoverContent className="bg-card border-border w-48 p-3" align="end">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Toggle Columns</p>
                 <div className="flex flex-col gap-2">
                   {(Object.keys(visibleCols) as (keyof typeof visibleCols)[]).map(col => (
@@ -256,7 +256,7 @@ export default function Options() {
                 const isSaved = savedSignals.includes(item.id);
                 return (
                   <div key={`uoa-${item.id}`}>
-                    <Card className={`border-white/5 hover:border-border transition-all overflow-hidden rounded-lg cursor-pointer ${isExpanded ? 'bg-muted/50 border-primary/30' : 'bg-black/40'}`}
+                    <Card className={`border-border hover:border-border transition-all overflow-hidden rounded-lg cursor-pointer ${isExpanded ? 'bg-muted/50 border-primary/30' : 'bg-muted/40'}`}
                       onClick={() => setExpandedRow(isExpanded ? null : item.id)}>
                       <CardContent className="p-0">
                         <div className="flex items-center gap-4 px-4 py-4">
@@ -313,7 +313,7 @@ export default function Options() {
                     </Card>
 
                     {isExpanded && (
-                      <div className="bg-muted/30 border border-white/5 border-t-0 rounded-b-lg px-6 py-5 animate-in slide-in-from-top-2 duration-200">
+                      <div className="bg-muted/30 border border-border border-t-0 rounded-b-lg px-6 py-5 animate-in slide-in-from-top-2 duration-200">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div className="space-y-3">
                             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Contract Details</h4>
@@ -398,7 +398,7 @@ export default function Options() {
           </div>
         )}
 
-        <div className="mt-8 p-4 rounded-lg border border-white/5 bg-muted/30">
+        <div className="mt-8 p-4 rounded-lg border border-border bg-muted/30">
           <p className="text-xs text-muted-foreground/60 text-center">Options trading carries substantial risk. The data shown above is for demonstration purposes. Signal strength is a composite score based on volume, premium size, and IV rank | it is not a recommendation to trade.</p>
         </div>
       </div>

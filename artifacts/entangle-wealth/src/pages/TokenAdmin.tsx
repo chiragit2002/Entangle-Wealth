@@ -145,23 +145,23 @@ export default function TokenAdmin() {
               <Coins className="w-5 h-5 text-yellow-400" /> Supply Overview
             </h2>
             <div className="space-y-3">
-              <div className="flex justify-between items-center py-2 border-b border-white/5">
+              <div className="flex justify-between items-center py-2 border-b border-border">
                 <span className="text-sm text-muted-foreground">Total Supply</span>
                 <span className="font-mono font-bold text-foreground">{(stats?.totalSupply || 0).toLocaleString()} ENTGL</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-white/5">
+              <div className="flex justify-between items-center py-2 border-b border-border">
                 <span className="text-sm text-muted-foreground">Founder (75%)</span>
                 <span className="font-mono text-foreground">{(stats?.founderAllocation || 0).toLocaleString()}</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-white/5">
+              <div className="flex justify-between items-center py-2 border-b border-border">
                 <span className="text-sm text-muted-foreground">Rewards Pool (25%)</span>
                 <span className="font-mono text-yellow-400">{(stats?.rewardsPool || 0).toLocaleString()}</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-white/5">
+              <div className="flex justify-between items-center py-2 border-b border-border">
                 <span className="text-sm text-muted-foreground">In Circulation</span>
                 <span className="font-mono text-emerald-400">{(stats?.totalCirculating || 0).toLocaleString()}</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-white/5">
+              <div className="flex justify-between items-center py-2 border-b border-border">
                 <span className="text-sm text-muted-foreground">Share Price</span>
                 <span className="font-mono text-primary">${(stats?.sharePrice || 0).toFixed(2)}</span>
               </div>
@@ -232,15 +232,15 @@ export default function TokenAdmin() {
             <BarChart3 className="w-5 h-5 text-primary" /> Marketplace Stats
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-muted/30 rounded-lg p-4 text-center border border-white/5">
+            <div className="bg-muted/30 rounded-lg p-4 text-center border border-border">
               <p className="text-xs text-muted-foreground uppercase mb-1">Total Bookings</p>
               <p className="text-2xl font-bold font-mono text-foreground">{stats?.bookings || 0}</p>
             </div>
-            <div className="bg-muted/30 rounded-lg p-4 text-center border border-white/5">
+            <div className="bg-muted/30 rounded-lg p-4 text-center border border-border">
               <p className="text-xs text-muted-foreground uppercase mb-1">Booking Volume</p>
               <p className="text-2xl font-bold font-mono text-yellow-400">{(stats?.bookingVolume || 0).toLocaleString()} ENTGL</p>
             </div>
-            <div className="bg-muted/30 rounded-lg p-4 text-center border border-white/5">
+            <div className="bg-muted/30 rounded-lg p-4 text-center border border-border">
               <p className="text-xs text-muted-foreground uppercase mb-1">Booking USD Value</p>
               <p className="text-2xl font-bold font-mono text-emerald-400">
                 ${((stats?.bookingVolume || 0) * (stats?.tokenValue || 10)).toLocaleString()}

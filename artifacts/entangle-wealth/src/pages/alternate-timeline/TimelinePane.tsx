@@ -134,9 +134,6 @@ export function TimelinePane({
   const expLabel = horizonResult ? getExperienceLabel(horizonResult, params.monthlyIncome) : null;
   const paneSlug = slugify(label);
 
-  const paneBg = isAmber
-    ? "rgba(20,14,2,0.92)"
-    : "rgba(8,8,20,0.85)";
   const borderStyle = isAmber && isExploration
     ? "rgba(251,191,36,0.35)"
     : borderColor;
@@ -160,10 +157,9 @@ export function TimelinePane({
 
   return (
     <div
-      className="rounded-sm p-4 flex flex-col gap-4 flex-1 min-w-0"
+      className={`rounded-sm p-4 flex flex-col gap-4 flex-1 min-w-0 bg-card border border-border ${isAmber ? "border-amber-400/35" : ""}`}
       style={{
-        background: paneBg,
-        border: `1px solid ${borderStyle}`,
+        borderColor: borderStyle,
         boxShadow: `0 0 40px ${borderStyle}20`,
       }}
     >

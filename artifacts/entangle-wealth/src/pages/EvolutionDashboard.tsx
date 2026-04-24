@@ -236,7 +236,7 @@ function FunnelViz({ funnel }: { funnel: FunnelData }) {
           );
         })}
       </div>
-      <div className="mt-3 flex items-center justify-between text-xs border-t border-white/5 pt-3">
+      <div className="mt-3 flex items-center justify-between text-xs border-t border-border pt-3">
         <span className="text-muted-foreground">Overall conversion</span>
         <span
           className="font-mono font-bold"

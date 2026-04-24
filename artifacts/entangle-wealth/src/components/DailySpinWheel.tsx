@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "@clerk/react";
 import { authFetch } from "@/lib/authFetch";
 import { useToast } from "@/hooks/use-toast";
@@ -247,7 +248,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <>
     <BigWinOverlay show={showBigWin} label="BIG WIN" onDone={() => setShowBigWin(false)} />
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 ">
@@ -368,6 +369,7 @@ export function DailySpinWheel({ isOpen, onClose, onReward, onBalanceChange }: D
         </div>
       </div>
     </div>
-    </>
+    </>,
+    document.body,
   );
 }

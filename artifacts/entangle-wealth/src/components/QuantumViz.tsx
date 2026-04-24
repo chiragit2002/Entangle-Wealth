@@ -116,7 +116,7 @@ function QuantumVizBase() {
           </svg>
         </div>
 
-        <div className="lg:w-48 flex flex-col gap-3 w-full lg:border-l lg:border-white/5 lg:pl-6">
+        <div className="lg:w-48 flex flex-col gap-3 w-full lg:border-l lg:border-border lg:pl-6">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Model Status</p>
           {QUANTUM_NODES.map((node) => (
             <div key={node.id} className="flex items-center justify-between gap-2">
@@ -127,7 +127,7 @@ function QuantumVizBase() {
               <span className={`text-xs font-mono font-bold text-muted-foreground/70`}>—</span>
             </div>
           ))}
-          <div className="border-t border-white/5 pt-3 mt-1">
+          <div className="border-t border-border pt-3 mt-1">
             <div className="flex items-center justify-between">
               <span className="text-[10px] uppercase text-muted-foreground">Consensus</span>
               <span className="text-sm font-mono font-bold text-primary stat-value">{consensusValue}%</span>

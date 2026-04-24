@@ -47,7 +47,7 @@ export default function AdminHub() {
   }
 
   return (
-    <div className="min-h-screen bg-[#020204] text-foreground flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-6 max-w-6xl">
         <h1 className="text-lg font-mono font-bold text-[#00B4D8] uppercase tracking-wider mb-4">Admin Hub</h1>

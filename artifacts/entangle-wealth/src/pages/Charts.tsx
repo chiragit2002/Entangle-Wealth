@@ -1007,7 +1007,7 @@ export default function Charts() {
 
         {/* Claude Analysis Modal */}
         {showClaudeModal && claudeAnalysis && (
-          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setShowClaudeModal(false)}>
+          <div className="fixed inset-0 bg-muted/40 dark:bg-muted/40 flex items-center justify-center z-50 backdrop-blur-sm" onClick={() => setShowClaudeModal(false)}>
             <div className="bg-card border border-border rounded-lg w-full max-w-[500px] mx-4 max-h-[80vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
               <div className="p-4 border-b border-border flex items-center justify-between">
                 <div className="flex items-center gap-2">

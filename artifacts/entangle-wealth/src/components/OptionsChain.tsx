@@ -204,7 +204,7 @@ export function OptionsChain() {
                 onChange={e => setContracts(e.target.value)}
                 type="number"
                 min="1"
-                className="w-16 h-7 px-2 text-[11px] font-mono bg-muted/50 border border-white/[0.1] rounded text-foreground focus:outline-none focus:border-[#00B4D8]/30 text-center"
+                className="w-16 h-7 px-2 text-[11px] font-mono bg-muted/50 border border-border rounded text-foreground focus:outline-none focus:border-[#00B4D8]/30 text-center"
               />
               <span className="text-[10px] text-muted-foreground/50">contracts</span>
               <span className="text-[10px] font-mono text-muted-foreground">
@@ -280,7 +280,7 @@ export function OptionsChain() {
               const isCallSelected = tradeSelection?.optionType === "CALL" && tradeSelection?.strike === row.strike;
               const isPutSelected = tradeSelection?.optionType === "PUT" && tradeSelection?.strike === row.strike;
               return (
-                <tr key={row.strike} className={`border-b border-white/[0.015] hover:bg-muted/30 transition-colors ${isATM ? "bg-[#FFB800]/[0.03] border-[#FFB800]/10" : ""} ${isCallSelected || isPutSelected ? "bg-[#00B4D8]/[0.04]" : ""}`}>
+                <tr key={row.strike} className={`border-b border-border/30 hover:bg-muted/30 transition-colors ${isATM ? "bg-[#FFB800]/[0.03] border-[#FFB800]/10" : ""} ${isCallSelected || isPutSelected ? "bg-[#00B4D8]/[0.04]" : ""}`}>
                   <td className="px-1 py-1">
                     <div className="flex gap-0.5">
                       <button onClick={() => selectContract("CALL", row.strike, row.callAsk, "buy")} className="w-4 h-4 flex items-center justify-center rounded bg-[#00B4D8]/10 hover:bg-[#00B4D8]/25 transition-colors" title="Buy Call">

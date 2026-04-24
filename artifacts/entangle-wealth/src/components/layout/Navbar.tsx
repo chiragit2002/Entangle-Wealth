@@ -14,7 +14,7 @@ interface NavLink { href: string; label: string }
 const CORE_LINKS: NavLink[] = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/stocks", label: "Stocks" },
-  { href: "/quant-signals", label: "Quant Signals" },
+  { href: "/quant", label: "Quant Signals" },
   { href: "/strategy-builder", label: "Strategy Builder" },
   { href: "/evaluate", label: "Evaluator" },
   { href: "/eval-pipeline", label: "Eval Pipeline" },
@@ -29,7 +29,7 @@ const MOBILE_SECTIONS = [
     links: [
       { href: "/dashboard", label: "Dashboard" },
       { href: "/stocks", label: "Stocks" },
-      { href: "/quant-signals", label: "Quant Signals" },
+      { href: "/quant", label: "Quant Signals" },
       { href: "/strategy-builder", label: "Strategy Builder" },
       { href: "/evaluate", label: "Evaluator" },
       { href: "/eval-pipeline", label: "Eval Pipeline" },

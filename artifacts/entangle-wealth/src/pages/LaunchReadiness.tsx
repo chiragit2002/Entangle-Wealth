@@ -390,13 +390,13 @@ export default function LaunchReadiness() {
                   </div>
                   <div className="flex-1">
                     <h4 className="text-sm font-semibold text-foreground mb-1">{step.title}</h4>
-                    <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono bg-muted/30 rounded-lg p-3 border border-white/5">
+                    <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono bg-muted/30 rounded-lg p-3 border border-border">
                       {step.desc}
                     </pre>
                   </div>
                 </div>
               ))}
-              <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+              <div className="flex items-center gap-2 pt-2 border-t border-border">
                 <ExternalLink className="w-4 h-4 text-[#00B4D8]" />
                 <a
                   href="https://docs.replit.com/hosting/deployments/custom-domains"
@@ -429,7 +429,7 @@ export default function LaunchReadiness() {
 
           {expandedSection === "env" && (
             <div className="bg-card border border-border rounded-xl overflow-hidden">
-              <div className="p-4 border-b border-white/5">
+              <div className="p-4 border-b border-border">
                 <p className="text-xs text-muted-foreground">
                   These environment variables must be updated when switching from development to production.
                   Click the copy icon to copy the variable name.

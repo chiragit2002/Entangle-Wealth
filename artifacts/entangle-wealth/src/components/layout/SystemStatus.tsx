@@ -125,7 +125,7 @@ export function SystemStatus() {
           <div className="space-y-1 max-h-[160px] overflow-y-auto">
             {status.agents.map((agent) => (
               <div key={agent.name} className="flex items-center justify-between gap-2">
-                <span className="text-[10px] font-mono truncate" style={{ color: "rgba(255,255,255,0.5)", maxWidth: 130 }}>
+                <span className="text-[10px] font-mono truncate" style={{ color: "hsl(var(--muted-foreground))", maxWidth: 130 }}>
                   {agent.name}
                 </span>
                 <div className="flex items-center gap-1.5">

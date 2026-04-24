@@ -271,7 +271,7 @@ export default function AdminKyc() {
                     </div>
 
                     {(s.kycFullLegalName || s.kycDateOfBirth || s.kycAddress || s.kycIdType) && (
-                      <div className="mb-4 p-4 rounded-lg border border-white/5 bg-muted/30">
+                      <div className="mb-4 p-4 rounded-lg border border-border bg-muted/30">
                         <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wide flex items-center gap-1.5">
                           <FileText className="w-3 h-3" /> Submitted Information
                         </p>
@@ -369,7 +369,7 @@ export default function AdminKyc() {
                     )}
 
                     {!s.kycFullLegalName && !s.kycDateOfBirth && !s.idPhotoUrl && !s.selfieUrl && (
-                      <div className="mb-4 p-3 rounded-lg border border-white/5 bg-muted/30">
+                      <div className="mb-4 p-3 rounded-lg border border-border bg-muted/30">
                         <p className="text-xs text-muted-foreground">No details or documents in this submission</p>
                       </div>
                     )}

@@ -89,7 +89,7 @@ export function WelcomeModal({ firstName, onComplete }: WelcomeModalProps) {
                 className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl border text-left transition-all duration-200 active:scale-[0.98] ${
                   goal === opt.id
                     ? "border-[#00B4D8]/50 bg-[#00B4D8]/8 text-foreground"
-                    : "border-white/8 bg-muted/30 text-foreground/70 hover:border-white/15 hover:bg-muted/50"
+                    : "border-border bg-muted/30 text-foreground/70 hover:border-border hover:bg-muted/50"
                 }`}
                 aria-pressed={goal === opt.id}
               >

@@ -42,7 +42,7 @@ function BloombergToastContent({ badgeIcon, badgeName, xpAmount, message, accent
         </div>
       )}
       {message && (
-        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "10px" }}>
+        <div style={{ color: "hsl(var(--muted-foreground))", fontSize: "10px" }}>
           {message}
         </div>
       )}

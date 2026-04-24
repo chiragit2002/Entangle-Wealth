@@ -215,9 +215,9 @@ export default function AdminStatus() {
                     onChange={(e) => setIncidentForm((f) => ({ ...f, serviceName: e.target.value }))}
                     className="w-full h-9 mt-1 px-3 text-xs bg-muted/50 border border-border rounded-lg text-foreground focus:outline-none focus:border-[#00B4D8]/40 appearance-none"
                   >
-                    <option value="" className="bg-black">Select service...</option>
+                    <option value="" className="bg-card">Select service...</option>
                     {services.map((s) => (
-                      <option key={s.service_name} value={s.service_name} className="bg-black">{s.service_name}</option>
+                      <option key={s.service_name} value={s.service_name} className="bg-card">{s.service_name}</option>
                     ))}
                   </select>
                 </div>
@@ -228,9 +228,9 @@ export default function AdminStatus() {
                     onChange={(e) => setIncidentForm((f) => ({ ...f, severity: e.target.value }))}
                     className="w-full h-9 mt-1 px-3 text-xs bg-muted/50 border border-border rounded-lg text-foreground focus:outline-none focus:border-[#00B4D8]/40 appearance-none"
                   >
-                    <option value="minor" className="bg-black">Minor</option>
-                    <option value="major" className="bg-black">Major</option>
-                    <option value="critical" className="bg-black">Critical</option>
+                    <option value="minor" className="bg-card">Minor</option>
+                    <option value="major" className="bg-card">Major</option>
+                    <option value="critical" className="bg-card">Critical</option>
                   </select>
                 </div>
               </div>

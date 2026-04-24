@@ -95,7 +95,7 @@ function Slider({ label, value, min, max, step = 1, unit = "", onChange, color =
           {tip && (
             <span className="group relative cursor-help">
               <Info className="w-2.5 h-2.5 text-muted-foreground/40" />
-              <span className="absolute left-0 bottom-full mb-1 w-48 text-[9px] bg-[#1a1a2e] border border-border text-foreground/70 px-2 py-1 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
+              <span className="absolute left-0 bottom-full mb-1 w-48 text-[9px] bg-card border border-border text-foreground/70 px-2 py-1 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
                 {tip}
               </span>
             </span>
@@ -117,7 +117,7 @@ function Slider({ label, value, min, max, step = 1, unit = "", onChange, color =
           style={{ zIndex: 10 }}
         />
         <div
-          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-[#0a0a14] shadow-lg"
+          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-card shadow-lg"
           style={{ left: `calc(${pct}% - 6px)`, background: color }}
         />
       </div>
@@ -131,15 +131,15 @@ function Slider({ label, value, min, max, step = 1, unit = "", onChange, color =
 
 const CHART_TOOLTIP_STYLE = {
   contentStyle: {
-    background: "#0d0d1a",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "hsl(var(--card))",
+    border: "1px solid hsl(var(--border))",
     borderRadius: "4px",
     fontSize: "10px",
     fontFamily: "monospace",
     color: "hsl(var(--foreground))",
     padding: "8px 12px",
   },
-  labelStyle: { color: "rgba(255,255,255,0.5)", fontSize: "9px" },
+  labelStyle: { color: "hsl(var(--muted-foreground))", fontSize: "9px" },
 };
 
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: { color: string; name: string; value: number }[]; label?: string }) {
@@ -513,7 +513,7 @@ export default function WealthSim() {
 
         {wizardStep === 0 && (
           <div className="max-w-5xl mx-auto p-4 space-y-4">
-            <div className="bg-gradient-to-r from-[#0a0a14] via-[#0d0d1f] to-[#0a0a14] border border-border rounded-sm p-6 text-center">
+            <div className="bg-card border border-border rounded-sm p-6 text-center">
               <div className="text-5xl mb-3">📈</div>
               <h1 className="text-2xl font-black text-foreground font-mono mb-2">Wealth Simulation Engine</h1>
               <p className="text-muted-foreground text-sm max-w-lg mx-auto mb-6">See how your money grows over time. Adjust your savings rate, investment allocation, and time horizon | watch your future net worth update in real time.</p>
@@ -591,7 +591,7 @@ export default function WealthSim() {
                           onClick={() => { handleProfileChange("riskTolerance", key); handleProfileChange("expectedReturnRate", rp.returnRate); }}
                           className={`p-2.5 rounded-sm border text-left transition-all ${profile.riskTolerance === key ? "border-[#00B4D8]/40 bg-[#00B4D8]/[0.06]" : "border-border hover:border-border"}`}
                         >
-                          <div className="text-[9px] font-mono font-bold mb-0.5" style={{ color: profile.riskTolerance === key ? rp.color : "rgba(255,255,255,0.5)" }}>{rp.label}</div>
+                          <div className={`text-[9px] font-mono font-bold mb-0.5 ${profile.riskTolerance === key ? "" : "text-muted-foreground"}`} style={profile.riskTolerance === key ? { color: rp.color } : undefined}>{rp.label}</div>
                           <div className="text-[8px] font-mono text-muted-foreground/40">{rp.returnRate}% avg. return</div>
                         </button>
                       ))}
@@ -757,9 +757,9 @@ export default function WealthSim() {
                               <stop offset="95%" stopColor="#FFB800" stopOpacity={0.02} />
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
-                          <XAxis dataKey="year" tick={{ fontSize: 8, fill: "rgba(255,255,255,0.2)", fontFamily: "monospace" }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-                          <YAxis tick={{ fontSize: 8, fill: "rgba(255,255,255,0.2)", fontFamily: "monospace" }} tickLine={false} axisLine={false} tickFormatter={v => formatCurrency(v)} width={60} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.15)" />
+                          <XAxis dataKey="year" tick={{ fontSize: 8, fill: "rgba(128,128,128,0.6)", fontFamily: "monospace" }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+                          <YAxis tick={{ fontSize: 8, fill: "rgba(128,128,128,0.6)", fontFamily: "monospace" }} tickLine={false} axisLine={false} tickFormatter={v => formatCurrency(v)} width={60} />
                           <Tooltip content={<CustomTooltip />} />
                           <Area type="monotone" dataKey="Contributions" stroke="#00B4D8" fill="url(#contribGrad)" strokeWidth={1.5} dot={false} />
                           <Area type="monotone" dataKey="Net Worth" stroke="#00B4D8" fill="url(#netWorthGrad)" strokeWidth={2} dot={false} />
@@ -791,9 +791,9 @@ export default function WealthSim() {
                               <stop offset="95%" stopColor="#FFB800" stopOpacity={0.02} />
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
-                          <XAxis dataKey="year" tick={{ fontSize: 8, fill: "rgba(255,255,255,0.2)", fontFamily: "monospace" }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-                          <YAxis tick={{ fontSize: 8, fill: "rgba(255,255,255,0.2)", fontFamily: "monospace" }} tickLine={false} axisLine={false} tickFormatter={v => formatCurrency(v)} width={60} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.15)" />
+                          <XAxis dataKey="year" tick={{ fontSize: 8, fill: "rgba(128,128,128,0.6)", fontFamily: "monospace" }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+                          <YAxis tick={{ fontSize: 8, fill: "rgba(128,128,128,0.6)", fontFamily: "monospace" }} tickLine={false} axisLine={false} tickFormatter={v => formatCurrency(v)} width={60} />
                           <Tooltip content={<CustomTooltip />} />
                           <Area type="monotone" dataKey="Contributions" stroke="#00B4D8" fill="#00B4D8" fillOpacity={0.15} strokeWidth={1.5} dot={false} stackId="1" />
                           <Area type="monotone" dataKey="Investment Growth" stroke="#FFB800" fill="url(#growthGrad)" strokeWidth={1.5} dot={false} stackId="1" />
@@ -824,14 +824,14 @@ export default function WealthSim() {
                             return (
                               <div key={m.key} className={`flex items-center gap-3 ml-2 ${!projected ? "opacity-40" : ""}`}>
                                 <div
-                                  className="relative z-10 w-6 h-6 rounded-sm flex items-center justify-center text-sm border"
-                                  style={achieved ? { borderColor: color, background: `${color}20` } : projected ? { borderColor: `${color}40`, background: "rgba(0,0,0,0.5)" } : { borderColor: "rgba(255,255,255,0.06)", background: "rgba(0,0,0,0.3)" }}
+                                  className={`relative z-10 w-6 h-6 rounded-sm flex items-center justify-center text-sm border ${!achieved ? "bg-muted/50 border-border" : ""}`}
+                                  style={achieved ? { borderColor: color, background: `${color}20` } : projected ? { borderColor: `${color}40` } : {}}
                                 >
                                   {achieved ? <CheckCircle className="w-3.5 h-3.5" style={{ color }} /> : projected ? icon : <Lock className="w-3 h-3 text-muted-foreground/70" />}
                                 </div>
                                 <div className="flex-1 flex items-center justify-between">
                                   <div>
-                                    <span className="text-[10px] font-mono font-bold" style={{ color: projected ? color : "rgba(255,255,255,0.3)" }}>{m.label}</span>
+                                    <span className={`text-[10px] font-mono font-bold ${!projected ? "text-muted-foreground/30" : ""}`} style={projected ? { color } : undefined}>{m.label}</span>
                                     {achieved && <span className="ml-2 text-[8px] font-mono text-[#00B4D8]">ACHIEVED</span>}
                                   </div>
                                   <span className="text-[9px] font-mono text-muted-foreground/50">{year ?? "Out of range"}</span>

@@ -100,7 +100,7 @@ export default function Gigs() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-foreground pb-20 lg:pb-0">
+    <div className="min-h-screen bg-background text-foreground pb-20 lg:pb-0">
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-8 max-w-4xl">
         <div className="flex items-center justify-between mb-2">

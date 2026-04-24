@@ -89,7 +89,7 @@ export function FeedbackWidget() {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" onClick={handleClose}>
-          <div className="absolute inset-0 bg-black/60 " />
+          <div className="absolute inset-0 bg-muted/40 " />
           <div
             className="relative w-full max-w-sm rounded-sm p-6 shadow-2xl"
             style={{
@@ -152,9 +152,9 @@ export function FeedbackWidget() {
                         onClick={() => setCategory(cat.value)}
                         className="px-2.5 py-1 rounded-full text-xs font-medium transition-all"
                         style={{
-                          background: category === cat.value ? "rgba(0,180,216,0.2)" : "rgba(255,255,255,0.05)",
-                          border: `1px solid ${category === cat.value ? "rgba(0,180,216,0.5)" : "rgba(255,255,255,0.08)"}`,
-                          color: category === cat.value ? "#00B4D8" : "rgba(255,255,255,0.5)",
+                          background: category === cat.value ? "rgba(0,180,216,0.2)" : "hsl(var(--muted) / 0.3)",
+                          border: `1px solid ${category === cat.value ? "rgba(0,180,216,0.5)" : "hsl(var(--border))"}`,
+                          color: category === cat.value ? "#00B4D8" : "hsl(var(--muted-foreground))",
                         }}
                       >
                         {cat.label}
@@ -172,8 +172,8 @@ export function FeedbackWidget() {
                     rows={3}
                     className="w-full rounded-lg p-3 text-sm text-foreground resize-none focus:outline-none"
                     style={{
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: "hsl(var(--muted) / 0.3)",
+                      border: "1px solid hsl(var(--border))",
                     }}
                   />
                   <p className="text-right text-[10px] text-muted-foreground/50">{comment.length}/500</p>

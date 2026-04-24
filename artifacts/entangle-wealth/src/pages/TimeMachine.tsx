@@ -252,15 +252,15 @@ export default function TimeMachine() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
             <div>
               <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1 block">Stock Symbol</label>
-              <Input value={symbol} onChange={(e) => setSymbol(e.target.value.toUpperCase())} placeholder="NVDA" className="font-mono bg-black/50 border-border" />
+              <Input value={symbol} onChange={(e) => setSymbol(e.target.value.toUpperCase())} placeholder="NVDA" className="font-mono bg-muted/50 border-border" />
             </div>
             <div>
               <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1 block">Start Date</label>
-              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="font-mono bg-black/50 border-border" />
+              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="font-mono bg-muted/50 border-border" />
             </div>
             <div>
               <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1 block">Investment Amount</label>
-              <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="10000" className="font-mono bg-black/50 border-border" />
+              <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="10000" className="font-mono bg-muted/50 border-border" />
             </div>
             <div className="flex items-end">
               <Button onClick={() => run()} disabled={loading} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-bold">

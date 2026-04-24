@@ -129,7 +129,7 @@ export function OnboardingWizard({ onComplete, onClose }: Props) {
   const totalSteps = 4;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 pb-24 lg:pb-6 px-4 overflow-y-auto bg-black/40 dark:bg-black/85 backdrop-blur-md">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 pb-24 lg:pb-6 px-4 overflow-y-auto bg-muted/40 dark:bg-black/85 backdrop-blur-md">
       <div className="w-full max-w-lg rounded-sm border border-border bg-card p-4 sm:p-6 relative my-auto">
         {onClose && (
           <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground/70 hover:text-foreground p-1">

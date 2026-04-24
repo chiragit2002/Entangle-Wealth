@@ -37,8 +37,7 @@ export function DecisionImpactLayer({ compareResult, selectedHorizon }: {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="rounded-sm p-4 space-y-3"
-      style={{ background: "rgba(8,8,20,0.85)", border: "1px solid rgba(255,255,255,0.08)" }}
+      className="rounded-sm p-4 space-y-3 bg-card border border-border"
       aria-label="Decision Impact Layer"
     >
       <div className="flex items-center gap-2">

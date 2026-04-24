@@ -58,7 +58,7 @@ export function PLSimulator() {
           <input
             value={strikePrice}
             onChange={(e) => setStrikePrice(Number(e.target.value))}
-            className="w-full h-8 bg-black/50 border border-border rounded px-2 font-mono text-sm text-foreground"
+            className="w-full h-8 bg-muted/50 border border-border rounded px-2 font-mono text-sm text-foreground"
             type="number"
           />
         </div>
@@ -67,7 +67,7 @@ export function PLSimulator() {
           <input
             value={premium}
             onChange={(e) => setPremium(Number(e.target.value))}
-            className="w-full h-8 bg-black/50 border border-border rounded px-2 font-mono text-sm text-foreground"
+            className="w-full h-8 bg-muted/50 border border-border rounded px-2 font-mono text-sm text-foreground"
             type="number"
             step="0.50"
           />
@@ -77,7 +77,7 @@ export function PLSimulator() {
           <input
             value={contracts}
             onChange={(e) => setContracts(Number(e.target.value))}
-            className="w-full h-8 bg-black/50 border border-border rounded px-2 font-mono text-sm text-foreground"
+            className="w-full h-8 bg-muted/50 border border-border rounded px-2 font-mono text-sm text-foreground"
             type="number"
             min="1"
           />
@@ -100,11 +100,11 @@ export function PLSimulator() {
             <XAxis dataKey="price" tick={{ fill: "#555", fontSize: 9, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} />
             <YAxis tick={{ fill: "#555", fontSize: 9, fontFamily: "JetBrains Mono" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${Math.abs(v).toLocaleString()}`} />
             <Tooltip
-              contentStyle={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontFamily: "JetBrains Mono", fontSize: 11 }}
+              contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontFamily: "JetBrains Mono", fontSize: 11 }}
               formatter={(value: number) => [`$${Math.abs(value).toLocaleString()}`, "P&L"]}
               labelFormatter={(label) => `Price: $${label}`}
             />
-            <ReferenceLine y={0} stroke="rgba(255,255,255,0.15)" strokeDasharray="3 3" />
+            <ReferenceLine y={0} stroke="hsl(var(--border))" strokeDasharray="3 3" />
             <ReferenceLine x={breakeven} stroke="#FFB800" strokeDasharray="3 3" label={{ value: `BE: $${breakeven.toFixed(0)}`, fill: "#FFB800", fontSize: 9 }} />
             <Area type="monotone" dataKey="pnl" stroke="#00B4D8" strokeWidth={2} fill="url(#plProfit)" />
           </AreaChart>

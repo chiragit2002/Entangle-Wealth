@@ -204,7 +204,7 @@ export default function Research() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search articles, tickers, sources..."
-              className="pl-10 h-11 bg-black/50 border-border focus-visible:ring-primary"
+              className="pl-10 h-11 bg-muted/50 border-border focus-visible:ring-primary"
             />
           </div>
         </form>
@@ -234,7 +234,7 @@ export default function Research() {
 
         {isInitializing ? (
           <div className="text-center py-16">
-            <div className="inline-block rounded-lg border border-[#00FF41]/20 bg-black/60 px-8 py-6 font-mono text-sm">
+            <div className="inline-block rounded-lg border border-[#00FF41]/20 bg-muted/40 px-8 py-6 font-mono text-sm">
               <div className="text-[#00FF41]/60 mb-1">$ scraping {feedCount} RSS feeds...</div>
               <div className="text-[#00FF41]/60 mb-1">$ analyzing financial relevance...</div>
               <div className="text-[#00FF41] animate-pulse">&gt; Initializing news intelligence...</div>

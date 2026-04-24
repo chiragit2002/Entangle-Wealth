@@ -62,17 +62,12 @@ function BloombergPanelHeader({
 }: PanelWrapperProps) {
   return (
     <div
-      className="flex items-center justify-between px-3 py-2 border-b select-none flex-shrink-0"
-      style={{
-        borderColor: "rgba(255,255,255,0.08)",
-        background: "rgba(10,10,20,0.98)",
-      }}
+      className="flex items-center justify-between px-3 py-2 border-b border-border select-none flex-shrink-0 bg-card"
     >
       <div className="flex items-center gap-2">
         <span style={{ color: statusColor }}>{icon}</span>
         <span
-          className="text-[10px] font-mono font-bold uppercase tracking-widest"
-          style={{ color: "#c0c0c0" }}
+          className="text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground"
         >
           {title}
         </span>
@@ -100,8 +95,7 @@ function BloombergPanelHeader({
         </Link>
         <button
           onClick={onToggle}
-          className="opacity-40 hover:opacity-80 transition-opacity"
-          style={{ color: "#c0c0c0" }}
+          className="opacity-40 hover:opacity-80 transition-opacity text-muted-foreground"
           title={collapsed ? "Expand panel" : "Collapse panel"}
         >
           {collapsed ? (
@@ -191,14 +185,13 @@ function MonteCarloPanel({ collapsed }: { collapsed: boolean }) {
             ].map(({ label, val, color }) => (
               <div
                 key={label}
-                className="rounded px-2 py-1.5"
-                style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
+                className="rounded px-2 py-1.5 bg-muted/30 border border-border"
               >
                 <div className="text-[8px] font-mono uppercase tracking-widest text-muted-foreground/70">
                   {label}
                 </div>
                 <div className="text-sm font-mono font-bold" style={{ color }}>{val}</div>
-                <div className="text-[8px] font-mono" style={{ color: "rgba(255,255,255,0.3)" }}>
+                <div className="text-[8px] font-mono text-muted-foreground/50">
                   Yr {profile.timeHorizonYears}
                 </div>
               </div>
@@ -217,13 +210,13 @@ function MonteCarloPanel({ collapsed }: { collapsed: boolean }) {
               if (!p) return null;
               const y = pad.t + ph;
               return (
-                <text key={pct} x={toX(idx)} y={y + 12} textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize="7" fontFamily="monospace">
+                <text key={pct} x={toX(idx)} y={y + 12} textAnchor="middle" fill="rgba(128,128,128,0.6)" fontSize="7" fontFamily="monospace">
                   Y{p.year}
                 </text>
               );
             })}
             {[minV, (minV + maxV) / 2, maxV].map((v, i) => (
-              <text key={i} x={pad.l - 3} y={toY(v) + 3} textAnchor="end" fill="rgba(255,255,255,0.25)" fontSize="7" fontFamily="monospace">
+              <text key={i} x={pad.l - 3} y={toY(v) + 3} textAnchor="end" fill="rgba(128,128,128,0.6)" fontSize="7" fontFamily="monospace">
                 {fmt(v)}
               </text>
             ))}
@@ -253,7 +246,7 @@ function MonteCarloPanel({ collapsed }: { collapsed: boolean }) {
                   setProfile((prev) => ({ ...prev, [key]: Number(e.target.value) }));
                 }}
                 className="w-full h-1 rounded-full appearance-none cursor-pointer"
-                style={{ accentColor: color, background: "rgba(255,255,255,0.08)" }}
+                style={{ accentColor: color, background: "hsl(var(--muted))" }}
               />
             </div>
           ))}
@@ -311,19 +304,18 @@ function FlashCouncilPanel({ collapsed }: { collapsed: boolean }) {
           <div className="text-[8px] font-mono uppercase tracking-widest mb-1" style={{ color: "rgba(0,180,216,0.6)" }}>
             AI COUNCIL INSIGHT
           </div>
-          <p className="text-[10px] font-mono leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
+          <p className="text-[10px] font-mono leading-relaxed text-foreground/75">
             {COUNCIL_INSIGHTS[idx]}
           </p>
         </div>
         <div className="space-y-1">
-          <div className="text-[8px] font-mono uppercase tracking-widest mb-1.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+          <div className="text-[8px] font-mono uppercase tracking-widest mb-1.5 text-muted-foreground/50">
             Agent Consensus
           </div>
           {agentStatuses.map((agent) => (
             <div
               key={agent.name}
-              className="flex items-center justify-between py-1.5 px-2 rounded"
-              style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}
+              className="flex items-center justify-between py-1.5 px-2 rounded bg-muted/30 border border-border"
             >
               <div className="flex items-center gap-2">
                 <div className="w-1 h-1 rounded-full animate-pulse" style={{ background: agent.color }} />
@@ -335,7 +327,7 @@ function FlashCouncilPanel({ collapsed }: { collapsed: boolean }) {
                 <span className="text-[9px] font-mono font-bold" style={{ color: agent.color }}>
                   {agent.status}
                 </span>
-                <div className="w-12 h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+                <div className="w-12 h-1 rounded-full overflow-hidden bg-muted">
                   <div
                     className="h-full rounded-full"
                     style={{ width: `${agent.conf}%`, background: agent.color }}
@@ -402,10 +394,9 @@ function MirofishPanel({ collapsed }: { collapsed: boolean }) {
   if (collapsed) return null;
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-[#000810]">
+    <div className="flex flex-col h-full overflow-hidden bg-card">
       <div
-        className="flex items-center justify-between px-3 py-1.5 border-b flex-shrink-0"
-        style={{ borderColor: "rgba(0,180,216,0.08)", background: "rgba(0,8,16,0.98)" }}
+        className="flex items-center justify-between px-3 py-1.5 border-b border-border flex-shrink-0 bg-card"
       >
         <div className="flex items-center gap-3">
           <div className="flex gap-1">
@@ -421,11 +412,11 @@ function MirofishPanel({ collapsed }: { collapsed: boolean }) {
         </div>
       </div>
       <div className="flex-1 overflow-hidden grid grid-cols-2 gap-0">
-        <div className="border-r overflow-auto p-2 flex flex-col items-center justify-center" style={{ borderColor: "rgba(0,180,216,0.07)" }}>
+        <div className="border-r border-border overflow-auto p-2 flex flex-col items-center justify-center">
           <div className="text-[8px] font-mono uppercase tracking-widest mb-1.5 w-full" style={{ color: "rgba(0,255,136,0.6)" }}>
             Live Order Flow
           </div>
-          <p className="text-[9px] font-mono text-center py-6" style={{ color: "rgba(255,255,255,0.15)" }}>
+          <p className="text-[9px] font-mono text-center py-6 text-muted-foreground/30">
             No order flow data
           </p>
         </div>
@@ -433,19 +424,19 @@ function MirofishPanel({ collapsed }: { collapsed: boolean }) {
           <div className="text-[8px] font-mono uppercase tracking-widest mb-1.5" style={{ color: "rgba(147,112,219,0.7)" }}>
             System Log
           </div>
-          <p className="text-[9px] font-mono text-center py-6" style={{ color: "rgba(255,255,255,0.15)" }}>
+          <p className="text-[9px] font-mono text-center py-6 text-muted-foreground/30">
             No system events
           </p>
         </div>
       </div>
-      <div className="border-t p-2 flex-shrink-0" style={{ borderColor: "rgba(0,180,216,0.08)" }}>
+      <div className="border-t border-border p-2 flex-shrink-0">
         <div ref={scrollRef} className="max-h-16 overflow-y-auto mb-1.5 space-y-0.5">
           {history.map((h, i) => (
             <div key={i} className="text-[9px] font-mono">
               <div style={{ color: "#00B4D8" }}>
                 <span style={{ color: "rgba(0,180,216,0.4)" }}>~$ </span>{h.input}
               </div>
-              <div style={{ color: "rgba(255,255,255,0.55)" }} className="pl-3 whitespace-pre-wrap">{h.output}</div>
+              <div className="pl-3 whitespace-pre-wrap text-muted-foreground">{h.output}</div>
             </div>
           ))}
         </div>
@@ -560,8 +551,8 @@ function BacktesterPanel({ collapsed }: { collapsed: boolean }) {
         <line x1={pad.l} y1={invest} x2={pad.l + pw} y2={invest} stroke="rgba(0,180,216,0.25)" strokeDasharray="4,3" strokeWidth="1" />
         <polygon points={area} fill="url(#bt-grad)" />
         <polyline points={pts.join(" ")} fill="none" stroke={profitColor} strokeWidth="1.5" />
-        <text x={pad.l} y={h - 2} fill="rgba(255,255,255,0.25)" fontSize="7" fontFamily="monospace">{result.startDate}</text>
-        <text x={pad.l + pw} y={h - 2} textAnchor="end" fill="rgba(255,255,255,0.25)" fontSize="7" fontFamily="monospace">Today</text>
+        <text x={pad.l} y={h - 2} fill="rgba(128,128,128,0.6)" fontSize="7" fontFamily="monospace">{result.startDate}</text>
+        <text x={pad.l + pw} y={h - 2} textAnchor="end" fill="rgba(128,128,128,0.6)" fontSize="7" fontFamily="monospace">Today</text>
       </svg>
     );
   }
@@ -575,8 +566,7 @@ function BacktesterPanel({ collapsed }: { collapsed: boolean }) {
             <input
               value={symbol}
               onChange={(e) => setSymbol(e.target.value.toUpperCase())}
-              className="w-full bg-transparent border rounded px-1.5 py-1 text-[10px] font-mono outline-none"
-              style={{ borderColor: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.85)" }}
+              className="w-full bg-transparent border border-border rounded px-1.5 py-1 text-[10px] font-mono outline-none text-foreground"
               placeholder="NVDA"
             />
           </div>
@@ -586,8 +576,7 @@ function BacktesterPanel({ collapsed }: { collapsed: boolean }) {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full bg-transparent border rounded px-1.5 py-1 text-[9px] font-mono outline-none"
-              style={{ borderColor: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.85)" }}
+              className="w-full bg-transparent border border-border rounded px-1.5 py-1 text-[9px] font-mono outline-none text-foreground"
             />
           </div>
           <div className="col-span-1">
@@ -596,8 +585,7 @@ function BacktesterPanel({ collapsed }: { collapsed: boolean }) {
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full bg-transparent border rounded px-1.5 py-1 text-[10px] font-mono outline-none"
-              style={{ borderColor: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.85)" }}
+              className="w-full bg-transparent border border-border rounded px-1.5 py-1 text-[10px] font-mono outline-none text-foreground"
               placeholder="10000"
             />
           </div>
@@ -619,8 +607,7 @@ function BacktesterPanel({ collapsed }: { collapsed: boolean }) {
             <button
               key={p.label}
               onClick={() => { setSymbol(p.symbol); setStartDate(p.date); run(p.symbol, p.date, amount); }}
-              className="text-[8px] font-mono px-2 py-0.5 rounded-full transition-colors"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}
+              className="text-[8px] font-mono px-2 py-0.5 rounded-full transition-colors bg-muted/30 border border-border text-muted-foreground"
             >
               {p.label}
             </button>
@@ -644,10 +631,9 @@ function BacktesterPanel({ collapsed }: { collapsed: boolean }) {
               ].map(({ label, val, color }) => (
                 <div
                   key={label}
-                  className="rounded px-2 py-1.5"
-                  style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
+                  className="rounded px-2 py-1.5 bg-muted/30 border border-border"
                 >
-                  <div className="text-[7px] font-mono uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.3)" }}>
+                  <div className="text-[7px] font-mono uppercase tracking-widest text-muted-foreground/50">
                     {label}
                   </div>
                   <div className="text-xs font-mono font-bold" style={{ color }}>{val}</div>
@@ -666,7 +652,7 @@ function BacktesterPanel({ collapsed }: { collapsed: boolean }) {
         {!result && !loading && !error && (
           <div className="text-center py-6">
             <Clock className="w-8 h-8 mx-auto mb-2 opacity-20" />
-            <p className="text-[9px] font-mono" style={{ color: "rgba(255,255,255,0.3)" }}>
+            <p className="text-[9px] font-mono text-muted-foreground/50">
               Pick a preset or enter details above
             </p>
           </div>
@@ -754,11 +740,7 @@ export default function CommandCenter() {
 
   const statusBar = (
     <div
-      className="flex items-center justify-between px-4 py-2 border-b flex-shrink-0"
-      style={{
-        background: "rgba(5,5,12,0.99)",
-        borderColor: "rgba(255,255,255,0.06)",
-      }}
+      className="flex items-center justify-between px-4 py-2 border-b border-border flex-shrink-0 bg-card"
     >
       <div className="flex items-center gap-4">
         <span className="text-[9px] font-mono font-bold uppercase tracking-widest" style={{ color: "#00B4D8" }}>
@@ -774,7 +756,7 @@ export default function CommandCenter() {
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Activity className="w-2.5 h-2.5" style={{ color: "rgba(255,255,255,0.3)" }} />
+          <Activity className="w-2.5 h-2.5 text-muted-foreground/50" />
           <span className="text-[8px] font-mono text-muted-foreground/70">4 PANELS ACTIVE</span>
         </div>
       </div>
@@ -796,8 +778,8 @@ export default function CommandCenter() {
     return (
       <Layout>
         <div
-          className="flex flex-col min-h-screen"
-          style={{ background: "#060612", fontFamily: "'JetBrains Mono', monospace" }}
+          className="flex flex-col min-h-screen bg-background"
+          style={{ fontFamily: "'JetBrains Mono', monospace" }}
         >
           {statusBar}
           <div className="flex-1 overflow-auto">
@@ -807,8 +789,7 @@ export default function CommandCenter() {
               return (
                 <div
                   key={id}
-                  className="border-b"
-                  style={{ borderColor: "rgba(255,255,255,0.06)" }}
+                  className="border-b border-border"
                 >
                   <BloombergPanelHeader
                     title={meta.title}
@@ -834,9 +815,8 @@ export default function CommandCenter() {
   return (
     <Layout>
       <div
-        className="flex flex-col"
+        className="flex flex-col bg-background"
         style={{
-          background: "#060612",
           fontFamily: "'JetBrains Mono', monospace",
           height: "calc(100vh - 3.5rem)",
         }}
@@ -852,8 +832,7 @@ export default function CommandCenter() {
               >
                 <ResizablePanel defaultSize={topSizes[0]} minSize={20}>
                   <div
-                    className="flex flex-col h-full border-r"
-                    style={{ borderColor: "rgba(255,255,255,0.06)" }}
+                    className="flex flex-col h-full border-r border-border"
                   >
                     <BloombergPanelHeader
                       {...PANELS[0]}
@@ -889,8 +868,7 @@ export default function CommandCenter() {
               >
                 <ResizablePanel defaultSize={bottomSizes[0]} minSize={20}>
                   <div
-                    className="flex flex-col h-full border-r border-t"
-                    style={{ borderColor: "rgba(255,255,255,0.06)" }}
+                    className="flex flex-col h-full border-r border-t border-border"
                   >
                     <BloombergPanelHeader
                       {...PANELS[2]}
@@ -905,8 +883,7 @@ export default function CommandCenter() {
                 <ResizableHandle className="w-1 bg-muted/50 hover:bg-[#00B4D8]/30 transition-colors" />
                 <ResizablePanel defaultSize={bottomSizes[1]} minSize={20}>
                   <div
-                    className="flex flex-col h-full border-t"
-                    style={{ borderColor: "rgba(255,255,255,0.06)" }}
+                    className="flex flex-col h-full border-t border-border"
                   >
                     <BloombergPanelHeader
                       {...PANELS[3]}

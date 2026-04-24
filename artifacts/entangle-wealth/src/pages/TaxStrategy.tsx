@@ -175,7 +175,7 @@ export default function TaxStrategy() {
                 </button>
 
                 {isExpanded && (
-                  <div className="px-4 pb-4 border-t border-white/5 pt-4">
+                  <div className="px-4 pb-4 border-t border-border pt-4">
                     <div className="mb-3">
                       <p className="text-[11px] text-[#00B4D8] font-semibold mb-1 uppercase">How It Works</p>
                       <p className="text-[13px] text-foreground/70 whitespace-pre-line">{strategy.how}</p>

@@ -44,7 +44,7 @@ export class PageErrorBoundary extends Component<Props, State> {
             onClick={() => this.setState({ hasError: false })}
             className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono text-muted-foreground/70 hover:text-foreground/70 transition-colors"
             style={{
-              border: "1px solid rgba(255,255,255,0.08)",
+              border: "1px solid hsl(var(--border))",
             }}
           >
             <RefreshCw className="w-3 h-3" />

@@ -108,7 +108,7 @@ export function FirstVisitTooltips() {
 
   return (
     <>
-      <div className="fixed inset-0 z-[90] bg-black/30" onClick={handleDismiss} />
+      <div className="fixed inset-0 z-[90] bg-muted/30" onClick={handleDismiss} />
       <div
         className="fixed z-[91] w-[280px] bg-card border border-[#00B4D8]/20 rounded-lg p-3 shadow-xl shadow-[#00B4D8]/10 animate-in fade-in slide-in-from-bottom-2 duration-300"
         style={style}

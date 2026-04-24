@@ -14,7 +14,7 @@ export function BeforeAfterCard({ param, oldValue, newValue, impact }: BeforeAft
   const impactPositive = impact.toLowerCase().includes("+") || impact.toLowerCase().includes("improv") || impact.toLowerCase().includes("better");
 
   return (
-    <div className="bg-muted/30 border border-white/8 rounded-xl p-4 hover:border-white/15 transition-all group">
+    <div className="bg-muted/30 border border-border rounded-xl p-4 hover:border-border transition-all group">
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs font-mono font-semibold text-foreground/70 capitalize">
           {param.replace(/_/g, " ")}
@@ -31,7 +31,7 @@ export function BeforeAfterCard({ param, oldValue, newValue, impact }: BeforeAft
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="flex-1 text-center bg-muted/50 border border-white/8 rounded-lg py-3 px-2">
+        <div className="flex-1 text-center bg-muted/50 border border-border rounded-lg py-3 px-2">
           <div className="text-[10px] text-muted-foreground/50 font-mono uppercase tracking-wider mb-1">Before</div>
           <div className="text-xl font-bold font-mono text-muted-foreground">{oldValue}</div>
         </div>

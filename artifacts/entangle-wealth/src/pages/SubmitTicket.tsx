@@ -166,7 +166,7 @@ export default function SubmitTicket() {
                       className="w-full h-11 px-4 text-sm bg-muted/50 border border-border rounded-xl text-foreground focus:outline-none focus:border-[#00B4D8]/40 transition-colors appearance-none"
                     >
                       {CATEGORIES.map((c) => (
-                        <option key={c.value} value={c.value} className="bg-black text-foreground">{c.label}</option>
+                        <option key={c.value} value={c.value} className="bg-background text-foreground">{c.label}</option>
                       ))}
                     </select>
                   </FormControl>

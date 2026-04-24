@@ -343,7 +343,7 @@ export default function Resume() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-foreground">
+      <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="flex items-center justify-center py-32">
           <div className="text-center space-y-4">
@@ -361,7 +361,7 @@ export default function Resume() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-6 max-w-[1600px]">
         <div className="mb-8">

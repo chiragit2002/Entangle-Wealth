@@ -610,7 +610,7 @@ function YourEdgeSection() {
   };
 
   return (
-    <section className="py-16 lg:py-24 px-4 border-t border-white/5 relative overflow-hidden">
+    <section className="py-16 lg:py-24 px-4 border-t border-border relative overflow-hidden">
       <div className="container mx-auto max-w-5xl relative z-10">
         <div className="text-center mb-10">
           <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#00B4D8]/70 mb-3">
@@ -1053,7 +1053,7 @@ export default function Home() {
                           ))}
                         </div>
                         <p className="text-sm text-foreground/70 leading-relaxed flex-1">"{t.message}"</p>
-                        <div className="flex items-center gap-2 pt-3 border-t border-white/5">
+                        <div className="flex items-center gap-2 pt-3 border-t border-border">
                           <div className="w-7 h-7 rounded-full bg-[#00B4D8]/20 flex items-center justify-center text-xs font-bold text-[#00B4D8]">
                             {t.name.charAt(0).toUpperCase()}
                           </div>
@@ -1149,7 +1149,7 @@ export default function Home() {
         </section>
 
         {testimonialsState.data && testimonialsState.data.length > 0 && (
-        <section className="py-16 lg:py-24 px-4 border-t border-white/5">
+        <section className="py-16 lg:py-24 px-4 border-t border-border">
           <div className="container mx-auto max-w-3xl">
             <div className="text-center mb-10">
               <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3">
@@ -1174,7 +1174,7 @@ export default function Home() {
                       ))}
                     </div>
                     <p className="text-sm text-foreground/70 leading-relaxed flex-1">"{t.message}"</p>
-                    <div className="flex items-center gap-2 pt-3 border-t border-white/5">
+                    <div className="flex items-center gap-2 pt-3 border-t border-border">
                       <div className="w-7 h-7 rounded-full bg-[#00B4D8]/20 flex items-center justify-center text-xs font-bold text-[#00B4D8]">
                         {t.name.charAt(0).toUpperCase()}
                       </div>
@@ -1190,7 +1190,7 @@ export default function Home() {
         </section>
         )}
         {/* Final CTA */}
-        <section className="py-20 lg:py-28 px-4 border-t border-white/5">
+        <section className="py-20 lg:py-28 px-4 border-t border-border">
           <RevealSection>
             <div className="container mx-auto max-w-2xl text-center flex flex-col items-center space-y-6">
               <p className="text-[11px] font-semibold tracking-widest uppercase text-[#00B4D8]/60">

@@ -230,7 +230,7 @@ export function WealthSignalCard({
             <div className="grid grid-cols-3 gap-3 mt-5">
               <div
                 className="rounded-lg p-3"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.06)" }}
+                style={{ background: "hsl(var(--muted) / 0.3)", border: "1px solid hsl(var(--border))" }}
               >
                 <div className="flex items-center gap-1 mb-1">
                   <Flame className="w-3 h-3 text-[#FFD700]" />
@@ -240,7 +240,7 @@ export function WealthSignalCard({
               </div>
               <div
                 className="rounded-lg p-3"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.06)" }}
+                style={{ background: "hsl(var(--muted) / 0.3)", border: "1px solid hsl(var(--border))" }}
               >
                 <div className="flex items-center gap-1 mb-1">
                   <Zap className="w-3 h-3 text-[#00B4D8]" />
@@ -250,7 +250,7 @@ export function WealthSignalCard({
               </div>
               <div
                 className="rounded-lg p-3"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.06)" }}
+                style={{ background: "hsl(var(--muted) / 0.3)", border: "1px solid hsl(var(--border))" }}
               >
                 <div className="flex items-center gap-1 mb-1">
                   <TrendingUp className="w-3 h-3 text-[#7B61FF]" />

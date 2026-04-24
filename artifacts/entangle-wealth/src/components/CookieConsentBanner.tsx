@@ -36,7 +36,7 @@ export function CookieConsentBanner() {
           style={{
             background: "var(--nav-dropdown-bg, rgba(10,10,20,0.97))",
             backdropFilter: "blur(24px)",
-            border: "var(--nav-dropdown-border, 1px solid rgba(255,255,255,0.08))",
+            border: "var(--nav-dropdown-border, 1px solid hsl(var(--border)))",
           }}
         >
           <div className="flex items-start gap-3">

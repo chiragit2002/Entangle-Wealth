@@ -115,7 +115,7 @@ export default function RewardHistory() {
             {REWARD_TIERS.map((tier) => {
               const Icon = tier.icon;
               return (
-                <div key={tier.label} className="bg-muted/30 rounded-lg p-3 text-center border border-white/5">
+                <div key={tier.label} className="bg-muted/30 rounded-lg p-3 text-center border border-border">
                   <Icon className="w-5 h-5 mx-auto mb-1" style={{ color: tier.color }} />
                   <p className="text-sm font-bold" style={{ color: tier.color }}>{tier.label}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{tier.tokens}</p>
@@ -132,7 +132,7 @@ export default function RewardHistory() {
             </h2>
             <div className="space-y-2">
               {myRewards.map((r) => (
-                <div key={r.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-white/5">
+                <div key={r.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center">
                       <span className="text-xs font-bold text-yellow-400">#{r.rank}</span>
@@ -173,7 +173,7 @@ export default function RewardHistory() {
                 const totalTokens = entries.reduce((s, e) => s + e.tokens, 0);
 
                 return (
-                  <div key={month} className="border border-white/5 rounded-lg overflow-hidden">
+                  <div key={month} className="border border-border rounded-lg overflow-hidden">
                     <button
                       className="w-full flex items-center justify-between p-4 hover:bg-muted/30 transition-colors text-left"
                       onClick={() => setExpandedMonth(isExpanded ? null : month)}
@@ -192,7 +192,7 @@ export default function RewardHistory() {
                     </button>
 
                     {isExpanded && (
-                      <div className="border-t border-white/5 p-4 bg-muted/30">
+                      <div className="border-t border-border p-4 bg-muted/30">
                         <div className="space-y-1.5">
                           {entries.map((entry, i) => (
                             <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted/30">

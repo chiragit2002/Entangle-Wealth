@@ -509,7 +509,7 @@ export default function Receipts() {
                   </thead>
                   <tbody>
                     {filteredDocs.map(d => (
-                      <tr key={d.id} className="border-b border-white/5 hover:bg-muted/30">
+                      <tr key={d.id} className="border-b border-border hover:bg-muted/30">
                         <td className="p-3 text-muted-foreground">{d.date}</td>
                         <td className="p-3 text-foreground/80 font-semibold">{d.vendor || d.fileName}</td>
                         <td className="p-3 text-muted-foreground">{d.category}</td>
@@ -605,7 +605,7 @@ export default function Receipts() {
                   </thead>
                   <tbody>
                     {mileage.map(m => (
-                      <tr key={m.id} className="border-b border-white/5 hover:bg-muted/30">
+                      <tr key={m.id} className="border-b border-border hover:bg-muted/30">
                         <td className="p-3 text-muted-foreground">{m.date}</td>
                         <td className="p-3 text-foreground/70">{m.startLocation}</td>
                         <td className="p-3 text-foreground/70">{m.endLocation}</td>

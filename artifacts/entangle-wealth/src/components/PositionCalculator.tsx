@@ -43,7 +43,7 @@ export function PositionCalculator() {
           <Input
             value={accountSize}
             onChange={(e) => setAccountSize(e.target.value)}
-            className="h-8 bg-black/50 border-border font-mono text-sm text-primary"
+            className="h-8 bg-muted/50 border-border font-mono text-sm text-primary"
             type="number"
           />
         </div>
@@ -52,7 +52,7 @@ export function PositionCalculator() {
           <Input
             value={riskPercent}
             onChange={(e) => setRiskPercent(e.target.value)}
-            className="h-8 bg-black/50 border-border font-mono text-sm text-secondary"
+            className="h-8 bg-muted/50 border-border font-mono text-sm text-secondary"
             type="number"
             step="0.5"
           />
@@ -62,7 +62,7 @@ export function PositionCalculator() {
           <Input
             value={entryPrice}
             onChange={(e) => setEntryPrice(e.target.value)}
-            className="h-8 bg-black/50 border-border font-mono text-sm"
+            className="h-8 bg-muted/50 border-border font-mono text-sm"
             type="number"
             step="0.01"
           />
@@ -72,14 +72,14 @@ export function PositionCalculator() {
           <Input
             value={stopLoss}
             onChange={(e) => setStopLoss(e.target.value)}
-            className="h-8 bg-black/50 border-border font-mono text-sm text-red-400"
+            className="h-8 bg-muted/50 border-border font-mono text-sm text-red-400"
             type="number"
             step="0.01"
           />
         </div>
       </div>
 
-      <div className="border-t border-white/5 pt-3">
+      <div className="border-t border-border pt-3">
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div className="bg-muted/30 rounded-lg p-2.5 text-center">
             <div className="text-[9px] font-mono text-muted-foreground uppercase">Shares</div>

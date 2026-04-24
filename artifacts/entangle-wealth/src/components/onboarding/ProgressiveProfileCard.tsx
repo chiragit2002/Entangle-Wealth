@@ -167,7 +167,7 @@ export function ProgressiveProfileCard({ className = "" }: ProgressiveProfileCar
                 className={`px-3 py-2 rounded-lg border text-[11px] font-semibold text-left transition-all ${
                   focus === opt.id
                     ? "border-[#00B4D8]/50 bg-[#00B4D8]/8 text-foreground"
-                    : "border-white/8 bg-muted/30 text-muted-foreground hover:border-white/15"
+                    : "border-border bg-muted/30 text-muted-foreground hover:border-border"
                 }`}
               >
                 {opt.label}

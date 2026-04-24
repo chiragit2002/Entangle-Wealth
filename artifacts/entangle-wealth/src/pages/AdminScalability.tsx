@@ -106,7 +106,7 @@ export default function AdminScalability() {
   if (isAdmin === null) {
     return (
       <Layout>
-        <div className="min-h-screen bg-[#020204] flex items-center justify-center">
+        <div className="min-h-screen bg-background flex items-center justify-center">
           <div className="animate-spin w-8 h-8 border-2 border-[#00B4D8] border-t-transparent rounded-full" />
         </div>
       </Layout>
@@ -158,7 +158,7 @@ export default function AdminScalability() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#020204] py-8 px-4">
+      <div className="min-h-screen bg-background py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>

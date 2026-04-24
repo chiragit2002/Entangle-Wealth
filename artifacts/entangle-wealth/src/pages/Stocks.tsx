@@ -323,7 +323,7 @@ export default function Stocks() {
                         </button>
                       ))}
                     </div>
-                    <div className="w-full border-t border-white/5 my-1" />
+                    <div className="w-full border-t border-border my-1" />
                     <div className="flex flex-wrap gap-1">
                       <button
                         onClick={() => setCapFilter("")}
@@ -381,7 +381,7 @@ export default function Stocks() {
                           </tr>
                         ) : loading ? (
                           Array.from({ length: 10 }).map((_, i) => (
-                            <tr key={i} className="border-b border-white/5">
+                            <tr key={i} className="border-b border-border">
                               <td className="p-3" colSpan={8}>
                                 <div className="h-4 bg-muted/50 rounded animate-pulse" />
                               </td>
@@ -413,7 +413,7 @@ export default function Stocks() {
                           stocks.map(stock => (
                             <tr
                               key={stock.symbol}
-                              className="border-b border-white/5 hover:bg-muted/50 cursor-pointer transition-colors"
+                              className="border-b border-border hover:bg-muted/50 cursor-pointer transition-colors"
                               onClick={() => setSelectedStock(stock)}
                             >
                               <td className="p-3">

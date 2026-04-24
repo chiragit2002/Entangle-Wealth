@@ -286,19 +286,19 @@ export default function Giveaway() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-              <div className="bg-muted/50 rounded-xl p-3 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-3 text-center border border-border">
                 <p className="text-2xl font-black font-mono text-[#FFB800]">{entries.totalEntries}</p>
                 <p className="text-[9px] uppercase tracking-wider text-muted-foreground/70 mt-0.5">Total Entries</p>
               </div>
-              <div className="bg-muted/50 rounded-xl p-3 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-3 text-center border border-border">
                 <p className="text-2xl font-black font-mono text-[#00B4D8]">{odds}</p>
                 <p className="text-[9px] uppercase tracking-wider text-muted-foreground/70 mt-0.5">Win Odds</p>
               </div>
-              <div className="bg-muted/50 rounded-xl p-3 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-3 text-center border border-border">
                 <p className="text-2xl font-black font-mono text-[#00d4ff]">{convertedReferrals}</p>
                 <p className="text-[9px] uppercase tracking-wider text-muted-foreground/70 mt-0.5">Referrals</p>
               </div>
-              <div className="bg-muted/50 rounded-xl p-3 text-center border border-white/5">
+              <div className="bg-muted/50 rounded-xl p-3 text-center border border-border">
                 <p className="text-xl font-black font-mono text-[#c084fc]">
                   ${referralBonusShare > 0 ? referralBonusShare.toFixed(0) : "—"}
                 </p>
@@ -445,7 +445,7 @@ export default function Giveaway() {
                 { icon: Star, color: "text-[#FFB800]", val: "10–25 refs", bonus: "~$3,600–$9,000", label: "Active referrer" },
                 { icon: Crown, color: "text-[#00B4D8]", val: "50+ refs", bonus: "$18,000+", label: "Super referrer" },
               ].map((t) => (
-                <div key={t.label} className="bg-muted/50 rounded-xl p-4 border border-white/5 text-center">
+                <div key={t.label} className="bg-muted/50 rounded-xl p-4 border border-border text-center">
                   <t.icon className={`w-5 h-5 ${t.color} mx-auto mb-2`} />
                   <p className="text-xs text-muted-foreground">{t.val}</p>
                   <p className={`text-lg font-black ${t.color}`}>{t.bonus}</p>

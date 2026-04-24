@@ -33,17 +33,23 @@ export default function LightweightChart({
   useEffect(() => {
     if (!containerRef.current) return;
 
+    const cs = getComputedStyle(document.documentElement);
+    const hsl = (v: string) => `hsl(${cs.getPropertyValue(v).trim()})`;
+    const textColor = hsl("--muted-foreground");
+    const borderColor = hsl("--border");
+    const cardColor = hsl("--card");
+
     const chart = createChart(containerRef.current, {
       width: containerRef.current.clientWidth,
       height,
       layout: {
         background: { type: ColorType.Solid, color: "transparent" },
-        textColor: "rgba(255, 255, 255, 0.6)",
+        textColor,
         fontSize: 11,
       },
       grid: {
-        vertLines: { color: "rgba(255, 255, 255, 0.04)" },
-        horzLines: { color: "rgba(255, 255, 255, 0.04)" },
+        vertLines: { color: borderColor },
+        horzLines: { color: borderColor },
       },
       crosshair: {
         mode: CrosshairMode.Normal,
@@ -51,11 +57,11 @@ export default function LightweightChart({
         horzLine: { color: "rgba(0,180,216, 0.3)", width: 1, style: 2 },
       },
       rightPriceScale: {
-        borderColor: "rgba(255, 255, 255, 0.1)",
+        borderColor,
         scaleMargins: { top: 0.1, bottom: showVolume ? 0.25 : 0.1 },
       },
       timeScale: {
-        borderColor: "rgba(255, 255, 255, 0.1)",
+        borderColor,
         timeVisible: true,
         secondsVisible: false,
       },

@@ -59,7 +59,7 @@ export function WealthProjectionCard({ jobTitle, currentIncome = 60000, newIncom
         </p>
 
         <div className="grid grid-cols-2 gap-3 mb-3">
-          <div className="rounded-lg p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+          <div className="rounded-lg p-3" style={{ background: "hsl(var(--muted) / 0.3)", border: "1px solid hsl(var(--border))" }}>
             <p className="text-[9px] text-muted-foreground/70 uppercase tracking-wider mb-2">Current Path</p>
             <div className="space-y-1">
               <div className="flex justify-between">

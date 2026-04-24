@@ -660,7 +660,7 @@ export default function TechnicalAnalysis() {
     <Layout>
       <PageErrorBoundary fallbackTitle="Technical Analysis encountered an error">
       <FinancialDisclaimerBanner pageKey="technical-analysis" />
-      <div className="w-full border-b border-border bg-[#060610]">
+      <div className="w-full border-b border-border bg-card">
         <div className="container mx-auto px-4 max-w-[1400px]">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3">
@@ -681,7 +681,7 @@ export default function TechnicalAnalysis() {
                     className="bg-transparent px-2 py-2 text-[13px] text-foreground w-[220px] md:w-[300px] focus:outline-none placeholder:text-muted-foreground/70 font-mono" aria-label="Search stocks" />
                 </div>
                 {showSearch && searchResults.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-[#0c0c1a] border border-border rounded-xl z-50 max-h-[400px] overflow-y-auto shadow-2xl shadow-black/80">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl z-50 max-h-[400px] overflow-y-auto shadow-2xl shadow-black/20 dark:shadow-black/80">
                     {searchResults.map(s => (
                       <div key={s.symbol} className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-primary/[0.06] transition-colors border-b border-border/50 last:border-0 min-h-[44px] cursor-pointer"
                         role="option" onClick={() => { analyze(s.symbol); }}>

@@ -39,12 +39,12 @@ export function PutItToWorkCard({ savingsAmount, className = "" }: PutItToWorkCa
         </p>
 
         <div className="grid grid-cols-2 gap-2 mb-3">
-          <div className="rounded-lg p-2.5 text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+          <div className="rounded-lg p-2.5 text-center" style={{ background: "hsl(var(--muted) / 0.3)", border: "1px solid hsl(var(--border))" }}>
             <p className="text-[9px] text-muted-foreground/70 uppercase tracking-wider mb-1">10-Year Growth</p>
             <p className="text-sm font-bold font-mono text-emerald-400">${projection10.toLocaleString()}</p>
             <p className="text-[9px] text-muted-foreground/50 mt-0.5">@ 8% avg return</p>
           </div>
-          <div className="rounded-lg p-2.5 text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+          <div className="rounded-lg p-2.5 text-center" style={{ background: "hsl(var(--muted) / 0.3)", border: "1px solid hsl(var(--border))" }}>
             <p className="text-[9px] text-muted-foreground/70 uppercase tracking-wider mb-1">20-Year Growth</p>
             <p className="text-sm font-bold font-mono text-emerald-400">${projection20.toLocaleString()}</p>
             <p className="text-[9px] text-muted-foreground/50 mt-0.5">@ 8% avg return</p>

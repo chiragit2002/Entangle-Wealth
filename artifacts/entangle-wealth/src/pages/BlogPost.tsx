@@ -108,7 +108,7 @@ export default function BlogPostPage() {
         </header>
 
         <div
-          className="prose prose-invert max-w-none"
+          className="prose dark:prose-invert max-w-none"
           dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }}
         />
 

@@ -241,7 +241,7 @@ export default function VolatilityLab() {
             <div className="flex-1">
               <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1 block">Symbol</label>
               <Input value={symbol} onChange={(e) => setSymbol(e.target.value.toUpperCase())} placeholder="NVDA"
-                className="font-mono bg-black/50 border-border" onKeyDown={(e) => e.key === "Enter" && analyze()} />
+                className="font-mono bg-muted/50 border-border" onKeyDown={(e) => e.key === "Enter" && analyze()} />
             </div>
             <Button onClick={() => analyze()} disabled={loading} className="h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-6">
               {loading ? <Activity className="w-4 h-4 animate-spin" /> : <><Zap className="w-4 h-4 mr-1" /> Analyze</>}

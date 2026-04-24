@@ -181,7 +181,7 @@ export function CommitmentEscalationFlow() {
                       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border text-left transition-all ${
                         selected
                           ? "border-[#00D4FF]/40 bg-[#00D4FF]/8"
-                          : "border-border bg-muted/30 hover:border-white/15"
+                          : "border-border bg-muted/30 hover:border-border"
                       }`}
                     >
                       <span className={`flex-shrink-0 ${selected ? "text-[#00D4FF]" : "text-muted-foreground/50"}`}>{goal.icon}</span>
@@ -242,7 +242,7 @@ export function CommitmentEscalationFlow() {
                           ? "border-[#FFB800]/40 bg-[#FFB800]/8"
                           : disabled
                             ? "border-border bg-muted/30 opacity-40"
-                            : "border-border bg-muted/30 hover:border-white/15"
+                            : "border-border bg-muted/30 hover:border-border"
                       }`}
                     >
                       <span className={`flex-shrink-0 ${selected ? "text-[#FFB800]" : "text-muted-foreground/50"}`}>{goal.icon}</span>
@@ -304,7 +304,7 @@ export function CommitmentEscalationFlow() {
             <div
               key={i}
               className="h-0.5 flex-1 rounded-full transition-all duration-300"
-              style={{ background: i <= step ? "#00D4FF" : "rgba(255,255,255,0.1)" }}
+              style={{ background: i <= step ? "#00D4FF" : "hsl(var(--border))" }}
             />
           ))}
         </div>
